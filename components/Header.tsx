@@ -716,29 +716,41 @@ const Header: React.FC<HeaderProps> = ({ gameData, onImportGame }) => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const result = e.target?.result;
-          if (typeof result === 'string') {
-            const importedData = JSON.parse(result);
-            // Basic validation for new (English) and old (Portuguese) formats
+    // @ts-ignore
+    const JSZip = window.JSZip;
+
+    if (file && JSZip) {
+      try {
+        const zip = new JSZip();
+        const contents = await zip.loadAsync(file);
+        const dataJsonFile = contents.file("data.json");
+
+        if (dataJsonFile) {
+          const jsonString = await dataJsonFile.async("string");
+          try {
+            const importedData = JSON.parse(jsonString);
             if ((importedData.scenes && importedData.startScene) || (importedData.cenas && importedData.cena_inicial)) {
               onImportGame(importedData);
             } else {
-              alert("Invalid game data file. Missing scene data.");
+              alert("Arquivo de dados do jogo inválido. Faltam dados de cena.");
             }
+          } catch (jsonError) {
+            console.error("Error parsing data.json:", jsonError);
+            alert("Não foi possível analisar o arquivo data.json. Verifique se ele é um JSON válido.");
           }
-        } catch (error) {
-          console.error("Error importing game:", error);
-          alert("Could not parse the game data file. Make sure it's a valid JSON file.");
+        } else {
+          alert("O arquivo data.json não foi encontrado no .zip. Por favor, importe um arquivo .zip exportado deste editor.");
         }
-      };
-      reader.readAsText(file);
+      } catch (zipError) {
+        console.error("Error importing game from zip:", zipError);
+        alert("Ocorreu um erro ao ler o arquivo .zip.");
+      }
+    } else if (!JSZip) {
+        alert('A biblioteca JSZip não está carregada. Não é possível importar.');
     }
+    
     // Reset file input
     if(event.target) event.target.value = '';
   };
@@ -749,20 +761,20 @@ const Header: React.FC<HeaderProps> = ({ gameData, onImportGame }) => {
         <h1 className="text-xl font-bold text-brand-text">IF Builder</h1>
       </div>
       <div className="flex items-center gap-2">
-        <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".json,application/json" className="hidden" />
-        <button
-          onClick={handleImportClick}
-          className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200"
-        >
-          <DocumentArrowUpIcon className="w-5 h-5 mr-2" />
-          Importar (.json)
-        </button>
+        <input type="file" ref={fileInputRef} onChange={handleFileChange} accept=".zip,application/zip" className="hidden" />
         <button
           onClick={handlePreview}
           className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200"
         >
           <EyeIcon className="w-5 h-5 mr-2" />
           Visualizar
+        </button>
+        <button
+          onClick={handleImportClick}
+          className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200"
+        >
+          <DocumentArrowUpIcon className="w-5 h-5 mr-2" />
+          Importar (.zip)
         </button>
         <button
           onClick={handleExport}
