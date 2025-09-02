@@ -8,17 +8,28 @@ interface UIEditorProps {
   layoutOrientation: 'vertical' | 'horizontal';
   layoutOrder: 'image-first' | 'image-last';
   actionButtonColor: string;
+  actionButtonText: string;
+  commandInputPlaceholder: string;
+  diaryPlayerName: string;
+  focusColor: string;
   onUpdate: (field: keyof GameData, value: any) => void;
 }
 
 const UIEditor: React.FC<UIEditorProps> = (props) => {
-  const { html, css, layoutOrientation, layoutOrder, actionButtonColor, onUpdate } = props;
+  const { 
+      html, css, layoutOrientation, layoutOrder, actionButtonColor, 
+      actionButtonText, commandInputPlaceholder, diaryPlayerName, focusColor, onUpdate 
+  } = props;
 
   const [localHtml, setLocalHtml] = useState(html);
   const [localCss, setLocalCss] = useState(css);
   const [localLayoutOrientation, setLocalLayoutOrientation] = useState(layoutOrientation);
   const [localLayoutOrder, setLocalLayoutOrder] = useState(layoutOrder);
   const [localActionButtonColor, setLocalActionButtonColor] = useState(actionButtonColor);
+  const [localActionButtonText, setLocalActionButtonText] = useState(actionButtonText);
+  const [localCommandInputPlaceholder, setLocalCommandInputPlaceholder] = useState(commandInputPlaceholder);
+  const [localDiaryPlayerName, setLocalDiaryPlayerName] = useState(diaryPlayerName);
+  const [localFocusColor, setLocalFocusColor] = useState(focusColor);
   const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
@@ -27,17 +38,25 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalLayoutOrientation(layoutOrientation);
     setLocalLayoutOrder(layoutOrder);
     setLocalActionButtonColor(actionButtonColor);
+    setLocalActionButtonText(actionButtonText);
+    setLocalCommandInputPlaceholder(commandInputPlaceholder);
+    setLocalDiaryPlayerName(diaryPlayerName);
+    setLocalFocusColor(focusColor);
     setIsDirty(false);
-  }, [html, css, layoutOrientation, layoutOrder, actionButtonColor]);
+  }, [html, css, layoutOrientation, layoutOrder, actionButtonColor, actionButtonText, commandInputPlaceholder, diaryPlayerName, focusColor]);
 
   useEffect(() => {
     const dirty = localHtml !== html ||
                   localCss !== css ||
                   localLayoutOrientation !== layoutOrientation ||
                   localLayoutOrder !== layoutOrder ||
-                  localActionButtonColor !== actionButtonColor;
+                  localActionButtonColor !== actionButtonColor ||
+                  localActionButtonText !== actionButtonText ||
+                  localCommandInputPlaceholder !== commandInputPlaceholder ||
+                  localDiaryPlayerName !== diaryPlayerName ||
+                  localFocusColor !== focusColor;
     setIsDirty(dirty);
-  }, [localHtml, localCss, localLayoutOrientation, localLayoutOrder, localActionButtonColor, html, css, layoutOrientation, layoutOrder, actionButtonColor]);
+  }, [localHtml, localCss, localLayoutOrientation, localLayoutOrder, localActionButtonColor, localActionButtonText, localCommandInputPlaceholder, localDiaryPlayerName, localFocusColor, props]);
 
   const handleSave = () => {
     if (localHtml !== html) onUpdate('gameHTML', localHtml);
@@ -45,6 +64,10 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localLayoutOrientation !== layoutOrientation) onUpdate('gameLayoutOrientation', localLayoutOrientation);
     if (localLayoutOrder !== layoutOrder) onUpdate('gameLayoutOrder', localLayoutOrder);
     if (localActionButtonColor !== actionButtonColor) onUpdate('gameActionButtonColor', localActionButtonColor);
+    if (localActionButtonText !== actionButtonText) onUpdate('gameActionButtonText', localActionButtonText);
+    if (localCommandInputPlaceholder !== commandInputPlaceholder) onUpdate('gameCommandInputPlaceholder', localCommandInputPlaceholder);
+    if (localDiaryPlayerName !== diaryPlayerName) onUpdate('gameDiaryPlayerName', localDiaryPlayerName);
+    if (localFocusColor !== focusColor) onUpdate('gameFocusColor', localFocusColor);
   };
   
   const handleUndo = () => {
@@ -53,6 +76,10 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalLayoutOrientation(layoutOrientation);
     setLocalLayoutOrder(layoutOrder);
     setLocalActionButtonColor(actionButtonColor);
+    setLocalActionButtonText(actionButtonText);
+    setLocalCommandInputPlaceholder(commandInputPlaceholder);
+    setLocalDiaryPlayerName(diaryPlayerName);
+    setLocalFocusColor(focusColor);
   };
 
   return (
@@ -94,35 +121,92 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                     className={`w-full max-w-sm aspect-video bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
                     style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
                 >
-                    <div className={`flex-1 bg-brand-border/50 rounded flex items-center justify-center text-center text-sm p-2 text-brand-text-dim ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'}`}>
-                        Painel de Imagem
+                    <div className={`flex-1 bg-green-500/30 border border-green-400 rounded flex items-center justify-center text-center text-sm p-2 text-green-200 font-semibold ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'}`}>
+                        Imagem
                     </div>
-                    <div className={`flex-1 bg-brand-surface rounded flex items-center justify-center text-center text-sm p-2 text-brand-text-dim ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'}`}>
-                        Painel de Descrição
+                    <div className={`flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'}`}>
+                        Descrição
                     </div>
                 </div>
             </div>
         </div>
       </CollapsibleCard>
 
+      <CollapsibleCard title="Textos da Interface" startOpen={true}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <div>
+                <label htmlFor="actionButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Ação</label>
+                <input
+                    type="text"
+                    id="actionButtonText"
+                    value={localActionButtonText}
+                    onChange={(e) => setLocalActionButtonText(e.target.value)}
+                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
+                />
+            </div>
+             <div>
+                <label htmlFor="commandInputPlaceholder" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Campo de Comando</label>
+                <input
+                    type="text"
+                    id="commandInputPlaceholder"
+                    value={localCommandInputPlaceholder}
+                    onChange={(e) => setLocalCommandInputPlaceholder(e.target.value)}
+                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
+                />
+            </div>
+            <div>
+                <label htmlFor="diaryPlayerName" className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Jogador no Diário</label>
+                <input
+                    type="text"
+                    id="diaryPlayerName"
+                    value={localDiaryPlayerName}
+                    onChange={(e) => setLocalDiaryPlayerName(e.target.value)}
+                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
+                />
+            </div>
+        </div>
+      </CollapsibleCard>
+
+
       <CollapsibleCard title="Cores" startOpen={true}>
-        <div>
-            <label htmlFor="actionButtonColor" className="block text-sm font-medium text-brand-text-dim mb-1">Cor do Botão de Ação</label>
-            <div className="flex items-center gap-2 p-1 bg-brand-bg border border-brand-border rounded-md max-w-xs">
-                <input 
-                    type="color" 
-                    id="actionButtonColor" 
-                    value={localActionButtonColor} 
-                    onChange={(e) => setLocalActionButtonColor(e.target.value)} 
-                    className="w-8 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
-                />
-                <input 
-                    type="text" 
-                    value={localActionButtonColor} 
-                    onChange={(e) => setLocalActionButtonColor(e.target.value)} 
-                    className="w-full bg-transparent font-mono text-sm focus:outline-none" 
-                    placeholder="#ffffff"
-                />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <div>
+                <label htmlFor="actionButtonColor" className="block text-sm font-medium text-brand-text-dim mb-1">Cor do Botão de Ação</label>
+                <div className="flex items-center gap-2 p-1 bg-brand-bg border border-brand-border rounded-md max-w-xs">
+                    <input 
+                        type="color" 
+                        id="actionButtonColor" 
+                        value={localActionButtonColor} 
+                        onChange={(e) => setLocalActionButtonColor(e.target.value)} 
+                        className="w-8 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
+                    />
+                    <input 
+                        type="text" 
+                        value={localActionButtonColor} 
+                        onChange={(e) => setLocalActionButtonColor(e.target.value)} 
+                        className="w-full bg-transparent font-mono text-sm focus:outline-none" 
+                        placeholder="#ffffff"
+                    />
+                </div>
+            </div>
+             <div>
+                <label htmlFor="focusColor" className="block text-sm font-medium text-brand-text-dim mb-1">Cor do Destaque de Foco</label>
+                <div className="flex items-center gap-2 p-1 bg-brand-bg border border-brand-border rounded-md max-w-xs">
+                    <input 
+                        type="color" 
+                        id="focusColor" 
+                        value={localFocusColor} 
+                        onChange={(e) => setLocalFocusColor(e.target.value)} 
+                        className="w-8 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
+                    />
+                    <input 
+                        type="text" 
+                        value={localFocusColor} 
+                        onChange={(e) => setLocalFocusColor(e.target.value)} 
+                        className="w-full bg-transparent font-mono text-sm focus:outline-none" 
+                        placeholder="#58a6ff"
+                    />
+                </div>
             </div>
         </div>
       </CollapsibleCard>

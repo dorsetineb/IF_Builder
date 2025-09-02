@@ -60,8 +60,8 @@ const gameHTML = `
                         <button id="diary-button">Diário</button>
                     </div>
                     <div class="input-area">
-                        <input type="text" id="command-input" placeholder="O QUE VOCÊ FAZ?">
-                        <button id="submit-command">AÇÃO</button>
+                        <input type="text" id="command-input" placeholder="__COMMAND_INPUT_PLACEHOLDER__">
+                        <button id="submit-command">__ACTION_BUTTON_TEXT__</button>
                     </div>
                 </div>
             </div>
@@ -88,6 +88,7 @@ const gameCSS = `
     --text-color: #c9d1d9;
     --text-dim-color: #8b949e;
     --accent-color: #58a6ff;
+    --focus-color: #58a6ff;
     --danger-color: #f85149;
     --danger-hover-bg: #da3633;
     --font-family: 'Silkscreen', sans-serif;
@@ -354,7 +355,7 @@ body {
 }
 #command-input:focus {
     outline: none;
-    border-color: var(--accent-color);
+    border-color: var(--focus-color);
 }
 #command-input:disabled {
     background-color: #21262d;
@@ -379,6 +380,18 @@ body {
 }
 #submit-command:disabled:hover {
     background-color: #30363d;
+}
+
+/* Focus styles for accessibility */
+.action-buttons button:focus-visible, 
+#submit-command:focus-visible,
+#splash-start-button:focus-visible, 
+.header-buttons button:focus-visible,
+.action-popup-list button:focus-visible,
+.modal-close-button:focus-visible {
+    outline: 2px solid var(--focus-color);
+    outline-offset: 2px;
+    -moz-outline-radius: 4px; /* For Firefox */
 }
 
 /* Diary Modal */
@@ -554,6 +567,10 @@ const initialGameData: GameData = {
   gameLayoutOrientation: 'vertical',
   gameLayoutOrder: 'image-first',
   gameActionButtonColor: '#ffffff',
+  gameActionButtonText: 'AÇÃO',
+  gameCommandInputPlaceholder: 'O QUE VOCÊ FAZ?',
+  gameDiaryPlayerName: 'VOCÊ',
+  gameFocusColor: '#58a6ff',
 };
 
 const App: React.FC = () => {
@@ -734,6 +751,10 @@ const App: React.FC = () => {
                     layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
                     layoutOrder={gameData.gameLayoutOrder || 'image-first'}
                     actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
+                    actionButtonText={gameData.gameActionButtonText || 'AÇÃO'}
+                    commandInputPlaceholder={gameData.gameCommandInputPlaceholder || 'O QUE VOCÊ FAZ?'}
+                    diaryPlayerName={gameData.gameDiaryPlayerName || 'VOCÊ'}
+                    focusColor={gameData.gameFocusColor || '#58a6ff'}
                     onUpdate={handleUpdateGameData}
                 />;
       case 'game_info':

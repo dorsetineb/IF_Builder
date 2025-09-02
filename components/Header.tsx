@@ -443,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (entry.data.command) {
                         const commandEcho = document.createElement('p');
                         commandEcho.className = 'command-echo';
-                        commandEcho.textContent = 'VOCÊ: ' + entry.data.command;
+                        commandEcho.textContent = (gameData.nome_jogador_diario || 'VOCÊ') + ': ' + entry.data.command;
                         textContainer.appendChild(commandEcho);
                     }
                     if (entry.data.response) {
@@ -652,9 +652,13 @@ const getProcessedHtmlAndCss = (data: GameData) => {
     html = html.replace('__LOGO_IMG_TAG__', headerLogoTag);
     html = html.replace('__HEADER_TITLE_H1_TAG__', headerTitleTag);
 
+    html = html.replace('__ACTION_BUTTON_TEXT__', data.gameActionButtonText || 'AÇÃO');
+    html = html.replace('__COMMAND_INPUT_PLACEHOLDER__', data.gameCommandInputPlaceholder || 'O QUE VOCÊ FAZ?');
+
     // --- Replace CSS Variables ---
     if (data.gameTextColor) css = css.replace(/--text-color: .*;/, `--text-color: ${data.gameTextColor};`);
     if (data.gameTitleColor) css = css.replace(/--accent-color: .*;/, `--accent-color: ${data.gameTitleColor};`);
+    if (data.gameFocusColor) css = css.replace(/--focus-color: .*;/, `--focus-color: ${data.gameFocusColor};`);
     if (data.gameSplashContentAlignment) {
         const hAlign = data.gameSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end';
         const textAlign = data.gameSplashContentAlignment === 'left' ? 'left' : 'right';
@@ -736,6 +740,7 @@ const Header: React.FC<HeaderProps> = ({ gameData, onImportGame }) => {
         cena_inicial: data.startScene,
         cenas: translatedScenes,
         mensagem_falha_padrao: data.defaultFailureMessage,
+        nome_jogador_diario: data.gameDiaryPlayerName,
     };
   };
 

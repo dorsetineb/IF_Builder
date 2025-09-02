@@ -64,6 +64,10 @@ export interface GameData {
   gameLayoutOrientation?: 'vertical' | 'horizontal';
   gameLayoutOrder?: 'image-first' | 'image-last';
   gameActionButtonColor?: string;
+  gameActionButtonText?: string;
+  gameCommandInputPlaceholder?: string;
+  gameDiaryPlayerName?: string;
+  gameFocusColor?: string;
 }
 
 export type View = 'scenes' | 'interface' | 'game_info' | 'scene_map';
