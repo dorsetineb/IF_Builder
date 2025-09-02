@@ -61,18 +61,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateSce
       }
   };
   
-  const handleSoundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            if (event.target && typeof event.target.result === 'string') {
-                updateLocalScene('soundEffect', event.target.result);
-            }
-        };
-        reader.readAsDataURL(e.target.files[0]);
-    }
-  };
-
   const handleGenerateImage = async () => {
       if (!localScene.description) {
           alert("Por favor, escreva uma descrição para a cena antes de gerar uma imagem.");
@@ -155,22 +143,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateSce
                      <div className="relative flex-1">
                         <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary resize-y"/>
                      </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-brand-text-dim mb-2">Efeito Sonoro de Entrada</label>
-                  {localScene.soundEffect ? (
-                      <div className="flex items-center gap-2">
-                        <audio controls src={localScene.soundEffect} className="w-full"></audio>
-                        <button onClick={() => updateLocalScene('soundEffect', undefined)} className="p-2 text-brand-text-dim hover:text-red-500" title="Remover som">
-                            <TrashIcon className="w-5 h-5" />
-                        </button>
-                      </div>
-                  ) : (
-                    <label className="inline-flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer">
-                        <UploadIcon className="w-5 h-5 mr-2" /> Carregar Áudio
-                        <input type="file" accept="audio/*" onChange={handleSoundUpload} className="hidden" />
-                    </label>
-                  )}
                 </div>
             </div>
         </div>

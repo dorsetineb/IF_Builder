@@ -11,6 +11,7 @@ export interface Interaction {
   target: string; // name of object in scene, e.g., 'porta'
   requiresInInventory?: string; // name of object in inventory, e.g., 'chave'
   successMessage?: string;
+  soundEffect?: string; // base64 data URL for interaction sound
   // --- Outcomes ---
   consumesItem?: boolean; // if requiresInInventory is used, is it consumed?
   removesTargetFromScene?: boolean; // remove the target object from the scene
@@ -31,7 +32,6 @@ export interface Scene {
   id: string;
   name: string;
   image: string; // URL or base64 string
-  soundEffect?: string; // base64 data URL for entry sound
   description: string;
   objects: GameObject[];
   interactions: Interaction[];

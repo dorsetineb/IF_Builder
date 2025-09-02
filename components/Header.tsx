@@ -1,3 +1,4 @@
+
 import React, { useState, useRef } from 'react';
 import { GameData, Scene } from '../types';
 import { DownloadIcon } from './icons/DownloadIcon';
@@ -11,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const sceneImageElement = document.getElementById('scene-image');
     const commandInputElement = document.getElementById('command-input');
     const sceneSoundEffectElement = document.getElementById('scene-sound-effect');
+    const transitionOverlay = document.getElementById('transition-overlay');
     const splashScreen = document.getElementById('splash-screen');
     const startButton = document.getElementById('splash-start-button');
     const restartButton = document.getElementById('restart-button');
@@ -146,14 +148,41 @@ document.addEventListener('DOMContentLoaded', () => {
             renderNextParagraph();
         }
 
-        if (sceneSoundEffectElement && scene.soundEffect) {
-            sceneSoundEffectElement.src = scene.soundEffect;
-            sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
-        }
-
         if (!isStateLoad) {
             saveState();
         }
+    }
+
+    function performSceneChange(sceneId, soundEffectUrl) {
+        if (!transitionOverlay) {
+            // Fallback for older HTML or if element is missing
+            if (soundEffectUrl && sceneSoundEffectElement) {
+                sceneSoundEffectElement.src = soundEffectUrl;
+                sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
+            }
+            changeScene(sceneId);
+            return;
+        }
+
+        // Play sound as fade-out starts
+        if (soundEffectUrl && sceneSoundEffectElement) {
+            sceneSoundEffectElement.src = soundEffectUrl;
+            sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
+        }
+        
+        transitionOverlay.classList.add('active');
+
+        const transitionHandler = () => {
+            transitionOverlay.removeEventListener('transitionend', transitionHandler);
+            
+            changeScene(sceneId);
+            
+            // Use requestAnimationFrame to ensure DOM has updated before fading back in
+            requestAnimationFrame(() => {
+                transitionOverlay.classList.remove('active');
+            });
+        };
+        transitionOverlay.addEventListener('transitionend', transitionHandler, { once: true });
     }
     
     function processCommand() {
@@ -209,15 +238,25 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (interaction.newSceneDescription) {
                             currentState.scenesState[currentState.currentSceneId].description = interaction.newSceneDescription;
                         }
-                        saveState();
-
+                        
                         // Then process navigation/display changes
                         if (interaction.goToScene) {
-                            responseText = interaction.successMessage || \`Você vai para \${currentState.scenesState[interaction.goToScene].name}.\`;
-                            currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
-                            changeScene(interaction.goToScene);
+                            // The success message is NOT displayed. The new scene's description is the feedback.
+                            // We log the action, but with an empty response.
+                            currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: '', sceneId: currentState.currentSceneId } });
+                            saveState(); // Save state before initiating the change
+                            performSceneChange(interaction.goToScene, interaction.soundEffect);
                             return; // Exit
                         }
+
+                        // Play sound for non-scene-changing interactions
+                        if (interaction.soundEffect && sceneSoundEffectElement) {
+                            sceneSoundEffectElement.src = interaction.soundEffect;
+                            sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
+                        }
+                        
+                        saveState();
+
                         if (interaction.newSceneDescription) {
                             responseText = interaction.successMessage || 'A cena mudou.';
                             currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
@@ -303,8 +342,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initialization ---
     async function initGame(fromRestart = false) {
+        let isPreview = false;
         try {
             if (window.embeddedGameData) {
+                isPreview = true;
                 gameData = window.embeddedGameData;
             } else {
                 const response = await fetch('data.json');
@@ -325,7 +366,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            if (!fromRestart && loadState()) {
+            if (!fromRestart && !isPreview && loadState()) {
                 console.log("Game state loaded from save.");
                 // Render scene without adding a new diary entry
                 changeScene(currentState.currentSceneId, true);

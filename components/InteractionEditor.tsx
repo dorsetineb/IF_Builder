@@ -2,6 +2,7 @@ import React from 'react';
 import { Interaction, Scene, GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
 import { TrashIcon } from './icons/TrashIcon';
+import { UploadIcon } from './icons/UploadIcon';
 
 interface InteractionEditorProps {
   interactions: Interaction[];
@@ -66,6 +67,18 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = []
         }
 
         onUpdateInteractions(newInteractions);
+    };
+
+    const handleSoundUpload = (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target && typeof event.target.result === 'string') {
+                    handleInteractionChange(index, 'soundEffect', event.target.result);
+                }
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
     };
 
   const otherScenes = allScenes.filter(s => s.id !== currentSceneId);
@@ -193,6 +206,24 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = []
                       </div>
                     </div>
                 </div>
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-brand-border/50">
+                <label className="block text-sm font-medium text-brand-text-dim mb-2">Efeito Sonoro de Sucesso (opcional)</label>
+                {inter.soundEffect ? (
+                  <div className="flex items-center gap-2">
+                    <audio controls src={inter.soundEffect} className="w-full"></audio>
+                    <button onClick={() => handleInteractionChange(index, 'soundEffect', undefined)} className="p-2 text-brand-text-dim hover:text-red-500" title="Remover som">
+                        <TrashIcon className="w-5 h-5" />
+                    </button>
+                  </div>
+                ) : (
+                <label className="inline-flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer">
+                    <UploadIcon className="w-5 h-5 mr-2" /> Carregar Áudio
+                    <input type="file" accept="audio/*" onChange={(e) => handleSoundUpload(e, index)} className="hidden" />
+                </label>
+                )}
+                <p className="text-xs text-brand-text-dim mt-1">O som tocará quando a interação for bem-sucedida, especialmente durante a transição para uma nova cena.</p>
             </div>
           </div>
         ))}

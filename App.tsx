@@ -45,6 +45,7 @@ const gameHTML = `
         </header>
         <div class="game-container">
             <div class="image-panel">
+                <div id="transition-overlay" class="transition-overlay"></div>
                 <div id="image-container" class="image-container">
                   <img id="scene-image" src="" alt="Ilustração da cena">
                 </div>
@@ -119,6 +120,7 @@ body {
     flex-direction: column;
     box-shadow: 0 0 30px rgba(0,0,0,0.7);
     overflow: hidden;
+    position: relative;
 }
 
 
@@ -233,6 +235,7 @@ body {
     align-items: center;
     justify-content: center;
     background-color: #010409;
+    position: relative;
 }
 .image-container {
     width: 100%;
@@ -457,6 +460,24 @@ body {
     margin-top: 10px;
     color: var(--text-dim-color);
     font-style: italic;
+}
+
+/* Transition Overlay */
+.transition-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease-in-out;
+    z-index: 500;
+}
+.transition-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
 }
 `;
 
