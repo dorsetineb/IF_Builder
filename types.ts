@@ -61,6 +61,9 @@ export interface GameData {
   gameSplashButtonText?: string;
   gameSplashButtonColor?: string;
   gameSplashButtonHoverColor?: string;
+  gameLayoutOrientation?: 'vertical' | 'horizontal';
+  gameLayoutOrder?: 'image-first' | 'image-last';
+  gameActionButtonColor?: string;
 }
 
 export type View = 'scenes' | 'interface' | 'game_info' | 'scene_map';

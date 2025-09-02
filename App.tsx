@@ -551,6 +551,9 @@ const initialGameData: GameData = {
   gameSplashButtonText: "INICIAR AVENTURA",
   gameSplashButtonColor: "#2ea043",
   gameSplashButtonHoverColor: "#238636",
+  gameLayoutOrientation: 'vertical',
+  gameLayoutOrder: 'image-first',
+  gameActionButtonColor: '#ffffff',
 };
 
 const App: React.FC = () => {
@@ -727,8 +730,11 @@ const App: React.FC = () => {
       case 'interface':
         return <UIEditor 
                     html={gameData.gameHTML} 
-                    css={gameData.gameCSS} 
-                    onUpdate={(type, content) => handleUpdateGameData(type === 'html' ? 'gameHTML' : 'gameCSS', content)} 
+                    css={gameData.gameCSS}
+                    layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
+                    layoutOrder={gameData.gameLayoutOrder || 'image-first'}
+                    actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
+                    onUpdate={handleUpdateGameData}
                 />;
       case 'game_info':
         return <GameInfoEditor 

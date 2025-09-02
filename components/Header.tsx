@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { GameData, Scene } from '../types';
 import { DownloadIcon } from './icons/DownloadIcon';
@@ -583,6 +582,52 @@ interface HeaderProps {
   onImportGame: (gameData: GameData) => void;
 }
 
+const getContrastColor = (hex: string): string => {
+    if (!hex) return '#0d1117';
+    let cleanHex = hex.startsWith('#') ? hex.slice(1) : hex;
+    if (cleanHex.length === 3) {
+        cleanHex = cleanHex.split('').map(char => char + char).join('');
+    }
+    if (cleanHex.length !== 6) return '#0d1117'; // default to dark on invalid hex
+
+    const r = parseInt(cleanHex.substring(0, 2), 16);
+    const g = parseInt(cleanHex.substring(2, 4), 16);
+    const b = parseInt(cleanHex.substring(4, 6), 16);
+    const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000;
+    return (yiq >= 128) ? '#0d1117' : '#ffffff';
+};
+
+const adjustColor = (hex: string, percent: number): string => {
+    if (!hex) return '#e0e0e0';
+    let cleanHex = hex.startsWith('#') ? hex.slice(1) : hex;
+    if (cleanHex.length === 3) {
+        cleanHex = cleanHex.split('').map(char => char + char).join('');
+    }
+    if (cleanHex.length !== 6) return '#e0e0e0'; // default on invalid hex
+    
+    let R = parseInt(cleanHex.substring(0,2),16);
+    let G = parseInt(cleanHex.substring(2,4),16);
+    let B = parseInt(cleanHex.substring(4,6),16);
+
+    R = Math.floor(R * (100 + percent) / 100);
+    G = Math.floor(G * (100 + percent) / 100);
+    B = Math.floor(B * (100 + percent) / 100);
+
+    R = (R<255)?R:255;  
+    G = (G<255)?G:255;  
+    B = (B<255)?B:255;  
+
+    R = (R>0)?R:0;
+    G = (G>0)?G:0;
+    B = (B>0)?B:0;
+
+    const RR = ((R.toString(16).length==1)?"0"+R.toString(16):R.toString(16));
+    const GG = ((G.toString(16).length==1)?"0"+G.toString(16):G.toString(16));
+    const BB = ((B.toString(16).length==1)?"0"+B.toString(16):B.toString(16));
+
+    return "#"+RR+GG+BB;
+};
+
 const getProcessedHtmlAndCss = (data: GameData) => {
     let html = data.gameHTML;
     let css = data.gameCSS;
@@ -620,7 +665,51 @@ const getProcessedHtmlAndCss = (data: GameData) => {
     if (data.gameSplashButtonColor) css = css.replace(/--splash-button-bg: .*;/, `--splash-button-bg: ${data.gameSplashButtonColor};`);
     if (data.gameSplashButtonHoverColor) css = css.replace(/--splash-button-hover-bg: .*;/, `--splash-button-hover-bg: ${data.gameSplashButtonHoverColor};`);
 
-    return { html, css };
+    // --- Add Style Overrides at the end ---
+    let cssOverrides = '';
+
+    if (data.gameActionButtonColor) {
+        const textColor = getContrastColor(data.gameActionButtonColor);
+        const hoverColor = adjustColor(data.gameActionButtonColor, -12); // Darken by 12%
+        cssOverrides += `
+        #submit-command { 
+            background-color: ${data.gameActionButtonColor}; 
+            color: ${textColor};
+        }
+        #submit-command:hover { background-color: ${hoverColor}; }
+        `;
+    }
+
+    const orientation = data.gameLayoutOrientation || 'vertical';
+    const order = data.gameLayoutOrder || 'image-first';
+    
+    // Default is vertical, image-first. We only add overrides for other cases.
+    if (orientation === 'horizontal') {
+        // Horizontal layout base
+        cssOverrides += `
+        .game-container { flex-direction: column; }
+        .image-panel { flex: 1 1 50%; max-width: none; border-right: none; border-bottom: 2px solid var(--border-color); }
+        .text-panel { flex: 1 1 50%; }
+        `;
+
+        if (order === 'image-last') {
+            // Horizontal, image on bottom
+            cssOverrides += `
+            .game-container { flex-direction: column-reverse; }
+            .image-panel { border-bottom: none; border-top: 2px solid var(--border-color); }
+            `;
+        }
+    } else { // vertical
+        if (order === 'image-last') {
+            // Vertical, image on right
+            cssOverrides += `
+            .game-container { flex-direction: row-reverse; }
+            .image-panel { border-right: none; border-left: 2px solid var(--border-color); }
+            `;
+        }
+    }
+    
+    return { html, css: css + cssOverrides };
 };
 
 
