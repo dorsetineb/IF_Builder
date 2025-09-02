@@ -16,7 +16,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const restartButton = document.getElementById('restart-button');
     const submitCommandButton = document.getElementById('submit-command');
     const inventoryButton = document.getElementById('inventory-button');
+    const suggestionsButton = document.getElementById('suggestions-button');
+    const diaryButton = document.getElementById('diary-button');
     const actionPopup = document.getElementById('action-popup');
+    const diaryModal = document.getElementById('diary-modal');
+    const diaryLogElement = document.getElementById('diary-log');
+    const diaryModalCloseButton = diaryModal ? diaryModal.querySelector('.modal-close-button') : null;
+
 
     // --- State Variables ---
     let gameData = null;
@@ -34,11 +40,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Game Logic ---
     function saveState() {
-        // In a full game, this would save progress. Not implemented for preview.
+        try {
+            localStorage.setItem(SAVE_KEY, JSON.stringify(currentState));
+        } catch (e) {
+            console.warn("Could not save game state to localStorage:", e);
+        }
     }
 
     function loadState() {
-        // In a full game, this would load progress. Not implemented for preview.
+        try {
+            const savedData = localStorage.getItem(SAVE_KEY);
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                // Basic validation to ensure it's not totally broken
+                if (parsedData.currentSceneId && parsedData.scenesState) {
+                    currentState = parsedData;
+                    return true;
+                }
+            }
+        } catch (e) {
+            console.warn("Could not load game state from localStorage:", e);
+            localStorage.removeItem(SAVE_KEY);
+        }
         return false;
     }
 
@@ -53,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const paragraphText = currentSceneParagraphs[currentParagraphIndex];
         const p = document.createElement('p');
-        p.textContent = paragraphText;
+        p.innerHTML = paragraphText.replace(/\\*\\*(.*?)\\*\\*/g, '<span class="highlight-item">$1</span>');
         sceneDescriptionElement.appendChild(p);
         sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
 
@@ -91,6 +114,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         currentState.currentSceneId = sceneId;
+        const rawDescription = scene.description ? String(scene.description).trim() : '';
+        currentSceneParagraphs = rawDescription.split('\\n').filter(p => p.trim() !== '');
+        currentParagraphIndex = 0;
+
+        // Add entry to diary log
+        const newLogEntry = {
+            sceneId: sceneId,
+            sceneName: scene.name,
+            sceneImage: scene.image,
+            fullDescription: rawDescription,
+            triggeringCommand: command,
+            transitionMessage: transitionMessage,
+        };
+        currentState.diaryLog.push(newLogEntry);
 
         if (sceneImageElement && scene.image) {
             sceneImageElement.src = scene.image;
@@ -114,10 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 sceneDescriptionElement.appendChild(transitionP);
                 sceneDescriptionElement.appendChild(document.createElement('br'));
             }
-            
-            const rawDescription = scene.description ? String(scene.description).trim() : '';
-            currentSceneParagraphs = rawDescription.split('\\n').filter(p => p.trim() !== '');
-            currentParagraphIndex = 0;
             
             // Disable input until description is fully displayed
             if (commandInputElement) commandInputElement.disabled = true;
@@ -284,7 +317,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!fromRestart && loadState()) {
                 console.log("Game state loaded from save.");
-                changeScene(currentState.currentSceneId); // Render loaded scene
+                const lastLog = currentState.diaryLog[currentState.diaryLog.length - 1];
+                changeScene(currentState.currentSceneId, lastLog.triggeringCommand, lastLog.transitionMessage);
             } else {
                 console.log("Starting new game.");
                 currentState.currentSceneId = gameData.cena_inicial;
@@ -293,12 +327,58 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentState.scenesState = JSON.parse(JSON.stringify(originalScenes));
                 changeScene(currentState.currentSceneId); // Render initial scene
             }
-            saveState();
 
         } catch (error) {
             console.error('Error initializing game:', error);
             if(sceneDescriptionElement) sceneDescriptionElement.innerHTML = '<p style="color:red;">Error loading game data. Check console for details.</p>';
         }
+    }
+    
+    function renderDiary() {
+        if (!diaryLogElement) return;
+        diaryLogElement.innerHTML = '';
+        if (currentState.diaryLog.length === 0) {
+            diaryLogElement.innerHTML = '<p>O diário está vazio.</p>';
+            return;
+        }
+
+        currentState.diaryLog.forEach(entry => {
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'diary-entry';
+
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'image-container';
+            const img = document.createElement('img');
+            img.src = entry.sceneImage || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+            imageContainer.appendChild(img);
+
+            const textContainer = document.createElement('div');
+            textContainer.className = 'text-container';
+            const sceneNameSpan = document.createElement('span');
+            sceneNameSpan.className = 'scene-name';
+            sceneNameSpan.textContent = entry.sceneName;
+            textContainer.appendChild(sceneNameSpan);
+
+            if (entry.triggeringCommand) {
+                const commandEcho = document.createElement('p');
+                commandEcho.className = 'command-echo';
+                commandEcho.textContent = '> ' + entry.triggeringCommand;
+                textContainer.appendChild(commandEcho);
+            }
+            if (entry.transitionMessage) {
+                const transitionP = document.createElement('p');
+                transitionP.textContent = entry.transitionMessage;
+                textContainer.appendChild(transitionP);
+            }
+            
+            const descriptionP = document.createElement('p');
+            descriptionP.textContent = entry.fullDescription;
+            textContainer.appendChild(descriptionP);
+
+            entryDiv.appendChild(imageContainer);
+            entryDiv.appendChild(textContainer);
+            diaryLogElement.appendChild(entryDiv);
+        });
     }
 
     // --- Event Listeners & Startup ---
@@ -318,7 +398,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(restartButton) {
         restartButton.addEventListener('click', () => {
             if (confirm('Tem certeza que quer reiniciar a aventura? Todo o progresso será perdido.')) {
-                // localStorage.removeItem(SAVE_KEY); // Saving is disabled for preview
+                localStorage.removeItem(SAVE_KEY);
                 initGame(true);
             }
         });
@@ -338,7 +418,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (inventoryButton) {
         inventoryButton.addEventListener('click', () => {
-            if (actionPopup.classList.contains('hidden') || !actionPopup.dataset.content || actionPopup.dataset.content !== 'inventory') {
+            if (actionPopup.classList.contains('hidden') || actionPopup.dataset.content !== 'inventory') {
                 actionPopup.innerHTML = '';
                 actionPopup.dataset.content = 'inventory';
 
@@ -367,6 +447,58 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    if (suggestionsButton) {
+        suggestionsButton.addEventListener('click', () => {
+             if (actionPopup.classList.contains('hidden') || actionPopup.dataset.content !== 'suggestions') {
+                actionPopup.innerHTML = '';
+                actionPopup.dataset.content = 'suggestions';
+                const list = document.createElement('div');
+                list.className = 'action-popup-list';
+                const commonVerbs = ['olhar', 'examinar', 'pegar', 'usar', 'ir', 'mover', 'empurrar', 'puxar', 'abrir', 'fechar'];
+                commonVerbs.forEach(verb => {
+                    const btn = document.createElement('button');
+                    btn.textContent = verb;
+                    btn.onclick = () => {
+                        if(commandInputElement) {
+                            commandInputElement.value = verb + ' ';
+                            commandInputElement.focus();
+                        }
+                        actionPopup.classList.add('hidden');
+                        actionPopup.dataset.content = '';
+                    };
+                    list.appendChild(btn);
+                });
+                actionPopup.appendChild(list);
+                actionPopup.classList.remove('hidden');
+            } else {
+                actionPopup.classList.add('hidden');
+                actionPopup.dataset.content = '';
+            }
+        });
+    }
+    
+    if (diaryButton) {
+        diaryButton.addEventListener('click', () => {
+            renderDiary();
+            diaryModal.classList.remove('hidden');
+        });
+    }
+
+    if (diaryModalCloseButton) {
+        diaryModalCloseButton.addEventListener('click', () => {
+            diaryModal.classList.add('hidden');
+        });
+    }
+    
+    if (diaryModal) {
+        diaryModal.addEventListener('click', (e) => {
+            if (e.target === diaryModal) {
+                 diaryModal.classList.add('hidden');
+            }
+        });
+    }
+
 });
 `;
 

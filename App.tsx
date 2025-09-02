@@ -461,8 +461,8 @@ body {
 `;
 
 const initialScenes: { [id: string]: Scene } = {
-    "start_cell": {
-      id: "start_cell",
+    "001_cela": {
+      id: "001_cela",
       name: "Cela Inicial",
       image: "https://images.unsplash.com/photo-1593345479634-f626a2f13765?w=1080&h=1920&fit=crop&q=80",
       description: "Sua cabeça dói. Você não sabe seu nome, nem onde está.\nVocê está em uma cela pequena e escura. O chão é de pedra fria e úmida. O ar cheira a mofo e terra. Há uma porta de madeira reforçada na sua frente.",
@@ -478,7 +478,7 @@ const initialScenes: { [id: string]: Scene } = {
               target: 'pedra',
               successMessage: 'Com um rangido, você move a pedra, revelando uma passagem escura.',
               removesTargetFromScene: true,
-              goToScene: 'corridor'
+              goToScene: '002_corredor'
           },
           {
               id: 'inter_door_key',
@@ -487,12 +487,12 @@ const initialScenes: { [id: string]: Scene } = {
               requiresInInventory: 'iron_key',
               successMessage: 'Você usa a chave de ferro na fechadura. Com um clique alto, a porta se destranca e se abre, revelando um corredor escuro.',
               removesTargetFromScene: true,
-              goToScene: 'corridor'
+              goToScene: '002_corredor'
           }
       ]
     },
-    "corridor": {
-      id: "corridor",
+    "002_corredor": {
+      id: "002_corredor",
       name: "Corredor",
       image: "https://images.unsplash.com/photo-1615418167098-917321553c07?w=1080&h=1920&fit=crop&q=80",
       description: "Você está em um corredor escuro e úmido. O ar é pesado e cheira a mofo. A única luz vem da cela atrás de você.",
@@ -503,14 +503,14 @@ const initialScenes: { [id: string]: Scene } = {
               verbs: ['ir', 'voltar', 'mover'],
               target: 'cela',
               successMessage: 'Você volta para a cela.',
-              goToScene: 'start_cell'
+              goToScene: '001_cela'
           }
       ]
     }
 };
 
 const initialGameData: GameData = {
-  startScene: "start_cell",
+  startScene: "001_cela",
   scenes: initialScenes,
   sceneOrder: Object.keys(initialScenes),
   defaultFailureMessage: "Isso não parece ter nenhum efeito.",
@@ -534,7 +534,7 @@ const initialGameData: GameData = {
 
 const App: React.FC = () => {
   const [gameData, setGameData] = useState<GameData>(initialGameData);
-  const [selectedSceneId, setSelectedSceneId] = useState<string | null>('start_cell');
+  const [selectedSceneId, setSelectedSceneId] = useState<string | null>('001_cela');
   const [currentView, setCurrentView] = useState<View>('scenes');
 
   const handleImportGame = useCallback((dataToImport: any) => {
@@ -569,7 +569,22 @@ const App: React.FC = () => {
   }, []);
 
   const handleAddScene = useCallback(() => {
-    const newSceneId = `new_scene_${Date.now()}`;
+    const sceneIds = Object.keys(gameData.scenes);
+    let maxId = 0;
+    sceneIds.forEach(id => {
+        const match = id.match(/^(\d{3})_/);
+        if (match) {
+            const num = parseInt(match[1], 10);
+            if (num > maxId) {
+                maxId = num;
+            }
+        }
+    });
+
+    const newIdNumber = maxId + 1;
+    const paddedId = String(newIdNumber).padStart(3, '0');
+    const newSceneId = `${paddedId}_nova_cena`;
+
     const newScene: Scene = {
       id: newSceneId,
       name: "Nova Cena",
@@ -585,7 +600,7 @@ const App: React.FC = () => {
     }));
     setSelectedSceneId(newSceneId);
     setCurrentView('scenes');
-  }, []);
+  }, [gameData.scenes]);
 
   const handleUpdateScene = useCallback((updatedScene: Scene) => {
     setGameData(prev => {
