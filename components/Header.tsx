@@ -223,7 +223,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Then process navigation/display changes
                         if (interaction.goToScene) {
-                            changeScene(interaction.goToScene, commandText, interaction.successMessage);
+                            // A mensagem de sucesso é omitida ao mudar de cena. A descrição da nova cena é o feedback.
+                            changeScene(interaction.goToScene, commandText, null);
                             return; // Exit
                         }
                         if (interaction.newSceneDescription) {

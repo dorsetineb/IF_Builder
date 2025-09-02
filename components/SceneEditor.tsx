@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Scene, GameObject } from '../types';
 import ObjectEditor from './ObjectEditor';
@@ -79,7 +80,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateSce
       }
       setIsGeneratingImage(true);
       try {
-          const prompt = `Desenho a lápis sobre papel, estilo de arte detalhado e atmosférico. A ilustração NÃO deve conter nenhum texto, margens ou molduras, preenchendo toda a área da imagem. A cena é: "${localScene.description}"`;
+          const prompt = `Pixel art no estilo de um jogo de computador dos anos 80 como Dungeon Master. Estética de fantasia sombria, 16-bit. A ilustração NÃO deve conter nenhum texto, margens ou molduras, preenchendo toda a área da imagem. A cena é: "${localScene.description}"`;
           const imageUrl = await generateSceneImage(prompt);
           updateLocalScene('image', imageUrl);
       } catch (error) {

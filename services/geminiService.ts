@@ -1,5 +1,5 @@
 
-import { GoogleGenAI } from "@google/genai";
+import { GoogleGenAI, Modality } from "@google/genai";
 
 // We won't initialize the client at the module level to prevent crashes on load
 // if the API key environment variable isn't set up correctly.
@@ -38,22 +38,26 @@ export const generateSceneDescription = async (prompt: string): Promise<string> 
 export const generateSceneImage = async (prompt: string): Promise<string> => {
     try {
         const client = getAiClient();
-        const response = await client.models.generateImages({
-            model: 'imagen-4.0-generate-001',
-            prompt: prompt,
+        const response = await client.models.generateContent({
+            model: 'gemini-2.5-flash-image-preview',
+            contents: {
+                parts: [{ text: prompt }],
+            },
             config: {
-              numberOfImages: 1,
-              outputMimeType: 'image/jpeg',
-              aspectRatio: '9:16',
+                responseModalities: [Modality.IMAGE, Modality.TEXT],
             },
         });
 
-        if (response.generatedImages && response.generatedImages.length > 0) {
-            const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;
-            return `data:image/jpeg;base64,${base64ImageBytes}`;
-        } else {
-            throw new Error("A API não retornou imagens.");
+        if (response.candidates && response.candidates.length > 0) {
+            const imagePart = response.candidates[0].content.parts.find(part => part.inlineData);
+            if (imagePart && imagePart.inlineData) {
+                const base64ImageBytes: string = imagePart.inlineData.data;
+                const mimeType = imagePart.inlineData.mimeType;
+                return `data:${mimeType};base64,${base64ImageBytes}`;
+            }
         }
+        throw new Error("A API não retornou uma imagem.");
+
     } catch (error) {
         console.error("Error generating scene image:", error);
         if (error instanceof Error) {
