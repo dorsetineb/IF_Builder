@@ -1,10 +1,8 @@
-
 import React, { useState, useCallback } from 'react';
 import { GameData, Scene, View, Interaction } from './types';
 import Sidebar from './components/Sidebar';
 import SceneEditor from './components/SceneEditor';
-// FIX: Changed import to a named import to resolve module resolution error.
-import { Header } from './components/Header';
+import Header from './components/Header';
 import { WelcomePlaceholder } from './components/WelcomePlaceholder';
 import UIEditor from './components/UIEditor';
 import GameInfoEditor from './components/GameInfoEditor';
@@ -371,6 +369,15 @@ body {
 }
 #submit-command:hover { background-color: #e0e0e0; }
 
+#submit-command:disabled {
+    background-color: #30363d;
+    color: var(--text-dim-color);
+    cursor: not-allowed;
+}
+#submit-command:disabled:hover {
+    background-color: #30363d;
+}
+
 /* Diary Modal */
 .hidden { display: none !important; }
 .modal-overlay {
@@ -454,15 +461,15 @@ body {
 `;
 
 const initialScenes: { [id: string]: Scene } = {
-    "cela_inicial": {
-      id: "cela_inicial",
+    "start_cell": {
+      id: "start_cell",
       name: "Cela Inicial",
       image: "https://images.unsplash.com/photo-1593345479634-f626a2f13765?w=1080&h=1920&fit=crop&q=80",
       description: "Sua cabeça dói. Você não sabe seu nome, nem onde está.\nVocê está em uma cela pequena e escura. O chão é de pedra fria e úmida. O ar cheira a mofo e terra. Há uma porta de madeira reforçada na sua frente.",
-      objetos: [
-        { id: "chave_ferro", name: "chave de ferro", examineDescription: "Uma chave de ferro pesada e enferrujada. Parece antiga.", isTakable: true },
-        { id: "pedra", name: "pedra", examineDescription: "Uma das pedras da parede parece estar solta. Talvez você consiga movê-la.", isTakable: false },
-        { id: "porta", name: "porta", examineDescription: "Uma porta de madeira reforçada com ferro. Parece trancada.", isTakable: false }
+      objects: [
+        { id: "iron_key", name: "chave de ferro", examineDescription: "Uma chave de ferro pesada e enferrujada. Parece antiga.", isTakable: true },
+        { id: "loose_stone", name: "pedra", examineDescription: "Uma das pedras da parede parece estar solta. Talvez você consiga movê-la.", isTakable: false },
+        { id: "cell_door", name: "porta", examineDescription: "Uma porta de madeira reforçada com ferro. Parece trancada.", isTakable: false }
       ],
       interactions: [
           {
@@ -471,42 +478,42 @@ const initialScenes: { [id: string]: Scene } = {
               target: 'pedra',
               successMessage: 'Com um rangido, você move a pedra, revelando uma passagem escura.',
               removesTargetFromScene: true,
-              goToScene: 'corredor'
+              goToScene: 'corridor'
           },
           {
-              id: 'inter_porta_chave',
+              id: 'inter_door_key',
               verbs: ['usar', 'abrir', 'destrancar'],
               target: 'porta',
-              requiresInInventory: 'chave_ferro',
+              requiresInInventory: 'iron_key',
               successMessage: 'Você usa a chave de ferro na fechadura. Com um clique alto, a porta se destranca e se abre, revelando um corredor escuro.',
               removesTargetFromScene: true,
-              goToScene: 'corredor'
+              goToScene: 'corridor'
           }
       ]
     },
-    "corredor": {
-      id: "corredor",
+    "corridor": {
+      id: "corridor",
       name: "Corredor",
       image: "https://images.unsplash.com/photo-1615418167098-917321553c07?w=1080&h=1920&fit=crop&q=80",
       description: "Você está em um corredor escuro e úmido. O ar é pesado e cheira a mofo. A única luz vem da cela atrás de você.",
-      objetos: [],
+      objects: [],
       interactions: [
           {
               id: 'inter_2',
               verbs: ['ir', 'voltar', 'mover'],
               target: 'cela',
               successMessage: 'Você volta para a cela.',
-              goToScene: 'cela_inicial'
+              goToScene: 'start_cell'
           }
       ]
     }
 };
 
 const initialGameData: GameData = {
-  cena_inicial: "cela_inicial",
-  cenas: initialScenes,
+  startScene: "start_cell",
+  scenes: initialScenes,
   sceneOrder: Object.keys(initialScenes),
-  mensagem_falha_padrao: "Isso não parece ter nenhum efeito.",
+  defaultFailureMessage: "Isso não parece ter nenhum efeito.",
   gameHTML: gameHTML,
   gameCSS: gameCSS,
   gameTitle: "Fuja da Masmorra",
@@ -527,44 +534,53 @@ const initialGameData: GameData = {
 
 const App: React.FC = () => {
   const [gameData, setGameData] = useState<GameData>(initialGameData);
-  const [selectedSceneId, setSelectedSceneId] = useState<string | null>('cela_inicial');
+  const [selectedSceneId, setSelectedSceneId] = useState<string | null>('start_cell');
   const [currentView, setCurrentView] = useState<View>('scenes');
 
-  const handleImportGame = useCallback((importedData: GameData) => {
-    // Migration for older file formats
-    if ((importedData as any).scenes && !importedData.cenas) {
-      importedData.cenas = (importedData as any).scenes;
-      delete (importedData as any).scenes;
-    }
-    if ((importedData as any).startScene && !importedData.cena_inicial) {
-        importedData.cena_inicial = (importedData as any).startScene;
-        delete (importedData as any).startScene;
-    }
-    Object.values(importedData.cenas).forEach((scene: any) => {
-        if (scene.objects && !scene.objetos) {
-            scene.objetos = scene.objects;
-            delete scene.objects;
-        }
-    });
+  const handleImportGame = useCallback((dataToImport: any) => {
+    // This function now handles migration from the Portuguese-keyed format
+    // to the editor's internal English-keyed format.
+    const importedData = { ...dataToImport }; // Create a mutable copy
 
-    setGameData(importedData);
-    setSelectedSceneId(importedData.cena_inicial);
+    if (importedData.cenas && !importedData.scenes) {
+      importedData.scenes = importedData.cenas;
+      delete importedData.cenas;
+    }
+    if (importedData.cena_inicial && !importedData.startScene) {
+        importedData.startScene = importedData.cena_inicial;
+        delete importedData.cena_inicial;
+    }
+    if (importedData.mensagem_falha_padrao && !importedData.defaultFailureMessage) {
+        importedData.defaultFailureMessage = importedData.mensagem_falha_padrao;
+        delete importedData.mensagem_falha_padrao;
+    }
+    if (importedData.scenes) {
+        Object.values(importedData.scenes).forEach((scene: any) => {
+            if (scene.objetos && !scene.objects) {
+                scene.objects = scene.objetos;
+                delete scene.objetos;
+            }
+        });
+    }
+
+    setGameData(prev => ({...prev, ...importedData}));
+    setSelectedSceneId(importedData.startScene || Object.keys(importedData.scenes)[0]);
     setCurrentView('scenes');
   }, []);
 
   const handleAddScene = useCallback(() => {
-    const newSceneId = `nova_cena_${Date.now()}`;
+    const newSceneId = `new_scene_${Date.now()}`;
     const newScene: Scene = {
       id: newSceneId,
       name: "Nova Cena",
       description: "Descreva esta nova cena...",
       image: `https://picsum.photos/seed/${newSceneId}/1080/1920`,
-      objetos: [],
+      objects: [],
       interactions: []
     };
     setGameData(prev => ({
       ...prev,
-      cenas: { ...prev.cenas, [newSceneId]: newScene },
+      scenes: { ...prev.scenes, [newSceneId]: newScene },
       sceneOrder: [...prev.sceneOrder, newSceneId],
     }));
     setSelectedSceneId(newSceneId);
@@ -573,7 +589,7 @@ const App: React.FC = () => {
 
   const handleUpdateScene = useCallback((updatedScene: Scene) => {
     setGameData(prev => {
-      const newScenes = { ...prev.cenas };
+      const newScenes = { ...prev.scenes };
       let newSceneOrder = prev.sceneOrder;
       const oldId = selectedSceneId!;
       
@@ -590,22 +606,22 @@ const App: React.FC = () => {
             });
         });
         
-        let newStartScene = prev.cena_inicial;
+        let newStartScene = prev.startScene;
         if (newStartScene === oldId) {
             newStartScene = updatedScene.id;
         }
         
         return {
             ...prev,
-            cenas: newScenes,
+            scenes: newScenes,
             sceneOrder: newSceneOrder,
-            cena_inicial: newStartScene,
+            startScene: newStartScene,
         };
       } else {
         newScenes[updatedScene.id] = updatedScene;
         return {
           ...prev,
-          cenas: newScenes,
+          scenes: newScenes,
         };
       }
     });
@@ -615,17 +631,17 @@ const App: React.FC = () => {
   }, [selectedSceneId]);
 
   const handleDeleteScene = useCallback((idToDelete: string) => {
-    if (Object.keys(gameData.cenas).length <= 1) {
+    if (Object.keys(gameData.scenes).length <= 1) {
         alert("Você não pode deletar a última cena.");
         return;
     }
-    if (gameData.cena_inicial === idToDelete) {
+    if (gameData.startScene === idToDelete) {
         alert("Você não pode deletar a cena inicial.");
         return;
     }
-    if (confirm(`Tem certeza que quer deletar a cena "${gameData.cenas[idToDelete].name}"?`)) {
+    if (confirm(`Tem certeza que quer deletar a cena "${gameData.scenes[idToDelete].name}"?`)) {
         setGameData(prev => {
-            const newScenes = { ...prev.cenas };
+            const newScenes = { ...prev.scenes };
             delete newScenes[idToDelete];
 
             // Remove links to the deleted scene
@@ -637,7 +653,7 @@ const App: React.FC = () => {
             
             return {
                 ...prev,
-                cenas: newScenes,
+                scenes: newScenes,
                 sceneOrder: newSceneOrder,
             };
         });
@@ -645,10 +661,10 @@ const App: React.FC = () => {
             setSelectedSceneId(gameData.sceneOrder.filter(id => id !== idToDelete)[0] || null);
         }
     }
-  }, [gameData.cenas, gameData.cena_inicial, gameData.sceneOrder, selectedSceneId]);
+  }, [gameData.scenes, gameData.startScene, gameData.sceneOrder, selectedSceneId]);
   
   const handleSetStartScene = useCallback((id: string) => {
-      setGameData(prev => ({ ...prev, cena_inicial: id }));
+      setGameData(prev => ({ ...prev, startScene: id }));
   }, []);
 
   const handleReorderScenes = useCallback((newOrder: string[]) => {
@@ -659,8 +675,8 @@ const App: React.FC = () => {
     setGameData(prev => ({ ...prev, [field]: value }));
   }, []);
 
-  const scenesInOrder = gameData.sceneOrder.map(id => gameData.cenas[id]).filter(Boolean);
-  const selectedScene = selectedSceneId ? gameData.cenas[selectedSceneId] : null;
+  const scenesInOrder = gameData.sceneOrder.map(id => gameData.scenes[id]).filter(Boolean);
+  const selectedScene = selectedSceneId ? gameData.scenes[selectedSceneId] : null;
 
   const renderCurrentView = () => {
     switch (currentView) {
@@ -699,8 +715,8 @@ const App: React.FC = () => {
       case 'scene_map':
         return <SceneMap 
                   scenes={scenesInOrder}
-                  allScenesMap={gameData.cenas}
-                  startSceneId={gameData.cena_inicial} 
+                  allScenesMap={gameData.scenes}
+                  startSceneId={gameData.startScene} 
                 />;
       default:
         return <WelcomePlaceholder />;
@@ -713,7 +729,7 @@ const App: React.FC = () => {
       <div className="flex flex-grow min-h-0">
         <Sidebar
           scenes={scenesInOrder}
-          startSceneId={gameData.cena_inicial}
+          startSceneId={gameData.startScene}
           selectedSceneId={selectedSceneId}
           currentView={currentView}
           onSelectScene={(id) => { setSelectedSceneId(id); setCurrentView('scenes'); }}

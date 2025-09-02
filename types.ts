@@ -33,17 +33,17 @@ export interface Scene {
   image: string; // URL or base64 string
   soundEffect?: string; // base64 data URL for entry sound
   description: string;
-  objetos: GameObject[];
+  objects: GameObject[];
   interactions: Interaction[];
   exits?: Exits;
 }
 
 export interface GameData {
-  cena_inicial: string;
-  cenas: {
+  startScene: string;
+  scenes: {
     [id: string]: Scene;
   };
-  mensagem_falha_padrao: string;
+  defaultFailureMessage: string;
   sceneOrder: string[];
   gameHTML: string;
   gameCSS: string;

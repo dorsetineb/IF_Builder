@@ -5,8 +5,7 @@ import { MinusIcon } from './icons/MinusIcon';
 
 interface SceneMapProps {
   scenes: Scene[];
-  // FIX: Corrected type to use 'cenas' from GameData interface instead of 'scenes'. This resolves all downstream type errors.
-  allScenesMap: GameData['cenas'];
+  allScenesMap: GameData['scenes'];
   startSceneId: string;
 }
 

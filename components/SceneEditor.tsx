@@ -177,8 +177,8 @@ const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateSce
 
       <CollapsibleCard title="Objetos">
         <ObjectEditor
-            objetos={localScene.objetos}
-            onUpdateObjetos={newObjects => updateLocalScene('objetos', newObjects)}
+            objects={localScene.objects || []}
+            onUpdateObjects={newObjects => updateLocalScene('objects', newObjects)}
         />
       </CollapsibleCard>
 
@@ -188,7 +188,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateSce
             onUpdateInteractions={newInteractions => updateLocalScene('interactions', newInteractions)}
             allScenes={allScenes}
             currentSceneId={localScene.id}
-            sceneObjetos={localScene.objetos}
+            sceneObjects={localScene.objects || []}
         />
       </CollapsibleCard>
 

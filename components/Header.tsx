@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { GameData } from '../types';
+import { GameData, Scene } from '../types';
 import { DownloadIcon } from './icons/DownloadIcon';
 import { EyeIcon } from './icons/EyeIcon';
 import { DocumentArrowUpIcon } from './icons/DocumentArrowUpIcon';
@@ -15,54 +15,77 @@ document.addEventListener('DOMContentLoaded', () => {
     const startButton = document.getElementById('splash-start-button');
     const restartButton = document.getElementById('restart-button');
     const submitCommandButton = document.getElementById('submit-command');
+    const inventoryButton = document.getElementById('inventory-button');
+    const actionPopup = document.getElementById('action-popup');
 
     // --- State Variables ---
     let gameData = null;
     let originalScenes = null;
-    const SAVE_KEY = 'textAdventureSaveData';
+    let allTakableObjects = {};
+    let currentSceneParagraphs = [];
+    let currentParagraphIndex = 0;
+    const SAVE_KEY = 'textAdventureSaveData_preview';
     let currentState = {
         currentSceneId: null,
-        inventory: [],
+        inventory: [], // stores item IDs
         diaryLog: [],
         scenesState: {},
     };
 
-    // --- Game Logic (Preview Implementation) ---
+    // --- Game Logic ---
     function saveState() {
         // In a full game, this would save progress. Not implemented for preview.
-        // try {
-        //     localStorage.setItem(SAVE_KEY, JSON.stringify(currentState));
-        // } catch (e) {
-        //     console.warn("Could not save game state.", e);
-        // }
     }
 
     function loadState() {
         // In a full game, this would load progress. Not implemented for preview.
-        // try {
-        //     const savedState = localStorage.getItem(SAVE_KEY);
-        //     if (savedState) {
-        //         const parsedState = JSON.parse(savedState);
-        //         // Basic validation
-        //         if (parsedState.currentSceneId && parsedState.scenesState) {
-        //             currentState = parsedState;
-        //             return true;
-        //         }
-        //     }
-        //     return false;
-        // } catch (e) {
-        //     console.warn("Could not load game state.", e);
-        //     return false;
-        // }
         return false;
     }
 
-    function changeScene(sceneId, command = null) {
+    function renderNextParagraph() {
+        if (!sceneDescriptionElement || currentParagraphIndex >= currentSceneParagraphs.length) {
+            // All paragraphs shown, enable input
+            if (commandInputElement) commandInputElement.disabled = false;
+            if (submitCommandButton) submitCommandButton.disabled = false;
+            if (commandInputElement) commandInputElement.focus();
+            return;
+        }
+
+        const paragraphText = currentSceneParagraphs[currentParagraphIndex];
+        const p = document.createElement('p');
+        p.textContent = paragraphText;
+        sceneDescriptionElement.appendChild(p);
+        sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
+
+        currentParagraphIndex++;
+
+        if (currentParagraphIndex < currentSceneParagraphs.length) {
+            const continueElem = document.createElement('p');
+            continueElem.className = 'click-to-continue';
+            continueElem.textContent = '[Clique para continuar]';
+            sceneDescriptionElement.appendChild(continueElem);
+            sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
+
+            const clickHandler = () => {
+                continueElem.remove();
+                renderNextParagraph();
+            };
+
+            continueElem.addEventListener('click', clickHandler, { once: true });
+        } else {
+            // This was the last paragraph, enable input
+            if (commandInputElement) commandInputElement.disabled = false;
+            if (submitCommandButton) submitCommandButton.disabled = false;
+            if (commandInputElement) commandInputElement.focus();
+        }
+    }
+
+    function changeScene(sceneId, command = null, transitionMessage = null) {
         const scene = currentState.scenesState[sceneId];
         if (!scene) {
-            console.error(\`Error: Scene with ID "\${sceneId}" not found.\`);
+            console.error('Error: Scene with ID "' + sceneId + '" not found.');
             if (sceneDescriptionElement) {
-                sceneDescriptionElement.textContent = \`Error: Scene "\${sceneId}" not found.\`;
+                sceneDescriptionElement.textContent = 'Error: Scene "' + sceneId + '" not found.';
             }
             return;
         }
@@ -76,23 +99,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (sceneDescriptionElement) {
-            // ULTIMATE FIX: Make description handling completely robust to prevent fatal TypeErrors.
-            // Explicitly convert to string to handle any data type (null, undefined, number, etc.).
-            const descText = String(scene.description || '');
+            sceneDescriptionElement.innerHTML = ''; // Clear previous content
 
-            const descriptionHtml = descText
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/\\n/g, '<br>'); // Correctly replace newline characters
-                
-            let html = \`<p>\${descriptionHtml}</p>\`;
             if (command) {
-                // Sanitize command echo
-                const sanitizedCommand = command.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-                html = \`<p class="command-echo">&gt; \${sanitizedCommand}</p>\` + html;
+                const echoP = document.createElement('p');
+                echoP.className = 'command-echo';
+                echoP.textContent = '> ' + command;
+                sceneDescriptionElement.appendChild(echoP);
             }
-            sceneDescriptionElement.innerHTML = html;
+
+            if (transitionMessage) {
+                const transitionP = document.createElement('p');
+                transitionP.textContent = transitionMessage;
+                sceneDescriptionElement.appendChild(transitionP);
+                sceneDescriptionElement.appendChild(document.createElement('br'));
+            }
+            
+            const rawDescription = scene.description ? String(scene.description).trim() : '';
+            currentSceneParagraphs = rawDescription.split('\\n').filter(p => p.trim() !== '');
+            currentParagraphIndex = 0;
+            
+            // Disable input until description is fully displayed
+            if (commandInputElement) commandInputElement.disabled = true;
+            if (submitCommandButton) submitCommandButton.disabled = true;
+
+            renderNextParagraph();
         }
 
         if (sceneSoundEffectElement && scene.soundEffect) {
@@ -104,13 +135,127 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function processCommand() {
-        if(!commandInputElement) return;
-        const commandText = commandInputElement.value.trim().toLowerCase();
+        if (!commandInputElement || commandInputElement.disabled) return;
+        const commandText = commandInputElement.value.trim();
         if (!commandText) return;
+        const lowerCaseCommandText = commandText.toLowerCase();
 
-        // Command processing is not implemented in this preview stub.
-        alert(\`Command processing is not implemented in the preview. You typed: "\${commandText}"\`);
         commandInputElement.value = '';
+
+        const currentScene = currentState.scenesState[currentState.currentSceneId];
+        if (!currentScene) return;
+
+        // Echo the command
+        const echoP = document.createElement('p');
+        echoP.className = 'command-echo';
+        echoP.textContent = '> ' + commandText;
+        sceneDescriptionElement.appendChild(echoP);
+
+        // Basic parser: verb + target
+        const commandParts = lowerCaseCommandText.split(/\\s+/);
+        const verb = commandParts[0];
+        const target = commandParts.slice(1).join(' ');
+
+        let interactionFound = false;
+
+        // 1. Look for matching custom interactions
+        if (currentScene.interactions) {
+            for (const interaction of currentScene.interactions) {
+                const verbMatch = interaction.verbs.includes(verb);
+                const targetMatch = target.includes(interaction.target);
+
+                if (verbMatch && targetMatch) {
+                    let hasRequiredItem = true;
+                    if (interaction.requiresInInventory) {
+                        hasRequiredItem = currentState.inventory.includes(interaction.requiresInInventory);
+                    }
+
+                    if (hasRequiredItem) {
+                        interactionFound = true;
+
+                        // Process state changes first
+                        if (interaction.consumesItem && interaction.requiresInInventory) {
+                            currentState.inventory = currentState.inventory.filter(itemId => itemId !== interaction.requiresInInventory);
+                        }
+                        if (interaction.removesTargetFromScene) {
+                            const sceneState = currentState.scenesState[currentState.currentSceneId];
+                            if (sceneState.objetos) {
+                                sceneState.objetos = sceneState.objetos.filter(obj => obj.name.toLowerCase() !== interaction.target);
+                            }
+                        }
+                        if (interaction.newSceneDescription) {
+                            currentState.scenesState[currentState.currentSceneId].description = interaction.newSceneDescription;
+                        }
+                        saveState();
+
+                        // Then process navigation/display changes
+                        if (interaction.goToScene) {
+                            changeScene(interaction.goToScene, commandText, interaction.successMessage);
+                            return; // Exit
+                        }
+                        if (interaction.newSceneDescription) {
+                            changeScene(currentState.currentSceneId, commandText, interaction.successMessage);
+                            return; // Exit
+                        }
+                        if (interaction.successMessage) {
+                            const successP = document.createElement('p');
+                            successP.textContent = interaction.successMessage;
+                            sceneDescriptionElement.appendChild(successP);
+                        }
+                        break; // Stop after finding the first matching interaction
+                    }
+                }
+            }
+        }
+
+        // 2. Built-in commands if no custom interaction found
+        if (!interactionFound) {
+            if (verb === 'olhar' || verb === 'examinar') {
+                let itemFound = false;
+                if (target) {
+                    const object = currentScene.objetos.find(obj => target.includes(obj.name.toLowerCase()));
+                    if (object) {
+                        const examineP = document.createElement('p');
+                        examineP.textContent = object.examineDescription;
+                        sceneDescriptionElement.appendChild(examineP);
+                        itemFound = true;
+                    }
+                }
+                if (!itemFound && !target) {
+                    changeScene(currentState.currentSceneId, commandText);
+                    return;
+                }
+                interactionFound = itemFound;
+            } else if (verb === 'pegar' || verb === 'apanhar' || verb === 'levar') {
+                const object = currentScene.objetos.find(obj => target.includes(obj.name.toLowerCase()));
+                if (object) {
+                    interactionFound = true;
+                    if (object.isTakable) {
+                        currentState.inventory.push(object.id);
+                        const sceneState = currentState.scenesState[currentState.currentSceneId];
+                        sceneState.objetos = sceneState.objetos.filter(obj => obj.id !== object.id);
+                        
+                        const takeP = document.createElement('p');
+                        takeP.textContent = \`Você pegou: \${object.name}.\`;
+                        sceneDescriptionElement.appendChild(takeP);
+                        saveState();
+                    } else {
+                        const cantTakeP = document.createElement('p');
+                        cantTakeP.textContent = 'Você não pode pegar isso.';
+                        sceneDescriptionElement.appendChild(cantTakeP);
+                    }
+                }
+            }
+        }
+
+        // 3. If still no interaction found, show default failure message
+        if (!interactionFound) {
+            const failureP = document.createElement('p');
+            failureP.textContent = gameData.mensagem_falha_padrao || "Isso não parece ter nenhum efeito.";
+            sceneDescriptionElement.appendChild(failureP);
+        }
+        
+        sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
     }
 
     // --- Initialization ---
@@ -126,6 +271,17 @@ document.addEventListener('DOMContentLoaded', () => {
             
             originalScenes = JSON.parse(JSON.stringify(gameData.cenas));
             
+            allTakableObjects = {};
+            Object.values(gameData.cenas).forEach(scene => {
+                if (scene.objetos) {
+                    scene.objetos.forEach(obj => {
+                        if (obj.isTakable) {
+                            allTakableObjects[obj.id] = obj;
+                        }
+                    });
+                }
+            });
+
             if (!fromRestart && loadState()) {
                 console.log("Game state loaded from save.");
                 changeScene(currentState.currentSceneId); // Render loaded scene
@@ -162,7 +318,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if(restartButton) {
         restartButton.addEventListener('click', () => {
             if (confirm('Tem certeza que quer reiniciar a aventura? Todo o progresso será perdido.')) {
-                localStorage.removeItem(SAVE_KEY);
+                // localStorage.removeItem(SAVE_KEY); // Saving is disabled for preview
                 initGame(true);
             }
         });
@@ -176,6 +332,38 @@ document.addEventListener('DOMContentLoaded', () => {
         commandInputElement.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 processCommand();
+            }
+        });
+    }
+
+    if (inventoryButton) {
+        inventoryButton.addEventListener('click', () => {
+            if (actionPopup.classList.contains('hidden') || !actionPopup.dataset.content || actionPopup.dataset.content !== 'inventory') {
+                actionPopup.innerHTML = '';
+                actionPopup.dataset.content = 'inventory';
+
+                const list = document.createElement('div');
+                list.className = 'action-popup-list';
+
+                if (currentState.inventory.length === 0) {
+                    const p = document.createElement('p');
+                    p.textContent = 'Seu inventário está vazio.';
+                    list.appendChild(p);
+                } else {
+                    currentState.inventory.forEach(itemId => {
+                        const item = allTakableObjects[itemId];
+                        if (item) {
+                            const p = document.createElement('p');
+                            p.textContent = item.name;
+                            list.appendChild(p);
+                        }
+                    });
+                }
+                actionPopup.appendChild(list);
+                actionPopup.classList.remove('hidden');
+            } else {
+                actionPopup.classList.add('hidden');
+                actionPopup.dataset.content = '';
             }
         });
     }
@@ -194,10 +382,10 @@ const getProcessedHtmlAndCss = (data: GameData) => {
     // --- Replace HTML Placeholders ---
     html = html.replace(/__GAME_TITLE__/g, data.gameTitle || 'Aventura de Texto');
     
-    const splashBgStyle = data.gameSplashImage ? \`style="background-image: url('\${data.gameSplashImage}')"\` : '';
-    const splashTextStyle = \`style="max-width: \${data.gameSplashTextWidth || '600px'}; height: \${data.gameSplashTextHeight || 'auto'};"\`;
-    const splashLogoTag = data.gameLogo ? \`<img src="\${data.gameLogo}" alt="Logo" class="splash-logo">\` : '';
-    const splashTitleTag = data.gameOmitSplashTitle ? '' : \`<h1>\${data.gameTitle || ''}</h1>\`;
+    const splashBgStyle = data.gameSplashImage ? `style="background-image: url('${data.gameSplashImage}')"` : '';
+    const splashTextStyle = `style="max-width: ${data.gameSplashTextWidth || '600px'}; height: ${data.gameSplashTextHeight || 'auto'};"`;
+    const splashLogoTag = data.gameLogo ? `<img src="${data.gameLogo}" alt="Logo" class="splash-logo">` : '';
+    const splashTitleTag = data.gameOmitSplashTitle ? '' : `<h1>${data.gameTitle || ''}</h1>`;
     
     html = html.replace('__SPLASH_BG_STYLE__', splashBgStyle);
     html = html.replace('__SPLASH_TEXT_STYLE__', splashTextStyle);
@@ -206,39 +394,51 @@ const getProcessedHtmlAndCss = (data: GameData) => {
     html = html.replace('__SPLASH_DESCRIPTION__', data.gameSplashDescription || '');
     html = html.replace('__SPLASH_BUTTON_TEXT__', data.gameSplashButtonText || 'Iniciar Aventura');
 
-    const headerLogoTag = data.gameLogo ? \`<img src="\${data.gameLogo}" alt="Logo" class="game-logo">\` : '';
-    const headerTitleTag = data.gameHideTitle ? '' : \`<h1>\${data.gameTitle || ''}</h1>\`;
+    const headerLogoTag = data.gameLogo ? `<img src="${data.gameLogo}" alt="Logo" class="game-logo">` : '';
+    const headerTitleTag = data.gameHideTitle ? '' : `<h1>${data.gameTitle || ''}</h1>`;
     html = html.replace('__LOGO_IMG_TAG__', headerLogoTag);
     html = html.replace('__HEADER_TITLE_H1_TAG__', headerTitleTag);
 
     // --- Replace CSS Variables ---
-    if (data.gameTextColor) css = css.replace(/--text-color: .*;/, \`--text-color: \${data.gameTextColor};\`);
-    if (data.gameTitleColor) css = css.replace(/--accent-color: .*;/, \`--accent-color: \${data.gameTitleColor};\`);
+    if (data.gameTextColor) css = css.replace(/--text-color: .*;/, `--text-color: ${data.gameTextColor};`);
+    if (data.gameTitleColor) css = css.replace(/--accent-color: .*;/, `--accent-color: ${data.gameTitleColor};`);
     if (data.gameSplashContentAlignment) {
         const hAlign = data.gameSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end';
         const textAlign = data.gameSplashContentAlignment === 'left' ? 'left' : 'right';
-        css = css.replace(/--splash-justify-content: .*;/, \`--splash-justify-content: \${hAlign};\`);
-        css = css.replace(/--splash-text-align: .*;/, \`--splash-text-align: \${textAlign};\`);
-        css = css.replace(/--splash-content-align-items: .*;/, \`--splash-content-align-items: \${hAlign};\`);
+        css = css.replace(/--splash-justify-content: .*;/, `--splash-justify-content: ${hAlign};`);
+        css = css.replace(/--splash-text-align: .*;/, `--splash-text-align: ${textAlign};`);
+        css = css.replace(/--splash-content-align-items: .*;/, `--splash-content-align-items: ${hAlign};`);
     }
-    if (data.gameSplashButtonColor) css = css.replace(/--splash-button-bg: .*;/, \`--splash-button-bg: \${data.gameSplashButtonColor};\`);
-    if (data.gameSplashButtonHoverColor) css = css.replace(/--splash-button-hover-bg: .*;/, \`--splash-button-hover-bg: \${data.gameSplashButtonHoverColor};\`);
+    if (data.gameSplashButtonColor) css = css.replace(/--splash-button-bg: .*;/, `--splash-button-bg: ${data.gameSplashButtonColor};`);
+    if (data.gameSplashButtonHoverColor) css = css.replace(/--splash-button-hover-bg: .*;/, `--splash-button-hover-bg: ${data.gameSplashButtonHoverColor};`);
 
     return { html, css };
 };
 
 
-// FIX: Changed to a named export to resolve module resolution error.
-export const Header: React.FC<HeaderProps> = ({ gameData, onImportGame }) => {
+const Header: React.FC<HeaderProps> = ({ gameData, onImportGame }) => {
   const [isExporting, setIsExporting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const prepareGameDataForExport = (data: GameData) => {
-    // The data model is now consistent, so we just select the fields the game engine needs.
+    // This is the "translation layer". It converts the editor's internal
+    // English-keyed data model into the Portuguese-keyed format expected
+    // by the game engine (game.js and data.json).
+    const translatedScenes: { [id: string]: any } = {};
+    for (const sceneId in data.scenes) {
+        const scene = data.scenes[sceneId];
+        translatedScenes[sceneId] = {
+            ...scene,
+            objetos: scene.objects // Rename 'objects' to 'objetos'
+        };
+        // @ts-ignore
+        delete translatedScenes[sceneId].objects;
+    }
+
     return {
-        cena_inicial: data.cena_inicial,
-        cenas: data.cenas,
-        mensagem_falha_padrao: data.mensagem_falha_padrao,
+        cena_inicial: data.startScene,
+        cenas: translatedScenes,
+        mensagem_falha_padrao: data.defaultFailureMessage,
     };
   };
 
@@ -269,7 +469,7 @@ export const Header: React.FC<HeaderProps> = ({ gameData, onImportGame }) => {
       const content = await zip.generateAsync({ type: "blob" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(content);
-      link.download = \`\${gameData.gameTitle?.replace(/\s+/g, '_')?.toLowerCase() || 'text-adventure'}.zip\`;
+      link.download = `${gameData.gameTitle?.replace(/\s+/g, '_')?.toLowerCase() || 'text-adventure'}.zip`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -287,8 +487,8 @@ export const Header: React.FC<HeaderProps> = ({ gameData, onImportGame }) => {
         const { html: processedHtml, css: processedCss } = getProcessedHtmlAndCss(gameData);
 
         const finalHtml = processedHtml
-            .replace('</head>', \`<style>\${processedCss}</style></head>\`)
-            .replace('</body>', \`<script>window.embeddedGameData = \${JSON.stringify(exportData)};</script><script>\${gameJS.replace(/<\/script>/g,'<\\/script>')}</script></body>\`);
+            .replace('</head>', `<style>${processedCss}</style></head>`)
+            .replace('</body>', `<script>window.embeddedGameData = ${JSON.stringify(exportData)};</script><script>${gameJS.replace(/<\/script>/g,'<\\/script>')}</script></body>`);
 
 
         const previewWindow = window.open();
@@ -317,8 +517,8 @@ export const Header: React.FC<HeaderProps> = ({ gameData, onImportGame }) => {
           const result = e.target?.result;
           if (typeof result === 'string') {
             const importedData = JSON.parse(result);
-            // Basic validation for new and old formats
-            if ((importedData.cenas && importedData.cena_inicial) || (importedData.scenes && importedData.startScene)) {
+            // Basic validation for new (English) and old (Portuguese) formats
+            if ((importedData.scenes && importedData.startScene) || (importedData.cenas && importedData.cena_inicial)) {
               onImportGame(importedData);
             } else {
               alert("Invalid game data file. Missing scene data.");
@@ -368,3 +568,5 @@ export const Header: React.FC<HeaderProps> = ({ gameData, onImportGame }) => {
     </header>
   );
 };
+
+export default Header;

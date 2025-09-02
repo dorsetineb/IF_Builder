@@ -4,11 +4,11 @@ import { PlusIcon } from './icons/PlusIcon';
 import { TrashIcon } from './icons/TrashIcon';
 
 interface ObjectEditorProps {
-  objetos: GameObject[];
-  onUpdateObjetos: (objects: GameObject[]) => void;
+  objects: GameObject[];
+  onUpdateObjects: (objects: GameObject[]) => void;
 }
 
-const ObjectEditor: React.FC<ObjectEditorProps> = ({ objetos, onUpdateObjetos }) => {
+const ObjectEditor: React.FC<ObjectEditorProps> = ({ objects = [], onUpdateObjects }) => {
   const handleAddObject = () => {
     const newObject: GameObject = {
       id: `objeto_${Date.now()}`,
@@ -16,15 +16,15 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ objetos, onUpdateObjetos })
       examineDescription: 'Descrição do novo objeto.',
       isTakable: false,
     };
-    onUpdateObjetos([...objetos, newObject]);
+    onUpdateObjects([...objects, newObject]);
   };
 
   const handleRemoveObject = (index: number) => {
-    onUpdateObjetos(objetos.filter((_, i) => i !== index));
+    onUpdateObjects(objects.filter((_, i) => i !== index));
   };
 
   const handleObjectChange = (index: number, field: keyof GameObject, value: string | boolean) => {
-    const newObjects = objetos.map((obj, i) => {
+    const newObjects = objects.map((obj, i) => {
         if (i === index) {
             let finalValue = value;
             if (field === 'id' && typeof value === 'string') {
@@ -34,13 +34,13 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ objetos, onUpdateObjetos })
         }
         return obj;
     });
-    onUpdateObjetos(newObjects);
+    onUpdateObjects(newObjects);
   };
 
   return (
     <>
       <div className="space-y-4">
-        {objetos.map((obj, index) => (
+        {objects.map((obj, index) => (
           <div key={index} className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
             <button
                 onClick={() => handleRemoveObject(index)}
@@ -102,7 +102,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ objetos, onUpdateObjetos })
             </div>
           </div>
         ))}
-         {objetos.length === 0 && <p className="text-center text-brand-text-dim">Nenhum objeto nesta cena.</p>}
+         {objects.length === 0 && <p className="text-center text-brand-text-dim">Nenhum objeto nesta cena.</p>}
       </div>
       <div className="flex justify-end mt-4">
         <button 

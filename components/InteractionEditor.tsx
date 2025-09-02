@@ -8,10 +8,10 @@ interface InteractionEditorProps {
   onUpdateInteractions: (interactions: Interaction[]) => void;
   allScenes: Scene[];
   currentSceneId: string;
-  sceneObjetos: GameObject[];
+  sceneObjects: GameObject[];
 }
 
-const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions, onUpdateInteractions, allScenes, currentSceneId, sceneObjetos }) => {
+const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = [], onUpdateInteractions, allScenes, currentSceneId, sceneObjects = [] }) => {
   const handleAddInteraction = () => {
     const newInteraction: Interaction = {
       id: `interacao_${Date.now()}`,
@@ -69,7 +69,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions, onU
     };
 
   const otherScenes = allScenes.filter(s => s.id !== currentSceneId);
-  const takableObjectsInScene = sceneObjetos.filter(obj => obj.isTakable);
+  const takableObjectsInScene = sceneObjects.filter(obj => obj.isTakable);
 
   const whiteChevron = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20' stroke-width='1.5' stroke='white'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='m5.25 7.5 4.5 4.5 4.5-4.5' /%3e%3c/svg%3e";
   const selectBaseClasses = "w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-brand-primary focus:border-brand-primary text-brand-text appearance-none bg-no-repeat pr-8";
