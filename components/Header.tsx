@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentState = {
         currentSceneId: null,
         inventory: [], // stores item IDs
-        diaryLog: [],
+        diaryLog: [], // Array of {type: 'scene_load' | 'action', data: {...}}
         scenesState: {},
     };
 
@@ -103,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function changeScene(sceneId, command = null, transitionMessage = null) {
+    function changeScene(sceneId, isStateLoad = false) {
         const scene = currentState.scenesState[sceneId];
         if (!scene) {
             console.error('Error: Scene with ID "' + sceneId + '" not found.');
@@ -118,17 +118,18 @@ document.addEventListener('DOMContentLoaded', () => {
         currentSceneParagraphs = rawDescription.split('\\n').filter(p => p.trim() !== '');
         currentParagraphIndex = 0;
 
-        // Add entry to diary log
-        const newLogEntry = {
-            sceneId: sceneId,
-            sceneName: scene.name,
-            sceneImage: scene.image,
-            fullDescription: rawDescription,
-            triggeringCommand: command,
-            transitionMessage: transitionMessage,
-        };
-        currentState.diaryLog.push(newLogEntry);
-
+        if (!isStateLoad) {
+            currentState.diaryLog.push({
+                type: 'scene_load',
+                data: {
+                    id: scene.id,
+                    name: scene.name,
+                    image: scene.image,
+                    description: rawDescription,
+                }
+            });
+        }
+        
         if (sceneImageElement && scene.image) {
             sceneImageElement.src = scene.image;
         } else if (sceneImageElement) {
@@ -137,20 +138,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (sceneDescriptionElement) {
             sceneDescriptionElement.innerHTML = ''; // Clear previous content
-
-            if (command) {
-                const echoP = document.createElement('p');
-                echoP.className = 'command-echo';
-                echoP.textContent = '> ' + command;
-                sceneDescriptionElement.appendChild(echoP);
-            }
-
-            if (transitionMessage) {
-                const transitionP = document.createElement('p');
-                transitionP.textContent = transitionMessage;
-                sceneDescriptionElement.appendChild(transitionP);
-                sceneDescriptionElement.appendChild(document.createElement('br'));
-            }
             
             // Disable input until description is fully displayed
             if (commandInputElement) commandInputElement.disabled = true;
@@ -164,7 +151,9 @@ document.addEventListener('DOMContentLoaded', () => {
             sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
         }
 
-        saveState();
+        if (!isStateLoad) {
+            saveState();
+        }
     }
     
     function processCommand() {
@@ -190,6 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const target = commandParts.slice(1).join(' ');
 
         let interactionFound = false;
+        let responseText = '';
 
         // 1. Look for matching custom interactions
         if (currentScene.interactions) {
@@ -223,17 +213,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
                         // Then process navigation/display changes
                         if (interaction.goToScene) {
-                            // A mensagem de sucesso é omitida ao mudar de cena. A descrição da nova cena é o feedback.
-                            changeScene(interaction.goToScene, commandText, null);
+                            responseText = interaction.successMessage || \`Você vai para \${currentState.scenesState[interaction.goToScene].name}.\`;
+                            currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
+                            changeScene(interaction.goToScene);
                             return; // Exit
                         }
                         if (interaction.newSceneDescription) {
-                            changeScene(currentState.currentSceneId, commandText, interaction.successMessage);
+                            responseText = interaction.successMessage || 'A cena mudou.';
+                            currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
+                            
+                            // To display the message, we append it before re-rendering the scene
+                            const messageP = document.createElement('p');
+                            messageP.textContent = responseText;
+                            sceneDescriptionElement.appendChild(messageP);
+                            sceneDescriptionElement.appendChild(document.createElement('br'));
+
+                            changeScene(currentState.currentSceneId);
                             return; // Exit
                         }
                         if (interaction.successMessage) {
+                            responseText = interaction.successMessage;
                             const successP = document.createElement('p');
-                            successP.textContent = interaction.successMessage;
+                            successP.textContent = responseText;
                             sceneDescriptionElement.appendChild(successP);
                         }
                         break; // Stop after finding the first matching interaction
@@ -244,23 +245,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Built-in commands if no custom interaction found
         if (!interactionFound) {
-            if (verb === 'olhar' || verb === 'examinar') {
+            if (['olhar', 'examinar'].includes(verb)) {
                 let itemFound = false;
                 if (target) {
                     const object = currentScene.objetos.find(obj => target.includes(obj.name.toLowerCase()));
                     if (object) {
+                        responseText = object.examineDescription;
                         const examineP = document.createElement('p');
-                        examineP.textContent = object.examineDescription;
+                        examineP.textContent = responseText;
                         sceneDescriptionElement.appendChild(examineP);
                         itemFound = true;
                     }
                 }
                 if (!itemFound && !target) {
-                    changeScene(currentState.currentSceneId, commandText);
+                    responseText = ''; // Re-describing the scene, no specific response text
+                    currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
+                    changeScene(currentState.currentSceneId);
                     return;
                 }
                 interactionFound = itemFound;
-            } else if (verb === 'pegar' || verb === 'apanhar' || verb === 'levar') {
+            } else if (['pegar', 'apanhar', 'levar'].includes(verb)) {
                 const object = currentScene.objetos.find(obj => target.includes(obj.name.toLowerCase()));
                 if (object) {
                     interactionFound = true;
@@ -269,13 +273,15 @@ document.addEventListener('DOMContentLoaded', () => {
                         const sceneState = currentState.scenesState[currentState.currentSceneId];
                         sceneState.objetos = sceneState.objetos.filter(obj => obj.id !== object.id);
                         
+                        responseText = \`Você pegou: \${object.name}.\`;
                         const takeP = document.createElement('p');
-                        takeP.textContent = \`Você pegou: \${object.name}.\`;
+                        takeP.textContent = responseText;
                         sceneDescriptionElement.appendChild(takeP);
                         saveState();
                     } else {
+                        responseText = 'Você não pode pegar isso.';
                         const cantTakeP = document.createElement('p');
-                        cantTakeP.textContent = 'Você não pode pegar isso.';
+                        cantTakeP.textContent = responseText;
                         sceneDescriptionElement.appendChild(cantTakeP);
                     }
                 }
@@ -284,11 +290,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 3. If still no interaction found, show default failure message
         if (!interactionFound) {
+            responseText = gameData.mensagem_falha_padrao || "Isso não parece ter nenhum efeito.";
             const failureP = document.createElement('p');
-            failureP.textContent = gameData.mensagem_falha_padrao || "Isso não parece ter nenhum efeito.";
+            failureP.textContent = responseText;
             sceneDescriptionElement.appendChild(failureP);
         }
         
+        currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
+        saveState();
         sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
     }
 
@@ -318,15 +327,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!fromRestart && loadState()) {
                 console.log("Game state loaded from save.");
-                const lastLog = currentState.diaryLog[currentState.diaryLog.length - 1];
-                changeScene(currentState.currentSceneId, lastLog.triggeringCommand, lastLog.transitionMessage);
+                // Render scene without adding a new diary entry
+                changeScene(currentState.currentSceneId, true);
             } else {
                 console.log("Starting new game.");
                 currentState.currentSceneId = gameData.cena_inicial;
                 currentState.inventory = [];
                 currentState.diaryLog = [];
                 currentState.scenesState = JSON.parse(JSON.stringify(originalScenes));
-                changeScene(currentState.currentSceneId); // Render initial scene
+                // Render initial scene and create the first diary entry
+                changeScene(currentState.currentSceneId); 
             }
 
         } catch (error) {
@@ -343,42 +353,66 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        let currentSceneBlock = null;
+
         currentState.diaryLog.forEach(entry => {
-            const entryDiv = document.createElement('div');
-            entryDiv.className = 'diary-entry';
+            if (entry.type === 'scene_load') {
+                // A new scene starts. Create a new block.
+                currentSceneBlock = document.createElement('div');
+                currentSceneBlock.className = 'diary-entry';
 
-            const imageContainer = document.createElement('div');
-            imageContainer.className = 'image-container';
-            const img = document.createElement('img');
-            img.src = entry.sceneImage || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-            imageContainer.appendChild(img);
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'image-container';
+                const img = document.createElement('img');
+                img.src = entry.data.image || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+                imageContainer.appendChild(img);
+                currentSceneBlock.appendChild(imageContainer);
 
-            const textContainer = document.createElement('div');
-            textContainer.className = 'text-container';
-            const sceneNameSpan = document.createElement('span');
-            sceneNameSpan.className = 'scene-name';
-            sceneNameSpan.textContent = entry.sceneName;
-            textContainer.appendChild(sceneNameSpan);
+                const textContainer = document.createElement('div');
+                textContainer.className = 'text-container';
+                
+                const sceneNameSpan = document.createElement('span');
+                sceneNameSpan.className = 'scene-name';
+                sceneNameSpan.textContent = entry.data.name;
+                textContainer.appendChild(sceneNameSpan);
+                
+                const descriptionP = document.createElement('p');
+                descriptionP.textContent = entry.data.description;
+                textContainer.appendChild(descriptionP);
+                
+                currentSceneBlock.appendChild(textContainer);
+                diaryLogElement.appendChild(currentSceneBlock);
 
-            if (entry.triggeringCommand) {
-                const commandEcho = document.createElement('p');
-                commandEcho.className = 'command-echo';
-                commandEcho.textContent = '> ' + entry.triggeringCommand;
-                textContainer.appendChild(commandEcho);
+            } else if (entry.type === 'action') {
+                if (!currentSceneBlock) {
+                    // Fallback if an action is logged before a scene (should not happen)
+                    currentSceneBlock = document.createElement('div');
+                    currentSceneBlock.className = 'diary-entry';
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'image-container';
+                    currentSceneBlock.appendChild(placeholder);
+                    const textContainer = document.createElement('div');
+                    textContainer.className = 'text-container';
+                    currentSceneBlock.appendChild(textContainer);
+                    diaryLogElement.appendChild(currentSceneBlock);
+                }
+
+                // Find the text container of the current scene block and append to it
+                const textContainer = currentSceneBlock.querySelector('.text-container');
+                if (textContainer) {
+                    if (entry.data.command) {
+                        const commandEcho = document.createElement('p');
+                        commandEcho.className = 'command-echo';
+                        commandEcho.textContent = 'VOCÊ: ' + entry.data.command;
+                        textContainer.appendChild(commandEcho);
+                    }
+                    if (entry.data.response) {
+                        const responseP = document.createElement('p');
+                        responseP.textContent = entry.data.response;
+                        textContainer.appendChild(responseP);
+                    }
+                }
             }
-            if (entry.transitionMessage) {
-                const transitionP = document.createElement('p');
-                transitionP.textContent = entry.transitionMessage;
-                textContainer.appendChild(transitionP);
-            }
-            
-            const descriptionP = document.createElement('p');
-            descriptionP.textContent = entry.fullDescription;
-            textContainer.appendChild(descriptionP);
-
-            entryDiv.appendChild(imageContainer);
-            entryDiv.appendChild(textContainer);
-            diaryLogElement.appendChild(entryDiv);
         });
     }
 
