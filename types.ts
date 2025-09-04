@@ -17,6 +17,7 @@ export interface Interaction {
   removesTargetFromScene?: boolean; // remove the target object from the scene
   goToScene?: string; // ID of the scene to move to
   newSceneDescription?: string;
+  refillsChances?: boolean;
 }
 
 export interface Exits {
@@ -36,6 +37,7 @@ export interface Scene {
   objects: GameObject[];
   interactions: Interaction[];
   exits?: Exits;
+  isEndingScene?: boolean;
 }
 
 export interface GameData {
@@ -68,6 +70,10 @@ export interface GameData {
   gameCommandInputPlaceholder?: string;
   gameDiaryPlayerName?: string;
   gameFocusColor?: string;
+  gameEnableChances?: boolean;
+  gameMaxChances?: number;
+  gameChanceIcon?: 'circle' | 'cross' | 'heart';
+  gameChanceIconColor?: string;
 }
 
 export type View = 'scenes' | 'interface' | 'game_info' | 'scene_map';

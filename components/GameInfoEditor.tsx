@@ -18,7 +18,11 @@ interface GameInfoEditorProps {
   splashButtonText: string;
   splashButtonColor: string;
   splashButtonHoverColor: string;
-  onUpdate: (field: keyof GameData, value: string | boolean) => void;
+  enableChances: boolean;
+  maxChances: number;
+  chanceIcon: 'circle' | 'cross' | 'heart';
+  chanceIconColor: string;
+  onUpdate: (field: keyof GameData, value: string | boolean | number) => void;
 }
 
 // Helper to extract number from a CSS value like "600px" or "auto"
@@ -34,6 +38,7 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         title, logo, hideTitle, omitSplashTitle, textColor, titleColor, 
         splashImage, splashTextWidth, splashTextHeight, splashContentAlignment, splashDescription,
         splashButtonText, splashButtonColor, splashButtonHoverColor,
+        enableChances, maxChances, chanceIcon, chanceIconColor,
         onUpdate 
     } = props;
 
@@ -51,6 +56,11 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
     const [localSplashButtonText, setLocalSplashButtonText] = useState(splashButtonText);
     const [localSplashButtonColor, setLocalSplashButtonColor] = useState(splashButtonColor);
     const [localSplashButtonHoverColor, setLocalSplashButtonHoverColor] = useState(splashButtonHoverColor);
+    const [localEnableChances, setLocalEnableChances] = useState(enableChances);
+    const [localMaxChances, setLocalMaxChances] = useState(maxChances);
+    const [localChanceIcon, setLocalChanceIcon] = useState(chanceIcon);
+    const [localChanceIconColor, setLocalChanceIconColor] = useState(chanceIconColor);
+
 
     const [isDirty, setIsDirty] = useState(false);
 
@@ -69,6 +79,10 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         setLocalSplashButtonText(props.splashButtonText);
         setLocalSplashButtonColor(props.splashButtonColor);
         setLocalSplashButtonHoverColor(props.splashButtonHoverColor);
+        setLocalEnableChances(props.enableChances);
+        setLocalMaxChances(props.maxChances);
+        setLocalChanceIcon(props.chanceIcon);
+        setLocalChanceIconColor(props.chanceIconColor);
         setIsDirty(false);
     }, [props]);
 
@@ -86,9 +100,13 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                          localSplashDescription !== splashDescription ||
                          localSplashButtonText !== splashButtonText ||
                          localSplashButtonColor !== splashButtonColor ||
-                         localSplashButtonHoverColor !== splashButtonHoverColor;
+                         localSplashButtonHoverColor !== splashButtonHoverColor ||
+                         localEnableChances !== enableChances ||
+                         localMaxChances !== maxChances ||
+                         localChanceIcon !== chanceIcon ||
+                         localChanceIconColor !== chanceIconColor;
         setIsDirty(hasChanged);
-    }, [localTitle, localLogo, localHideTitle, localOmitSplashTitle, localTextColor, localTitleColor, localSplashImage, localSplashTextWidth, localSplashTextHeight, localSplashContentAlignment, localSplashDescription, localSplashButtonText, localSplashButtonColor, localSplashButtonHoverColor, props]);
+    }, [localTitle, localLogo, localHideTitle, localOmitSplashTitle, localTextColor, localTitleColor, localSplashImage, localSplashTextWidth, localSplashTextHeight, localSplashContentAlignment, localSplashDescription, localSplashButtonText, localSplashButtonColor, localSplashButtonHoverColor, localEnableChances, localMaxChances, localChanceIcon, localChanceIconColor, props]);
 
     const handleSave = () => {
         if (localTitle !== title) onUpdate('gameTitle', localTitle);
@@ -105,6 +123,10 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         if (localSplashButtonText !== splashButtonText) onUpdate('gameSplashButtonText', localSplashButtonText);
         if (localSplashButtonColor !== splashButtonColor) onUpdate('gameSplashButtonColor', localSplashButtonColor);
         if (localSplashButtonHoverColor !== splashButtonHoverColor) onUpdate('gameSplashButtonHoverColor', localSplashButtonHoverColor);
+        if (localEnableChances !== enableChances) onUpdate('gameEnableChances', localEnableChances);
+        if (localMaxChances !== maxChances) onUpdate('gameMaxChances', localMaxChances);
+        if (localChanceIcon !== chanceIcon) onUpdate('gameChanceIcon', localChanceIcon);
+        if (localChanceIconColor !== chanceIconColor) onUpdate('gameChanceIconColor', localChanceIconColor);
     };
     
     const handleUndo = () => {
@@ -122,6 +144,10 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         setLocalSplashButtonText(splashButtonText);
         setLocalSplashButtonColor(splashButtonColor);
         setLocalSplashButtonHoverColor(splashButtonHoverColor);
+        setLocalEnableChances(enableChances);
+        setLocalMaxChances(maxChances);
+        setLocalChanceIcon(chanceIcon);
+        setLocalChanceIconColor(chanceIconColor);
     };
     
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
@@ -217,7 +243,7 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
               </div>
           </div>
           
-          <div className="mt-6">
+          <div className="mt-6 pt-6 border-t border-brand-border/50">
             <h4 className="text-lg font-semibold text-brand-text mb-4">Cores do Jogo</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
@@ -235,7 +261,57 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                     </div>
                 </div>
             </div>
-        </div>
+          </div>
+
+          <div className="mt-6 pt-6 border-t border-brand-border/50">
+            <h4 className="text-lg font-semibold text-brand-text mb-4">Sistema de Chances (Vidas)</h4>
+            <div className="flex items-center">
+                <input 
+                    type="checkbox" 
+                    id="enableChances" 
+                    checked={localEnableChances} 
+                    onChange={(e) => setLocalEnableChances(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+                />
+                <label htmlFor="enableChances" className="ml-2 text-sm text-brand-text-dim">Habilitar sistema de chances</label>
+            </div>
+            {localEnableChances && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mt-4 pl-6 border-l-2 border-brand-border">
+                    <div>
+                        <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
+                        <input
+                            type="number"
+                            id="maxChances"
+                            value={localMaxChances}
+                            onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
+                            min="1"
+                            max="10"
+                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2"
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="chanceIcon" className="block text-sm font-medium text-brand-text-dim mb-1">Ícone das Chances</label>
+                        <select
+                            id="chanceIcon"
+                            value={localChanceIcon}
+                            onChange={(e) => setLocalChanceIcon(e.target.value as any)}
+                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2"
+                        >
+                            <option value="heart">Corações</option>
+                            <option value="circle">Círculos</option>
+                            <option value="cross">Cruzes</option>
+                        </select>
+                    </div>
+                    <div className="md:col-span-2">
+                        <label htmlFor="chanceIconColor" className="block text-sm font-medium text-brand-text-dim mb-1">Cor dos Ícones</label>
+                        <div className="flex items-center gap-2 p-1 bg-brand-bg border border-brand-border rounded-md max-w-xs">
+                            <input type="color" id="chanceIconColor" value={localChanceIconColor} onChange={(e) => setLocalChanceIconColor(e.target.value)} className="w-8 h-8 p-0 border-none rounded cursor-pointer bg-transparent" />
+                            <input type="text" value={localChanceIconColor} onChange={(e) => setLocalChanceIconColor(e.target.value)} className="w-full bg-transparent font-mono text-sm focus:outline-none" placeholder="#ff4d4d" />
+                        </div>
+                    </div>
+                </div>
+            )}
+          </div>
       </CollapsibleCard>
 
       <CollapsibleCard title="Abertura do jogo" startOpen={true}>

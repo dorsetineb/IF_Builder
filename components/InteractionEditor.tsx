@@ -46,23 +46,22 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = []
         const newInteractions = [...interactions];
         const interaction = newInteractions[index];
 
-        if (field === 'goToScene') {
-            if (isChecked) {
-                interaction.goToScene = ''; // Set to empty to be selected
-                interaction.newSceneDescription = undefined; // Mutually exclusive
+        // Reset other mutually exclusive options when one is checked
+        if (isChecked) {
+            interaction.goToScene = field === 'goToScene' ? '' : undefined;
+            interaction.newSceneDescription = field === 'newSceneDescription' ? (interaction.successMessage || 'A cena mudou...') : undefined;
+            
+            if (field !== 'newSceneDescription') {
+                interaction.successMessage = interaction.newSceneDescription || interaction.successMessage || 'Ação bem sucedida.';
             } else {
-                interaction.goToScene = undefined;
+                interaction.successMessage = undefined;
             }
-        } else if (field === 'newSceneDescription') {
-            if (isChecked) {
-                // When enabling, move the success message to the new description field if it exists
-                interaction.newSceneDescription = interaction.successMessage || 'A cena mudou...';
-                interaction.successMessage = undefined; // Clear the old field
-                interaction.goToScene = undefined; // Mutually exclusive
-            } else {
-                // When disabling, move the description back to the success message field
-                interaction.successMessage = interaction.newSceneDescription || 'A ação foi bem sucedida.';
-                interaction.newSceneDescription = undefined;
+
+        } else { // When unchecking
+            if (field === 'goToScene') interaction.goToScene = undefined;
+            if (field === 'newSceneDescription') {
+                 interaction.successMessage = interaction.newSceneDescription || 'A ação foi bem sucedida.';
+                 interaction.newSceneDescription = undefined;
             }
         }
 
@@ -135,32 +134,25 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = []
               </div>
               {/* Right Column - Feedback message */}
               <div className="flex flex-col h-full">
-                {inter.goToScene !== undefined ? (
-                    <div className="flex flex-col items-center justify-center h-full bg-brand-bg border-2 border-dashed border-brand-border/50 rounded-md p-4">
-                        <p className="text-center text-sm text-brand-text-dim">O feedback para o jogador será a descrição da nova cena.</p>
-                         <p className="text-center text-xs text-brand-text-dim mt-2">(Nenhuma mensagem separada é necessária)</p>
-                    </div>
-                ) : inter.newSceneDescription !== undefined ? (
+                {inter.goToScene !== undefined || inter.newSceneDescription !== undefined ? (
                     <>
-                        <label className="block text-sm font-medium text-brand-text-dim mb-1">Nova Descrição da Cena</label>
-                        <textarea 
-                          value={inter.newSceneDescription || ''} 
-                          onChange={e => handleInteractionChange(index, 'newSceneDescription', e.target.value)} 
-                          rows={5} 
-                          className="w-full flex-grow bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-brand-primary focus:border-brand-primary" 
-                          placeholder="Descreva como a cena mudou..."
-                        />
+                    {inter.goToScene !== undefined && (
+                        <div className="flex flex-col items-center justify-center h-full bg-brand-bg border-2 border-dashed border-brand-border/50 rounded-md p-4">
+                            <p className="text-center text-sm text-brand-text-dim">O feedback para o jogador será a descrição da nova cena.</p>
+                            <p className="text-center text-xs text-brand-text-dim mt-2">(Nenhuma mensagem separada é necessária)</p>
+                        </div>
+                    )}
+                    {inter.newSceneDescription !== undefined && (
+                        <>
+                            <label className="block text-sm font-medium text-brand-text-dim mb-1">Nova Descrição da Cena</label>
+                            <textarea value={inter.newSceneDescription || ''} onChange={e => handleInteractionChange(index, 'newSceneDescription', e.target.value)} rows={5} className="w-full flex-grow bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-brand-primary focus:border-brand-primary" placeholder="Descreva como a cena mudou..."/>
+                        </>
+                    )}
                     </>
                 ) : (
                     <>
                         <label className="block text-sm font-medium text-brand-text-dim mb-1">Mensagem de Sucesso</label>
-                        <textarea 
-                          value={inter.successMessage || ''} 
-                          onChange={e => handleInteractionChange(index, 'successMessage', e.target.value)} 
-                          rows={5} 
-                          className="w-full flex-grow bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-brand-primary focus:border-brand-primary" 
-                          placeholder="A ação foi bem sucedida."
-                        />
+                        <textarea value={inter.successMessage || ''} onChange={e => handleInteractionChange(index, 'successMessage', e.target.value)} rows={5} className="w-full flex-grow bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-brand-primary focus:border-brand-primary" placeholder="A ação foi bem sucedida."/>
                     </>
                 )}
               </div>
@@ -169,9 +161,33 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = []
 
             {/* --- Consequências --- */}
             <div className="mt-4 pt-4 border-t border-brand-border/50">
-                <h4 className="text-md font-semibold mb-2 text-brand-text">Consequências da Ação</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
-                    {/* Left Column */}
+                <h4 className="text-md font-semibold mb-2 text-brand-text">Resultado da Ação</h4>
+                <div className="space-y-3">
+                    <div className="flex items-start">
+                        <input type="checkbox" id={`newDesc-${index}`} checked={inter.newSceneDescription !== undefined} onChange={e => handleConsequenceToggle(index, 'newSceneDescription', e.target.checked )} className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"/>
+                        <label htmlFor={`newDesc-${index}`} className="ml-2 block text-sm text-brand-text-dim">Alterar a descrição da cena</label>
+                    </div>
+
+                    <div className="flex items-start">
+                        <input type="checkbox" id={`goToScene-${index}`} checked={inter.goToScene !== undefined} onChange={e => handleConsequenceToggle(index, 'goToScene', e.target.checked )} className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"/>
+                        <div className="ml-2 flex-1">
+                             <label htmlFor={`goToScene-${index}`} className="block text-sm text-brand-text-dim">Ir para outra cena</label>
+                             {inter.goToScene !== undefined && (
+                                <div className="mt-2">
+                                    <select value={inter.goToScene} onChange={e => handleInteractionChange(index, 'goToScene', e.target.value)} className={selectBaseClasses} style={selectStyle}>
+                                        <option className={optionDimClasses} value="">Selecione a cena de destino...</option>
+                                        {otherScenes.map(scene => <option className={optionBaseClasses} key={scene.id} value={scene.id}>{scene.name} ({scene.id}) {scene.isEndingScene ? '(Fim de Jogo)' : ''}</option>)}
+                                    </select>
+                                </div>
+                             )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div className="mt-4 pt-4 border-t border-brand-border/50">
+                <h4 className="text-md font-semibold mb-2 text-brand-text">Efeitos Adicionais</h4>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
                     <div className="space-y-3">
                         <div className="flex items-center">
                             <input type="checkbox" id={`removesTarget-${index}`} checked={!!inter.removesTargetFromScene} onChange={e => handleInteractionChange(index, 'removesTargetFromScene', e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"/>
@@ -181,49 +197,28 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = []
                             <input type="checkbox" id={`consumesItem-${index}`} checked={!!inter.consumesItem} onChange={e => handleInteractionChange(index, 'consumesItem', e.target.checked)} disabled={!inter.requiresInInventory} className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary disabled:opacity-50"/>
                             <label htmlFor={`consumesItem-${index}`} className={`ml-2 block text-sm text-brand-text-dim ${!inter.requiresInInventory ? 'opacity-50' : ''}`}>Consumir o item do inventário</label>
                         </div>
+                        <div className="flex items-center">
+                            <input type="checkbox" id={`refillsChances-${index}`} checked={!!inter.refillsChances} onChange={e => handleInteractionChange(index, 'refillsChances', e.target.checked)} className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"/>
+                            <label htmlFor={`refillsChances-${index}`} className="ml-2 block text-sm text-brand-text-dim">Recarregar chances (vidas)</label>
+                        </div>
                     </div>
-                    {/* Right Column */}
-                    <div className="space-y-3">
-                      <div className="flex items-start">
-                          <input type="checkbox" id={`newDesc-${index}`} checked={inter.newSceneDescription !== undefined} onChange={e => handleConsequenceToggle(index, 'newSceneDescription', e.target.checked )} disabled={inter.goToScene !== undefined} className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary disabled:opacity-50"/>
-                          <div className="ml-2 flex-1">
-                              <label htmlFor={`newDesc-${index}`} className={`block text-sm text-brand-text-dim ${inter.goToScene !== undefined ? 'opacity-50' : ''}`}>Alterar a descrição da cena</label>
+                     <div>
+                        <label className="block text-sm font-medium text-brand-text-dim mb-2">Efeito Sonoro (opcional)</label>
+                        {inter.soundEffect ? (
+                          <div className="flex items-center gap-2">
+                            <audio controls src={inter.soundEffect} className="w-full"></audio>
+                            <button onClick={() => handleInteractionChange(index, 'soundEffect', undefined)} className="p-2 text-brand-text-dim hover:text-red-500" title="Remover som">
+                                <TrashIcon className="w-5 h-5" />
+                            </button>
                           </div>
-                      </div>
-                      <div className="flex items-start">
-                          <input type="checkbox" id={`goToScene-${index}`} checked={inter.goToScene !== undefined} onChange={e => handleConsequenceToggle(index, 'goToScene', e.target.checked )} disabled={inter.newSceneDescription !== undefined} className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary disabled:opacity-50"/>
-                          <div className="ml-2 flex-1">
-                               <label htmlFor={`goToScene-${index}`} className={`block text-sm text-brand-text-dim ${inter.newSceneDescription !== undefined ? 'opacity-50' : ''}`}>Ir para outra cena</label>
-                               {inter.goToScene !== undefined && (
-                                  <div className="mt-2">
-                                      <select value={inter.goToScene} onChange={e => handleInteractionChange(index, 'goToScene', e.target.value)} className={selectBaseClasses} style={selectStyle}>
-                                          <option className={optionDimClasses} value="">Selecione a cena de destino...</option>
-                                          {otherScenes.map(scene => <option className={optionBaseClasses} key={scene.id} value={scene.id}>{scene.name} ({scene.id})</option>)}
-                                      </select>
-                                  </div>
-                               )}
-                          </div>
-                      </div>
+                        ) : (
+                        <label className="inline-flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer">
+                            <UploadIcon className="w-5 h-5 mr-2" /> Carregar Áudio
+                            <input type="file" accept="audio/*" onChange={(e) => handleSoundUpload(e, index)} className="hidden" />
+                        </label>
+                        )}
                     </div>
-                </div>
-            </div>
-
-            <div className="mt-4 pt-4 border-t border-brand-border/50">
-                <label className="block text-sm font-medium text-brand-text-dim mb-2">Efeito Sonoro de Sucesso (opcional)</label>
-                {inter.soundEffect ? (
-                  <div className="flex items-center gap-2">
-                    <audio controls src={inter.soundEffect} className="w-full"></audio>
-                    <button onClick={() => handleInteractionChange(index, 'soundEffect', undefined)} className="p-2 text-brand-text-dim hover:text-red-500" title="Remover som">
-                        <TrashIcon className="w-5 h-5" />
-                    </button>
-                  </div>
-                ) : (
-                <label className="inline-flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer">
-                    <UploadIcon className="w-5 h-5 mr-2" /> Carregar Áudio
-                    <input type="file" accept="audio/*" onChange={(e) => handleSoundUpload(e, index)} className="hidden" />
-                </label>
-                )}
-                <p className="text-xs text-brand-text-dim mt-1">O som tocará quando a interação for bem-sucedida, especialmente durante a transição para uma nova cena.</p>
+                 </div>
             </div>
           </div>
         ))}

@@ -1,5 +1,7 @@
 
-import { GoogleGenAI, Modality } from "@google/genai";
+
+// FIX: Removed unused 'Modality' import as it is not needed for the updated image generation logic.
+import { GoogleGenAI } from "@google/genai";
 
 // We won't initialize the client at the module level to prevent crashes on load
 // if the API key environment variable isn't set up correctly.
@@ -35,26 +37,23 @@ export const generateSceneDescription = async (prompt: string): Promise<string> 
   }
 };
 
+// FIX: Updated to use the recommended 'imagen-4.0-generate-001' model and 'generateImages' method for image generation. This aligns with current best practices and is more suitable for creating a new image from a text prompt.
 export const generateSceneImage = async (prompt: string): Promise<string> => {
     try {
         const client = getAiClient();
-        const response = await client.models.generateContent({
-            model: 'gemini-2.5-flash-image-preview',
-            contents: {
-                parts: [{ text: prompt }],
-            },
+        const response = await client.models.generateImages({
+            model: 'imagen-4.0-generate-001',
+            prompt: prompt,
             config: {
-                responseModalities: [Modality.IMAGE, Modality.TEXT],
+              numberOfImages: 1,
+              outputMimeType: 'image/png',
+              aspectRatio: '9:16',
             },
         });
 
-        if (response.candidates && response.candidates.length > 0) {
-            const imagePart = response.candidates[0].content.parts.find(part => part.inlineData);
-            if (imagePart && imagePart.inlineData) {
-                const base64ImageBytes: string = imagePart.inlineData.data;
-                const mimeType = imagePart.inlineData.mimeType;
-                return `data:${mimeType};base64,${base64ImageBytes}`;
-            }
+        if (response.generatedImages && response.generatedImages.length > 0) {
+            const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;
+            return `data:image/png;base64,${base64ImageBytes}`;
         }
         throw new Error("A API não retornou uma imagem.");
 

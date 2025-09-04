@@ -7,6 +7,7 @@ interface SceneMapProps {
   scenes: Scene[];
   allScenesMap: GameData['scenes'];
   startSceneId: string;
+  onSelectScene: (sceneId: string) => void;
 }
 
 const NODE_WIDTH = 250;
@@ -21,7 +22,7 @@ const CONNECTOR_RADIUS = 8; // Half of connector width (w-4)
 type Node = Scene & { x: number; y: number; level: number; height: number };
 type Edge = { source: string; target: string; sourceInteractionId: string };
 
-const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId }) => {
+const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelectScene }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState({ x: 0, y: 0, scale: 1 });
   const [isPanning, setIsPanning] = useState(false);
@@ -185,7 +186,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId }) => {
   }, [handleZoom]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
-    if ((e.target as HTMLElement).closest('button')) return;
+    if ((e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('[data-clickable-node]')) return;
     setIsPanning(true);
     setPanStart({ x: e.clientX - view.x, y: e.clientY - view.y });
   }, [view.x, view.y]);
@@ -218,7 +219,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId }) => {
           <svg className="absolute" width={bounds.maxX - bounds.minX + NODE_WIDTH + X_GAP} height={bounds.maxY - bounds.minY + Y_GAP * 4} style={{ transform: `translate(${bounds.minX}px, ${bounds.minY}px)`, zIndex: 0 }}>
             <defs>
               <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#f87171" />
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#4fd1c5" />
               </marker>
             </defs>
             {edges.map((edge, i) => {
@@ -263,7 +264,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId }) => {
                 <path
                   key={`${edge.source}-${edge.target}-${i}`}
                   d={d}
-                  stroke="#f87171"
+                  stroke="#4fd1c5"
                   strokeWidth="2"
                   fill="none"
                   markerEnd="url(#arrow)"
@@ -278,18 +279,30 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId }) => {
             return (
               <div
                 key={node.id}
-                className={`absolute bg-brand-surface rounded-xl shadow-lg flex flex-col transition-all duration-300 border ${node.id === startSceneId ? 'border-brand-primary' : 'border-brand-border'}`}
+                data-clickable-node
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelectScene(node.id);
+                }}
+                className={`absolute bg-brand-surface rounded-xl shadow-lg flex flex-col transition-all duration-300 border ${
+                  node.id === startSceneId
+                    ? 'border-yellow-400'
+                    : node.isEndingScene
+                    ? 'border-red-500'
+                    : 'border-brand-border'
+                } cursor-pointer hover:border-yellow-400 hover:shadow-xl`}
                 style={{ width: NODE_WIDTH, transform: `translate(${node.x}px, ${node.y}px)`, height: node.height }}
               >
-                  <div className="p-3 relative flex-shrink-0" style={{height: NODE_HEADER_HEIGHT}}>
+                  <div className="p-3 relative flex-shrink-0 text-center" style={{height: NODE_HEADER_HEIGHT}}>
                       {/* Left Header Connector: filled if it receives a forward connection */}
-                      <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${nodesWithForwardIncomingEdges.has(node.id) ? 'bg-red-400' : 'bg-transparent border-2 border-slate-400'}`} />
+                      <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${nodesWithForwardIncomingEdges.has(node.id) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
                       {/* Right Header Connector: filled if it receives a backward connection */}
-                      <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${nodesWithBackwardIncomingEdges.has(node.id) ? 'bg-red-400' : 'bg-transparent border-2 border-slate-400'}`} />
+                      <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${nodesWithBackwardIncomingEdges.has(node.id) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
                       
                       <h3 className="font-bold text-brand-text truncate">{node.name}</h3>
                       <p className="text-xs text-brand-text-dim">(ID: {node.id})</p>
-                      {node.id === startSceneId && <p className="text-xs font-bold text-brand-primary mt-1">(Início)</p>}
+                      {node.id === startSceneId && <p className="text-xs font-bold text-yellow-400 mt-1">(Início)</p>}
+                      {node.isEndingScene && <p className="text-xs font-bold text-red-500 mt-1">(Fim de Jogo)</p>}
                   </div>
                   
                   {linkingInteractions.length > 0 && (
@@ -297,10 +310,10 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId }) => {
                         {linkingInteractions.map(inter => (
                                 <div key={inter.id} className="relative bg-brand-primary/10 text-brand-primary-hover font-medium py-1 flex items-center rounded-md" style={{height: INTERACTION_ITEM_HEIGHT}}>
                                     {/* Left Interaction Connector: filled if it sends a backward connection */}
-                                    <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-10 transition-colors ${interactionsWithBackwardOutgoingEdges.has(inter.id) ? 'bg-red-400' : 'bg-transparent border-2 border-slate-400'}`} />
+                                    <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-10 transition-colors ${interactionsWithBackwardOutgoingEdges.has(inter.id) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
                                     <span className="truncate px-4 text-center w-full text-sm">{inter.target}</span>
                                     {/* Right Interaction Connector: filled if it sends a forward connection */}
-                                    <div className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full z-10 right-0 translate-x-1/2 transition-colors ${interactionsWithForwardOutgoingEdges.has(inter.id) ? 'bg-red-400' : 'bg-transparent border-2 border-slate-400'}`} />
+                                    <div className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full z-10 right-0 translate-x-1/2 transition-colors ${interactionsWithForwardOutgoingEdges.has(inter.id) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
                                 </div>
                           ))
                         }

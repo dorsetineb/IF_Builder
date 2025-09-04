@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { Scene, GameObject } from '../types';
 import ObjectEditor from './ObjectEditor';
@@ -13,9 +14,10 @@ interface SceneEditorProps {
   scene: Scene;
   allScenes: Scene[];
   onUpdateScene: (scene: Scene) => void;
+  allObjectIds: string[];
 }
 
-const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateScene }) => {
+const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateScene, allObjectIds }) => {
   const [localScene, setLocalScene] = useState<Scene>(scene);
   const [isDirty, setIsDirty] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -36,9 +38,14 @@ const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateSce
   const updateLocalScene = <K extends keyof Scene,>(key: K, value: Scene[K]) => {
     setLocalScene(prev => ({ ...prev, [key]: value }));
   };
-  
-  const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    updateLocalScene('id', e.target.value);
+
+  const handleEndingSceneToggle = (isChecked: boolean) => {
+    setLocalScene(prev => ({
+        ...prev,
+        isEndingScene: isChecked,
+        objects: isChecked ? [] : prev.objects, 
+        interactions: isChecked ? [] : prev.interactions,
+    }));
   };
   
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -80,10 +87,14 @@ const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateSce
   };
   
   const handleSave = () => {
-    const finalScene = {
-        ...localScene,
-        id: localScene.id.trim().replace(/\s+/g, '_').toLowerCase() || `cena_${Date.now()}`
-    };
+    // ID is now immutable and generated on creation, so no need for complex parsing.
+    const finalScene: Scene = { ...localScene };
+
+    if (finalScene.isEndingScene) {
+        finalScene.objects = [];
+        finalScene.interactions = [];
+    }
+
     onUpdateScene(finalScene);
   }
   
@@ -135,35 +146,64 @@ const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateSce
                   <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"/>
                 </div>
                 <div>
-                  <label htmlFor="sceneId" className="block text-sm font-medium text-brand-text-dim mb-1">ID da Cena (único, sem espaços)</label>
-                  <input type="text" id="sceneId" value={localScene.id} onChange={handleIdChange} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"/>
+                  <label htmlFor="sceneId" className="block text-sm font-medium text-brand-text-dim mb-1">ID da Cena</label>
+                  <p 
+                    id="sceneId" 
+                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 text-brand-text-dim font-mono select-all"
+                    title="O ID da cena é único e não pode ser alterado."
+                  >
+                    {localScene.id}
+                  </p>
                 </div>
                 <div className="flex flex-col flex-1 min-h-0">
-                    <label htmlFor="sceneDescription" className="block text-sm font-medium text-brand-text-dim mb-1">Descrição</label>
+                    <label htmlFor="sceneDescription" className="block text-sm font-medium text-brand-text-dim mb-1">
+                      {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição'}
+                    </label>
                      <div className="relative flex-1">
                         <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary resize-y"/>
                      </div>
+                </div>
+                <div className="flex items-center pt-2 border-t border-brand-border/50">
+                    <input
+                        type="checkbox"
+                        id="isEndingScene"
+                        checked={!!localScene.isEndingScene}
+                        onChange={e => handleEndingSceneToggle(e.target.checked)}
+                        className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+                    />
+                    <label htmlFor="isEndingScene" className="ml-2 block text-sm text-brand-text-dim">
+                        Esta é uma cena final (Fim de Jogo).
+                    </label>
                 </div>
             </div>
         </div>
       </CollapsibleCard>
 
-      <CollapsibleCard title="Objetos">
-        <ObjectEditor
-            objects={localScene.objects || []}
-            onUpdateObjects={newObjects => updateLocalScene('objects', newObjects)}
-        />
-      </CollapsibleCard>
+      {!localScene.isEndingScene ? (
+        <>
+          <CollapsibleCard title="Objetos">
+            <ObjectEditor
+                objects={localScene.objects || []}
+                onUpdateObjects={newObjects => updateLocalScene('objects', newObjects)}
+                allObjectIds={allObjectIds}
+            />
+          </CollapsibleCard>
 
-      <CollapsibleCard title="Interações">
-        <InteractionEditor
-            interactions={localScene.interactions || []}
-            onUpdateInteractions={newInteractions => updateLocalScene('interactions', newInteractions)}
-            allScenes={allScenes}
-            currentSceneId={localScene.id}
-            sceneObjects={localScene.objects || []}
-        />
-      </CollapsibleCard>
+          <CollapsibleCard title="Interações">
+            <InteractionEditor
+                interactions={localScene.interactions || []}
+                onUpdateInteractions={newInteractions => updateLocalScene('interactions', newInteractions)}
+                allScenes={allScenes}
+                currentSceneId={localScene.id}
+                sceneObjects={localScene.objects || []}
+            />
+          </CollapsibleCard>
+        </>
+      ) : (
+        <div className="text-center p-4 bg-brand-bg border-2 border-dashed border-brand-border rounded-md text-brand-text-dim">
+            Cenas finais não possuem objetos ou interações. Chegar a esta cena encerrará o jogo.
+        </div>
+      )}
 
       <div className="fixed bottom-6 right-10 z-10 flex gap-2">
            <button

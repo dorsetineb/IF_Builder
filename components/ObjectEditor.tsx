@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -6,12 +7,21 @@ import { TrashIcon } from './icons/TrashIcon';
 interface ObjectEditorProps {
   objects: GameObject[];
   onUpdateObjects: (objects: GameObject[]) => void;
+  allObjectIds: string[];
 }
 
-const ObjectEditor: React.FC<ObjectEditorProps> = ({ objects = [], onUpdateObjects }) => {
+const generateUniqueId = (prefix: 'obj', existingIds: string[]): string => {
+    let id;
+    do {
+        id = `${prefix}_${Math.random().toString(36).substring(2, 10)}`;
+    } while (existingIds.includes(id));
+    return id;
+};
+
+const ObjectEditor: React.FC<ObjectEditorProps> = ({ objects = [], onUpdateObjects, allObjectIds }) => {
   const handleAddObject = () => {
     const newObject: GameObject = {
-      id: `objeto_${Date.now()}`,
+      id: generateUniqueId('obj', allObjectIds),
       name: 'Novo Objeto',
       examineDescription: 'Descrição do novo objeto.',
       isTakable: false,
@@ -26,11 +36,8 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ objects = [], onUpdateObjec
   const handleObjectChange = (index: number, field: keyof GameObject, value: string | boolean) => {
     const newObjects = objects.map((obj, i) => {
         if (i === index) {
-            let finalValue = value;
-            if (field === 'id' && typeof value === 'string') {
-                finalValue = value.trim().replace(/\s+/g, '_').toLowerCase();
-            }
-            return { ...obj, [field]: finalValue };
+            // The 'id' field is now read-only, so we don't need special handling for it.
+            return { ...obj, [field]: value };
         }
         return obj;
     });
@@ -64,15 +71,14 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ objects = [], onUpdateObjec
                         />
                     </div>
                     <div>
-                        <label htmlFor={`obj-id-${index}`} className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto (único, sem espaços)</label>
-                        <input
+                        <label htmlFor={`obj-id-${index}`} className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
+                        <p
                             id={`obj-id-${index}`}
-                            type="text"
-                            value={obj.id}
-                            onChange={e => handleObjectChange(index, 'id', e.target.value)}
-                            placeholder="ID do Objeto"
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-brand-primary focus:border-brand-primary"
-                        />
+                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
+                            title="O ID do objeto é único e não pode ser alterado."
+                        >
+                            {obj.id}
+                        </p>
                     </div>
                     <div className="flex items-center pt-2">
                       <input
