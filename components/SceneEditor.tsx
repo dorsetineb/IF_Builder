@@ -108,7 +108,14 @@ const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateSce
   };
 
   return (
-    <div className="space-y-4 pb-24">
+    <div className="space-y-6 pb-24">
+      <div>
+        <h2 className="text-3xl font-bold text-brand-text">Editor de Cena</h2>
+        <p className="text-brand-text-dim mt-1">
+          Defina a imagem, descrição, objetos e interações para a cena <code className="bg-brand-bg px-1 py-0.5 rounded text-brand-primary-hover">{localScene.name}</code>.
+        </p>
+      </div>
+
       <CollapsibleCard title="Propriedades" startOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
             {/* Left Column: Image */}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { GameData } from '../types';
 import { UploadIcon } from './icons/UploadIcon';
@@ -178,12 +179,17 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
 
   return (
     <div className="space-y-6 pb-24">
-      <h2 className="text-2xl font-bold text-brand-primary">Informações do Jogo</h2>
+      <div>
+        <h2 className="text-3xl font-bold text-brand-text">Informações Gerais e Abertura</h2>
+        <p className="text-brand-text-dim mt-1">
+          Configure o título, a tela de abertura e outras configurações globais do seu jogo.
+        </p>
+      </div>
 
       <CollapsibleCard title="Geral" startOpen={true}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
               <div className="space-y-2">
-                  <h4 className="text-lg font-semibold text-brand-text">Título do Jogo</h4>
+                  <h4 className="text-lg font-semibold text-brand-text mb-2">Título do Jogo</h4>
                   <input
                     type="text"
                     id="gameTitle"
@@ -217,7 +223,7 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
               </div>
 
               <div className="space-y-2">
-                  <h4 className="text-lg font-semibold text-brand-text">Logotipo do Jogo</h4>
+                  <h4 className="text-lg font-semibold text-brand-text mb-2">Logotipo do Jogo</h4>
                   <div className="flex items-center gap-4">
                       {localLogo && <img src={localLogo} alt="Pré-visualização do logo" className="h-16 w-auto bg-brand-bg p-1 border border-brand-border rounded" />}
                       <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
@@ -304,7 +310,7 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
       <CollapsibleCard title="Abertura do jogo" startOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
             <div className="space-y-2">
-                <h4 className="text-lg font-semibold text-brand-text">Dimensões do Conteúdo</h4>
+                <h4 className="text-lg font-semibold text-brand-text mb-2">Dimensões do Conteúdo</h4>
                 <p className="text-xs text-brand-text-dim">Visualizador de proporção:</p>
                 <div
                     className="relative w-full aspect-video bg-green-500/30 border border-green-400 rounded-md flex"
@@ -379,7 +385,7 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
             </div>
             
             <div className="space-y-2">
-                <h4 className="text-lg font-semibold text-brand-text">Imagem de Fundo</h4>
+                <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
                 <div className="flex items-start gap-4">
                     {localSplashImage && <img src={localSplashImage} alt="Fundo da tela de abertura" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />}
                     <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">

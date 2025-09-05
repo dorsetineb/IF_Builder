@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { GameData } from '../types';
 import CollapsibleCard from './CollapsibleCard';
@@ -83,14 +84,19 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   };
 
   return (
-    <div className="h-full flex flex-col gap-6 pb-24">
-      <h2 className="text-2xl font-bold text-brand-primary">Editor de Interface</h2>
+    <div className="space-y-6 pb-24">
+      <div>
+        <h2 className="text-3xl font-bold text-brand-text">Aparência e Interface</h2>
+        <p className="text-brand-text-dim mt-1">
+            Personalize o layout, as cores e os textos da interface do seu jogo. Para personalizações avançadas, edite o código-fonte.
+        </p>
+      </div>
       
       <CollapsibleCard title="Layout" startOpen={true}>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-center">
             <div className="space-y-6">
                 <div>
-                    <label htmlFor="orientation-select" className="block text-lg font-semibold text-brand-text mb-2">Orientação</label>
+                    <label htmlFor="orientation-select" className="block text-sm font-medium text-brand-text-dim mb-1">Orientação</label>
                     <select
                         id="orientation-select"
                         value={localLayoutOrientation}
@@ -102,7 +108,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                     </select>
                 </div>
                 <div>
-                    <label htmlFor="order-select" className="block text-lg font-semibold text-brand-text mb-2">Posição da Imagem</label>
+                    <label htmlFor="order-select" className="block text-sm font-medium text-brand-text-dim mb-1">Posição da Imagem</label>
                     <select
                         id="order-select"
                         value={localLayoutOrder}

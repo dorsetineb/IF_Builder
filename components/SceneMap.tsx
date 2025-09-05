@@ -259,7 +259,12 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
 
   return (
     <div className="h-full flex flex-col relative">
-      <h2 className="text-2xl font-bold text-brand-primary mb-4 flex-shrink-0">Mapa de Cenas</h2>
+      <div className="mb-4 flex-shrink-0">
+        <h2 className="text-3xl font-bold text-brand-text">Mapa de Cenas</h2>
+        <p className="text-brand-text-dim mt-1">
+          Visualize e organize a estrutura do seu jogo. Arraste as cenas para reposicioná-las e clique para editá-las.
+        </p>
+      </div>
       <div 
         ref={containerRef}
         className={`w-full h-full bg-brand-bg rounded-lg border border-brand-border overflow-hidden ${isPanning || dragInfo ? 'cursor-grabbing' : 'cursor-grab'}`}

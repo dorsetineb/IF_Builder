@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Interaction, Scene, GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -100,7 +101,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = []
         {interactions.map((inter, index) => (
           <div key={inter.id} className="p-4 bg-brand-bg rounded-md border border-brand-border/50">
             <div className="flex justify-between items-center mb-4">
-                 <p className="font-semibold text-lg text-brand-text">Interação #{index + 1}</p>
+                 <h3 className="font-semibold text-lg text-brand-text">Interação #{index + 1}</h3>
                  <button onClick={() => handleRemoveInteraction(index)} className="p-1 text-brand-text-dim hover:text-red-500 rounded-full" title="Remover interação">
                     <TrashIcon className="w-5 h-5" />
                 </button>
@@ -161,7 +162,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = []
 
             {/* --- Consequências --- */}
             <div className="mt-4 pt-4 border-t border-brand-border/50">
-                <h4 className="text-md font-semibold mb-2 text-brand-text">Resultado da Ação</h4>
+                <h4 className="text-lg font-semibold mb-3 text-brand-text">Resultado da Ação</h4>
                 <div className="space-y-3">
                     <div className="flex items-start">
                         <input type="checkbox" id={`newDesc-${index}`} checked={inter.newSceneDescription !== undefined} onChange={e => handleConsequenceToggle(index, 'newSceneDescription', e.target.checked )} className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"/>
@@ -186,7 +187,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = []
             </div>
             
             <div className="mt-4 pt-4 border-t border-brand-border/50">
-                <h4 className="text-md font-semibold mb-2 text-brand-text">Efeitos Adicionais</h4>
+                <h4 className="text-lg font-semibold mb-3 text-brand-text">Efeitos Adicionais</h4>
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-3">
                     <div className="space-y-3">
                         <div className="flex items-center">
