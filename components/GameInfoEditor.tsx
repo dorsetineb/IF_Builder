@@ -25,10 +25,10 @@ interface GameInfoEditorProps {
   onUpdate: (field: keyof GameData, value: string | boolean | number) => void;
 }
 
-// Helper to extract number from a CSS value like "600px" or "auto"
-const extractNumber = (value: string): string => {
+// Helper to extract number from a CSS value like "60%" or "auto"
+const extractPercentage = (value: string): string => {
     if (value === 'auto') return '';
-    const num = parseInt(value, 10);
+    const num = parseFloat(value);
     return isNaN(num) ? '' : String(num);
 };
 
@@ -168,25 +168,12 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
             setter('auto');
         } else {
             const num = Number(value);
-            if (!isNaN(num) && num >= 0) {
-                setter(`${num}px`);
+            if (!isNaN(num)) {
+                const clampedNum = Math.max(0, Math.min(100, num));
+                setter(`${clampedNum}%`);
             }
         }
     };
-
-    const proportionalWidth = useMemo(() => {
-        const widthValue = parseInt(localSplashTextWidth, 10);
-        if (isNaN(widthValue)) return 50;
-        const screenWidth = 1920; 
-        return Math.min(100, Math.max(0, (widthValue / screenWidth) * 100));
-    }, [localSplashTextWidth]);
-
-    const proportionalHeight = useMemo(() => {
-        const heightValue = parseInt(localSplashTextHeight, 10);
-        if (isNaN(heightValue)) return 33;
-        const screenHeight = 1080;
-        return Math.min(100, Math.max(0, (heightValue / screenHeight) * 100));
-    }, [localSplashTextHeight]);
 
 
   return (
@@ -319,9 +306,30 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
             <div className="space-y-2">
                 <h4 className="text-lg font-semibold text-brand-text">Dimensões do Conteúdo</h4>
                 <p className="text-xs text-brand-text-dim">Visualizador de proporção:</p>
-                <div className={`w-full aspect-video bg-brand-bg border border-brand-border rounded-md p-2 flex items-end ${localSplashContentAlignment === 'left' ? 'justify-start' : 'justify-end'}`}>
-                    <div className="bg-brand-primary/30 border border-dashed border-brand-primary" style={{width: `${proportionalWidth}%`, height: `${proportionalHeight}%`}}></div>
+                <div
+                    className="relative w-full aspect-video bg-green-500/30 border border-green-400 rounded-md flex"
+                    style={{
+                        justifyContent: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
+                        alignItems: 'flex-end'
+                    }}
+                    title="Área da Imagem de Fundo"
+                >
+                    <div className="absolute top-2 left-2 text-green-200 font-semibold text-sm">
+                        Imagem
+                    </div>
+                    <div
+                        className="bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold"
+                        style={{
+                            width: localSplashTextWidth !== 'auto' ? localSplashTextWidth : 'auto',
+                            minWidth: '40%',
+                            height: localSplashTextHeight !== 'auto' ? localSplashTextHeight : 'auto',
+                        }}
+                        title="Área de Texto"
+                    >
+                        Texto
+                    </div>
                 </div>
+
                 <div className="flex items-end gap-4 pt-2">
                     <div className="flex-1">
                         <label htmlFor="splashTextWidth" className="text-sm text-brand-text-dim mb-1 block">Largura</label>
@@ -329,12 +337,14 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                             <input
                                 id="splashTextWidth"
                                 type="number"
-                                value={extractNumber(localSplashTextWidth)}
+                                min="0"
+                                max="100"
+                                value={extractPercentage(localSplashTextWidth)}
                                 onChange={(e) => handleDimensionChange(e, setLocalSplashTextWidth)}
                                 className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
                                 placeholder="auto"
                             />
-                            <span className="ml-2 text-brand-text-dim">px</span>
+                            <span className="ml-2 text-brand-text-dim">%</span>
                         </div>
                     </div>
                      <div className="flex-1">
@@ -343,12 +353,14 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                             <input
                                 id="splashTextHeight"
                                 type="number"
-                                value={extractNumber(localSplashTextHeight)}
+                                min="0"
+                                max="100"
+                                value={extractPercentage(localSplashTextHeight)}
                                 onChange={(e) => handleDimensionChange(e, setLocalSplashTextHeight)}
                                 className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
                                 placeholder="auto"
                             />
-                            <span className="ml-2 text-brand-text-dim">px</span>
+                            <span className="ml-2 text-brand-text-dim">%</span>
                          </div>
                     </div>
                 </div>

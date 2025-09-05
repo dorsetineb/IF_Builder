@@ -1,6 +1,4 @@
 
-
-
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -619,7 +617,7 @@ const initializeGameData = (): GameData => {
         gameTitle: "Fuja da Masmorra",
         gameLogo: "", // base64 string
         gameSplashImage: "", // base64 string
-        gameSplashTextWidth: "600px",
+        gameSplashTextWidth: "60%",
         gameSplashTextHeight: "auto",
         gameSplashContentAlignment: 'right',
         gameSplashDescription: "Uma breve descrição da sua aventura começa aqui. O que o jogador deve saber antes de iniciar?",
@@ -650,10 +648,29 @@ const App: React.FC = () => {
   const [selectedSceneId, setSelectedSceneId] = useState<string | null>(gameData.startScene);
   const [currentView, setCurrentView] = useState<View>('scenes');
   const [isPreviewMode, setIsPreviewMode] = useState(false);
+  const [gameDataForPreview, setGameDataForPreview] = useState<GameData | null>(null);
 
   const handleTogglePreview = useCallback(() => {
-    setIsPreviewMode(prev => !prev);
+    setIsPreviewMode(prev => {
+        const isOpening = !prev;
+        if (isOpening) {
+            // When opening the GLOBAL preview, ensure the single-scene data is cleared.
+            setGameDataForPreview(null);
+        }
+        return isOpening;
+    });
   }, []);
+  
+  const handlePreviewSingleScene = useCallback((sceneWithUnsavedChanges: Scene) => {
+    const tempGameData = JSON.parse(JSON.stringify(gameData));
+    // Overwrite the scene in our temporary data with the version from the editor
+    tempGameData.scenes[sceneWithUnsavedChanges.id] = sceneWithUnsavedChanges;
+    // Set the starting scene for the preview to be the one we're editing
+    tempGameData.startScene = sceneWithUnsavedChanges.id;
+    
+    setGameDataForPreview(tempGameData);
+    setIsPreviewMode(true);
+  }, [gameData]);
 
   const handleSelectSceneAndSwitchView = useCallback((id: string) => {
     setSelectedSceneId(id);
@@ -774,6 +791,23 @@ const App: React.FC = () => {
     setGameData(prev => ({ ...prev, [field]: value }));
   }, []);
 
+  const handleUpdateScenePosition = useCallback((sceneId: string, x: number, y: number) => {
+    setGameData(prev => {
+      const newScenes = { ...prev.scenes };
+      if (newScenes[sceneId]) {
+        newScenes[sceneId] = {
+          ...newScenes[sceneId],
+          mapX: x,
+          mapY: y,
+        };
+      }
+      return {
+        ...prev,
+        scenes: newScenes,
+      };
+    });
+  }, []);
+
   const scenesInOrder = gameData.sceneOrder.map(id => gameData.scenes[id]).filter(Boolean);
   const selectedScene = selectedSceneId ? gameData.scenes[selectedSceneId] : null;
 
@@ -790,6 +824,7 @@ const App: React.FC = () => {
             allScenes={scenesInOrder}
             onUpdateScene={handleUpdateScene}
             allObjectIds={allObjectIds}
+            onPreviewScene={handlePreviewSingleScene}
           />
         ) : <WelcomePlaceholder />;
       case 'interface':
@@ -814,7 +849,7 @@ const App: React.FC = () => {
                     textColor={gameData.gameTextColor || ''}
                     titleColor={gameData.gameTitleColor || ''}
                     splashImage={gameData.gameSplashImage || ''}
-                    splashTextWidth={gameData.gameSplashTextWidth || '600px'}
+                    splashTextWidth={gameData.gameSplashTextWidth || '60%'}
                     splashTextHeight={gameData.gameSplashTextHeight || 'auto'}
                     splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
                     splashDescription={gameData.gameSplashDescription || ''}
@@ -829,10 +864,11 @@ const App: React.FC = () => {
                 />;
       case 'scene_map':
         return <SceneMap 
-                  scenes={scenesInOrder}
                   allScenesMap={gameData.scenes}
                   startSceneId={gameData.startScene}
                   onSelectScene={handleSelectSceneAndSwitchView}
+                  onUpdateScenePosition={handleUpdateScenePosition}
+                  onAddScene={handleAddScene}
                 />;
       default:
         return <WelcomePlaceholder />;
@@ -849,7 +885,7 @@ const App: React.FC = () => {
       />
       <div className="flex flex-grow min-h-0">
         {isPreviewMode ? (
-          <Preview gameData={gameData} />
+          <Preview gameData={gameDataForPreview || gameData} />
         ) : (
           <>
             <Sidebar

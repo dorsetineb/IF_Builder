@@ -38,6 +38,8 @@ export interface Scene {
   interactions: Interaction[];
   exits?: Exits;
   isEndingScene?: boolean;
+  mapX?: number;
+  mapY?: number;
 }
 
 export interface GameData {

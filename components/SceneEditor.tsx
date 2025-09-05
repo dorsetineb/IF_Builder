@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect } from 'react';
 import { Scene, GameObject } from '../types';
 import ObjectEditor from './ObjectEditor';
@@ -9,15 +8,17 @@ import CollapsibleCard from './CollapsibleCard';
 import { SparklesIcon } from './icons/SparklesIcon';
 import { generateSceneImage } from '../services/geminiService';
 import { TrashIcon } from './icons/TrashIcon';
+import { EyeIcon } from './icons/EyeIcon';
 
 interface SceneEditorProps {
   scene: Scene;
   allScenes: Scene[];
   onUpdateScene: (scene: Scene) => void;
   allObjectIds: string[];
+  onPreviewScene: (scene: Scene) => void;
 }
 
-const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateScene, allObjectIds }) => {
+const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateScene, allObjectIds, onPreviewScene }) => {
   const [localScene, setLocalScene] = useState<Scene>(scene);
   const [isDirty, setIsDirty] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
@@ -102,6 +103,9 @@ const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateSce
     setLocalScene(scene);
   };
 
+  const handlePreview = () => {
+    onPreviewScene(localScene);
+  };
 
   return (
     <div className="space-y-4 pb-24">
@@ -206,6 +210,14 @@ const SceneEditor: React.FC<SceneEditorProps> = ({ scene, allScenes, onUpdateSce
       )}
 
       <div className="fixed bottom-6 right-10 z-10 flex gap-2">
+           <button
+              onClick={handlePreview}
+              className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors"
+              title="Pré-visualizar esta cena (com alterações não salvas)"
+            >
+              <EyeIcon className="w-5 h-5 mr-2" />
+              Pré-visualizar Cena
+            </button>
            <button
               onClick={handleUndo}
               disabled={!isDirty}
