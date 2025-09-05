@@ -13,9 +13,6 @@ interface GameInfoEditorProps {
   splashTextHeight: string;
   splashContentAlignment: 'left' | 'right';
   splashDescription: string;
-  enableChances: boolean;
-  maxChances: number;
-  chanceIcon: 'circle' | 'cross' | 'heart';
   onUpdate: (field: keyof GameData, value: string | boolean | number) => void;
 }
 
@@ -30,7 +27,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
     const { 
         title, logo, hideTitle, omitSplashTitle, 
         splashImage, splashTextWidth, splashTextHeight, splashContentAlignment, splashDescription,
-        enableChances, maxChances, chanceIcon,
         onUpdate 
     } = props;
 
@@ -43,9 +39,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
     const [localSplashTextHeight, setLocalSplashTextHeight] = useState(splashTextHeight);
     const [localSplashContentAlignment, setLocalSplashContentAlignment] = useState(splashContentAlignment);
     const [localSplashDescription, setLocalSplashDescription] = useState(splashDescription);
-    const [localEnableChances, setLocalEnableChances] = useState(enableChances);
-    const [localMaxChances, setLocalMaxChances] = useState(maxChances);
-    const [localChanceIcon, setLocalChanceIcon] = useState(chanceIcon);
     const [activeTab, setActiveTab] = useState('geral');
     const [isDirty, setIsDirty] = useState(false);
 
@@ -59,9 +52,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         setLocalSplashTextHeight(props.splashTextHeight);
         setLocalSplashContentAlignment(props.splashContentAlignment);
         setLocalSplashDescription(props.splashDescription);
-        setLocalEnableChances(props.enableChances);
-        setLocalMaxChances(props.maxChances);
-        setLocalChanceIcon(props.chanceIcon);
         setIsDirty(false);
     }, [props]);
 
@@ -74,12 +64,9 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                          localSplashTextWidth !== splashTextWidth ||
                          localSplashTextHeight !== splashTextHeight ||
                          localSplashContentAlignment !== splashContentAlignment ||
-                         localSplashDescription !== splashDescription ||
-                         localEnableChances !== enableChances ||
-                         localMaxChances !== maxChances ||
-                         localChanceIcon !== chanceIcon;
+                         localSplashDescription !== splashDescription;
         setIsDirty(hasChanged);
-    }, [localTitle, localLogo, localHideTitle, localOmitSplashTitle, localSplashImage, localSplashTextWidth, localSplashTextHeight, localSplashContentAlignment, localSplashDescription, localEnableChances, localMaxChances, localChanceIcon, props]);
+    }, [localTitle, localLogo, localHideTitle, localOmitSplashTitle, localSplashImage, localSplashTextWidth, localSplashTextHeight, localSplashContentAlignment, localSplashDescription, props]);
 
     const handleSave = () => {
         if (localTitle !== title) onUpdate('gameTitle', localTitle);
@@ -91,9 +78,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         if (localSplashTextHeight !== splashTextHeight) onUpdate('gameSplashTextHeight', localSplashTextHeight);
         if (localSplashContentAlignment !== splashContentAlignment) onUpdate('gameSplashContentAlignment', localSplashContentAlignment);
         if (localSplashDescription !== splashDescription) onUpdate('gameSplashDescription', localSplashDescription);
-        if (localEnableChances !== enableChances) onUpdate('gameEnableChances', localEnableChances);
-        if (localMaxChances !== maxChances) onUpdate('gameMaxChances', localMaxChances);
-        if (localChanceIcon !== chanceIcon) onUpdate('gameChanceIcon', localChanceIcon);
     };
     
     const handleUndo = () => {
@@ -106,9 +90,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         setLocalSplashTextHeight(splashTextHeight);
         setLocalSplashContentAlignment(splashContentAlignment);
         setLocalSplashDescription(splashDescription);
-        setLocalEnableChances(enableChances);
-        setLocalMaxChances(maxChances);
-        setLocalChanceIcon(chanceIcon);
     };
     
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
@@ -139,7 +120,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
     const TABS = {
         geral: 'Geral',
         abertura: 'Abertura do Jogo',
-        vidas: 'Sistema de Vidas',
     };
 
   return (
@@ -327,51 +307,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                         </div>
                     </div>
                 </div>
-            </div>
-        )}
-
-        {activeTab === 'vidas' && (
-            <div>
-                <h4 className="text-lg font-semibold text-brand-text mb-4">Sistema de Chances (Vidas)</h4>
-                <div className="flex items-center">
-                    <input 
-                        type="checkbox" 
-                        id="enableChances" 
-                        checked={localEnableChances} 
-                        onChange={(e) => setLocalEnableChances(e.target.checked)}
-                        className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
-                    />
-                    <label htmlFor="enableChances" className="ml-2 text-sm text-brand-text-dim">Habilitar sistema de chances</label>
-                </div>
-                {localEnableChances && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mt-4 pl-6 border-l-2 border-brand-border">
-                        <div>
-                            <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
-                            <input
-                                type="number"
-                                id="maxChances"
-                                value={localMaxChances}
-                                onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
-                                min="1"
-                                max="10"
-                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="chanceIcon" className="block text-sm font-medium text-brand-text-dim mb-1">Ícone das Chances</label>
-                            <select
-                                id="chanceIcon"
-                                value={localChanceIcon}
-                                onChange={(e) => setLocalChanceIcon(e.target.value as any)}
-                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2"
-                            >
-                                <option value="heart">Corações</option>
-                                <option value="circle">Círculos</option>
-                                <option value="cross">Cruzes</option>
-                            </select>
-                        </div>
-                    </div>
-                )}
             </div>
         )}
       </div>

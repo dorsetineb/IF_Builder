@@ -11,7 +11,10 @@ interface ThemeEditorProps {
   focusColor: string;
   chanceIconColor: string;
   gameFontFamily: string;
-  onUpdate: (field: keyof GameData, value: string) => void;
+  enableChances: boolean;
+  maxChances: number;
+  chanceIcon: 'circle' | 'cross' | 'heart';
+  onUpdate: (field: keyof GameData, value: any) => void;
 }
 
 const FONTS = [
@@ -61,7 +64,8 @@ const ColorInput: React.FC<{
 const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
     const { 
         textColor, titleColor, splashButtonColor, splashButtonHoverColor,
-        actionButtonColor, focusColor, chanceIconColor, gameFontFamily, onUpdate 
+        actionButtonColor, focusColor, chanceIconColor, gameFontFamily, 
+        enableChances, maxChances, chanceIcon, onUpdate 
     } = props;
 
     const [localTextColor, setLocalTextColor] = useState(textColor);
@@ -72,6 +76,9 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
     const [localFocusColor, setLocalFocusColor] = useState(focusColor);
     const [localChanceIconColor, setLocalChanceIconColor] = useState(chanceIconColor);
     const [localFontFamily, setLocalFontFamily] = useState(gameFontFamily);
+    const [localEnableChances, setLocalEnableChances] = useState(enableChances);
+    const [localMaxChances, setLocalMaxChances] = useState(maxChances);
+    const [localChanceIcon, setLocalChanceIcon] = useState(chanceIcon);
     const [isDirty, setIsDirty] = useState(false);
     const [focusPreview, setFocusPreview] = useState(false);
 
@@ -84,6 +91,9 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         setLocalFocusColor(props.focusColor);
         setLocalChanceIconColor(props.chanceIconColor);
         setLocalFontFamily(props.gameFontFamily);
+        setLocalEnableChances(props.enableChances);
+        setLocalMaxChances(props.maxChances);
+        setLocalChanceIcon(props.chanceIcon);
         setIsDirty(false);
     }, [props]);
 
@@ -95,9 +105,12 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                       localActionButtonColor !== actionButtonColor ||
                       localFocusColor !== focusColor ||
                       localChanceIconColor !== chanceIconColor ||
-                      localFontFamily !== gameFontFamily;
+                      localFontFamily !== gameFontFamily ||
+                      localEnableChances !== enableChances ||
+                      localMaxChances !== maxChances ||
+                      localChanceIcon !== chanceIcon;
         setIsDirty(dirty);
-    }, [localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localActionButtonColor, localFocusColor, localChanceIconColor, localFontFamily, props]);
+    }, [localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localActionButtonColor, localFocusColor, localChanceIconColor, localFontFamily, localEnableChances, localMaxChances, localChanceIcon, props]);
 
     const handleSave = () => {
         if (localTextColor !== textColor) onUpdate('gameTextColor', localTextColor);
@@ -108,6 +121,9 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         if (localFocusColor !== focusColor) onUpdate('gameFocusColor', localFocusColor);
         if (localChanceIconColor !== chanceIconColor) onUpdate('gameChanceIconColor', localChanceIconColor);
         if (localFontFamily !== gameFontFamily) onUpdate('gameFontFamily', localFontFamily);
+        if (localEnableChances !== enableChances) onUpdate('gameEnableChances', localEnableChances);
+        if (localMaxChances !== maxChances) onUpdate('gameMaxChances', localMaxChances);
+        if (localChanceIcon !== chanceIcon) onUpdate('gameChanceIcon', localChanceIcon);
     };
     
     const handleUndo = () => {
@@ -119,20 +135,45 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         setLocalFocusColor(focusColor);
         setLocalChanceIconColor(chanceIconColor);
         setLocalFontFamily(gameFontFamily);
+        setLocalEnableChances(enableChances);
+        setLocalMaxChances(maxChances);
+        setLocalChanceIcon(chanceIcon);
     };
     
-    const HeartIcon: React.FC<{ color: string }> = ({ color }) => (
-        <svg fill={color} viewBox="0 0 24 24" className="w-7 h-7">
+    const HeartIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
+        <svg fill={color} viewBox="0 0 24 24" className={className}>
             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
         </svg>
     );
+
+    const CircleIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
+      <svg fill={color} viewBox="0 0 24 24" className={className}>
+        <circle cx="12" cy="12" r="10"/>
+      </svg>
+    );
+
+    const CrossIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
+      <svg stroke={color} strokeWidth="3" strokeLinecap="round" viewBox="0 0 24 24" className={className} fill="none">
+        <path d="M12 5 V19 M5 12 H19"/>
+      </svg>
+    );
+
+    const ChanceIcon: React.FC<{ type: 'heart' | 'circle' | 'cross', color: string, className?: string }> = ({ type, color, className }) => {
+        switch (type) {
+            case 'heart': return <HeartIcon color={color} className={className} />;
+            case 'circle': return <CircleIcon color={color} className={className} />;
+            case 'cross': return <CrossIcon color={color} className={className} />;
+            default: return <HeartIcon color={color} className={className} />;
+        }
+    };
+
 
     return (
         <div className="space-y-6 pb-24">
             <div>
                 <h2 className="text-3xl font-bold text-brand-text">Tema do Jogo</h2>
                 <p className="text-brand-text-dim mt-1">
-                    Gerencie a paleta de cores e a fonte do seu jogo. As alterações são refletidas na pré-visualização ao vivo.
+                    Gerencie a paleta de cores, fonte e outros elementos visuais do seu jogo.
                 </p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -175,8 +216,50 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <ColorInput label="Cor do Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#ffffff" />
                             <ColorInput label="Cor de Destaque (Foco)" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#58a6ff" />
-                            <ColorInput label="Cor dos Ícones de Vidas" id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
                         </div>
+                    </div>
+                     <div className="pt-6 border-t border-brand-border/50">
+                        <h3 className="text-lg font-semibold text-brand-text mb-4">Sistema de Chances (Vidas)</h3>
+                        <div className="flex items-center">
+                            <input 
+                                type="checkbox" 
+                                id="enableChances" 
+                                checked={localEnableChances} 
+                                onChange={(e) => setLocalEnableChances(e.target.checked)}
+                                className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+                            />
+                            <label htmlFor="enableChances" className="ml-2 text-sm text-brand-text-dim">Habilitar sistema de chances</label>
+                        </div>
+                        {localEnableChances && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4 pl-6 border-l-2 border-brand-border/50">
+                                <ColorInput label="Cor dos Ícones de Vidas" id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
+                                <div>
+                                    <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
+                                    <input
+                                        type="number"
+                                        id="maxChances"
+                                        value={localMaxChances}
+                                        onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
+                                        min="1"
+                                        max="10"
+                                        className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2"
+                                    />
+                                </div>
+                                <div>
+                                    <label htmlFor="chanceIcon" className="block text-sm font-medium text-brand-text-dim mb-1">Formato do Ícone</label>
+                                    <select
+                                        id="chanceIcon"
+                                        value={localChanceIcon}
+                                        onChange={(e) => setLocalChanceIcon(e.target.value as any)}
+                                        className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2"
+                                    >
+                                        <option value="heart">Corações</option>
+                                        <option value="circle">Círculos</option>
+                                        <option value="cross">Cruzes</option>
+                                    </select>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
 
@@ -185,11 +268,13 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                     <div className="flex-1 bg-[#0d1117] rounded-lg border-2 border-brand-border p-6 flex flex-col justify-between" style={{ fontFamily: localFontFamily }}>
                         <div className="flex justify-between items-start">
                              <h1 className="text-xl" style={{ color: localTitleColor }}>Título do Jogo</h1>
-                             <div className="flex gap-1">
-                                <HeartIcon color={localChanceIconColor} />
-                                <HeartIcon color={localChanceIconColor} />
-                                <HeartIcon color={localChanceIconColor} />
-                             </div>
+                             {localEnableChances && (
+                                <div className="flex gap-1">
+                                    {Array.from({ length: localMaxChances }).map((_, i) => (
+                                        <ChanceIcon key={i} type={localChanceIcon} color={localChanceIconColor} />
+                                    ))}
+                                </div>
+                             )}
                         </div>
                         <div className="my-4">
                             <p className="text-sm" style={{ color: localTextColor }}>Esta é uma descrição de exemplo para a cena. Ela usa a cor de texto padrão que você definir.</p>

@@ -874,9 +874,6 @@ const App: React.FC = () => {
             splashTextHeight={gameData.gameSplashTextHeight || 'auto'}
             splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
             splashDescription={gameData.gameSplashDescription || ''}
-            enableChances={gameData.gameEnableChances || false}
-            maxChances={gameData.gameMaxChances || 3}
-            chanceIcon={gameData.gameChanceIcon || 'heart'}
             onUpdate={handleUpdateGameData}
           />
         );
@@ -891,6 +888,9 @@ const App: React.FC = () => {
             focusColor={gameData.gameFocusColor || '#58a6ff'}
             chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
             gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
+            enableChances={gameData.gameEnableChances || false}
+            maxChances={gameData.gameMaxChances || 3}
+            chanceIcon={gameData.gameChanceIcon || 'heart'}
             onUpdate={handleUpdateGameData}
           />
         );
