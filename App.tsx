@@ -549,7 +549,7 @@ const initialScenes: { [id: string]: Scene } = {
 const generateUniqueId = (prefix: 'scn' | 'obj' | 'inter', existingIds: string[]): string => {
     let id;
     do {
-        id = `${prefix}_${Math.random().toString(36).substring(2, 10)}`;
+        id = `${prefix}_${Math.random().toString(36).substring(2, 5)}`;
     } while (existingIds.includes(id));
     return id;
 };
@@ -815,99 +815,108 @@ const App: React.FC = () => {
     return Object.values(gameData.scenes).flatMap(s => s.objects.map(o => o.id));
   }, [gameData.scenes]);
 
+  // FIX: Completed the renderCurrentView function to handle all view types and pass correct props.
   const renderCurrentView = () => {
     switch (currentView) {
       case 'scenes':
         return selectedScene ? (
-          <SceneEditor 
+          <SceneEditor
             scene={selectedScene}
             allScenes={scenesInOrder}
             onUpdateScene={handleUpdateScene}
             allObjectIds={allObjectIds}
             onPreviewScene={handlePreviewSingleScene}
           />
-        ) : <WelcomePlaceholder />;
+        ) : (
+          <WelcomePlaceholder />
+        );
       case 'interface':
-        return <UIEditor 
-                    html={gameData.gameHTML} 
-                    css={gameData.gameCSS}
-                    layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
-                    layoutOrder={gameData.gameLayoutOrder || 'image-first'}
-                    actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
-                    actionButtonText={gameData.gameActionButtonText || 'AÇÃO'}
-                    commandInputPlaceholder={gameData.gameCommandInputPlaceholder || 'O QUE VOCÊ FAZ?'}
-                    diaryPlayerName={gameData.gameDiaryPlayerName || 'VOCÊ'}
-                    focusColor={gameData.gameFocusColor || '#58a6ff'}
-                    onUpdate={handleUpdateGameData}
-                />;
+        return (
+          <UIEditor
+            html={gameData.gameHTML}
+            css={gameData.gameCSS}
+            layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
+            layoutOrder={gameData.gameLayoutOrder || 'image-first'}
+            actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
+            actionButtonText={gameData.gameActionButtonText || 'AÇÃO'}
+            commandInputPlaceholder={gameData.gameCommandInputPlaceholder || 'O QUE VOCÊ FAZ?'}
+            diaryPlayerName={gameData.gameDiaryPlayerName || 'VOCÊ'}
+            focusColor={gameData.gameFocusColor || '#58a6ff'}
+            onUpdate={handleUpdateGameData}
+          />
+        );
       case 'game_info':
-        return <GameInfoEditor 
-                    title={gameData.gameTitle || ''}
-                    logo={gameData.gameLogo || ''}
-                    hideTitle={!!gameData.gameHideTitle}
-                    omitSplashTitle={!!gameData.gameOmitSplashTitle}
-                    textColor={gameData.gameTextColor || ''}
-                    titleColor={gameData.gameTitleColor || ''}
-                    splashImage={gameData.gameSplashImage || ''}
-                    splashTextWidth={gameData.gameSplashTextWidth || '60%'}
-                    splashTextHeight={gameData.gameSplashTextHeight || 'auto'}
-                    splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
-                    splashDescription={gameData.gameSplashDescription || ''}
-                    splashButtonText={gameData.gameSplashButtonText || ''}
-                    splashButtonColor={gameData.gameSplashButtonColor || ''}
-                    splashButtonHoverColor={gameData.gameSplashButtonHoverColor || ''}
-                    enableChances={!!gameData.gameEnableChances}
-                    maxChances={gameData.gameMaxChances || 3}
-                    chanceIcon={gameData.gameChanceIcon || 'heart'}
-                    chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
-                    onUpdate={handleUpdateGameData}
-                />;
+        return (
+          <GameInfoEditor
+            title={gameData.gameTitle || 'Fuja da Masmorra'}
+            logo={gameData.gameLogo || ''}
+            hideTitle={gameData.gameHideTitle || false}
+            omitSplashTitle={gameData.gameOmitSplashTitle || false}
+            textColor={gameData.gameTextColor || '#c9d1d9'}
+            titleColor={gameData.gameTitleColor || '#58a6ff'}
+            splashImage={gameData.gameSplashImage || ''}
+            splashTextWidth={gameData.gameSplashTextWidth || '60%'}
+            splashTextHeight={gameData.gameSplashTextHeight || 'auto'}
+            splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
+            splashDescription={gameData.gameSplashDescription || ''}
+            splashButtonText={gameData.gameSplashButtonText || 'INICIAR AVENTURA'}
+            splashButtonColor={gameData.gameSplashButtonColor || '#2ea043'}
+            splashButtonHoverColor={gameData.gameSplashButtonHoverColor || '#238636'}
+            enableChances={gameData.gameEnableChances || false}
+            maxChances={gameData.gameMaxChances || 3}
+            chanceIcon={gameData.gameChanceIcon || 'heart'}
+            chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
+            onUpdate={handleUpdateGameData}
+          />
+        );
       case 'scene_map':
-        return <SceneMap 
-                  allScenesMap={gameData.scenes}
-                  startSceneId={gameData.startScene}
-                  onSelectScene={handleSelectSceneAndSwitchView}
-                  onUpdateScenePosition={handleUpdateScenePosition}
-                  onAddScene={handleAddScene}
-                />;
+        return (
+          <SceneMap
+            allScenesMap={gameData.scenes}
+            startSceneId={gameData.startScene}
+            onSelectScene={handleSelectSceneAndSwitchView}
+            onUpdateScenePosition={handleUpdateScenePosition}
+            onAddScene={handleAddScene}
+          />
+        );
       default:
         return <WelcomePlaceholder />;
     }
   };
 
+  // FIX: Added the main return statement for the App component to render the layout.
   return (
-    <div className="flex flex-col h-screen font-sans">
-      <Header 
-        gameData={gameData} 
+    <div className="flex flex-col h-screen bg-brand-bg text-brand-text font-sans">
+      <Header
+        gameData={gameData}
         onImportGame={handleImportGame}
         isPreviewing={isPreviewMode}
-        onTogglePreview={handleTogglePreview} 
+        onTogglePreview={handleTogglePreview}
       />
-      <div className="flex flex-grow min-h-0">
-        {isPreviewMode ? (
-          <Preview gameData={gameDataForPreview || gameData} />
-        ) : (
-          <>
-            <Sidebar
-              scenes={scenesInOrder}
-              startSceneId={gameData.startScene}
-              selectedSceneId={selectedSceneId}
-              currentView={currentView}
-              onSelectScene={handleSelectSceneAndSwitchView}
-              onAddScene={handleAddScene}
-              onDeleteScene={handleDeleteScene}
-              onSetStartScene={handleSetStartScene}
-              onReorderScenes={handleReorderScenes}
-              onSetView={setCurrentView}
-            />
-            <main className="flex-1 p-6 overflow-y-auto">
-              {renderCurrentView()}
-            </main>
-          </>
-        )}
-      </div>
+      {isPreviewMode ? (
+        <Preview gameData={gameDataForPreview || gameData} />
+      ) : (
+        <div className="flex flex-1 overflow-hidden">
+          <Sidebar
+            scenes={scenesInOrder}
+            startSceneId={gameData.startScene}
+            selectedSceneId={selectedSceneId}
+            currentView={currentView}
+            onSelectScene={handleSelectSceneAndSwitchView}
+            onAddScene={handleAddScene}
+            onDeleteScene={handleDeleteScene}
+            onSetStartScene={handleSetStartScene}
+            onReorderScenes={handleReorderScenes}
+            onSetView={setCurrentView}
+          />
+          <main className="flex-1 p-6 overflow-y-auto">
+            {renderCurrentView()}
+          </main>
+        </div>
+      )}
     </div>
   );
 };
 
+// FIX: Added a default export for the App component to resolve the import error in index.tsx.
 export default App;

@@ -13,7 +13,7 @@ interface ObjectEditorProps {
 const generateUniqueId = (prefix: 'obj', existingIds: string[]): string => {
     let id;
     do {
-        id = `${prefix}_${Math.random().toString(36).substring(2, 10)}`;
+        id = `${prefix}_${Math.random().toString(36).substring(2, 5)}`;
     } while (existingIds.includes(id));
     return id;
 };
