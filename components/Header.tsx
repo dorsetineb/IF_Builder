@@ -1,5 +1,3 @@
-
-
 // FIX: Corrected React import to properly include 'useRef'. The previous syntax 'import React, a from ...' was invalid.
 import React, { useRef } from 'react';
 import { GameData } from '../types';
@@ -209,7 +207,17 @@ const Header: React.FC<{
 
   return (
     <header className="flex items-center justify-between p-3 bg-brand-surface border-b border-brand-border flex-shrink-0 z-20">
-      <h1 className="text-xl font-bold">IF Builder</h1>
+      <div className="flex flex-col items-start min-w-0">
+        <h1 className="text-xl font-bold text-brand-text whitespace-nowrap">IF Builder</h1>
+        {gameData.gameTitle && (
+            <code
+                className="mt-1 bg-brand-bg px-2 py-1 rounded text-brand-primary-hover text-sm truncate max-w-full"
+                title={gameData.gameTitle}
+            >
+                {gameData.gameTitle}
+            </code>
+        )}
+      </div>
       <div className="flex items-center gap-2">
         <input type="file" ref={importInputRef} onChange={handleFileImport} className="hidden" accept=".zip" />
         <button onClick={handleImportClick} className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors">
