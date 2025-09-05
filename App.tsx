@@ -649,6 +649,19 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('scenes');
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [gameDataForPreview, setGameDataForPreview] = useState<GameData | null>(null);
+  const [dirtySceneIds, setDirtySceneIds] = useState(new Set<string>());
+
+  const handleDirtyStateChange = useCallback((sceneId: string, isDirty: boolean) => {
+    setDirtySceneIds(prev => {
+        const newSet = new Set(prev);
+        if (isDirty) {
+            newSet.add(sceneId);
+        } else {
+            newSet.delete(sceneId);
+        }
+        return newSet;
+    });
+  }, []);
 
   const handleTogglePreview = useCallback(() => {
     setIsPreviewMode(prev => {
@@ -826,6 +839,9 @@ const App: React.FC = () => {
             onUpdateScene={handleUpdateScene}
             allObjectIds={allObjectIds}
             onPreviewScene={handlePreviewSingleScene}
+            sceneOrder={gameData.sceneOrder}
+            onSelectScene={handleSelectSceneAndSwitchView}
+            onDirtyStateChange={handleDirtyStateChange}
           />
         ) : (
           <WelcomePlaceholder />
@@ -908,6 +924,7 @@ const App: React.FC = () => {
             onSetStartScene={handleSetStartScene}
             onReorderScenes={handleReorderScenes}
             onSetView={setCurrentView}
+            dirtySceneIds={dirtySceneIds}
           />
           <main className="flex-1 p-6 overflow-y-auto">
             {renderCurrentView()}

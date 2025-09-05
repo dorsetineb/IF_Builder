@@ -1,18 +1,18 @@
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import SceneList from './SceneList';
 import { Scene, View } from '../types';
 import { CodeIcon } from './icons/CodeIcon';
 import { BookOpenIcon } from './icons/BookOpenIcon';
 import { InformationCircleIcon } from './icons/InformationCircleIcon';
 import { NodeIcon } from './icons/NodeIcon';
-import { ChevronDownIcon } from './icons/ChevronDownIcon';
 
 interface SidebarProps {
   scenes: Scene[];
   startSceneId: string;
   selectedSceneId: string | null;
   currentView: View;
+  dirtySceneIds: Set<string>;
   onSelectScene: (id: string) => void;
   onAddScene: () => void;
   onDeleteScene: (id: string) => void;
@@ -22,14 +22,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { currentView, onSetView, scenes, ...sceneListProps } = props;
-  const [isSceneListOpen, setIsSceneListOpen] = useState(true);
-
-  useEffect(() => {
-    if (currentView !== 'scenes') {
-      setIsSceneListOpen(false);
-    }
-  }, [currentView]);
+  const { currentView, onSetView, scenes, dirtySceneIds, ...sceneListProps } = props;
 
   const getButtonClass = (view: View) => 
     `w-full flex items-center p-2 rounded-md transition-colors text-left ${
@@ -50,24 +43,21 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           <span className="font-semibold">Interface</span>
         </button>
       
-        <button
-            onClick={() => setIsSceneListOpen(!isSceneListOpen)}
-            className="w-full flex justify-between items-center text-left p-2 rounded-md hover:bg-brand-border/50"
-            aria-expanded={isSceneListOpen}
-        >
-            <div className="flex items-center">
+        {/* Scene Editor Section */}
+        <div>
+            <button className={getButtonClass('scenes')} onClick={() => onSetView('scenes')}>
                 <BookOpenIcon className="w-5 h-5 mr-3" />
                 <span className="font-semibold">Editor de Cenas</span>
                 <span className="ml-2 bg-brand-border text-brand-text-dim text-xs font-bold px-2 py-0.5 rounded-full">
                     {scenes.length}
                 </span>
-            </div>
-            <ChevronDownIcon className={`w-5 h-5 transition-transform duration-300 ${isSceneListOpen ? 'rotate-180' : ''}`} />
-        </button>
-
-        {isSceneListOpen && (
-          <SceneList scenes={scenes} {...sceneListProps} />
-        )}
+            </button>
+            {currentView === 'scenes' && (
+              <div className="pl-4 pt-2 mt-2 border-l-2 border-brand-border/50 ml-2">
+                <SceneList scenes={scenes} dirtySceneIds={dirtySceneIds} {...sceneListProps} />
+              </div>
+            )}
+        </div>
         
         <button className={getButtonClass('scene_map')} onClick={() => onSetView('scene_map')}>
           <NodeIcon className="w-5 h-5 mr-3" />

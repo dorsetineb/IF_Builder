@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { Scene } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -8,6 +9,7 @@ interface SceneListProps {
   scenes: Scene[];
   startSceneId: string;
   selectedSceneId: string | null;
+  dirtySceneIds: Set<string>;
   onSelectScene: (id: string) => void;
   onAddScene: () => void;
   onDeleteScene: (id: string) => void;
@@ -19,6 +21,7 @@ const SceneList: React.FC<SceneListProps> = ({
   scenes,
   startSceneId,
   selectedSceneId,
+  dirtySceneIds,
   onSelectScene,
   onAddScene,
   onDeleteScene,
@@ -71,8 +74,11 @@ const SceneList: React.FC<SceneListProps> = ({
               draggable
           >
               <Bars3Icon className={`w-5 h-5 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? 'text-black' : 'text-brand-text-dim'}`} />
-              <div className="flex-1 min-w-0">
+              <div className="flex-1 min-w-0 flex items-center gap-2">
                   <span className="truncate font-medium">{scene.name}</span>
+                  {dirtySceneIds.has(scene.id) && (
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0" title="Alterações não salvas"></div>
+                  )}
               </div>
               <div className="absolute right-0 flex items-center h-full transition-transform duration-300 ease-in-out group-hover:-translate-x-10">
                   {startSceneId === scene.id && (
