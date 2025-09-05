@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Interaction, Scene, GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -99,13 +98,14 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = []
     <>
       <div className="space-y-4">
         {interactions.map((inter, index) => (
-          <div key={inter.id} className="p-4 bg-brand-bg rounded-md border border-brand-border/50">
-            <div className="flex justify-between items-center mb-4">
-                 <h3 className="font-semibold text-lg text-brand-text">Interação #{index + 1}</h3>
-                 <button onClick={() => handleRemoveInteraction(index)} className="p-1 text-brand-text-dim hover:text-red-500 rounded-full" title="Remover interação">
-                    <TrashIcon className="w-5 h-5" />
-                </button>
-            </div>
+          <div key={inter.id} className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
+            <button
+                onClick={() => handleRemoveInteraction(index)}
+                className="absolute top-0 right-0 p-2 bg-red-500 text-white rounded-bl-lg hover:bg-red-600 transition-colors"
+                title="Remover interação"
+            >
+                <TrashIcon className="w-5 h-5" />
+            </button>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
               {/* Left Column */}
