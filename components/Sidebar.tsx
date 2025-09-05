@@ -6,6 +6,7 @@ import { CodeIcon } from './icons/CodeIcon';
 import { BookOpenIcon } from './icons/BookOpenIcon';
 import { InformationCircleIcon } from './icons/InformationCircleIcon';
 import { NodeIcon } from './icons/NodeIcon';
+import { PaintBrushIcon } from './icons/PaintBrushIcon';
 
 interface SidebarProps {
   scenes: Scene[];
@@ -41,6 +42,10 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         <button className={getButtonClass('interface')} onClick={() => onSetView('interface')}>
           <CodeIcon className="w-5 h-5 mr-3" />
           <span className="font-semibold">Interface</span>
+        </button>
+        <button className={getButtonClass('theme')} onClick={() => onSetView('theme')}>
+          <PaintBrushIcon className="w-5 h-5 mr-3" />
+          <span className="font-semibold">Tema</span>
         </button>
       
         {/* Scene Editor Section */}

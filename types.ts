@@ -1,3 +1,4 @@
+
 export interface GameObject {
   id: string;
   name: string;
@@ -52,6 +53,7 @@ export interface GameData {
   gameHTML: string;
   gameCSS: string;
   gameTitle?: string;
+  gameFontFamily?: string;
   gameLogo?: string; // base64 string
   gameSplashImage?: string; // base64 string
   gameSplashTextWidth?: string;
@@ -78,4 +80,4 @@ export interface GameData {
   gameChanceIconColor?: string;
 }
 
-export type View = 'scenes' | 'interface' | 'game_info' | 'scene_map';
+export type View = 'scenes' | 'interface' | 'game_info' | 'scene_map' | 'theme';

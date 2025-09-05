@@ -10,6 +10,7 @@ import UIEditor from './components/UIEditor';
 import GameInfoEditor from './components/GameInfoEditor';
 import SceneMap from './components/SceneMap';
 import Preview from './components/Preview';
+import ThemeEditor from './components/ThemeEditor';
 
 const gameHTML = `
 <!DOCTYPE html>
@@ -20,7 +21,7 @@ const gameHTML = `
     <title>__GAME_TITLE__</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap" rel="stylesheet">
+    __FONT_STYLESHEET__
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -94,7 +95,7 @@ const gameCSS = `
     --focus-color: #58a6ff;
     --danger-color: #f85149;
     --danger-hover-bg: #da3633;
-    --font-family: 'Silkscreen', sans-serif;
+    --font-family: __FONT_FAMILY__;
     --splash-button-bg: #2ea043;
     --splash-button-hover-bg: #238636;
     --splash-align-items: flex-end;
@@ -615,6 +616,7 @@ const initializeGameData = (): GameData => {
         gameHTML: gameHTML,
         gameCSS: gameCSS,
         gameTitle: "Fuja da Masmorra",
+        gameFontFamily: "'Silkscreen', sans-serif",
         gameLogo: "", // base64 string
         gameSplashImage: "", // base64 string
         gameSplashTextWidth: "60%",
@@ -853,11 +855,10 @@ const App: React.FC = () => {
             css={gameData.gameCSS}
             layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
             layoutOrder={gameData.gameLayoutOrder || 'image-first'}
-            actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
             actionButtonText={gameData.gameActionButtonText || 'AÇÃO'}
             commandInputPlaceholder={gameData.gameCommandInputPlaceholder || 'O QUE VOCÊ FAZ?'}
             diaryPlayerName={gameData.gameDiaryPlayerName || 'VOCÊ'}
-            focusColor={gameData.gameFocusColor || '#58a6ff'}
+            splashButtonText={gameData.gameSplashButtonText || 'INICIAR AVENTURA'}
             onUpdate={handleUpdateGameData}
           />
         );
@@ -868,20 +869,28 @@ const App: React.FC = () => {
             logo={gameData.gameLogo || ''}
             hideTitle={gameData.gameHideTitle || false}
             omitSplashTitle={gameData.gameOmitSplashTitle || false}
-            textColor={gameData.gameTextColor || '#c9d1d9'}
-            titleColor={gameData.gameTitleColor || '#58a6ff'}
             splashImage={gameData.gameSplashImage || ''}
             splashTextWidth={gameData.gameSplashTextWidth || '60%'}
             splashTextHeight={gameData.gameSplashTextHeight || 'auto'}
             splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
             splashDescription={gameData.gameSplashDescription || ''}
-            splashButtonText={gameData.gameSplashButtonText || 'INICIAR AVENTURA'}
-            splashButtonColor={gameData.gameSplashButtonColor || '#2ea043'}
-            splashButtonHoverColor={gameData.gameSplashButtonHoverColor || '#238636'}
             enableChances={gameData.gameEnableChances || false}
             maxChances={gameData.gameMaxChances || 3}
             chanceIcon={gameData.gameChanceIcon || 'heart'}
+            onUpdate={handleUpdateGameData}
+          />
+        );
+      case 'theme':
+        return (
+          <ThemeEditor
+            textColor={gameData.gameTextColor || '#c9d1d9'}
+            titleColor={gameData.gameTitleColor || '#58a6ff'}
+            splashButtonColor={gameData.gameSplashButtonColor || '#2ea043'}
+            splashButtonHoverColor={gameData.gameSplashButtonHoverColor || '#238636'}
+            actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
+            focusColor={gameData.gameFocusColor || '#58a6ff'}
             chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
+            gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
             onUpdate={handleUpdateGameData}
           />
         );

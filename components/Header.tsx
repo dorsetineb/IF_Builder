@@ -1,3 +1,4 @@
+
 // FIX: Corrected React import to properly include 'useRef'. The previous syntax 'import React, a from ...' was invalid.
 import React, { useRef } from 'react';
 import { GameData } from '../types';
@@ -8,6 +9,14 @@ import { gameJS, prepareGameDataForEngine } from './game-engine';
 
 // Fix: Declare JSZip to inform TypeScript about the global variable.
 declare var JSZip: any;
+
+// Helper to generate the correct Google Fonts URL from a font-family string.
+const getFontUrl = (fontFamily: string) => {
+    const fontName = fontFamily.split(',')[0].replace(/'/g, '').trim();
+    if (!fontName) return '';
+    const googleFontName = fontName.replace(/ /g, '+');
+    return `https://fonts.googleapis.com/css2?family=${googleFontName}&display=swap`;
+};
 
 const Header: React.FC<{ 
   gameData: GameData; 
@@ -72,10 +81,14 @@ const Header: React.FC<{
     const headerContent = exportData.gameEnableChances 
         ? '<div id="chances-container" class="chances-container"></div>' 
         : '<button id="restart-button" class="btn-danger">Reiniciar Aventura</button>';
+    
+    const fontFamily = exportData.gameFontFamily || "'Silkscreen', sans-serif";
+    const fontUrl = getFontUrl(fontFamily);
+    const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
 
     const finalHtml = exportData.gameHTML
-        .replace('<title>__GAME_TITLE__</title>', `<title>${exportData.gameTitle || 'Game'}</title>\n    <link rel="stylesheet" href="style.css">`)
-        .replace('<link rel="stylesheet" href="style.css">', '')
+        .replace('__GAME_TITLE__', exportData.gameTitle || 'Game')
+        .replace('__FONT_STYLESHEET__', fontStylesheet)
         .replace('__LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="game-logo">` : '')
         .replace('__HEADER_TITLE_H1_TAG__', !exportData.gameHideTitle ? `<h1>${exportData.gameTitle}</h1>` : '')
         .replace('<button id="restart-button" class="btn-danger">Reiniciar Aventura</button>', headerContent)
@@ -90,6 +103,7 @@ const Header: React.FC<{
 
     const chancesCSS = `\n.chances-container { display: flex; align-items: center; gap: 8px; }\n.chance-icon { width: 28px; height: 28px; transition: all 0.3s ease; }\n.chance-icon.lost { opacity: 0.5; }`;
     let finalCss = exportData.gameCSS
+        .replace('__FONT_FAMILY__', fontFamily)
         .replace(/:root {/, `:root {\n    --text-color: ${exportData.gameTextColor || '#c9d1d9'};` + `\n    --accent-color: ${exportData.gameTitleColor || '#58a6ff'};` + `\n    --splash-button-bg: ${exportData.gameSplashButtonColor || '#2ea043'};` + `\n    --splash-button-hover-bg: ${exportData.gameSplashButtonHoverColor || '#238636'};`+ `\n    --focus-color: ${exportData.gameFocusColor || '#58a6ff'};`) + (exportData.gameEnableChances ? chancesCSS : '');
 
     const engineData = prepareGameDataForEngine(exportData);

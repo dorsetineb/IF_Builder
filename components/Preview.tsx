@@ -4,6 +4,14 @@ import React, { useMemo } from 'react';
 import { GameData } from '../types';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 
+// Helper to generate the correct Google Fonts URL from a font-family string.
+const getFontUrl = (fontFamily: string) => {
+    const fontName = fontFamily.split(',')[0].replace(/'/g, '').trim();
+    if (!fontName) return '';
+    const googleFontName = fontName.replace(/ /g, '+');
+    return `https://fonts.googleapis.com/css2?family=${googleFontName}&display=swap`;
+};
+
 const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
     const srcDoc = useMemo(() => {
         let headerContent;
@@ -13,8 +21,13 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             headerContent = '<button id="restart-button" class="btn-danger">Reiniciar Aventura</button>';
         }
 
+        const fontFamily = gameData.gameFontFamily || "'Silkscreen', sans-serif";
+        const fontUrl = getFontUrl(fontFamily);
+        const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
+
         let finalHtml = gameData.gameHTML
             .replace('__GAME_TITLE__', gameData.gameTitle || 'IF Builder Game')
+            .replace('__FONT_STYLESHEET__', fontStylesheet)
             .replace('__LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="game-logo">` : '')
             .replace('__HEADER_TITLE_H1_TAG__', !gameData.gameHideTitle ? `<h1>${gameData.gameTitle}</h1>` : '')
             .replace('<button id="restart-button" class="btn-danger">Reiniciar Aventura</button>', headerContent)
@@ -33,6 +46,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
         `;
 
         let finalCss = gameData.gameCSS
+            .replace('__FONT_FAMILY__', fontFamily)
             .replace(/:root {/, 
                 `:root {\n    --text-color: ${gameData.gameTextColor || '#c9d1d9'};` +
                 `\n    --accent-color: ${gameData.gameTitleColor || '#58a6ff'};` +

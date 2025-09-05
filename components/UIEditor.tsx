@@ -7,29 +7,27 @@ interface UIEditorProps {
   css: string;
   layoutOrientation: 'vertical' | 'horizontal';
   layoutOrder: 'image-first' | 'image-last';
-  actionButtonColor: string;
   actionButtonText: string;
   commandInputPlaceholder: string;
   diaryPlayerName: string;
-  focusColor: string;
+  splashButtonText: string;
   onUpdate: (field: keyof GameData, value: any) => void;
 }
 
 const UIEditor: React.FC<UIEditorProps> = (props) => {
   const { 
-      html, css, layoutOrientation, layoutOrder, actionButtonColor, 
-      actionButtonText, commandInputPlaceholder, diaryPlayerName, focusColor, onUpdate 
+      html, css, layoutOrientation, layoutOrder, splashButtonText,
+      actionButtonText, commandInputPlaceholder, diaryPlayerName, onUpdate 
   } = props;
 
   const [localHtml, setLocalHtml] = useState(html);
   const [localCss, setLocalCss] = useState(css);
   const [localLayoutOrientation, setLocalLayoutOrientation] = useState(layoutOrientation);
   const [localLayoutOrder, setLocalLayoutOrder] = useState(layoutOrder);
-  const [localActionButtonColor, setLocalActionButtonColor] = useState(actionButtonColor);
   const [localActionButtonText, setLocalActionButtonText] = useState(actionButtonText);
   const [localCommandInputPlaceholder, setLocalCommandInputPlaceholder] = useState(commandInputPlaceholder);
   const [localDiaryPlayerName, setLocalDiaryPlayerName] = useState(diaryPlayerName);
-  const [localFocusColor, setLocalFocusColor] = useState(focusColor);
+  const [localSplashButtonText, setLocalSplashButtonText] = useState(splashButtonText);
   const [isDirty, setIsDirty] = useState(false);
   const [activeTab, setActiveTab] = useState('layout');
 
@@ -38,37 +36,34 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalCss(css);
     setLocalLayoutOrientation(layoutOrientation);
     setLocalLayoutOrder(layoutOrder);
-    setLocalActionButtonColor(actionButtonColor);
     setLocalActionButtonText(actionButtonText);
     setLocalCommandInputPlaceholder(commandInputPlaceholder);
     setLocalDiaryPlayerName(diaryPlayerName);
-    setLocalFocusColor(focusColor);
+    setLocalSplashButtonText(splashButtonText);
     setIsDirty(false);
-  }, [html, css, layoutOrientation, layoutOrder, actionButtonColor, actionButtonText, commandInputPlaceholder, diaryPlayerName, focusColor]);
+  }, [html, css, layoutOrientation, layoutOrder, actionButtonText, commandInputPlaceholder, diaryPlayerName, splashButtonText]);
 
   useEffect(() => {
     const dirty = localHtml !== html ||
                   localCss !== css ||
                   localLayoutOrientation !== layoutOrientation ||
                   localLayoutOrder !== layoutOrder ||
-                  localActionButtonColor !== actionButtonColor ||
+                  localSplashButtonText !== splashButtonText ||
                   localActionButtonText !== actionButtonText ||
                   localCommandInputPlaceholder !== commandInputPlaceholder ||
-                  localDiaryPlayerName !== diaryPlayerName ||
-                  localFocusColor !== focusColor;
+                  localDiaryPlayerName !== diaryPlayerName;
     setIsDirty(dirty);
-  }, [localHtml, localCss, localLayoutOrientation, localLayoutOrder, localActionButtonColor, localActionButtonText, localCommandInputPlaceholder, localDiaryPlayerName, localFocusColor, props]);
+  }, [localHtml, localCss, localLayoutOrientation, localLayoutOrder, localActionButtonText, localCommandInputPlaceholder, localDiaryPlayerName, localSplashButtonText, props]);
 
   const handleSave = () => {
     if (localHtml !== html) onUpdate('gameHTML', localHtml);
     if (localCss !== css) onUpdate('gameCSS', localCss);
     if (localLayoutOrientation !== layoutOrientation) onUpdate('gameLayoutOrientation', localLayoutOrientation);
     if (localLayoutOrder !== layoutOrder) onUpdate('gameLayoutOrder', localLayoutOrder);
-    if (localActionButtonColor !== actionButtonColor) onUpdate('gameActionButtonColor', localActionButtonColor);
+    if (localSplashButtonText !== splashButtonText) onUpdate('gameSplashButtonText', localSplashButtonText);
     if (localActionButtonText !== actionButtonText) onUpdate('gameActionButtonText', localActionButtonText);
     if (localCommandInputPlaceholder !== commandInputPlaceholder) onUpdate('gameCommandInputPlaceholder', localCommandInputPlaceholder);
     if (localDiaryPlayerName !== diaryPlayerName) onUpdate('gameDiaryPlayerName', localDiaryPlayerName);
-    if (localFocusColor !== focusColor) onUpdate('gameFocusColor', localFocusColor);
   };
   
   const handleUndo = () => {
@@ -76,16 +71,15 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalCss(css);
     setLocalLayoutOrientation(layoutOrientation);
     setLocalLayoutOrder(layoutOrder);
-    setLocalActionButtonColor(actionButtonColor);
+    setLocalSplashButtonText(splashButtonText);
     setLocalActionButtonText(actionButtonText);
     setLocalCommandInputPlaceholder(commandInputPlaceholder);
     setLocalDiaryPlayerName(diaryPlayerName);
-    setLocalFocusColor(focusColor);
   };
 
   const TABS = {
     layout: 'Layout',
-    textos_cores: 'Textos e Cores',
+    textos: 'Textos da Interface',
     codigo: 'Código-Fonte',
   };
 
@@ -162,7 +156,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
             </div>
         )}
 
-        {activeTab === 'textos_cores' && (
+        {activeTab === 'textos' && (
             <div className="space-y-8">
                 <div>
                     <h3 className="text-lg font-semibold text-brand-text mb-4">Textos da Interface</h3>
@@ -197,49 +191,16 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
                             />
                         </div>
-                    </div>
-                </div>
-
-                <div className="pt-8 border-t border-brand-border/50">
-                    <h3 className="text-lg font-semibold text-brand-text mb-4">Cores</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                         <div>
-                            <label htmlFor="actionButtonColor" className="block text-sm font-medium text-brand-text-dim mb-1">Cor do Botão de Ação</label>
-                            <div className="flex items-center gap-2 p-1 bg-brand-bg border border-brand-border rounded-md max-w-xs">
-                                <input 
-                                    type="color" 
-                                    id="actionButtonColor" 
-                                    value={localActionButtonColor} 
-                                    onChange={(e) => setLocalActionButtonColor(e.target.value)} 
-                                    className="w-8 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
-                                />
-                                <input 
-                                    type="text" 
-                                    value={localActionButtonColor} 
-                                    onChange={(e) => setLocalActionButtonColor(e.target.value)} 
-                                    className="w-full bg-transparent font-mono text-sm focus:outline-none" 
-                                    placeholder="#ffffff"
-                                />
-                            </div>
-                        </div>
-                         <div>
-                            <label htmlFor="focusColor" className="block text-sm font-medium text-brand-text-dim mb-1">Cor do Destaque de Foco</label>
-                            <div className="flex items-center gap-2 p-1 bg-brand-bg border border-brand-border rounded-md max-w-xs">
-                                <input 
-                                    type="color" 
-                                    id="focusColor" 
-                                    value={localFocusColor} 
-                                    onChange={(e) => setLocalFocusColor(e.target.value)} 
-                                    className="w-8 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
-                                />
-                                <input 
-                                    type="text" 
-                                    value={localFocusColor} 
-                                    onChange={(e) => setLocalFocusColor(e.target.value)} 
-                                    className="w-full bg-transparent font-mono text-sm focus:outline-none" 
-                                    placeholder="#58a6ff"
-                                />
-                            </div>
+                            <label htmlFor="splashButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Início</label>
+                            <input
+                                type="text"
+                                id="splashButtonText"
+                                value={localSplashButtonText}
+                                onChange={(e) => setLocalSplashButtonText(e.target.value)}
+                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
+                                placeholder="INICIAR"
+                            />
                         </div>
                     </div>
                 </div>
