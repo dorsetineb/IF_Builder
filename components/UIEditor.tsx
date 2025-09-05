@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { GameData } from '../types';
-import CollapsibleCard from './CollapsibleCard';
 
 interface UIEditorProps {
   html: string;
@@ -32,6 +31,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localDiaryPlayerName, setLocalDiaryPlayerName] = useState(diaryPlayerName);
   const [localFocusColor, setLocalFocusColor] = useState(focusColor);
   const [isDirty, setIsDirty] = useState(false);
+  const [activeTab, setActiveTab] = useState('layout');
 
   useEffect(() => {
     setLocalHtml(html);
@@ -83,6 +83,13 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalFocusColor(focusColor);
   };
 
+  const TABS = {
+    layout: 'Layout',
+    textos_cores: 'Textos e Cores',
+    codigo: 'Código-Fonte',
+  };
+
+
   return (
     <div className="space-y-6 pb-24">
       <div>
@@ -92,178 +99,201 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
         </p>
       </div>
       
-      <CollapsibleCard title="Layout" startOpen={true}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-center">
-            <div className="space-y-6">
-                <div>
-                    <label htmlFor="orientation-select" className="block text-sm font-medium text-brand-text-dim mb-1">Orientação</label>
-                    <select
-                        id="orientation-select"
-                        value={localLayoutOrientation}
-                        onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
-                        className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
-                    >
-                        <option value="vertical">Vertical</option>
-                        <option value="horizontal">Horizontal</option>
-                    </select>
-                </div>
-                <div>
-                    <label htmlFor="order-select" className="block text-sm font-medium text-brand-text-dim mb-1">Posição da Imagem</label>
-                    <select
-                        id="order-select"
-                        value={localLayoutOrder}
-                        onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
-                        className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
-                    >
-                        <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
-                        <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
-                    </select>
-                </div>
-            </div>
-            
-            <div className="flex flex-col items-center justify-center">
-                <p className="text-sm text-brand-text-dim mb-2">Pré-visualização do Layout</p>
-                <div 
-                    className={`w-full max-w-sm aspect-video bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
-                    style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
-                >
-                    <div className={`flex-1 bg-green-500/30 border border-green-400 rounded flex items-center justify-center text-center text-sm p-2 text-green-200 font-semibold ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'}`}>
-                        Imagem
-                    </div>
-                    <div className={`flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'}`}>
-                        Descrição
-                    </div>
-                </div>
-            </div>
-        </div>
-      </CollapsibleCard>
-
-      <CollapsibleCard title="Textos da Interface" startOpen={true}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-            <div>
-                <label htmlFor="actionButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Ação</label>
-                <input
-                    type="text"
-                    id="actionButtonText"
-                    value={localActionButtonText}
-                    onChange={(e) => setLocalActionButtonText(e.target.value)}
-                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
-                />
-            </div>
-             <div>
-                <label htmlFor="commandInputPlaceholder" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Campo de Comando</label>
-                <input
-                    type="text"
-                    id="commandInputPlaceholder"
-                    value={localCommandInputPlaceholder}
-                    onChange={(e) => setLocalCommandInputPlaceholder(e.target.value)}
-                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
-                />
-            </div>
-            <div>
-                <label htmlFor="diaryPlayerName" className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Jogador no Diário</label>
-                <input
-                    type="text"
-                    id="diaryPlayerName"
-                    value={localDiaryPlayerName}
-                    onChange={(e) => setLocalDiaryPlayerName(e.target.value)}
-                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
-                />
-            </div>
-        </div>
-      </CollapsibleCard>
-
-
-      <CollapsibleCard title="Cores" startOpen={true}>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-            <div>
-                <label htmlFor="actionButtonColor" className="block text-sm font-medium text-brand-text-dim mb-1">Cor do Botão de Ação</label>
-                <div className="flex items-center gap-2 p-1 bg-brand-bg border border-brand-border rounded-md max-w-xs">
-                    <input 
-                        type="color" 
-                        id="actionButtonColor" 
-                        value={localActionButtonColor} 
-                        onChange={(e) => setLocalActionButtonColor(e.target.value)} 
-                        className="w-8 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
-                    />
-                    <input 
-                        type="text" 
-                        value={localActionButtonColor} 
-                        onChange={(e) => setLocalActionButtonColor(e.target.value)} 
-                        className="w-full bg-transparent font-mono text-sm focus:outline-none" 
-                        placeholder="#ffffff"
-                    />
-                </div>
-            </div>
-             <div>
-                <label htmlFor="focusColor" className="block text-sm font-medium text-brand-text-dim mb-1">Cor do Destaque de Foco</label>
-                <div className="flex items-center gap-2 p-1 bg-brand-bg border border-brand-border rounded-md max-w-xs">
-                    <input 
-                        type="color" 
-                        id="focusColor" 
-                        value={localFocusColor} 
-                        onChange={(e) => setLocalFocusColor(e.target.value)} 
-                        className="w-8 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
-                    />
-                    <input 
-                        type="text" 
-                        value={localFocusColor} 
-                        onChange={(e) => setLocalFocusColor(e.target.value)} 
-                        className="w-full bg-transparent font-mono text-sm focus:outline-none" 
-                        placeholder="#58a6ff"
-                    />
-                </div>
-            </div>
-        </div>
-      </CollapsibleCard>
-
-      <CollapsibleCard title="Código Fonte">
-        <div className="h-[60vh] flex flex-col gap-6">
-            <div className="flex-1 flex flex-col">
-                <label htmlFor="html-editor" className="block text-sm font-medium text-brand-text-dim mb-1">
-                    HTML do Jogo (index.html)
-                </label>
-                <textarea
-                    id="html-editor"
-                    value={localHtml}
-                    onChange={(e) => setLocalHtml(e.target.value)}
-                    className="w-full flex-1 bg-brand-bg border border-brand-border rounded-md p-3 font-mono text-sm focus:ring-brand-primary focus:border-brand-primary resize-none"
-                    spellCheck="false"
-                />
-            </div>
-            <div className="flex-1 flex flex-col">
-                <label htmlFor="css-editor" className="block text-sm font-medium text-brand-text-dim mb-1">
-                    CSS do Jogo (style.css)
-                </label>
-                <textarea
-                    id="css-editor"
-                    value={localCss}
-                    onChange={(e) => setLocalCss(e.target.value)}
-                    className="w-full flex-1 bg-brand-bg border border-brand-border rounded-md p-3 font-mono text-sm focus:ring-brand-primary focus:border-brand-primary resize-none"
-                    spellCheck="false"
-                />
-            </div>
-        </div>
-      </CollapsibleCard>
-
-        <div className="fixed bottom-6 right-10 z-10 flex gap-2">
+      <div className="border-b border-brand-border flex space-x-1">
+        {Object.entries(TABS).map(([key, name]) => (
             <button
-              onClick={handleUndo}
-              disabled={!isDirty}
-              className="px-6 py-2 bg-brand-surface border border-brand-border text-brand-text-dim font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-              title={isDirty ? "Desfazer alterações" : "Nenhuma alteração para desfazer"}
+                key={key}
+                onClick={() => setActiveTab(key as any)}
+                className={`px-4 py-2 font-semibold text-sm rounded-t-md transition-colors ${
+                    activeTab === key
+                        ? 'bg-brand-surface border-brand-border border-t border-x text-brand-primary'
+                        : 'text-brand-text-dim hover:text-brand-text'
+                }`}
             >
-              Desfazer
-          </button>
-            <button
-                onClick={handleSave}
-                disabled={!isDirty}
-                className="px-6 py-2 bg-yellow-400 text-black font-semibold rounded-md hover:bg-yellow-500 transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
-                title={isDirty ? "Salvar alterações na interface" : "Nenhuma alteração para salvar"}
-            >
-                Salvar
+                {name}
             </button>
-        </div>
+        ))}
+      </div>
+
+      <div className="bg-brand-surface rounded-b-lg rounded-r-lg border border-t-0 border-brand-border -mt-6 p-6">
+        {activeTab === 'layout' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-center">
+                <div className="space-y-6">
+                    <div>
+                        <label htmlFor="orientation-select" className="block text-sm font-medium text-brand-text-dim mb-1">Orientação</label>
+                        <select
+                            id="orientation-select"
+                            value={localLayoutOrientation}
+                            onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
+                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
+                        >
+                            <option value="vertical">Vertical</option>
+                            <option value="horizontal">Horizontal</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="order-select" className="block text-sm font-medium text-brand-text-dim mb-1">Posição da Imagem</label>
+                        <select
+                            id="order-select"
+                            value={localLayoutOrder}
+                            onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
+                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
+                        >
+                            <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
+                            <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div className="flex flex-col items-center justify-center">
+                    <p className="text-sm text-brand-text-dim mb-2">Pré-visualização do Layout</p>
+                    <div 
+                        className={`w-full max-w-sm aspect-video bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
+                        style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
+                    >
+                        <div className={`flex-1 bg-green-500/30 border border-green-400 rounded flex items-center justify-center text-center text-sm p-2 text-green-200 font-semibold ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'}`}>
+                            Imagem
+                        </div>
+                        <div className={`flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'}`}>
+                            Descrição
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {activeTab === 'textos_cores' && (
+            <div className="space-y-8">
+                <div>
+                    <h3 className="text-lg font-semibold text-brand-text mb-4">Textos da Interface</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div>
+                            <label htmlFor="actionButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Ação</label>
+                            <input
+                                type="text"
+                                id="actionButtonText"
+                                value={localActionButtonText}
+                                onChange={(e) => setLocalActionButtonText(e.target.value)}
+                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
+                            />
+                        </div>
+                         <div>
+                            <label htmlFor="commandInputPlaceholder" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Campo de Comando</label>
+                            <input
+                                type="text"
+                                id="commandInputPlaceholder"
+                                value={localCommandInputPlaceholder}
+                                onChange={(e) => setLocalCommandInputPlaceholder(e.target.value)}
+                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
+                            />
+                        </div>
+                        <div>
+                            <label htmlFor="diaryPlayerName" className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Jogador no Diário</label>
+                            <input
+                                type="text"
+                                id="diaryPlayerName"
+                                value={localDiaryPlayerName}
+                                onChange={(e) => setLocalDiaryPlayerName(e.target.value)}
+                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                <div className="pt-8 border-t border-brand-border/50">
+                    <h3 className="text-lg font-semibold text-brand-text mb-4">Cores</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div>
+                            <label htmlFor="actionButtonColor" className="block text-sm font-medium text-brand-text-dim mb-1">Cor do Botão de Ação</label>
+                            <div className="flex items-center gap-2 p-1 bg-brand-bg border border-brand-border rounded-md max-w-xs">
+                                <input 
+                                    type="color" 
+                                    id="actionButtonColor" 
+                                    value={localActionButtonColor} 
+                                    onChange={(e) => setLocalActionButtonColor(e.target.value)} 
+                                    className="w-8 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
+                                />
+                                <input 
+                                    type="text" 
+                                    value={localActionButtonColor} 
+                                    onChange={(e) => setLocalActionButtonColor(e.target.value)} 
+                                    className="w-full bg-transparent font-mono text-sm focus:outline-none" 
+                                    placeholder="#ffffff"
+                                />
+                            </div>
+                        </div>
+                         <div>
+                            <label htmlFor="focusColor" className="block text-sm font-medium text-brand-text-dim mb-1">Cor do Destaque de Foco</label>
+                            <div className="flex items-center gap-2 p-1 bg-brand-bg border border-brand-border rounded-md max-w-xs">
+                                <input 
+                                    type="color" 
+                                    id="focusColor" 
+                                    value={localFocusColor} 
+                                    onChange={(e) => setLocalFocusColor(e.target.value)} 
+                                    className="w-8 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
+                                />
+                                <input 
+                                    type="text" 
+                                    value={localFocusColor} 
+                                    onChange={(e) => setLocalFocusColor(e.target.value)} 
+                                    className="w-full bg-transparent font-mono text-sm focus:outline-none" 
+                                    placeholder="#58a6ff"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {activeTab === 'codigo' && (
+             <div className="h-[60vh] flex flex-col gap-6">
+                <div className="flex-1 flex flex-col">
+                    <label htmlFor="html-editor" className="block text-sm font-medium text-brand-text-dim mb-1">
+                        HTML do Jogo (index.html)
+                    </label>
+                    <textarea
+                        id="html-editor"
+                        value={localHtml}
+                        onChange={(e) => setLocalHtml(e.target.value)}
+                        className="w-full flex-1 bg-brand-bg border border-brand-border rounded-md p-3 font-mono text-sm focus:ring-brand-primary focus:border-brand-primary resize-none"
+                        spellCheck="false"
+                    />
+                </div>
+                <div className="flex-1 flex flex-col">
+                    <label htmlFor="css-editor" className="block text-sm font-medium text-brand-text-dim mb-1">
+                        CSS do Jogo (style.css)
+                    </label>
+                    <textarea
+                        id="css-editor"
+                        value={localCss}
+                        onChange={(e) => setLocalCss(e.target.value)}
+                        className="w-full flex-1 bg-brand-bg border border-brand-border rounded-md p-3 font-mono text-sm focus:ring-brand-primary focus:border-brand-primary resize-none"
+                        spellCheck="false"
+                    />
+                </div>
+            </div>
+        )}
+      </div>
+
+      <div className="fixed bottom-6 right-10 z-10 flex gap-2">
+          <button
+            onClick={handleUndo}
+            disabled={!isDirty}
+            className="px-6 py-2 bg-brand-surface border border-brand-border text-brand-text-dim font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            title={isDirty ? "Desfazer alterações" : "Nenhuma alteração para desfazer"}
+          >
+            Desfazer
+        </button>
+          <button
+              onClick={handleSave}
+              disabled={!isDirty}
+              className="px-6 py-2 bg-yellow-400 text-black font-semibold rounded-md hover:bg-yellow-500 transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
+              title={isDirty ? "Salvar alterações na interface" : "Nenhuma alteração para salvar"}
+          >
+              Salvar
+          </button>
+      </div>
     </div>
   );
 };
