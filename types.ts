@@ -1,4 +1,5 @@
 
+
 export interface GameObject {
   id: string;
   name: string;
@@ -56,8 +57,6 @@ export interface GameData {
   gameFontFamily?: string;
   gameLogo?: string; // base64 string
   gameSplashImage?: string; // base64 string
-  gameSplashTextWidth?: string;
-  gameSplashTextHeight?: string;
   gameTextColor?: string;
   gameTitleColor?: string;
   gameHideTitle?: boolean;
@@ -67,9 +66,11 @@ export interface GameData {
   gameSplashButtonText?: string;
   gameSplashButtonColor?: string;
   gameSplashButtonHoverColor?: string;
+  gameSplashButtonTextColor?: string;
   gameLayoutOrientation?: 'vertical' | 'horizontal';
   gameLayoutOrder?: 'image-first' | 'image-last';
   gameActionButtonColor?: string;
+  gameActionButtonTextColor?: string;
   gameActionButtonText?: string;
   gameCommandInputPlaceholder?: string;
   gameDiaryPlayerName?: string;
@@ -78,6 +79,10 @@ export interface GameData {
   gameMaxChances?: number;
   gameChanceIcon?: 'circle' | 'cross' | 'heart';
   gameChanceIconColor?: string;
+  gameTheme?: 'dark' | 'light';
+  gameTextColorLight?: string;
+  gameTitleColorLight?: string;
+  gameFocusColorLight?: string;
 }
 
 export type View = 'scenes' | 'interface' | 'game_info' | 'scene_map' | 'theme';

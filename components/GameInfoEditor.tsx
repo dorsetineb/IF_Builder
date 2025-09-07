@@ -9,24 +9,15 @@ interface GameInfoEditorProps {
   hideTitle: boolean;
   omitSplashTitle: boolean;
   splashImage: string;
-  splashTextWidth: string;
-  splashTextHeight: string;
   splashContentAlignment: 'left' | 'right';
   splashDescription: string;
   onUpdate: (field: keyof GameData, value: string | boolean | number) => void;
 }
 
-// Helper to extract number from a CSS value like "60%" or "auto"
-const extractPercentage = (value: string): string => {
-    if (value === 'auto') return '';
-    const num = parseFloat(value);
-    return isNaN(num) ? '' : String(num);
-};
-
 const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
     const { 
         title, logo, hideTitle, omitSplashTitle, 
-        splashImage, splashTextWidth, splashTextHeight, splashContentAlignment, splashDescription,
+        splashImage, splashContentAlignment, splashDescription,
         onUpdate 
     } = props;
 
@@ -35,8 +26,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
     const [localHideTitle, setLocalHideTitle] = useState(hideTitle);
     const [localOmitSplashTitle, setLocalOmitSplashTitle] = useState(omitSplashTitle);
     const [localSplashImage, setLocalSplashImage] = useState(splashImage);
-    const [localSplashTextWidth, setLocalSplashTextWidth] = useState(splashTextWidth);
-    const [localSplashTextHeight, setLocalSplashTextHeight] = useState(splashTextHeight);
     const [localSplashContentAlignment, setLocalSplashContentAlignment] = useState(splashContentAlignment);
     const [localSplashDescription, setLocalSplashDescription] = useState(splashDescription);
     const [activeTab, setActiveTab] = useState('geral');
@@ -48,8 +37,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         setLocalHideTitle(props.hideTitle);
         setLocalOmitSplashTitle(props.omitSplashTitle);
         setLocalSplashImage(props.splashImage);
-        setLocalSplashTextWidth(props.splashTextWidth);
-        setLocalSplashTextHeight(props.splashTextHeight);
         setLocalSplashContentAlignment(props.splashContentAlignment);
         setLocalSplashDescription(props.splashDescription);
         setIsDirty(false);
@@ -61,12 +48,10 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                          localHideTitle !== hideTitle ||
                          localOmitSplashTitle !== omitSplashTitle ||
                          localSplashImage !== splashImage ||
-                         localSplashTextWidth !== splashTextWidth ||
-                         localSplashTextHeight !== splashTextHeight ||
                          localSplashContentAlignment !== splashContentAlignment ||
                          localSplashDescription !== splashDescription;
         setIsDirty(hasChanged);
-    }, [localTitle, localLogo, localHideTitle, localOmitSplashTitle, localSplashImage, localSplashTextWidth, localSplashTextHeight, localSplashContentAlignment, localSplashDescription, props]);
+    }, [localTitle, localLogo, localHideTitle, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, props]);
 
     const handleSave = () => {
         if (localTitle !== title) onUpdate('gameTitle', localTitle);
@@ -74,8 +59,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         if (localHideTitle !== hideTitle) onUpdate('gameHideTitle', localHideTitle);
         if (localOmitSplashTitle !== omitSplashTitle) onUpdate('gameOmitSplashTitle', localOmitSplashTitle);
         if (localSplashImage !== splashImage) onUpdate('gameSplashImage', localSplashImage);
-        if (localSplashTextWidth !== splashTextWidth) onUpdate('gameSplashTextWidth', localSplashTextWidth);
-        if (localSplashTextHeight !== splashTextHeight) onUpdate('gameSplashTextHeight', localSplashTextHeight);
         if (localSplashContentAlignment !== splashContentAlignment) onUpdate('gameSplashContentAlignment', localSplashContentAlignment);
         if (localSplashDescription !== splashDescription) onUpdate('gameSplashDescription', localSplashDescription);
     };
@@ -86,8 +69,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         setLocalHideTitle(hideTitle);
         setLocalOmitSplashTitle(omitSplashTitle);
         setLocalSplashImage(splashImage);
-        setLocalSplashTextWidth(splashTextWidth);
-        setLocalSplashTextHeight(splashTextHeight);
         setLocalSplashContentAlignment(splashContentAlignment);
         setLocalSplashDescription(splashDescription);
     };
@@ -102,19 +83,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
           };
           reader.readAsDataURL(e.target.files[0]);
       }
-    };
-    
-    const handleDimensionChange = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
-        const value = e.target.value;
-        if (value === '') {
-            setter('auto');
-        } else {
-            const num = Number(value);
-            if (!isNaN(num)) {
-                const clampedNum = Math.max(0, Math.min(100, num));
-                setter(`${clampedNum}%`);
-            }
-        }
     };
 
     const TABS = {
@@ -205,8 +173,8 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
             <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                     <div className="space-y-2">
-                        <h4 className="text-lg font-semibold text-brand-text mb-2">Dimensões do Conteúdo</h4>
-                        <p className="text-xs text-brand-text-dim">Visualizador de proporção:</p>
+                        <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
+                        <p className="text-xs text-brand-text-dim">Visualizador de alinhamento:</p>
                         <div
                             className="relative w-full aspect-video bg-green-500/30 border border-green-400 rounded-md flex"
                             style={{
@@ -216,57 +184,18 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                             title="Área da Imagem de Fundo"
                         >
                             <div className="absolute top-2 left-2 text-green-200 font-semibold text-sm">
-                                Imagem
+                                Imagem de Fundo
                             </div>
                             <div
-                                className="bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold"
-                                style={{
-                                    width: localSplashTextWidth !== 'auto' ? localSplashTextWidth : 'auto',
-                                    minWidth: '40%',
-                                    height: localSplashTextHeight !== 'auto' ? localSplashTextHeight : 'auto',
-                                }}
+                                className="w-2/3 bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold"
                                 title="Área de Texto"
                             >
-                                Texto
+                                Texto de Abertura
                             </div>
                         </div>
 
-                        <div className="flex items-end gap-4 pt-2">
-                            <div className="flex-1">
-                                <label htmlFor="splashTextWidth" className="text-sm text-brand-text-dim mb-1 block">Largura</label>
-                                <div className="flex items-center">
-                                    <input
-                                        id="splashTextWidth"
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        value={extractPercentage(localSplashTextWidth)}
-                                        onChange={(e) => handleDimensionChange(e, setLocalSplashTextWidth)}
-                                        className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
-                                        placeholder="auto"
-                                    />
-                                    <span className="ml-2 text-brand-text-dim">%</span>
-                                </div>
-                            </div>
-                             <div className="flex-1">
-                                <label htmlFor="splashTextHeight" className="text-sm text-brand-text-dim mb-1 block">Altura</label>
-                                 <div className="flex items-center">
-                                    <input
-                                        id="splashTextHeight"
-                                        type="number"
-                                        min="0"
-                                        max="100"
-                                        value={extractPercentage(localSplashTextHeight)}
-                                        onChange={(e) => handleDimensionChange(e, setLocalSplashTextHeight)}
-                                        className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
-                                        placeholder="auto"
-                                    />
-                                    <span className="ml-2 text-brand-text-dim">%</span>
-                                 </div>
-                            </div>
-                        </div>
                         <div className="pt-2">
-                            <label htmlFor="splashContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento do Conteúdo</label>
+                            <label htmlFor="splashContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento Horizontal</label>
                             <select
                                 id="splashContentAlignment"
                                 value={localSplashContentAlignment}

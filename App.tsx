@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -24,7 +25,7 @@ const gameHTML = `
     __FONT_STYLESHEET__
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
+<body class="__THEME_CLASS__">
     <audio id="scene-sound-effect" preload="auto"></audio>
     <div class="main-wrapper">
         <div id="splash-screen" class="splash-screen" __SPLASH_BG_STYLE__>
@@ -85,24 +86,49 @@ const gameHTML = `
 `;
 
 const gameCSS = `
-:root {
+body.dark-theme {
     --bg-color: #0d1117;
     --panel-bg: #161b22;
     --border-color: #30363d;
-    --text-color: #c9d1d9;
+    --text-color: __GAME_TEXT_COLOR__;
     --text-dim-color: #8b949e;
-    --accent-color: #58a6ff;
-    --focus-color: #58a6ff;
+    --accent-color: __GAME_TITLE_COLOR__;
+    --focus-color: __GAME_FOCUS_COLOR__;
     --danger-color: #f85149;
     --danger-hover-bg: #da3633;
+    --highlight-color: #eab308;
+    --input-bg: #010409;
+    --button-bg: #21262d;
+    --button-hover-bg: #30363d;
+}
+
+body.light-theme {
+    --bg-color: #ffffff;
+    --panel-bg: #f6f8fa;
+    --border-color: #d0d7de;
+    --text-color: __GAME_TEXT_COLOR_LIGHT__;
+    --text-dim-color: #57606a;
+    --accent-color: __GAME_TITLE_COLOR_LIGHT__;
+    --focus-color: __GAME_FOCUS_COLOR_LIGHT__;
+    --danger-color: #cf222e;
+    --danger-hover-bg: #a40e26;
+    --highlight-color: #9a6700;
+    --input-bg: #ffffff;
+    --button-bg: #f6f8fa;
+    --button-hover-bg: #e5e7eb;
+}
+
+:root {
     --font-family: __FONT_FAMILY__;
-    --splash-button-bg: #2ea043;
-    --splash-button-hover-bg: #238636;
+    --splash-button-bg: __SPLASH_BUTTON_COLOR__;
+    --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__;
+    --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__;
+    --action-button-bg: __ACTION_BUTTON_COLOR__;
+    --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__;
     --splash-align-items: flex-end;
     --splash-justify-content: flex-end;
     --splash-text-align: right;
     --splash-content-align-items: flex-end;
-    --highlight-color: #eab308;
 }
 
 /* Reset and base styles */
@@ -177,7 +203,7 @@ body {
     border: none;
     cursor: pointer;
     background-color: var(--splash-button-bg);
-    color: white;
+    color: var(--splash-button-text-color);
     transition: all 0.2s ease-in-out;
 }
 #splash-start-button:hover {
@@ -216,14 +242,14 @@ body {
     font-family: var(--font-family);
     padding: 8px 12px;
     border: 1px solid var(--border-color);
-    background-color: #21262d;
+    background-color: var(--button-bg);
     color: var(--text-color);
     cursor: pointer;
     margin-left: 10px;
     transition: background-color 0.2s;
 }
-.header-buttons button:hover { background-color: #30363d; }
-.header-buttons button.btn-danger { background-color: #a12d2d; border-color: #c74a4a; }
+.header-buttons button:hover { background-color: var(--button-hover-bg); }
+.header-buttons button.btn-danger { background-color: var(--danger-color); border-color: var(--danger-color); color: white; }
 .header-buttons button.btn-danger:hover { background-color: var(--danger-hover-bg); }
 
 /* Main Layout */
@@ -239,7 +265,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: #010409;
+    background-color: var(--input-bg);
     position: relative;
 }
 .image-container {
@@ -309,7 +335,7 @@ body {
     padding: 8px 12px;
     margin: 0 8px 8px 0;
     text-align: left;
-    background-color: #21262d;
+    background-color: var(--button-bg);
     border: 1px solid var(--border-color);
     color: var(--text-color);
     font-family: var(--font-family);
@@ -352,7 +378,7 @@ body {
     flex-grow: 1;
     padding: 15px 12px;
     border: 2px solid var(--border-color);
-    background-color: #010409;
+    background-color: var(--input-bg);
     color: var(--text-color);
     font-family: var(--font-family);
     font-size: 1em;
@@ -362,14 +388,14 @@ body {
     border-color: var(--focus-color);
 }
 #command-input:disabled {
-    background-color: #21262d;
+    background-color: var(--button-bg);
     cursor: not-allowed;
 }
 #submit-command {
     padding: 10px 20px;
     border: 2px solid var(--border-color);
-    background-color: #ffffff;
-    color: var(--bg-color);
+    background-color: var(--action-button-bg);
+    color: var(--action-button-text-color);
     font-family: var(--font-family);
     cursor: pointer;
     font-weight: bold;
@@ -378,12 +404,12 @@ body {
 #submit-command:hover { background-color: #e0e0e0; }
 
 #submit-command:disabled {
-    background-color: #30363d;
+    background-color: var(--button-hover-bg);
     color: var(--text-dim-color);
     cursor: not-allowed;
 }
 #submit-command:disabled:hover {
-    background-color: #30363d;
+    background-color: var(--button-hover-bg);
 }
 
 /* Focus styles for accessibility */
@@ -619,8 +645,6 @@ const initializeGameData = (): GameData => {
         gameFontFamily: "'Silkscreen', sans-serif",
         gameLogo: "", // base64 string
         gameSplashImage: "", // base64 string
-        gameSplashTextWidth: "60%",
-        gameSplashTextHeight: "auto",
         gameSplashContentAlignment: 'right',
         gameSplashDescription: "Uma breve descrição da sua aventura começa aqui. O que o jogador deve saber antes de iniciar?",
         gameTextColor: "#c9d1d9",
@@ -630,9 +654,11 @@ const initializeGameData = (): GameData => {
         gameSplashButtonText: "INICIAR AVENTURA",
         gameSplashButtonColor: "#2ea043",
         gameSplashButtonHoverColor: "#238636",
+        gameSplashButtonTextColor: "#ffffff",
         gameLayoutOrientation: 'vertical',
         gameLayoutOrder: 'image-first',
         gameActionButtonColor: '#ffffff',
+        gameActionButtonTextColor: '#0d1117',
         gameActionButtonText: 'AÇÃO',
         gameCommandInputPlaceholder: 'O QUE VOCÊ FAZ?',
         gameDiaryPlayerName: 'VOCÊ',
@@ -641,6 +667,10 @@ const initializeGameData = (): GameData => {
         gameMaxChances: 3,
         gameChanceIcon: 'heart',
         gameChanceIconColor: '#ff4d4d',
+        gameTheme: 'dark',
+        gameTextColorLight: '#24292f',
+        gameTitleColorLight: '#0969da',
+        gameFocusColorLight: '#0969da',
     };
 };
 
@@ -844,6 +874,7 @@ const App: React.FC = () => {
             sceneOrder={gameData.sceneOrder}
             onSelectScene={handleSelectSceneAndSwitchView}
             onDirtyStateChange={handleDirtyStateChange}
+            layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
           />
         ) : (
           <WelcomePlaceholder />
@@ -870,8 +901,6 @@ const App: React.FC = () => {
             hideTitle={gameData.gameHideTitle || false}
             omitSplashTitle={gameData.gameOmitSplashTitle || false}
             splashImage={gameData.gameSplashImage || ''}
-            splashTextWidth={gameData.gameSplashTextWidth || '60%'}
-            splashTextHeight={gameData.gameSplashTextHeight || 'auto'}
             splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
             splashDescription={gameData.gameSplashDescription || ''}
             onUpdate={handleUpdateGameData}
@@ -884,13 +913,19 @@ const App: React.FC = () => {
             titleColor={gameData.gameTitleColor || '#58a6ff'}
             splashButtonColor={gameData.gameSplashButtonColor || '#2ea043'}
             splashButtonHoverColor={gameData.gameSplashButtonHoverColor || '#238636'}
+            splashButtonTextColor={gameData.gameSplashButtonTextColor || '#ffffff'}
             actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
+            actionButtonTextColor={gameData.gameActionButtonTextColor || '#0d1117'}
             focusColor={gameData.gameFocusColor || '#58a6ff'}
             chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
             gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
             enableChances={gameData.gameEnableChances || false}
             maxChances={gameData.gameMaxChances || 3}
             chanceIcon={gameData.gameChanceIcon || 'heart'}
+            gameTheme={gameData.gameTheme || 'dark'}
+            textColorLight={gameData.gameTextColorLight || '#24292f'}
+            titleColorLight={gameData.gameTitleColorLight || '#0969da'}
+            focusColorLight={gameData.gameFocusColorLight || '#0969da'}
             onUpdate={handleUpdateGameData}
           />
         );

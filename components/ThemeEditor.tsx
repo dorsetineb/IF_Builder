@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { GameData } from '../types';
 
@@ -7,13 +8,19 @@ interface ThemeEditorProps {
   titleColor: string;
   splashButtonColor: string;
   splashButtonHoverColor: string;
+  splashButtonTextColor: string;
   actionButtonColor: string;
+  actionButtonTextColor: string;
   focusColor: string;
   chanceIconColor: string;
   gameFontFamily: string;
   enableChances: boolean;
   maxChances: number;
   chanceIcon: 'circle' | 'cross' | 'heart';
+  gameTheme: 'dark' | 'light';
+  textColorLight: string;
+  titleColorLight: string;
+  focusColorLight: string;
   onUpdate: (field: keyof GameData, value: any) => void;
 }
 
@@ -64,21 +71,29 @@ const ColorInput: React.FC<{
 const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
     const { 
         textColor, titleColor, splashButtonColor, splashButtonHoverColor,
-        actionButtonColor, focusColor, chanceIconColor, gameFontFamily, 
-        enableChances, maxChances, chanceIcon, onUpdate 
+        splashButtonTextColor, actionButtonColor, actionButtonTextColor,
+        focusColor, chanceIconColor, gameFontFamily, 
+        enableChances, maxChances, chanceIcon, onUpdate,
+        gameTheme, textColorLight, titleColorLight, focusColorLight
     } = props;
 
     const [localTextColor, setLocalTextColor] = useState(textColor);
     const [localTitleColor, setLocalTitleColor] = useState(titleColor);
     const [localSplashButtonColor, setLocalSplashButtonColor] = useState(splashButtonColor);
     const [localSplashButtonHoverColor, setLocalSplashButtonHoverColor] = useState(splashButtonHoverColor);
+    const [localSplashButtonTextColor, setLocalSplashButtonTextColor] = useState(splashButtonTextColor);
     const [localActionButtonColor, setLocalActionButtonColor] = useState(actionButtonColor);
+    const [localActionButtonTextColor, setLocalActionButtonTextColor] = useState(actionButtonTextColor);
     const [localFocusColor, setLocalFocusColor] = useState(focusColor);
     const [localChanceIconColor, setLocalChanceIconColor] = useState(chanceIconColor);
     const [localFontFamily, setLocalFontFamily] = useState(gameFontFamily);
     const [localEnableChances, setLocalEnableChances] = useState(enableChances);
     const [localMaxChances, setLocalMaxChances] = useState(maxChances);
     const [localChanceIcon, setLocalChanceIcon] = useState(chanceIcon);
+    const [localGameTheme, setLocalGameTheme] = useState(gameTheme);
+    const [localTextColorLight, setLocalTextColorLight] = useState(textColorLight);
+    const [localTitleColorLight, setLocalTitleColorLight] = useState(titleColorLight);
+    const [localFocusColorLight, setLocalFocusColorLight] = useState(focusColorLight);
     const [isDirty, setIsDirty] = useState(false);
     const [focusPreview, setFocusPreview] = useState(false);
 
@@ -87,13 +102,19 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         setLocalTitleColor(props.titleColor);
         setLocalSplashButtonColor(props.splashButtonColor);
         setLocalSplashButtonHoverColor(props.splashButtonHoverColor);
+        setLocalSplashButtonTextColor(props.splashButtonTextColor);
         setLocalActionButtonColor(props.actionButtonColor);
+        setLocalActionButtonTextColor(props.actionButtonTextColor);
         setLocalFocusColor(props.focusColor);
         setLocalChanceIconColor(props.chanceIconColor);
         setLocalFontFamily(props.gameFontFamily);
         setLocalEnableChances(props.enableChances);
         setLocalMaxChances(props.maxChances);
         setLocalChanceIcon(props.chanceIcon);
+        setLocalGameTheme(props.gameTheme);
+        setLocalTextColorLight(props.textColorLight);
+        setLocalTitleColorLight(props.titleColorLight);
+        setLocalFocusColorLight(props.focusColorLight);
         setIsDirty(false);
     }, [props]);
 
@@ -102,28 +123,40 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                       localTitleColor !== titleColor ||
                       localSplashButtonColor !== splashButtonColor ||
                       localSplashButtonHoverColor !== splashButtonHoverColor ||
+                      localSplashButtonTextColor !== splashButtonTextColor ||
                       localActionButtonColor !== actionButtonColor ||
+                      localActionButtonTextColor !== actionButtonTextColor ||
                       localFocusColor !== focusColor ||
                       localChanceIconColor !== chanceIconColor ||
                       localFontFamily !== gameFontFamily ||
                       localEnableChances !== enableChances ||
                       localMaxChances !== maxChances ||
-                      localChanceIcon !== chanceIcon;
+                      localChanceIcon !== chanceIcon ||
+                      localGameTheme !== gameTheme ||
+                      localTextColorLight !== textColorLight ||
+                      localTitleColorLight !== titleColorLight ||
+                      localFocusColorLight !== focusColorLight;
         setIsDirty(dirty);
-    }, [localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localActionButtonColor, localFocusColor, localChanceIconColor, localFontFamily, localEnableChances, localMaxChances, localChanceIcon, props]);
+    }, [localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localEnableChances, localMaxChances, localChanceIcon, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight, props]);
 
     const handleSave = () => {
         if (localTextColor !== textColor) onUpdate('gameTextColor', localTextColor);
         if (localTitleColor !== titleColor) onUpdate('gameTitleColor', localTitleColor);
         if (localSplashButtonColor !== splashButtonColor) onUpdate('gameSplashButtonColor', localSplashButtonColor);
         if (localSplashButtonHoverColor !== splashButtonHoverColor) onUpdate('gameSplashButtonHoverColor', localSplashButtonHoverColor);
+        if (localSplashButtonTextColor !== splashButtonTextColor) onUpdate('gameSplashButtonTextColor', localSplashButtonTextColor);
         if (localActionButtonColor !== actionButtonColor) onUpdate('gameActionButtonColor', localActionButtonColor);
+        if (localActionButtonTextColor !== actionButtonTextColor) onUpdate('gameActionButtonTextColor', localActionButtonTextColor);
         if (localFocusColor !== focusColor) onUpdate('gameFocusColor', localFocusColor);
         if (localChanceIconColor !== chanceIconColor) onUpdate('gameChanceIconColor', localChanceIconColor);
         if (localFontFamily !== gameFontFamily) onUpdate('gameFontFamily', localFontFamily);
         if (localEnableChances !== enableChances) onUpdate('gameEnableChances', localEnableChances);
         if (localMaxChances !== maxChances) onUpdate('gameMaxChances', localMaxChances);
         if (localChanceIcon !== chanceIcon) onUpdate('gameChanceIcon', localChanceIcon);
+        if (localGameTheme !== gameTheme) onUpdate('gameTheme', localGameTheme);
+        if (localTextColorLight !== textColorLight) onUpdate('gameTextColorLight', localTextColorLight);
+        if (localTitleColorLight !== titleColorLight) onUpdate('gameTitleColorLight', localTitleColorLight);
+        if (localFocusColorLight !== focusColorLight) onUpdate('gameFocusColorLight', localFocusColorLight);
     };
     
     const handleUndo = () => {
@@ -131,13 +164,19 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         setLocalTitleColor(titleColor);
         setLocalSplashButtonColor(splashButtonColor);
         setLocalSplashButtonHoverColor(splashButtonHoverColor);
+        setLocalSplashButtonTextColor(splashButtonTextColor);
         setLocalActionButtonColor(actionButtonColor);
+        setLocalActionButtonTextColor(actionButtonTextColor);
         setLocalFocusColor(focusColor);
         setLocalChanceIconColor(chanceIconColor);
         setLocalFontFamily(gameFontFamily);
         setLocalEnableChances(enableChances);
         setLocalMaxChances(maxChances);
         setLocalChanceIcon(chanceIcon);
+        setLocalGameTheme(gameTheme);
+        setLocalTextColorLight(textColorLight);
+        setLocalTitleColorLight(titleColorLight);
+        setLocalFocusColorLight(focusColorLight);
     };
     
     const HeartIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
@@ -178,7 +217,28 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="bg-brand-surface rounded-lg border border-brand-border p-6 space-y-6">
-                    <div>
+                    <div className="space-y-2">
+                        <h3 className="text-lg font-semibold text-brand-text">Tema da Interface</h3>
+                        <div className="flex gap-2 rounded-md bg-brand-bg p-1">
+                            <button
+                                onClick={() => setLocalGameTheme('dark')}
+                                className={`w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors ${
+                                    localGameTheme === 'dark' ? 'bg-brand-primary text-brand-bg' : 'hover:bg-brand-border/30'
+                                }`}
+                            >
+                                Escuro
+                            </button>
+                            <button
+                                onClick={() => setLocalGameTheme('light')}
+                                className={`w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors ${
+                                    localGameTheme === 'light' ? 'bg-brand-primary text-brand-bg' : 'hover:bg-brand-border/30'
+                                }`}
+                            >
+                                Claro
+                            </button>
+                        </div>
+                    </div>
+                     <div>
                         <h3 className="text-lg font-semibold text-brand-text mb-4">Fonte do Jogo</h3>
                          <div>
                             <label htmlFor="font-select" className="block text-sm font-medium text-brand-text-dim mb-1">Fonte do Jogo</label>
@@ -197,25 +257,39 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                             </select>
                         </div>
                     </div>
-                     <div className="pt-6 border-t border-brand-border/50">
-                        <h3 className="text-lg font-semibold text-brand-text mb-4">Cores Gerais</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <ColorInput label="Cor do Texto Padrão" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#c9d1d9" />
-                            <ColorInput label="Cor do Título / Destaque" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58a6ff" />
+
+                    {localGameTheme === 'dark' && (
+                        <div className="pt-6 border-t border-brand-border/50">
+                            <h3 className="text-lg font-semibold text-brand-text mb-4">Cores (Tema Escuro)</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <ColorInput label="Cor do Texto Padrão" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#c9d1d9" />
+                                <ColorInput label="Cor do Título / Destaque" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58a6ff" />
+                                <ColorInput label="Cor de Destaque (Foco)" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#58a6ff" />
+                            </div>
                         </div>
-                    </div>
+                    )}
+
+                    {localGameTheme === 'light' && (
+                        <div className="pt-6 border-t border-brand-border/50">
+                            <h3 className="text-lg font-semibold text-brand-text mb-4">Cores (Tema Claro)</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <ColorInput label="Cor do Texto Padrão" id="textColorLight" value={localTextColorLight} onChange={setLocalTextColorLight} placeholder="#24292f" />
+                                <ColorInput label="Cor do Título / Destaque" id="titleColorLight" value={localTitleColorLight} onChange={setLocalTitleColorLight} placeholder="#0969da" />
+                                <ColorInput label="Cor de Destaque (Foco)" id="focusColorLight" value={localFocusColorLight} onChange={setLocalFocusColorLight} placeholder="#0969da" />
+                            </div>
+                        </div>
+                    )}
+
+
                     <div className="pt-6 border-t border-brand-border/50">
-                        <h3 className="text-lg font-semibold text-brand-text mb-4">Tela de Abertura</h3>
+                        <h3 className="text-lg font-semibold text-brand-text mb-4">Botões (Geral)</h3>
+                         <p className="text-xs text-brand-text-dim mb-4 -mt-3">Estas cores são aplicadas a ambos os temas.</p>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <ColorInput label="Cor do Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#2ea043" />
+                            <ColorInput label="Cor do Texto do Botão de Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#ffffff" />
                             <ColorInput label="Cor do Botão de Início (Hover)" id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#238636" />
-                        </div>
-                    </div>
-                     <div className="pt-6 border-t border-brand-border/50">
-                        <h3 className="text-lg font-semibold text-brand-text mb-4">Interface do Jogo</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                            <ColorInput label="Cor do Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#ffffff" />
-                            <ColorInput label="Cor de Destaque (Foco)" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#58a6ff" />
+                             <ColorInput label="Cor do Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#ffffff" />
+                             <ColorInput label="Cor do Texto do Botão de Ação" id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#0d1117" />
                         </div>
                     </div>
                      <div className="pt-6 border-t border-brand-border/50">
@@ -265,9 +339,12 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
 
                 <div className="flex flex-col">
                     <p className="text-sm text-brand-text-dim mb-2 text-center">Pré-visualização ao vivo</p>
-                    <div className="flex-1 bg-[#0d1117] rounded-lg border-2 border-brand-border p-6 flex flex-col justify-between" style={{ fontFamily: localFontFamily }}>
+                    <div 
+                        className={`flex-1 rounded-lg border-2 p-6 flex flex-col justify-between transition-colors ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-brand-border' : 'bg-[#ffffff] border-[#d0d7de]'}`}
+                        style={{ fontFamily: localFontFamily }}
+                    >
                         <div className="flex justify-between items-start">
-                             <h1 className="text-xl" style={{ color: localTitleColor }}>Título do Jogo</h1>
+                             <h1 className="text-xl" style={{ color: localGameTheme === 'dark' ? localTitleColor : localTitleColorLight }}>Título do Jogo</h1>
                              {localEnableChances && (
                                 <div className="flex gap-1">
                                     {Array.from({ length: localMaxChances }).map((_, i) => (
@@ -277,29 +354,33 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                              )}
                         </div>
                         <div className="my-4">
-                            <p className="text-sm" style={{ color: localTextColor }}>Esta é uma descrição de exemplo para a cena. Ela usa a cor de texto padrão que você definir.</p>
-                            <p className="mt-2 text-sm italic" style={{ color: '#8b949e' }}>&gt; comando de exemplo</p>
+                            <p className="text-sm" style={{ color: localGameTheme === 'dark' ? localTextColor : localTextColorLight }}>Esta é uma descrição de exemplo para a cena. Ela usa a cor de texto padrão que você definir.</p>
+                            <p className="mt-2 text-sm italic" style={{ color: localGameTheme === 'dark' ? '#8b949e' : '#57606a' }}>&gt; comando de exemplo</p>
                         </div>
                         <div className="space-y-4">
                              <div className="flex items-center gap-4">
                                 <input 
                                     type="text" 
                                     placeholder="Campo de comando"
-                                    className="flex-1 bg-[#010409] border-2 rounded p-2 text-sm"
+                                    className="flex-1 border-2 rounded p-2 text-sm transition-colors"
                                     style={{
-                                        color: localTextColor,
-                                        borderColor: focusPreview ? localFocusColor : '#30363d',
+                                        backgroundColor: localGameTheme === 'dark' ? '#010409' : '#f6f8fa',
+                                        color: localGameTheme === 'dark' ? localTextColor : localTextColorLight,
+                                        borderColor: focusPreview 
+                                            ? (localGameTheme === 'dark' ? localFocusColor : localFocusColorLight) 
+                                            : (localGameTheme === 'dark' ? '#30363d' : '#d0d7de'),
                                         fontFamily: localFontFamily,
                                     }}
                                     onFocus={() => setFocusPreview(true)}
                                     onBlur={() => setFocusPreview(false)}
                                 />
-                                <button className="font-bold py-2 px-4 rounded" style={{ backgroundColor: localActionButtonColor, color: '#0d1117', fontFamily: localFontFamily }}>Ação</button>
+                                <button className="font-bold py-2 px-4 rounded" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily }}>Ação</button>
                              </div>
                               <button
-                                    className="w-full font-bold text-white transition-all duration-200 ease-in-out text-lg py-3"
+                                    className="w-full font-bold transition-all duration-200 ease-in-out text-lg py-3"
                                     style={{
                                         backgroundColor: localSplashButtonColor,
+                                        color: localSplashButtonTextColor,
                                         fontFamily: localFontFamily,
                                     }}
                                     onMouseEnter={e => e.currentTarget.style.backgroundColor = localSplashButtonHoverColor}

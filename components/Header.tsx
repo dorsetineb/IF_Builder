@@ -1,4 +1,5 @@
 
+
 // FIX: Corrected React import to properly include 'useRef'. The previous syntax 'import React, a from ...' was invalid.
 import React, { useRef } from 'react';
 import { GameData } from '../types';
@@ -80,7 +81,7 @@ const Header: React.FC<{
 
     const headerContent = exportData.gameEnableChances 
         ? '<div id="chances-container" class="chances-container"></div>' 
-        : '<button id="restart-button" class="btn-danger">Reiniciar Aventura</button>';
+        : '';
     
     const fontFamily = exportData.gameFontFamily || "'Silkscreen', sans-serif";
     const fontUrl = getFontUrl(fontFamily);
@@ -88,6 +89,7 @@ const Header: React.FC<{
 
     const finalHtml = exportData.gameHTML
         .replace('__GAME_TITLE__', exportData.gameTitle || 'Game')
+        .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme`)
         .replace('__FONT_STYLESHEET__', fontStylesheet)
         .replace('__LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="game-logo">` : '')
         .replace('__HEADER_TITLE_H1_TAG__', !exportData.gameHideTitle ? `<h1>${exportData.gameTitle}</h1>` : '')
@@ -102,9 +104,32 @@ const Header: React.FC<{
         .replace('</body>', `<script src="game.js"></script>\n</body>`);
 
     const chancesCSS = `\n.chances-container { display: flex; align-items: center; gap: 8px; }\n.chance-icon { width: 28px; height: 28px; transition: all 0.3s ease; }\n.chance-icon.lost { opacity: 0.5; }`;
+    
     let finalCss = exportData.gameCSS
         .replace('__FONT_FAMILY__', fontFamily)
-        .replace(/:root {/, `:root {\n    --text-color: ${exportData.gameTextColor || '#c9d1d9'};` + `\n    --accent-color: ${exportData.gameTitleColor || '#58a6ff'};` + `\n    --splash-button-bg: ${exportData.gameSplashButtonColor || '#2ea043'};` + `\n    --splash-button-hover-bg: ${exportData.gameSplashButtonHoverColor || '#238636'};`+ `\n    --focus-color: ${exportData.gameFocusColor || '#58a6ff'};`) + (exportData.gameEnableChances ? chancesCSS : '');
+        .replace('__GAME_TEXT_COLOR__', exportData.gameTextColor || '#c9d1d9')
+        .replace('__GAME_TITLE_COLOR__', exportData.gameTitleColor || '#58a6ff')
+        .replace('__GAME_FOCUS_COLOR__', exportData.gameFocusColor || '#58a6ff')
+        .replace('__GAME_TEXT_COLOR_LIGHT__', exportData.gameTextColorLight || '#24292f')
+        .replace('__GAME_TITLE_COLOR_LIGHT__', exportData.gameTitleColorLight || '#0969da')
+        .replace('__GAME_FOCUS_COLOR_LIGHT__', exportData.gameFocusColorLight || '#0969da')
+        .replace('__SPLASH_BUTTON_COLOR__', exportData.gameSplashButtonColor || '#2ea043')
+        .replace('__SPLASH_BUTTON_HOVER_COLOR__', exportData.gameSplashButtonHoverColor || '#238636')
+        .replace('__SPLASH_BUTTON_TEXT_COLOR__', exportData.gameSplashButtonTextColor || '#ffffff')
+        .replace('__ACTION_BUTTON_COLOR__', exportData.gameActionButtonColor || '#ffffff')
+        .replace('__ACTION_BUTTON_TEXT_COLOR__', exportData.gameActionButtonTextColor || '#0d1117');
+
+    if (exportData.gameSplashContentAlignment === 'left') {
+        finalCss = finalCss
+            .replace(/--splash-justify-content: flex-end;/g, '--splash-justify-content: flex-start;')
+            .replace(/--splash-align-items: flex-end;/g, '--splash-align-items: flex-start;')
+            .replace(/--splash-text-align: right;/g, '--splash-text-align: left;')
+            .replace(/--splash-content-align-items: flex-end;/g, '--splash-content-align-items: flex-start;');
+    }
+    
+    if (exportData.gameEnableChances) {
+        finalCss += chancesCSS;
+    }
 
     const engineData = prepareGameDataForEngine(exportData);
     const finalDataScript = `document.addEventListener('DOMContentLoaded', () => { window.embeddedGameData = ${JSON.stringify(engineData)}; });`;
@@ -156,6 +181,10 @@ const Header: React.FC<{
         reconstructedData.gameMaxChances = importedEngineData.gameMaxChances;
         reconstructedData.gameChanceIcon = importedEngineData.gameChanceIcon;
         reconstructedData.gameChanceIconColor = importedEngineData.gameChanceIconColor;
+        reconstructedData.gameTheme = importedEngineData.gameTheme;
+        reconstructedData.gameTextColorLight = importedEngineData.gameTextColorLight;
+        reconstructedData.gameTitleColorLight = importedEngineData.gameTitleColorLight;
+        reconstructedData.gameFocusColorLight = importedEngineData.gameFocusColorLight;
 
         const editorScenes: { [id: string]: any } = {};
         if (importedEngineData.cenas) {
@@ -222,7 +251,7 @@ const Header: React.FC<{
   return (
     <header className="flex items-center justify-between p-3 bg-brand-surface border-b border-brand-border flex-shrink-0 z-20">
       <div className="flex flex-col items-start min-w-0">
-        <h1 className="text-xl font-bold text-brand-text whitespace-nowrap">IF Builder</h1>
+        <h1 className="text-xl font-bold text-brand-text whitespace-nowrap">TXT Builder</h1>
         {gameData.gameTitle && (
             <code
                 className="mt-1 bg-brand-bg px-2 py-1 rounded text-brand-primary-hover text-sm truncate max-w-full"

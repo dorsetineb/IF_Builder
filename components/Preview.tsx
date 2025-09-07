@@ -1,5 +1,6 @@
 
 
+
 import React, { useMemo } from 'react';
 import { GameData } from '../types';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
@@ -18,7 +19,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
         if (gameData.gameEnableChances) {
             headerContent = '<div id="chances-container" class="chances-container"></div>';
         } else {
-            headerContent = '<button id="restart-button" class="btn-danger">Reiniciar Aventura</button>';
+            headerContent = '';
         }
 
         const fontFamily = gameData.gameFontFamily || "'Silkscreen', sans-serif";
@@ -26,7 +27,8 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
         const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
 
         let finalHtml = gameData.gameHTML
-            .replace('__GAME_TITLE__', gameData.gameTitle || 'IF Builder Game')
+            .replace('__GAME_TITLE__', gameData.gameTitle || 'TXT Builder Game')
+            .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme`)
             .replace('__FONT_STYLESHEET__', fontStylesheet)
             .replace('__LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="game-logo">` : '')
             .replace('__HEADER_TITLE_H1_TAG__', !gameData.gameHideTitle ? `<h1>${gameData.gameTitle}</h1>` : '')
@@ -47,18 +49,26 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
 
         let finalCss = gameData.gameCSS
             .replace('__FONT_FAMILY__', fontFamily)
-            .replace(/:root {/, 
-                `:root {\n    --text-color: ${gameData.gameTextColor || '#c9d1d9'};` +
-                `\n    --accent-color: ${gameData.gameTitleColor || '#58a6ff'};` +
-                `\n    --splash-button-bg: ${gameData.gameSplashButtonColor || '#2ea043'};` +
-                `\n    --splash-button-hover-bg: ${gameData.gameSplashButtonHoverColor || '#238636'};`+
-                `\n    --focus-color: ${gameData.gameFocusColor || '#58a6ff'};`
-            ) + (gameData.gameEnableChances ? chancesCSS : '');
+            .replace('__GAME_TEXT_COLOR__', gameData.gameTextColor || '#c9d1d9')
+            .replace('__GAME_TITLE_COLOR__', gameData.gameTitleColor || '#58a6ff')
+            .replace('__GAME_FOCUS_COLOR__', gameData.gameFocusColor || '#58a6ff')
+            .replace('__GAME_TEXT_COLOR_LIGHT__', gameData.gameTextColorLight || '#24292f')
+            .replace('__GAME_TITLE_COLOR_LIGHT__', gameData.gameTitleColorLight || '#0969da')
+            .replace('__GAME_FOCUS_COLOR_LIGHT__', gameData.gameFocusColorLight || '#0969da')
+            .replace('__SPLASH_BUTTON_COLOR__', gameData.gameSplashButtonColor || '#2ea043')
+            .replace('__SPLASH_BUTTON_HOVER_COLOR__', gameData.gameSplashButtonHoverColor || '#238636')
+            .replace('__SPLASH_BUTTON_TEXT_COLOR__', gameData.gameSplashButtonTextColor || '#ffffff')
+            .replace('__ACTION_BUTTON_COLOR__', gameData.gameActionButtonColor || '#ffffff')
+            .replace('__ACTION_BUTTON_TEXT_COLOR__', gameData.gameActionButtonTextColor || '#0d1117');
+
+        if (gameData.gameEnableChances) {
+            finalCss += chancesCSS;
+        }
 
         if (gameData.gameSplashContentAlignment === 'left') {
             finalCss = finalCss
-                .replace(/--splash-align-items: flex-end;/g, '--splash-align-items: flex-start;')
                 .replace(/--splash-justify-content: flex-end;/g, '--splash-justify-content: flex-start;')
+                .replace(/--splash-align-items: flex-end;/g, '--splash-align-items: flex-start;')
                 .replace(/--splash-text-align: right;/g, '--splash-text-align: left;')
                 .replace(/--splash-content-align-items: flex-end;/g, '--splash-content-align-items: flex-start;');
         }

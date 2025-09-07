@@ -4,8 +4,6 @@ import { Scene } from '../types';
 import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
 import { UploadIcon } from './icons/UploadIcon';
-import { SparklesIcon } from './icons/SparklesIcon';
-import { generateSceneImage } from '../services/geminiService';
 import { EyeIcon } from './icons/EyeIcon';
 import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
 import { ChevronRightIcon } from './icons/ChevronRightIcon';
@@ -19,6 +17,7 @@ interface SceneEditorProps {
   sceneOrder: string[];
   onSelectScene: (id: string) => void;
   onDirtyStateChange: (sceneId: string, isDirty: boolean) => void;
+  layoutOrientation: 'vertical' | 'horizontal';
 }
 
 const SceneEditor: React.FC<SceneEditorProps> = ({ 
@@ -30,10 +29,10 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     sceneOrder,
     onSelectScene,
     onDirtyStateChange,
+    layoutOrientation,
 }) => {
   const [localScene, setLocalScene] = useState<Scene>(scene);
   const [isDirty, setIsDirty] = useState(false);
-  const [isGeneratingImage, setIsGeneratingImage] = useState(false);
   const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions'>('properties');
   
   useEffect(() => {
@@ -84,24 +83,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
               }
           };
           reader.readAsDataURL(e.target.files[0]);
-      }
-  };
-  
-  const handleGenerateImage = async () => {
-      if (!localScene.description) {
-          alert("Por favor, escreva uma descrição para a cena antes de gerar uma imagem.");
-          return;
-      }
-      setIsGeneratingImage(true);
-      try {
-          const prompt = `Pixel art no estilo de um jogo de computador dos anos 80 como Dungeon Master. Estética de fantasia sombria, 16-bit. A ilustração NÃO deve conter nenhum texto, margens ou molduras, preenchendo toda a área da imagem. A cena é: "${localScene.description}"`;
-          const imageUrl = await generateSceneImage(prompt);
-          updateLocalScene('image', imageUrl);
-      } catch (error) {
-          console.error(error);
-          alert(error instanceof Error ? error.message : "Ocorreu um erro desconhecido ao gerar la imagem.");
-      } finally {
-          setIsGeneratingImage(false);
       }
   };
   
@@ -198,14 +179,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                 <div className="flex flex-col space-y-3">
                     <div className="flex-grow relative">
                         <img src={localScene.image} alt={localScene.name} className="w-full h-full min-h-[300px] object-cover rounded-md border border-brand-border bg-brand-bg" />
-                        {isGeneratingImage && (
-                            <div className="absolute inset-0 bg-black/70 flex items-center justify-center rounded-md">
-                                <div className="text-white text-center">
-                                    <p className="text-lg font-semibold animate-pulse">Gerando imagem...</p>
-                                    <p className="text-sm">Isso pode levar um momento.</p>
-                                </div>
-                            </div>
-                        )}
                     </div>
                     <div className="flex-shrink-0">
                         <div className="flex items-center gap-2">
@@ -213,16 +186,12 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                <UploadIcon className="w-5 h-5 mr-2" /> Carregar Imagem
                                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                             </label>
-                            <button 
-                                onClick={handleGenerateImage}
-                                disabled={isGeneratingImage}
-                                className="inline-flex items-center px-4 py-2 bg-purple-500 text-white font-semibold rounded-md hover:bg-purple-600 transition-colors cursor-pointer disabled:bg-purple-400 disabled:cursor-wait"
-                            >
-                               <SparklesIcon className="w-5 h-5 mr-2" />
-                               {isGeneratingImage ? 'Gerando...' : 'Gerar Imagem (IA)'}
-                            </button>
                         </div>
-                        <p className="text-xs text-brand-text-dim mt-2">imagens na proporção 9:16 (vertical), recomendado 1080x1920 pixels (.jpg, .png ou .gif)</p>
+                        <p className="text-xs text-brand-text-dim mt-2">
+                            {layoutOrientation === 'horizontal'
+                                ? 'imagens na proporção 16:9 (horizontal), recomendado 1920x1080 pixels (.jpg, .png ou .gif)'
+                                : 'imagens na proporção 9:16 (vertical), recomendado 1080x1920 pixels (.jpg, .png ou .gif)'}
+                        </p>
                     </div>
                 </div>
 

@@ -21,6 +21,10 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameMaxChances: data.gameMaxChances,
         gameChanceIcon: data.gameChanceIcon,
         gameChanceIconColor: data.gameChanceIconColor,
+        gameTheme: data.gameTheme,
+        gameTextColorLight: data.gameTextColorLight,
+        gameTitleColorLight: data.gameTitleColorLight,
+        gameFocusColorLight: data.gameFocusColorLight,
     };
 };
 
