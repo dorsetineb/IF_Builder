@@ -9,8 +9,6 @@ interface ThemeEditorProps {
   splashButtonColor: string;
   splashButtonHoverColor: string;
   splashButtonTextColor: string;
-  actionButtonColor: string;
-  actionButtonTextColor: string;
   focusColor: string;
   chanceIconColor: string;
   gameFontFamily: string;
@@ -21,6 +19,8 @@ interface ThemeEditorProps {
   textColorLight: string;
   titleColorLight: string;
   focusColorLight: string;
+  gameChanceLossMessage: string;
+  gameChanceReturnButtonText: string;
   onUpdate: (field: keyof GameData, value: any) => void;
 }
 
@@ -71,10 +71,10 @@ const ColorInput: React.FC<{
 const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
     const { 
         textColor, titleColor, splashButtonColor, splashButtonHoverColor,
-        splashButtonTextColor, actionButtonColor, actionButtonTextColor,
-        focusColor, chanceIconColor, gameFontFamily, 
+        splashButtonTextColor, focusColor, chanceIconColor, gameFontFamily, 
         enableChances, maxChances, chanceIcon, onUpdate,
-        gameTheme, textColorLight, titleColorLight, focusColorLight
+        gameTheme, textColorLight, titleColorLight, focusColorLight,
+        gameChanceLossMessage, gameChanceReturnButtonText
     } = props;
 
     const [localTextColor, setLocalTextColor] = useState(textColor);
@@ -82,20 +82,18 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
     const [localSplashButtonColor, setLocalSplashButtonColor] = useState(splashButtonColor);
     const [localSplashButtonHoverColor, setLocalSplashButtonHoverColor] = useState(splashButtonHoverColor);
     const [localSplashButtonTextColor, setLocalSplashButtonTextColor] = useState(splashButtonTextColor);
-    const [localActionButtonColor, setLocalActionButtonColor] = useState(actionButtonColor);
-    const [localActionButtonTextColor, setLocalActionButtonTextColor] = useState(actionButtonTextColor);
     const [localFocusColor, setLocalFocusColor] = useState(focusColor);
     const [localChanceIconColor, setLocalChanceIconColor] = useState(chanceIconColor);
     const [localFontFamily, setLocalFontFamily] = useState(gameFontFamily);
-    const [localEnableChances, setLocalEnableChances] = useState(enableChances);
     const [localMaxChances, setLocalMaxChances] = useState(maxChances);
     const [localChanceIcon, setLocalChanceIcon] = useState(chanceIcon);
     const [localGameTheme, setLocalGameTheme] = useState(gameTheme);
     const [localTextColorLight, setLocalTextColorLight] = useState(textColorLight);
     const [localTitleColorLight, setLocalTitleColorLight] = useState(titleColorLight);
     const [localFocusColorLight, setLocalFocusColorLight] = useState(focusColorLight);
+    const [localGameChanceLossMessage, setLocalGameChanceLossMessage] = useState(gameChanceLossMessage);
+    const [localGameChanceReturnButtonText, setLocalGameChanceReturnButtonText] = useState(gameChanceReturnButtonText);
     const [isDirty, setIsDirty] = useState(false);
-    const [focusPreview, setFocusPreview] = useState(false);
 
     useEffect(() => {
         setLocalTextColor(props.textColor);
@@ -103,18 +101,17 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         setLocalSplashButtonColor(props.splashButtonColor);
         setLocalSplashButtonHoverColor(props.splashButtonHoverColor);
         setLocalSplashButtonTextColor(props.splashButtonTextColor);
-        setLocalActionButtonColor(props.actionButtonColor);
-        setLocalActionButtonTextColor(props.actionButtonTextColor);
         setLocalFocusColor(props.focusColor);
         setLocalChanceIconColor(props.chanceIconColor);
         setLocalFontFamily(props.gameFontFamily);
-        setLocalEnableChances(props.enableChances);
         setLocalMaxChances(props.maxChances);
         setLocalChanceIcon(props.chanceIcon);
         setLocalGameTheme(props.gameTheme);
         setLocalTextColorLight(props.textColorLight);
         setLocalTitleColorLight(props.titleColorLight);
         setLocalFocusColorLight(props.focusColorLight);
+        setLocalGameChanceLossMessage(props.gameChanceLossMessage);
+        setLocalGameChanceReturnButtonText(props.gameChanceReturnButtonText);
         setIsDirty(false);
     }, [props]);
 
@@ -124,20 +121,19 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                       localSplashButtonColor !== splashButtonColor ||
                       localSplashButtonHoverColor !== splashButtonHoverColor ||
                       localSplashButtonTextColor !== splashButtonTextColor ||
-                      localActionButtonColor !== actionButtonColor ||
-                      localActionButtonTextColor !== actionButtonTextColor ||
                       localFocusColor !== focusColor ||
                       localChanceIconColor !== chanceIconColor ||
                       localFontFamily !== gameFontFamily ||
-                      localEnableChances !== enableChances ||
                       localMaxChances !== maxChances ||
                       localChanceIcon !== chanceIcon ||
                       localGameTheme !== gameTheme ||
                       localTextColorLight !== textColorLight ||
                       localTitleColorLight !== titleColorLight ||
-                      localFocusColorLight !== focusColorLight;
+                      localFocusColorLight !== focusColorLight ||
+                      localGameChanceLossMessage !== gameChanceLossMessage ||
+                      localGameChanceReturnButtonText !== gameChanceReturnButtonText;
         setIsDirty(dirty);
-    }, [localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localEnableChances, localMaxChances, localChanceIcon, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight, props]);
+    }, [localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localMaxChances, localChanceIcon, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight, localGameChanceLossMessage, localGameChanceReturnButtonText, props]);
 
     const handleSave = () => {
         if (localTextColor !== textColor) onUpdate('gameTextColor', localTextColor);
@@ -145,18 +141,17 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         if (localSplashButtonColor !== splashButtonColor) onUpdate('gameSplashButtonColor', localSplashButtonColor);
         if (localSplashButtonHoverColor !== splashButtonHoverColor) onUpdate('gameSplashButtonHoverColor', localSplashButtonHoverColor);
         if (localSplashButtonTextColor !== splashButtonTextColor) onUpdate('gameSplashButtonTextColor', localSplashButtonTextColor);
-        if (localActionButtonColor !== actionButtonColor) onUpdate('gameActionButtonColor', localActionButtonColor);
-        if (localActionButtonTextColor !== actionButtonTextColor) onUpdate('gameActionButtonTextColor', localActionButtonTextColor);
         if (localFocusColor !== focusColor) onUpdate('gameFocusColor', localFocusColor);
         if (localChanceIconColor !== chanceIconColor) onUpdate('gameChanceIconColor', localChanceIconColor);
         if (localFontFamily !== gameFontFamily) onUpdate('gameFontFamily', localFontFamily);
-        if (localEnableChances !== enableChances) onUpdate('gameEnableChances', localEnableChances);
         if (localMaxChances !== maxChances) onUpdate('gameMaxChances', localMaxChances);
         if (localChanceIcon !== chanceIcon) onUpdate('gameChanceIcon', localChanceIcon);
         if (localGameTheme !== gameTheme) onUpdate('gameTheme', localGameTheme);
         if (localTextColorLight !== textColorLight) onUpdate('gameTextColorLight', localTextColorLight);
         if (localTitleColorLight !== titleColorLight) onUpdate('gameTitleColorLight', localTitleColorLight);
         if (localFocusColorLight !== focusColorLight) onUpdate('gameFocusColorLight', localFocusColorLight);
+        if (localGameChanceLossMessage !== gameChanceLossMessage) onUpdate('gameChanceLossMessage', localGameChanceLossMessage);
+        if (localGameChanceReturnButtonText !== gameChanceReturnButtonText) onUpdate('gameChanceReturnButtonText', localGameChanceReturnButtonText);
     };
     
     const handleUndo = () => {
@@ -165,18 +160,17 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         setLocalSplashButtonColor(splashButtonColor);
         setLocalSplashButtonHoverColor(splashButtonHoverColor);
         setLocalSplashButtonTextColor(splashButtonTextColor);
-        setLocalActionButtonColor(actionButtonColor);
-        setLocalActionButtonTextColor(actionButtonTextColor);
         setLocalFocusColor(focusColor);
         setLocalChanceIconColor(chanceIconColor);
         setLocalFontFamily(gameFontFamily);
-        setLocalEnableChances(enableChances);
         setLocalMaxChances(maxChances);
         setLocalChanceIcon(chanceIcon);
         setLocalGameTheme(gameTheme);
         setLocalTextColorLight(textColorLight);
         setLocalTitleColorLight(titleColorLight);
         setLocalFocusColorLight(focusColorLight);
+        setLocalGameChanceLossMessage(gameChanceLossMessage);
+        setLocalGameChanceReturnButtonText(gameChanceReturnButtonText);
     };
     
     const HeartIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
@@ -282,30 +276,17 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
 
 
                     <div className="pt-6 border-t border-brand-border/50">
-                        <h3 className="text-lg font-semibold text-brand-text mb-4">Botões (Geral)</h3>
-                         <p className="text-xs text-brand-text-dim mb-4 -mt-3">Estas cores são aplicadas a ambos os temas.</p>
+                        <h3 className="text-lg font-semibold text-brand-text mb-4">Botão de Início</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <ColorInput label="Cor do Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#2ea043" />
                             <ColorInput label="Cor do Texto do Botão de Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#ffffff" />
                             <ColorInput label="Cor do Botão de Início (Hover)" id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#238636" />
-                             <ColorInput label="Cor do Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#ffffff" />
-                             <ColorInput label="Cor do Texto do Botão de Ação" id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#0d1117" />
                         </div>
                     </div>
-                     <div className="pt-6 border-t border-brand-border/50">
-                        <h3 className="text-lg font-semibold text-brand-text mb-4">Sistema de Chances (Vidas)</h3>
-                        <div className="flex items-center">
-                            <input 
-                                type="checkbox" 
-                                id="enableChances" 
-                                checked={localEnableChances} 
-                                onChange={(e) => setLocalEnableChances(e.target.checked)}
-                                className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
-                            />
-                            <label htmlFor="enableChances" className="ml-2 text-sm text-brand-text-dim">Habilitar sistema de chances</label>
-                        </div>
-                        {localEnableChances && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mt-4 pl-6 border-l-2 border-brand-border/50">
+                     {enableChances && (
+                        <div className="pt-6 border-t border-brand-border/50">
+                            <h3 className="text-lg font-semibold text-brand-text mb-4">Sistema de Chances (Vidas)</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <ColorInput label="Cor dos Ícones de Vidas" id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
                                 <div>
                                     <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
@@ -332,9 +313,36 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                         <option value="cross">Cruzes</option>
                                     </select>
                                 </div>
+                                <div className="sm:col-span-2 space-y-4 pt-4 mt-4 border-t border-brand-border/30">
+                                    <div>
+                                        <label htmlFor="chanceLossMessage" className="block text-sm font-medium text-brand-text-dim mb-1">
+                                            Mensagem de Perda de Chance
+                                            <span className="text-xs ml-1">(use {"{chances}"})</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="chanceLossMessage"
+                                            value={localGameChanceLossMessage}
+                                            onChange={(e) => setLocalGameChanceLossMessage(e.target.value)}
+                                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2"
+                                            placeholder="Você perdeu uma chance."
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="chanceReturnButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Retorno</label>
+                                        <input
+                                            type="text"
+                                            id="chanceReturnButtonText"
+                                            value={localGameChanceReturnButtonText}
+                                            onChange={(e) => setLocalGameChanceReturnButtonText(e.target.value)}
+                                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2"
+                                            placeholder="Tentar Novamente"
+                                        />
+                                    </div>
+                                </div>
                             </div>
-                        )}
-                    </div>
+                        </div>
+                    )}
                 </div>
 
                 <div className="flex flex-col">
@@ -345,7 +353,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                     >
                         <div className="flex justify-between items-start">
                              <h1 className="text-xl" style={{ color: localGameTheme === 'dark' ? localTitleColor : localTitleColorLight }}>Título do Jogo</h1>
-                             {localEnableChances && (
+                             {enableChances && (
                                 <div className="flex gap-1">
                                     {Array.from({ length: localMaxChances }).map((_, i) => (
                                         <ChanceIcon key={i} type={localChanceIcon} color={localChanceIconColor} />
@@ -355,39 +363,32 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                         </div>
                         <div className="my-4">
                             <p className="text-sm" style={{ color: localGameTheme === 'dark' ? localTextColor : localTextColorLight }}>Esta é uma descrição de exemplo para a cena. Ela usa a cor de texto padrão que você definir.</p>
-                            <p className="mt-2 text-sm italic" style={{ color: localGameTheme === 'dark' ? '#8b949e' : '#57606a' }}>&gt; comando de exemplo</p>
                         </div>
-                        <div className="space-y-4">
-                             <div className="flex items-center gap-4">
-                                <input 
-                                    type="text" 
-                                    placeholder="Campo de comando"
-                                    className="flex-1 border-2 rounded p-2 text-sm transition-colors"
-                                    style={{
-                                        backgroundColor: localGameTheme === 'dark' ? '#010409' : '#f6f8fa',
-                                        color: localGameTheme === 'dark' ? localTextColor : localTextColorLight,
-                                        borderColor: focusPreview 
-                                            ? (localGameTheme === 'dark' ? localFocusColor : localFocusColorLight) 
-                                            : (localGameTheme === 'dark' ? '#30363d' : '#d0d7de'),
-                                        fontFamily: localFontFamily,
-                                    }}
-                                    onFocus={() => setFocusPreview(true)}
-                                    onBlur={() => setFocusPreview(false)}
-                                />
-                                <button className="font-bold py-2 px-4 rounded" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily }}>Ação</button>
-                             </div>
-                              <button
-                                    className="w-full font-bold transition-all duration-200 ease-in-out text-lg py-3"
-                                    style={{
-                                        backgroundColor: localSplashButtonColor,
-                                        color: localSplashButtonTextColor,
-                                        fontFamily: localFontFamily,
-                                    }}
-                                    onMouseEnter={e => e.currentTarget.style.backgroundColor = localSplashButtonHoverColor}
-                                    onMouseLeave={e => e.currentTarget.style.backgroundColor = localSplashButtonColor}
-                                >
-                                    Botão de Início
-                                </button>
+                        <div className="space-y-3">
+                            <button
+                                className="w-full font-bold transition-all duration-200 ease-in-out py-3 px-4 text-left border-2"
+                                style={{
+                                    backgroundColor: localGameTheme === 'dark' ? '#21262d' : '#f6f8fa',
+                                    color: localGameTheme === 'dark' ? localTextColor : localTextColorLight,
+                                    borderColor: localGameTheme === 'dark' ? '#30363d' : '#d0d7de',
+                                    fontFamily: localFontFamily,
+                                }}
+                            >
+                                Opção de Exemplo 1
+                            </button>
+                             <button
+                                className="w-full font-bold transition-all duration-200 ease-in-out py-3 px-4 text-left border-2"
+                                style={{
+                                    backgroundColor: localGameTheme === 'dark' ? '#21262d' : '#f6f8fa',
+                                    color: localGameTheme === 'dark' ? localTextColor : localTextColorLight,
+                                    borderColor: localGameTheme === 'dark' ? localFocusColor : localFocusColorLight,
+                                    fontFamily: localFontFamily,
+                                }}
+                                onMouseEnter={e => e.currentTarget.style.backgroundColor = localGameTheme === 'dark' ? '#30363d' : '#e5e7eb'}
+                                onMouseLeave={e => e.currentTarget.style.backgroundColor = localGameTheme === 'dark' ? '#21262d' : '#f6f8fa'}
+                            >
+                                Opção de Exemplo 2 (Hover)
+                            </button>
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { GameData } from '../types';
 
@@ -7,27 +8,18 @@ interface UIEditorProps {
   css: string;
   layoutOrientation: 'vertical' | 'horizontal';
   layoutOrder: 'image-first' | 'image-last';
-  actionButtonText: string;
-  commandInputPlaceholder: string;
-  diaryPlayerName: string;
-  splashButtonText: string;
   onUpdate: (field: keyof GameData, value: any) => void;
 }
 
 const UIEditor: React.FC<UIEditorProps> = (props) => {
   const { 
-      html, css, layoutOrientation, layoutOrder, splashButtonText,
-      actionButtonText, commandInputPlaceholder, diaryPlayerName, onUpdate 
+      html, css, layoutOrientation, layoutOrder, onUpdate 
   } = props;
 
   const [localHtml, setLocalHtml] = useState(html);
   const [localCss, setLocalCss] = useState(css);
   const [localLayoutOrientation, setLocalLayoutOrientation] = useState(layoutOrientation);
   const [localLayoutOrder, setLocalLayoutOrder] = useState(layoutOrder);
-  const [localActionButtonText, setLocalActionButtonText] = useState(actionButtonText);
-  const [localCommandInputPlaceholder, setLocalCommandInputPlaceholder] = useState(commandInputPlaceholder);
-  const [localDiaryPlayerName, setLocalDiaryPlayerName] = useState(diaryPlayerName);
-  const [localSplashButtonText, setLocalSplashButtonText] = useState(splashButtonText);
   const [isDirty, setIsDirty] = useState(false);
   const [activeTab, setActiveTab] = useState('layout');
 
@@ -36,34 +28,22 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalCss(css);
     setLocalLayoutOrientation(layoutOrientation);
     setLocalLayoutOrder(layoutOrder);
-    setLocalActionButtonText(actionButtonText);
-    setLocalCommandInputPlaceholder(commandInputPlaceholder);
-    setLocalDiaryPlayerName(diaryPlayerName);
-    setLocalSplashButtonText(splashButtonText);
     setIsDirty(false);
-  }, [html, css, layoutOrientation, layoutOrder, actionButtonText, commandInputPlaceholder, diaryPlayerName, splashButtonText]);
+  }, [html, css, layoutOrientation, layoutOrder]);
 
   useEffect(() => {
     const dirty = localHtml !== html ||
                   localCss !== css ||
                   localLayoutOrientation !== layoutOrientation ||
-                  localLayoutOrder !== layoutOrder ||
-                  localSplashButtonText !== splashButtonText ||
-                  localActionButtonText !== actionButtonText ||
-                  localCommandInputPlaceholder !== commandInputPlaceholder ||
-                  localDiaryPlayerName !== diaryPlayerName;
+                  localLayoutOrder !== layoutOrder;
     setIsDirty(dirty);
-  }, [localHtml, localCss, localLayoutOrientation, localLayoutOrder, localActionButtonText, localCommandInputPlaceholder, localDiaryPlayerName, localSplashButtonText, props]);
+  }, [localHtml, localCss, localLayoutOrientation, localLayoutOrder, props]);
 
   const handleSave = () => {
     if (localHtml !== html) onUpdate('gameHTML', localHtml);
     if (localCss !== css) onUpdate('gameCSS', localCss);
     if (localLayoutOrientation !== layoutOrientation) onUpdate('gameLayoutOrientation', localLayoutOrientation);
     if (localLayoutOrder !== layoutOrder) onUpdate('gameLayoutOrder', localLayoutOrder);
-    if (localSplashButtonText !== splashButtonText) onUpdate('gameSplashButtonText', localSplashButtonText);
-    if (localActionButtonText !== actionButtonText) onUpdate('gameActionButtonText', localActionButtonText);
-    if (localCommandInputPlaceholder !== commandInputPlaceholder) onUpdate('gameCommandInputPlaceholder', localCommandInputPlaceholder);
-    if (localDiaryPlayerName !== diaryPlayerName) onUpdate('gameDiaryPlayerName', localDiaryPlayerName);
   };
   
   const handleUndo = () => {
@@ -71,15 +51,10 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalCss(css);
     setLocalLayoutOrientation(layoutOrientation);
     setLocalLayoutOrder(layoutOrder);
-    setLocalSplashButtonText(splashButtonText);
-    setLocalActionButtonText(actionButtonText);
-    setLocalCommandInputPlaceholder(commandInputPlaceholder);
-    setLocalDiaryPlayerName(diaryPlayerName);
   };
 
   const TABS = {
     layout: 'Layout',
-    textos: 'Textos da Interface',
     codigo: 'Código-Fonte',
   };
 
@@ -149,58 +124,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                             Imagem
                         </div>
                         <div className={`flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'}`}>
-                            Descrição
-                        </div>
-                    </div>
-                </div>
-            </div>
-        )}
-
-        {activeTab === 'textos' && (
-            <div className="space-y-8">
-                <div>
-                    <h3 className="text-lg font-semibold text-brand-text mb-4">Textos da Interface</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        <div>
-                            <label htmlFor="actionButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Ação</label>
-                            <input
-                                type="text"
-                                id="actionButtonText"
-                                value={localActionButtonText}
-                                onChange={(e) => setLocalActionButtonText(e.target.value)}
-                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
-                            />
-                        </div>
-                         <div>
-                            <label htmlFor="commandInputPlaceholder" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Campo de Comando</label>
-                            <input
-                                type="text"
-                                id="commandInputPlaceholder"
-                                value={localCommandInputPlaceholder}
-                                onChange={(e) => setLocalCommandInputPlaceholder(e.target.value)}
-                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="diaryPlayerName" className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Jogador no Diário</label>
-                            <input
-                                type="text"
-                                id="diaryPlayerName"
-                                value={localDiaryPlayerName}
-                                onChange={(e) => setLocalDiaryPlayerName(e.target.value)}
-                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
-                            />
-                        </div>
-                        <div>
-                            <label htmlFor="splashButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Início</label>
-                            <input
-                                type="text"
-                                id="splashButtonText"
-                                value={localSplashButtonText}
-                                onChange={(e) => setLocalSplashButtonText(e.target.value)}
-                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
-                                placeholder="INICIAR"
-                            />
+                            Texto e Opções
                         </div>
                     </div>
                 </div>

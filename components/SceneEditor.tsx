@@ -1,8 +1,8 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { Scene } from '../types';
-import ObjectEditor from './ObjectEditor';
-import InteractionEditor from './InteractionEditor';
+import ChoiceEditor from './ChoiceEditor';
 import { UploadIcon } from './icons/UploadIcon';
 import { EyeIcon } from './icons/EyeIcon';
 import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
@@ -12,7 +12,6 @@ interface SceneEditorProps {
   scene: Scene;
   allScenes: Scene[];
   onUpdateScene: (scene: Scene) => void;
-  allObjectIds: string[];
   onPreviewScene: (scene: Scene) => void;
   sceneOrder: string[];
   onSelectScene: (id: string) => void;
@@ -24,7 +23,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     scene, 
     allScenes, 
     onUpdateScene, 
-    allObjectIds, 
     onPreviewScene,
     sceneOrder,
     onSelectScene,
@@ -33,7 +31,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 }) => {
   const [localScene, setLocalScene] = useState<Scene>(scene);
   const [isDirty, setIsDirty] = useState(false);
-  const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions'>('properties');
+  const [activeTab, setActiveTab] = useState<'properties' | 'choices'>('properties');
   
   useEffect(() => {
     setLocalScene(scene);
@@ -61,8 +59,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     setLocalScene(prev => ({
         ...prev,
         isEndingScene: isChecked,
-        objects: isChecked ? [] : prev.objects, 
-        interactions: isChecked ? [] : prev.interactions,
+        choices: isChecked ? [] : prev.choices,
     }));
   };
   
@@ -89,8 +86,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   const handleSave = () => {
     const finalScene: Scene = { ...localScene };
     if (finalScene.isEndingScene) {
-        finalScene.objects = [];
-        finalScene.interactions = [];
+        finalScene.choices = [];
     }
     onUpdateScene(finalScene);
   }
@@ -120,8 +116,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
   const TABS = {
     properties: 'Propriedades',
-    objects: 'Objetos',
-    interactions: 'Interações',
+    choices: 'Opções',
   };
 
   return (
@@ -130,7 +125,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         <div>
             <h2 className="text-3xl font-bold text-brand-text">Editor de Cena</h2>
             <p className="text-brand-text-dim mt-1">
-            Defina a imagem, descrição, objetos e interações para a cena <code className="bg-brand-bg px-1 py-0.5 rounded text-brand-primary-hover">{localScene.name}</code>.
+            Defina a imagem, descrição e opções para a cena <code className="bg-brand-bg px-1 py-0.5 rounded text-brand-primary-hover">{localScene.name}</code>.
             </p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0 mt-1">
@@ -155,7 +150,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
       <div className="border-b border-brand-border flex space-x-1">
         {Object.entries(TABS).map(([key, name]) => {
-            const isTabDisabled = localScene.isEndingScene && (key === 'objects' || key === 'interactions');
+            const isTabDisabled = localScene.isEndingScene && key === 'choices';
             return (
                 <button
                     key={key}
@@ -234,27 +229,18 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
             </div>
         )}
         
-        {activeTab === 'objects' && !localScene.isEndingScene && (
-            <ObjectEditor
-                objects={localScene.objects || []}
-                onUpdateObjects={newObjects => updateLocalScene('objects', newObjects)}
-                allObjectIds={allObjectIds}
-            />
-        )}
-        
-        {activeTab === 'interactions' && !localScene.isEndingScene && (
-             <InteractionEditor
-                interactions={localScene.interactions || []}
-                onUpdateInteractions={newInteractions => updateLocalScene('interactions', newInteractions)}
+        {activeTab === 'choices' && !localScene.isEndingScene && (
+             <ChoiceEditor
+                choices={localScene.choices || []}
+                onUpdateChoices={newChoices => updateLocalScene('choices', newChoices)}
                 allScenes={allScenes}
                 currentSceneId={localScene.id}
-                sceneObjects={localScene.objects || []}
             />
         )}
 
-        {localScene.isEndingScene && (activeTab === 'objects' || activeTab === 'interactions') && (
+        {localScene.isEndingScene && activeTab === 'choices' && (
             <div className="text-center p-4 bg-brand-bg border-2 border-dashed border-brand-border rounded-md text-brand-text-dim">
-                Cenas finais não possuem objetos ou interações.
+                Cenas finais não possuem opções.
             </div>
         )}
       </div>

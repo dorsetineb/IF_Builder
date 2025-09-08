@@ -1,8 +1,7 @@
 
 
 import React, { useState, useCallback, useMemo } from 'react';
-// FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
-import { GameData, Scene, GameObject, Interaction, View } from './types';
+import { GameData, Scene, Choice, View } from './types';
 import Sidebar from './components/Sidebar';
 import SceneEditor from './components/SceneEditor';
 import Header from './components/Header';
@@ -39,14 +38,34 @@ const gameHTML = `
           </div>
         </div>
 
+        <div id="positive-ending-screen" class="ending-screen" __POSITIVE_ENDING_BG_STYLE__>
+            <div class="ending-content">
+                <div class="ending-text">
+                    __POSITIVE_ENDING_LOGO_IMG_TAG__
+                    __POSITIVE_ENDING_TITLE_H1_TAG__
+                    <p id="positive-ending-description">__POSITIVE_ENDING_DESCRIPTION__</p>
+                </div>
+                <button id="positive-ending-button">__POSITIVE_ENDING_BUTTON_TEXT__</button>
+            </div>
+        </div>
+
+        <div id="negative-ending-screen" class="ending-screen" __NEGATIVE_ENDING_BG_STYLE__>
+            <div class="ending-content">
+                <div class="ending-text">
+                    __NEGATIVE_ENDING_LOGO_IMG_TAG__
+                    __NEGATIVE_ENDING_TITLE_H1_TAG__
+                    <p id="negative-ending-description">__NEGATIVE_ENDING_DESCRIPTION__</p>
+                </div>
+                <button id="negative-ending-button">__NEGATIVE_ENDING_BUTTON_TEXT__</button>
+            </div>
+        </div>
+
         <header class="game-header">
             <div class="game-title-container">
                 __LOGO_IMG_TAG__
                 __HEADER_TITLE_H1_TAG__
             </div>
-            <div class="header-buttons">
-                <button id="restart-button" class="btn-danger">Reiniciar Aventura</button>
-            </div>
+            <div class="header-buttons">__HEADER_BUTTONS__</div>
         </header>
         <div class="game-container">
             <div class="image-panel">
@@ -57,28 +76,8 @@ const gameHTML = `
             </div>
             <div class="text-panel">
                 <div id="scene-description" class="scene-description"></div>
-                <div id="action-popup" class="action-popup hidden"></div>
-                <div class="action-bar">
-                    <div class="action-buttons">
-                        <button id="suggestions-button">Sugestões</button>
-                        <button id="inventory-button">Inventário</button>
-                        <button id="diary-button">Diário</button>
-                    </div>
-                    <div class="input-area">
-                        <input type="text" id="command-input" placeholder="__COMMAND_INPUT_PLACEHOLDER__">
-                        <button id="submit-command">__ACTION_BUTTON_TEXT__</button>
-                    </div>
-                </div>
+                <div id="choices-container" class="choices-container"></div>
             </div>
-        </div>
-    </div>
-
-    <!-- Diary Modal -->
-    <div id="diary-modal" class="modal-overlay hidden">
-        <div class="modal-content diary-modal-content">
-            <button class="modal-close-button">&times;</button>
-            <h2>Diário</h2>
-            <div id="diary-log" class="diary-log"></div>
         </div>
     </div>
 </body>
@@ -123,8 +122,6 @@ body.light-theme {
     --splash-button-bg: __SPLASH_BUTTON_COLOR__;
     --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__;
     --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__;
-    --action-button-bg: __ACTION_BUTTON_COLOR__;
-    --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__;
     --splash-align-items: flex-end;
     --splash-justify-content: flex-end;
     --splash-text-align: right;
@@ -212,6 +209,65 @@ body {
     box-shadow: 0 3px 0px rgba(0, 0, 0, 0.4);
 }
 
+/* Ending Screens */
+.ending-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg-color);
+    background-size: cover;
+    background-position: center;
+    z-index: 1900;
+    padding: 5vw;
+    display: none; /* Hidden by default */
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+.ending-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    background-color: rgba(0,0,0,0.6);
+    padding: 40px;
+    border-radius: 10px;
+}
+.ending-logo {
+    max-height: 150px;
+    width: auto;
+    margin-bottom: 20px;
+}
+.ending-text h1 {
+    font-size: 2.5em;
+    color: var(--accent-color);
+    margin: 0;
+}
+.ending-text p {
+    font-size: 1.1em;
+    margin-top: 10px;
+    color: var(--text-color);
+    max-width: 60ch;
+}
+.ending-content button {
+    font-family: var(--font-family);
+    padding: 12px 24px;
+    font-size: 1.2em;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    background-color: var(--splash-button-bg);
+    color: var(--splash-button-text-color);
+    transition: all 0.2s ease-in-out;
+}
+.ending-content button:hover {
+    background-color: var(--splash-button-hover-bg);
+    transform: translateY(-3px);
+    box-shadow: 0 3px 0px rgba(0, 0, 0, 0.4);
+}
+
 
 /* Header */
 .game-header {
@@ -238,6 +294,11 @@ body {
     color: var(--accent-color);
     text-shadow: none;
 }
+.header-buttons {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 .header-buttons button {
     font-family: var(--font-family);
     padding: 8px 12px;
@@ -245,7 +306,6 @@ body {
     background-color: var(--button-bg);
     color: var(--text-color);
     cursor: pointer;
-    margin-left: 10px;
     transition: background-color 0.2s;
 }
 .header-buttons button:hover { background-color: var(--button-hover-bg); }
@@ -299,7 +359,6 @@ body {
     line-height: 1.8;
     padding-bottom: 20px;
 }
-.command-echo { color: var(--text-dim-color); font-style: italic; }
 .highlight-item {
     font-weight: bold;
     color: var(--highlight-color);
@@ -316,193 +375,44 @@ body {
     text-decoration: underline;
 }
 
-/* Action Bar & Popups */
-.action-bar {
-    border-top: 2px solid var(--border-color);
-    padding-top: 20px;
+/* Choices Container */
+.choices-container {
     margin-top: auto;
-    flex-shrink: 0;
-}
-.action-popup {
-    margin-bottom: 20px;
-    background-color: var(--panel-bg);
-    border: 1px solid var(--border-color);
-    padding: 15px;
-}
-.action-popup.hidden { display: none; }
-.action-popup-list button, .action-popup-list p {
-    display: inline-block;
-    padding: 8px 12px;
-    margin: 0 8px 8px 0;
-    text-align: left;
-    background-color: var(--button-bg);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    font-family: var(--font-family);
-    font-size: 0.9em;
-}
-.action-popup-list button {
-    cursor: pointer;
-}
-.action-popup-list button:hover {
-    background-color: var(--border-color);
-}
-.action-popup-list p {
-    cursor: default;
-    color: var(--text-dim-color);
-}
-.action-buttons {
+    padding-top: 20px;
+    border-top: 2px solid var(--border-color);
     display: flex;
-    gap: 10px;
-    margin-bottom: 15px;
+    flex-direction: column;
+    gap: 12px;
+    max-height: 40%;
+    overflow-y: auto;
 }
-.action-buttons button {
+.choice-button {
     font-family: var(--font-family);
-    padding: 10px 15px;
-    border: 2px solid var(--border-color);
-    background-color: var(--panel-bg);
-    color: var(--text-color);
-    cursor: pointer;
-    transition: background-color 0.2s, border-color 0.2s;
-    font-size: 0.9em;
-}
-.action-buttons button:hover {
-    background-color: var(--border-color);
-    border-color: var(--text-dim-color);
-}
-.input-area { 
-    display: flex;
-    gap: 10px;
-}
-#command-input {
-    flex-grow: 1;
-    padding: 15px 12px;
-    border: 2px solid var(--border-color);
-    background-color: var(--input-bg);
-    color: var(--text-color);
-    font-family: var(--font-family);
+    width: 100%;
+    padding: 15px 20px;
     font-size: 1em;
-}
-#command-input:focus {
-    outline: none;
-    border-color: var(--focus-color);
-}
-#command-input:disabled {
-    background-color: var(--button-bg);
-    cursor: not-allowed;
-}
-#submit-command {
-    padding: 10px 20px;
+    text-align: left;
     border: 2px solid var(--border-color);
-    background-color: var(--action-button-bg);
-    color: var(--action-button-text-color);
-    font-family: var(--font-family);
+    background-color: var(--button-bg);
+    color: var(--text-color);
     cursor: pointer;
-    font-weight: bold;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
 }
-#submit-command:hover { background-color: #e0e0e0; }
+.choice-button:hover, .choice-button:focus {
+    background-color: var(--button-hover-bg);
+    border-color: var(--focus-color);
+    color: var(--accent-color);
+    outline: none;
+}
 
-#submit-command:disabled {
-    background-color: var(--button-hover-bg);
-    color: var(--text-dim-color);
-    cursor: not-allowed;
-}
-#submit-command:disabled:hover {
-    background-color: var(--button-hover-bg);
-}
 
 /* Focus styles for accessibility */
-.action-buttons button:focus-visible, 
-#submit-command:focus-visible,
+.choice-button:focus-visible, 
 #splash-start-button:focus-visible, 
-.header-buttons button:focus-visible,
-.action-popup-list button:focus-visible,
-.modal-close-button:focus-visible {
+.header-buttons button:focus-visible {
     outline: 2px solid var(--focus-color);
     outline-offset: 2px;
     -moz-outline-radius: 4px; /* For Firefox */
-}
-
-/* Diary Modal */
-.hidden { display: none !important; }
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-.modal-content {
-    background-color: var(--panel-bg);
-    padding: 30px;
-    border: 2px solid var(--border-color);
-    position: relative;
-    max-width: 600px;
-    width: 90%;
-}
-.modal-content h2 {
-    margin-top: 0;
-    font-size: 1.5em;
-    color: var(--accent-color);
-}
-.modal-close-button {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    background: none;
-    border: none;
-    color: var(--text-dim-color);
-    font-size: 2em;
-    cursor: pointer;
-    line-height: 1;
-}
-.diary-modal-content {
-    max-width: 80vw;
-    height: 80vh;
-    display: flex;
-    flex-direction: column;
-}
-.diary-log { flex-grow: 1; overflow-y: auto; text-align: left; }
-.diary-entry {
-    display: flex;
-    gap: 15px;
-    align-items: flex-start;
-    padding: 15px;
-    border-bottom: 1px solid var(--border-color);
-}
-.diary-entry:last-child { border-bottom: none; }
-.diary-entry .image-container {
-    flex: 0 0 150px;
-}
-.diary-entry .image-container img {
-    max-width: 150px;
-    width: 100%;
-    border: 1px solid var(--border-color);
-}
-.diary-entry .text-container {
-    flex: 1;
-}
-.diary-entry .scene-name {
-    font-weight: bold;
-    color: var(--accent-color);
-    margin-bottom: 8px;
-    display: block;
-}
-.diary-entry .text-container p {
-    margin: 0;
-    white-space: pre-wrap;
-}
-.diary-entry .text-container .command-echo {
-    display: block;
-    margin-top: 10px;
-    color: var(--text-dim-color);
-    font-style: italic;
 }
 
 /* Transition Overlay */
@@ -524,56 +434,43 @@ body {
 }
 `;
 
-const initialScenes: { [id: string]: Scene } = {
+const initialScenes: { [id: string]: Omit<Scene, 'id'> } = {
     "scn_cela_inicial": {
-      id: "scn_cela_inicial",
       name: "Cela Inicial",
       image: "https://images.unsplash.com/photo-1593345479634-f626a2f13765?w=1080&h=1920&fit=crop&q=80",
-      description: "Sua cabeça dói. Você não sabe seu nome, nem onde está.\nVocê está em uma cela pequena e escura. O chão é de pedra fria e úmida. O ar cheira a mofo e terra. Há uma porta de madeira reforçada na sua frente.",
-      objects: [
-        { id: "obj_chave_de_ferro", name: "chave de ferro", examineDescription: "Uma chave de ferro pesada e enferrujada. Parece antiga.", isTakable: true },
-        { id: "obj_pedra_solta", name: "pedra", examineDescription: "Uma das pedras da parede parece estar solta. Talvez você consiga movê-la.", isTakable: false },
-        { id: "obj_porta_da_cela", name: "porta", examineDescription: "Uma porta de madeira reforçada com ferro. Parece trancada.", isTakable: false }
+      description: "Sua cabeça dói. Você não sabe seu nome, nem onde está.\nVocê está em uma cela pequena e escura. O chão é de pedra fria e úmida. O ar cheira a mofo e terra. Há uma porta de madeira reforçada na sua frente e uma pedra solta na parede.",
+      choices: [
+        { id: 'chc_1', text: 'Tentar forçar a porta.', goToScene: 'scn_porta_trancada', costsChance: true },
+        { id: 'chc_2', text: 'Examinar a pedra solta.', goToScene: 'scn_pedra_solta' },
       ],
-      interactions: [
-          {
-              id: 'inter_1',
-              verbs: ['mover', 'forçar', 'empurrar'],
-              target: 'pedra',
-              successMessage: 'Com um rangido, você move a pedra, revelando uma passagem escura.',
-              removesTargetFromScene: true,
-              goToScene: 'scn_corredor'
-          },
-          {
-              id: 'inter_door_key',
-              verbs: ['usar', 'abrir', 'destrancar'],
-              target: 'porta',
-              requiresInInventory: 'obj_chave_de_ferro',
-              successMessage: 'Você usa a chave de ferro na fechadura. Com um clique alto, a porta se destranca e se abre, revelando um corredor escuro.',
-              removesTargetFromScene: true,
-              goToScene: 'scn_corredor'
-          }
-      ]
+    },
+    "scn_porta_trancada": {
+        name: "Porta Trancada",
+        image: "https://images.unsplash.com/photo-1593345479634-f626a2f13765?w=1080&h=1920&fit=crop&q=80",
+        description: "Você empurra a porta com toda a sua força, mas ela não se move. Está firmemente trancada. O som do seu esforço ecoa pela cela silenciosa.",
+        choices: [
+            { id: 'chc_3', text: 'Voltar.', goToScene: 'scn_cela_inicial' },
+        ],
+    },
+    "scn_pedra_solta": {
+        name: "Passagem Secreta",
+        image: "https://images.unsplash.com/photo-1615418167098-917321553c07?w=1080&h=1920&fit=crop&q=80",
+        description: "Você força a pedra solta e, com um rangido, ela se move, revelando uma passagem escura e úmida.",
+        choices: [
+            { id: 'chc_4', text: 'Entrar na passagem.', goToScene: 'scn_corredor' },
+            { id: 'chc_5', text: 'Empurrar a pedra de volta para o lugar.', goToScene: 'scn_cela_inicial' },
+        ],
     },
     "scn_corredor": {
-      id: "scn_corredor",
       name: "Corredor",
       image: "https://images.unsplash.com/photo-1615418167098-917321553c07?w=1080&h=1920&fit=crop&q=80",
-      description: "Você está em um corredor escuro e úmido. O ar é pesado e cheira a mofo. A única luz vem da cela atrás de você.",
-      objects: [],
-      interactions: [
-          {
-              id: 'inter_2',
-              verbs: ['ir', 'voltar', 'mover'],
-              target: 'cela',
-              successMessage: 'Você volta para a cela.',
-              goToScene: 'scn_cela_inicial'
-          }
-      ]
+      description: "Você está em um corredor escuro e úmido. O ar é pesado e cheira a mofo. A única luz vem da cela atrás de você. Você alcançou o final do jogo!",
+      isEndingScene: true,
+      choices: []
     }
 };
 
-const generateUniqueId = (prefix: 'scn' | 'obj' | 'inter', existingIds: string[]): string => {
+const generateUniqueId = (prefix: 'scn' | 'chc', existingIds: string[]): string => {
     let id;
     do {
         id = `${prefix}_${Math.random().toString(36).substring(2, 5)}`;
@@ -583,26 +480,15 @@ const generateUniqueId = (prefix: 'scn' | 'obj' | 'inter', existingIds: string[]
 
 const initializeGameData = (): GameData => {
     const sceneIdMap: { [oldId: string]: string } = {};
-    const objIdMap: { [oldId: string]: string } = {};
-    
     const newScenes: { [id: string]: Scene } = {};
     const existingScnIds: string[] = [];
-    const existingObjIds: string[] = [];
-
     const initialSceneOrder = Object.keys(initialScenes);
 
-    // First pass: generate new IDs for scenes and objects and create a map.
+    // First pass: generate new IDs for scenes and create a map.
     initialSceneOrder.forEach(oldSceneId => {
         const newSceneId = generateUniqueId('scn', existingScnIds);
         existingScnIds.push(newSceneId);
         sceneIdMap[oldSceneId] = newSceneId;
-
-        const scene = initialScenes[oldSceneId];
-        scene.objects.forEach(obj => {
-            const newObjId = generateUniqueId('obj', existingObjIds);
-            existingObjIds.push(newObjId);
-            objIdMap[obj.id] = newObjId;
-        });
     });
     
     // Second pass: build the new scenes object using the new IDs and updating all references.
@@ -610,23 +496,16 @@ const initializeGameData = (): GameData => {
         const oldScene = initialScenes[oldSceneId];
         const newSceneId = sceneIdMap[oldSceneId];
 
-        const newObjects: GameObject[] = oldScene.objects.map(obj => ({
-            ...obj,
-            id: objIdMap[obj.id],
-        }));
-
-        const newInteractions: Interaction[] = oldScene.interactions.map(inter => ({
-            ...inter,
-            id: generateUniqueId('inter', []), // Interaction IDs are local to the scene, no need for a global check
-            goToScene: inter.goToScene ? sceneIdMap[inter.goToScene] : undefined,
-            requiresInInventory: inter.requiresInInventory ? objIdMap[inter.requiresInInventory] : undefined,
+        const newChoices: Choice[] = oldScene.choices.map(choice => ({
+            ...choice,
+            id: generateUniqueId('chc', []), // Choice IDs are local to the scene
+            goToScene: choice.goToScene ? sceneIdMap[choice.goToScene] : '',
         }));
 
         newScenes[newSceneId] = {
-            ...oldScene,
+            ...(oldScene as Scene),
             id: newSceneId,
-            objects: newObjects,
-            interactions: newInteractions,
+            choices: newChoices,
         };
     });
 
@@ -638,7 +517,6 @@ const initializeGameData = (): GameData => {
         startScene: newStartScene,
         scenes: newScenes,
         sceneOrder: newSceneOrder,
-        defaultFailureMessage: "Isso não parece ter nenhum efeito.",
         gameHTML: gameHTML,
         gameCSS: gameCSS,
         gameTitle: "Fuja da Masmorra",
@@ -657,13 +535,8 @@ const initializeGameData = (): GameData => {
         gameSplashButtonTextColor: "#ffffff",
         gameLayoutOrientation: 'vertical',
         gameLayoutOrder: 'image-first',
-        gameActionButtonColor: '#ffffff',
-        gameActionButtonTextColor: '#0d1117',
-        gameActionButtonText: 'AÇÃO',
-        gameCommandInputPlaceholder: 'O QUE VOCÊ FAZ?',
-        gameDiaryPlayerName: 'VOCÊ',
         gameFocusColor: '#58a6ff',
-        gameEnableChances: false,
+        gameEnableChances: true,
         gameMaxChances: 3,
         gameChanceIcon: 'heart',
         gameChanceIconColor: '#ff4d4d',
@@ -671,6 +544,16 @@ const initializeGameData = (): GameData => {
         gameTextColorLight: '#24292f',
         gameTitleColorLight: '#0969da',
         gameFocusColorLight: '#0969da',
+        gameChanceLossMessage: "Você perdeu uma chance. Restam {chances} chance(s).",
+        gameChanceReturnButtonText: "Tentar Novamente",
+        gamePositiveEndingImage: "",
+        gamePositiveEndingOmitTitle: false,
+        gamePositiveEndingDescription: "Parabéns! Você concluiu a aventura com sucesso.",
+        gamePositiveEndingButtonText: "Jogar Novamente",
+        gameNegativeEndingImage: "",
+        gameNegativeEndingOmitTitle: false,
+        gameNegativeEndingDescription: "Você não tem mais chances. Fim de jogo.",
+        gameNegativeEndingButtonText: "Tentar Novamente",
     };
 };
 
@@ -699,7 +582,6 @@ const App: React.FC = () => {
     setIsPreviewMode(prev => {
         const isOpening = !prev;
         if (isOpening) {
-            // When opening the GLOBAL preview, ensure the single-scene data is cleared.
             setGameDataForPreview(null);
         }
         return isOpening;
@@ -708,9 +590,7 @@ const App: React.FC = () => {
   
   const handlePreviewSingleScene = useCallback((sceneWithUnsavedChanges: Scene) => {
     const tempGameData = JSON.parse(JSON.stringify(gameData));
-    // Overwrite the scene in our temporary data with the version from the editor
     tempGameData.scenes[sceneWithUnsavedChanges.id] = sceneWithUnsavedChanges;
-    // Set the starting scene for the preview to be the one we're editing
     tempGameData.startScene = sceneWithUnsavedChanges.id;
     
     setGameDataForPreview(tempGameData);
@@ -720,35 +600,14 @@ const App: React.FC = () => {
   const handleSelectSceneAndSwitchView = useCallback((id: string) => {
     setSelectedSceneId(id);
     setCurrentView('scenes');
-    setIsPreviewMode(false); // Always exit preview mode when a scene is selected
+    setIsPreviewMode(false);
   }, []);
 
   const handleImportGame = useCallback((dataToImport: any) => {
-    // This function now handles migration from the Portuguese-keyed format
-    // to the editor's internal English-keyed format.
-    const importedData = { ...dataToImport }; // Create a mutable copy
+    const importedData = { ...dataToImport };
 
-    if (importedData.cenas && !importedData.scenes) {
-      importedData.scenes = importedData.cenas;
-      delete importedData.cenas;
-    }
-    if (importedData.cena_inicial && !importedData.startScene) {
-        importedData.startScene = importedData.cena_inicial;
-        delete importedData.cena_inicial;
-    }
-    if (importedData.mensagem_falha_padrao && !importedData.defaultFailureMessage) {
-        importedData.defaultFailureMessage = importedData.mensagem_falha_padrao;
-        delete importedData.mensagem_falha_padrao;
-    }
-    if (importedData.scenes) {
-        Object.values(importedData.scenes).forEach((scene: any) => {
-            if (scene.objetos && !scene.objects) {
-                scene.objects = scene.objetos;
-                delete scene.objetos;
-            }
-        });
-    }
-
+    // Migration logic for old formats can be added here if needed
+    // For now, assuming new format
     setGameData(prev => ({...prev, ...importedData}));
     setSelectedSceneId(importedData.startScene || Object.keys(importedData.scenes)[0]);
     setCurrentView('scenes');
@@ -763,8 +622,7 @@ const App: React.FC = () => {
       name: "Nova Cena",
       description: "Descreva esta nova cena...",
       image: `https://picsum.photos/seed/${newSceneId}/1080/1920`,
-      objects: [],
-      interactions: []
+      choices: []
     };
     setGameData(prev => ({
       ...prev,
@@ -776,19 +634,10 @@ const App: React.FC = () => {
   }, [gameData.scenes]);
 
   const handleUpdateScene = useCallback((updatedScene: Scene) => {
-    setGameData(prev => {
-      // With immutable IDs, we don't need the complex logic to handle renaming.
-      // We just update the scene data for the given ID.
-      const newScenes = { 
-          ...prev.scenes,
-          [updatedScene.id]: updatedScene 
-      };
-      
-      return {
-        ...prev,
-        scenes: newScenes,
-      };
-    });
+    setGameData(prev => ({
+      ...prev,
+      scenes: { ...prev.scenes, [updatedScene.id]: updatedScene },
+    }));
   }, []);
 
   const handleDeleteScene = useCallback((idToDelete: string) => {
@@ -807,7 +656,7 @@ const App: React.FC = () => {
 
             // Remove links to the deleted scene
             Object.values(newScenes).forEach(scene => {
-                scene.interactions = scene.interactions.filter(inter => inter.goToScene !== idToDelete);
+                scene.choices = scene.choices.filter(choice => choice.goToScene !== idToDelete);
             });
 
             const newSceneOrder = prev.sceneOrder.filter(id => id !== idToDelete);
@@ -853,14 +702,9 @@ const App: React.FC = () => {
     });
   }, []);
 
-  const scenesInOrder = gameData.sceneOrder.map(id => gameData.scenes[id]).filter(Boolean);
+  const scenesInOrder = useMemo(() => gameData.sceneOrder.map(id => gameData.scenes[id]).filter(Boolean), [gameData.sceneOrder, gameData.scenes]);
   const selectedScene = selectedSceneId ? gameData.scenes[selectedSceneId] : null;
 
-  const allObjectIds = useMemo(() => {
-    return Object.values(gameData.scenes).flatMap(s => s.objects.map(o => o.id));
-  }, [gameData.scenes]);
-
-  // FIX: Completed the renderCurrentView function to handle all view types and pass correct props.
   const renderCurrentView = () => {
     switch (currentView) {
       case 'scenes':
@@ -869,7 +713,6 @@ const App: React.FC = () => {
             scene={selectedScene}
             allScenes={scenesInOrder}
             onUpdateScene={handleUpdateScene}
-            allObjectIds={allObjectIds}
             onPreviewScene={handlePreviewSingleScene}
             sceneOrder={gameData.sceneOrder}
             onSelectScene={handleSelectSceneAndSwitchView}
@@ -886,10 +729,6 @@ const App: React.FC = () => {
             css={gameData.gameCSS}
             layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
             layoutOrder={gameData.gameLayoutOrder || 'image-first'}
-            actionButtonText={gameData.gameActionButtonText || 'AÇÃO'}
-            commandInputPlaceholder={gameData.gameCommandInputPlaceholder || 'O QUE VOCÊ FAZ?'}
-            diaryPlayerName={gameData.gameDiaryPlayerName || 'VOCÊ'}
-            splashButtonText={gameData.gameSplashButtonText || 'INICIAR AVENTURA'}
             onUpdate={handleUpdateGameData}
           />
         );
@@ -903,6 +742,16 @@ const App: React.FC = () => {
             splashImage={gameData.gameSplashImage || ''}
             splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
             splashDescription={gameData.gameSplashDescription || ''}
+            splashButtonText={gameData.gameSplashButtonText || 'INICIAR AVENTURA'}
+            enableChances={gameData.gameEnableChances || false}
+            positiveEndingImage={gameData.gamePositiveEndingImage || ''}
+            positiveEndingOmitTitle={gameData.gamePositiveEndingOmitTitle || false}
+            positiveEndingDescription={gameData.gamePositiveEndingDescription || ''}
+            positiveEndingButtonText={gameData.gamePositiveEndingButtonText || ''}
+            negativeEndingImage={gameData.gameNegativeEndingImage || ''}
+            negativeEndingOmitTitle={gameData.gameNegativeEndingOmitTitle || false}
+            negativeEndingDescription={gameData.gameNegativeEndingDescription || ''}
+            negativeEndingButtonText={gameData.gameNegativeEndingButtonText || ''}
             onUpdate={handleUpdateGameData}
           />
         );
@@ -914,8 +763,6 @@ const App: React.FC = () => {
             splashButtonColor={gameData.gameSplashButtonColor || '#2ea043'}
             splashButtonHoverColor={gameData.gameSplashButtonHoverColor || '#238636'}
             splashButtonTextColor={gameData.gameSplashButtonTextColor || '#ffffff'}
-            actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
-            actionButtonTextColor={gameData.gameActionButtonTextColor || '#0d1117'}
             focusColor={gameData.gameFocusColor || '#58a6ff'}
             chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
             gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
@@ -926,6 +773,8 @@ const App: React.FC = () => {
             textColorLight={gameData.gameTextColorLight || '#24292f'}
             titleColorLight={gameData.gameTitleColorLight || '#0969da'}
             focusColorLight={gameData.gameFocusColorLight || '#0969da'}
+            gameChanceLossMessage={gameData.gameChanceLossMessage || "Você perdeu uma chance. Restam {chances} chance(s)."}
+            gameChanceReturnButtonText={gameData.gameChanceReturnButtonText || "Tentar Novamente"}
             onUpdate={handleUpdateGameData}
           />
         );
@@ -944,7 +793,6 @@ const App: React.FC = () => {
     }
   };
 
-  // FIX: Added the main return statement for the App component to render the layout.
   return (
     <div className="flex flex-col h-screen bg-brand-bg text-brand-text font-sans">
       <Header
@@ -979,5 +827,4 @@ const App: React.FC = () => {
   );
 };
 
-// FIX: Added a default export for the App component to resolve the import error in index.tsx.
 export default App;

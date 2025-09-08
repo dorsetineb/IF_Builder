@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -14,15 +15,15 @@ interface SceneMapProps {
 
 const NODE_WIDTH = 250;
 const NODE_HEADER_HEIGHT = 70;
-const INTERACTION_ITEM_HEIGHT = 36;
+const CHOICE_ITEM_HEIGHT = 36;
 const X_GAP = 150;
 const Y_GAP = 50;
-const INTERACTION_ITEM_MARGIN_Y = 4; // Corresponds to gap-1
-const PADDING = 8; // Corresponds to p-2 or py-2
-const CONNECTOR_RADIUS = 8; // Half of connector width (w-4)
+const CHOICE_ITEM_MARGIN_Y = 4;
+const PADDING = 8;
+const CONNECTOR_RADIUS = 8;
 
 type Node = Scene & { x: number; y: number; level: number; height: number };
-type Edge = { source: string; target: string; sourceInteractionId: string };
+type Edge = { source: string; target: string; sourceChoiceId: string };
 
 const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelectScene, onUpdateScenePosition, onAddScene }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -32,22 +33,21 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
   const [dragInfo, setDragInfo] = useState<{ id: string; offsetX: number; offsetY: number } | null>(null);
   const dragStartPos = useRef({ x: 0, y: 0 });
 
-  const { initialNodes, edges, bounds, nodeLevels, nodesWithForwardIncomingEdges, nodesWithBackwardIncomingEdges, interactionsWithForwardOutgoingEdges, interactionsWithBackwardOutgoingEdges } = useMemo(() => {
-    // 1. Calculate the actual height of each node first
+  const { initialNodes, edges, bounds, nodeLevels, nodesWithForwardIncomingEdges, nodesWithBackwardIncomingEdges, choicesWithForwardOutgoingEdges, choicesWithBackwardOutgoingEdges } = useMemo(() => {
     const nodeData = new Map<string, { height: number }>();
     Object.values(allScenesMap).forEach(scene => {
-        const linkingInteractions = scene.interactions?.filter(inter => inter.goToScene) || [];
-        const interactionsHeight = linkingInteractions.length > 0
-            ? (linkingInteractions.length * INTERACTION_ITEM_HEIGHT) + ((linkingInteractions.length - 1) * INTERACTION_ITEM_MARGIN_Y) + PADDING
+        const linkingChoices = scene.choices?.filter(choice => choice.goToScene) || [];
+        const choicesHeight = linkingChoices.length > 0
+            ? (linkingChoices.length * CHOICE_ITEM_HEIGHT) + ((linkingChoices.length - 1) * CHOICE_ITEM_MARGIN_Y) + PADDING
             : 0;
-        nodeData.set(scene.id, { height: NODE_HEADER_HEIGHT + interactionsHeight });
+        nodeData.set(scene.id, { height: NODE_HEADER_HEIGHT + choicesHeight });
     });
     
     const createdEdges: Edge[] = [];
     Object.values(allScenesMap).forEach(scene => {
-        scene.interactions?.forEach(inter => {
-            if (inter.goToScene && allScenesMap[inter.goToScene]) {
-                createdEdges.push({ source: scene.id, target: inter.goToScene, sourceInteractionId: inter.id });
+        scene.choices?.forEach(choice => {
+            if (choice.goToScene && allScenesMap[choice.goToScene]) {
+                createdEdges.push({ source: scene.id, target: choice.goToScene, sourceChoiceId: choice.id });
             }
         });
     });
@@ -70,11 +70,11 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
         if (!levels.has(level)) levels.set(level, []);
         levels.get(level)!.push(id);
 
-        scene.interactions?.forEach(inter => {
-          if (inter.goToScene && allScenesMap[inter.goToScene]) {
-            if (!visited.has(inter.goToScene)) {
-              visited.add(inter.goToScene);
-              queue.push({ id: inter.goToScene, level: level + 1 });
+        scene.choices?.forEach(choice => {
+          if (choice.goToScene && allScenesMap[choice.goToScene]) {
+            if (!visited.has(choice.goToScene)) {
+              visited.add(choice.goToScene);
+              queue.push({ id: choice.goToScene, level: level + 1 });
             }
           }
         });
@@ -126,8 +126,8 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
 
     const nodesWithForwardIncomingEdges = new Set<string>();
     const nodesWithBackwardIncomingEdges = new Set<string>();
-    const interactionsWithForwardOutgoingEdges = new Set<string>();
-    const interactionsWithBackwardOutgoingEdges = new Set<string>();
+    const choicesWithForwardOutgoingEdges = new Set<string>();
+    const choicesWithBackwardOutgoingEdges = new Set<string>();
 
     createdEdges.forEach(edge => {
         const sourceLevel = nodeLevels.get(edge.source);
@@ -136,14 +136,14 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
         if (sourceLevel !== undefined && targetLevel !== undefined) {
             if (targetLevel < sourceLevel) {
                 nodesWithBackwardIncomingEdges.add(edge.target);
-                interactionsWithBackwardOutgoingEdges.add(edge.sourceInteractionId);
+                choicesWithBackwardOutgoingEdges.add(edge.sourceChoiceId);
             } else {
                 nodesWithForwardIncomingEdges.add(edge.target);
-                interactionsWithForwardOutgoingEdges.add(edge.sourceInteractionId);
+                choicesWithForwardOutgoingEdges.add(edge.sourceChoiceId);
             }
         } else {
             nodesWithForwardIncomingEdges.add(edge.target);
-            interactionsWithForwardOutgoingEdges.add(edge.sourceInteractionId);
+            choicesWithForwardOutgoingEdges.add(edge.sourceChoiceId);
         }
     });
 
@@ -154,8 +154,8 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
         nodeLevels, 
         nodesWithForwardIncomingEdges, 
         nodesWithBackwardIncomingEdges,
-        interactionsWithForwardOutgoingEdges,
-        interactionsWithBackwardOutgoingEdges
+        choicesWithForwardOutgoingEdges,
+        choicesWithBackwardOutgoingEdges
     };
   }, [allScenesMap, startSceneId]);
   
@@ -290,11 +290,11 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
               const targetNode = nodes.find(n => n.id === edge.target);
               if (!sourceNode || !targetNode) return null;
 
-              const linkingInteractions = sourceNode.interactions.filter(inter => inter.goToScene);
-              const interactionIndex = linkingInteractions.findIndex(inter => inter.id === edge.sourceInteractionId);
-              if (interactionIndex === -1) return null;
+              const linkingChoices = sourceNode.choices.filter(choice => choice.goToScene);
+              const choiceIndex = linkingChoices.findIndex(choice => choice.id === edge.sourceChoiceId);
+              if (choiceIndex === -1) return null;
               
-              const y1_offset = NODE_HEADER_HEIGHT + (interactionIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y)) + (INTERACTION_ITEM_HEIGHT / 2);
+              const y1_offset = NODE_HEADER_HEIGHT + (choiceIndex * (CHOICE_ITEM_HEIGHT + CHOICE_ITEM_MARGIN_Y)) + (CHOICE_ITEM_HEIGHT / 2);
               
               const sourceLevel = nodeLevels.get(edge.source);
               const targetLevel = nodeLevels.get(edge.target);
@@ -335,7 +335,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
           </svg>
           
           {nodes.map(node => {
-            const linkingInteractions = node.interactions.filter(inter => inter.goToScene && allScenesMap[inter.goToScene]);
+            const linkingChoices = node.choices.filter(choice => choice.goToScene && allScenesMap[choice.goToScene]);
             
             return (
               <div
@@ -361,15 +361,18 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
                       {node.isEndingScene && <p className="text-xs font-bold text-red-500 mt-1">(Fim de Jogo)</p>}
                   </div>
                   
-                  {linkingInteractions.length > 0 && (
+                  {linkingChoices.length > 0 && (
                     <div className="flex flex-col gap-1 pb-2">
-                        {linkingInteractions.map(inter => (
-                                <div key={inter.id} className="relative bg-brand-primary/10 text-brand-primary-hover font-medium py-1 flex items-center rounded-md" style={{height: INTERACTION_ITEM_HEIGHT}}>
-                                    <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-10 transition-colors ${interactionsWithBackwardOutgoingEdges.has(inter.id) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
-                                    <span className="truncate px-4 text-center w-full text-sm">{inter.target}</span>
-                                    <div className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full z-10 right-0 translate-x-1/2 transition-colors ${interactionsWithForwardOutgoingEdges.has(inter.id) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
+                        {linkingChoices.map(choice => {
+                            const targetSceneName = allScenesMap[choice.goToScene]?.name || 'Cena inválida';
+                            return (
+                                <div key={choice.id} className="relative bg-brand-primary/10 text-brand-primary-hover font-medium py-1 flex items-center rounded-md" style={{height: CHOICE_ITEM_HEIGHT}}>
+                                    <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-10 transition-colors ${choicesWithBackwardOutgoingEdges.has(choice.id) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
+                                    <span className="truncate px-4 text-center w-full text-sm" title={choice.text}>{targetSceneName}</span>
+                                    <div className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full z-10 right-0 translate-x-1/2 transition-colors ${choicesWithForwardOutgoingEdges.has(choice.id) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
                                 </div>
-                          ))
+                            )
+                          })
                         }
                     </div>
                   )}

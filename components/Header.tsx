@@ -25,7 +25,6 @@ const Header: React.FC<{
   isPreviewing: boolean;
   onTogglePreview: () => void;
 }> = ({ gameData, onImportGame, isPreviewing, onTogglePreview }) => {
-  // FIX: Changed 'a.useRef' to 'useRef' to match the corrected import.
   const importInputRef = useRef<HTMLInputElement>(null);
   
   const handleExport = async () => {
@@ -67,40 +66,57 @@ const Header: React.FC<{
 
     exportData.gameLogo = processAsset(exportData.gameLogo, 'logo');
     exportData.gameSplashImage = processAsset(exportData.gameSplashImage, 'splash_image');
+    exportData.gamePositiveEndingImage = processAsset(exportData.gamePositiveEndingImage, 'positive_ending_image');
+    exportData.gameNegativeEndingImage = processAsset(exportData.gameNegativeEndingImage, 'negative_ending_image');
+
     for (const sceneId in exportData.scenes) {
         const scene = exportData.scenes[sceneId];
         scene.image = processAsset(scene.image, `scene_image_${sceneId}`);
-        if (scene.interactions) {
-            scene.interactions.forEach((inter: any, index: number) => {
-                inter.soundEffect = processAsset(inter.soundEffect, `sfx_${sceneId}_${index}`);
+        if (scene.choices) {
+            scene.choices.forEach((choice: any, index: number) => {
+                choice.soundEffect = processAsset(choice.soundEffect, `sfx_${sceneId}_${index}`);
             });
         }
     }
 
     await Promise.all(assetPromises);
 
-    const headerContent = exportData.gameEnableChances 
-        ? '<div id="chances-container" class="chances-container"></div>' 
-        : '';
+    const headerButtons = `
+      ${exportData.gameEnableChances ? '<div id="chances-container" class="chances-container"></div>' : ''}
+    `;
     
     const fontFamily = exportData.gameFontFamily || "'Silkscreen', sans-serif";
     const fontUrl = getFontUrl(fontFamily);
     const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
 
     const finalHtml = exportData.gameHTML
+        // General
         .replace('__GAME_TITLE__', exportData.gameTitle || 'Game')
         .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme`)
         .replace('__FONT_STYLESHEET__', fontStylesheet)
+        // Header
         .replace('__LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="game-logo">` : '')
         .replace('__HEADER_TITLE_H1_TAG__', !exportData.gameHideTitle ? `<h1>${exportData.gameTitle}</h1>` : '')
-        .replace('<button id="restart-button" class="btn-danger">Reiniciar Aventura</button>', headerContent)
+        .replace('__HEADER_BUTTONS__', headerButtons)
+        // Splash Screen
         .replace('__SPLASH_BG_STYLE__', exportData.gameSplashImage ? `style="background-image: url('${exportData.gameSplashImage}')"` : '')
         .replace('__SPLASH_LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="splash-logo">` : '')
         .replace('__SPLASH_TITLE_H1_TAG__', !exportData.gameOmitSplashTitle ? `<h1>${exportData.gameTitle}</h1>` : '')
         .replace('__SPLASH_DESCRIPTION__', exportData.gameSplashDescription || '')
         .replace('__SPLASH_BUTTON_TEXT__', exportData.gameSplashButtonText || 'Start')
-        .replace('__ACTION_BUTTON_TEXT__', exportData.gameActionButtonText || 'Action')
-        .replace('__COMMAND_INPUT_PLACEHOLDER__', exportData.gameCommandInputPlaceholder || 'What do you do?')
+        // Positive Ending
+        .replace('__POSITIVE_ENDING_BG_STYLE__', exportData.gamePositiveEndingImage ? `style="background-image: url('${exportData.gamePositiveEndingImage}')"` : '')
+        .replace('__POSITIVE_ENDING_LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="ending-logo">` : '')
+        .replace('__POSITIVE_ENDING_TITLE_H1_TAG__', !exportData.gamePositiveEndingOmitTitle ? `<h1>${exportData.gameTitle}</h1>` : '')
+        .replace('__POSITIVE_ENDING_DESCRIPTION__', exportData.gamePositiveEndingDescription || '')
+        .replace('__POSITIVE_ENDING_BUTTON_TEXT__', exportData.gamePositiveEndingButtonText || 'Play Again')
+        // Negative Ending
+        .replace('__NEGATIVE_ENDING_BG_STYLE__', exportData.gameNegativeEndingImage ? `style="background-image: url('${exportData.gameNegativeEndingImage}')"` : '')
+        .replace('__NEGATIVE_ENDING_LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="ending-logo">` : '')
+        .replace('__NEGATIVE_ENDING_TITLE_H1_TAG__', !exportData.gameNegativeEndingOmitTitle ? `<h1>${exportData.gameTitle}</h1>` : '')
+        .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.gameNegativeEndingDescription || '')
+        .replace('__NEGATIVE_ENDING_BUTTON_TEXT__', exportData.gameNegativeEndingButtonText || 'Try Again')
+        // Script
         .replace('</body>', `<script src="game.js"></script>\n</body>`);
 
     const chancesCSS = `\n.chances-container { display: flex; align-items: center; gap: 8px; }\n.chance-icon { width: 28px; height: 28px; transition: all 0.3s ease; }\n.chance-icon.lost { opacity: 0.5; }`;
@@ -115,9 +131,7 @@ const Header: React.FC<{
         .replace('__GAME_FOCUS_COLOR_LIGHT__', exportData.gameFocusColorLight || '#0969da')
         .replace('__SPLASH_BUTTON_COLOR__', exportData.gameSplashButtonColor || '#2ea043')
         .replace('__SPLASH_BUTTON_HOVER_COLOR__', exportData.gameSplashButtonHoverColor || '#238636')
-        .replace('__SPLASH_BUTTON_TEXT_COLOR__', exportData.gameSplashButtonTextColor || '#ffffff')
-        .replace('__ACTION_BUTTON_COLOR__', exportData.gameActionButtonColor || '#ffffff')
-        .replace('__ACTION_BUTTON_TEXT_COLOR__', exportData.gameActionButtonTextColor || '#0d1117');
+        .replace('__SPLASH_BUTTON_TEXT_COLOR__', exportData.gameSplashButtonTextColor || '#ffffff');
 
     if (exportData.gameSplashContentAlignment === 'left') {
         finalCss = finalCss
@@ -130,6 +144,47 @@ const Header: React.FC<{
     if (exportData.gameEnableChances) {
         finalCss += chancesCSS;
     }
+
+    let layoutCSS = '';
+    const orientation = exportData.gameLayoutOrientation || 'vertical';
+    const order = exportData.gameLayoutOrder || 'image-first';
+
+    if (orientation === 'horizontal') {
+        layoutCSS += `
+            .game-container { flex-direction: column; }
+            .image-panel { flex: 0 0 40%; max-width: 100%; border-right: none; border-left: none; }
+            .text-panel { flex: 1; }
+        `;
+        if (order === 'image-last') {
+            layoutCSS += `
+                .image-panel { order: 2; border-bottom: none; border-top: 2px solid var(--border-color); }
+                .text-panel { order: 1; }
+            `;
+        } else {
+            layoutCSS += `
+                .image-panel { order: 1; border-top: none; border-bottom: 2px solid var(--border-color); }
+                .text-panel { order: 2; }
+            `;
+        }
+    } else { // 'vertical'
+        layoutCSS += `
+            .game-container { flex-direction: row; }
+            .image-panel { flex: 0 0 45%; max-width: 650px; border-bottom: none; border-top: none; }
+            .text-panel { flex: 1; }
+        `;
+        if (order === 'image-last') {
+            layoutCSS += `
+                .image-panel { order: 2; border-right: none; border-left: 2px solid var(--border-color); }
+                .text-panel { order: 1; }
+            `;
+        } else {
+            layoutCSS += `
+                .image-panel { order: 1; border-left: none; border-right: 2px solid var(--border-color); }
+                .text-panel { order: 2; }
+            `;
+        }
+    }
+    finalCss += layoutCSS;
 
     const engineData = prepareGameDataForEngine(exportData);
     const finalDataScript = `document.addEventListener('DOMContentLoaded', () => { window.embeddedGameData = ${JSON.stringify(engineData)}; });`;
@@ -175,8 +230,6 @@ const Header: React.FC<{
         reconstructedData.gameHTML = await htmlFile.async("string");
         reconstructedData.gameCSS = await cssFile.async("string");
         reconstructedData.startScene = importedEngineData.cena_inicial;
-        reconstructedData.defaultFailureMessage = importedEngineData.mensagem_falha_padrao;
-        reconstructedData.gameDiaryPlayerName = importedEngineData.nome_jogador_diario;
         reconstructedData.gameEnableChances = importedEngineData.gameEnableChances;
         reconstructedData.gameMaxChances = importedEngineData.gameMaxChances;
         reconstructedData.gameChanceIcon = importedEngineData.gameChanceIcon;
@@ -185,19 +238,7 @@ const Header: React.FC<{
         reconstructedData.gameTextColorLight = importedEngineData.gameTextColorLight;
         reconstructedData.gameTitleColorLight = importedEngineData.gameTitleColorLight;
         reconstructedData.gameFocusColorLight = importedEngineData.gameFocusColorLight;
-
-        const editorScenes: { [id: string]: any } = {};
-        if (importedEngineData.cenas) {
-            for (const sceneId in importedEngineData.cenas) {
-                const scene = importedEngineData.cenas[sceneId];
-                editorScenes[sceneId] = {
-                    ...scene,
-                    objects: scene.objetos || [],
-                };
-                delete editorScenes[sceneId].objetos;
-            }
-        }
-        reconstructedData.scenes = editorScenes;
+        reconstructedData.scenes = importedEngineData.cenas || {};
 
         const processAssetPath = async (path: string | undefined): Promise<string | undefined> => {
             if (!path || !path.startsWith('assets/')) return path;
@@ -224,10 +265,10 @@ const Header: React.FC<{
             if (scene.image && typeof scene.image === 'string') {
                  promises.push(processAssetPath(scene.image).then(b64 => { scene.image = b64 as string; }));
             }
-            if (scene.interactions) {
-                scene.interactions.forEach((inter: any) => {
-                    if (inter.soundEffect && typeof inter.soundEffect === 'string') {
-                         promises.push(processAssetPath(inter.soundEffect).then(b64 => { inter.soundEffect = b64 as string; }));
+            if (scene.choices) {
+                scene.choices.forEach((choice: any) => {
+                    if (choice.soundEffect && typeof choice.soundEffect === 'string') {
+                         promises.push(processAssetPath(choice.soundEffect).then(b64 => { choice.soundEffect = b64 as string; }));
                     }
                 });
             }
@@ -251,7 +292,7 @@ const Header: React.FC<{
   return (
     <header className="flex items-center justify-between p-3 bg-brand-surface border-b border-brand-border flex-shrink-0 z-20">
       <div className="flex flex-col items-start min-w-0">
-        <h1 className="text-xl font-bold text-brand-text whitespace-nowrap">TXT Builder</h1>
+        <h1 className="text-xl font-bold text-brand-text whitespace-nowrap">IF Builder</h1>
         {gameData.gameTitle && (
             <code
                 className="mt-1 bg-brand-bg px-2 py-1 rounded text-brand-primary-hover text-sm truncate max-w-full"

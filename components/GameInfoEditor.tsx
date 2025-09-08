@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { GameData } from '../types';
 import { UploadIcon } from './icons/UploadIcon';
@@ -11,6 +12,16 @@ interface GameInfoEditorProps {
   splashImage: string;
   splashContentAlignment: 'left' | 'right';
   splashDescription: string;
+  splashButtonText: string;
+  enableChances: boolean;
+  positiveEndingImage: string;
+  positiveEndingOmitTitle: boolean;
+  positiveEndingDescription: string;
+  positiveEndingButtonText: string;
+  negativeEndingImage: string;
+  negativeEndingOmitTitle: boolean;
+  negativeEndingDescription: string;
+  negativeEndingButtonText: string;
   onUpdate: (field: keyof GameData, value: string | boolean | number) => void;
 }
 
@@ -18,7 +29,9 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
     const { 
         title, logo, hideTitle, omitSplashTitle, 
         splashImage, splashContentAlignment, splashDescription,
-        onUpdate 
+        splashButtonText, onUpdate, enableChances,
+        positiveEndingImage, positiveEndingOmitTitle, positiveEndingDescription, positiveEndingButtonText,
+        negativeEndingImage, negativeEndingOmitTitle, negativeEndingDescription, negativeEndingButtonText,
     } = props;
 
     const [localTitle, setLocalTitle] = useState(title);
@@ -28,6 +41,16 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
     const [localSplashImage, setLocalSplashImage] = useState(splashImage);
     const [localSplashContentAlignment, setLocalSplashContentAlignment] = useState(splashContentAlignment);
     const [localSplashDescription, setLocalSplashDescription] = useState(splashDescription);
+    const [localSplashButtonText, setLocalSplashButtonText] = useState(splashButtonText);
+    const [localEnableChances, setLocalEnableChances] = useState(enableChances);
+    const [localPositiveEndingImage, setLocalPositiveEndingImage] = useState(positiveEndingImage);
+    const [localPositiveEndingOmitTitle, setLocalPositiveEndingOmitTitle] = useState(positiveEndingOmitTitle);
+    const [localPositiveEndingDescription, setLocalPositiveEndingDescription] = useState(positiveEndingDescription);
+    const [localPositiveEndingButtonText, setLocalPositiveEndingButtonText] = useState(positiveEndingButtonText);
+    const [localNegativeEndingImage, setLocalNegativeEndingImage] = useState(negativeEndingImage);
+    const [localNegativeEndingOmitTitle, setLocalNegativeEndingOmitTitle] = useState(negativeEndingOmitTitle);
+    const [localNegativeEndingDescription, setLocalNegativeEndingDescription] = useState(negativeEndingDescription);
+    const [localNegativeEndingButtonText, setLocalNegativeEndingButtonText] = useState(negativeEndingButtonText);
     const [activeTab, setActiveTab] = useState('geral');
     const [isDirty, setIsDirty] = useState(false);
 
@@ -39,6 +62,16 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         setLocalSplashImage(props.splashImage);
         setLocalSplashContentAlignment(props.splashContentAlignment);
         setLocalSplashDescription(props.splashDescription);
+        setLocalSplashButtonText(props.splashButtonText);
+        setLocalEnableChances(props.enableChances);
+        setLocalPositiveEndingImage(props.positiveEndingImage);
+        setLocalPositiveEndingOmitTitle(props.positiveEndingOmitTitle);
+        setLocalPositiveEndingDescription(props.positiveEndingDescription);
+        setLocalPositiveEndingButtonText(props.positiveEndingButtonText);
+        setLocalNegativeEndingImage(props.negativeEndingImage);
+        setLocalNegativeEndingOmitTitle(props.negativeEndingOmitTitle);
+        setLocalNegativeEndingDescription(props.negativeEndingDescription);
+        setLocalNegativeEndingButtonText(props.negativeEndingButtonText);
         setIsDirty(false);
     }, [props]);
 
@@ -49,9 +82,19 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                          localOmitSplashTitle !== omitSplashTitle ||
                          localSplashImage !== splashImage ||
                          localSplashContentAlignment !== splashContentAlignment ||
-                         localSplashDescription !== splashDescription;
+                         localSplashDescription !== splashDescription ||
+                         localSplashButtonText !== splashButtonText ||
+                         localEnableChances !== enableChances ||
+                         localPositiveEndingImage !== positiveEndingImage ||
+                         localPositiveEndingOmitTitle !== positiveEndingOmitTitle ||
+                         localPositiveEndingDescription !== positiveEndingDescription ||
+                         localPositiveEndingButtonText !== positiveEndingButtonText ||
+                         localNegativeEndingImage !== negativeEndingImage ||
+                         localNegativeEndingOmitTitle !== negativeEndingOmitTitle ||
+                         localNegativeEndingDescription !== negativeEndingDescription ||
+                         localNegativeEndingButtonText !== negativeEndingButtonText;
         setIsDirty(hasChanged);
-    }, [localTitle, localLogo, localHideTitle, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, props]);
+    }, [localTitle, localLogo, localHideTitle, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, localSplashButtonText, localEnableChances, localPositiveEndingImage, localPositiveEndingOmitTitle, localPositiveEndingDescription, localPositiveEndingButtonText, localNegativeEndingImage, localNegativeEndingOmitTitle, localNegativeEndingDescription, localNegativeEndingButtonText, props]);
 
     const handleSave = () => {
         if (localTitle !== title) onUpdate('gameTitle', localTitle);
@@ -61,6 +104,16 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         if (localSplashImage !== splashImage) onUpdate('gameSplashImage', localSplashImage);
         if (localSplashContentAlignment !== splashContentAlignment) onUpdate('gameSplashContentAlignment', localSplashContentAlignment);
         if (localSplashDescription !== splashDescription) onUpdate('gameSplashDescription', localSplashDescription);
+        if (localSplashButtonText !== splashButtonText) onUpdate('gameSplashButtonText', localSplashButtonText);
+        if (localEnableChances !== enableChances) onUpdate('gameEnableChances', localEnableChances);
+        if (localPositiveEndingImage !== positiveEndingImage) onUpdate('gamePositiveEndingImage', localPositiveEndingImage);
+        if (localPositiveEndingOmitTitle !== positiveEndingOmitTitle) onUpdate('gamePositiveEndingOmitTitle', localPositiveEndingOmitTitle);
+        if (localPositiveEndingDescription !== positiveEndingDescription) onUpdate('gamePositiveEndingDescription', localPositiveEndingDescription);
+        if (localPositiveEndingButtonText !== positiveEndingButtonText) onUpdate('gamePositiveEndingButtonText', localPositiveEndingButtonText);
+        if (localNegativeEndingImage !== negativeEndingImage) onUpdate('gameNegativeEndingImage', localNegativeEndingImage);
+        if (localNegativeEndingOmitTitle !== negativeEndingOmitTitle) onUpdate('gameNegativeEndingOmitTitle', localNegativeEndingOmitTitle);
+        if (localNegativeEndingDescription !== negativeEndingDescription) onUpdate('gameNegativeEndingDescription', localNegativeEndingDescription);
+        if (localNegativeEndingButtonText !== negativeEndingButtonText) onUpdate('gameNegativeEndingButtonText', localNegativeEndingButtonText);
     };
     
     const handleUndo = () => {
@@ -71,6 +124,16 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         setLocalSplashImage(splashImage);
         setLocalSplashContentAlignment(splashContentAlignment);
         setLocalSplashDescription(splashDescription);
+        setLocalSplashButtonText(splashButtonText);
+        setLocalEnableChances(enableChances);
+        setLocalPositiveEndingImage(positiveEndingImage);
+        setLocalPositiveEndingOmitTitle(positiveEndingOmitTitle);
+        setLocalPositiveEndingDescription(positiveEndingDescription);
+        setLocalPositiveEndingButtonText(positiveEndingButtonText);
+        setLocalNegativeEndingImage(negativeEndingImage);
+        setLocalNegativeEndingOmitTitle(negativeEndingOmitTitle);
+        setLocalNegativeEndingDescription(negativeEndingDescription);
+        setLocalNegativeEndingButtonText(negativeEndingButtonText);
     };
     
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
@@ -88,6 +151,7 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
     const TABS = {
         geral: 'Geral',
         abertura: 'Abertura do Jogo',
+        fim: 'Fim de Jogo',
     };
 
   return (
@@ -166,6 +230,22 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                          <p className="text-xs text-brand-text-dim">Opcional.</p>
                     </div>
                 </div>
+
+                <div className="pt-6 border-t border-brand-border/50">
+                    <h3 className="text-lg font-semibold text-brand-text mb-4">Sistema de Chances (Vidas)</h3>
+                    <div className="flex items-center">
+                        <input 
+                            type="checkbox" 
+                            id="enableChances" 
+                            checked={localEnableChances} 
+                            onChange={(e) => setLocalEnableChances(e.target.checked)}
+                            className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+                        />
+                        <label htmlFor="enableChances" className="ml-2 text-sm text-brand-text-dim">
+                          Habilitar sistema de chances (vidas). As opções de customização estão na aba "Tema".
+                        </label>
+                    </div>
+                </div>
             </div>
         )}
 
@@ -224,16 +304,110 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                 <div className="pt-6 border-t border-brand-border/50">
                     <div className="grid grid-cols-1 gap-x-8 gap-y-6">
                         <div className="space-y-2">
-                            <h4 className="text-lg font-semibold text-brand-text mb-2">Descrição do Jogo</h4>
+                            <h4 className="text-lg font-semibold text-brand-text mb-2">Descrição e Botão de Início</h4>
+                            <label htmlFor="splashDescription" className="text-sm text-brand-text-dim mb-1 block">Descrição do Jogo</label>
                             <textarea
                               id="splashDescription"
                               value={localSplashDescription}
                               onChange={(e) => setLocalSplashDescription(e.target.value)}
-                              rows={8}
+                              rows={6}
                               className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
                               placeholder="Uma breve descrição da sua aventura..."
                             />
                         </div>
+                         <div>
+                            <label htmlFor="splashButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Início</label>
+                            <input
+                                type="text"
+                                id="splashButtonText"
+                                value={localSplashButtonText}
+                                onChange={(e) => setLocalSplashButtonText(e.target.value)}
+                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary"
+                                placeholder="INICIAR"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {activeTab === 'fim' && (
+            <div className="space-y-10">
+                {/* Fim Positivo */}
+                <div className="space-y-6">
+                    <h3 className="text-2xl font-bold text-brand-text">Fim Positivo (Vitória)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div className="space-y-2">
+                            <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
+                            <div className="flex items-start gap-4">
+                                {localPositiveEndingImage && <img src={localPositiveEndingImage} alt="Fundo da tela de vitória" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />}
+                                <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                    <UploadIcon className="w-5 h-5 mr-2" /> 
+                                    {positiveEndingImage ? 'Alterar Imagem' : 'Carregar Imagem'}
+                                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
+                                </label>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                             <h4 className="text-lg font-semibold text-brand-text mb-2">Título</h4>
+                             <div className="flex items-center">
+                              <input
+                                type="checkbox"
+                                id="omitPositiveEndingTitle"
+                                checked={localPositiveEndingOmitTitle}
+                                onChange={(e) => setLocalPositiveEndingOmitTitle(e.target.checked)}
+                                className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+                              />
+                              <label htmlFor="omitPositiveEndingTitle" className="ml-2 text-sm text-brand-text-dim">Omitir título da tela de vitória</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label htmlFor="positiveEndingDescription" className="text-sm text-brand-text-dim mb-1 block">Descrição da Vitória</label>
+                        <textarea id="positiveEndingDescription" value={localPositiveEndingDescription} onChange={(e) => setLocalPositiveEndingDescription(e.target.value)} rows={4} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary" placeholder="Parabéns, você venceu!"/>
+                    </div>
+                    <div>
+                        <label htmlFor="positiveEndingButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão</label>
+                        <input type="text" id="positiveEndingButtonText" value={localPositiveEndingButtonText} onChange={(e) => setLocalPositiveEndingButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary" placeholder="Jogar Novamente"/>
+                    </div>
+                </div>
+                
+                {/* Fim Negativo */}
+                <div className="space-y-6 pt-10 border-t border-brand-border/50">
+                     <h3 className="text-2xl font-bold text-brand-text">Fim Negativo (Derrota)</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div className="space-y-2">
+                            <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
+                            <div className="flex items-start gap-4">
+                                {localNegativeEndingImage && <img src={localNegativeEndingImage} alt="Fundo da tela de derrota" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />}
+                                <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                    <UploadIcon className="w-5 h-5 mr-2" /> 
+                                    {negativeEndingImage ? 'Alterar Imagem' : 'Carregar Imagem'}
+                                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
+                                </label>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                             <h4 className="text-lg font-semibold text-brand-text mb-2">Título</h4>
+                             <div className="flex items-center">
+                              <input
+                                type="checkbox"
+                                id="omitNegativeEndingTitle"
+                                checked={localNegativeEndingOmitTitle}
+                                onChange={(e) => setLocalNegativeEndingOmitTitle(e.target.checked)}
+                                className="h-4 w-4 rounded border-gray-300 text-brand-primary focus:ring-brand-primary"
+                              />
+                              <label htmlFor="omitNegativeEndingTitle" className="ml-2 text-sm text-brand-text-dim">Omitir título da tela de derrota</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label htmlFor="negativeEndingDescription" className="text-sm text-brand-text-dim mb-1 block">Descrição da Derrota</label>
+                        <textarea id="negativeEndingDescription" value={localNegativeEndingDescription} onChange={(e) => setLocalNegativeEndingDescription(e.target.value)} rows={4} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary" placeholder="Fim de jogo..."/>
+                    </div>
+                    <div>
+                        <label htmlFor="negativeEndingButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão</label>
+                        <input type="text" id="negativeEndingButtonText" value={localNegativeEndingButtonText} onChange={(e) => setLocalNegativeEndingButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-brand-primary focus:border-brand-primary" placeholder="Tentar Novamente"/>
                     </div>
                 </div>
             </div>

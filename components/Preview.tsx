@@ -1,6 +1,5 @@
 
 
-
 import React, { useMemo } from 'react';
 import { GameData } from '../types';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
@@ -15,31 +14,41 @@ const getFontUrl = (fontFamily: string) => {
 
 const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
     const srcDoc = useMemo(() => {
-        let headerContent;
-        if (gameData.gameEnableChances) {
-            headerContent = '<div id="chances-container" class="chances-container"></div>';
-        } else {
-            headerContent = '';
-        }
+        const headerButtons = `
+          ${gameData.gameEnableChances ? '<div id="chances-container" class="chances-container"></div>' : ''}
+        `;
 
         const fontFamily = gameData.gameFontFamily || "'Silkscreen', sans-serif";
         const fontUrl = getFontUrl(fontFamily);
         const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
 
         let finalHtml = gameData.gameHTML
-            .replace('__GAME_TITLE__', gameData.gameTitle || 'TXT Builder Game')
+            // General
+            .replace('__GAME_TITLE__', gameData.gameTitle || 'IF Builder Game')
             .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme`)
             .replace('__FONT_STYLESHEET__', fontStylesheet)
+            // Header
             .replace('__LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="game-logo">` : '')
             .replace('__HEADER_TITLE_H1_TAG__', !gameData.gameHideTitle ? `<h1>${gameData.gameTitle}</h1>` : '')
-            .replace('<button id="restart-button" class="btn-danger">Reiniciar Aventura</button>', headerContent)
+            .replace('__HEADER_BUTTONS__', headerButtons)
+            // Splash Screen
             .replace('__SPLASH_BG_STYLE__', gameData.gameSplashImage ? `style="background-image: url('${gameData.gameSplashImage}')"` : '')
             .replace('__SPLASH_LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="splash-logo">` : '')
             .replace('__SPLASH_TITLE_H1_TAG__', !gameData.gameOmitSplashTitle ? `<h1>${gameData.gameTitle}</h1>` : '')
             .replace('__SPLASH_DESCRIPTION__', gameData.gameSplashDescription || '')
             .replace('__SPLASH_BUTTON_TEXT__', gameData.gameSplashButtonText || 'Start')
-            .replace('__ACTION_BUTTON_TEXT__', gameData.gameActionButtonText || 'Action')
-            .replace('__COMMAND_INPUT_PLACEHOLDER__', gameData.gameCommandInputPlaceholder || 'What do you do?');
+            // Positive Ending
+            .replace('__POSITIVE_ENDING_BG_STYLE__', gameData.gamePositiveEndingImage ? `style="background-image: url('${gameData.gamePositiveEndingImage}')"` : '')
+            .replace('__POSITIVE_ENDING_LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="ending-logo">` : '')
+            .replace('__POSITIVE_ENDING_TITLE_H1_TAG__', !gameData.gamePositiveEndingOmitTitle ? `<h1>${gameData.gameTitle}</h1>` : '')
+            .replace('__POSITIVE_ENDING_DESCRIPTION__', gameData.gamePositiveEndingDescription || '')
+            .replace('__POSITIVE_ENDING_BUTTON_TEXT__', gameData.gamePositiveEndingButtonText || 'Play Again')
+            // Negative Ending
+            .replace('__NEGATIVE_ENDING_BG_STYLE__', gameData.gameNegativeEndingImage ? `style="background-image: url('${gameData.gameNegativeEndingImage}')"` : '')
+            .replace('__NEGATIVE_ENDING_LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="ending-logo">` : '')
+            .replace('__NEGATIVE_ENDING_TITLE_H1_TAG__', !gameData.gameNegativeEndingOmitTitle ? `<h1>${gameData.gameTitle}</h1>` : '')
+            .replace('__NEGATIVE_ENDING_DESCRIPTION__', gameData.gameNegativeEndingDescription || '')
+            .replace('__NEGATIVE_ENDING_BUTTON_TEXT__', gameData.gameNegativeEndingButtonText || 'Try Again');
             
         const chancesCSS = `
         .chances-container { display: flex; align-items: center; gap: 8px; }
@@ -57,9 +66,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace('__GAME_FOCUS_COLOR_LIGHT__', gameData.gameFocusColorLight || '#0969da')
             .replace('__SPLASH_BUTTON_COLOR__', gameData.gameSplashButtonColor || '#2ea043')
             .replace('__SPLASH_BUTTON_HOVER_COLOR__', gameData.gameSplashButtonHoverColor || '#238636')
-            .replace('__SPLASH_BUTTON_TEXT_COLOR__', gameData.gameSplashButtonTextColor || '#ffffff')
-            .replace('__ACTION_BUTTON_COLOR__', gameData.gameActionButtonColor || '#ffffff')
-            .replace('__ACTION_BUTTON_TEXT_COLOR__', gameData.gameActionButtonTextColor || '#0d1117');
+            .replace('__SPLASH_BUTTON_TEXT_COLOR__', gameData.gameSplashButtonTextColor || '#ffffff');
 
         if (gameData.gameEnableChances) {
             finalCss += chancesCSS;
@@ -73,6 +80,47 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
                 .replace(/--splash-content-align-items: flex-end;/g, '--splash-content-align-items: flex-start;');
         }
             
+        let layoutCSS = '';
+        const orientation = gameData.gameLayoutOrientation || 'vertical';
+        const order = gameData.gameLayoutOrder || 'image-first';
+
+        if (orientation === 'horizontal') {
+            layoutCSS += `
+                .game-container { flex-direction: column; }
+                .image-panel { flex: 0 0 40%; max-width: 100%; border-right: none; border-left: none; }
+                .text-panel { flex: 1; }
+            `;
+            if (order === 'image-last') {
+                layoutCSS += `
+                    .image-panel { order: 2; border-bottom: none; border-top: 2px solid var(--border-color); }
+                    .text-panel { order: 1; }
+                `;
+            } else {
+                layoutCSS += `
+                    .image-panel { order: 1; border-top: none; border-bottom: 2px solid var(--border-color); }
+                    .text-panel { order: 2; }
+                `;
+            }
+        } else { // 'vertical'
+            layoutCSS += `
+                .game-container { flex-direction: row; }
+                .image-panel { flex: 0 0 45%; max-width: 650px; border-bottom: none; border-top: none; }
+                .text-panel { flex: 1; }
+            `;
+            if (order === 'image-last') {
+                layoutCSS += `
+                    .image-panel { order: 2; border-right: none; border-left: 2px solid var(--border-color); }
+                    .text-panel { order: 1; }
+                `;
+            } else {
+                layoutCSS += `
+                    .image-panel { order: 1; border-left: none; border-right: 2px solid var(--border-color); }
+                    .text-panel { order: 2; }
+                `;
+            }
+        }
+        finalCss += layoutCSS;
+        
         const engineData = prepareGameDataForEngine(gameData);
         // Safely stringify JSON to prevent issues with '</script>' tags in user content.
         const safeJson = JSON.stringify(engineData).replace(/<\/script/g, '<\\/script>');
