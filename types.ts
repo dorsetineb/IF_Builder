@@ -1,12 +1,32 @@
 
-
-export interface Choice {
+export interface GameObject {
   id: string;
-  text: string;
-  goToScene: string; // ID of the scene to move to
+  name: string;
+  examineDescription: string;
+  isTakable: boolean;
+}
+
+export interface Interaction {
+  id: string;
+  verbs: string[]; // e.g., ['usar', 'abrir']
+  target: string; // name of object in scene, e.g., 'porta'
+  requiresInInventory?: string; // name of object in inventory, e.g., 'chave'
+  successMessage?: string;
   soundEffect?: string; // base64 data URL for interaction sound
-  refillsChances?: boolean;
-  costsChance?: boolean;
+  // --- Outcomes ---
+  consumesItem?: boolean; // if requiresInInventory is used, is it consumed?
+  removesTargetFromScene?: boolean; // remove the target object from the scene
+  goToScene?: string; // ID of the scene to move to
+  newSceneDescription?: string;
+}
+
+export interface Exits {
+  norte?: string;
+  sul?: string;
+  leste?: string;
+  oeste?: string;
+  acima?: string;
+  abaixo?: string;
 }
 
 export interface Scene {
@@ -14,8 +34,13 @@ export interface Scene {
   name: string;
   image: string; // URL or base64 string
   description: string;
-  choices: Choice[];
+  objects: GameObject[];
+  interactions: Interaction[];
+  exits?: Exits;
   isEndingScene?: boolean;
+  removesChanceOnEntry?: boolean;
+  restoresChanceOnEntry?: boolean;
+  // FIX: Add optional mapX and mapY properties for SceneMap positioning.
   mapX?: number;
   mapY?: number;
 }
@@ -25,6 +50,7 @@ export interface GameData {
   scenes: {
     [id: string]: Scene;
   };
+  defaultFailureMessage: string;
   sceneOrder: string[];
   gameHTML: string;
   gameCSS: string;
@@ -39,30 +65,35 @@ export interface GameData {
   gameSplashContentAlignment?: 'left' | 'right';
   gameSplashDescription?: string;
   gameSplashButtonText?: string;
+  gameRestartButtonText?: string;
   gameSplashButtonColor?: string;
   gameSplashButtonHoverColor?: string;
   gameSplashButtonTextColor?: string;
   gameLayoutOrientation?: 'vertical' | 'horizontal';
   gameLayoutOrder?: 'image-first' | 'image-last';
+  gameActionButtonColor?: string;
+  gameActionButtonTextColor?: string;
+  gameActionButtonText?: string;
+  gameCommandInputPlaceholder?: string;
+  gameDiaryPlayerName?: string;
   gameFocusColor?: string;
   gameEnableChances?: boolean;
   gameMaxChances?: number;
   gameChanceIcon?: 'circle' | 'cross' | 'heart';
   gameChanceIconColor?: string;
+  gameChanceLossMessage?: string;
+  gameChanceRestoreMessage?: string;
+  gameChanceReturnButtonText?: string;
   gameTheme?: 'dark' | 'light';
   gameTextColorLight?: string;
   gameTitleColorLight?: string;
   gameFocusColorLight?: string;
-  gameChanceLossMessage?: string;
-  gameChanceReturnButtonText?: string;
-  gamePositiveEndingImage?: string;
-  gamePositiveEndingOmitTitle?: boolean;
-  gamePositiveEndingDescription?: string;
-  gamePositiveEndingButtonText?: string;
-  gameNegativeEndingImage?: string;
-  gameNegativeEndingOmitTitle?: boolean;
-  gameNegativeEndingDescription?: string;
-  gameNegativeEndingButtonText?: string;
+  positiveEndingImage?: string;
+  positiveEndingContentAlignment?: 'left' | 'right';
+  positiveEndingDescription?: string;
+  negativeEndingImage?: string;
+  negativeEndingContentAlignment?: 'left' | 'right';
+  negativeEndingDescription?: string;
 }
 
-export type View = 'scenes' | 'interface' | 'game_info' | 'scene_map' | 'theme';
+export type View = 'scenes' | 'interface' | 'game_info' | 'theme';

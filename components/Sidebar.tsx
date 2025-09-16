@@ -5,7 +5,6 @@ import { Scene, View } from '../types';
 import { CodeIcon } from './icons/CodeIcon';
 import { BookOpenIcon } from './icons/BookOpenIcon';
 import { InformationCircleIcon } from './icons/InformationCircleIcon';
-import { NodeIcon } from './icons/NodeIcon';
 import { PaintBrushIcon } from './icons/PaintBrushIcon';
 
 interface SidebarProps {
@@ -13,17 +12,15 @@ interface SidebarProps {
   startSceneId: string;
   selectedSceneId: string | null;
   currentView: View;
-  dirtySceneIds: Set<string>;
   onSelectScene: (id: string) => void;
   onAddScene: () => void;
   onDeleteScene: (id: string) => void;
-  onSetStartScene: (id: string) => void;
   onReorderScenes: (newOrder: string[]) => void;
   onSetView: (view: View) => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { currentView, onSetView, scenes, dirtySceneIds, ...sceneListProps } = props;
+  const { currentView, onSetView, scenes, ...sceneListProps } = props;
 
   const getButtonClass = (view: View) => 
     `w-full flex items-center p-2 rounded-md transition-colors text-left ${
@@ -53,21 +50,17 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             <button className={getButtonClass('scenes')} onClick={() => onSetView('scenes')}>
                 <BookOpenIcon className="w-5 h-5 mr-3" />
                 <span className="font-semibold">Editor de Cenas</span>
-                <span className="ml-2 bg-brand-border text-brand-text-dim text-xs font-bold px-2 py-0.5 rounded-full">
+                <span className="ml-auto bg-white text-brand-bg text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {scenes.length}
                 </span>
             </button>
             {currentView === 'scenes' && (
               <div className="pl-4 pt-2 mt-2 border-l-2 border-brand-border/50 ml-2">
-                <SceneList scenes={scenes} dirtySceneIds={dirtySceneIds} {...sceneListProps} />
+                <SceneList scenes={scenes} {...sceneListProps} />
               </div>
             )}
         </div>
         
-        <button className={getButtonClass('scene_map')} onClick={() => onSetView('scene_map')}>
-          <NodeIcon className="w-5 h-5 mr-3" />
-          <span className="font-semibold">Mapa de Cenas</span>
-        </button>
       </nav>
     </aside>
   );

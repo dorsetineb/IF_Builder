@@ -1,4 +1,3 @@
-
 import React, { useRef } from 'react';
 import { Scene } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -9,11 +8,9 @@ interface SceneListProps {
   scenes: Scene[];
   startSceneId: string;
   selectedSceneId: string | null;
-  dirtySceneIds: Set<string>;
   onSelectScene: (id: string) => void;
   onAddScene: () => void;
   onDeleteScene: (id: string) => void;
-  onSetStartScene: (id: string) => void;
   onReorderScenes: (newOrder: string[]) => void;
 }
 
@@ -21,11 +18,9 @@ const SceneList: React.FC<SceneListProps> = ({
   scenes,
   startSceneId,
   selectedSceneId,
-  dirtySceneIds,
   onSelectScene,
   onAddScene,
   onDeleteScene,
-  onSetStartScene,
   onReorderScenes,
 }) => {
   const dragItem = useRef<number | null>(null);
@@ -61,42 +56,46 @@ const SceneList: React.FC<SceneListProps> = ({
           {scenes.map((scene, index) => (
           <li
               key={scene.id}
-              className={`group relative flex items-center p-2 rounded-md cursor-pointer transition-colors overflow-hidden ${
+              className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-md transition-colors overflow-hidden ${
               selectedSceneId === scene.id
                   ? 'bg-yellow-400 text-black'
                   : 'hover:bg-brand-border/50'
-              }`}
-              onClick={() => onSelectScene(scene.id)}
-              onDragStart={(e) => handleDragStart(e, index)}
-              onDragEnter={(e) => handleDragEnter(e, index)}
+              } ${scene.id === startSceneId ? 'cursor-default' : ''}`}
+              onDragStart={(e) => scene.id !== startSceneId && handleDragStart(e, index)}
+              onDragEnter={(e) => scene.id !== startSceneId && handleDragEnter(e, index)}
               onDragEnd={handleDragEnd}
               onDragOver={(e) => e.preventDefault()}
-              draggable
+              draggable={scene.id !== startSceneId}
           >
-              <Bars3Icon className={`w-5 h-5 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? 'text-black' : 'text-brand-text-dim'}`} />
-              <div className="flex-1 min-w-0 flex items-center gap-2">
-                  <span className="truncate font-medium">{scene.name}</span>
-                  {dirtySceneIds.has(scene.id) && (
-                    <div className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0" title="Alterações não salvas"></div>
-                  )}
-              </div>
-              <div className="absolute right-0 flex items-center h-full transition-transform duration-300 ease-in-out group-hover:-translate-x-10">
-                  {startSceneId === scene.id && (
-                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-md ${selectedSceneId === scene.id ? 'bg-black/20' : 'bg-brand-primary/30 text-brand-primary'}`}>
-                          início
-                      </span>
-                  )}
+              <div className={`flex items-center flex-grow p-2`}>
+                  {scene.id !== startSceneId ? (
+                    <Bars3Icon className={`w-5 h-5 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? 'text-black' : 'text-brand-text-dim'}`} />
+                  ) : null }
+                  
+                  <div 
+                    className={`flex-1 min-w-0 flex items-center justify-between ${scene.id !== startSceneId ? 'cursor-pointer' : ''}`}
+                    onClick={() => onSelectScene(scene.id)}
+                  >
+                      <span className="truncate font-medium">{scene.name}</span>
+                      {startSceneId === scene.id && (
+                          <span className={`ml-2 text-xs font-bold px-2 py-0.5 rounded-full ${
+                              selectedSceneId === scene.id ? 'bg-black/20 text-black' : 'bg-yellow-400/20 text-yellow-300'
+                          }`}>
+                              Início
+                          </span>
+                      )}
+                  </div>
               </div>
               
-              <div className="absolute right-0 top-0 h-full w-10 flex items-center justify-center bg-red-500 transform translate-x-full group-hover:translate-x-0 transition-transform duration-300 ease-in-out">
-                  <button
-                      onClick={(e) => { e.stopPropagation(); onDeleteScene(scene.id); }}
-                      className="w-full h-full flex items-center justify-center text-white"
-                      title="Deletar cena"
-                      >
-                      <TrashIcon className="w-5 h-5" />
-                  </button>
-              </div>
+              {startSceneId !== scene.id && (
+                <button
+                    onClick={(e) => { e.stopPropagation(); onDeleteScene(scene.id); }}
+                    className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out"
+                    title="Deletar cena"
+                    >
+                    <TrashIcon className="w-5 h-5" />
+                </button>
+              )}
           </li>
           ))}
       </ul>
