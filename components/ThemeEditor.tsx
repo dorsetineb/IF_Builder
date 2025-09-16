@@ -206,7 +206,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                 </p>
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-brand-surface rounded-lg border border-brand-border p-6 space-y-6">
+                <div className="bg-brand-surface p-6 space-y-6">
                     <div className="space-y-2">
                         <h3 className="text-lg font-semibold text-brand-text">Tema da Interface</h3>
                         <div className="flex gap-2 rounded-md bg-brand-bg p-1">
@@ -341,7 +341,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                 <div className="flex flex-col">
                     <p className="text-sm text-brand-text-dim mb-2 text-center">Pré-visualização ao vivo</p>
                     <div 
-                        className={`flex-1 rounded-lg border-2 p-6 flex flex-col justify-between transition-colors ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-brand-border' : 'bg-[#ffffff] border-[#d0d7de]'}`}
+                        className={`flex-1 border-2 p-6 flex flex-col justify-between transition-colors ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-brand-border' : 'bg-[#ffffff] border-[#d0d7de]'}`}
                         style={{ fontFamily: localFontFamily }}
                     >
                         <div className="flex justify-between items-start">
@@ -369,7 +369,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                         color: localGameTheme === 'dark' ? localTextColor : localTextColorLight,
                                         borderColor: focusPreview 
                                             ? (localGameTheme === 'dark' ? localFocusColor : localFocusColorLight) 
-                                            : (localGameTheme === 'dark' ? '#30363d' : '#d0d7de'),
+                                            : (localGameTheme === 'dark' ? '#3036d' : '#d0d7de'),
                                         fontFamily: localFontFamily,
                                     }}
                                     onFocus={() => setFocusPreview(true)}

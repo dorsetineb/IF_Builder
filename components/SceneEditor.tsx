@@ -211,17 +211,17 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
           })}
         </div>
 
-        <div className="bg-brand-surface rounded-b-lg rounded-r-lg border border-t-0 border-brand-border -mt-px p-6">
+        <div className="bg-brand-surface -mt-px p-6">
           {activeTab === 'properties' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                   <div className="flex flex-col space-y-3">
                       <div className="flex-grow relative">
                           {localScene.image ? (
-                              <img src={localScene.image} alt={localScene.name} className="w-full h-full min-h-[300px] object-cover rounded-md border border-brand-border bg-brand-bg" />
+                              <img src={localScene.image} alt={localScene.name} className="w-full h-full min-h-[300px] object-cover bg-brand-bg" />
                           ) : (
                               <label 
                                   htmlFor="image-upload-input" 
-                                  className={`flex flex-col items-center justify-center w-full h-full min-h-[300px] border-2 border-dashed rounded-md bg-brand-bg cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
+                                  className={`flex flex-col items-center justify-center w-full h-full min-h-[300px] border-2 border-dashed bg-brand-bg cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
                                   onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                   onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                   onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}

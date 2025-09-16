@@ -30,7 +30,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     }`;
 
   return (
-    <aside className="w-1/4 xl:w-1/5 bg-brand-surface p-4 overflow-y-auto border-r border-brand-border">
+    <aside className="w-1/4 xl:w-1/5 bg-brand-sidebar p-4 overflow-y-auto border-r border-brand-border">
       <nav className="flex flex-col gap-2">
         <button className={getButtonClass('game_info')} onClick={() => onSetView('game_info')}>
           <InformationCircleIcon className="w-5 h-5 mr-3" />

@@ -11,7 +11,7 @@ const CollapsibleCard: React.FC<CollapsibleCardProps> = ({ title, children, star
   const [isOpen, setIsOpen] = useState(startOpen);
 
   return (
-    <div className="bg-brand-surface rounded-lg border border-brand-border">
+    <div className="bg-brand-surface">
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center p-4 text-left focus:outline-none"
