@@ -11,6 +11,8 @@ interface UIEditorProps {
   diaryPlayerName: string;
   splashButtonText: string;
   restartButtonText: string;
+  enableChances: boolean;
+  maxChances: number;
   onUpdate: (field: keyof GameData, value: any) => void;
   isDirty: boolean;
   onSetDirty: (isDirty: boolean) => void;
@@ -19,7 +21,8 @@ interface UIEditorProps {
 const UIEditor: React.FC<UIEditorProps> = (props) => {
   const { 
       html, css, layoutOrientation, layoutOrder, splashButtonText,
-      actionButtonText, commandInputPlaceholder, diaryPlayerName, restartButtonText, onUpdate, isDirty, onSetDirty 
+      actionButtonText, commandInputPlaceholder, diaryPlayerName, restartButtonText, 
+      enableChances, maxChances, onUpdate, isDirty, onSetDirty 
   } = props;
 
   const [localHtml, setLocalHtml] = useState(html);
@@ -31,6 +34,8 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localDiaryPlayerName, setLocalDiaryPlayerName] = useState(diaryPlayerName);
   const [localSplashButtonText, setLocalSplashButtonText] = useState(splashButtonText);
   const [localRestartButtonText, setLocalRestartButtonText] = useState(restartButtonText);
+  const [localEnableChances, setLocalEnableChances] = useState(enableChances);
+  const [localMaxChances, setLocalMaxChances] = useState(maxChances);
   const [activeTab, setActiveTab] = useState('layout');
 
   useEffect(() => {
@@ -43,7 +48,9 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalDiaryPlayerName(diaryPlayerName);
     setLocalSplashButtonText(splashButtonText);
     setLocalRestartButtonText(restartButtonText);
-  }, [html, css, layoutOrientation, layoutOrder, actionButtonText, commandInputPlaceholder, diaryPlayerName, splashButtonText, restartButtonText]);
+    setLocalEnableChances(enableChances);
+    setLocalMaxChances(maxChances);
+  }, [html, css, layoutOrientation, layoutOrder, actionButtonText, commandInputPlaceholder, diaryPlayerName, splashButtonText, restartButtonText, enableChances, maxChances]);
 
   useEffect(() => {
     const dirty = localHtml !== html ||
@@ -54,9 +61,11 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localRestartButtonText !== restartButtonText ||
                   localActionButtonText !== actionButtonText ||
                   localCommandInputPlaceholder !== commandInputPlaceholder ||
-                  localDiaryPlayerName !== diaryPlayerName;
+                  localDiaryPlayerName !== diaryPlayerName ||
+                  localEnableChances !== enableChances ||
+                  localMaxChances !== maxChances;
     onSetDirty(dirty);
-  }, [localHtml, localCss, localLayoutOrientation, localLayoutOrder, localActionButtonText, localCommandInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localRestartButtonText, props, onSetDirty]);
+  }, [localHtml, localCss, localLayoutOrientation, localLayoutOrder, localActionButtonText, localCommandInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localRestartButtonText, localEnableChances, localMaxChances, props, onSetDirty]);
 
   const handleSave = () => {
     if (localHtml !== html) onUpdate('gameHTML', localHtml);
@@ -68,6 +77,8 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localActionButtonText !== actionButtonText) onUpdate('gameActionButtonText', localActionButtonText);
     if (localCommandInputPlaceholder !== commandInputPlaceholder) onUpdate('gameCommandInputPlaceholder', localCommandInputPlaceholder);
     if (localDiaryPlayerName !== diaryPlayerName) onUpdate('gameDiaryPlayerName', localDiaryPlayerName);
+    if (localEnableChances !== enableChances) onUpdate('gameEnableChances', localEnableChances);
+    if (localMaxChances !== maxChances) onUpdate('gameMaxChances', localMaxChances);
   };
   
   const handleUndo = () => {
@@ -80,6 +91,8 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalActionButtonText(actionButtonText);
     setLocalCommandInputPlaceholder(commandInputPlaceholder);
     setLocalDiaryPlayerName(diaryPlayerName);
+    setLocalEnableChances(enableChances);
+    setLocalMaxChances(maxChances);
   };
 
   const TABS = {
@@ -122,47 +135,77 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
 
         <div className="bg-brand-surface -mt-px p-6">
           {activeTab === 'layout' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-center">
-                  <div className="space-y-6">
-                      <div>
-                          <label htmlFor="orientation-select" className="block text-sm font-medium text-brand-text-dim mb-1">Orientação</label>
-                          <select
-                              id="orientation-select"
-                              value={localLayoutOrientation}
-                              onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
-                              className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                          >
-                              <option value="vertical">Vertical</option>
-                              <option value="horizontal">Horizontal</option>
-                          </select>
+              <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-center">
+                      <div className="space-y-6">
+                          <div>
+                              <label htmlFor="orientation-select" className="block text-sm font-medium text-brand-text-dim mb-1">Orientação</label>
+                              <select
+                                  id="orientation-select"
+                                  value={localLayoutOrientation}
+                                  onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                              >
+                                  <option value="vertical">Vertical</option>
+                                  <option value="horizontal">Horizontal</option>
+                              </select>
+                          </div>
+                          <div>
+                              <label htmlFor="order-select" className="block text-sm font-medium text-brand-text-dim mb-1">Posição da Imagem</label>
+                              <select
+                                  id="order-select"
+                                  value={localLayoutOrder}
+                                  onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                              >
+                                  <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
+                                  <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
+                              </select>
+                          </div>
                       </div>
-                      <div>
-                          <label htmlFor="order-select" className="block text-sm font-medium text-brand-text-dim mb-1">Posição da Imagem</label>
-                          <select
-                              id="order-select"
-                              value={localLayoutOrder}
-                              onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
-                              className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                      
+                      <div className="flex flex-col items-center justify-center">
+                          <p className="text-sm text-brand-text-dim mb-2">Pré-visualização do Layout</p>
+                          <div 
+                              className={`w-full max-w-sm aspect-video bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
+                              style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
                           >
-                              <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
-                              <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
-                          </select>
+                              <div className={`flex-1 bg-green-500/30 border border-green-400 rounded flex items-center justify-center text-center text-sm p-2 text-green-200 font-semibold ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'}`}>
+                                  Imagem
+                              </div>
+                              <div className={`flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'}`}>
+                                  Descrição
+                              </div>
+                          </div>
                       </div>
                   </div>
-                  
-                  <div className="flex flex-col items-center justify-center">
-                      <p className="text-sm text-brand-text-dim mb-2">Pré-visualização do Layout</p>
-                      <div 
-                          className={`w-full max-w-sm aspect-video bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
-                          style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
-                      >
-                          <div className={`flex-1 bg-green-500/30 border border-green-400 rounded flex items-center justify-center text-center text-sm p-2 text-green-200 font-semibold ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'}`}>
-                              Imagem
-                          </div>
-                          <div className={`flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'}`}>
-                              Descrição
-                          </div>
+
+                  <div className="pt-6 border-t border-brand-border/50">
+                      <h3 className="text-lg font-semibold text-brand-text mb-4">Sistema de Chances (Vidas)</h3>
+                      <div className="flex items-center">
+                          <input 
+                              type="checkbox" 
+                              id="enableChances" 
+                              checked={localEnableChances} 
+                              onChange={(e) => setLocalEnableChances(e.target.checked)}
+                              className="custom-checkbox"
+                          />
+                          <label htmlFor="enableChances" className="ml-2 text-sm text-brand-text-dim">Habilitar sistema de chances</label>
                       </div>
+                      {localEnableChances && (
+                          <div className="mt-4 pl-6 border-l-2 border-brand-border/50">
+                              <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
+                              <input
+                                  type="number"
+                                  id="maxChances"
+                                  value={localMaxChances}
+                                  onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
+                                  min="1"
+                                  max="10"
+                                  className="w-full max-w-xs bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                              />
+                          </div>
+                      )}
                   </div>
               </div>
           )}

@@ -641,7 +641,6 @@ const initializeGameData = (): GameData => {
         gameSplashDescription: "Uma breve descrição da sua aventura começa aqui. O que o jogador deve saber antes de iniciar?",
         gameTextColor: "#c9d1d9",
         gameTitleColor: "#58a6ff",
-        gameHideTitle: false,
         gameOmitSplashTitle: false,
         gameSplashButtonText: "INICIAR AVENTURA",
         gameRestartButtonText: "Reiniciar Aventura",
@@ -899,6 +898,8 @@ const App: React.FC = () => {
             diaryPlayerName={gameData.gameDiaryPlayerName || 'VOCÊ'}
             splashButtonText={gameData.gameSplashButtonText || 'INICIAR AVENTURA'}
             restartButtonText={gameData.gameRestartButtonText || 'Reiniciar Aventura'}
+            enableChances={gameData.gameEnableChances || false}
+            maxChances={gameData.gameMaxChances || 3}
             onUpdate={handleUpdateGameData}
             isDirty={isDirty}
             onSetDirty={setIsDirty}
@@ -909,13 +910,10 @@ const App: React.FC = () => {
           <GameInfoEditor
             title={gameData.gameTitle || 'Fuja da Masmorra'}
             logo={gameData.gameLogo || ''}
-            hideTitle={gameData.gameHideTitle || false}
             omitSplashTitle={gameData.gameOmitSplashTitle || false}
             splashImage={gameData.gameSplashImage || ''}
             splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
             splashDescription={gameData.gameSplashDescription || ''}
-            enableChances={gameData.gameEnableChances || false}
-            maxChances={gameData.gameMaxChances || 3}
             positiveEndingImage={gameData.positiveEndingImage || ''}
             positiveEndingContentAlignment={gameData.positiveEndingContentAlignment || 'right'}
             positiveEndingDescription={gameData.positiveEndingDescription || ''}
