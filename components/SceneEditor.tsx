@@ -160,14 +160,20 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     <div className="space-y-6 pb-24">
       <div className="flex justify-between items-start">
         <div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-baseline gap-3">
                 <h2 className="text-xl font-bold text-brand-text">Editor de Cena</h2>
+                <code
+                    className="bg-brand-bg px-2 py-1 rounded text-brand-primary-hover text-base"
+                    title={localScene.name}
+                >
+                    {localScene.name}
+                </code>
                 {isDirty && (
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Alterações não salvas"></div>
+                    <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse self-center" title="Alterações não salvas"></div>
                 )}
             </div>
             <p className="text-brand-text-dim mt-1">
-            Defina a imagem, descrição, objetos e interações para a cena <code className="bg-brand-bg px-1 py-0.5 rounded text-brand-primary-hover">{localScene.name}</code>.
+            Defina a imagem, descrição, objetos e interações para esta cena.
             </p>
         </div>
         <div className="flex items-center gap-2 flex-shrink-0 mt-1">
@@ -241,9 +247,10 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                               <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                           </div>
                           <p className="text-xs text-brand-text-dim mt-2">
-                              {layoutOrientation === 'horizontal'
-                                  ? 'imagens na proporção 16:9 (horizontal), recomendado 1920x1080 pixels (.jpg, .png ou .gif)'
-                                  : 'imagens na proporção 9:16 (vertical), recomendado 1080x1920 pixels (.jpg, .png ou .gif)'}
+                              {layoutOrientation === 'vertical'
+                                  ? 'imagens na proporção 9:16 (vertical), recomendado 1080x1920 pixels (.jpg, .png ou .gif)'
+                                  : 'imagens na proporção 16:9 (horizontal), recomendado 1920x1080 pixels (.jpg, .png ou .gif)'
+                                  }
                           </p>
                       </div>
                   </div>
