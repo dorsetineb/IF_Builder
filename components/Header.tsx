@@ -1,7 +1,3 @@
-
-
-
-
 // FIX: Corrected React import to properly include 'useRef'. The previous syntax 'import React, a from ...' was invalid.
 import React, { useRef } from 'react';
 import { GameData } from '../types';
@@ -84,7 +80,7 @@ const Header: React.FC<{
 
     await Promise.all(assetPromises);
 
-    const headerContent = exportData.gameEnableChances 
+    const chancesContainerHTML = exportData.gameEnableChances 
         ? '<div id="chances-container" class="chances-container"></div>' 
         : '';
     
@@ -97,8 +93,7 @@ const Header: React.FC<{
         .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme`)
         .replace('__FONT_STYLESHEET__', fontStylesheet)
         .replace('__LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="game-logo">` : '')
-        .replace('__HEADER_TITLE_H1_TAG__', !exportData.gameHideTitle ? `<h1>${exportData.gameTitle}</h1>` : '')
-        .replace('<button id="restart-button" class="btn-danger">Reiniciar Aventura</button>', headerContent)
+        .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
         .replace('__SPLASH_BG_STYLE__', exportData.gameSplashImage ? `style="background-image: url('${exportData.gameSplashImage}')"` : '')
         .replace('__SPLASH_ALIGN_CLASS__', exportData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
         .replace('__SPLASH_LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="splash-logo">` : '')
@@ -116,8 +111,6 @@ const Header: React.FC<{
         .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '')
         .replace('</body>', `<script src="game.js"></script>\n</body>`);
 
-    const chancesCSS = `\n.chances-container { display: flex; align-items: center; gap: 8px; }\n.chance-icon { width: 28px; height: 28px; transition: all 0.3s ease; }\n.chance-icon.lost { opacity: 0.5; }`;
-    
     let finalCss = exportData.gameCSS
         .replace('__FONT_FAMILY__', fontFamily)
         .replace('__GAME_TEXT_COLOR__', exportData.gameTextColor || '#c9d1d9')
@@ -132,10 +125,6 @@ const Header: React.FC<{
         .replace('__ACTION_BUTTON_COLOR__', exportData.gameActionButtonColor || '#ffffff')
         .replace('__ACTION_BUTTON_TEXT_COLOR__', exportData.gameActionButtonTextColor || '#0d1117');
     
-    if (exportData.gameEnableChances) {
-        finalCss += chancesCSS;
-    }
-
     const engineData = prepareGameDataForEngine(exportData);
     const finalDataScript = `document.addEventListener('DOMContentLoaded', () => { window.embeddedGameData = ${JSON.stringify(engineData)}; });`;
 

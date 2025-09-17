@@ -145,7 +145,7 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                   onClick={() => setActiveTab(key as any)}
                   className={`px-4 py-2 font-semibold text-sm rounded-t-md transition-colors ${
                       activeTab === key
-                          ? 'bg-brand-surface border-brand-border border-t border-x text-brand-primary'
+                          ? 'bg-brand-surface text-brand-primary'
                           : 'text-brand-text-dim hover:text-brand-text'
                   }`}
               >

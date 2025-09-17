@@ -53,15 +53,6 @@ const gameHTML = `
             </div>
         </div>
 
-        <header class="game-header">
-            <div class="game-title-container">
-                __LOGO_IMG_TAG__
-                __HEADER_TITLE_H1_TAG__
-            </div>
-            <div class="header-buttons">
-                <button id="restart-button" class="btn-danger">Reiniciar Aventura</button>
-            </div>
-        </header>
         <div class="game-container">
             <div class="image-panel">
                 <div id="transition-overlay" class="transition-overlay"></div>
@@ -72,6 +63,7 @@ const gameHTML = `
             <div class="text-panel">
                 <div id="scene-description" class="scene-description"></div>
                 <div id="action-popup" class="action-popup hidden"></div>
+                __CHANCES_CONTAINER__
                 <div class="action-bar">
                     <div class="action-buttons">
                         <button id="suggestions-button">Sugestões</button>
@@ -230,45 +222,22 @@ body {
     box-shadow: 0 3px 0px rgba(0, 0, 0, 0.4);
 }
 
-
-/* Header */
-.game-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 20px;
-    background-color: var(--panel-bg);
-    border-bottom: 1px solid var(--border-color);
-    flex-shrink: 0;
-}
-.game-title-container {
+/* Chances Container */
+.chances-container {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-bottom: 15px;
 }
-.game-logo {
-    height: 40px;
-    width: auto;
+.chance-icon {
+    width: 28px;
+    height: 28px;
+    transition: all 0.3s ease;
 }
-.game-header h1 {
-    margin: 0;
-    font-size: 1.5em;
-    color: var(--accent-color);
-    text-shadow: none;
+.chance-icon.lost {
+    opacity: 0.5;
 }
-.header-buttons button {
-    font-family: var(--font-family);
-    padding: 8px 12px;
-    border: 1px solid var(--border-color);
-    background-color: var(--button-bg);
-    color: var(--text-color);
-    cursor: pointer;
-    margin-left: 10px;
-    transition: background-color 0.2s;
-}
-.header-buttons button:hover { background-color: var(--button-hover-bg); }
-.header-buttons button.btn-danger { background-color: var(--danger-color); border-color: var(--danger-color); color: white; }
-.header-buttons button.btn-danger:hover { background-color: var(--danger-hover-bg); }
 
 /* Main Layout */
 .game-container {

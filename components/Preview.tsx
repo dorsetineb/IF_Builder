@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useMemo } from 'react';
 import { GameData } from '../types';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
@@ -16,12 +12,7 @@ const getFontUrl = (fontFamily: string) => {
 
 const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
     const srcDoc = useMemo(() => {
-        let headerContent;
-        if (gameData.gameEnableChances) {
-            headerContent = '<div id="chances-container" class="chances-container"></div>';
-        } else {
-            headerContent = '';
-        }
+        const chancesContainerHTML = gameData.gameEnableChances ? '<div id="chances-container" class="chances-container"></div>' : '';
 
         const fontFamily = gameData.gameFontFamily || "'Silkscreen', sans-serif";
         const fontUrl = getFontUrl(fontFamily);
@@ -32,8 +23,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme`)
             .replace('__FONT_STYLESHEET__', fontStylesheet)
             .replace('__LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="game-logo">` : '')
-            .replace('__HEADER_TITLE_H1_TAG__', !gameData.gameHideTitle ? `<h1>${gameData.gameTitle}</h1>` : '')
-            .replace('<button id="restart-button" class="btn-danger">Reiniciar Aventura</button>', headerContent)
+            .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
             .replace('__SPLASH_BG_STYLE__', gameData.gameSplashImage ? `style="background-image: url('${gameData.gameSplashImage}')"` : '')
             .replace('__SPLASH_ALIGN_CLASS__', gameData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
             .replace('__SPLASH_LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="splash-logo">` : '')
@@ -50,12 +40,6 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace('__NEGATIVE_ENDING_ALIGN_CLASS__', gameData.negativeEndingContentAlignment === 'left' ? 'align-left' : '')
             .replace('__NEGATIVE_ENDING_DESCRIPTION__', gameData.negativeEndingDescription || '');
             
-        const chancesCSS = `
-        .chances-container { display: flex; align-items: center; gap: 8px; }
-        .chance-icon { width: 28px; height: 28px; transition: all 0.3s ease; }
-        .chance-icon.lost { opacity: 0.5; }
-        `;
-
         let finalCss = gameData.gameCSS
             .replace('__FONT_FAMILY__', fontFamily)
             .replace('__GAME_TEXT_COLOR__', gameData.gameTextColor || '#c9d1d9')
@@ -69,10 +53,6 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace('__SPLASH_BUTTON_TEXT_COLOR__', gameData.gameSplashButtonTextColor || '#ffffff')
             .replace('__ACTION_BUTTON_COLOR__', gameData.gameActionButtonColor || '#ffffff')
             .replace('__ACTION_BUTTON_TEXT_COLOR__', gameData.gameActionButtonTextColor || '#0d1117');
-
-        if (gameData.gameEnableChances) {
-            finalCss += chancesCSS;
-        }
             
         const engineData = prepareGameDataForEngine(gameData);
         // Safely stringify JSON to prevent issues with '</script>' tags in user content.
