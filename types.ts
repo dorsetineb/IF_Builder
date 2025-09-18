@@ -65,6 +65,7 @@ export interface GameData {
   gameSplashContentAlignment?: 'left' | 'right';
   gameSplashDescription?: string;
   gameSplashButtonText?: string;
+  gameContinueButtonText?: string;
   gameRestartButtonText?: string;
   gameSplashButtonColor?: string;
   gameSplashButtonHoverColor?: string;

@@ -10,6 +10,7 @@ interface UIEditorProps {
   commandInputPlaceholder: string;
   diaryPlayerName: string;
   splashButtonText: string;
+  continueButtonText: string;
   restartButtonText: string;
   enableChances: boolean;
   maxChances: number;
@@ -132,7 +133,7 @@ const ColorInput: React.FC<{
 
 const UIEditor: React.FC<UIEditorProps> = (props) => {
   const { 
-      html, css, layoutOrientation, layoutOrder, splashButtonText,
+      html, css, layoutOrientation, layoutOrder, splashButtonText, continueButtonText,
       actionButtonText, commandInputPlaceholder, diaryPlayerName, restartButtonText, 
       enableChances, maxChances, onUpdate, isDirty, onSetDirty,
       textColor, titleColor, splashButtonColor, splashButtonHoverColor,
@@ -149,6 +150,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localCommandInputPlaceholder, setLocalCommandInputPlaceholder] = useState(commandInputPlaceholder);
   const [localDiaryPlayerName, setLocalDiaryPlayerName] = useState(diaryPlayerName);
   const [localSplashButtonText, setLocalSplashButtonText] = useState(splashButtonText);
+  const [localContinueButtonText, setLocalContinueButtonText] = useState(continueButtonText);
   const [localRestartButtonText, setLocalRestartButtonText] = useState(restartButtonText);
   const [localEnableChances, setLocalEnableChances] = useState(enableChances);
   const [localMaxChances, setLocalMaxChances] = useState(maxChances);
@@ -184,6 +186,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalCommandInputPlaceholder(commandInputPlaceholder);
     setLocalDiaryPlayerName(diaryPlayerName);
     setLocalSplashButtonText(splashButtonText);
+    setLocalContinueButtonText(continueButtonText);
     setLocalRestartButtonText(restartButtonText);
     setLocalEnableChances(enableChances);
     setLocalMaxChances(maxChances);
@@ -206,7 +209,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalTitleColorLight(titleColorLight);
     setLocalFocusColorLight(focusColorLight);
   }, [
-    layoutOrientation, layoutOrder, actionButtonText, commandInputPlaceholder, diaryPlayerName, splashButtonText, restartButtonText, enableChances, maxChances,
+    layoutOrientation, layoutOrder, actionButtonText, commandInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, enableChances, maxChances,
     textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
     chanceIconColor, gameFontFamily, chanceIcon, chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight
   ]);
@@ -215,6 +218,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     const dirty = localLayoutOrientation !== layoutOrientation ||
                   localLayoutOrder !== layoutOrder ||
                   localSplashButtonText !== splashButtonText ||
+                  localContinueButtonText !== continueButtonText ||
                   localRestartButtonText !== restartButtonText ||
                   localActionButtonText !== actionButtonText ||
                   localCommandInputPlaceholder !== commandInputPlaceholder ||
@@ -241,7 +245,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localFocusColorLight !== focusColorLight;
     onSetDirty(dirty);
   }, [
-    localLayoutOrientation, localLayoutOrder, localActionButtonText, localCommandInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localRestartButtonText, localEnableChances, localMaxChances,
+    localLayoutOrientation, localLayoutOrder, localActionButtonText, localCommandInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localEnableChances, localMaxChances,
     localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
     props, onSetDirty
   ]);
@@ -251,6 +255,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localLayoutOrientation !== layoutOrientation) onUpdate('gameLayoutOrientation', localLayoutOrientation);
     if (localLayoutOrder !== layoutOrder) onUpdate('gameLayoutOrder', localLayoutOrder);
     if (localSplashButtonText !== splashButtonText) onUpdate('gameSplashButtonText', localSplashButtonText);
+    if (localContinueButtonText !== continueButtonText) onUpdate('gameContinueButtonText', localContinueButtonText);
     if (localRestartButtonText !== restartButtonText) onUpdate('gameRestartButtonText', localRestartButtonText);
     if (localActionButtonText !== actionButtonText) onUpdate('gameActionButtonText', localActionButtonText);
     if (localCommandInputPlaceholder !== commandInputPlaceholder) onUpdate('gameCommandInputPlaceholder', localCommandInputPlaceholder);
@@ -283,6 +288,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalLayoutOrientation(layoutOrientation);
     setLocalLayoutOrder(layoutOrder);
     setLocalSplashButtonText(splashButtonText);
+    setLocalContinueButtonText(continueButtonText);
     setLocalRestartButtonText(restartButtonText);
     setLocalActionButtonText(actionButtonText);
     setLocalCommandInputPlaceholder(commandInputPlaceholder);
@@ -512,6 +518,17 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   onChange={(e) => setLocalSplashButtonText(e.target.value)}
                                   className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
                                   placeholder="INICIAR"
+                              />
+                          </div>
+                          <div>
+                              <label htmlFor="continueButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Continuar</label>
+                              <input
+                                  type="text"
+                                  id="continueButtonText"
+                                  value={localContinueButtonText}
+                                  onChange={(e) => setLocalContinueButtonText(e.target.value)}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                  placeholder="Continuar Aventura"
                               />
                           </div>
                           <div>

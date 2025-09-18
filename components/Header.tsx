@@ -100,6 +100,7 @@ const Header: React.FC<{
         .replace('__SPLASH_TITLE_H1_TAG__', !exportData.gameOmitSplashTitle ? `<h1>${exportData.gameTitle}</h1>` : '')
         .replace('__SPLASH_DESCRIPTION__', exportData.gameSplashDescription || '')
         .replace('__SPLASH_BUTTON_TEXT__', exportData.gameSplashButtonText || 'Start')
+        .replace('__CONTINUE_BUTTON_TEXT__', exportData.gameContinueButtonText || 'Continue')
         .replace('__RESTART_BUTTON_TEXT__', exportData.gameRestartButtonText || 'Reiniciar Aventura')
         .replace('__ACTION_BUTTON_TEXT__', exportData.gameActionButtonText || 'Action')
         .replace('__COMMAND_INPUT_PLACEHOLDER__', exportData.gameCommandInputPlaceholder || 'What do you do?')

@@ -32,7 +32,10 @@ const gameHTML = `
                 __SPLASH_TITLE_H1_TAG__
                 <p>__SPLASH_DESCRIPTION__</p>
             </div>
-            <button id="splash-start-button">__SPLASH_BUTTON_TEXT__</button>
+            <div class="splash-buttons">
+                <button id="continue-button" class="hidden">__CONTINUE_BUTTON_TEXT__</button>
+                <button id="splash-start-button">__SPLASH_BUTTON_TEXT__</button>
+            </div>
           </div>
         </div>
 
@@ -205,22 +208,42 @@ body {
     color: var(--text-color);
     max-width: 60ch;
 }
-#splash-start-button, .ending-restart-button {
+.splash-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    align-items: var(--splash-content-align-items);
+}
+#splash-start-button, .ending-restart-button, #continue-button {
     font-family: var(--font-family);
     padding: 12px 24px;
     font-size: 1.2em;
     font-weight: bold;
     border: none;
     cursor: pointer;
-    background-color: var(--splash-button-bg);
     color: var(--splash-button-text-color);
     transition: all 0.2s ease-in-out;
+    width: 100%;
+    max-width: 350px;
 }
-#splash-start-button:hover, .ending-restart-button:hover {
-    background-color: var(--splash-button-hover-bg);
+#splash-start-button, .ending-restart-button {
+    background-color: var(--splash-button-bg);
+}
+#continue-button {
+    background-color: #1d4ed8; /* Blue-700 */
+}
+#splash-start-button:hover, .ending-restart-button:hover, #continue-button:hover {
     transform: translateY(-3px);
     box-shadow: 0 3px 0px rgba(0, 0, 0, 0.4);
 }
+#splash-start-button:hover, .ending-restart-button:hover {
+    background-color: var(--splash-button-hover-bg);
+}
+#continue-button:hover {
+    background-color: #2563eb; /* Blue-600 */
+}
+
 
 /* Chances Container */
 .chances-container {
@@ -643,6 +666,7 @@ const initializeGameData = (): GameData => {
         gameTitleColor: "#58a6ff",
         gameOmitSplashTitle: false,
         gameSplashButtonText: "INICIAR AVENTURA",
+        gameContinueButtonText: "Continuar Aventura",
         gameRestartButtonText: "Reiniciar Aventura",
         gameSplashButtonColor: "#2ea043",
         gameSplashButtonHoverColor: "#238636",
@@ -897,6 +921,7 @@ const App: React.FC = () => {
             commandInputPlaceholder={gameData.gameCommandInputPlaceholder || 'O QUE VOCÊ FAZ?'}
             diaryPlayerName={gameData.gameDiaryPlayerName || 'VOCÊ'}
             splashButtonText={gameData.gameSplashButtonText || 'INICIAR AVENTURA'}
+            continueButtonText={gameData.gameContinueButtonText || 'Continuar Aventura'}
             restartButtonText={gameData.gameRestartButtonText || 'Reiniciar Aventura'}
             enableChances={gameData.gameEnableChances || false}
             maxChances={gameData.gameMaxChances || 3}

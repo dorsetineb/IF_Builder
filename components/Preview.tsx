@@ -30,6 +30,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace('__SPLASH_TITLE_H1_TAG__', !gameData.gameOmitSplashTitle ? `<h1>${gameData.gameTitle}</h1>` : '')
             .replace('__SPLASH_DESCRIPTION__', gameData.gameSplashDescription || '')
             .replace('__SPLASH_BUTTON_TEXT__', gameData.gameSplashButtonText || 'Start')
+            .replace('__CONTINUE_BUTTON_TEXT__', gameData.gameContinueButtonText || 'Continue')
             .replace('__RESTART_BUTTON_TEXT__', gameData.gameRestartButtonText || 'Reiniciar Aventura')
             .replace('__ACTION_BUTTON_TEXT__', gameData.gameActionButtonText || 'Action')
             .replace('__COMMAND_INPUT_PLACEHOLDER__', gameData.gameCommandInputPlaceholder || 'What do you do?')

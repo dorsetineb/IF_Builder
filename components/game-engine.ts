@@ -35,6 +35,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         negativeEndingContentAlignment: data.negativeEndingContentAlignment,
         negativeEndingDescription: data.negativeEndingDescription,
         gameRestartButtonText: data.gameRestartButtonText,
+        gameContinueButtonText: data.gameContinueButtonText,
     };
 };
 
@@ -61,6 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const transitionOverlay = document.getElementById('transition-overlay');
     const splashScreen = document.getElementById('splash-screen');
     const startButton = document.getElementById('splash-start-button');
+    const continueButton = document.getElementById('continue-button');
     const restartButton = document.getElementById('restart-button');
     const submitCommandButton = document.getElementById('submit-command');
     const inventoryButton = document.getElementById('inventory-button');
@@ -83,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allTakableObjects = {};
     let currentSceneParagraphs = [];
     let currentParagraphIndex = 0;
-    const SAVE_KEY = 'textAdventureSaveData_preview';
+    const SAVE_KEY = 'textAdventureSaveData_v1';
     let currentState = {
         currentSceneId: null,
         previousSceneId: null,
@@ -509,58 +511,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (commandInputElement) commandInputElement.disabled = false;
         if (submitCommandButton) submitCommandButton.disabled = false;
     }
-
-    // --- Initialization ---
-    async function initGame(fromRestart = false) {
-        resetUI(); // Reset UI state on every game start/restart.
-        let isPreview = false;
-        try {
-            if (window.embeddedGameData) {
-                isPreview = true;
-                gameData = window.embeddedGameData;
-            } else {
-                const response = await fetch('data.json');
-                if (!response.ok) throw new Error('Could not load game data file (data.json).');
-                gameData = await response.json();
-            }
-            
-            originalScenes = JSON.parse(JSON.stringify(gameData.cenas));
-            
-            allTakableObjects = {};
-            Object.values(gameData.cenas).forEach(scene => {
-                if (scene.objetos) {
-                    scene.objetos.forEach(obj => {
-                        if (obj.isTakable) {
-                            allTakableObjects[obj.id] = obj;
-                        }
-                    });
-                }
-            });
-
-            if (!fromRestart && !isPreview && loadState()) {
-                console.log("Game state loaded from save.");
-                // Render scene without adding a new diary entry
-                changeScene(currentState.currentSceneId, true);
-            } else {
-                console.log("Starting new game.");
-                currentState.currentSceneId = gameData.cena_inicial;
-                currentState.inventory = [];
-                currentState.diaryLog = [];
-                currentState.scenesState = JSON.parse(JSON.stringify(originalScenes));
-                if (gameData.gameEnableChances) {
-                    currentState.chances = gameData.gameMaxChances;
-                    currentState.previousSceneId = gameData.cena_inicial;
-                }
-                // Render initial scene and create the first diary entry
-                changeScene(currentState.currentSceneId); 
-            }
-            renderChances();
-
-        } catch (error) {
-            console.error('Error initializing game:', error);
-            if(sceneDescriptionElement) sceneDescriptionElement.innerHTML = '<p style="color:red;">Error loading game data. Check console for details.</p>';
-        }
-    }
     
     function renderDiary() {
         if (!diaryLogElement) return;
@@ -633,133 +583,182 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- Event Listeners & Startup ---
-    const startGame = () => {
-        if (splashScreen) {
-            splashScreen.style.display = 'none';
+    function initGame(isContinuing) {
+        resetUI();
+        
+        if (isContinuing && loadState()) {
+            console.log("Continuing from saved state.");
+            currentState.scenesState = currentState.scenesState || JSON.parse(JSON.stringify(originalScenes)); // Ensure scenesState is hydrated
+            changeScene(currentState.currentSceneId, true);
+        } else {
+            console.log("Starting new game.");
+            localStorage.removeItem(SAVE_KEY); // Clear any potentially corrupt save
+            currentState.currentSceneId = gameData.cena_inicial;
+            currentState.inventory = [];
+            currentState.diaryLog = [];
+            currentState.scenesState = JSON.parse(JSON.stringify(originalScenes));
+            if (gameData.gameEnableChances) {
+                currentState.chances = gameData.gameMaxChances;
+            }
+            changeScene(currentState.currentSceneId); // This creates the first diary entry and saves state.
         }
-        initGame();
-    };
-
-    const restartGame = () => {
+        renderChances();
+    }
+    
+    function restartGame() {
         localStorage.removeItem(SAVE_KEY);
-        initGame(true);
+        // show splash screen again
+        if (continueButton) continueButton.classList.add('hidden');
+        if (splashScreen) splashScreen.style.display = 'flex';
+        resetUI();
     };
 
-    if (splashScreen && startButton) {
-        startButton.addEventListener('click', startGame);
-    } else {
-        startGame(); // Start immediately if no splash screen
-    }
-
-    if(restartButton) {
-        restartButton.addEventListener('click', () => {
-            if (confirm('Tem certeza que quer reiniciar a aventura? Todo o progresso será perdido.')) {
-                restartGame();
+    // --- Main execution block ---
+    (async () => {
+        try {
+            // 1. Load Core Game Data
+            if (window.embeddedGameData) {
+                gameData = window.embeddedGameData;
+            } else {
+                const response = await fetch('data.json');
+                if (!response.ok) throw new Error('Could not load game data file (data.json).');
+                gameData = await response.json();
             }
-        });
-    }
-
-    if (endingRestartButtons) {
-        endingRestartButtons.forEach(button => {
-            button.addEventListener('click', restartGame);
-        });
-    }
-
-    if(submitCommandButton) {
-        submitCommandButton.addEventListener('click', processCommand);
-    }
-
-    if(commandInputElement) {
-        commandInputElement.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                processCommand();
-            }
-        });
-    }
-
-    if (inventoryButton) {
-        inventoryButton.addEventListener('click', () => {
-            if (actionPopup.classList.contains('hidden') || actionPopup.dataset.content !== 'inventory') {
-                actionPopup.innerHTML = '';
-                actionPopup.dataset.content = 'inventory';
-
-                const list = document.createElement('div');
-                list.className = 'action-popup-list';
-
-                if (currentState.inventory.length === 0) {
-                    const p = document.createElement('p');
-                    p.textContent = 'Seu inventário está vazio.';
-                    list.appendChild(p);
-                } else {
-                    currentState.inventory.forEach(itemId => {
-                        const item = allTakableObjects[itemId];
-                        if (item) {
-                            const p = document.createElement('p');
-                            p.textContent = item.name;
-                            list.appendChild(p);
+            
+            originalScenes = JSON.parse(JSON.stringify(gameData.cenas));
+            
+            allTakableObjects = {};
+            Object.values(gameData.cenas).forEach(scene => {
+                if (scene.objetos) {
+                    scene.objetos.forEach(obj => {
+                        if (obj.isTakable) {
+                            allTakableObjects[obj.id] = obj;
                         }
                     });
                 }
-                actionPopup.appendChild(list);
-                actionPopup.classList.remove('hidden');
-            } else {
-                actionPopup.classList.add('hidden');
-                actionPopup.dataset.content = '';
-            }
-        });
-    }
-    
-    if (suggestionsButton) {
-        suggestionsButton.addEventListener('click', () => {
-            if (actionPopup.classList.contains('hidden') || actionPopup.dataset.content !== 'suggestions') {
-                actionPopup.innerHTML = '';
-                actionPopup.dataset.content = 'suggestions';
-                
-                const list = document.createElement('div');
-                list.className = 'action-popup-list';
+            });
 
-                const commonVerbs = ['Olhar', 'Usar', 'Pegar', 'Abrir', 'Fechar', 'Empurrar', 'Puxar', 'Falar', 'Examinar', 'Ir'];
+            // 2. Setup UI based on save state
+            if (splashScreen) {
+                const canContinue = loadState();
+                if (canContinue && continueButton) {
+                    continueButton.classList.remove('hidden');
+                }
                 
-                commonVerbs.forEach(verb => {
-                    const button = document.createElement('button');
-                    button.textContent = verb;
-                    button.onclick = () => {
-                        if (commandInputElement) {
-                            commandInputElement.value = verb.toLowerCase() + ' ';
-                            commandInputElement.focus();
-                            actionPopup.classList.add('hidden');
-                            actionPopup.dataset.content = '';
-                        }
-                    };
-                    list.appendChild(button);
+                if (startButton) {
+                    startButton.addEventListener('click', () => {
+                        if (splashScreen) splashScreen.style.display = 'none';
+                        initGame(false);
+                    });
+                }
+                if (continueButton) {
+                    continueButton.addEventListener('click', () => {
+                        if (splashScreen) splashScreen.style.display = 'none';
+                        initGame(true);
+                    });
+                }
+            } else {
+                // No splash screen, start immediately, try to continue.
+                initGame(true);
+            }
+
+            // 3. Attach common event listeners
+            if(restartButton) {
+                restartButton.addEventListener('click', () => {
+                    if (confirm('Tem certeza que quer reiniciar a aventura? Todo o progresso será perdido.')) {
+                        restartGame();
+                    }
                 });
-
-                actionPopup.appendChild(list);
-                actionPopup.classList.remove('hidden');
-            } else {
-                actionPopup.classList.add('hidden');
-                actionPopup.dataset.content = '';
             }
-        });
-    }
-    
-    if (diaryButton && diaryModal && diaryModalCloseButton) {
-        const toggleDiary = () => {
-            if(diaryModal.classList.contains('hidden')) {
-                renderDiary();
-                diaryModal.classList.remove('hidden');
-            } else {
-                diaryModal.classList.add('hidden');
+            if (endingRestartButtons) {
+                endingRestartButtons.forEach(button => button.addEventListener('click', restartGame));
             }
-        };
-        diaryButton.addEventListener('click', toggleDiary);
-        diaryModalCloseButton.addEventListener('click', toggleDiary);
-        diaryModal.addEventListener('click', (e) => {
-            if (e.target === diaryModal) {
-                toggleDiary();
+            if(submitCommandButton) {
+                submitCommandButton.addEventListener('click', processCommand);
             }
-        });
-    }
+            if(commandInputElement) {
+                commandInputElement.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') processCommand();
+                });
+            }
+            if (inventoryButton) {
+                inventoryButton.addEventListener('click', () => {
+                    if (actionPopup.classList.contains('hidden') || actionPopup.dataset.content !== 'inventory') {
+                        actionPopup.innerHTML = '';
+                        actionPopup.dataset.content = 'inventory';
+                        const list = document.createElement('div');
+                        list.className = 'action-popup-list';
+                        if (currentState.inventory.length === 0) {
+                            const p = document.createElement('p');
+                            p.textContent = 'Seu inventário está vazio.';
+                            list.appendChild(p);
+                        } else {
+                            currentState.inventory.forEach(itemId => {
+                                const item = allTakableObjects[itemId];
+                                if (item) {
+                                    const p = document.createElement('p');
+                                    p.textContent = item.name;
+                                    list.appendChild(p);
+                                }
+                            });
+                        }
+                        actionPopup.appendChild(list);
+                        actionPopup.classList.remove('hidden');
+                    } else {
+                        actionPopup.classList.add('hidden');
+                        actionPopup.dataset.content = '';
+                    }
+                });
+            }
+            if (suggestionsButton) {
+                suggestionsButton.addEventListener('click', () => {
+                    if (actionPopup.classList.contains('hidden') || actionPopup.dataset.content !== 'suggestions') {
+                        actionPopup.innerHTML = '';
+                        actionPopup.dataset.content = 'suggestions';
+                        const list = document.createElement('div');
+                        list.className = 'action-popup-list';
+                        const commonVerbs = ['Olhar', 'Usar', 'Pegar', 'Abrir', 'Fechar', 'Empurrar', 'Puxar', 'Falar', 'Examinar', 'Ir'];
+                        commonVerbs.forEach(verb => {
+                            const button = document.createElement('button');
+                            button.textContent = verb;
+                            button.onclick = () => {
+                                if (commandInputElement) {
+                                    commandInputElement.value = verb.toLowerCase() + ' ';
+                                    commandInputElement.focus();
+                                    actionPopup.classList.add('hidden');
+                                    actionPopup.dataset.content = '';
+                                }
+                            };
+                            list.appendChild(button);
+                        });
+                        actionPopup.appendChild(list);
+                        actionPopup.classList.remove('hidden');
+                    } else {
+                        actionPopup.classList.add('hidden');
+                        actionPopup.dataset.content = '';
+                    }
+                });
+            }
+            if (diaryButton && diaryModal && diaryModalCloseButton) {
+                const toggleDiary = () => {
+                    if(diaryModal.classList.contains('hidden')) {
+                        renderDiary();
+                        diaryModal.classList.remove('hidden');
+                    } else {
+                        diaryModal.classList.add('hidden');
+                    }
+                };
+                diaryButton.addEventListener('click', toggleDiary);
+                diaryModalCloseButton.addEventListener('click', toggleDiary);
+                diaryModal.addEventListener('click', (e) => {
+                    if (e.target === diaryModal) toggleDiary();
+                });
+            }
+        
+        } catch (error) {
+            console.error('Error initializing game:', error);
+            if(sceneDescriptionElement) sceneDescriptionElement.innerHTML = '<p style="color:red;">Error loading game data. Check console for details.</p>';
+        }
+    })();
 });
 `;
