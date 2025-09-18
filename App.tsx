@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -520,7 +521,7 @@ const initialScenes: { [id: string]: Scene } = {
       id: "scn_cela_inicial",
       name: "Cela Inicial",
       image: "",
-      description: "Sua cabeça dói. Você não sabe seu nome, nem onde está.\nVocê está em uma cela pequena e escura. O chão é de pedra fria e úmida. O ar cheira a mofo e terra. Há uma porta de madeira reforçada na sua frente.",
+      description: "Sua cabeça dói. Você não sabe seu nome, nem onde está.\nVocê está em uma cela pequena e escura. O chão é de pedra fria e úmida. Há uma porta de madeira reforçada na sua frente.",
       objects: [
         { id: "obj_chave_de_ferro", name: "chave de ferro", examineDescription: "Uma chave de ferro pesada e enferrujada. Parece antiga.", isTakable: true },
         { id: "obj_pedra_solta", name: "pedra", examineDescription: "Uma das pedras da parede parece estar solta. Talvez você consiga movê-la.", isTakable: false },
@@ -550,7 +551,7 @@ const initialScenes: { [id: string]: Scene } = {
       id: "scn_corredor",
       name: "Corredor",
       image: "",
-      description: "Você está em um corredor escuro e úmido. O ar é pesado e cheira a mofo. A única luz vem da cela atrás de você.",
+      description: "Você está em um corredor escuro e úmido. A única luz vem da cela atrás de você.",
       objects: [],
       interactions: [
           {
