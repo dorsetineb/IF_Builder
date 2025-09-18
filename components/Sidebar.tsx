@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import SceneList from './SceneList';
 import { Scene, View } from '../types';
@@ -39,10 +40,6 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         <button className={getButtonClass('interface')} onClick={() => onSetView('interface')}>
           <CodeIcon className="w-5 h-5 mr-3" />
           <span className="font-semibold">Interface</span>
-        </button>
-        <button className={getButtonClass('theme')} onClick={() => onSetView('theme')}>
-          <PaintBrushIcon className="w-5 h-5 mr-3" />
-          <span className="font-semibold">Tema</span>
         </button>
       
         {/* Scene Editor Section */}

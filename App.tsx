@@ -8,7 +8,6 @@ import { WelcomePlaceholder } from './components/WelcomePlaceholder';
 import UIEditor from './components/UIEditor';
 import GameInfoEditor from './components/GameInfoEditor';
 import Preview from './components/Preview';
-import ThemeEditor from './components/ThemeEditor';
 
 const gameHTML = `
 <!DOCTYPE html>
@@ -900,6 +899,24 @@ const App: React.FC = () => {
             restartButtonText={gameData.gameRestartButtonText || 'Reiniciar Aventura'}
             enableChances={gameData.gameEnableChances || false}
             maxChances={gameData.gameMaxChances || 3}
+            textColor={gameData.gameTextColor || '#c9d1d9'}
+            titleColor={gameData.gameTitleColor || '#58a6ff'}
+            splashButtonColor={gameData.gameSplashButtonColor || '#2ea043'}
+            splashButtonHoverColor={gameData.gameSplashButtonHoverColor || '#238636'}
+            splashButtonTextColor={gameData.gameSplashButtonTextColor || '#ffffff'}
+            actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
+            actionButtonTextColor={gameData.gameActionButtonTextColor || '#0d1117'}
+            focusColor={gameData.gameFocusColor || '#58a6ff'}
+            chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
+            gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
+            chanceIcon={gameData.gameChanceIcon || 'heart'}
+            chanceLossMessage={gameData.gameChanceLossMessage || ''}
+            chanceRestoreMessage={gameData.gameChanceRestoreMessage || ''}
+            chanceReturnButtonText={gameData.gameChanceReturnButtonText || ''}
+            gameTheme={gameData.gameTheme || 'dark'}
+            textColorLight={gameData.gameTextColorLight || '#24292f'}
+            titleColorLight={gameData.gameTitleColorLight || '#0969da'}
+            focusColorLight={gameData.gameFocusColorLight || '#0969da'}
             onUpdate={handleUpdateGameData}
             isDirty={isDirty}
             onSetDirty={setIsDirty}
@@ -920,33 +937,6 @@ const App: React.FC = () => {
             negativeEndingImage={gameData.negativeEndingImage || ''}
             negativeEndingContentAlignment={gameData.negativeEndingContentAlignment || 'right'}
             negativeEndingDescription={gameData.negativeEndingDescription || ''}
-            onUpdate={handleUpdateGameData}
-            isDirty={isDirty}
-            onSetDirty={setIsDirty}
-          />
-        );
-      case 'theme':
-        return (
-          <ThemeEditor
-            textColor={gameData.gameTextColor || '#c9d1d9'}
-            titleColor={gameData.gameTitleColor || '#58a6ff'}
-            splashButtonColor={gameData.gameSplashButtonColor || '#2ea043'}
-            splashButtonHoverColor={gameData.gameSplashButtonHoverColor || '#238636'}
-            splashButtonTextColor={gameData.gameSplashButtonTextColor || '#ffffff'}
-            actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
-            actionButtonTextColor={gameData.gameActionButtonTextColor || '#0d1117'}
-            focusColor={gameData.gameFocusColor || '#58a6ff'}
-            chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
-            gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
-            enableChances={gameData.gameEnableChances || false}
-            chanceIcon={gameData.gameChanceIcon || 'heart'}
-            chanceLossMessage={gameData.gameChanceLossMessage || ''}
-            chanceRestoreMessage={gameData.gameChanceRestoreMessage || ''}
-            chanceReturnButtonText={gameData.gameChanceReturnButtonText || ''}
-            gameTheme={gameData.gameTheme || 'dark'}
-            textColorLight={gameData.gameTextColorLight || '#24292f'}
-            titleColorLight={gameData.gameTitleColorLight || '#0969da'}
-            focusColorLight={gameData.gameFocusColorLight || '#0969da'}
             onUpdate={handleUpdateGameData}
             isDirty={isDirty}
             onSetDirty={setIsDirty}

@@ -193,18 +193,18 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                         <div className="space-y-2">
                           <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
                            <div
-                              className="relative w-full aspect-video bg-green-500/30 border border-green-400 rounded-md flex"
+                              className="relative w-full aspect-video bg-indigo-500/30 border border-indigo-400 rounded-md flex"
                               style={{
                                   justifyContent: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
                                   alignItems: 'flex-end'
                               }}
                               title="Área da Imagem de Fundo"
                           >
-                              <div className="absolute top-2 left-2 text-green-200 font-semibold text-sm">
+                              <div className="absolute top-2 left-2 text-indigo-200 font-semibold text-sm">
                                   Imagem de Fundo
                               </div>
                               <div
-                                  className="w-2/3 bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold"
+                                  className="w-2/3 h-1/2 m-4 bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold"
                                   title="Área de Texto"
                               >
                                   Texto de Abertura
@@ -246,6 +246,17 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                       <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Positivo</h3>
                       <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador alcança uma cena marcada como "final".</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                          <div className="space-y-2 flex flex-col">
+                              <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Vitória</h4>
+                              <textarea
+                                  id="positiveEndingDescription"
+                                  value={localPositiveEndingDescription}
+                                  onChange={(e) => setLocalPositiveEndingDescription(e.target.value)}
+                                  rows={4}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
+                                  placeholder="Parabéns! Você venceu."
+                              />
+                          </div>
                           <div className="space-y-6">
                               <div className="space-y-2">
                                   <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
@@ -272,17 +283,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                                   </div>
                               </div>
                           </div>
-                           <div className="space-y-2 flex flex-col">
-                              <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Vitória</h4>
-                              <textarea
-                                  id="positiveEndingDescription"
-                                  value={localPositiveEndingDescription}
-                                  onChange={(e) => setLocalPositiveEndingDescription(e.target.value)}
-                                  rows={4}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
-                                  placeholder="Parabéns! Você venceu."
-                              />
-                          </div>
                       </div>
                   </div>
 
@@ -291,6 +291,17 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                       <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Negativo</h3>
                       <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador fica sem chances (vidas).</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                          <div className="space-y-2 flex flex-col">
+                              <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Derrota</h4>
+                              <textarea
+                                  id="negativeEndingDescription"
+                                  value={localNegativeEndingDescription}
+                                  onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
+                                  rows={4}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
+                                  placeholder="Fim de jogo."
+                              />
+                          </div>
                            <div className="space-y-6">
                               <div className="space-y-2">
                                   <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
@@ -316,17 +327,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                                       </label>
                                   </div>
                               </div>
-                          </div>
-                          <div className="space-y-2 flex flex-col">
-                              <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Derrota</h4>
-                              <textarea
-                                  id="negativeEndingDescription"
-                                  value={localNegativeEndingDescription}
-                                  onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
-                                  rows={4}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
-                                  placeholder="Fim de jogo."
-                              />
                           </div>
                       </div>
                   </div>
