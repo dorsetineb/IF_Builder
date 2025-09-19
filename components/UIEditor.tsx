@@ -6,7 +6,7 @@ interface UIEditorProps {
   css: string;
   layoutOrientation: 'vertical' | 'horizontal';
   layoutOrder: 'image-first' | 'image-last';
-  imageFrame: 'none' | 'classic' | 'art-deco' | 'rounded-top';
+  imageFrame: GameData['gameImageFrame'];
   actionButtonText: string;
   commandInputPlaceholder: string;
   diaryPlayerName: string;
@@ -33,6 +33,17 @@ interface UIEditorProps {
   textColorLight: string;
   titleColorLight: string;
   focusColorLight: string;
+  frameBookColor: string;
+  frameCardInnerColor: string;
+  frameCardOuterColor: string;
+  frameChamferedColor: string;
+  frameClassicWoodDarkColor: string;
+  frameClassicWoodLightColor: string;
+  frameClassicGoldColor: string;
+  frameArtDecoBackgroundColor: string;
+  frameArtDecoAccentColor: string;
+  frameRoundedTopBackgroundColor: string;
+  frameRoundedTopBorderColor: string;
   onUpdate: (field: keyof GameData, value: any) => void;
   isDirty: boolean;
   onSetDirty: (isDirty: boolean) => void;
@@ -141,7 +152,11 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
       splashButtonTextColor, actionButtonColor, actionButtonTextColor,
       focusColor, chanceIconColor, gameFontFamily, chanceIcon,
       chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText,
-      gameTheme, textColorLight, titleColorLight, focusColorLight
+      gameTheme, textColorLight, titleColorLight, focusColorLight,
+      frameBookColor, frameCardInnerColor, frameCardOuterColor,
+      frameChamferedColor, frameClassicWoodDarkColor, frameClassicWoodLightColor,
+      frameClassicGoldColor, frameArtDecoBackgroundColor, frameArtDecoAccentColor,
+      frameRoundedTopBackgroundColor, frameRoundedTopBorderColor
   } = props;
 
   // State from UIEditor
@@ -177,6 +192,17 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localTextColorLight, setLocalTextColorLight] = useState(textColorLight);
   const [localTitleColorLight, setLocalTitleColorLight] = useState(titleColorLight);
   const [localFocusColorLight, setLocalFocusColorLight] = useState(focusColorLight);
+  const [localFrameBookColor, setLocalFrameBookColor] = useState(frameBookColor);
+  const [localFrameCardInnerColor, setLocalFrameCardInnerColor] = useState(frameCardInnerColor);
+  const [localFrameCardOuterColor, setLocalFrameCardOuterColor] = useState(frameCardOuterColor);
+  const [localFrameChamferedColor, setLocalFrameChamferedColor] = useState(frameChamferedColor);
+  const [localFrameClassicWoodDarkColor, setLocalFrameClassicWoodDarkColor] = useState(frameClassicWoodDarkColor);
+  const [localFrameClassicWoodLightColor, setLocalFrameClassicWoodLightColor] = useState(frameClassicWoodLightColor);
+  const [localFrameClassicGoldColor, setLocalFrameClassicGoldColor] = useState(frameClassicGoldColor);
+  const [localFrameArtDecoBackgroundColor, setLocalFrameArtDecoBackgroundColor] = useState(frameArtDecoBackgroundColor);
+  const [localFrameArtDecoAccentColor, setLocalFrameArtDecoAccentColor] = useState(frameArtDecoAccentColor);
+  const [localFrameRoundedTopBackgroundColor, setLocalFrameRoundedTopBackgroundColor] = useState(frameRoundedTopBackgroundColor);
+  const [localFrameRoundedTopBorderColor, setLocalFrameRoundedTopBorderColor] = useState(frameRoundedTopBorderColor);
   const [focusPreview, setFocusPreview] = useState(false);
   const [isCustomizing, setIsCustomizing] = useState(false);
 
@@ -211,10 +237,23 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalTextColorLight(textColorLight);
     setLocalTitleColorLight(titleColorLight);
     setLocalFocusColorLight(focusColorLight);
+    setLocalFrameBookColor(frameBookColor);
+    setLocalFrameCardInnerColor(frameCardInnerColor);
+    setLocalFrameCardOuterColor(frameCardOuterColor);
+    setLocalFrameChamferedColor(frameChamferedColor);
+    setLocalFrameClassicWoodDarkColor(frameClassicWoodDarkColor);
+    setLocalFrameClassicWoodLightColor(frameClassicWoodLightColor);
+    setLocalFrameClassicGoldColor(frameClassicGoldColor);
+    setLocalFrameArtDecoBackgroundColor(frameArtDecoBackgroundColor);
+    setLocalFrameArtDecoAccentColor(frameArtDecoAccentColor);
+    setLocalFrameRoundedTopBackgroundColor(frameRoundedTopBackgroundColor);
+    setLocalFrameRoundedTopBorderColor(frameRoundedTopBorderColor);
   }, [
     layoutOrientation, layoutOrder, imageFrame, actionButtonText, commandInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, enableChances, maxChances,
     textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
-    chanceIconColor, gameFontFamily, chanceIcon, chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight
+    chanceIconColor, gameFontFamily, chanceIcon, chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight,
+    frameBookColor, frameCardInnerColor, frameCardOuterColor, frameChamferedColor, frameClassicWoodDarkColor, frameClassicWoodLightColor, frameClassicGoldColor,
+    frameArtDecoBackgroundColor, frameArtDecoAccentColor, frameRoundedTopBackgroundColor, frameRoundedTopBorderColor
   ]);
 
   useEffect(() => {
@@ -246,11 +285,24 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localGameTheme !== gameTheme ||
                   localTextColorLight !== textColorLight ||
                   localTitleColorLight !== titleColorLight ||
-                  localFocusColorLight !== focusColorLight;
+                  localFocusColorLight !== focusColorLight ||
+                  localFrameBookColor !== frameBookColor ||
+                  localFrameCardInnerColor !== frameCardInnerColor ||
+                  localFrameCardOuterColor !== frameCardOuterColor ||
+                  localFrameChamferedColor !== frameChamferedColor ||
+                  localFrameClassicWoodDarkColor !== frameClassicWoodDarkColor ||
+                  localFrameClassicWoodLightColor !== frameClassicWoodLightColor ||
+                  localFrameClassicGoldColor !== frameClassicGoldColor ||
+                  localFrameArtDecoBackgroundColor !== frameArtDecoBackgroundColor ||
+                  localFrameArtDecoAccentColor !== frameArtDecoAccentColor ||
+                  localFrameRoundedTopBackgroundColor !== frameRoundedTopBackgroundColor ||
+                  localFrameRoundedTopBorderColor !== frameRoundedTopBorderColor;
     onSetDirty(dirty);
   }, [
     localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localCommandInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localEnableChances, localMaxChances,
     localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
+    localFrameBookColor, localFrameCardInnerColor, localFrameCardOuterColor, localFrameChamferedColor, localFrameClassicWoodDarkColor, localFrameClassicWoodLightColor, localFrameClassicGoldColor,
+    frameArtDecoBackgroundColor, localFrameArtDecoAccentColor, localFrameRoundedTopBackgroundColor, localFrameRoundedTopBorderColor,
     props, onSetDirty
   ]);
 
@@ -286,6 +338,17 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localTextColorLight !== textColorLight) onUpdate('gameTextColorLight', localTextColorLight);
     if (localTitleColorLight !== titleColorLight) onUpdate('gameTitleColorLight', localTitleColorLight);
     if (localFocusColorLight !== focusColorLight) onUpdate('gameFocusColorLight', localFocusColorLight);
+    if (localFrameBookColor !== frameBookColor) onUpdate('frameBookColor', localFrameBookColor);
+    if (localFrameCardInnerColor !== frameCardInnerColor) onUpdate('frameCardInnerColor', localFrameCardInnerColor);
+    if (localFrameCardOuterColor !== frameCardOuterColor) onUpdate('frameCardOuterColor', localFrameCardOuterColor);
+    if (localFrameChamferedColor !== frameChamferedColor) onUpdate('frameChamferedColor', localFrameChamferedColor);
+    if (localFrameClassicWoodDarkColor !== frameClassicWoodDarkColor) onUpdate('frameClassicWoodDarkColor', localFrameClassicWoodDarkColor);
+    if (localFrameClassicWoodLightColor !== frameClassicWoodLightColor) onUpdate('frameClassicWoodLightColor', localFrameClassicWoodLightColor);
+    if (localFrameClassicGoldColor !== frameClassicGoldColor) onUpdate('frameClassicGoldColor', localFrameClassicGoldColor);
+    if (localFrameArtDecoBackgroundColor !== frameArtDecoBackgroundColor) onUpdate('frameArtDecoBackgroundColor', localFrameArtDecoBackgroundColor);
+    if (localFrameArtDecoAccentColor !== frameArtDecoAccentColor) onUpdate('frameArtDecoAccentColor', localFrameArtDecoAccentColor);
+    if (localFrameRoundedTopBackgroundColor !== frameRoundedTopBackgroundColor) onUpdate('frameRoundedTopBackgroundColor', localFrameRoundedTopBackgroundColor);
+    if (localFrameRoundedTopBorderColor !== frameRoundedTopBorderColor) onUpdate('frameRoundedTopBorderColor', localFrameRoundedTopBorderColor);
   };
   
   const handleUndo = () => {
@@ -320,6 +383,17 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalTextColorLight(textColorLight);
     setLocalTitleColorLight(titleColorLight);
     setLocalFocusColorLight(focusColorLight);
+    setLocalFrameBookColor(frameBookColor);
+    setLocalFrameCardInnerColor(frameCardInnerColor);
+    setLocalFrameCardOuterColor(frameCardOuterColor);
+    setLocalFrameChamferedColor(frameChamferedColor);
+    setLocalFrameClassicWoodDarkColor(frameClassicWoodDarkColor);
+    setLocalFrameClassicWoodLightColor(frameClassicWoodLightColor);
+    setLocalFrameClassicGoldColor(frameClassicGoldColor);
+    setLocalFrameArtDecoBackgroundColor(frameArtDecoBackgroundColor);
+    setLocalFrameArtDecoAccentColor(frameArtDecoAccentColor);
+    setLocalFrameRoundedTopBackgroundColor(frameRoundedTopBackgroundColor);
+    setLocalFrameRoundedTopBorderColor(frameRoundedTopBorderColor);
   };
 
   const applyTheme = (theme: typeof PREDEFINED_THEMES[0]) => {
@@ -364,6 +438,63 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
       }
   };
 
+  const getFramePreviewStyles = (frame: GameData['gameImageFrame']) => {
+      const panelStyles: React.CSSProperties = {};
+      const containerStyles: React.CSSProperties = {
+          backgroundColor: localGameTheme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+          color: localGameTheme === 'dark' ? '#a0aec0' : '#4a5568',
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+      };
+
+      switch (frame) {
+          case 'classic':
+              panelStyles.backgroundColor = localFrameClassicWoodDarkColor;
+              panelStyles.padding = '10px';
+              containerStyles.border = `2px solid ${localFrameClassicGoldColor}`;
+              containerStyles.outline = `5px solid ${localFrameClassicWoodLightColor}`;
+              break;
+          case 'art-deco':
+              panelStyles.backgroundColor = localFrameArtDecoBackgroundColor;
+              panelStyles.padding = '12px';
+              containerStyles.border = `2px solid ${localFrameArtDecoAccentColor}`;
+              containerStyles.boxShadow = `0 0 0 5px ${localFrameArtDecoBackgroundColor}, 0 0 0 7px ${localFrameArtDecoAccentColor}`;
+              break;
+          case 'rounded-top':
+              panelStyles.padding = '8px';
+              panelStyles.backgroundColor = localFrameRoundedTopBackgroundColor;
+              panelStyles.border = `5px solid ${localFrameRoundedTopBorderColor}`;
+              panelStyles.borderRadius = '40px 40px 4px 4px';
+              containerStyles.borderRadius = '32px 32px 0 0';
+              break;
+          case 'book-cover':
+              panelStyles.padding = '8px';
+              panelStyles.border = `5px solid ${localFrameBookColor}`;
+              break;
+          case 'trading-card':
+              panelStyles.backgroundColor = localFrameCardOuterColor;
+              panelStyles.borderRadius = '12px';
+              panelStyles.padding = '8px';
+              containerStyles.border = `2px solid ${localFrameCardInnerColor}`;
+              containerStyles.borderRadius = '6px';
+              break;
+          case 'chamfered':
+              panelStyles.backgroundColor = localFrameChamferedColor;
+              panelStyles.clipPath = 'polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)';
+              panelStyles.padding = '5px';
+              containerStyles.clipPath = 'polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)';
+              break;
+          default:
+              panelStyles.border = `2px solid ${localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}`;
+              panelStyles.padding = '4px';
+      }
+      return { panelStyles, containerStyles };
+  };
+
+  const { panelStyles, containerStyles } = getFramePreviewStyles(localImageFrame);
 
   const TABS = {
     layout: 'Layout',
@@ -437,13 +568,16 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                               <select
                                   id="frame-select"
                                   value={localImageFrame}
-                                  onChange={(e) => setLocalImageFrame(e.target.value as 'none' | 'classic' | 'art-deco' | 'rounded-top')}
+                                  onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
                                   className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
                               >
                                   <option value="none">Básica (Sem Moldura)</option>
                                   <option value="classic">Clássica</option>
                                   <option value="art-deco">Art Deco</option>
                                   <option value="rounded-top">Retrô Arredondada</option>
+                                  <option value="book-cover">Capa de Livro</option>
+                                  <option value="trading-card">Carta de Jogo</option>
+                                  <option value="chamfered">Chanfrada</option>
                               </select>
                           </div>
                       </div>
@@ -454,19 +588,14 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                               className={`w-full max-w-sm aspect-video bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
                               style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
                           >
-                            <div className={`
-                                flex items-center justify-center
-                                ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'}
-                                ${localImageFrame === 'classic' ? 'p-2 bg-[#5a3d3d]' : ''}
-                                ${localImageFrame === 'art-deco' ? 'p-2 bg-[#1c1c1c]' : ''}
-                                ${localImageFrame === 'rounded-top' ? 'p-2 bg-[#000] border-2 border-yellow-400 rounded-tl-[60px] rounded-tr-[60px]' : ''}
-                                transition-all duration-300
-                            `}>
-                                  <div className={`flex-1 w-full h-full bg-indigo-500/30 border border-indigo-400 rounded flex items-center justify-center text-center text-sm p-2 text-indigo-200 font-semibold 
-                                      ${localImageFrame === 'classic' ? 'border-2 border-[#c0a080]' : ''}
-                                      ${localImageFrame === 'art-deco' ? 'border-2 border-[#c0a080]' : ''}
-                                      ${localImageFrame === 'rounded-top' ? 'border-none rounded-tl-[50px] rounded-tr-[50px]' : ''}
-                                  `}>
+                            <div 
+                                className={`flex items-center justify-center ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'} transition-all duration-300`}
+                                style={getFramePreviewStyles(localImageFrame).panelStyles}
+                            >
+                                  <div 
+                                      className={`flex-1 w-full h-full rounded flex items-center justify-center text-center text-sm p-2 font-semibold`}
+                                      style={getFramePreviewStyles(localImageFrame).containerStyles}
+                                  >
                                       Imagem
                                   </div>
                               </div>
@@ -645,17 +774,62 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                         </div>
                     </div>
 
+                    <div className="pt-6 border-t border-brand-border/50">
+                        <h3 className="text-lg font-semibold text-brand-text mb-4">Cores da Moldura</h3>
+                        
+                        {localImageFrame === 'classic' && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                <ColorInput label="Madeira Escura" id="frameClassicWoodDark" value={localFrameClassicWoodDarkColor} onChange={setLocalFrameClassicWoodDarkColor} placeholder="#3a2d2d" />
+                                <ColorInput label="Madeira Clara" id="frameClassicWoodLight" value={localFrameClassicWoodLightColor} onChange={setLocalFrameClassicWoodLightColor} placeholder="#5a3d3d" />
+                                <ColorInput label="Dourado" id="frameClassicGold" value={localFrameClassicGoldColor} onChange={setLocalFrameClassicGoldColor} placeholder="#c0a080" />
+                            </div>
+                        )}
+                        {localImageFrame === 'art-deco' && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <ColorInput label="Cor de Fundo" id="frameArtDecoBg" value={localFrameArtDecoBackgroundColor} onChange={setLocalFrameArtDecoBackgroundColor} placeholder="#1a1a1a" />
+                                <ColorInput label="Cor do Destaque" id="frameArtDecoAccent" value={localFrameArtDecoAccentColor} onChange={setLocalFrameArtDecoAccentColor} placeholder="#c0a080" />
+                            </div>
+                        )}
+                        {localImageFrame === 'rounded-top' && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <ColorInput label="Cor de Fundo" id="frameRoundedTopBg" value={localFrameRoundedTopBackgroundColor} onChange={setLocalFrameRoundedTopBackgroundColor} placeholder="#000000" />
+                                <ColorInput label="Cor da Borda" id="frameRoundedTopBorder" value={localFrameRoundedTopBorderColor} onChange={setLocalFrameRoundedTopBorderColor} placeholder="#facc15" />
+                            </div>
+                        )}
+                        {localImageFrame === 'book-cover' && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <ColorInput label="Cor da Moldura" id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#2d2d2d" />
+                            </div>
+                        )}
+                        {localImageFrame === 'trading-card' && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <ColorInput label="Cor da Borda Externa" id="frameCardOuterColor" value={localFrameCardOuterColor} onChange={setLocalFrameCardOuterColor} placeholder="#1c1917" />
+                                <ColorInput label="Cor da Borda Interna" id="frameCardInnerColor" value={localFrameCardInnerColor} onChange={setLocalFrameCardInnerColor} placeholder="#d97706" />
+                            </div>
+                        )}
+                        {localImageFrame === 'chamfered' && (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <ColorInput label="Cor da Moldura" id="frameChamferedColor" value={localFrameChamferedColor} onChange={setLocalFrameChamferedColor} placeholder="#4a5568" />
+                            </div>
+                        )}
+                        {localImageFrame === 'none' && (
+                            <p className="text-brand-text-dim text-sm text-center py-4 bg-brand-bg rounded-md">
+                                Nenhuma moldura especial selecionada.
+                            </p>
+                        )}
+                    </div>
+
                     {!isCustomizing && (
                          <div className="pt-6 border-t border-brand-border/50">
                              <button 
                                  onClick={() => setIsCustomizing(true)}
                                  className="w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors bg-brand-primary/20 text-brand-primary hover:bg-brand-primary/30"
                              >
-                                 Customizar Cores
+                                 Customizar Cores de Tema e Botões
                              </button>
                          </div>
                     )}
-
+                    
                     {isCustomizing && (
                       <>
                         {localGameTheme === 'dark' && (
@@ -679,7 +853,6 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
                             </div>
                         )}
-
 
                         <div className="pt-6 border-t border-brand-border/50">
                             <h3 className="text-lg font-semibold text-brand-text mb-4">Botões (Geral)</h3>
@@ -755,24 +928,34 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                 <div className="flex flex-col">
                     <p className="text-sm text-brand-text-dim mb-2 text-center">Pré-visualização ao vivo</p>
                     <div 
-                        className={`flex-1 border-2 p-6 flex flex-col justify-between transition-colors ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-brand-border' : 'bg-[#ffffff] border-[#d0d7de]'}`}
+                        className={`flex-1 border-2 flex flex-col transition-colors ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-brand-border' : 'bg-[#ffffff] border-[#d0d7de]'}`}
                         style={{ fontFamily: localFontFamily }}
                     >
-                        <div className="flex justify-between items-start">
-                             <h1 className="text-xl" style={{ color: localGameTheme === 'dark' ? localTitleColor : localTitleColorLight }}>Título do Jogo</h1>
-                             {enableChances && (
-                                <div className="flex gap-1">
+                        {/* Upper Part */}
+                        <div className="flex flex-1 p-4 gap-4">
+                            {/* Image Panel Mock */}
+                            <div className="w-2/5 h-full flex items-center justify-center" style={panelStyles}>
+                                <div className="font-semibold" style={containerStyles}>
+                                    Imagem
+                                </div>
+                            </div>
+                            {/* Text Panel Mock */}
+                            <div className="w-3/5 flex flex-col">
+                                <h1 className="text-xl" style={{ color: localGameTheme === 'dark' ? localTitleColor : localTitleColorLight }}>Título do Jogo</h1>
+                                <p className="text-sm mt-2" style={{ color: localGameTheme === 'dark' ? localTextColor : localTextColorLight }}>Esta é uma descrição de exemplo para a cena.</p>
+                                <p className="mt-2 text-sm italic" style={{ color: localGameTheme === 'dark' ? '#8b949e' : '#57606a' }}>&gt; comando de exemplo</p>
+                                {enableChances && (
+                                <div className="flex gap-1 mt-auto">
                                     <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
                                     <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
                                     <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
                                 </div>
-                             )}
+                                )}
+                            </div>
                         </div>
-                        <div className="my-4">
-                            <p className="text-sm" style={{ color: localGameTheme === 'dark' ? localTextColor : localTextColorLight }}>Esta é uma descrição de exemplo para a cena. Ela usa a cor de texto padrão que você definir.</p>
-                            <p className="mt-2 text-sm italic" style={{ color: localGameTheme === 'dark' ? '#8b949e' : '#57606a' }}>&gt; comando de exemplo</p>
-                        </div>
-                        <div className="space-y-4">
+
+                        {/* Lower Part */}
+                        <div className="p-4 space-y-4 border-t" style={{borderColor: localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}}>
                              <div className="flex items-center gap-4">
                                 <input 
                                     type="text" 

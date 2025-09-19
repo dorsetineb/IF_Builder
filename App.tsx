@@ -96,6 +96,12 @@ const gameHTML = `
 `;
 
 const gameCSS = `
+body {
+    padding: 0;
+}
+body.with-spacing {
+    padding: 20px;
+}
 body.dark-theme {
     --bg-color: #0d1117;
     --panel-bg: #161b22;
@@ -109,9 +115,6 @@ body.dark-theme {
     --input-bg: #010409;
     --button-bg: #21262d;
     --button-hover-bg: #30363d;
-    --frame-wood-dark: #3a2d2d;
-    --frame-wood-light: #5a3d3d;
-    --frame-gold: #c0a080;
 }
 
 body.light-theme {
@@ -127,9 +130,6 @@ body.light-theme {
     --input-bg: #ffffff;
     --button-bg: #f6f8fa;
     --button-hover-bg: #e5e7eb;
-    --frame-wood-dark: #6d5f5f;
-    --frame-wood-light: #8b7979;
-    --frame-gold: #a18060;
 }
 
 :root {
@@ -152,7 +152,6 @@ body {
     background-color: var(--bg-color);
     color: var(--text-color);
     margin: 0;
-    padding: 0;
     height: 100vh;
     overflow: hidden;
 }
@@ -160,12 +159,15 @@ body {
 .main-wrapper {
     max-width: 1400px;
     margin: 0 auto;
-    height: 100vh;
+    height: 100%;
     display: flex;
     flex-direction: column;
     box-shadow: 0 0 30px rgba(0,0,0,0.7);
     overflow: hidden;
     position: relative;
+}
+body.with-spacing .main-wrapper {
+    height: calc(100vh - 40px);
 }
 
 
@@ -550,65 +552,127 @@ body {
 /* Image Frame Styles */
 .frame-classic .image-panel {
     padding: 20px;
-    background: var(--frame-wood-dark);
+    background: __FRAME_CLASSIC_WOOD_DARK_COLOR__;
     box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-    border-right-color: var(--frame-wood-dark);
+    border-right-color: __FRAME_CLASSIC_WOOD_DARK_COLOR__;
 }
 .frame-classic .image-container {
-    border: 4px solid var(--frame-gold);
-    outline: 10px solid var(--frame-wood-light);
+    border: 4px solid __FRAME_CLASSIC_GOLD_COLOR__;
+    outline: 10px solid __FRAME_CLASSIC_WOOD_LIGHT_COLOR__;
     box-shadow: 0 0 15px rgba(0,0,0,0.7);
 }
 
 .frame-art-deco .image-panel {
     padding: 25px;
-    background: #1c1c1c;
+    background-color: __FRAME_ART_DECO_BG_COLOR__;
+    border-right-color: __FRAME_ART_DECO_BG_COLOR__;
     position: relative;
-    border-right-color: #1c1c1c;
-    box-shadow: inset 0 0 10px black;
 }
 .frame-art-deco .image-container {
-    border: 2px solid var(--frame-gold);
+    border: 2px solid __FRAME_ART_DECO_ACCENT_COLOR__;
+    box-shadow: 0 0 0 5px __FRAME_ART_DECO_BG_COLOR__, 0 0 0 7px __FRAME_ART_DECO_ACCENT_COLOR__;
     position: relative;
+    z-index: 1;
 }
-.frame-art-deco .image-panel::before { /* top-left */
-    content: ''; position: absolute; top: 8px; left: 8px;
-    width: 45px; height: 45px;
-    border-style: solid; border-color: var(--frame-gold);
+
+/* --- New Art Deco Ornaments --- */
+.frame-art-deco .image-panel::before,
+.frame-art-deco .image-panel::after,
+.frame-art-deco .image-container::before,
+.frame-art-deco .image-container::after {
+    content: '';
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    border-color: __FRAME_ART_DECO_ACCENT_COLOR__;
+    border-style: solid;
+    background: __FRAME_ART_DECO_BG_COLOR__; /* Hides lines underneath */
+}
+
+/* Top Left */
+.frame-art-deco .image-panel::before {
+    top: 8px;
+    left: 8px;
     border-width: 2px 0 0 2px;
-    box-shadow: inset 2px 2px 0 0 var(--frame-gold);
+    border-top-left-radius: 30px;
+    box-shadow: inset 6px 6px 0 -4px __FRAME_ART_DECO_ACCENT_COLOR__;
 }
-.frame-art-deco .image-panel::after { /* bottom-right */
-    content: ''; position: absolute; bottom: 8px; right: 8px;
-    width: 45px; height: 45px;
-    border-style: solid; border-color: var(--frame-gold);
+
+/* Bottom Right */
+.frame-art-deco .image-panel::after {
+    bottom: 8px;
+    right: 8px;
     border-width: 0 2px 2px 0;
-    box-shadow: inset -2px -2px 0 0 var(--frame-gold);
+    border-bottom-right-radius: 30px;
+    box-shadow: inset -6px -6px 0 -4px __FRAME_ART_DECO_ACCENT_COLOR__;
 }
-.frame-art-deco .image-container::before { /* top-right */
-    content: ''; position: absolute; top: -17px; right: -17px;
-    width: 45px; height: 45px;
-    border-style: solid; border-color: var(--frame-gold);
+
+/* Top Right */
+.frame-art-deco .image-container::before {
+    top: -17px;
+    right: -17px;
     border-width: 2px 2px 0 0;
-    box-shadow: inset -2px 2px 0 0 var(--frame-gold);
+    border-top-right-radius: 30px;
+    box-shadow: inset -6px 6px 0 -4px __FRAME_ART_DECO_ACCENT_COLOR__;
 }
-.frame-art-deco .image-container::after { /* bottom-left */
-    content: ''; position: absolute; bottom: -17px; left: -17px;
-    width: 45px; height: 45px;
-    border-style: solid; border-color: var(--frame-gold);
+
+/* Bottom Left */
+.frame-art-deco .image-container::after {
+    bottom: -17px;
+    left: -17px;
     border-width: 0 0 2px 2px;
-    box-shadow: inset 2px -2px 0 0 var(--frame-gold);
+    border-bottom-left-radius: 30px;
+    box-shadow: inset 6px -6px 0 -4px __FRAME_ART_DECO_ACCENT_COLOR__;
 }
+
 
 .frame-rounded-top .image-panel {
     padding: 15px;
-    background: #000;
-    border: 10px solid #facc15; /* yellow-400 */
+    background: __FRAME_ROUNDED_TOP_BG_COLOR__;
+    border: 10px solid __FRAME_ROUNDED_TOP_BORDER_COLOR__;
     border-radius: 80px 80px 6px 6px;
     box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
 }
 .frame-rounded-top .image-container {
     border-radius: 65px 65px 0 0;
+}
+
+/* --- New Frame Styles --- */
+.frame-book-cover .image-panel {
+    padding: 15px;
+    background: var(--bg-color);
+    border: 10px solid __FRAME_BOOK_COLOR__;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+}
+.frame-book-cover .image-container {
+    box-shadow: 0 0 15px rgba(0,0,0,0.7);
+}
+
+.frame-trading-card .image-panel {
+    padding: 15px;
+    background: transparent;
+    border-right-color: transparent;
+}
+.frame-trading-card .image-container {
+    border: 4px solid __FRAME_CARD_INNER_COLOR__;
+    border-radius: 24px;
+}
+.frame-trading-card #scene-image {
+    border-radius: 20px;
+}
+
+.frame-chamfered .image-panel {
+    padding: 0;
+    background: __FRAME_CHAMFERED_COLOR__;
+    clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 30px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.frame-chamfered .image-container {
+    width: calc(100% - 20px);
+    height: calc(100% - 20px);
+    clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
 }
 `;
 
@@ -770,6 +834,17 @@ const initializeGameData = (): GameData => {
         negativeEndingImage: "",
         negativeEndingContentAlignment: 'right',
         negativeEndingDescription: "Fim de jogo. Suas chances acabaram. Tente novamente!",
+        frameBookColor: '#2d2d2d',
+        frameCardInnerColor: '#d97706',
+        frameCardOuterColor: '#1c1917',
+        frameChamferedColor: '#4a5568',
+        frameClassicWoodDarkColor: '#3a2d2d',
+        frameClassicWoodLightColor: '#5a3d3d',
+        frameClassicGoldColor: '#c0a080',
+        frameArtDecoBackgroundColor: '#1a1a1a',
+        frameArtDecoAccentColor: '#c0a080',
+        frameRoundedTopBackgroundColor: '#000000',
+        frameRoundedTopBorderColor: '#facc15',
     };
 };
 
@@ -1018,6 +1093,17 @@ const App: React.FC = () => {
             textColorLight={gameData.gameTextColorLight || '#24292f'}
             titleColorLight={gameData.gameTitleColorLight || '#0969da'}
             focusColorLight={gameData.gameFocusColorLight || '#0969da'}
+            frameBookColor={gameData.frameBookColor || '#2d2d2d'}
+            frameCardInnerColor={gameData.frameCardInnerColor || '#d97706'}
+            frameCardOuterColor={gameData.frameCardOuterColor || '#1c1917'}
+            frameChamferedColor={gameData.frameChamferedColor || '#4a5568'}
+            frameClassicWoodDarkColor={gameData.frameClassicWoodDarkColor || '#3a2d2d'}
+            frameClassicWoodLightColor={gameData.frameClassicWoodLightColor || '#5a3d3d'}
+            frameClassicGoldColor={gameData.frameClassicGoldColor || '#c0a080'}
+            frameArtDecoBackgroundColor={gameData.frameArtDecoBackgroundColor || '#1a1a1a'}
+            frameArtDecoAccentColor={gameData.frameArtDecoAccentColor || '#c0a080'}
+            frameRoundedTopBackgroundColor={gameData.frameRoundedTopBackgroundColor || '#000000'}
+            frameRoundedTopBorderColor={gameData.frameRoundedTopBorderColor || '#facc15'}
             onUpdate={handleUpdateGameData}
             isDirty={isDirty}
             onSetDirty={setIsDirty}

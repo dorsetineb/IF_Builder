@@ -10,11 +10,14 @@ const getFontUrl = (fontFamily: string) => {
     return `https://fonts.googleapis.com/css2?family=${googleFontName}&display=swap`;
 };
 
-const getFrameClass = (frame?: 'none' | 'classic' | 'art-deco' | 'rounded-top'): string => {
+const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
     switch (frame) {
         case 'classic': return 'frame-classic';
         case 'art-deco': return 'frame-art-deco';
         case 'rounded-top': return 'frame-rounded-top';
+        case 'book-cover': return 'frame-book-cover';
+        case 'trading-card': return 'frame-trading-card';
+        case 'chamfered': return 'frame-chamfered';
         default: return '';
     }
 }
@@ -29,7 +32,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
 
         let finalHtml = gameData.gameHTML
             .replace('__GAME_TITLE__', gameData.gameTitle || 'TXT Builder Game')
-            .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme`)
+            .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme with-spacing`)
             .replace('__FRAME_CLASS__', getFrameClass(gameData.gameImageFrame))
             .replace('__FONT_STYLESHEET__', fontStylesheet)
             .replace('__LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="game-logo">` : '')
@@ -52,18 +55,29 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace('__NEGATIVE_ENDING_DESCRIPTION__', gameData.negativeEndingDescription || '');
             
         let finalCss = gameData.gameCSS
-            .replace('__FONT_FAMILY__', fontFamily)
-            .replace('__GAME_TEXT_COLOR__', gameData.gameTextColor || '#c9d1d9')
-            .replace('__GAME_TITLE_COLOR__', gameData.gameTitleColor || '#58a6ff')
-            .replace('__GAME_FOCUS_COLOR__', gameData.gameFocusColor || '#58a6ff')
-            .replace('__GAME_TEXT_COLOR_LIGHT__', gameData.gameTextColorLight || '#24292f')
-            .replace('__GAME_TITLE_COLOR_LIGHT__', gameData.gameTitleColorLight || '#0969da')
-            .replace('__GAME_FOCUS_COLOR_LIGHT__', gameData.gameFocusColorLight || '#0969da')
-            .replace('__SPLASH_BUTTON_COLOR__', gameData.gameSplashButtonColor || '#2ea043')
-            .replace('__SPLASH_BUTTON_HOVER_COLOR__', gameData.gameSplashButtonHoverColor || '#238636')
-            .replace('__SPLASH_BUTTON_TEXT_COLOR__', gameData.gameSplashButtonTextColor || '#ffffff')
-            .replace('__ACTION_BUTTON_COLOR__', gameData.gameActionButtonColor || '#ffffff')
-            .replace('__ACTION_BUTTON_TEXT_COLOR__', gameData.gameActionButtonTextColor || '#0d1117');
+            .replace(/__FONT_FAMILY__/g, fontFamily)
+            .replace(/__GAME_TEXT_COLOR__/g, gameData.gameTextColor || '#c9d1d9')
+            .replace(/__GAME_TITLE_COLOR__/g, gameData.gameTitleColor || '#58a6ff')
+            .replace(/__GAME_FOCUS_COLOR__/g, gameData.gameFocusColor || '#58a6ff')
+            .replace(/__GAME_TEXT_COLOR_LIGHT__/g, gameData.gameTextColorLight || '#24292f')
+            .replace(/__GAME_TITLE_COLOR_LIGHT__/g, gameData.gameTitleColorLight || '#0969da')
+            .replace(/__GAME_FOCUS_COLOR_LIGHT__/g, gameData.gameFocusColorLight || '#0969da')
+            .replace(/__SPLASH_BUTTON_COLOR__/g, gameData.gameSplashButtonColor || '#2ea043')
+            .replace(/__SPLASH_BUTTON_HOVER_COLOR__/g, gameData.gameSplashButtonHoverColor || '#238636')
+            .replace(/__SPLASH_BUTTON_TEXT_COLOR__/g, gameData.gameSplashButtonTextColor || '#ffffff')
+            .replace(/__ACTION_BUTTON_COLOR__/g, gameData.gameActionButtonColor || '#ffffff')
+            .replace(/__ACTION_BUTTON_TEXT_COLOR__/g, gameData.gameActionButtonTextColor || '#0d1117')
+            .replace(/__FRAME_BOOK_COLOR__/g, gameData.frameBookColor || '#2d2d2d')
+            .replace(/__FRAME_CARD_OUTER_COLOR__/g, gameData.frameCardOuterColor || '#1c1917')
+            .replace(/__FRAME_CARD_INNER_COLOR__/g, gameData.frameCardInnerColor || '#d97706')
+            .replace(/__FRAME_CHAMFERED_COLOR__/g, gameData.frameChamferedColor || '#4a5568')
+            .replace(/__FRAME_CLASSIC_WOOD_DARK_COLOR__/g, gameData.frameClassicWoodDarkColor || '#3a2d2d')
+            .replace(/__FRAME_CLASSIC_WOOD_LIGHT_COLOR__/g, gameData.frameClassicWoodLightColor || '#5a3d3d')
+            .replace(/__FRAME_CLASSIC_GOLD_COLOR__/g, gameData.frameClassicGoldColor || '#c0a080')
+            .replace(/__FRAME_ART_DECO_BG_COLOR__/g, gameData.frameArtDecoBackgroundColor || '#1a1a1a')
+            .replace(/__FRAME_ART_DECO_ACCENT_COLOR__/g, gameData.frameArtDecoAccentColor || '#c0a080')
+            .replace(/__FRAME_ROUNDED_TOP_BG_COLOR__/g, gameData.frameRoundedTopBackgroundColor || '#000000')
+            .replace(/__FRAME_ROUNDED_TOP_BORDER_COLOR__/g, gameData.frameRoundedTopBorderColor || '#facc15');
             
         const engineData = prepareGameDataForEngine(gameData);
         // Safely stringify JSON to prevent issues with '</script>' tags in user content.

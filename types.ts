@@ -1,5 +1,9 @@
 
 
+
+
+
+
 export interface GameObject {
   id: string;
   name: string;
@@ -73,7 +77,7 @@ export interface GameData {
   gameSplashButtonTextColor?: string;
   gameLayoutOrientation?: 'vertical' | 'horizontal';
   gameLayoutOrder?: 'image-first' | 'image-last';
-  gameImageFrame?: 'none' | 'classic' | 'art-deco' | 'rounded-top';
+  gameImageFrame?: 'none' | 'classic' | 'art-deco' | 'rounded-top' | 'book-cover' | 'trading-card' | 'chamfered';
   gameActionButtonColor?: string;
   gameActionButtonTextColor?: string;
   gameActionButtonText?: string;
@@ -97,6 +101,17 @@ export interface GameData {
   negativeEndingImage?: string;
   negativeEndingContentAlignment?: 'left' | 'right';
   negativeEndingDescription?: string;
+  frameBookColor?: string;
+  frameCardInnerColor?: string;
+  frameCardOuterColor?: string;
+  frameChamferedColor?: string;
+  frameClassicWoodDarkColor?: string;
+  frameClassicWoodLightColor?: string;
+  frameClassicGoldColor?: string;
+  frameArtDecoBackgroundColor?: string;
+  frameArtDecoAccentColor?: string;
+  frameRoundedTopBackgroundColor?: string;
+  frameRoundedTopBorderColor?: string;
 }
 
 export type View = 'scenes' | 'interface' | 'game_info' | 'theme';
