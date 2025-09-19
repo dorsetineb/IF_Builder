@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -22,7 +23,7 @@ const gameHTML = `
     __FONT_STYLESHEET__
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="__THEME_CLASS__">
+<body class="__THEME_CLASS__ __FRAME_CLASS__">
     <audio id="scene-sound-effect" preload="auto"></audio>
     <div class="main-wrapper">
         <div id="splash-screen" class="splash-screen __SPLASH_ALIGN_CLASS__" __SPLASH_BG_STYLE__>
@@ -108,6 +109,9 @@ body.dark-theme {
     --input-bg: #010409;
     --button-bg: #21262d;
     --button-hover-bg: #30363d;
+    --frame-wood-dark: #3a2d2d;
+    --frame-wood-light: #5a3d3d;
+    --frame-gold: #c0a080;
 }
 
 body.light-theme {
@@ -123,6 +127,9 @@ body.light-theme {
     --input-bg: #ffffff;
     --button-bg: #f6f8fa;
     --button-hover-bg: #e5e7eb;
+    --frame-wood-dark: #6d5f5f;
+    --frame-wood-light: #8b7979;
+    --frame-gold: #a18060;
 }
 
 :root {
@@ -277,6 +284,7 @@ body {
     justify-content: center;
     background-color: var(--input-bg);
     position: relative;
+    transition: padding 0.3s ease-in-out, background-color 0.3s ease-in-out;
 }
 .image-container {
     width: 100%;
@@ -285,6 +293,7 @@ body {
     overflow: hidden;
     background-size: cover;
     background-position: center;
+    transition: border 0.3s ease-in-out, outline 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 #scene-image {
     position: absolute;
@@ -537,6 +546,70 @@ body {
     opacity: 1;
     pointer-events: auto;
 }
+
+/* Image Frame Styles */
+.frame-classic .image-panel {
+    padding: 20px;
+    background: var(--frame-wood-dark);
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+    border-right-color: var(--frame-wood-dark);
+}
+.frame-classic .image-container {
+    border: 4px solid var(--frame-gold);
+    outline: 10px solid var(--frame-wood-light);
+    box-shadow: 0 0 15px rgba(0,0,0,0.7);
+}
+
+.frame-art-deco .image-panel {
+    padding: 25px;
+    background: #1c1c1c;
+    position: relative;
+    border-right-color: #1c1c1c;
+    box-shadow: inset 0 0 10px black;
+}
+.frame-art-deco .image-container {
+    border: 2px solid var(--frame-gold);
+    position: relative;
+}
+.frame-art-deco .image-panel::before { /* top-left */
+    content: ''; position: absolute; top: 8px; left: 8px;
+    width: 45px; height: 45px;
+    border-style: solid; border-color: var(--frame-gold);
+    border-width: 2px 0 0 2px;
+    box-shadow: inset 2px 2px 0 0 var(--frame-gold);
+}
+.frame-art-deco .image-panel::after { /* bottom-right */
+    content: ''; position: absolute; bottom: 8px; right: 8px;
+    width: 45px; height: 45px;
+    border-style: solid; border-color: var(--frame-gold);
+    border-width: 0 2px 2px 0;
+    box-shadow: inset -2px -2px 0 0 var(--frame-gold);
+}
+.frame-art-deco .image-container::before { /* top-right */
+    content: ''; position: absolute; top: -17px; right: -17px;
+    width: 45px; height: 45px;
+    border-style: solid; border-color: var(--frame-gold);
+    border-width: 2px 2px 0 0;
+    box-shadow: inset -2px 2px 0 0 var(--frame-gold);
+}
+.frame-art-deco .image-container::after { /* bottom-left */
+    content: ''; position: absolute; bottom: -17px; left: -17px;
+    width: 45px; height: 45px;
+    border-style: solid; border-color: var(--frame-gold);
+    border-width: 0 0 2px 2px;
+    box-shadow: inset 2px -2px 0 0 var(--frame-gold);
+}
+
+.frame-rounded-top .image-panel {
+    padding: 15px;
+    background: #000;
+    border: 10px solid #facc15; /* yellow-400 */
+    border-radius: 80px 80px 6px 6px;
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
+}
+.frame-rounded-top .image-container {
+    border-radius: 65px 65px 0 0;
+}
 `;
 
 const initialScenes: { [id: string]: Scene } = {
@@ -673,6 +746,7 @@ const initializeGameData = (): GameData => {
         gameSplashButtonTextColor: "#ffffff",
         gameLayoutOrientation: 'vertical',
         gameLayoutOrder: 'image-first',
+        gameImageFrame: 'none',
         gameActionButtonColor: '#ffffff',
         gameActionButtonTextColor: '#0d1117',
         gameActionButtonText: 'AÇÃO',
@@ -917,6 +991,7 @@ const App: React.FC = () => {
             css={gameData.gameCSS}
             layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
             layoutOrder={gameData.gameLayoutOrder || 'image-first'}
+            imageFrame={gameData.gameImageFrame || 'none'}
             actionButtonText={gameData.gameActionButtonText || 'AÇÃO'}
             commandInputPlaceholder={gameData.gameCommandInputPlaceholder || 'O QUE VOCÊ FAZ?'}
             diaryPlayerName={gameData.gameDiaryPlayerName || 'VOCÊ'}

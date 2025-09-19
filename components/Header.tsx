@@ -17,6 +17,15 @@ const getFontUrl = (fontFamily: string) => {
     return `https://fonts.googleapis.com/css2?family=${googleFontName}&display=swap`;
 };
 
+const getFrameClass = (frame?: 'none' | 'classic' | 'art-deco' | 'rounded-top'): string => {
+    switch (frame) {
+        case 'classic': return 'frame-classic';
+        case 'art-deco': return 'frame-art-deco';
+        case 'rounded-top': return 'frame-rounded-top';
+        default: return '';
+    }
+}
+
 const Header: React.FC<{ 
   gameData: GameData; 
   onImportGame: (data: GameData) => void;
@@ -91,6 +100,7 @@ const Header: React.FC<{
     const finalHtml = exportData.gameHTML
         .replace('__GAME_TITLE__', exportData.gameTitle || 'Game')
         .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme`)
+        .replace('__FRAME_CLASS__', getFrameClass(exportData.gameImageFrame))
         .replace('__FONT_STYLESHEET__', fontStylesheet)
         .replace('__LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="game-logo">` : '')
         .replace('__CHANCES_CONTAINER__', chancesContainerHTML)

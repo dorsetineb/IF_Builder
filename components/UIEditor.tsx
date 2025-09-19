@@ -6,6 +6,7 @@ interface UIEditorProps {
   css: string;
   layoutOrientation: 'vertical' | 'horizontal';
   layoutOrder: 'image-first' | 'image-last';
+  imageFrame: 'none' | 'classic' | 'art-deco' | 'rounded-top';
   actionButtonText: string;
   commandInputPlaceholder: string;
   diaryPlayerName: string;
@@ -133,7 +134,7 @@ const ColorInput: React.FC<{
 
 const UIEditor: React.FC<UIEditorProps> = (props) => {
   const { 
-      html, css, layoutOrientation, layoutOrder, splashButtonText, continueButtonText,
+      html, css, layoutOrientation, layoutOrder, imageFrame, splashButtonText, continueButtonText,
       actionButtonText, commandInputPlaceholder, diaryPlayerName, restartButtonText, 
       enableChances, maxChances, onUpdate, isDirty, onSetDirty,
       textColor, titleColor, splashButtonColor, splashButtonHoverColor,
@@ -146,6 +147,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   // State from UIEditor
   const [localLayoutOrientation, setLocalLayoutOrientation] = useState(layoutOrientation);
   const [localLayoutOrder, setLocalLayoutOrder] = useState(layoutOrder);
+  const [localImageFrame, setLocalImageFrame] = useState(imageFrame);
   const [localActionButtonText, setLocalActionButtonText] = useState(actionButtonText);
   const [localCommandInputPlaceholder, setLocalCommandInputPlaceholder] = useState(commandInputPlaceholder);
   const [localDiaryPlayerName, setLocalDiaryPlayerName] = useState(diaryPlayerName);
@@ -182,6 +184,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     // Sync all local states with props
     setLocalLayoutOrientation(layoutOrientation);
     setLocalLayoutOrder(layoutOrder);
+    setLocalImageFrame(imageFrame);
     setLocalActionButtonText(actionButtonText);
     setLocalCommandInputPlaceholder(commandInputPlaceholder);
     setLocalDiaryPlayerName(diaryPlayerName);
@@ -209,7 +212,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalTitleColorLight(titleColorLight);
     setLocalFocusColorLight(focusColorLight);
   }, [
-    layoutOrientation, layoutOrder, actionButtonText, commandInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, enableChances, maxChances,
+    layoutOrientation, layoutOrder, imageFrame, actionButtonText, commandInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, enableChances, maxChances,
     textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
     chanceIconColor, gameFontFamily, chanceIcon, chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight
   ]);
@@ -217,6 +220,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   useEffect(() => {
     const dirty = localLayoutOrientation !== layoutOrientation ||
                   localLayoutOrder !== layoutOrder ||
+                  localImageFrame !== imageFrame ||
                   localSplashButtonText !== splashButtonText ||
                   localContinueButtonText !== continueButtonText ||
                   localRestartButtonText !== restartButtonText ||
@@ -245,7 +249,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localFocusColorLight !== focusColorLight;
     onSetDirty(dirty);
   }, [
-    localLayoutOrientation, localLayoutOrder, localActionButtonText, localCommandInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localEnableChances, localMaxChances,
+    localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localCommandInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localEnableChances, localMaxChances,
     localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
     props, onSetDirty
   ]);
@@ -254,6 +258,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     // UIEditor fields
     if (localLayoutOrientation !== layoutOrientation) onUpdate('gameLayoutOrientation', localLayoutOrientation);
     if (localLayoutOrder !== layoutOrder) onUpdate('gameLayoutOrder', localLayoutOrder);
+    if (localImageFrame !== imageFrame) onUpdate('gameImageFrame', localImageFrame);
     if (localSplashButtonText !== splashButtonText) onUpdate('gameSplashButtonText', localSplashButtonText);
     if (localContinueButtonText !== continueButtonText) onUpdate('gameContinueButtonText', localContinueButtonText);
     if (localRestartButtonText !== restartButtonText) onUpdate('gameRestartButtonText', localRestartButtonText);
@@ -287,6 +292,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     // UIEditor fields
     setLocalLayoutOrientation(layoutOrientation);
     setLocalLayoutOrder(layoutOrder);
+    setLocalImageFrame(imageFrame);
     setLocalSplashButtonText(splashButtonText);
     setLocalContinueButtonText(continueButtonText);
     setLocalRestartButtonText(restartButtonText);
@@ -362,7 +368,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const TABS = {
     layout: 'Layout',
     textos: 'Textos da Interface',
-    tema: 'Tema',
+    cores: 'Cores',
   };
 
 
@@ -426,6 +432,20 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
                               </select>
                           </div>
+                          <div>
+                              <label htmlFor="frame-select" className="block text-sm font-medium text-brand-text-dim mb-1">Moldura da Imagem</label>
+                              <select
+                                  id="frame-select"
+                                  value={localImageFrame}
+                                  onChange={(e) => setLocalImageFrame(e.target.value as 'none' | 'classic' | 'art-deco' | 'rounded-top')}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                              >
+                                  <option value="none">Básica (Sem Moldura)</option>
+                                  <option value="classic">Clássica</option>
+                                  <option value="art-deco">Art Deco</option>
+                                  <option value="rounded-top">Retrô Arredondada</option>
+                              </select>
+                          </div>
                       </div>
                       
                       <div className="flex flex-col items-center justify-center">
@@ -434,8 +454,21 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                               className={`w-full max-w-sm aspect-video bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
                               style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
                           >
-                              <div className={`flex-1 bg-indigo-500/30 border border-indigo-400 rounded flex items-center justify-center text-center text-sm p-2 text-indigo-200 font-semibold ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'}`}>
-                                  Imagem
+                            <div className={`
+                                flex items-center justify-center
+                                ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'}
+                                ${localImageFrame === 'classic' ? 'p-2 bg-[#5a3d3d]' : ''}
+                                ${localImageFrame === 'art-deco' ? 'p-2 bg-[#1c1c1c]' : ''}
+                                ${localImageFrame === 'rounded-top' ? 'p-2 bg-[#000] border-2 border-yellow-400 rounded-tl-[60px] rounded-tr-[60px]' : ''}
+                                transition-all duration-300
+                            `}>
+                                  <div className={`flex-1 w-full h-full bg-indigo-500/30 border border-indigo-400 rounded flex items-center justify-center text-center text-sm p-2 text-indigo-200 font-semibold 
+                                      ${localImageFrame === 'classic' ? 'border-2 border-[#c0a080]' : ''}
+                                      ${localImageFrame === 'art-deco' ? 'border-2 border-[#c0a080]' : ''}
+                                      ${localImageFrame === 'rounded-top' ? 'border-none rounded-tl-[50px] rounded-tr-[50px]' : ''}
+                                  `}>
+                                      Imagem
+                                  </div>
                               </div>
                               <div className={`flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'}`}>
                                   Descrição
@@ -547,7 +580,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
               </div>
           )}
 
-          {activeTab === 'tema' && (
+          {activeTab === 'cores' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="bg-brand-surface space-y-6">
                     <div className="space-y-2">

@@ -10,6 +10,15 @@ const getFontUrl = (fontFamily: string) => {
     return `https://fonts.googleapis.com/css2?family=${googleFontName}&display=swap`;
 };
 
+const getFrameClass = (frame?: 'none' | 'classic' | 'art-deco' | 'rounded-top'): string => {
+    switch (frame) {
+        case 'classic': return 'frame-classic';
+        case 'art-deco': return 'frame-art-deco';
+        case 'rounded-top': return 'frame-rounded-top';
+        default: return '';
+    }
+}
+
 const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
     const srcDoc = useMemo(() => {
         const chancesContainerHTML = gameData.gameEnableChances ? '<div id="chances-container" class="chances-container"></div>' : '';
@@ -21,6 +30,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
         let finalHtml = gameData.gameHTML
             .replace('__GAME_TITLE__', gameData.gameTitle || 'TXT Builder Game')
             .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme`)
+            .replace('__FRAME_CLASS__', getFrameClass(gameData.gameImageFrame))
             .replace('__FONT_STYLESHEET__', fontStylesheet)
             .replace('__LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="game-logo">` : '')
             .replace('__CHANCES_CONTAINER__', chancesContainerHTML)

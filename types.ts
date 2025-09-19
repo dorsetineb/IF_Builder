@@ -1,4 +1,5 @@
 
+
 export interface GameObject {
   id: string;
   name: string;
@@ -72,6 +73,7 @@ export interface GameData {
   gameSplashButtonTextColor?: string;
   gameLayoutOrientation?: 'vertical' | 'horizontal';
   gameLayoutOrder?: 'image-first' | 'image-last';
+  gameImageFrame?: 'none' | 'classic' | 'art-deco' | 'rounded-top';
   gameActionButtonColor?: string;
   gameActionButtonTextColor?: string;
   gameActionButtonText?: string;
