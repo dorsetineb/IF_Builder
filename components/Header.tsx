@@ -45,6 +45,10 @@ const Header: React.FC<{
     }
     const zip = new JSZip();
     const assetsFolder = zip.folder("assets");
+    if (!assetsFolder) {
+        alert('Falha ao criar a pasta de assets no arquivo .zip.');
+        return;
+    }
 
     const exportData = JSON.parse(JSON.stringify(gameData));
 
@@ -97,8 +101,64 @@ const Header: React.FC<{
         : '';
     
     const fontFamily = exportData.gameFontFamily || "'Silkscreen', sans-serif";
-    const fontUrl = getFontUrl(fontFamily);
-    const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
+    const fontName = fontFamily.split(',')[0].replace(/'/g, '').trim();
+    let fontStylesheet = ''; // This will be the <link> tag on failure.
+    let finalCss = exportData.gameCSS; // This will be modified with @font-face rules on success.
+
+    // --- Font Embedding Logic ---
+    if (fontName) {
+        const googleFontName = fontName.replace(/ /g, '+');
+        const fontCssUrl = `https://fonts.googleapis.com/css2?family=${googleFontName}:wght@400;700&display=swap`;
+
+        try {
+            const userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/98.0.4758.102 Safari/537.36';
+            const cssResponse = await fetch(fontCssUrl, { headers: { 'User-Agent': userAgent } });
+            
+            if (!cssResponse.ok) throw new Error(`Failed to fetch font CSS: ${cssResponse.statusText}`);
+            
+            let fontCssText = await cssResponse.text();
+            
+            const fontUrlRegex = /url\((https:\/\/[^)]+\.woff2)\)/g;
+            const fontPromises = [];
+            const fontFolder = zip.folder("fonts");
+            if (!fontFolder) throw new Error("Could not create 'fonts' folder in zip.");
+
+            const fontUrlsToDownload = new Set<string>();
+            let match;
+            while ((match = fontUrlRegex.exec(fontCssText)) !== null) {
+                fontUrlsToDownload.add(match[1]);
+            }
+
+            for (const originalUrl of fontUrlsToDownload) {
+                const fontFileName = originalUrl.substring(originalUrl.lastIndexOf('/') + 1);
+                const localUrl = `fonts/${fontFileName}`;
+                fontCssText = fontCssText.replace(new RegExp(originalUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), localUrl);
+                
+                fontPromises.push(
+                    fetch(originalUrl)
+                        .then(res => {
+                            if (!res.ok) throw new Error(`Failed to download font file: ${originalUrl}`);
+                            return res.blob();
+                        })
+                        .then(blob => {
+                            fontFolder.file(fontFileName, blob);
+                        })
+                );
+            }
+
+            await Promise.all(fontPromises);
+            
+            finalCss = fontCssText + '\n' + finalCss;
+            fontStylesheet = ''; // Success, no need for <link> tag.
+        } catch (error) {
+            console.warn("Could not download and embed font. Falling back to online version.", error);
+            const fallbackFontUrl = getFontUrl(fontFamily);
+            fontStylesheet = fallbackFontUrl ? `<link href="${fallbackFontUrl}" rel="stylesheet">` : '';
+        }
+    } else {
+        fontStylesheet = '';
+    }
+    // --- End of Font Embedding Logic ---
 
     const finalHtml = exportData.gameHTML
         .replace('__GAME_TITLE__', exportData.gameTitle || 'Game')
@@ -125,7 +185,7 @@ const Header: React.FC<{
         .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '')
         .replace('</body>', `<script src="game.js"></script>\n</body>`);
 
-    let finalCss = exportData.gameCSS
+    finalCss = finalCss
         .replace(/__FONT_FAMILY__/g, fontFamily)
         .replace(/__GAME_TEXT_COLOR__/g, exportData.gameTextColor || '#c9d1d9')
         .replace(/__GAME_TITLE_COLOR__/g, exportData.gameTitleColor || '#58a6ff')
