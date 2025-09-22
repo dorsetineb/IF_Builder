@@ -1,5 +1,9 @@
 
 
+
+
+
+
 import React, { useState, useEffect } from 'react';
 import { GameData } from '../types';
 
@@ -47,16 +51,14 @@ interface UIEditorProps {
 }
 
 const FONTS = [
-    { name: 'Pixel (Padrão)', family: "'Silkscreen', sans-serif" },
-    { name: 'Pixel (Arcade)', family: "'Press Start 2P', cursive" },
-    { name: 'Pixel (Terminal)', family: "'VT323', monospace" },
-    { name: 'Pixel (Gótico)', family: "'DotGothic16', sans-serif" },
-    { name: 'Máquina de Escrever', family: "'Special Elite', cursive" },
-    { name: 'Mono (Arredondada)', family: "'Cutive Mono', monospace" },
-    { name: 'Mono (Técnica)', family: "'Share Tech Mono', monospace" },
-    { name: 'Mono (Console)', family: "'Inconsolata', monospace" },
-    { name: 'Mono (Moderna)', family: "'Roboto Mono', monospace" },
-    { name: 'Mono (Clássica)', family: "'Anonymous Pro', monospace" },
+    { name: 'Silkscreen', family: "'Silkscreen', sans-serif" },
+    { name: 'DotGothic16', family: "'DotGothic16', sans-serif" },
+    { name: 'Cutive Mono', family: "'Cutive Mono', monospace" },
+    { name: 'Space Mono', family: "'Space Mono', monospace" },
+    { name: 'Inconsolata', family: "'Inconsolata', monospace" },
+    { name: 'IBM Plex Mono', family: "'IBM Plex Mono', monospace" },
+    { name: 'Chakra Petch', family: "'Chakra Petch', sans-serif" },
+    { name: 'Crimson Text', family: "'Crimson Text', serif" },
 ];
 
 const PREDEFINED_THEMES = [

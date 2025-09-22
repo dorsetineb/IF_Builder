@@ -1,5 +1,3 @@
-
-
 // FIX: Corrected React import to properly include 'useRef'. The previous syntax 'import React, a from ...' was invalid.
 import React, { useRef } from 'react';
 import { GameData } from '../types';
@@ -35,7 +33,6 @@ const Header: React.FC<{
   isPreviewing: boolean;
   onTogglePreview: () => void;
 }> = ({ gameData, onImportGame, isPreviewing, onTogglePreview }) => {
-  // FIX: Changed 'a.useRef' to 'useRef' to match the corrected import.
   const importInputRef = useRef<HTMLInputElement>(null);
   
   const handleExport = async () => {
@@ -52,7 +49,7 @@ const Header: React.FC<{
 
     const exportData = JSON.parse(JSON.stringify(gameData));
 
-    const assetPromises = [];
+    const assetPromises: Promise<void>[] = [];
     const assetMap = new Map<string, string>();
 
     const processAsset = (base64String: string | undefined, baseName: string): string | undefined => {
@@ -101,11 +98,16 @@ const Header: React.FC<{
         : '';
     
     const fontFamily = exportData.gameFontFamily || "'Silkscreen', sans-serif";
-    const fontName = fontFamily.split(',')[0].replace(/'/g, '').trim();
-    let fontStylesheet = ''; // This will be the <link> tag on failure.
-    let finalCss = exportData.gameCSS; // This will be modified with @font-face rules on success.
+    
+    let fontAdjustClass = '';
+    if (fontFamily.includes('DotGothic16')) {
+        fontAdjustClass = 'font-adjust-gothic';
+    }
 
-    // --- Font Embedding Logic ---
+    const fontName = fontFamily.split(',')[0].replace(/'/g, '').trim();
+    let fontStylesheet = '';
+    let finalCss = exportData.gameCSS;
+
     if (fontName) {
         const googleFontName = fontName.replace(/ /g, '+');
         const fontCssUrl = `https://fonts.googleapis.com/css2?family=${googleFontName}:wght@400;700&display=swap`;
@@ -119,7 +121,7 @@ const Header: React.FC<{
             let fontCssText = await cssResponse.text();
             
             const fontUrlRegex = /url\((https:\/\/[^)]+\.woff2)\)/g;
-            const fontPromises = [];
+            const fontPromises: Promise<void>[] = [];
             const fontFolder = zip.folder("fonts");
             if (!fontFolder) throw new Error("Could not create 'fonts' folder in zip.");
 
@@ -147,25 +149,25 @@ const Header: React.FC<{
             }
 
             await Promise.all(fontPromises);
-            
-            finalCss = fontCssText + '\n' + finalCss;
-            fontStylesheet = ''; // Success, no need for <link> tag.
+            finalCss = fontCssText;
+            fontStylesheet = '';
         } catch (error) {
-            console.warn("Could not download and embed font. Falling back to online version.", error);
-            const fallbackFontUrl = getFontUrl(fontFamily);
-            fontStylesheet = fallbackFontUrl ? `<link href="${fallbackFontUrl}" rel="stylesheet">` : '';
+            console.error("Failed to embed fonts, falling back to online version:", error);
+            const fontUrl = getFontUrl(fontFamily);
+            fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
         }
-    } else {
-        fontStylesheet = '';
     }
-    // --- End of Font Embedding Logic ---
 
-    const finalHtml = exportData.gameHTML
-        .replace('__GAME_TITLE__', exportData.gameTitle || 'Game')
-        .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme with-spacing`)
+    const engineData = prepareGameDataForEngine(exportData);
+    const safeJson = JSON.stringify(engineData).replace(/<\/script/g, '<\\/script>');
+    const finalGameScript = `window.embeddedGameData = ${safeJson};\n\n${gameJS}`;
+
+    let html = exportData.gameHTML
+        .replace('__GAME_TITLE__', exportData.gameTitle || 'TXT Builder Game')
+        .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme`)
         .replace('__FRAME_CLASS__', getFrameClass(exportData.gameImageFrame))
         .replace('__FONT_STYLESHEET__', fontStylesheet)
-        .replace('__LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="game-logo">` : '')
+        .replace('__FONT_ADJUST_CLASS__', fontAdjustClass)
         .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
         .replace('__SPLASH_BG_STYLE__', exportData.gameSplashImage ? `style="background-image: url('${exportData.gameSplashImage}')"` : '')
         .replace('__SPLASH_ALIGN_CLASS__', exportData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
@@ -182,10 +184,11 @@ const Header: React.FC<{
         .replace('__POSITIVE_ENDING_DESCRIPTION__', exportData.positiveEndingDescription || '')
         .replace('__NEGATIVE_ENDING_BG_STYLE__', exportData.negativeEndingImage ? `style="background-image: url('${exportData.negativeEndingImage}')"` : '')
         .replace('__NEGATIVE_ENDING_ALIGN_CLASS__', exportData.negativeEndingContentAlignment === 'left' ? 'align-left' : '')
-        .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '')
-        .replace('</body>', `<script src="game.js"></script>\n</body>`);
+        .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '');
 
-    finalCss = finalCss
+    html = html.replace('</body>', '<script src="game.js"></script></body>');
+
+    const css = finalCss
         .replace(/__FONT_FAMILY__/g, fontFamily)
         .replace(/__GAME_TEXT_COLOR__/g, exportData.gameTextColor || '#c9d1d9')
         .replace(/__GAME_TITLE_COLOR__/g, exportData.gameTitleColor || '#58a6ff')
@@ -198,152 +201,85 @@ const Header: React.FC<{
         .replace(/__SPLASH_BUTTON_TEXT_COLOR__/g, exportData.gameSplashButtonTextColor || '#ffffff')
         .replace(/__ACTION_BUTTON_COLOR__/g, exportData.gameActionButtonColor || '#ffffff')
         .replace(/__ACTION_BUTTON_TEXT_COLOR__/g, exportData.gameActionButtonTextColor || '#0d1117')
-        .replace(/__FRAME_BOOK_COLOR__/g, exportData.frameBookColor || '#2d2d2d')
-        .replace(/__FRAME_CARD_OUTER_COLOR__/g, exportData.frameCardOuterColor || '#1c1917')
-        .replace(/__FRAME_CARD_INNER_COLOR__/g, exportData.frameCardInnerColor || '#d97706')
-        .replace(/__FRAME_CHAMFERED_COLOR__/g, exportData.frameChamferedColor || '#4a5568')
+        .replace(/__FRAME_BOOK_COLOR__/g, exportData.frameBookColor || '#FFFFFF')
+        .replace(/__FRAME_CARD_OUTER_COLOR__/g, exportData.frameCardOuterColor || '#FFFFFF')
+        .replace(/__FRAME_CARD_INNER_COLOR__/g, exportData.frameCardInnerColor || '#FFFFFF')
+        .replace(/__FRAME_CHAMFERED_COLOR__/g, exportData.frameChamferedColor || '#FFFFFF')
         .replace(/__FRAME_ROUNDED_TOP_BG_COLOR__/g, exportData.frameRoundedTopBackgroundColor || '#000000')
-        .replace(/__FRAME_ROUNDED_TOP_BORDER_COLOR__/g, exportData.frameRoundedTopBorderColor || '#facc15');
+        .replace(/__FRAME_ROUNDED_TOP_BORDER_COLOR__/g, exportData.frameRoundedTopBorderColor || '#FFFFFF');
     
-    const engineData = prepareGameDataForEngine(exportData);
-    const finalDataScript = `document.addEventListener('DOMContentLoaded', () => { window.embeddedGameData = ${JSON.stringify(engineData)}; });`;
+    zip.file("index.html", html);
+    zip.file("style.css", css);
+    zip.file("game.js", finalGameScript);
 
-    zip.file("index.html", finalHtml);
-    zip.file("style.css", finalCss);
-    zip.file("game.js", `\n${finalDataScript}\n\n${gameJS}\n`);
-    
-    const content = await zip.generateAsync({ type: "blob" });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(content);
-    link.download = `${(gameData.gameTitle || 'meu-jogo').toLowerCase().replace(/\s+/g, '-')}.zip`;
-    link.click();
-    URL.revokeObjectURL(link.href);
+    zip.generateAsync({ type: "blob" })
+      .then(function(content: Blob) {
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(content);
+        const safeTitle = exportData.gameTitle?.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'txt_builder_game';
+        link.download = `${safeTitle}.zip`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      });
   };
 
   const handleImportClick = () => {
     importInputRef.current?.click();
   };
 
-  const handleFileImport = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (!file) return;
-
-    try {
-        const zip = await JSZip.loadAsync(file);
-
-        const dataScriptFile = zip.file("game.js");
-        const htmlFile = zip.file("index.html");
-        const cssFile = zip.file("style.css");
-
-        if (!dataScriptFile || !htmlFile || !cssFile) {
-            throw new Error("Arquivo .zip inválido. Faltam game.js, index.html ou style.css.");
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const result = e.target?.result;
+          if (typeof result === 'string') {
+            const data = JSON.parse(result);
+            onImportGame(data);
+          }
+        } catch (error) {
+          console.error("Error parsing JSON file:", error);
+          alert("Erro ao importar o arquivo. Verifique se é um arquivo JSON válido.");
         }
-
-        const dataScriptContent = await dataScriptFile.async("string");
-        const match = dataScriptContent.match(/window\.embeddedGameData\s*=\s*(\{.*?\});/);
-        if (!match) throw new Error("Não foi possível encontrar os dados do jogo dentro de game.js");
-        
-        const importedEngineData = JSON.parse(match[1]);
-        let reconstructedData: Partial<GameData> = { ...gameData };
-
-        reconstructedData.gameHTML = await htmlFile.async("string");
-        reconstructedData.gameCSS = await cssFile.async("string");
-        reconstructedData.startScene = importedEngineData.cena_inicial;
-        reconstructedData.defaultFailureMessage = importedEngineData.mensagem_falha_padrao;
-        reconstructedData.gameDiaryPlayerName = importedEngineData.nome_jogador_diario;
-        reconstructedData.gameEnableChances = importedEngineData.gameEnableChances;
-        reconstructedData.gameMaxChances = importedEngineData.gameMaxChances;
-        reconstructedData.gameChanceIcon = importedEngineData.gameChanceIcon;
-        reconstructedData.gameChanceIconColor = importedEngineData.gameChanceIconColor;
-        reconstructedData.gameTheme = importedEngineData.gameTheme;
-        reconstructedData.gameTextColorLight = importedEngineData.gameTextColorLight;
-        reconstructedData.gameTitleColorLight = importedEngineData.gameTitleColorLight;
-        reconstructedData.gameFocusColorLight = importedEngineData.gameFocusColorLight;
-
-        const editorScenes: { [id: string]: any } = {};
-        if (importedEngineData.cenas) {
-            for (const sceneId in importedEngineData.cenas) {
-                const scene = importedEngineData.cenas[sceneId];
-                editorScenes[sceneId] = {
-                    ...scene,
-                    objects: scene.objetos || [],
-                };
-                delete editorScenes[sceneId].objetos;
-            }
-        }
-        reconstructedData.scenes = editorScenes;
-
-        const processAssetPath = async (path: string | undefined): Promise<string | undefined> => {
-            if (!path || !path.startsWith('assets/')) return path;
-            const assetFile = zip.file(path);
-            if (!assetFile) return undefined;
-            const blob = await assetFile.async("blob");
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result as string);
-                reader.onerror = reject;
-                reader.readAsDataURL(blob);
-            });
-        };
-
-        const promises = [];
-        if (reconstructedData.gameLogo && typeof reconstructedData.gameLogo === 'string') {
-            promises.push(processAssetPath(reconstructedData.gameLogo).then(b64 => reconstructedData.gameLogo = b64));
-        }
-        if (reconstructedData.gameSplashImage && typeof reconstructedData.gameSplashImage === 'string') {
-            promises.push(processAssetPath(reconstructedData.gameSplashImage).then(b64 => reconstructedData.gameSplashImage = b64));
-        }
-        for (const sceneId in reconstructedData.scenes) {
-            const scene = reconstructedData.scenes[sceneId];
-            if (scene.image && typeof scene.image === 'string') {
-                 promises.push(processAssetPath(scene.image).then(b64 => { scene.image = b64 as string; }));
-            }
-            if (scene.interactions) {
-                scene.interactions.forEach((inter: any) => {
-                    if (inter.soundEffect && typeof inter.soundEffect === 'string') {
-                         promises.push(processAssetPath(inter.soundEffect).then(b64 => { inter.soundEffect = b64 as string; }));
-                    }
-                });
-            }
-        }
-        
-        await Promise.all(promises);
-        
-        onImportGame(reconstructedData as GameData);
-        alert('Jogo importado com sucesso!');
-
-    } catch (error) {
-        console.error("Erro ao importar .zip:", error);
-        alert(`Erro ao importar o arquivo .zip: ${error instanceof Error ? error.message : String(error)}`);
+      };
+      reader.readAsText(file);
     }
-
-    if (importInputRef.current) {
-      importInputRef.current.value = '';
+    if (event.target) {
+        event.target.value = '';
     }
   };
 
   return (
-    <header className="flex items-center justify-between p-3 bg-brand-surface border-b border-brand-border flex-shrink-0 z-20">
-      <div className="flex flex-col items-start min-w-0">
-        <h1 className="text-xl font-bold text-brand-text whitespace-nowrap">TXT Builder</h1>
-        {gameData.gameTitle && (
-            <code
-                className="mt-1 bg-brand-bg px-2 py-1 rounded text-brand-primary-hover text-sm truncate max-w-full"
-                title={gameData.gameTitle}
-            >
-                {gameData.gameTitle}
-            </code>
-        )}
-      </div>
-      <div className="flex items-center gap-2">
-        <input type="file" ref={importInputRef} onChange={handleFileImport} className="hidden" accept=".zip" />
-        <button onClick={handleImportClick} className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors">
-          <DocumentArrowUpIcon className="w-5 h-5 mr-2" /> Importar Jogo (.zip)
+    <header className="flex-shrink-0 bg-brand-sidebar p-4 flex justify-between items-center border-b border-brand-border">
+      <h1 className="text-2xl font-bold">TXT Builder</h1>
+      <div className="flex items-center gap-4">
+        <input
+            type="file"
+            ref={importInputRef}
+            className="hidden"
+            accept=".json"
+            onChange={handleFileImport}
+        />
+        <button 
+            onClick={handleImportClick}
+            className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors"
+        >
+          <DocumentArrowUpIcon className="w-5 h-5 mr-2" />
+          Importar
         </button>
-        <button onClick={handleExport} className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors">
-          <DownloadIcon className="w-5 h-5 mr-2" /> Exportar Jogo (.zip)
+        <button 
+            onClick={handleExport}
+            className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors"
+        >
+          <DownloadIcon className="w-5 h-5 mr-2" />
+          Exportar Jogo
         </button>
-        <button onClick={onTogglePreview} className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors">
+        <button 
+            onClick={onTogglePreview}
+            className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors"
+        >
           <EyeIcon className="w-5 h-5 mr-2" />
           {isPreviewing ? 'Fechar Pré-visualização' : 'Pré-visualizar Jogo'}
         </button>
@@ -351,5 +287,5 @@ const Header: React.FC<{
     </header>
   );
 };
-
+    
 export default Header;

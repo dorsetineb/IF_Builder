@@ -1,5 +1,7 @@
 
 
+
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -23,7 +25,7 @@ const gameHTML = `
     __FONT_STYLESHEET__
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="__THEME_CLASS__ __FRAME_CLASS__">
+<body class="__THEME_CLASS__ __FRAME_CLASS__ __FONT_ADJUST_CLASS__">
     <audio id="scene-sound-effect" preload="auto"></audio>
     <div class="main-wrapper">
         <div id="splash-screen" class="splash-screen __SPLASH_ALIGN_CLASS__" __SPLASH_BG_STYLE__>
@@ -91,6 +93,7 @@ const gameHTML = `
             <div id="diary-log" class="diary-log"></div>
         </div>
     </div>
+    <script src="game.js"></script>
 </body>
 </html>
 `;
@@ -605,6 +608,11 @@ body.with-spacing .main-wrapper {
     background-color: transparent; /* This is crucial for the image to be visible */
     /* Clip the inner container to match the frame's inner shape */
     clip-path: polygon(25px 0, calc(100% - 25px) 0, 100% 25px, 100% calc(100% - 25px), calc(100% - 25px) 100%, 25px 100%, 0 calc(100% - 25px), 0 25px);
+}
+
+/* Font Size Adjustments */
+body.font-adjust-gothic {
+    font-size: 1.15em;
 }
 `;
 
