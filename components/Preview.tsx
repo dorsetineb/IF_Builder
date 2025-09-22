@@ -1,3 +1,5 @@
+
+
 import React, { useMemo } from 'react';
 import { GameData } from '../types';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
@@ -12,8 +14,6 @@ const getFontUrl = (fontFamily: string) => {
 
 const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
     switch (frame) {
-        case 'classic': return 'frame-classic';
-        case 'art-deco': return 'frame-art-deco';
         case 'rounded-top': return 'frame-rounded-top';
         case 'book-cover': return 'frame-book-cover';
         case 'trading-card': return 'frame-trading-card';
@@ -46,7 +46,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace('__CONTINUE_BUTTON_TEXT__', gameData.gameContinueButtonText || 'Continue')
             .replace('__RESTART_BUTTON_TEXT__', gameData.gameRestartButtonText || 'Reiniciar Aventura')
             .replace('__ACTION_BUTTON_TEXT__', gameData.gameActionButtonText || 'Action')
-            .replace('__COMMAND_INPUT_PLACEHOLDER__', gameData.gameCommandInputPlaceholder || 'What do you do?')
+            .replace('__VERB_INPUT_PLACEHOLDER__', gameData.gameVerbInputPlaceholder || 'What do you do?')
             .replace('__POSITIVE_ENDING_BG_STYLE__', gameData.positiveEndingImage ? `style="background-image: url('${gameData.positiveEndingImage}')"` : '')
             .replace('__POSITIVE_ENDING_ALIGN_CLASS__', gameData.positiveEndingContentAlignment === 'left' ? 'align-left' : '')
             .replace('__POSITIVE_ENDING_DESCRIPTION__', gameData.positiveEndingDescription || '')
@@ -71,11 +71,6 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace(/__FRAME_CARD_OUTER_COLOR__/g, gameData.frameCardOuterColor || '#1c1917')
             .replace(/__FRAME_CARD_INNER_COLOR__/g, gameData.frameCardInnerColor || '#d97706')
             .replace(/__FRAME_CHAMFERED_COLOR__/g, gameData.frameChamferedColor || '#4a5568')
-            .replace(/__FRAME_CLASSIC_WOOD_DARK_COLOR__/g, gameData.frameClassicWoodDarkColor || '#3a2d2d')
-            .replace(/__FRAME_CLASSIC_WOOD_LIGHT_COLOR__/g, gameData.frameClassicWoodLightColor || '#5a3d3d')
-            .replace(/__FRAME_CLASSIC_GOLD_COLOR__/g, gameData.frameClassicGoldColor || '#c0a080')
-            .replace(/__FRAME_ART_DECO_BG_COLOR__/g, gameData.frameArtDecoBackgroundColor || '#1a1a1a')
-            .replace(/__FRAME_ART_DECO_ACCENT_COLOR__/g, gameData.frameArtDecoAccentColor || '#c0a080')
             .replace(/__FRAME_ROUNDED_TOP_BG_COLOR__/g, gameData.frameRoundedTopBackgroundColor || '#000000')
             .replace(/__FRAME_ROUNDED_TOP_BORDER_COLOR__/g, gameData.frameRoundedTopBorderColor || '#facc15');
             

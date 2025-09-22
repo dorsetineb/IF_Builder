@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { GameData } from '../types';
 
@@ -8,7 +10,7 @@ interface UIEditorProps {
   layoutOrder: 'image-first' | 'image-last';
   imageFrame: GameData['gameImageFrame'];
   actionButtonText: string;
-  commandInputPlaceholder: string;
+  verbInputPlaceholder: string;
   diaryPlayerName: string;
   splashButtonText: string;
   continueButtonText: string;
@@ -37,11 +39,6 @@ interface UIEditorProps {
   frameCardInnerColor: string;
   frameCardOuterColor: string;
   frameChamferedColor: string;
-  frameClassicWoodDarkColor: string;
-  frameClassicWoodLightColor: string;
-  frameClassicGoldColor: string;
-  frameArtDecoBackgroundColor: string;
-  frameArtDecoAccentColor: string;
   frameRoundedTopBackgroundColor: string;
   frameRoundedTopBorderColor: string;
   onUpdate: (field: keyof GameData, value: any) => void;
@@ -146,7 +143,7 @@ const ColorInput: React.FC<{
 const UIEditor: React.FC<UIEditorProps> = (props) => {
   const { 
       html, css, layoutOrientation, layoutOrder, imageFrame, splashButtonText, continueButtonText,
-      actionButtonText, commandInputPlaceholder, diaryPlayerName, restartButtonText, 
+      actionButtonText, verbInputPlaceholder, diaryPlayerName, restartButtonText, 
       enableChances, maxChances, onUpdate, isDirty, onSetDirty,
       textColor, titleColor, splashButtonColor, splashButtonHoverColor,
       splashButtonTextColor, actionButtonColor, actionButtonTextColor,
@@ -154,8 +151,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
       chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText,
       gameTheme, textColorLight, titleColorLight, focusColorLight,
       frameBookColor, frameCardInnerColor, frameCardOuterColor,
-      frameChamferedColor, frameClassicWoodDarkColor, frameClassicWoodLightColor,
-      frameClassicGoldColor, frameArtDecoBackgroundColor, frameArtDecoAccentColor,
+      frameChamferedColor,
       frameRoundedTopBackgroundColor, frameRoundedTopBorderColor
   } = props;
 
@@ -164,7 +160,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localLayoutOrder, setLocalLayoutOrder] = useState(layoutOrder);
   const [localImageFrame, setLocalImageFrame] = useState(imageFrame);
   const [localActionButtonText, setLocalActionButtonText] = useState(actionButtonText);
-  const [localCommandInputPlaceholder, setLocalCommandInputPlaceholder] = useState(commandInputPlaceholder);
+  const [localVerbInputPlaceholder, setLocalVerbInputPlaceholder] = useState(verbInputPlaceholder);
   const [localDiaryPlayerName, setLocalDiaryPlayerName] = useState(diaryPlayerName);
   const [localSplashButtonText, setLocalSplashButtonText] = useState(splashButtonText);
   const [localContinueButtonText, setLocalContinueButtonText] = useState(continueButtonText);
@@ -196,11 +192,6 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localFrameCardInnerColor, setLocalFrameCardInnerColor] = useState(frameCardInnerColor);
   const [localFrameCardOuterColor, setLocalFrameCardOuterColor] = useState(frameCardOuterColor);
   const [localFrameChamferedColor, setLocalFrameChamferedColor] = useState(frameChamferedColor);
-  const [localFrameClassicWoodDarkColor, setLocalFrameClassicWoodDarkColor] = useState(frameClassicWoodDarkColor);
-  const [localFrameClassicWoodLightColor, setLocalFrameClassicWoodLightColor] = useState(frameClassicWoodLightColor);
-  const [localFrameClassicGoldColor, setLocalFrameClassicGoldColor] = useState(frameClassicGoldColor);
-  const [localFrameArtDecoBackgroundColor, setLocalFrameArtDecoBackgroundColor] = useState(frameArtDecoBackgroundColor);
-  const [localFrameArtDecoAccentColor, setLocalFrameArtDecoAccentColor] = useState(frameArtDecoAccentColor);
   const [localFrameRoundedTopBackgroundColor, setLocalFrameRoundedTopBackgroundColor] = useState(frameRoundedTopBackgroundColor);
   const [localFrameRoundedTopBorderColor, setLocalFrameRoundedTopBorderColor] = useState(frameRoundedTopBorderColor);
   const [focusPreview, setFocusPreview] = useState(false);
@@ -212,7 +203,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalLayoutOrder(layoutOrder);
     setLocalImageFrame(imageFrame);
     setLocalActionButtonText(actionButtonText);
-    setLocalCommandInputPlaceholder(commandInputPlaceholder);
+    setLocalVerbInputPlaceholder(verbInputPlaceholder);
     setLocalDiaryPlayerName(diaryPlayerName);
     setLocalSplashButtonText(splashButtonText);
     setLocalContinueButtonText(continueButtonText);
@@ -241,19 +232,14 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalFrameCardInnerColor(frameCardInnerColor);
     setLocalFrameCardOuterColor(frameCardOuterColor);
     setLocalFrameChamferedColor(frameChamferedColor);
-    setLocalFrameClassicWoodDarkColor(frameClassicWoodDarkColor);
-    setLocalFrameClassicWoodLightColor(frameClassicWoodLightColor);
-    setLocalFrameClassicGoldColor(frameClassicGoldColor);
-    setLocalFrameArtDecoBackgroundColor(frameArtDecoBackgroundColor);
-    setLocalFrameArtDecoAccentColor(frameArtDecoAccentColor);
     setLocalFrameRoundedTopBackgroundColor(frameRoundedTopBackgroundColor);
     setLocalFrameRoundedTopBorderColor(frameRoundedTopBorderColor);
   }, [
-    layoutOrientation, layoutOrder, imageFrame, actionButtonText, commandInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, enableChances, maxChances,
+    layoutOrientation, layoutOrder, imageFrame, actionButtonText, verbInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, enableChances, maxChances,
     textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
     chanceIconColor, gameFontFamily, chanceIcon, chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight,
-    frameBookColor, frameCardInnerColor, frameCardOuterColor, frameChamferedColor, frameClassicWoodDarkColor, frameClassicWoodLightColor, frameClassicGoldColor,
-    frameArtDecoBackgroundColor, frameArtDecoAccentColor, frameRoundedTopBackgroundColor, frameRoundedTopBorderColor
+    frameBookColor, frameCardInnerColor, frameCardOuterColor, frameChamferedColor,
+    frameRoundedTopBackgroundColor, frameRoundedTopBorderColor
   ]);
 
   useEffect(() => {
@@ -264,7 +250,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localContinueButtonText !== continueButtonText ||
                   localRestartButtonText !== restartButtonText ||
                   localActionButtonText !== actionButtonText ||
-                  localCommandInputPlaceholder !== commandInputPlaceholder ||
+                  localVerbInputPlaceholder !== verbInputPlaceholder ||
                   localDiaryPlayerName !== diaryPlayerName ||
                   localEnableChances !== enableChances ||
                   localMaxChances !== maxChances ||
@@ -290,19 +276,14 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localFrameCardInnerColor !== frameCardInnerColor ||
                   localFrameCardOuterColor !== frameCardOuterColor ||
                   localFrameChamferedColor !== frameChamferedColor ||
-                  localFrameClassicWoodDarkColor !== frameClassicWoodDarkColor ||
-                  localFrameClassicWoodLightColor !== frameClassicWoodLightColor ||
-                  localFrameClassicGoldColor !== frameClassicGoldColor ||
-                  localFrameArtDecoBackgroundColor !== frameArtDecoBackgroundColor ||
-                  localFrameArtDecoAccentColor !== frameArtDecoAccentColor ||
                   localFrameRoundedTopBackgroundColor !== frameRoundedTopBackgroundColor ||
                   localFrameRoundedTopBorderColor !== frameRoundedTopBorderColor;
     onSetDirty(dirty);
   }, [
-    localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localCommandInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localEnableChances, localMaxChances,
+    localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localEnableChances, localMaxChances,
     localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
-    localFrameBookColor, localFrameCardInnerColor, localFrameCardOuterColor, localFrameChamferedColor, localFrameClassicWoodDarkColor, localFrameClassicWoodLightColor, localFrameClassicGoldColor,
-    frameArtDecoBackgroundColor, localFrameArtDecoAccentColor, localFrameRoundedTopBackgroundColor, localFrameRoundedTopBorderColor,
+    localFrameBookColor, localFrameCardInnerColor, localFrameCardOuterColor, localFrameChamferedColor,
+    frameRoundedTopBackgroundColor, localFrameRoundedTopBorderColor,
     props, onSetDirty
   ]);
 
@@ -315,7 +296,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localContinueButtonText !== continueButtonText) onUpdate('gameContinueButtonText', localContinueButtonText);
     if (localRestartButtonText !== restartButtonText) onUpdate('gameRestartButtonText', localRestartButtonText);
     if (localActionButtonText !== actionButtonText) onUpdate('gameActionButtonText', localActionButtonText);
-    if (localCommandInputPlaceholder !== commandInputPlaceholder) onUpdate('gameCommandInputPlaceholder', localCommandInputPlaceholder);
+    if (localVerbInputPlaceholder !== verbInputPlaceholder) onUpdate('gameVerbInputPlaceholder', localVerbInputPlaceholder);
     if (localDiaryPlayerName !== diaryPlayerName) onUpdate('gameDiaryPlayerName', localDiaryPlayerName);
     if (localEnableChances !== enableChances) onUpdate('gameEnableChances', localEnableChances);
     if (localMaxChances !== maxChances) onUpdate('gameMaxChances', localMaxChances);
@@ -342,11 +323,6 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localFrameCardInnerColor !== frameCardInnerColor) onUpdate('frameCardInnerColor', localFrameCardInnerColor);
     if (localFrameCardOuterColor !== frameCardOuterColor) onUpdate('frameCardOuterColor', localFrameCardOuterColor);
     if (localFrameChamferedColor !== frameChamferedColor) onUpdate('frameChamferedColor', localFrameChamferedColor);
-    if (localFrameClassicWoodDarkColor !== frameClassicWoodDarkColor) onUpdate('frameClassicWoodDarkColor', localFrameClassicWoodDarkColor);
-    if (localFrameClassicWoodLightColor !== frameClassicWoodLightColor) onUpdate('frameClassicWoodLightColor', localFrameClassicWoodLightColor);
-    if (localFrameClassicGoldColor !== frameClassicGoldColor) onUpdate('frameClassicGoldColor', localFrameClassicGoldColor);
-    if (localFrameArtDecoBackgroundColor !== frameArtDecoBackgroundColor) onUpdate('frameArtDecoBackgroundColor', localFrameArtDecoBackgroundColor);
-    if (localFrameArtDecoAccentColor !== frameArtDecoAccentColor) onUpdate('frameArtDecoAccentColor', localFrameArtDecoAccentColor);
     if (localFrameRoundedTopBackgroundColor !== frameRoundedTopBackgroundColor) onUpdate('frameRoundedTopBackgroundColor', localFrameRoundedTopBackgroundColor);
     if (localFrameRoundedTopBorderColor !== frameRoundedTopBorderColor) onUpdate('frameRoundedTopBorderColor', localFrameRoundedTopBorderColor);
   };
@@ -360,7 +336,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalContinueButtonText(continueButtonText);
     setLocalRestartButtonText(restartButtonText);
     setLocalActionButtonText(actionButtonText);
-    setLocalCommandInputPlaceholder(commandInputPlaceholder);
+    setLocalVerbInputPlaceholder(verbInputPlaceholder);
     setLocalDiaryPlayerName(diaryPlayerName);
     setLocalEnableChances(enableChances);
     setLocalMaxChances(maxChances);
@@ -387,11 +363,6 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalFrameCardInnerColor(frameCardInnerColor);
     setLocalFrameCardOuterColor(frameCardOuterColor);
     setLocalFrameChamferedColor(frameChamferedColor);
-    setLocalFrameClassicWoodDarkColor(frameClassicWoodDarkColor);
-    setLocalFrameClassicWoodLightColor(frameClassicWoodLightColor);
-    setLocalFrameClassicGoldColor(frameClassicGoldColor);
-    setLocalFrameArtDecoBackgroundColor(frameArtDecoBackgroundColor);
-    setLocalFrameArtDecoAccentColor(frameArtDecoAccentColor);
     setLocalFrameRoundedTopBackgroundColor(frameRoundedTopBackgroundColor);
     setLocalFrameRoundedTopBorderColor(frameRoundedTopBorderColor);
   };
@@ -451,18 +422,6 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
       };
 
       switch (frame) {
-          case 'classic':
-              panelStyles.backgroundColor = localFrameClassicWoodDarkColor;
-              panelStyles.padding = '10px';
-              containerStyles.border = `2px solid ${localFrameClassicGoldColor}`;
-              containerStyles.outline = `5px solid ${localFrameClassicWoodLightColor}`;
-              break;
-          case 'art-deco':
-              panelStyles.backgroundColor = localFrameArtDecoBackgroundColor;
-              panelStyles.padding = '12px';
-              containerStyles.border = `2px solid ${localFrameArtDecoAccentColor}`;
-              containerStyles.boxShadow = `0 0 0 5px ${localFrameArtDecoBackgroundColor}, 0 0 0 7px ${localFrameArtDecoAccentColor}`;
-              break;
           case 'rounded-top':
               panelStyles.padding = '8px';
               panelStyles.backgroundColor = localFrameRoundedTopBackgroundColor;
@@ -483,9 +442,9 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
               break;
           case 'chamfered':
               panelStyles.backgroundColor = localFrameChamferedColor;
-              panelStyles.clipPath = 'polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)';
+              panelStyles.clipPath = 'polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px)';
               panelStyles.padding = '5px';
-              containerStyles.clipPath = 'polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px)';
+              containerStyles.clipPath = 'polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px)';
               break;
           default:
               panelStyles.border = `2px solid ${localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}`;
@@ -571,12 +530,10 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
                                   className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
                               >
-                                  <option value="none">Básica (Sem Moldura)</option>
-                                  <option value="classic">Clássica</option>
-                                  <option value="art-deco">Art Deco</option>
-                                  <option value="rounded-top">Retrô Arredondada</option>
-                                  <option value="book-cover">Capa de Livro</option>
-                                  <option value="trading-card">Carta de Jogo</option>
+                                  <option value="none">Sem moldura</option>
+                                  <option value="rounded-top">Portal</option>
+                                  <option value="book-cover">Quadrada</option>
+                                  <option value="trading-card">Arredondada</option>
                                   <option value="chamfered">Chanfrada</option>
                               </select>
                           </div>
@@ -652,12 +609,12 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                               />
                           </div>
                           <div>
-                              <label htmlFor="commandInputPlaceholder" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Campo de Comando</label>
+                              <label htmlFor="verbInputPlaceholder" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Campo de Verbo</label>
                               <input
                                   type="text"
-                                  id="commandInputPlaceholder"
-                                  value={localCommandInputPlaceholder}
-                                  onChange={(e) => setLocalCommandInputPlaceholder(e.target.value)}
+                                  id="verbInputPlaceholder"
+                                  value={localVerbInputPlaceholder}
+                                  onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)}
                                   className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
                               />
                           </div>
@@ -777,19 +734,6 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                     <div className="pt-6 border-t border-brand-border/50">
                         <h3 className="text-lg font-semibold text-brand-text mb-4">Cores da Moldura</h3>
                         
-                        {localImageFrame === 'classic' && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <ColorInput label="Madeira Escura" id="frameClassicWoodDark" value={localFrameClassicWoodDarkColor} onChange={setLocalFrameClassicWoodDarkColor} placeholder="#3a2d2d" />
-                                <ColorInput label="Madeira Clara" id="frameClassicWoodLight" value={localFrameClassicWoodLightColor} onChange={setLocalFrameClassicWoodLightColor} placeholder="#5a3d3d" />
-                                <ColorInput label="Dourado" id="frameClassicGold" value={localFrameClassicGoldColor} onChange={setLocalFrameClassicGoldColor} placeholder="#c0a080" />
-                            </div>
-                        )}
-                        {localImageFrame === 'art-deco' && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <ColorInput label="Cor de Fundo" id="frameArtDecoBg" value={localFrameArtDecoBackgroundColor} onChange={setLocalFrameArtDecoBackgroundColor} placeholder="#1a1a1a" />
-                                <ColorInput label="Cor do Destaque" id="frameArtDecoAccent" value={localFrameArtDecoAccentColor} onChange={setLocalFrameArtDecoAccentColor} placeholder="#c0a080" />
-                            </div>
-                        )}
                         {localImageFrame === 'rounded-top' && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                 <ColorInput label="Cor de Fundo" id="frameRoundedTopBg" value={localFrameRoundedTopBackgroundColor} onChange={setLocalFrameRoundedTopBackgroundColor} placeholder="#000000" />

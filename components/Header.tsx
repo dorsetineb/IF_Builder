@@ -1,3 +1,5 @@
+
+
 // FIX: Corrected React import to properly include 'useRef'. The previous syntax 'import React, a from ...' was invalid.
 import React, { useRef } from 'react';
 import { GameData } from '../types';
@@ -19,8 +21,6 @@ const getFontUrl = (fontFamily: string) => {
 
 const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
     switch (frame) {
-        case 'classic': return 'frame-classic';
-        case 'art-deco': return 'frame-art-deco';
         case 'rounded-top': return 'frame-rounded-top';
         case 'book-cover': return 'frame-book-cover';
         case 'trading-card': return 'frame-trading-card';
@@ -116,7 +116,7 @@ const Header: React.FC<{
         .replace('__CONTINUE_BUTTON_TEXT__', exportData.gameContinueButtonText || 'Continue')
         .replace('__RESTART_BUTTON_TEXT__', exportData.gameRestartButtonText || 'Reiniciar Aventura')
         .replace('__ACTION_BUTTON_TEXT__', exportData.gameActionButtonText || 'Action')
-        .replace('__COMMAND_INPUT_PLACEHOLDER__', exportData.gameCommandInputPlaceholder || 'What do you do?')
+        .replace('__VERB_INPUT_PLACEHOLDER__', exportData.gameVerbInputPlaceholder || 'What do you do?')
         .replace('__POSITIVE_ENDING_BG_STYLE__', exportData.positiveEndingImage ? `style="background-image: url('${exportData.positiveEndingImage}')"` : '')
         .replace('__POSITIVE_ENDING_ALIGN_CLASS__', exportData.positiveEndingContentAlignment === 'left' ? 'align-left' : '')
         .replace('__POSITIVE_ENDING_DESCRIPTION__', exportData.positiveEndingDescription || '')
@@ -142,11 +142,6 @@ const Header: React.FC<{
         .replace(/__FRAME_CARD_OUTER_COLOR__/g, exportData.frameCardOuterColor || '#1c1917')
         .replace(/__FRAME_CARD_INNER_COLOR__/g, exportData.frameCardInnerColor || '#d97706')
         .replace(/__FRAME_CHAMFERED_COLOR__/g, exportData.frameChamferedColor || '#4a5568')
-        .replace(/__FRAME_CLASSIC_WOOD_DARK_COLOR__/g, exportData.frameClassicWoodDarkColor || '#3a2d2d')
-        .replace(/__FRAME_CLASSIC_WOOD_LIGHT_COLOR__/g, exportData.frameClassicWoodLightColor || '#5a3d3d')
-        .replace(/__FRAME_CLASSIC_GOLD_COLOR__/g, exportData.frameClassicGoldColor || '#c0a080')
-        .replace(/__FRAME_ART_DECO_BG_COLOR__/g, exportData.frameArtDecoBackgroundColor || '#1a1a1a')
-        .replace(/__FRAME_ART_DECO_ACCENT_COLOR__/g, exportData.frameArtDecoAccentColor || '#c0a080')
         .replace(/__FRAME_ROUNDED_TOP_BG_COLOR__/g, exportData.frameRoundedTopBackgroundColor || '#000000')
         .replace(/__FRAME_ROUNDED_TOP_BORDER_COLOR__/g, exportData.frameRoundedTopBorderColor || '#facc15');
     

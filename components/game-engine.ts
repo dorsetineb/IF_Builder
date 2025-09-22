@@ -1,3 +1,4 @@
+
 import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
@@ -36,7 +37,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         negativeEndingDescription: data.negativeEndingDescription,
         gameRestartButtonText: data.gameRestartButtonText,
         gameContinueButtonText: data.gameContinueButtonText,
-        fixedCommands: data.fixedCommands || [],
+        fixedVerbs: data.fixedVerbs || [],
     };
 };
 
@@ -58,14 +59,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- DOM Elements ---
     const sceneDescriptionElement = document.getElementById('scene-description');
     const sceneImageElement = document.getElementById('scene-image');
-    const commandInputElement = document.getElementById('command-input');
+    const verbInputElement = document.getElementById('verb-input');
     const sceneSoundEffectElement = document.getElementById('scene-sound-effect');
     const transitionOverlay = document.getElementById('transition-overlay');
     const splashScreen = document.getElementById('splash-screen');
     const startButton = document.getElementById('splash-start-button');
     const continueButton = document.getElementById('continue-button');
     const restartButton = document.getElementById('restart-button');
-    const submitCommandButton = document.getElementById('submit-command');
+    const submitVerbButton = document.getElementById('submit-verb');
     const inventoryButton = document.getElementById('inventory-button');
     const suggestionsButton = document.getElementById('suggestions-button');
     const diaryButton = document.getElementById('diary-button');
@@ -185,9 +186,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (scene.isEndingScene) {
                 showEnding('positive');
             } else {
-                if (commandInputElement) commandInputElement.disabled = false;
-                if (submitCommandButton) submitCommandButton.disabled = false;
-                if (commandInputElement) commandInputElement.focus();
+                if (verbInputElement) verbInputElement.disabled = false;
+                if (submitVerbButton) submitVerbButton.disabled = false;
+                if (verbInputElement) verbInputElement.focus();
             }
             return;
         }
@@ -301,8 +302,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (sceneDescriptionElement) {
             sceneDescriptionElement.innerHTML = ''; // Clear previous content
             
-            if (commandInputElement) commandInputElement.disabled = true;
-            if (submitCommandButton) submitCommandButton.disabled = true;
+            if (verbInputElement) verbInputElement.disabled = true;
+            if (submitVerbButton) submitVerbButton.disabled = true;
 
             renderNextParagraph();
         }
@@ -344,52 +345,62 @@ document.addEventListener('DOMContentLoaded', () => {
         transitionOverlay.addEventListener('transitionend', transitionHandler, { once: true });
     }
     
-    function processCommand() {
-        if (!commandInputElement || commandInputElement.disabled) return;
-        const commandText = commandInputElement.value.trim();
-        if (!commandText) return;
-        const lowerCaseCommandText = commandText.toLowerCase();
+    function processVerb() {
+        if (!verbInputElement || verbInputElement.disabled) return;
+        const verbText = verbInputElement.value.trim();
+        if (!verbText) return;
 
-        commandInputElement.value = '';
+        if (verbText.toLowerCase() === 'salvar jogo') {
+            saveState();
+            const saveP = document.createElement('p');
+            saveP.textContent = 'Jogo salvo.';
+            sceneDescriptionElement.appendChild(saveP);
+            sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
+            verbInputElement.value = '';
+            return;
+        }
+        
+        const lowerCaseVerbText = verbText.toLowerCase();
+
+        verbInputElement.value = '';
 
         const currentScene = currentState.scenesState[currentState.currentSceneId];
         if (!currentScene) return;
 
-        // Echo the command
+        // Echo the verb
         const echoP = document.createElement('p');
-        echoP.className = 'command-echo';
-        echoP.textContent = '> ' + commandText;
+        echoP.className = 'verb-echo';
+        echoP.textContent = '> ' + verbText;
         sceneDescriptionElement.appendChild(echoP);
 
-        let commandProcessed = false;
+        let verbProcessed = false;
         let responseText = '';
         
-        // 0. Check for fixed commands
-        if (gameData.fixedCommands && gameData.fixedCommands.length > 0) {
-            for (const fixedCmd of gameData.fixedCommands) {
-                const commandMatch = fixedCmd.commands.find(cmd => cmd.toLowerCase() === lowerCaseCommandText);
-                if (commandMatch) {
-                    responseText = fixedCmd.description;
-                    const fixedCmdP = document.createElement('p');
-                    fixedCmdP.innerHTML = responseText.replace(/\\n/g, '<br>');
-                    sceneDescriptionElement.appendChild(fixedCmdP);
-                    commandProcessed = true;
+        // 0. Check for fixed verbs
+        if (gameData.fixedVerbs && gameData.fixedVerbs.length > 0) {
+            for (const fixedVerb of gameData.fixedVerbs) {
+                const verbMatch = fixedVerb.verbs.find(verb => verb.toLowerCase() === lowerCaseVerbText);
+                if (verbMatch) {
+                    responseText = fixedVerb.description;
+                    const fixedVerbP = document.createElement('p');
+                    fixedVerbP.innerHTML = responseText.replace(/\\n/g, '<br>');
+                    sceneDescriptionElement.appendChild(fixedVerbP);
+                    verbProcessed = true;
                     break;
                 }
             }
         }
         
-        if (commandProcessed) {
-             currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
-             saveState();
+        if (verbProcessed) {
+             currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: responseText, sceneId: currentState.currentSceneId } });
              sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
-             return; // Exit processCommand early
+             return;
         }
 
         // Basic parser: verb + target
-        const commandParts = lowerCaseCommandText.split(/\\s+/);
-        const verb = commandParts[0];
-        const target = commandParts.slice(1).join(' ');
+        const verbParts = lowerCaseVerbText.split(/\\s+/);
+        const verb = verbParts[0];
+        const target = verbParts.slice(1).join(' ');
 
         // 1. Look for matching custom interactions
         if (currentScene.interactions) {
@@ -404,7 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     if (hasRequiredItem) {
-                        commandProcessed = true;
+                        verbProcessed = true;
                         
                         // Process state changes first
                         if (interaction.consumesItem && interaction.requiresInInventory) {
@@ -422,16 +433,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         
                         // Then process navigation/display changes
                         if (interaction.goToScene) {
-                            // The success message is NOT displayed. The new scene's description is the feedback.
-                            // We log the action, but with an empty response.
-                            currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: '', sceneId: currentState.currentSceneId } });
-                            saveState(); // Save state changes before navigating
+                            currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: '', sceneId: currentState.currentSceneId } });
                             performSceneChange(interaction.goToScene, interaction.soundEffect);
                         } else {
-                            // If not navigating, show the new description or a success message
                             if (interaction.newSceneDescription) {
                                 responseText = interaction.newSceneDescription;
-                                // Re-render the scene description from scratch
                                 if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
                                 currentSceneParagraphs = responseText.split('\\n').filter(p => p.trim() !== '');
                                 currentParagraphIndex = 0;
@@ -448,17 +454,16 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                         
-                        break; // Stop processing other interactions
+                        break;
                     }
                 }
             }
         }
         
-        if (commandProcessed) {
-            if (responseText) { // Only log if there was a textual response
-                currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
+        if (verbProcessed) {
+            if (responseText) {
+                currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: responseText, sceneId: currentState.currentSceneId } });
             }
-            saveState();
             if (sceneDescriptionElement) sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
             return;
         }
@@ -479,15 +484,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
                 if (!foundObject) {
-                    // Look at the scene itself
                     if (target === '' || target === 'cena' || target === 'ao redor' || target === 'lugar') {
-                        // Re-display scene description
                         if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
                          currentSceneParagraphs = currentScene.description.split('\\n').filter(p => p.trim() !== '');
                          currentParagraphIndex = 0;
                          renderNextParagraph();
-                         commandProcessed = true; // Set to true to avoid failure message
-                         // No responseText needed as the scene redraws
+                         verbProcessed = true;
                     } else {
                         responseText = "Não vejo nenhum(a) " + target + " aqui.";
                     }
@@ -527,7 +529,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  if (currentState.previousSceneId && currentState.previousSceneId !== currentState.currentSceneId) {
                     const sceneToReturn = currentState.previousSceneId;
                     responseText = '';
-                    commandProcessed = true;
+                    verbProcessed = true;
                     performSceneChange(sceneToReturn);
                  } else {
                     responseText = "Não há para onde voltar.";
@@ -541,11 +543,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const responseP = document.createElement('p');
             responseP.innerHTML = responseText;
             sceneDescriptionElement.appendChild(responseP);
-            currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
+            currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: responseText, sceneId: currentState.currentSceneId } });
         }
         
         if (sceneDescriptionElement) sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
-        saveState();
     }
 
     // --- UI Logic ---
@@ -595,7 +596,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 content += '<p>Nenhuma sugestão óbvia no momento.</p>';
             } else {
                 suggestions.forEach(s => {
-                    content += \`<button data-command="\${s}">\${s}</button>\`;
+                    content += \`<button data-verb="\${s}">\${s}</button>\`;
                 });
             }
         }
@@ -604,13 +605,12 @@ document.addEventListener('DOMContentLoaded', () => {
         actionPopup.innerHTML = content;
         actionPopup.classList.remove('hidden');
 
-        // Add event listeners to newly created suggestion buttons
         if (type === 'suggestions') {
-            actionPopup.querySelectorAll('button[data-command]').forEach(button => {
+            actionPopup.querySelectorAll('button[data-verb]').forEach(button => {
                 button.addEventListener('click', () => {
-                    if(commandInputElement) {
-                        commandInputElement.value = button.getAttribute('data-command');
-                        commandInputElement.focus();
+                    if(verbInputElement) {
+                        verbInputElement.value = button.getAttribute('data-verb');
+                        verbInputElement.focus();
                         actionPopup.classList.add('hidden');
                     }
                 });
@@ -636,11 +636,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 \`;
                 diaryLogElement.appendChild(div);
-            } else if (entry.type === 'action' && entry.data.command) { // Only show entries with an explicit command
+            } else if (entry.type === 'action' && entry.data.command) {
                 const lastEntry = diaryLogElement.querySelector('.diary-entry:last-child .text-container');
                 if (lastEntry) {
                     const p = document.createElement('p');
-                    p.className = 'command-echo';
+                    p.className = 'verb-echo';
                     p.innerHTML = \`
                         <strong>\${gameData.nome_jogador_diario || 'VOCÊ'}:</strong> 
                         "\${entry.data.command}"
@@ -693,17 +693,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // --- Event Listeners ---
-    if (commandInputElement) {
-        commandInputElement.addEventListener('keydown', (e) => {
+    if (verbInputElement) {
+        verbInputElement.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 e.preventDefault();
-                processCommand();
+                processVerb();
             }
         });
     }
 
-    if (submitCommandButton) {
-        submitCommandButton.addEventListener('click', processCommand);
+    if (submitVerbButton) {
+        submitVerbButton.addEventListener('click', processVerb);
     }
     
     if (inventoryButton) {

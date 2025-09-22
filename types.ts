@@ -1,9 +1,5 @@
 
 
-
-
-
-
 export interface GameObject {
   id: string;
   name: string;
@@ -50,9 +46,9 @@ export interface Scene {
   mapY?: number;
 }
 
-export interface FixedCommand {
+export interface FixedVerb {
   id: string;
-  commands: string[];
+  verbs: string[];
   description: string;
 }
 
@@ -83,11 +79,11 @@ export interface GameData {
   gameSplashButtonTextColor?: string;
   gameLayoutOrientation?: 'vertical' | 'horizontal';
   gameLayoutOrder?: 'image-first' | 'image-last';
-  gameImageFrame?: 'none' | 'classic' | 'art-deco' | 'rounded-top' | 'book-cover' | 'trading-card' | 'chamfered';
+  gameImageFrame?: 'none' | 'book-cover' | 'trading-card' | 'chamfered' | 'rounded-top';
   gameActionButtonColor?: string;
   gameActionButtonTextColor?: string;
   gameActionButtonText?: string;
-  gameCommandInputPlaceholder?: string;
+  gameVerbInputPlaceholder?: string;
   gameDiaryPlayerName?: string;
   gameFocusColor?: string;
   gameEnableChances?: boolean;
@@ -111,14 +107,9 @@ export interface GameData {
   frameCardInnerColor?: string;
   frameCardOuterColor?: string;
   frameChamferedColor?: string;
-  frameClassicWoodDarkColor?: string;
-  frameClassicWoodLightColor?: string;
-  frameClassicGoldColor?: string;
-  frameArtDecoBackgroundColor?: string;
-  frameArtDecoAccentColor?: string;
   frameRoundedTopBackgroundColor?: string;
   frameRoundedTopBorderColor?: string;
-  fixedCommands?: FixedCommand[];
+  fixedVerbs?: FixedVerb[];
 }
 
 export type View = 'scenes' | 'interface' | 'game_info' | 'theme';

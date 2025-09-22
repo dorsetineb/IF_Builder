@@ -1,7 +1,5 @@
 
 
-
-
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -77,8 +75,8 @@ const gameHTML = `
                         <button id="diary-button">Diário</button>
                     </div>
                     <div class="input-area">
-                        <input type="text" id="command-input" placeholder="__COMMAND_INPUT_PLACEHOLDER__">
-                        <button id="submit-command">__ACTION_BUTTON_TEXT__</button>
+                        <input type="text" id="verb-input" placeholder="__VERB_INPUT_PLACEHOLDER__">
+                        <button id="submit-verb">__ACTION_BUTTON_TEXT__</button>
                     </div>
                 </div>
             </div>
@@ -322,7 +320,7 @@ body.with-spacing .main-wrapper {
     line-height: 1.8;
     padding-bottom: 20px;
 }
-.command-echo { color: var(--text-dim-color); font-style: italic; }
+.verb-echo { color: var(--text-dim-color); font-style: italic; }
 .highlight-item {
     font-weight: bold;
     color: var(--highlight-color);
@@ -414,7 +412,7 @@ body.with-spacing .main-wrapper {
     display: flex;
     gap: 10px;
 }
-#command-input {
+#verb-input {
     flex-grow: 1;
     padding: 15px 12px;
     border: 2px solid var(--border-color);
@@ -423,15 +421,15 @@ body.with-spacing .main-wrapper {
     font-family: var(--font-family);
     font-size: 1em;
 }
-#command-input:focus {
+#verb-input:focus {
     outline: none;
     border-color: var(--border-color);
 }
-#command-input:disabled {
+#verb-input:disabled {
     background-color: var(--button-bg);
     cursor: not-allowed;
 }
-#submit-command {
+#submit-verb {
     padding: 10px 20px;
     border: 2px solid var(--border-color);
     background-color: var(--action-button-bg);
@@ -441,14 +439,14 @@ body.with-spacing .main-wrapper {
     font-weight: bold;
     transition: background-color 0.2s;
 }
-#submit-command:hover { background-color: #e0e0e0; }
+#submit-verb:hover { background-color: #e0e0e0; }
 
-#submit-command:disabled {
+#submit-verb:disabled {
     background-color: var(--button-hover-bg);
     color: var(--text-dim-color);
     cursor: not-allowed;
 }
-#submit-command:disabled:hover {
+#submit-verb:disabled:hover {
     background-color: var(--button-hover-bg);
 }
 
@@ -526,7 +524,7 @@ body.with-spacing .main-wrapper {
     margin: 0;
     white-space: pre-wrap;
 }
-.diary-entry .text-container .command-echo {
+.diary-entry .text-container .verb-echo {
     display: block;
     margin-top: 10px;
     color: var(--text-dim-color);
@@ -552,82 +550,6 @@ body.with-spacing .main-wrapper {
 }
 
 /* Image Frame Styles */
-.frame-classic .image-panel {
-    padding: 20px;
-    background: __FRAME_CLASSIC_WOOD_DARK_COLOR__;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
-    border-right-color: __FRAME_CLASSIC_WOOD_DARK_COLOR__;
-}
-.frame-classic .image-container {
-    border: 4px solid __FRAME_CLASSIC_GOLD_COLOR__;
-    outline: 10px solid __FRAME_CLASSIC_WOOD_LIGHT_COLOR__;
-    box-shadow: 0 0 15px rgba(0,0,0,0.7);
-}
-
-.frame-art-deco .image-panel {
-    padding: 25px;
-    background-color: __FRAME_ART_DECO_BG_COLOR__;
-    border-right-color: __FRAME_ART_DECO_BG_COLOR__;
-    position: relative;
-}
-.frame-art-deco .image-container {
-    border: 2px solid __FRAME_ART_DECO_ACCENT_COLOR__;
-    box-shadow: 0 0 0 5px __FRAME_ART_DECO_BG_COLOR__, 0 0 0 7px __FRAME_ART_DECO_ACCENT_COLOR__;
-    position: relative;
-    z-index: 1;
-}
-
-/* --- New Art Deco Ornaments --- */
-.frame-art-deco .image-panel::before,
-.frame-art-deco .image-panel::after,
-.frame-art-deco .image-container::before,
-.frame-art-deco .image-container::after {
-    content: '';
-    position: absolute;
-    width: 45px;
-    height: 45px;
-    border-color: __FRAME_ART_DECO_ACCENT_COLOR__;
-    border-style: solid;
-    background: __FRAME_ART_DECO_BG_COLOR__; /* Hides lines underneath */
-}
-
-/* Top Left */
-.frame-art-deco .image-panel::before {
-    top: 8px;
-    left: 8px;
-    border-width: 2px 0 0 2px;
-    border-top-left-radius: 30px;
-    box-shadow: inset 6px 6px 0 -4px __FRAME_ART_DECO_ACCENT_COLOR__;
-}
-
-/* Bottom Right */
-.frame-art-deco .image-panel::after {
-    bottom: 8px;
-    right: 8px;
-    border-width: 0 2px 2px 0;
-    border-bottom-right-radius: 30px;
-    box-shadow: inset -6px -6px 0 -4px __FRAME_ART_DECO_ACCENT_COLOR__;
-}
-
-/* Top Right */
-.frame-art-deco .image-container::before {
-    top: -17px;
-    right: -17px;
-    border-width: 2px 2px 0 0;
-    border-top-right-radius: 30px;
-    box-shadow: inset -6px 6px 0 -4px __FRAME_ART_DECO_ACCENT_COLOR__;
-}
-
-/* Bottom Left */
-.frame-art-deco .image-container::after {
-    bottom: -17px;
-    left: -17px;
-    border-width: 0 0 2px 2px;
-    border-bottom-left-radius: 30px;
-    box-shadow: inset 6px -6px 0 -4px __FRAME_ART_DECO_ACCENT_COLOR__;
-}
-
-
 .frame-rounded-top .image-panel {
     padding: 15px;
     background: __FRAME_ROUNDED_TOP_BG_COLOR__;
@@ -666,7 +588,7 @@ body.with-spacing .main-wrapper {
 .frame-chamfered .image-panel {
     padding: 0;
     background: __FRAME_CHAMFERED_COLOR__;
-    clip-path: polygon(30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%, 0 30px);
+    clip-path: polygon(30px 0, calc(100% - 30px) 0, 100% 30px, 100% calc(100% - 30px), calc(100% - 30px) 100%, 30px 100%, 0 calc(100% - 30px), 0 30px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -674,7 +596,7 @@ body.with-spacing .main-wrapper {
 .frame-chamfered .image-container {
     width: calc(100% - 20px);
     height: calc(100% - 20px);
-    clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+    clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
 }
 `;
 
@@ -816,7 +738,7 @@ const initializeGameData = (): GameData => {
         gameActionButtonColor: '#ffffff',
         gameActionButtonTextColor: '#0d1117',
         gameActionButtonText: 'AÇÃO',
-        gameCommandInputPlaceholder: 'O QUE VOCÊ FAZ?',
+        gameVerbInputPlaceholder: 'O QUE VOCÊ FAZ?',
         gameDiaryPlayerName: 'VOCÊ',
         gameFocusColor: '#58a6ff',
         gameEnableChances: false,
@@ -840,14 +762,9 @@ const initializeGameData = (): GameData => {
         frameCardInnerColor: '#d97706',
         frameCardOuterColor: '#1c1917',
         frameChamferedColor: '#4a5568',
-        frameClassicWoodDarkColor: '#3a2d2d',
-        frameClassicWoodLightColor: '#5a3d3d',
-        frameClassicGoldColor: '#c0a080',
-        frameArtDecoBackgroundColor: '#1a1a1a',
-        frameArtDecoAccentColor: '#c0a080',
         frameRoundedTopBackgroundColor: '#000000',
         frameRoundedTopBorderColor: '#facc15',
-        fixedCommands: [],
+        fixedVerbs: [],
     };
 };
 
@@ -1071,7 +988,7 @@ const App: React.FC = () => {
             layoutOrder={gameData.gameLayoutOrder || 'image-first'}
             imageFrame={gameData.gameImageFrame || 'none'}
             actionButtonText={gameData.gameActionButtonText || 'AÇÃO'}
-            commandInputPlaceholder={gameData.gameCommandInputPlaceholder || 'O QUE VOCÊ FAZ?'}
+            verbInputPlaceholder={gameData.gameVerbInputPlaceholder || 'O QUE VOCÊ FAZ?'}
             diaryPlayerName={gameData.gameDiaryPlayerName || 'VOCÊ'}
             splashButtonText={gameData.gameSplashButtonText || 'INICIAR AVENTURA'}
             continueButtonText={gameData.gameContinueButtonText || 'Continuar Aventura'}
@@ -1100,11 +1017,6 @@ const App: React.FC = () => {
             frameCardInnerColor={gameData.frameCardInnerColor || '#d97706'}
             frameCardOuterColor={gameData.frameCardOuterColor || '#1c1917'}
             frameChamferedColor={gameData.frameChamferedColor || '#4a5568'}
-            frameClassicWoodDarkColor={gameData.frameClassicWoodDarkColor || '#3a2d2d'}
-            frameClassicWoodLightColor={gameData.frameClassicWoodLightColor || '#5a3d3d'}
-            frameClassicGoldColor={gameData.frameClassicGoldColor || '#c0a080'}
-            frameArtDecoBackgroundColor={gameData.frameArtDecoBackgroundColor || '#1a1a1a'}
-            frameArtDecoAccentColor={gameData.frameArtDecoAccentColor || '#c0a080'}
             frameRoundedTopBackgroundColor={gameData.frameRoundedTopBackgroundColor || '#000000'}
             frameRoundedTopBorderColor={gameData.frameRoundedTopBorderColor || '#facc15'}
             onUpdate={handleUpdateGameData}
@@ -1127,7 +1039,7 @@ const App: React.FC = () => {
             negativeEndingImage={gameData.negativeEndingImage || ''}
             negativeEndingContentAlignment={gameData.negativeEndingContentAlignment || 'right'}
             negativeEndingDescription={gameData.negativeEndingDescription || ''}
-            fixedCommands={gameData.fixedCommands || []}
+            fixedVerbs={gameData.fixedVerbs || []}
             onUpdate={handleUpdateGameData}
             isDirty={isDirty}
             onSetDirty={setIsDirty}
