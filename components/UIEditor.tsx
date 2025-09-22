@@ -410,7 +410,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   };
 
   const getFramePreviewStyles = (frame: GameData['gameImageFrame']) => {
-      const panelStyles: React.CSSProperties = {};
+      const panelStyles: React.CSSProperties = { boxSizing: 'border-box' };
       const containerStyles: React.CSSProperties = {
           backgroundColor: localGameTheme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
           color: localGameTheme === 'dark' ? '#a0aec0' : '#4a5568',
@@ -418,7 +418,8 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
           height: '100%',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          boxSizing: 'border-box',
       };
 
       switch (frame) {
@@ -441,10 +442,20 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
               containerStyles.borderRadius = '6px';
               break;
           case 'chamfered':
+              const previewChamferSize = '18px'; // Adjusted for small preview size
+              const previewBorderWidth = '8px';  // Adjusted for small preview size
+              const previewChamferPath = `polygon(${previewChamferSize} 0, calc(100% - ${previewChamferSize}) 0, 100% ${previewChamferSize}, 100% calc(100% - ${previewChamferSize}), calc(100% - ${previewChamferSize}) 100%, ${previewChamferSize} 100%, 0 calc(100% - ${previewChamferSize}), 0 ${previewChamferSize})`;
+              
+              // .image-panel simulation
+              panelStyles.padding = previewBorderWidth;
               panelStyles.backgroundColor = localFrameChamferedColor;
-              panelStyles.clipPath = 'polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px)';
-              panelStyles.padding = '5px';
-              containerStyles.clipPath = 'polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px)';
+              panelStyles.clipPath = previewChamferPath;
+              panelStyles.border = 'none'; // Ensure no other borders interfere
+
+              // .image-container simulation
+              containerStyles.clipPath = previewChamferPath;
+              containerStyles.border = 'none'; // Ensure no other borders interfere
+              // The default background of containerStyles is a semi-transparent fill, which is perfect for the preview.
               break;
           default:
               panelStyles.border = `2px solid ${localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}`;

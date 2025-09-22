@@ -574,29 +574,37 @@ body.with-spacing .main-wrapper {
 
 .frame-trading-card .image-panel {
     padding: 15px;
-    background: transparent;
+    background: __FRAME_CARD_OUTER_COLOR__;
     border-right-color: transparent;
+    border-radius: 28px;
 }
 .frame-trading-card .image-container {
     border: 4px solid __FRAME_CARD_INNER_COLOR__;
     border-radius: 24px;
 }
-.frame-trading-card #scene-image {
+#scene-image {
     border-radius: 20px;
 }
 
+/*
+  The two-element clip-path technique for a mitered frame.
+  .image-panel is the outer element, creating the frame with its background color and padding.
+  .image-container is the inner element, which holds the actual image.
+*/
 .frame-chamfered .image-panel {
-    padding: 0;
-    background: __FRAME_CHAMFERED_COLOR__;
-    clip-path: polygon(30px 0, calc(100% - 30px) 0, 100% 30px, 100% calc(100% - 30px), calc(100% - 30px) 100%, 30px 100%, 0 calc(100% - 30px), 0 30px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    padding: 15px; /* This becomes the frame width */
+    background: __FRAME_CHAMFERED_COLOR__; /* The frame color */
+    border: none;
+    /* A 25px chamfer. The value is the distance from the corner along the edge. */
+    clip-path: polygon(25px 0, calc(100% - 25px) 0, 100% 25px, 100% calc(100% - 25px), calc(100% - 25px) 100%, 25px 100%, 0 calc(100% - 25px), 0 25px);
 }
 .frame-chamfered .image-container {
-    width: calc(100% - 20px);
-    height: calc(100% - 20px);
-    clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% calc(100% - 20px), calc(100% - 20px) 100%, 20px 100%, 0 calc(100% - 20px), 0 20px);
+    width: 100%;
+    height: 100%;
+    border: none;
+    background-color: transparent; /* This is crucial for the image to be visible */
+    /* Clip the inner container to match the frame's inner shape */
+    clip-path: polygon(25px 0, calc(100% - 25px) 0, 100% 25px, 100% calc(100% - 25px), calc(100% - 25px) 100%, 25px 100%, 0 calc(100% - 25px), 0 25px);
 }
 `;
 
@@ -758,12 +766,12 @@ const initializeGameData = (): GameData => {
         negativeEndingImage: "",
         negativeEndingContentAlignment: 'right',
         negativeEndingDescription: "Fim de jogo. Suas chances acabaram. Tente novamente!",
-        frameBookColor: '#2d2d2d',
-        frameCardInnerColor: '#d97706',
-        frameCardOuterColor: '#1c1917',
-        frameChamferedColor: '#4a5568',
+        frameBookColor: '#FFFFFF',
+        frameCardInnerColor: '#FFFFFF',
+        frameCardOuterColor: '#FFFFFF',
+        frameChamferedColor: '#FFFFFF',
         frameRoundedTopBackgroundColor: '#000000',
-        frameRoundedTopBorderColor: '#facc15',
+        frameRoundedTopBorderColor: '#FFFFFF',
         fixedVerbs: [],
     };
 };
