@@ -499,7 +499,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const TABS = {
     layout: 'Layout',
     textos: 'Textos da Interface',
-    cores: 'Cores',
+    cores: 'Cores e Fontes',
   };
 
 
@@ -991,7 +991,6 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                 </div>
             </div>
           )}
-
         </div>
       </div>
 

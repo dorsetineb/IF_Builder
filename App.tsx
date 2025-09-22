@@ -1,5 +1,7 @@
 
 
+
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -845,6 +847,7 @@ const initializeGameData = (): GameData => {
         frameArtDecoAccentColor: '#c0a080',
         frameRoundedTopBackgroundColor: '#000000',
         frameRoundedTopBorderColor: '#facc15',
+        fixedCommands: [],
     };
 };
 
@@ -1124,6 +1127,7 @@ const App: React.FC = () => {
             negativeEndingImage={gameData.negativeEndingImage || ''}
             negativeEndingContentAlignment={gameData.negativeEndingContentAlignment || 'right'}
             negativeEndingDescription={gameData.negativeEndingDescription || ''}
+            fixedCommands={gameData.fixedCommands || []}
             onUpdate={handleUpdateGameData}
             isDirty={isDirty}
             onSetDirty={setIsDirty}

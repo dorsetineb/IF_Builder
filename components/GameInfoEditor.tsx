@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { GameData } from '../types';
+import { GameData, FixedCommand } from '../types';
 import { UploadIcon } from './icons/UploadIcon';
+import { PlusIcon } from './icons/PlusIcon';
+import { TrashIcon } from './icons/TrashIcon';
 
 interface GameInfoEditorProps {
   title: string;
@@ -15,10 +17,74 @@ interface GameInfoEditorProps {
   negativeEndingImage: string;
   negativeEndingContentAlignment: 'left' | 'right';
   negativeEndingDescription: string;
-  onUpdate: (field: keyof GameData, value: string | boolean | number) => void;
+  fixedCommands: FixedCommand[];
+  onUpdate: (field: keyof GameData, value: any) => void;
   isDirty: boolean;
   onSetDirty: (isDirty: boolean) => void;
 }
+
+// Sub-component to manage local state for the commands input field
+const FixedCommandItem: React.FC<{
+  command: FixedCommand;
+  onUpdate: (id: string, field: 'commands' | 'description', value: any) => void;
+  onRemove: (id: string) => void;
+}> = ({ command, onUpdate, onRemove }) => {
+  const [localCommands, setLocalCommands] = useState(command.commands.join(', '));
+  const inputId = `cmd-words-${command.id}`;
+
+  useEffect(() => {
+    // Sync local state with prop, but only if the user is not currently typing in the input.
+    if (document.activeElement?.id !== inputId) {
+      setLocalCommands(command.commands.join(', '));
+    }
+  }, [command.commands, inputId]);
+
+  const handleCommandsBlur = () => {
+    const cleanedCommands = localCommands.split(',').map(c => c.trim().toLowerCase()).filter(Boolean);
+    // Only call update if the cleaned array is different from the source
+    if (JSON.stringify(cleanedCommands) !== JSON.stringify(command.commands)) {
+      onUpdate(command.id, 'commands', cleanedCommands);
+    }
+  };
+
+  return (
+    <div className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
+      <button
+        onClick={() => onRemove(command.id)}
+        className="absolute top-0 right-0 p-2 bg-red-500 text-white rounded-bl-lg hover:bg-red-600 transition-colors"
+        title="Remover comando"
+      >
+        <TrashIcon className="w-5 h-5" />
+      </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+        <div>
+          <label htmlFor={inputId} className="block text-sm font-medium text-brand-text-dim mb-1">Comandos (separados por vírgula)</label>
+          <input
+            id={inputId}
+            type="text"
+            value={localCommands}
+            onChange={e => setLocalCommands(e.target.value)}
+            onBlur={handleCommandsBlur}
+            placeholder="ex: ajuda, help, ?"
+            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+          />
+        </div>
+        <div className="flex flex-col h-full">
+          <label htmlFor={`cmd-desc-${command.id}`} className="block text-sm font-medium text-brand-text-dim mb-1">Descrição / Resposta</label>
+          <textarea
+            id={`cmd-desc-${command.id}`}
+            value={command.description}
+            onChange={e => onUpdate(command.id, 'description', e.target.value)}
+            placeholder="Texto que será exibido para o jogador."
+            rows={3}
+            className="w-full flex-grow bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 
 const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
     const { 
@@ -26,6 +92,7 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         splashImage, splashContentAlignment, splashDescription,
         positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription,
         negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription,
+        fixedCommands,
         onUpdate, isDirty, onSetDirty 
     } = props;
 
@@ -41,6 +108,7 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
     const [localNegativeEndingImage, setLocalNegativeEndingImage] = useState(negativeEndingImage);
     const [localNegativeEndingContentAlignment, setLocalNegativeEndingContentAlignment] = useState(negativeEndingContentAlignment);
     const [localNegativeEndingDescription, setLocalNegativeEndingDescription] = useState(negativeEndingDescription);
+    const [localFixedCommands, setLocalFixedCommands] = useState(fixedCommands);
     const [activeTab, setActiveTab] = useState('abertura');
 
     useEffect(() => {
@@ -55,9 +123,10 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                          localPositiveEndingDescription !== positiveEndingDescription ||
                          localNegativeEndingImage !== negativeEndingImage ||
                          localNegativeEndingContentAlignment !== negativeEndingContentAlignment ||
-                         localNegativeEndingDescription !== negativeEndingDescription;
+                         localNegativeEndingDescription !== negativeEndingDescription ||
+                         JSON.stringify(localFixedCommands) !== JSON.stringify(fixedCommands);
         onSetDirty(hasChanged);
-    }, [localTitle, localLogo, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, localPositiveEndingImage, localPositiveEndingContentAlignment, localPositiveEndingDescription, localNegativeEndingImage, localNegativeEndingContentAlignment, localNegativeEndingDescription, props, onSetDirty]);
+    }, [localTitle, localLogo, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, localPositiveEndingImage, localPositiveEndingContentAlignment, localPositiveEndingDescription, localNegativeEndingImage, localNegativeEndingContentAlignment, localNegativeEndingDescription, localFixedCommands, props, onSetDirty]);
 
     const handleSave = () => {
         if (localTitle !== title) onUpdate('gameTitle', localTitle);
@@ -72,6 +141,7 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         if (localNegativeEndingImage !== negativeEndingImage) onUpdate('negativeEndingImage', localNegativeEndingImage);
         if (localNegativeEndingContentAlignment !== negativeEndingContentAlignment) onUpdate('negativeEndingContentAlignment', localNegativeEndingContentAlignment);
         if (localNegativeEndingDescription !== negativeEndingDescription) onUpdate('negativeEndingDescription', localNegativeEndingDescription);
+        if (JSON.stringify(localFixedCommands) !== JSON.stringify(fixedCommands)) onUpdate('fixedCommands', localFixedCommands);
     };
     
     const handleUndo = () => {
@@ -87,6 +157,7 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         setLocalNegativeEndingImage(negativeEndingImage);
         setLocalNegativeEndingContentAlignment(negativeEndingContentAlignment);
         setLocalNegativeEndingDescription(negativeEndingDescription);
+        setLocalFixedCommands(fixedCommands);
     };
     
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
@@ -100,10 +171,33 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
           reader.readAsDataURL(e.target.files[0]);
       }
     };
+    
+    const handleAddFixedCommand = () => {
+        const newCommand: FixedCommand = {
+            id: `cmd_${Math.random().toString(36).substring(2, 9)}`,
+            commands: [],
+            description: 'Nova resposta para o comando.',
+        };
+        setLocalFixedCommands([...localFixedCommands, newCommand]);
+    };
+    
+    const handleRemoveFixedCommand = (id: string) => {
+        setLocalFixedCommands(localFixedCommands.filter(cmd => cmd.id !== id));
+    };
+    
+    const handleFixedCommandChange = (id: string, field: 'commands' | 'description', value: any) => {
+        setLocalFixedCommands(localFixedCommands.map(cmd => {
+            if (cmd.id === id) {
+                return { ...cmd, [field]: value };
+            }
+            return cmd;
+        }));
+    };
 
     const TABS = {
         abertura: 'Abertura do Jogo',
         fim_de_jogo: 'Fim de Jogo',
+        comandos: 'Comandos Fixos',
     };
 
   return (
@@ -329,6 +423,34 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                               </div>
                           </div>
                       </div>
+                  </div>
+              </div>
+          )}
+
+          {activeTab === 'comandos' && (
+              <div className="space-y-4">
+                  <p className="text-brand-text-dim text-sm">
+                      Defina comandos fixos que o jogador pode usar a qualquer momento. Estes comandos têm prioridade sobre as interações de cena.
+                  </p>
+                  {localFixedCommands.map((cmd) => (
+                      <FixedCommandItem
+                          key={cmd.id}
+                          command={cmd}
+                          onUpdate={handleFixedCommandChange}
+                          onRemove={handleRemoveFixedCommand}
+                      />
+                  ))}
+                  {localFixedCommands.length === 0 && (
+                      <p className="text-center text-brand-text-dim py-4">Nenhum comando fixo definido.</p>
+                  )}
+                  <div className="flex justify-end mt-4">
+                      <button 
+                          onClick={handleAddFixedCommand} 
+                          className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
+                      >
+                          <PlusIcon className="w-5 h-5 mr-2" />
+                          Adicionar Comando Fixo
+                      </button>
                   </div>
               </div>
           )}

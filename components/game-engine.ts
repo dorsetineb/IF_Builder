@@ -36,6 +36,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         negativeEndingDescription: data.negativeEndingDescription,
         gameRestartButtonText: data.gameRestartButtonText,
         gameContinueButtonText: data.gameContinueButtonText,
+        fixedCommands: data.fixedCommands || [],
     };
 };
 
@@ -360,13 +361,35 @@ document.addEventListener('DOMContentLoaded', () => {
         echoP.textContent = '> ' + commandText;
         sceneDescriptionElement.appendChild(echoP);
 
+        let commandProcessed = false;
+        let responseText = '';
+        
+        // 0. Check for fixed commands
+        if (gameData.fixedCommands && gameData.fixedCommands.length > 0) {
+            for (const fixedCmd of gameData.fixedCommands) {
+                const commandMatch = fixedCmd.commands.find(cmd => cmd.toLowerCase() === lowerCaseCommandText);
+                if (commandMatch) {
+                    responseText = fixedCmd.description;
+                    const fixedCmdP = document.createElement('p');
+                    fixedCmdP.innerHTML = responseText.replace(/\\n/g, '<br>');
+                    sceneDescriptionElement.appendChild(fixedCmdP);
+                    commandProcessed = true;
+                    break;
+                }
+            }
+        }
+        
+        if (commandProcessed) {
+             currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
+             saveState();
+             sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
+             return; // Exit processCommand early
+        }
+
         // Basic parser: verb + target
         const commandParts = lowerCaseCommandText.split(/\\s+/);
         const verb = commandParts[0];
         const target = commandParts.slice(1).join(' ');
-
-        let interactionFound = false;
-        let responseText = '';
 
         // 1. Look for matching custom interactions
         if (currentScene.interactions) {
@@ -381,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
 
                     if (hasRequiredItem) {
-                        interactionFound = true;
+                        commandProcessed = true;
                         
                         // Process state changes first
                         if (interaction.consumesItem && interaction.requiresInInventory) {
@@ -402,363 +425,343 @@ document.addEventListener('DOMContentLoaded', () => {
                             // The success message is NOT displayed. The new scene's description is the feedback.
                             // We log the action, but with an empty response.
                             currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: '', sceneId: currentState.currentSceneId } });
-                            saveState(); // Save state before initiating the change
+                            saveState(); // Save state changes before navigating
                             performSceneChange(interaction.goToScene, interaction.soundEffect);
-                            return; // Exit
-                        }
-
-                        // Play sound for non-scene-changing interactions
-                        if (interaction.soundEffect && sceneSoundEffectElement) {
-                            sceneSoundEffectElement.src = interaction.soundEffect;
-                            sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
+                        } else {
+                            // If not navigating, show the new description or a success message
+                            if (interaction.newSceneDescription) {
+                                responseText = interaction.newSceneDescription;
+                                // Re-render the scene description from scratch
+                                if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
+                                currentSceneParagraphs = responseText.split('\\n').filter(p => p.trim() !== '');
+                                currentParagraphIndex = 0;
+                                renderNextParagraph();
+                            } else if (interaction.successMessage) {
+                                responseText = interaction.successMessage;
+                                const successP = document.createElement('p');
+                                successP.innerHTML = responseText;
+                                sceneDescriptionElement.appendChild(successP);
+                            }
+                             if (interaction.soundEffect && sceneSoundEffectElement) {
+                                sceneSoundEffectElement.src = interaction.soundEffect;
+                                sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
+                            }
                         }
                         
-                        saveState();
-
-                        if (interaction.newSceneDescription) {
-                            responseText = interaction.successMessage || 'A cena mudou.';
-                            currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
-                            
-                            // To display the message, we append it before re-rendering the scene
-                            const messageP = document.createElement('p');
-                            messageP.textContent = responseText;
-                            sceneDescriptionElement.appendChild(messageP);
-                            sceneDescriptionElement.appendChild(document.createElement('br'));
-
-                            changeScene(currentState.currentSceneId);
-                            return; // Exit
-                        }
-                        if (interaction.successMessage) {
-                            responseText = interaction.successMessage;
-                            const successP = document.createElement('p');
-                            successP.textContent = responseText;
-                            sceneDescriptionElement.appendChild(successP);
-                        }
-                        break; // Stop after finding the first matching interaction
+                        break; // Stop processing other interactions
                     }
                 }
             }
-        }
-
-        // 2. Built-in commands if no custom interaction found
-        if (!interactionFound) {
-            if (['olhar', 'examinar'].includes(verb)) {
-                let itemFound = false;
-                if (target) {
-                    const object = currentScene.objetos.find(obj => target.includes(obj.name.toLowerCase()));
-                    if (object) {
-                        responseText = object.examineDescription;
-                        const examineP = document.createElement('p');
-                        examineP.textContent = responseText;
-                        sceneDescriptionElement.appendChild(examineP);
-                        itemFound = true;
-                    }
-                }
-                if (!itemFound && !target) {
-                    responseText = ''; // Re-describing the scene, no specific response text
-                    currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
-                    changeScene(currentState.currentSceneId);
-                    return;
-                }
-                interactionFound = itemFound;
-            } else if (['pegar', 'apanhar', 'levar'].includes(verb)) {
-                const object = currentScene.objetos.find(obj => target.includes(obj.name.toLowerCase()));
-                if (object) {
-                    interactionFound = true;
-                    if (object.isTakable) {
-                        currentState.inventory.push(object.id);
-                        const sceneState = currentState.scenesState[currentState.currentSceneId];
-                        sceneState.objetos = sceneState.objetos.filter(obj => obj.id !== object.id);
-                        
-                        responseText = \`Você pegou: \${object.name}.\`;
-                        const takeP = document.createElement('p');
-                        takeP.textContent = responseText;
-                        sceneDescriptionElement.appendChild(takeP);
-                        saveState();
-                    } else {
-                        responseText = 'Você não pode pegar isso.';
-                        const cantTakeP = document.createElement('p');
-                        cantTakeP.textContent = responseText;
-                        sceneDescriptionElement.appendChild(cantTakeP);
-                    }
-                }
-            }
-        }
-
-        // 3. If still no interaction found, show default failure message
-        if (!interactionFound) {
-            responseText = gameData.mensagem_falha_padrao || "Isso não parece ter nenhum efeito.";
-            const failureP = document.createElement('p');
-            failureP.textContent = responseText;
-            sceneDescriptionElement.appendChild(failureP);
         }
         
-        currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
+        if (commandProcessed) {
+            if (responseText) { // Only log if there was a textual response
+                currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
+            }
+            saveState();
+            if (sceneDescriptionElement) sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
+            return;
+        }
+
+        // 2. Built-in command processing
+        const allSceneObjects = [...(currentScene.objetos || []), ...currentState.inventory.map(id => allTakableObjects[id])];
+        
+        switch (verb) {
+            case 'olhar':
+            case 'examinar':
+            case 'ver':
+                let foundObject = false;
+                for (const obj of allSceneObjects) {
+                    if (target.includes(obj.name.toLowerCase())) {
+                        responseText = obj.examineDescription;
+                        foundObject = true;
+                        break;
+                    }
+                }
+                if (!foundObject) {
+                    // Look at the scene itself
+                    if (target === '' || target === 'cena' || target === 'ao redor' || target === 'lugar') {
+                        // Re-display scene description
+                        if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
+                         currentSceneParagraphs = currentScene.description.split('\\n').filter(p => p.trim() !== '');
+                         currentParagraphIndex = 0;
+                         renderNextParagraph();
+                         commandProcessed = true; // Set to true to avoid failure message
+                         // No responseText needed as the scene redraws
+                    } else {
+                        responseText = "Não vejo nenhum(a) " + target + " aqui.";
+                    }
+                }
+                break;
+            case 'pegar':
+            case 'apanhar':
+                let objectToTake = null;
+                let objectIndex = -1;
+                if (currentScene.objetos) {
+                    for (let i = 0; i < currentScene.objetos.length; i++) {
+                        const obj = currentScene.objetos[i];
+                        if (target.includes(obj.name.toLowerCase())) {
+                            objectToTake = obj;
+                            objectIndex = i;
+                            break;
+                        }
+                    }
+                }
+                if (objectToTake) {
+                    if (objectToTake.isTakable) {
+                        if (!currentState.inventory.includes(objectToTake.id)) {
+                             currentState.inventory.push(objectToTake.id);
+                             currentScene.objetos.splice(objectIndex, 1);
+                             responseText = objectToTake.name + " adicionado(a) ao inventário.";
+                        } else {
+                            responseText = "Você já tem isso.";
+                        }
+                    } else {
+                        responseText = "Não consigo pegar " + objectToTake.name + ".";
+                    }
+                } else {
+                     responseText = "Não vejo nenhum(a) " + target + " para pegar.";
+                }
+                break;
+            case 'voltar':
+                 if (currentState.previousSceneId && currentState.previousSceneId !== currentState.currentSceneId) {
+                    const sceneToReturn = currentState.previousSceneId;
+                    responseText = '';
+                    commandProcessed = true;
+                    performSceneChange(sceneToReturn);
+                 } else {
+                    responseText = "Não há para onde voltar.";
+                 }
+                 break;
+            default:
+                responseText = gameData.mensagem_falha_padrao;
+        }
+
+        if (responseText) {
+            const responseP = document.createElement('p');
+            responseP.innerHTML = responseText;
+            sceneDescriptionElement.appendChild(responseP);
+            currentState.diaryLog.push({ type: 'action', data: { command: commandText, response: responseText, sceneId: currentState.currentSceneId } });
+        }
+        
+        if (sceneDescriptionElement) sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
         saveState();
-        sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
     }
 
-    function resetUI() {
-        if(gameHeader) gameHeader.classList.remove('hidden');
-        if(gameContainer) gameContainer.classList.remove('hidden');
-        if(positiveEndingScreen) positiveEndingScreen.classList.add('hidden');
-        if(negativeEndingScreen) negativeEndingScreen.classList.add('hidden');
+    // --- UI Logic ---
+    function populateAndShowPopup(type) {
+        if (!actionPopup) return;
+        actionPopup.innerHTML = '';
+        let content = '<div class="action-popup-list">';
 
-        const actionButtons = document.querySelector('.action-buttons');
-        const inputArea = document.querySelector('.input-area');
-        if (actionButtons) actionButtons.style.display = 'flex';
-        if (inputArea) inputArea.style.display = 'flex';
-        if (commandInputElement) commandInputElement.disabled = false;
-        if (submitCommandButton) submitCommandButton.disabled = false;
+        if (type === 'inventory') {
+            if (currentState.inventory.length === 0) {
+                content += '<p>O inventário está vazio.</p>';
+            } else {
+                currentState.inventory.forEach(itemId => {
+                    const item = allTakableObjects[itemId];
+                    if (item) {
+                        content += \`<p title="\${item.examineDescription}">\${item.name}</p>\`;
+                    }
+                });
+            }
+        } else if (type === 'suggestions') {
+            const currentScene = currentState.scenesState[currentState.currentSceneId];
+            const suggestions = new Set();
+            if (currentScene.objetos) {
+                 currentScene.objetos.forEach(obj => {
+                     suggestions.add(\`olhar \${obj.name}\`);
+                     if (obj.isTakable) {
+                        suggestions.add(\`pegar \${obj.name}\`);
+                     }
+                 });
+            }
+            if (currentScene.interactions) {
+                currentScene.interactions.forEach(inter => {
+                    const verb = inter.verbs[0] || 'usar';
+                    if (inter.requiresInInventory) {
+                        if (currentState.inventory.includes(inter.requiresInInventory)) {
+                            const item = allTakableObjects[inter.requiresInInventory];
+                            if(item) {
+                                suggestions.add(\`\${verb} \${item.name} em \${inter.target}\`);
+                            }
+                        }
+                    } else {
+                        suggestions.add(\`\${verb} \${inter.target}\`);
+                    }
+                });
+            }
+            if (suggestions.size === 0) {
+                content += '<p>Nenhuma sugestão óbvia no momento.</p>';
+            } else {
+                suggestions.forEach(s => {
+                    content += \`<button data-command="\${s}">\${s}</button>\`;
+                });
+            }
+        }
+
+        content += '</div>';
+        actionPopup.innerHTML = content;
+        actionPopup.classList.remove('hidden');
+
+        // Add event listeners to newly created suggestion buttons
+        if (type === 'suggestions') {
+            actionPopup.querySelectorAll('button[data-command]').forEach(button => {
+                button.addEventListener('click', () => {
+                    if(commandInputElement) {
+                        commandInputElement.value = button.getAttribute('data-command');
+                        commandInputElement.focus();
+                        actionPopup.classList.add('hidden');
+                    }
+                });
+            });
+        }
     }
     
     function renderDiary() {
         if (!diaryLogElement) return;
         diaryLogElement.innerHTML = '';
-        if (currentState.diaryLog.length === 0) {
-            diaryLogElement.innerHTML = '<p>O diário está vazio.</p>';
-            return;
-        }
-
-        let currentSceneBlock = null;
-
+        
         currentState.diaryLog.forEach(entry => {
             if (entry.type === 'scene_load') {
-                // A new scene starts. Create a new block.
-                currentSceneBlock = document.createElement('div');
-                currentSceneBlock.className = 'diary-entry';
-
-                const imageContainer = document.createElement('div');
-                imageContainer.className = 'image-container';
-                const img = document.createElement('img');
-                img.src = entry.data.image || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
-                imageContainer.appendChild(img);
-                currentSceneBlock.appendChild(imageContainer);
-
-                const textContainer = document.createElement('div');
-                textContainer.className = 'text-container';
-                
-                const sceneNameSpan = document.createElement('span');
-                sceneNameSpan.className = 'scene-name';
-                sceneNameSpan.textContent = entry.data.name;
-                textContainer.appendChild(sceneNameSpan);
-                
-                const descriptionP = document.createElement('p');
-                descriptionP.textContent = entry.data.description;
-                textContainer.appendChild(descriptionP);
-                
-                currentSceneBlock.appendChild(textContainer);
-                diaryLogElement.appendChild(currentSceneBlock);
-
-            } else if (entry.type === 'action') {
-                if (!currentSceneBlock) {
-                    // Fallback if an action is logged before a scene (should not happen)
-                    currentSceneBlock = document.createElement('div');
-                    currentSceneBlock.className = 'diary-entry';
-                    const placeholder = document.createElement('div');
-                    placeholder.className = 'image-container';
-                    currentSceneBlock.appendChild(placeholder);
-                    const textContainer = document.createElement('div');
-                    textContainer.className = 'text-container';
-                    currentSceneBlock.appendChild(textContainer);
-                    diaryLogElement.appendChild(currentSceneBlock);
-                }
-
-                // Find the text container of the current scene block and append to it
-                const textContainer = currentSceneBlock.querySelector('.text-container');
-                if (textContainer) {
-                    if (entry.data.command) {
-                        const commandEcho = document.createElement('p');
-                        commandEcho.className = 'command-echo';
-                        commandEcho.textContent = (gameData.nome_jogador_diario || 'VOCÊ') + ': ' + entry.data.command;
-                        textContainer.appendChild(commandEcho);
-                    }
-                    if (entry.data.response) {
-                        const responseP = document.createElement('p');
-                        responseP.textContent = entry.data.response;
-                        textContainer.appendChild(responseP);
-                    }
+                const div = document.createElement('div');
+                div.className = 'diary-entry';
+                div.innerHTML = \`
+                    <div class="image-container">
+                        <img src="\${entry.data.image || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}" alt="\${entry.data.name}">
+                    </div>
+                    <div class="text-container">
+                        <span class="scene-name">\${entry.data.name}</span>
+                        <p>\${entry.data.description.replace(/\\n/g, '<br>')}</p>
+                    </div>
+                \`;
+                diaryLogElement.appendChild(div);
+            } else if (entry.type === 'action' && entry.data.command) { // Only show entries with an explicit command
+                const lastEntry = diaryLogElement.querySelector('.diary-entry:last-child .text-container');
+                if (lastEntry) {
+                    const p = document.createElement('p');
+                    p.className = 'command-echo';
+                    p.innerHTML = \`
+                        <strong>\${gameData.nome_jogador_diario || 'VOCÊ'}:</strong> 
+                        "\${entry.data.command}"
+                        <br>
+                        <em>\${entry.data.response.replace(/\\n/g, '<br>')}</em>
+                    \`;
+                    lastEntry.appendChild(p);
                 }
             }
         });
+        diaryLogElement.scrollTop = diaryLogElement.scrollHeight;
     }
 
-    function initGame(isContinuing) {
-        resetUI();
+    // --- Initialization ---
+    function initializeGame(startFresh = false) {
+        gameData = window.embeddedGameData;
+        if (!gameData) {
+            console.error('Game data not found!');
+            if (sceneDescriptionElement) sceneDescriptionElement.textContent = 'Error: Game data is missing.';
+            return;
+        }
         
-        if (isContinuing && loadState()) {
-            console.log("Continuing from saved state.");
-            currentState.scenesState = currentState.scenesState || JSON.parse(JSON.stringify(originalScenes)); // Ensure scenesState is hydrated
-            changeScene(currentState.currentSceneId, true);
-        } else {
-            console.log("Starting new game.");
-            localStorage.removeItem(SAVE_KEY); // Clear any potentially corrupt save
+        originalScenes = JSON.parse(JSON.stringify(gameData.cenas));
+        allTakableObjects = {};
+         Object.values(gameData.cenas).forEach(scene => {
+            if(scene.objetos) {
+                scene.objetos.forEach(obj => {
+                    if (obj.isTakable) {
+                        allTakableObjects[obj.id] = obj;
+                    }
+                });
+            }
+        });
+
+        const hasSave = loadState();
+
+        if (startFresh || !hasSave) {
             currentState.currentSceneId = gameData.cena_inicial;
+            currentState.previousSceneId = null;
             currentState.inventory = [];
             currentState.diaryLog = [];
             currentState.scenesState = JSON.parse(JSON.stringify(originalScenes));
             if (gameData.gameEnableChances) {
                 currentState.chances = gameData.gameMaxChances;
             }
-            changeScene(currentState.currentSceneId); // This creates the first diary entry and saves state.
         }
-        renderChances();
+        
+        changeScene(currentState.currentSceneId, hasSave && !startFresh);
+        if(gameData.gameEnableChances) renderChances();
     }
     
-    function restartGame() {
-        localStorage.removeItem(SAVE_KEY);
-        // show splash screen again
-        if (continueButton) continueButton.classList.add('hidden');
-        if (splashScreen) splashScreen.style.display = 'flex';
-        resetUI();
-    };
-
-    // --- Main execution block ---
-    (async () => {
-        try {
-            // 1. Load Core Game Data
-            if (window.embeddedGameData) {
-                gameData = window.embeddedGameData;
-            } else {
-                const response = await fetch('data.json');
-                if (!response.ok) throw new Error('Could not load game data file (data.json).');
-                gameData = await response.json();
+    // --- Event Listeners ---
+    if (commandInputElement) {
+        commandInputElement.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                processCommand();
             }
-            
-            originalScenes = JSON.parse(JSON.stringify(gameData.cenas));
-            
-            allTakableObjects = {};
-            Object.values(gameData.cenas).forEach(scene => {
-                if (scene.objetos) {
-                    scene.objetos.forEach(obj => {
-                        if (obj.isTakable) {
-                            allTakableObjects[obj.id] = obj;
-                        }
-                    });
-                }
+        });
+    }
+
+    if (submitCommandButton) {
+        submitCommandButton.addEventListener('click', processCommand);
+    }
+    
+    if (inventoryButton) {
+        inventoryButton.addEventListener('click', () => {
+             if (actionPopup && !actionPopup.classList.contains('hidden') && actionPopup.innerHTML.includes('inventário')) {
+                actionPopup.classList.add('hidden');
+            } else {
+                populateAndShowPopup('inventory');
+            }
+        });
+    }
+
+    if (suggestionsButton) {
+        suggestionsButton.addEventListener('click', () => {
+            if (actionPopup && !actionPopup.classList.contains('hidden') && actionPopup.innerHTML.includes('Sugestões')) {
+                actionPopup.classList.add('hidden');
+            } else {
+                populateAndShowPopup('suggestions');
+            }
+        });
+    }
+    
+    if (diaryButton) {
+        diaryButton.addEventListener('click', () => {
+            renderDiary();
+            if (diaryModal) diaryModal.classList.remove('hidden');
+        });
+    }
+
+    if (diaryModalCloseButton) {
+        diaryModalCloseButton.addEventListener('click', () => {
+            if (diaryModal) diaryModal.classList.add('hidden');
+        });
+    }
+    
+    if (startButton) {
+        startButton.addEventListener('click', () => {
+            if (splashScreen) splashScreen.classList.add('hidden');
+        });
+    }
+    
+    endingRestartButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            localStorage.removeItem(SAVE_KEY);
+            window.location.reload();
+        });
+    });
+
+    if (continueButton) {
+        if (localStorage.getItem(SAVE_KEY)) {
+            continueButton.classList.remove('hidden');
+            continueButton.addEventListener('click', () => {
+                 if (splashScreen) splashScreen.classList.add('hidden');
             });
-
-            // 2. Setup UI based on save state
-            if (splashScreen) {
-                const canContinue = loadState();
-                if (canContinue && continueButton) {
-                    continueButton.classList.remove('hidden');
-                }
-                
-                if (startButton) {
-                    startButton.addEventListener('click', () => {
-                        if (splashScreen) splashScreen.style.display = 'none';
-                        initGame(false);
-                    });
-                }
-                if (continueButton) {
-                    continueButton.addEventListener('click', () => {
-                        if (splashScreen) splashScreen.style.display = 'none';
-                        initGame(true);
-                    });
-                }
-            } else {
-                // No splash screen, start immediately, try to continue.
-                initGame(true);
-            }
-
-            // 3. Attach common event listeners
-            if(restartButton) {
-                restartButton.addEventListener('click', () => {
-                    if (confirm('Tem certeza que quer reiniciar a aventura? Todo o progresso será perdido.')) {
-                        restartGame();
-                    }
-                });
-            }
-            if (endingRestartButtons) {
-                endingRestartButtons.forEach(button => button.addEventListener('click', restartGame));
-            }
-            if(submitCommandButton) {
-                submitCommandButton.addEventListener('click', processCommand);
-            }
-            if(commandInputElement) {
-                commandInputElement.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter') processCommand();
-                });
-            }
-            if (inventoryButton) {
-                inventoryButton.addEventListener('click', () => {
-                    if (actionPopup.classList.contains('hidden') || actionPopup.dataset.content !== 'inventory') {
-                        actionPopup.innerHTML = '';
-                        actionPopup.dataset.content = 'inventory';
-                        const list = document.createElement('div');
-                        list.className = 'action-popup-list';
-                        if (currentState.inventory.length === 0) {
-                            const p = document.createElement('p');
-                            p.textContent = 'Seu inventário está vazio.';
-                            list.appendChild(p);
-                        } else {
-                            currentState.inventory.forEach(itemId => {
-                                const item = allTakableObjects[itemId];
-                                if (item) {
-                                    const p = document.createElement('p');
-                                    p.textContent = item.name;
-                                    list.appendChild(p);
-                                }
-                            });
-                        }
-                        actionPopup.appendChild(list);
-                        actionPopup.classList.remove('hidden');
-                    } else {
-                        actionPopup.classList.add('hidden');
-                        actionPopup.dataset.content = '';
-                    }
-                });
-            }
-            if (suggestionsButton) {
-                suggestionsButton.addEventListener('click', () => {
-                    if (actionPopup.classList.contains('hidden') || actionPopup.dataset.content !== 'suggestions') {
-                        actionPopup.innerHTML = '';
-                        actionPopup.dataset.content = 'suggestions';
-                        const list = document.createElement('div');
-                        list.className = 'action-popup-list';
-                        const commonVerbs = ['Olhar', 'Usar', 'Pegar', 'Abrir', 'Fechar', 'Empurrar', 'Puxar', 'Falar', 'Examinar', 'Ir'];
-                        commonVerbs.forEach(verb => {
-                            const button = document.createElement('button');
-                            button.textContent = verb;
-                            button.onclick = () => {
-                                if (commandInputElement) {
-                                    commandInputElement.value = verb.toLowerCase() + ' ';
-                                    commandInputElement.focus();
-                                    actionPopup.classList.add('hidden');
-                                    actionPopup.dataset.content = '';
-                                }
-                            };
-                            list.appendChild(button);
-                        });
-                        actionPopup.appendChild(list);
-                        actionPopup.classList.remove('hidden');
-                    } else {
-                        actionPopup.classList.add('hidden');
-                        actionPopup.dataset.content = '';
-                    }
-                });
-            }
-            if (diaryButton && diaryModal && diaryModalCloseButton) {
-                const toggleDiary = () => {
-                    if(diaryModal.classList.contains('hidden')) {
-                        renderDiary();
-                        diaryModal.classList.remove('hidden');
-                    } else {
-                        diaryModal.classList.add('hidden');
-                    }
-                };
-                diaryButton.addEventListener('click', toggleDiary);
-                diaryModalCloseButton.addEventListener('click', toggleDiary);
-                diaryModal.addEventListener('click', (e) => {
-                    if (e.target === diaryModal) toggleDiary();
-                });
-            }
-        
-        } catch (error) {
-            console.error('Error initializing game:', error);
-            if(sceneDescriptionElement) sceneDescriptionElement.innerHTML = '<p style="color:red;">Error loading game data. Check console for details.</p>';
         }
-    })();
+    }
+
+    // --- Game Start ---
+    initializeGame();
 });
 `;

@@ -50,6 +50,12 @@ export interface Scene {
   mapY?: number;
 }
 
+export interface FixedCommand {
+  id: string;
+  commands: string[];
+  description: string;
+}
+
 export interface GameData {
   startScene: string;
   scenes: {
@@ -112,6 +118,7 @@ export interface GameData {
   frameArtDecoAccentColor?: string;
   frameRoundedTopBackgroundColor?: string;
   frameRoundedTopBorderColor?: string;
+  fixedCommands?: FixedCommand[];
 }
 
 export type View = 'scenes' | 'interface' | 'game_info' | 'theme';
