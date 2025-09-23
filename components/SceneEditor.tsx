@@ -133,8 +133,8 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
   const handleToggle = (key: 'isEndingScene' | 'removesChanceOnEntry' | 'restoresChanceOnEntry', value: boolean) => {
     // FIX: Explicitly type `prev` to resolve type inference issues where it might default to `{}` or `unknown`, causing errors on property assignment.
-    // FIX: Explicitly typing newScene to Scene to prevent issues with spread operator on generic types.
-    setLocalScene(prev => {
+    setLocalScene((prev: Scene) => {
+        // FIX: Explicitly typing newScene to Scene to prevent issues with spread operator on generic types.
         const newScene: Scene = { ...prev };
 
         // If we are checking a box, uncheck all others first.

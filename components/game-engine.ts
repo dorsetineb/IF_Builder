@@ -210,7 +210,8 @@ document.addEventListener('DOMContentLoaded', () => {
             span.addEventListener('click', () => {
                 if (verbInputElement) {
                     const word = span.dataset.word;
-                    verbInputElement.value = word + ' ';
+                    const currentValue = verbInputElement.value.trim();
+                    verbInputElement.value = (currentValue ? currentValue + ' ' + word : word) + ' ';
                     verbInputElement.focus();
                     if (actionPopup) {
                         actionPopup.classList.add('hidden');
@@ -649,7 +650,9 @@ document.addEventListener('DOMContentLoaded', () => {
             actionPopup.querySelectorAll('button[data-verb]').forEach(button => {
                 button.addEventListener('click', () => {
                     if(verbInputElement) {
-                        verbInputElement.value = button.getAttribute('data-verb') + ' ';
+                        const verb = button.getAttribute('data-verb');
+                        const currentValue = verbInputElement.value.trim();
+                        verbInputElement.value = (verb + ' ' + currentValue).trim() + ' ';
                         verbInputElement.focus();
                         actionPopup.classList.add('hidden');
                     }
