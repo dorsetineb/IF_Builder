@@ -5,16 +5,15 @@ import InteractionEditor from './InteractionEditor';
 import ConnectionsView from './ConnectionsView';
 import { UploadIcon } from './icons/UploadIcon';
 import { EyeIcon } from './icons/EyeIcon';
-import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
-import { ChevronRightIcon } from './icons/ChevronRightIcon';
+import { DocumentDuplicateIcon } from './icons/DocumentDuplicateIcon';
 
 interface SceneEditorProps {
   scene: Scene;
   allScenes: Scene[];
   onUpdateScene: (scene: Scene) => void;
+  onCopyScene: (scene: Scene) => void;
   allObjectIds: string[];
   onPreviewScene: (scene: Scene) => void;
-  sceneOrder: string[];
   onSelectScene: (id: string) => void;
   isDirty: boolean;
   onSetDirty: (isDirty: boolean) => void;
@@ -41,9 +40,9 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     scene, 
     allScenes, 
     onUpdateScene, 
+    onCopyScene,
     allObjectIds, 
     onPreviewScene,
-    sceneOrder,
     onSelectScene,
     isDirty,
     onSetDirty,
@@ -134,7 +133,9 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   };
 
   const handleToggle = (key: 'isEndingScene' | 'removesChanceOnEntry' | 'restoresChanceOnEntry', value: boolean) => {
-    setLocalScene(prev => {
+    // FIX: Explicitly type the 'prev' parameter as 'Scene' to correct type inference issues within the setter.
+    // This ensures that 'newScene' is correctly typed as 'Scene', resolving assignment errors.
+    setLocalScene((prev: Scene) => {
         let newScene = { ...prev };
 
         // If we are checking a box, uncheck all others first.
@@ -211,16 +212,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     onPreviewScene(localScene);
   };
 
-  const currentSceneIndex = sceneOrder.indexOf(scene.id);
-  const prevSceneId = currentSceneIndex > 0 ? sceneOrder[currentSceneIndex - 1] : null;
-  const nextSceneId = currentSceneIndex < sceneOrder.length - 1 ? sceneOrder[currentSceneIndex + 1] : null;
-
-  const handleNavigate = (targetId: string | null) => {
-      if (!targetId) return;
-      // Confirmation logic is now handled by the parent component via onSelectScene prop
-      onSelectScene(targetId);
-  };
-
   const TABS = {
     properties: 'Propriedades',
     objects: 'Objetos',
@@ -252,20 +243,12 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         </div>
         <div className="flex items-center gap-2 flex-shrink-0 mt-1">
             <button
-                onClick={() => handleNavigate(prevSceneId)}
-                disabled={!prevSceneId}
-                className="p-2 rounded-md hover:bg-brand-surface disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Cena Anterior"
+                onClick={() => onCopyScene(localScene)}
+                className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors"
+                title="Copiar Cena"
             >
-                <ChevronLeftIcon className="w-6 h-6" />
-            </button>
-            <button
-                onClick={() => handleNavigate(nextSceneId)}
-                disabled={!nextSceneId}
-                className="p-2 rounded-md hover:bg-brand-surface disabled:opacity-50 disabled:cursor-not-allowed"
-                title="Próxima Cena"
-            >
-                <ChevronRightIcon className="w-6 h-6" />
+                <DocumentDuplicateIcon className="w-5 h-5 mr-2" />
+                Copiar Cena
             </button>
         </div>
       </div>

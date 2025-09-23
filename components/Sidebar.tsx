@@ -6,7 +6,7 @@ import { Scene, View } from '../types';
 import { CodeIcon } from './icons/CodeIcon';
 import { BookOpenIcon } from './icons/BookOpenIcon';
 import { InformationCircleIcon } from './icons/InformationCircleIcon';
-import { PaintBrushIcon } from './icons/PaintBrushIcon';
+import { MapIcon } from './icons/MapIcon';
 
 interface SidebarProps {
   scenes: Scene[];
@@ -58,6 +58,10 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             )}
         </div>
         
+        <button className={getButtonClass('map')} onClick={() => onSetView('map')}>
+            <MapIcon className="w-5 h-5 mr-3" />
+            <span className="font-semibold">Mapa de Cenas</span>
+        </button>
       </nav>
     </aside>
   );

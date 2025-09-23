@@ -112,4 +112,4 @@ export interface GameData {
   fixedVerbs?: FixedVerb[];
 }
 
-export type View = 'scenes' | 'interface' | 'game_info' | 'theme';
+export type View = 'scenes' | 'interface' | 'game_info' | 'map';

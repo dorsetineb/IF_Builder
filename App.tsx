@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -9,6 +10,7 @@ import { WelcomePlaceholder } from './components/WelcomePlaceholder';
 import UIEditor from './components/UIEditor';
 import GameInfoEditor from './components/GameInfoEditor';
 import Preview from './components/Preview';
+import SceneMap from './components/SceneMap';
 
 const gameHTML = `
 <!DOCTYPE html>
@@ -852,6 +854,7 @@ const App: React.FC = () => {
         }
         if (importedData.scenes) {
             // FIX: Cast scene to 'any' to handle property access on an 'unknown' type during data migration.
+            // When importing data, 'scene' can be inferred as 'unknown', so we cast it to 'any' to safely access properties.
             Object.values(importedData.scenes).forEach((scene: any) => {
                 if (scene.objetos && !scene.objects) {
                     scene.objects = scene.objetos;
@@ -887,6 +890,47 @@ const App: React.FC = () => {
         setCurrentView('scenes');
     });
   }, [gameData.scenes, confirmNavigation]);
+
+  const handleCopyScene = useCallback((sceneToCopy: Scene) => {
+    confirmNavigation(() => {
+        const allScnIds = Object.keys(gameData.scenes);
+        // FIX: Cast scene to 'any' to handle property access on an 'unknown' type during data migration.
+        const allObjIds = Object.values(gameData.scenes).flatMap((s: any) => s.objects?.map((o: any) => o.id) || []);
+
+        const newSceneId = generateUniqueId('scn', allScnIds);
+        const newScene: Scene = JSON.parse(JSON.stringify(sceneToCopy));
+
+        newScene.id = newSceneId;
+        newScene.name = `${sceneToCopy.name} (Cópia)`;
+        
+        // The object IDs need to be unique across the entire game.
+        newScene.objects = newScene.objects.map(obj => {
+            const newObjId = generateUniqueId('obj', allObjIds);
+            allObjIds.push(newObjId); // Add to the list to prevent collisions in this same operation
+            return { ...obj, id: newObjId };
+        });
+
+        // Interaction IDs are only locally significant, but let's regenerate for good measure.
+        newScene.interactions = newScene.interactions.map(inter => ({
+            ...inter,
+            id: `inter_${Math.random().toString(36).substring(2, 9)}`
+        }));
+
+        const originalSceneIndex = gameData.sceneOrder.indexOf(sceneToCopy.id);
+        const newSceneOrder = [...gameData.sceneOrder];
+        // Insert the new scene right after the original one in the order list.
+        newSceneOrder.splice(originalSceneIndex + 1, 0, newSceneId);
+
+        setGameData(prev => ({
+            ...prev,
+            scenes: { ...prev.scenes, [newSceneId]: newScene },
+            sceneOrder: newSceneOrder,
+        }));
+        
+        setSelectedSceneId(newSceneId);
+        setCurrentView('scenes');
+    });
+}, [gameData, confirmNavigation]);
 
   const handleUpdateScene = useCallback((updatedScene: Scene) => {
     setGameData(prev => {
@@ -966,11 +1010,23 @@ const App: React.FC = () => {
     setIsDirty(false);
   }, []);
 
+  const handleUpdateScenePosition = useCallback((sceneId: string, x: number, y: number) => {
+    setGameData(prev => {
+        const newScenes = { ...prev.scenes };
+        if (newScenes[sceneId]) {
+            newScenes[sceneId] = { ...newScenes[sceneId], mapX: x, mapY: y };
+        }
+        return { ...prev, scenes: newScenes };
+    });
+    // Position changes are saved immediately and don't make the app "dirty"
+  }, []);
+
   const scenesInOrder = gameData.sceneOrder.map(id => gameData.scenes[id]).filter(Boolean);
   const selectedScene = selectedSceneId ? gameData.scenes[selectedSceneId] : null;
 
   const allObjectIds = useMemo(() => {
-    return Object.values(gameData.scenes).flatMap(s => s.objects.map(o => o.id));
+    // FIX: Add type annotation to handle potentially malformed scene data from imports.
+    return Object.values(gameData.scenes).flatMap((s: any) => s.objects?.map((o: any) => o.id) || []);
   }, [gameData.scenes]);
 
   const renderCurrentView = () => {
@@ -982,9 +1038,9 @@ const App: React.FC = () => {
             scene={selectedScene}
             allScenes={scenesInOrder}
             onUpdateScene={handleUpdateScene}
+            onCopyScene={handleCopyScene}
             allObjectIds={allObjectIds}
             onPreviewScene={handlePreviewSingleScene}
-            sceneOrder={gameData.sceneOrder}
             onSelectScene={handleSelectSceneAndSwitchView}
             isDirty={isDirty}
             onSetDirty={setIsDirty}
@@ -1057,6 +1113,16 @@ const App: React.FC = () => {
             onUpdate={handleUpdateGameData}
             isDirty={isDirty}
             onSetDirty={setIsDirty}
+          />
+        );
+      case 'map':
+        return (
+          <SceneMap
+            allScenesMap={gameData.scenes}
+            startSceneId={gameData.startScene}
+            onSelectScene={handleSelectSceneAndSwitchView}
+            onUpdateScenePosition={handleUpdateScenePosition}
+            onAddScene={handleAddScene}
           />
         );
       default:
