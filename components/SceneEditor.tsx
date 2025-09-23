@@ -133,8 +133,9 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
   const handleToggle = (key: 'isEndingScene' | 'removesChanceOnEntry' | 'restoresChanceOnEntry', value: boolean) => {
     // FIX: Explicitly type `prev` to resolve type inference issues where it might default to `{}` or `unknown`, causing errors on property assignment.
-    setLocalScene((prev: Scene) => {
-        const newScene = { ...prev };
+    // FIX: Explicitly typing newScene to Scene to prevent issues with spread operator on generic types.
+    setLocalScene(prev => {
+        const newScene: Scene = { ...prev };
 
         // If we are checking a box, uncheck all others first.
         if (value) {
@@ -335,6 +336,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                           <label htmlFor="sceneDescription" className="block text-sm font-medium text-brand-text-dim mb-1">
                               {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição'}
                           </label>
+                           <p className="text-xs text-brand-text-dim -mt-1 mb-2">Use <code>&lt;palavra&gt;</code> para destacar texto clicável.</p>
                           <div className="relative flex-1">
                               <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-brand-bg border border-brand-border rounded-md px-3 py-2 resize-y focus:ring-0"/>
                           </div>

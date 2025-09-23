@@ -197,8 +197,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const paragraphText = currentSceneParagraphs[currentParagraphIndex];
         const p = document.createElement('p');
-        p.innerHTML = paragraphText.replace(/\\*\\*(.*?)\\*\\*/g, '<span class="highlight-item">$1</span>');
+        
+        // Process highlights: **bold** and <clickable>
+        let processedText = paragraphText.replace(/\\*\\*(.*?)\\*\\*/g, '<span class="highlight-item">$1</span>');
+        processedText = processedText.replace(/<(.*?)>/g, '<span class="highlight-word" data-word="$1">$1</span>');
+        p.innerHTML = processedText;
+
         sceneDescriptionElement.appendChild(p);
+        
+        // Add click listeners for the new spans
+        p.querySelectorAll('.highlight-word').forEach(span => {
+            span.addEventListener('click', () => {
+                if (verbInputElement) {
+                    const word = span.dataset.word;
+                    verbInputElement.value = word + ' ';
+                    verbInputElement.focus();
+                    if (actionPopup) {
+                        actionPopup.classList.add('hidden');
+                    }
+                }
+            });
+        });
+        
         sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
 
         currentParagraphIndex++;
