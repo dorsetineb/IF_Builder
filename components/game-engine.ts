@@ -99,6 +99,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Game Logic ---
     function saveState() {
+        if (window.isPreview) return;
         try {
             localStorage.setItem(SAVE_KEY, JSON.stringify(currentState));
         } catch (e) {
@@ -107,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function loadState() {
+        if (window.isPreview) return false;
         try {
             const savedData = localStorage.getItem(SAVE_KEY);
             if (savedData) {
@@ -568,35 +570,53 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else if (type === 'suggestions') {
             const currentScene = currentState.scenesState[currentState.currentSceneId];
-            const suggestions = new Set();
-            if (currentScene.objetos) {
-                 currentScene.objetos.forEach(obj => {
-                     suggestions.add(\`olhar \${obj.name}\`);
-                     if (obj.isTakable) {
-                        suggestions.add(\`pegar \${obj.name}\`);
-                     }
-                 });
-            }
+            const suggestedVerbs = new Set();
+
+            const capitalize = (s) => {
+                if (typeof s !== 'string' || !s) return '';
+                return s.charAt(0).toUpperCase() + s.slice(1);
+            };
+
+            // Add verbs from all interactions in the scene
             if (currentScene.interactions) {
-                currentScene.interactions.forEach(inter => {
-                    const verb = inter.verbs[0] || 'usar';
-                    if (inter.requiresInInventory) {
-                        if (currentState.inventory.includes(inter.requiresInInventory)) {
-                            const item = allTakableObjects[inter.requiresInInventory];
-                            if(item) {
-                                suggestions.add(\`\${verb} \${item.name} em \${inter.target}\`);
-                            }
-                        }
-                    } else {
-                        suggestions.add(\`\${verb} \${inter.target}\`);
+                currentScene.interactions.forEach(interaction => {
+                    interaction.verbs.forEach(verb => suggestedVerbs.add(capitalize(verb)));
+                });
+            }
+
+            // Add verbs based on objects present
+            if (currentScene.objetos && currentScene.objetos.length > 0) {
+                suggestedVerbs.add('Olhar');
+                suggestedVerbs.add('Examinar');
+                if (currentScene.objetos.some(obj => obj.isTakable)) {
+                    suggestedVerbs.add('Pegar');
+                }
+            } else {
+                // Can still look at the scene itself
+                suggestedVerbs.add('Olhar');
+                suggestedVerbs.add('Examinar');
+            }
+            
+            // Add 'Voltar' if applicable
+            if (currentState.previousSceneId) {
+                suggestedVerbs.add('Voltar');
+            }
+            
+            // Add fixed verbs
+            if (gameData.fixedVerbs && gameData.fixedVerbs.length > 0) {
+                gameData.fixedVerbs.forEach(fixed => {
+                    if (fixed.verbs && fixed.verbs.length > 0) {
+                        suggestedVerbs.add(capitalize(fixed.verbs[0]));
                     }
                 });
             }
-            if (suggestions.size === 0) {
+
+            if (suggestedVerbs.size === 0) {
                 content += '<p>Nenhuma sugestão óbvia no momento.</p>';
             } else {
-                suggestions.forEach(s => {
-                    content += \`<button data-verb="\${s}">\${s}</button>\`;
+                const sortedVerbs = Array.from(suggestedVerbs).sort();
+                sortedVerbs.forEach(verb => {
+                    content += \`<button data-verb="\${verb}">\${verb}</button>\`;
                 });
             }
         }
@@ -609,7 +629,7 @@ document.addEventListener('DOMContentLoaded', () => {
             actionPopup.querySelectorAll('button[data-verb]').forEach(button => {
                 button.addEventListener('click', () => {
                     if(verbInputElement) {
-                        verbInputElement.value = button.getAttribute('data-verb');
+                        verbInputElement.value = button.getAttribute('data-verb') + ' ';
                         verbInputElement.focus();
                         actionPopup.classList.add('hidden');
                     }
@@ -753,7 +773,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     if (continueButton) {
-        if (localStorage.getItem(SAVE_KEY)) {
+        if (!window.isPreview && localStorage.getItem(SAVE_KEY)) {
             continueButton.classList.remove('hidden');
             continueButton.addEventListener('click', () => {
                  if (splashScreen) splashScreen.classList.add('hidden');
@@ -764,4 +784,4 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Game Start ---
     initializeGame();
 });
-`;
+`

@@ -78,7 +78,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
         // Safely stringify JSON to prevent issues with '</script>' tags in user content.
         const safeJson = JSON.stringify(engineData).replace(/<\/script/g, '<\\/script>');
 
-        const dataScript = `<script>window.embeddedGameData = ${safeJson};</script>`;
+        const dataScript = `<script>window.embeddedGameData = ${safeJson}; window.isPreview = true;</script>`;
         const styleTag = `<style>${finalCss}</style>`;
         const gameScriptTag = `<script>${gameJS}</script>`;
 

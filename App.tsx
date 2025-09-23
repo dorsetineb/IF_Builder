@@ -102,7 +102,7 @@ body {
     padding: 0;
 }
 body.with-spacing {
-    padding: 20px;
+    padding: 0;
 }
 body.dark-theme {
     --bg-color: #0d1117;
@@ -159,17 +159,16 @@ body {
 }
 
 .main-wrapper {
-    max-width: 1400px;
-    margin: 0 auto;
     height: 100%;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 0 30px rgba(0,0,0,0.7);
     overflow: hidden;
     position: relative;
+    max-width: 1280px;
+    margin: 0 auto;
 }
 body.with-spacing .main-wrapper {
-    height: calc(100vh - 40px);
+    height: 100vh;
 }
 
 
@@ -184,7 +183,7 @@ body.with-spacing .main-wrapper {
     background-size: cover;
     background-position: center;
     z-index: 2000;
-    padding: 5vw;
+    padding: 0;
     display: flex;
     align-items: var(--splash-align-items);
     justify-content: var(--splash-justify-content);
@@ -201,6 +200,8 @@ body.with-spacing .main-wrapper {
     flex-direction: column;
     align-items: var(--splash-content-align-items);
     gap: 20px;
+    width: 100%;
+    padding: 5vw 225px;
 }
 .splash-logo {
     max-height: 150px;
