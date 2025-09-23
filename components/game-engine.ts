@@ -79,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const endingRestartButtons = document.querySelectorAll('.ending-restart-button');
     const gameHeader = document.querySelector('.game-header');
     const gameContainer = document.querySelector('.game-container');
+    const sceneNameOverlayElement = document.getElementById('scene-name-overlay');
 
 
     // --- State Variables ---
@@ -322,6 +323,10 @@ document.addEventListener('DOMContentLoaded', () => {
             sceneImageElement.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; // transparent pixel
         }
         
+        if (sceneNameOverlayElement) {
+            sceneNameOverlayElement.textContent = scene.name;
+        }
+
         if (sceneDescriptionElement) {
             sceneDescriptionElement.innerHTML = ''; // Clear previous content
             
@@ -344,9 +349,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
             }
             changeScene(sceneId);
+            if(sceneNameOverlayElement) {
+                sceneNameOverlayElement.style.opacity = '1';
+            }
             return;
         }
 
+        if (sceneNameOverlayElement) {
+            sceneNameOverlayElement.style.opacity = '0';
+        }
+        
         // Play sound as fade-out starts
         if (soundEffectUrl && sceneSoundEffectElement) {
             sceneSoundEffectElement.src = soundEffectUrl;
@@ -363,6 +375,11 @@ document.addEventListener('DOMContentLoaded', () => {
             // Use requestAnimationFrame to ensure DOM has updated before fading back in
             requestAnimationFrame(() => {
                 transitionOverlay.classList.remove('active');
+                if (sceneNameOverlayElement) {
+                    setTimeout(() => {
+                        sceneNameOverlayElement.style.opacity = '1';
+                    }, 50);
+                }
             });
         };
         transitionOverlay.addEventListener('transitionend', transitionHandler, { once: true });
@@ -785,6 +802,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (startButton) {
         startButton.addEventListener('click', () => {
             if (splashScreen) splashScreen.classList.add('hidden');
+            if(sceneNameOverlayElement) {
+                setTimeout(() => sceneNameOverlayElement.style.opacity = '1', 500);
+            }
         });
     }
     
@@ -800,6 +820,9 @@ document.addEventListener('DOMContentLoaded', () => {
             continueButton.classList.remove('hidden');
             continueButton.addEventListener('click', () => {
                  if (splashScreen) splashScreen.classList.add('hidden');
+                 if(sceneNameOverlayElement) {
+                    setTimeout(() => sceneNameOverlayElement.style.opacity = '1', 500);
+                }
             });
         }
     }

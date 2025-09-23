@@ -63,6 +63,7 @@ const gameHTML = `
                 <div id="transition-overlay" class="transition-overlay"></div>
                 <div id="image-container" class="image-container">
                   <img id="scene-image" src="" alt="Ilustração da cena">
+                  <div id="scene-name-overlay" class="scene-name-overlay"></div>
                 </div>
             </div>
             <div class="text-panel">
@@ -308,6 +309,31 @@ body.with-spacing .main-wrapper {
     height: 100%;
     object-fit: cover;
 }
+
+.scene-name-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(13, 17, 23, 0.75);
+    color: var(--text-color);
+    border: 2px solid var(--border-color);
+    border-radius: 0; /* Sharp corners */
+    font-size: 0.9em;
+    font-weight: bold;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    pointer-events: none;
+    text-align: center;
+    padding: 8px 16px;
+    box-sizing: border-box;
+}
+
+body.light-theme .scene-name-overlay {
+    background-color: rgba(246, 248, 250, 0.85);
+}
+
 
 .text-panel {
     flex: 1;
