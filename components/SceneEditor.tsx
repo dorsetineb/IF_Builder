@@ -107,15 +107,23 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         }
     }
 
-    const inputConnections: ConnectionDetail[] = Array.from(inputConnectionsMap.entries()).map(([sceneId, interactions]) => ({
-        scene: sceneMap.get(sceneId)!,
-        interactions: interactions,
-    })).filter(item => item.scene);
+    // FIX: Use reduce with explicit generic type for safer type inference.
+    const inputConnections: ConnectionDetail[] = Array.from(inputConnectionsMap.entries()).reduce<ConnectionDetail[]>((acc, [sceneId, interactions]) => {
+        const scene = sceneMap.get(sceneId);
+        if (scene) {
+            acc.push({ scene, interactions });
+        }
+        return acc;
+    }, []);
 
-    const outputConnections: ConnectionDetail[] = Array.from(outputConnectionsMap.entries()).map(([sceneId, interactions]) => ({
-        scene: sceneMap.get(sceneId)!,
-        interactions: interactions,
-    })).filter(item => item.scene);
+    // FIX: Use reduce with explicit generic type for safer type inference.
+    const outputConnections: ConnectionDetail[] = Array.from(outputConnectionsMap.entries()).reduce<ConnectionDetail[]>((acc, [sceneId, interactions]) => {
+        const scene = sceneMap.get(sceneId);
+        if (scene) {
+            acc.push({ scene, interactions });
+        }
+        return acc;
+    }, []);
 
     return { inputConnections, outputConnections };
   }, [allScenes, localScene.id, localScene.interactions]);

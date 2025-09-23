@@ -1,5 +1,6 @@
 
 
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -36,7 +37,8 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
   const { initialNodes, edges, bounds, nodeLevels, nodesWithForwardIncomingEdges, nodesWithBackwardIncomingEdges, interactionsWithForwardOutgoingEdges, interactionsWithBackwardOutgoingEdges } = useMemo(() => {
     // 1. Calculate the actual height of each node first
     const nodeData = new Map<string, { height: number }>();
-    Object.values(allScenesMap).forEach(scene => {
+    // FIX: Explicitly type 'scene' as 'Scene' to prevent it from being inferred as 'unknown'.
+    Object.values(allScenesMap).forEach((scene: Scene) => {
         const linkingInteractions = scene.interactions?.filter(inter => inter.goToScene) || [];
         const interactionsHeight = linkingInteractions.length > 0
             ? (linkingInteractions.length * INTERACTION_ITEM_HEIGHT) + ((linkingInteractions.length - 1) * INTERACTION_ITEM_MARGIN_Y) + PADDING
@@ -45,7 +47,8 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
     });
     
     const createdEdges: Edge[] = [];
-    Object.values(allScenesMap).forEach(scene => {
+    // FIX: Explicitly type 'scene' as 'Scene' to prevent it from being inferred as 'unknown'.
+    Object.values(allScenesMap).forEach((scene: Scene) => {
         scene.interactions?.forEach(inter => {
             if (inter.goToScene && allScenesMap[inter.goToScene]) {
                 createdEdges.push({ source: scene.id, target: inter.goToScene, sourceInteractionId: inter.id });

@@ -31,7 +31,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
         const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
 
         let finalHtml = gameData.gameHTML
-            .replace('__GAME_TITLE__', gameData.gameTitle || 'TXT Builder Game')
+            .replace('__GAME_TITLE__', gameData.gameTitle || 'IF Builder Game')
             .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme with-spacing`)
             .replace('__FRAME_CLASS__', getFrameClass(gameData.gameImageFrame))
             .replace('__FONT_STYLESHEET__', fontStylesheet)

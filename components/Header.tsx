@@ -163,7 +163,7 @@ const Header: React.FC<{
     const finalGameScript = `window.embeddedGameData = ${safeJson};\n\n${gameJS}`;
 
     let html = exportData.gameHTML
-        .replace('__GAME_TITLE__', exportData.gameTitle || 'TXT Builder Game')
+        .replace('__GAME_TITLE__', exportData.gameTitle || 'IF Builder Game')
         .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme`)
         .replace('__FRAME_CLASS__', getFrameClass(exportData.gameImageFrame))
         .replace('__FONT_STYLESHEET__', fontStylesheet)
@@ -216,7 +216,7 @@ const Header: React.FC<{
       .then(function(content: Blob) {
         const link = document.createElement('a');
         link.href = URL.createObjectURL(content);
-        const safeTitle = exportData.gameTitle?.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'txt_builder_game';
+        const safeTitle = exportData.gameTitle?.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'if_builder_game';
         link.download = `${safeTitle}.zip`;
         document.body.appendChild(link);
         link.click();
@@ -253,7 +253,15 @@ const Header: React.FC<{
 
   return (
     <header className="flex-shrink-0 bg-brand-sidebar p-4 flex justify-between items-center border-b border-brand-border">
-      <h1 className="text-2xl font-bold">TXT Builder</h1>
+      <div className="flex items-center gap-3">
+        <h1 className="text-2xl font-bold">IF Builder</h1>
+        <code
+            className="bg-brand-bg px-2 py-1 rounded text-brand-primary-hover text-base align-middle"
+            title={gameData.gameTitle}
+        >
+            {gameData.gameTitle}
+        </code>
+      </div>
       <div className="flex items-center gap-4">
         <input
             type="file"
