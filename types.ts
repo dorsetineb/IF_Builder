@@ -104,11 +104,9 @@ export interface GameData {
   negativeEndingContentAlignment?: 'left' | 'right';
   negativeEndingDescription?: string;
   frameBookColor?: string;
-  frameCardInnerColor?: string;
-  frameCardOuterColor?: string;
+  frameTradingCardColor?: string;
   frameChamferedColor?: string;
-  frameRoundedTopBackgroundColor?: string;
-  frameRoundedTopBorderColor?: string;
+  frameRoundedTopColor?: string;
   fixedVerbs?: FixedVerb[];
 }
 

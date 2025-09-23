@@ -68,11 +68,9 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace(/__ACTION_BUTTON_COLOR__/g, gameData.gameActionButtonColor || '#ffffff')
             .replace(/__ACTION_BUTTON_TEXT_COLOR__/g, gameData.gameActionButtonTextColor || '#0d1117')
             .replace(/__FRAME_BOOK_COLOR__/g, gameData.frameBookColor || '#2d2d2d')
-            .replace(/__FRAME_CARD_OUTER_COLOR__/g, gameData.frameCardOuterColor || '#1c1917')
-            .replace(/__FRAME_CARD_INNER_COLOR__/g, gameData.frameCardInnerColor || '#d97706')
+            .replace(/__FRAME_TRADING_CARD_COLOR__/g, gameData.frameTradingCardColor || '#1c1917')
             .replace(/__FRAME_CHAMFERED_COLOR__/g, gameData.frameChamferedColor || '#4a5568')
-            .replace(/__FRAME_ROUNDED_TOP_BG_COLOR__/g, gameData.frameRoundedTopBackgroundColor || '#000000')
-            .replace(/__FRAME_ROUNDED_TOP_BORDER_COLOR__/g, gameData.frameRoundedTopBorderColor || '#facc15');
+            .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, gameData.frameRoundedTopColor || '#facc15');
             
         const engineData = prepareGameDataForEngine(gameData);
         // Safely stringify JSON to prevent issues with '</script>' tags in user content.

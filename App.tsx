@@ -554,14 +554,14 @@ body.with-spacing .main-wrapper {
 
 /* Image Frame Styles */
 .frame-rounded-top .image-panel {
-    padding: 15px;
-    background: __FRAME_ROUNDED_TOP_BG_COLOR__;
-    border: 10px solid __FRAME_ROUNDED_TOP_BORDER_COLOR__;
-    border-radius: 80px 80px 6px 6px;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.6);
+    padding: 20px;
+    background: __FRAME_ROUNDED_TOP_COLOR__;
+    border: none;
+    border-radius: 150px 150px 6px 6px;
+    box-shadow: none;
 }
 .frame-rounded-top .image-container {
-    border-radius: 65px 65px 0 0;
+    border-radius: 130px 130px 0 0;
 }
 
 /* --- New Frame Styles --- */
@@ -577,16 +577,16 @@ body.with-spacing .main-wrapper {
 
 .frame-trading-card .image-panel {
     padding: 15px;
-    background: __FRAME_CARD_OUTER_COLOR__;
+    background: __FRAME_TRADING_CARD_COLOR__;
     border-right-color: transparent;
     border-radius: 28px;
 }
 .frame-trading-card .image-container {
-    border: 4px solid __FRAME_CARD_INNER_COLOR__;
-    border-radius: 24px;
+    border: none;
+    border-radius: 12px;
 }
 #scene-image {
-    border-radius: 20px;
+    border-radius: 10px;
 }
 
 /*
@@ -775,11 +775,9 @@ const initializeGameData = (): GameData => {
         negativeEndingContentAlignment: 'right',
         negativeEndingDescription: "Fim de jogo. Suas chances acabaram. Tente novamente!",
         frameBookColor: '#FFFFFF',
-        frameCardInnerColor: '#FFFFFF',
-        frameCardOuterColor: '#FFFFFF',
+        frameTradingCardColor: '#FFFFFF',
         frameChamferedColor: '#FFFFFF',
-        frameRoundedTopBackgroundColor: '#000000',
-        frameRoundedTopBorderColor: '#FFFFFF',
+        frameRoundedTopColor: '#FFFFFF',
         fixedVerbs: [],
     };
 };
@@ -1084,12 +1082,10 @@ const App: React.FC = () => {
             textColorLight={gameData.gameTextColorLight || '#24292f'}
             titleColorLight={gameData.gameTitleColorLight || '#0969da'}
             focusColorLight={gameData.gameFocusColorLight || '#0969da'}
-            frameBookColor={gameData.frameBookColor || '#2d2d2d'}
-            frameCardInnerColor={gameData.frameCardInnerColor || '#d97706'}
-            frameCardOuterColor={gameData.frameCardOuterColor || '#1c1917'}
-            frameChamferedColor={gameData.frameChamferedColor || '#4a5568'}
-            frameRoundedTopBackgroundColor={gameData.frameRoundedTopBackgroundColor || '#000000'}
-            frameRoundedTopBorderColor={gameData.frameRoundedTopBorderColor || '#facc15'}
+            frameBookColor={gameData.frameBookColor || '#FFFFFF'}
+            frameTradingCardColor={gameData.frameTradingCardColor || '#FFFFFF'}
+            frameChamferedColor={gameData.frameChamferedColor || '#FFFFFF'}
+            frameRoundedTopColor={gameData.frameRoundedTopColor || '#FFFFFF'}
             onUpdate={handleUpdateGameData}
             isDirty={isDirty}
             onSetDirty={setIsDirty}

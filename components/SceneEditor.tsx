@@ -132,8 +132,8 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   };
 
   const handleToggle = (key: 'isEndingScene' | 'removesChanceOnEntry' | 'restoresChanceOnEntry', value: boolean) => {
-    // FIX: By letting TypeScript infer the types of `prev` and `newScene`, we avoid a complex type inference issue.
-    setLocalScene(prev => {
+    // FIX: Explicitly type `prev` to resolve type inference issues where it might default to `{}` or `unknown`, causing errors on property assignment.
+    setLocalScene((prev: Scene) => {
         const newScene = { ...prev };
 
         // If we are checking a box, uncheck all others first.
@@ -209,7 +209,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   }
   
   const handleUndo = () => {
-    // FIX: Cast the result of JSON.parse to 'Scene' as it returns 'any' or 'unknown' by default.
+    // FIX: Cast the result of JSON.parse to 'Scene' as it returns 'any' or 'unknown' by default, which is not assignable to Scene.
     setLocalScene(JSON.parse(initialSceneJson.current) as Scene);
   };
 

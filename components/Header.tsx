@@ -202,11 +202,9 @@ const Header: React.FC<{
         .replace(/__ACTION_BUTTON_COLOR__/g, exportData.gameActionButtonColor || '#ffffff')
         .replace(/__ACTION_BUTTON_TEXT_COLOR__/g, exportData.gameActionButtonTextColor || '#0d1117')
         .replace(/__FRAME_BOOK_COLOR__/g, exportData.frameBookColor || '#FFFFFF')
-        .replace(/__FRAME_CARD_OUTER_COLOR__/g, exportData.frameCardOuterColor || '#FFFFFF')
-        .replace(/__FRAME_CARD_INNER_COLOR__/g, exportData.frameCardInnerColor || '#FFFFFF')
+        .replace(/__FRAME_TRADING_CARD_COLOR__/g, exportData.frameTradingCardColor || '#1c1917')
         .replace(/__FRAME_CHAMFERED_COLOR__/g, exportData.frameChamferedColor || '#FFFFFF')
-        .replace(/__FRAME_ROUNDED_TOP_BG_COLOR__/g, exportData.frameRoundedTopBackgroundColor || '#000000')
-        .replace(/__FRAME_ROUNDED_TOP_BORDER_COLOR__/g, exportData.frameRoundedTopBorderColor || '#FFFFFF');
+        .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, exportData.frameRoundedTopColor || '#facc15');
     
     zip.file("index.html", html);
     zip.file("style.css", css);

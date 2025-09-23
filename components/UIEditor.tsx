@@ -40,11 +40,9 @@ interface UIEditorProps {
   titleColorLight: string;
   focusColorLight: string;
   frameBookColor: string;
-  frameCardInnerColor: string;
-  frameCardOuterColor: string;
+  frameTradingCardColor: string;
   frameChamferedColor: string;
-  frameRoundedTopBackgroundColor: string;
-  frameRoundedTopBorderColor: string;
+  frameRoundedTopColor: string;
   onUpdate: (field: keyof GameData, value: any) => void;
   isDirty: boolean;
   onSetDirty: (isDirty: boolean) => void;
@@ -152,9 +150,9 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
       focusColor, chanceIconColor, gameFontFamily, chanceIcon,
       chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText,
       gameTheme, textColorLight, titleColorLight, focusColorLight,
-      frameBookColor, frameCardInnerColor, frameCardOuterColor,
+      frameBookColor, frameTradingCardColor,
       frameChamferedColor,
-      frameRoundedTopBackgroundColor, frameRoundedTopBorderColor
+      frameRoundedTopColor
   } = props;
 
   // State from UIEditor
@@ -191,11 +189,9 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localTitleColorLight, setLocalTitleColorLight] = useState(titleColorLight);
   const [localFocusColorLight, setLocalFocusColorLight] = useState(focusColorLight);
   const [localFrameBookColor, setLocalFrameBookColor] = useState(frameBookColor);
-  const [localFrameCardInnerColor, setLocalFrameCardInnerColor] = useState(frameCardInnerColor);
-  const [localFrameCardOuterColor, setLocalFrameCardOuterColor] = useState(frameCardOuterColor);
+  const [localFrameTradingCardColor, setLocalFrameTradingCardColor] = useState(frameTradingCardColor);
   const [localFrameChamferedColor, setLocalFrameChamferedColor] = useState(frameChamferedColor);
-  const [localFrameRoundedTopBackgroundColor, setLocalFrameRoundedTopBackgroundColor] = useState(frameRoundedTopBackgroundColor);
-  const [localFrameRoundedTopBorderColor, setLocalFrameRoundedTopBorderColor] = useState(frameRoundedTopBorderColor);
+  const [localFrameRoundedTopColor, setLocalFrameRoundedTopColor] = useState(frameRoundedTopColor);
   const [focusPreview, setFocusPreview] = useState(false);
   const [isCustomizing, setIsCustomizing] = useState(false);
 
@@ -231,18 +227,24 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalTitleColorLight(titleColorLight);
     setLocalFocusColorLight(focusColorLight);
     setLocalFrameBookColor(frameBookColor);
-    setLocalFrameCardInnerColor(frameCardInnerColor);
-    setLocalFrameCardOuterColor(frameCardOuterColor);
+    setLocalFrameTradingCardColor(frameTradingCardColor);
     setLocalFrameChamferedColor(frameChamferedColor);
-    setLocalFrameRoundedTopBackgroundColor(frameRoundedTopBackgroundColor);
-    setLocalFrameRoundedTopBorderColor(frameRoundedTopBorderColor);
+    setLocalFrameRoundedTopColor(frameRoundedTopColor);
   }, [
     layoutOrientation, layoutOrder, imageFrame, actionButtonText, verbInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, enableChances, maxChances,
     textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
     chanceIconColor, gameFontFamily, chanceIcon, chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight,
-    frameBookColor, frameCardInnerColor, frameCardOuterColor, frameChamferedColor,
-    frameRoundedTopBackgroundColor, frameRoundedTopBorderColor
+    frameBookColor, frameTradingCardColor, frameChamferedColor,
+    frameRoundedTopColor
   ]);
+  
+  useEffect(() => {
+    const newFrameColor = localGameTheme === 'dark' ? '#FFFFFF' : '#1a202c'; // White for dark, Dark for light
+    setLocalFrameBookColor(newFrameColor);
+    setLocalFrameTradingCardColor(newFrameColor);
+    setLocalFrameChamferedColor(newFrameColor);
+    setLocalFrameRoundedTopColor(newFrameColor);
+  }, [localGameTheme]);
 
   useEffect(() => {
     const dirty = localLayoutOrientation !== layoutOrientation ||
@@ -275,17 +277,15 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localTitleColorLight !== titleColorLight ||
                   localFocusColorLight !== focusColorLight ||
                   localFrameBookColor !== frameBookColor ||
-                  localFrameCardInnerColor !== frameCardInnerColor ||
-                  localFrameCardOuterColor !== frameCardOuterColor ||
+                  localFrameTradingCardColor !== frameTradingCardColor ||
                   localFrameChamferedColor !== frameChamferedColor ||
-                  localFrameRoundedTopBackgroundColor !== frameRoundedTopBackgroundColor ||
-                  localFrameRoundedTopBorderColor !== frameRoundedTopBorderColor;
+                  localFrameRoundedTopColor !== frameRoundedTopColor;
     onSetDirty(dirty);
   }, [
     localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localEnableChances, localMaxChances,
     localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
-    localFrameBookColor, localFrameCardInnerColor, localFrameCardOuterColor, localFrameChamferedColor,
-    frameRoundedTopBackgroundColor, localFrameRoundedTopBorderColor,
+    localFrameBookColor, localFrameTradingCardColor, localFrameChamferedColor,
+    localFrameRoundedTopColor,
     props, onSetDirty
   ]);
 
@@ -322,11 +322,9 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localTitleColorLight !== titleColorLight) onUpdate('gameTitleColorLight', localTitleColorLight);
     if (localFocusColorLight !== focusColorLight) onUpdate('gameFocusColorLight', localFocusColorLight);
     if (localFrameBookColor !== frameBookColor) onUpdate('frameBookColor', localFrameBookColor);
-    if (localFrameCardInnerColor !== frameCardInnerColor) onUpdate('frameCardInnerColor', localFrameCardInnerColor);
-    if (localFrameCardOuterColor !== frameCardOuterColor) onUpdate('frameCardOuterColor', localFrameCardOuterColor);
+    if (localFrameTradingCardColor !== frameTradingCardColor) onUpdate('frameTradingCardColor', localFrameTradingCardColor);
     if (localFrameChamferedColor !== frameChamferedColor) onUpdate('frameChamferedColor', localFrameChamferedColor);
-    if (localFrameRoundedTopBackgroundColor !== frameRoundedTopBackgroundColor) onUpdate('frameRoundedTopBackgroundColor', localFrameRoundedTopBackgroundColor);
-    if (localFrameRoundedTopBorderColor !== frameRoundedTopBorderColor) onUpdate('frameRoundedTopBorderColor', localFrameRoundedTopBorderColor);
+    if (localFrameRoundedTopColor !== frameRoundedTopColor) onUpdate('frameRoundedTopColor', localFrameRoundedTopColor);
   };
   
   const handleUndo = () => {
@@ -362,11 +360,9 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalTitleColorLight(titleColorLight);
     setLocalFocusColorLight(focusColorLight);
     setLocalFrameBookColor(frameBookColor);
-    setLocalFrameCardInnerColor(frameCardInnerColor);
-    setLocalFrameCardOuterColor(frameCardOuterColor);
+    setLocalFrameTradingCardColor(frameTradingCardColor);
     setLocalFrameChamferedColor(frameChamferedColor);
-    setLocalFrameRoundedTopBackgroundColor(frameRoundedTopBackgroundColor);
-    setLocalFrameRoundedTopBorderColor(frameRoundedTopBorderColor);
+    setLocalFrameRoundedTopColor(frameRoundedTopColor);
   };
 
   const applyTheme = (theme: typeof PREDEFINED_THEMES[0]) => {
@@ -414,7 +410,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const getFramePreviewStyles = (frame: GameData['gameImageFrame']) => {
       const panelStyles: React.CSSProperties = { boxSizing: 'border-box' };
       const containerStyles: React.CSSProperties = {
-          backgroundColor: localGameTheme === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
+          backgroundColor: localGameTheme === 'dark' ? '#1a202c' : '#e2e8f0',
           color: localGameTheme === 'dark' ? '#a0aec0' : '#4a5568',
           width: '100%',
           height: '100%',
@@ -427,8 +423,8 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
       switch (frame) {
           case 'rounded-top':
               panelStyles.padding = '8px';
-              panelStyles.backgroundColor = localFrameRoundedTopBackgroundColor;
-              panelStyles.border = `5px solid ${localFrameRoundedTopBorderColor}`;
+              panelStyles.backgroundColor = localFrameRoundedTopColor;
+              panelStyles.border = 'none';
               panelStyles.borderRadius = '40px 40px 4px 4px';
               containerStyles.borderRadius = '32px 32px 0 0';
               break;
@@ -437,27 +433,24 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
               panelStyles.border = `5px solid ${localFrameBookColor}`;
               break;
           case 'trading-card':
-              panelStyles.backgroundColor = localFrameCardOuterColor;
+              panelStyles.backgroundColor = localFrameTradingCardColor;
               panelStyles.borderRadius = '12px';
               panelStyles.padding = '8px';
-              containerStyles.border = `2px solid ${localFrameCardInnerColor}`;
+              containerStyles.border = 'none';
               containerStyles.borderRadius = '6px';
               break;
           case 'chamfered':
-              const previewChamferSize = '18px'; // Adjusted for small preview size
-              const previewBorderWidth = '8px';  // Adjusted for small preview size
+              const previewChamferSize = '18px';
+              const previewBorderWidth = '8px';
               const previewChamferPath = `polygon(${previewChamferSize} 0, calc(100% - ${previewChamferSize}) 0, 100% ${previewChamferSize}, 100% calc(100% - ${previewChamferSize}), calc(100% - ${previewChamferSize}) 100%, ${previewChamferSize} 100%, 0 calc(100% - ${previewChamferSize}), 0 ${previewChamferSize})`;
               
-              // .image-panel simulation
               panelStyles.padding = previewBorderWidth;
               panelStyles.backgroundColor = localFrameChamferedColor;
               panelStyles.clipPath = previewChamferPath;
-              panelStyles.border = 'none'; // Ensure no other borders interfere
+              panelStyles.border = 'none';
 
-              // .image-container simulation
               containerStyles.clipPath = previewChamferPath;
-              containerStyles.border = 'none'; // Ensure no other borders interfere
-              // The default background of containerStyles is a semi-transparent fill, which is perfect for the preview.
+              containerStyles.border = 'none';
               break;
           default:
               panelStyles.border = `2px solid ${localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}`;
@@ -559,7 +552,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                               style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
                           >
                             <div 
-                                className={`flex items-center justify-center ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'} transition-all duration-300`}
+                                className={`flex items-center justify-center ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'} transition-all duration-300 w-1/2`}
                                 style={getFramePreviewStyles(localImageFrame).panelStyles}
                             >
                                   <div 
@@ -569,7 +562,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                       Imagem
                                   </div>
                               </div>
-                              <div className={`flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'}`}>
+                              <div className={`w-1/2 flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'}`}>
                                   Descrição
                               </div>
                           </div>
@@ -749,24 +742,22 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                         
                         {localImageFrame === 'rounded-top' && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <ColorInput label="Cor de Fundo" id="frameRoundedTopBg" value={localFrameRoundedTopBackgroundColor} onChange={setLocalFrameRoundedTopBackgroundColor} placeholder="#000000" />
-                                <ColorInput label="Cor da Borda" id="frameRoundedTopBorder" value={localFrameRoundedTopBorderColor} onChange={setLocalFrameRoundedTopBorderColor} placeholder="#facc15" />
+                                <ColorInput label="Cor da Moldura" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
                             </div>
                         )}
                         {localImageFrame === 'book-cover' && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <ColorInput label="Cor da Moldura" id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#2d2d2d" />
+                                <ColorInput label="Cor da Moldura" id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
                             </div>
                         )}
                         {localImageFrame === 'trading-card' && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <ColorInput label="Cor da Borda Externa" id="frameCardOuterColor" value={localFrameCardOuterColor} onChange={setLocalFrameCardOuterColor} placeholder="#1c1917" />
-                                <ColorInput label="Cor da Borda Interna" id="frameCardInnerColor" value={localFrameCardInnerColor} onChange={setLocalFrameCardInnerColor} placeholder="#d97706" />
+                                <ColorInput label="Cor da Moldura" id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
                             </div>
                         )}
                         {localImageFrame === 'chamfered' && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <ColorInput label="Cor da Moldura" id="frameChamferedColor" value={localFrameChamferedColor} onChange={setLocalFrameChamferedColor} placeholder="#4a5568" />
+                                <ColorInput label="Cor da Moldura" id="frameChamferedColor" value={localFrameChamferedColor} onChange={setLocalFrameChamferedColor} placeholder="#FFFFFF" />
                             </div>
                         )}
                         {localImageFrame === 'none' && (
