@@ -5,7 +5,6 @@ import InteractionEditor from './InteractionEditor';
 import ConnectionsView from './ConnectionsView';
 import { UploadIcon } from './icons/UploadIcon';
 import { EyeIcon } from './icons/EyeIcon';
-import { DocumentDuplicateIcon } from './icons/DocumentDuplicateIcon';
 
 interface SceneEditorProps {
   scene: Scene;
@@ -133,10 +132,10 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   };
 
   const handleToggle = (key: 'isEndingScene' | 'removesChanceOnEntry' | 'restoresChanceOnEntry', value: boolean) => {
-    // FIX: Explicitly type the 'prev' parameter as 'Scene' to correct type inference issues within the setter.
-    // This ensures that 'newScene' is correctly typed as 'Scene', resolving assignment errors.
-    setLocalScene((prev: Scene) => {
-        let newScene = { ...prev };
+    // FIX: Explicitly type `newScene` to `Scene` to avoid type inference issues when using a dynamic key to set a property.
+    // This resolves errors where `newScene` was incorrectly inferred as `{}` or `unknown`.
+    setLocalScene(prev => {
+        const newScene: Scene = { ...prev };
 
         // If we are checking a box, uncheck all others first.
         if (value) {
@@ -247,7 +246,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                 className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors"
                 title="Copiar Cena"
             >
-                <DocumentDuplicateIcon className="w-5 h-5 mr-2" />
                 Copiar Cena
             </button>
         </div>
