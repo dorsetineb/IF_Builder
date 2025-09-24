@@ -62,6 +62,7 @@ const InteractionItem: React.FC<{
         delete newInteraction.goToScene;
         delete newInteraction.newSceneDescription;
         delete newInteraction.successMessage;
+        delete newInteraction.transitionType; // Reset transition when outcome changes
 
         switch (outcome) {
             case 'goToScene':
@@ -168,7 +169,7 @@ const InteractionItem: React.FC<{
               <div className="flex flex-col flex-grow h-full">
                   {outcomeType === 'goToScene' && (
                       <>
-                          <div>
+                          <div className="flex-grow">
                               <label className="block text-sm font-medium text-brand-text-dim mb-1">Cena de Destino</label>
                               <select 
                                   value={interaction.goToScene || ''} 
@@ -187,21 +188,6 @@ const InteractionItem: React.FC<{
                                       </option>
                                   ))}
                               </select>
-                          </div>
-                          <div>
-                            <label htmlFor={`transition-type-${index}`} className="block text-sm font-medium text-brand-text-dim mb-1 mt-2">Transição Visual</label>
-                            <select 
-                                id={`transition-type-${index}`}
-                                value={interaction.transitionType || 'fade'} 
-                                onChange={e => handleInteractionChange('transitionType', e.target.value)} 
-                                className={`${selectBaseClasses} mb-2`}
-                                style={selectStyle}
-                            >
-                                <option className={optionBaseClasses} value="fade">Fade (Padrão)</option>
-                                <option className={optionBaseClasses} value="slide-left">Deslizar da Direita</option>
-                                <option className={optionBaseClasses} value="slide-right">Deslizar da Esquerda</option>
-                                <option className={optionBaseClasses} value="wipe-down">Cortina (de Cima)</option>
-                            </select>
                           </div>
                           <div className="flex-grow flex items-center justify-center bg-brand-bg border-2 border-dashed border-brand-border/50 rounded-md p-4 mt-2">
                               <p className="text-center text-sm text-brand-text-dim">O feedback para o jogador será a nova cena.</p>
@@ -225,21 +211,44 @@ const InteractionItem: React.FC<{
           </div>
         </div>
         
-        <div className="mt-4 pt-4 border-t border-brand-border/50">
-            <label className="block text-sm font-medium text-brand-text-dim">Efeito Sonoro (opcional)</label>
-            <p className="text-xs text-brand-text-dim mb-2">será tocado no término da interação</p>
-            {interaction.soundEffect ? (
-              <div className="flex items-center gap-2">
-                <audio controls src={interaction.soundEffect} className="w-full max-w-sm"></audio>
-                <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="p-2 text-brand-text-dim hover:text-red-500" title="Remover som">
-                    <TrashIcon className="w-5 h-5" />
-                </button>
-              </div>
-            ) : (
-            <label className="inline-flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer">
-                <UploadIcon className="w-5 h-5 mr-2" /> Carregar Áudio
-                <input type="file" accept="audio/*" onChange={(e) => handleSoundUpload(e)} className="hidden" />
-            </label>
+        <div className="mt-4 pt-4 border-t border-brand-border/50 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+            <div>
+                <label className="block text-sm font-medium text-brand-text-dim">Efeito Sonoro (opcional)</label>
+                <p className="text-xs text-brand-text-dim mb-2">Será tocado no término da interação.</p>
+                {interaction.soundEffect ? (
+                  <div className="flex items-center gap-2">
+                    <audio controls src={interaction.soundEffect} className="w-full max-w-sm"></audio>
+                    <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="p-2 text-brand-text-dim hover:text-red-500" title="Remover som">
+                        <TrashIcon className="w-5 h-5" />
+                    </button>
+                  </div>
+                ) : (
+                <label className="inline-flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer">
+                    <UploadIcon className="w-5 h-5 mr-2" /> Carregar Áudio
+                    <input type="file" accept="audio/*" onChange={(e) => handleSoundUpload(e)} className="hidden" />
+                </label>
+                )}
+            </div>
+            {outcomeType === 'goToScene' && (
+                <div>
+                    <label htmlFor={`transition-type-${index}`} className="block text-sm font-medium text-brand-text-dim">Transição Visual (opcional)</label>
+                    <p className="text-xs text-brand-text-dim mb-2">Efeito visual ao mudar de cena.</p>
+                    <select 
+                        id={`transition-type-${index}`}
+                        value={interaction.transitionType || 'none'} 
+                        onChange={e => handleInteractionChange('transitionType', e.target.value)} 
+                        className={`${selectBaseClasses}`}
+                        style={selectStyle}
+                    >
+                        <option className={optionBaseClasses} value="none">Sem transição (Padrão)</option>
+                        <option className={optionBaseClasses} value="fade">Fade</option>
+                        <option className={optionBaseClasses} value="wipe-down">Cortina (Cima)</option>
+                        <option className={optionBaseClasses} value="wipe-up">Cortina (Baixo)</option>
+                        <option className={optionBaseClasses} value="wipe-right">Cortina (Esquerda)</option>
+                        <option className={optionBaseClasses} value="wipe-left">Cortina (Direita)</option>
+                        <option className={optionBaseClasses} value="wipe-diagonal">Fade Diagonal</option>
+                    </select>
+                </div>
             )}
         </div>
       </div>

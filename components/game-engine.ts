@@ -1,5 +1,3 @@
-
-
 import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
@@ -271,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentState.chances--;
                 renderChances();
                 const messageTemplate = gameData.gameChanceLossMessage || 'Você perdeu uma chance. Restam {chances} chance(s).';
-                const message = messageTemplate.replace('{chances}', String(currentState.chances));
+                const message = messageTemplate.replace('{chances}', ('' + currentState.chances));
                 extraMessages.push(message);
                 currentState.diaryLog.push({ type: 'action', data: { command: '[EFEITO DE CENA]', response: message, sceneId: sceneId } });
 
@@ -302,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         currentState.currentSceneId = sceneId;
-        const rawDescription = scene.description ? String(scene.description).trim() : '';
+        const rawDescription = scene.description ? ('' + scene.description).trim() : '';
         currentSceneParagraphs = [...extraMessages, ...rawDescription.split('\\n').filter(p => p.trim() !== '')];
         currentParagraphIndex = 0;
 
@@ -342,92 +340,96 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function performSceneChange(sceneId, soundEffectUrl, transitionType = 'fade') {
+    function performSceneChange(sceneId, soundEffectUrl, transitionType = 'none') {
         if (!transitionOverlay) {
             changeScene(sceneId);
             return;
         }
-        
+    
         const newScene = currentState.scenesState[sceneId];
         if (!newScene) {
             console.error('New scene not found for transition:', sceneId);
             changeScene(sceneId);
             return;
         }
-
+    
         if (soundEffectUrl && sceneSoundEffectElement) {
             sceneSoundEffectElement.src = soundEffectUrl;
             sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
         }
-
+    
         if (sceneNameOverlayElement) {
             sceneNameOverlayElement.style.opacity = '0';
         }
-
-        if (transitionType === 'fade' || !transitionType) {
-            transitionOverlay.className = 'transition-overlay';
-            const onFadeInEnd = () => {
-                transitionOverlay.removeEventListener('transitionend', onFadeInEnd);
-                changeScene(sceneId);
-                requestAnimationFrame(() => {
-                    transitionOverlay.classList.remove('active');
-                    if (sceneNameOverlayElement) {
-                        setTimeout(() => { sceneNameOverlayElement.style.opacity = '1'; }, 50);
-                    }
-                });
-            };
-            transitionOverlay.addEventListener('transitionend', onFadeInEnd, { once: true });
-            transitionOverlay.classList.add('active');
+    
+        // Handle 'none' as the default, no-animation transition
+        if (transitionType === 'none' || !transitionType) {
+            changeScene(sceneId);
+            if (sceneNameOverlayElement) {
+                setTimeout(() => { sceneNameOverlayElement.style.opacity = '1'; }, 50);
+            }
             return;
         }
-
+    
+        // Handle all visual transitions that require the overlay
         const onTransitionEnd = () => {
             transitionOverlay.removeEventListener('transitionend', onTransitionEnd);
             changeScene(sceneId);
-
-            transitionOverlay.style.transition = 'opacity 0.2s ease-out';
-            transitionOverlay.style.opacity = '0';
-
-            const onFadeOutEnd = () => {
-                transitionOverlay.removeEventListener('transitionend', onFadeOutEnd);
-                transitionOverlay.className = 'transition-overlay';
-                transitionOverlay.style.cssText = '';
-                if (sceneNameOverlayElement) {
-                    setTimeout(() => { sceneNameOverlayElement.style.opacity = '1'; }, 50);
-                }
-            };
-            transitionOverlay.addEventListener('transitionend', onFadeOutEnd, { once: true });
+    
+            // Immediately hide overlay after the new scene is rendered underneath.
+            transitionOverlay.className = 'transition-overlay';
+            transitionOverlay.style.cssText = ''; 
+            
+            if (sceneNameOverlayElement) {
+                setTimeout(() => { sceneNameOverlayElement.style.opacity = '1'; }, 50);
+            }
         };
         
         transitionOverlay.addEventListener('transitionend', onTransitionEnd, { once: true });
-
+    
+        // Set the overlay's background to the new scene's image for a seamless effect
         transitionOverlay.style.backgroundImage = \`url('\${newScene.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}')\`;
-        transitionOverlay.style.opacity = '1';
-
+        
         let startClass = '';
         let transClass = '';
-
+    
         switch (transitionType) {
-            case 'slide-left':
-                startClass = 'slide-left-start';
-                transClass = 'is-transitioning';
-                break;
-            case 'slide-right':
-                startClass = 'slide-right-start';
-                transClass = 'is-transitioning';
+            case 'fade':
+                // The CSS for .transition-overlay handles the opacity transition.
+                // No special classes needed, just adding 'active' later.
                 break;
             case 'wipe-down':
                 startClass = 'wipe-down-start';
                 transClass = 'is-wiping';
                 break;
+            case 'wipe-up':
+                startClass = 'wipe-up-start';
+                transClass = 'is-wiping';
+                break;
+            case 'wipe-left':
+                startClass = 'wipe-left-start';
+                transClass = 'is-wiping';
+                break;
+            case 'wipe-right':
+                startClass = 'wipe-right-start';
+                transClass = 'is-wiping';
+                break;
+            case 'wipe-diagonal':
+                startClass = 'wipe-diagonal-start';
+                transClass = 'is-wiping-diagonal';
+                break;
             default:
-                onTransitionEnd();
+                // Fallback for unknown transition types to no transition
+                transitionOverlay.removeEventListener('transitionend', onTransitionEnd);
+                changeScene(sceneId);
                 return;
         }
-
-        transitionOverlay.className = 'transition-overlay';
-        transitionOverlay.classList.add(startClass, transClass);
-
+    
+        transitionOverlay.className = 'transition-overlay'; // Reset classes
+        if (startClass) transitionOverlay.classList.add(startClass);
+        if (transClass) transitionOverlay.classList.add(transClass);
+    
+        // Double requestAnimationFrame to ensure CSS classes are applied before transition starts
         requestAnimationFrame(() => {
              requestAnimationFrame(() => {
                 transitionOverlay.classList.add('active');

@@ -1,5 +1,7 @@
 
 
+
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -578,10 +580,10 @@ body.light-theme .scene-name-overlay {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: var(--bg-color);
+    background-color: transparent;
     opacity: 0;
     pointer-events: none;
-    transition: opacity 0.4s ease-in-out;
+    transition: opacity 0.5s ease-in-out;
     z-index: 500;
     background-size: cover;
     background-position: center;
@@ -590,28 +592,40 @@ body.light-theme .scene-name-overlay {
     opacity: 1;
     pointer-events: auto;
 }
-.transition-overlay.is-transitioning {
-    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
 .transition-overlay.is-wiping {
-    transition: clip-path 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.transition-overlay.slide-left-start {
-    transform: translateX(100%);
-}
-.transition-overlay.slide-right-start {
-    transform: translateX(-100%);
-}
-.transition-overlay.slide-left-start.active, .transition-overlay.slide-right-start.active {
-    transform: translateX(0);
+    opacity: 1; /* For wipes, we want the image to be visible immediately */
+    transition: clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .transition-overlay.wipe-down-start {
     clip-path: inset(0 0 100% 0);
 }
-.transition-overlay.wipe-down-start.active {
+.transition-overlay.wipe-up-start {
+    clip-path: inset(100% 0 0 0);
+}
+.transition-overlay.wipe-left-start {
+    clip-path: inset(0 0 0 100%);
+}
+.transition-overlay.wipe-right-start {
+    clip-path: inset(0 100% 0 0);
+}
+.transition-overlay.wipe-down-start.active,
+.transition-overlay.wipe-up-start.active,
+.transition-overlay.wipe-left-start.active,
+.transition-overlay.wipe-right-start.active {
     clip-path: inset(0 0 0 0);
 }
 
+.transition-overlay.is-wiping-diagonal {
+    transition: clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease-out;
+}
+.transition-overlay.wipe-diagonal-start {
+    clip-path: polygon(100% 0, 100% 0, 100% 0, 100% 0);
+    opacity: 0;
+}
+.transition-overlay.wipe-diagonal-start.active {
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+    opacity: 1;
+}
 
 /* Image Frame Styles */
 .frame-rounded-top .image-panel {
