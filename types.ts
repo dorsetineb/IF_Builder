@@ -2,6 +2,7 @@
 
 
 
+
 export interface GameObject {
   id: string;
   name: string;
@@ -16,7 +17,7 @@ export interface Interaction {
   requiresInInventory?: string; // name of object in inventory, e.g., 'chave'
   successMessage?: string;
   soundEffect?: string; // base64 data URL for interaction sound
-  transitionType?: 'none' | 'fade' | 'wipe-down' | 'wipe-up' | 'wipe-left' | 'wipe-right' | 'wipe-diagonal';
+  transitionType?: 'none' | 'fade' | 'wipe-down' | 'wipe-up' | 'wipe-left' | 'wipe-right';
   // --- Outcomes ---
   consumesItem?: boolean; // if requiresInInventory is used, is it consumed?
   removesTargetFromScene?: boolean; // remove the target object from the scene
@@ -110,6 +111,8 @@ export interface GameData {
   frameTradingCardColor?: string;
   frameChamferedColor?: string;
   frameRoundedTopColor?: string;
+  gameSceneNameOverlayBg?: string;
+  gameSceneNameOverlayTextColor?: string;
   fixedVerbs?: FixedVerb[];
 }
 

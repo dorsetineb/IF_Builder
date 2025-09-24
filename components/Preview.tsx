@@ -1,5 +1,7 @@
 
 
+
+
 import React, { useMemo } from 'react';
 import { GameData } from '../types';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
@@ -70,7 +72,9 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace(/__FRAME_BOOK_COLOR__/g, gameData.frameBookColor || '#2d2d2d')
             .replace(/__FRAME_TRADING_CARD_COLOR__/g, gameData.frameTradingCardColor || '#1c1917')
             .replace(/__FRAME_CHAMFERED_COLOR__/g, gameData.frameChamferedColor || '#4a5568')
-            .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, gameData.frameRoundedTopColor || '#facc15');
+            .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, gameData.frameRoundedTopColor || '#facc15')
+            .replace(/__SCENE_NAME_OVERLAY_BG__/g, gameData.gameSceneNameOverlayBg || '#0d1117')
+            .replace(/__SCENE_NAME_OVERLAY_TEXT_COLOR__/g, gameData.gameSceneNameOverlayTextColor || '#c9d1d9');
             
         const engineData = prepareGameDataForEngine(gameData);
         // Safely stringify JSON to prevent issues with '</script>' tags in user content.

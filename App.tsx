@@ -2,6 +2,7 @@
 
 
 
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -148,6 +149,8 @@ body.light-theme {
     --splash-justify-content: flex-end;
     --splash-text-align: right;
     --splash-content-align-items: flex-end;
+    --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__;
+    --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__;
 }
 
 /* Reset and base styles */
@@ -317,8 +320,8 @@ body.with-spacing .main-wrapper {
     bottom: 20px;
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(13, 17, 23, 0.75);
-    color: var(--text-color);
+    background-color: var(--scene-name-overlay-bg);
+    color: var(--scene-name-overlay-text-color);
     border: 2px solid var(--border-color);
     border-radius: 0; /* Sharp corners */
     font-size: 0.9em;
@@ -331,11 +334,6 @@ body.with-spacing .main-wrapper {
     padding: 8px 16px;
     box-sizing: border-box;
 }
-
-body.light-theme .scene-name-overlay {
-    background-color: rgba(246, 248, 250, 0.85);
-}
-
 
 .text-panel {
     flex: 1;
@@ -615,18 +613,6 @@ body.light-theme .scene-name-overlay {
     clip-path: inset(0 0 0 0);
 }
 
-.transition-overlay.is-wiping-diagonal {
-    transition: clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease-out;
-}
-.transition-overlay.wipe-diagonal-start {
-    clip-path: polygon(100% 0, 100% 0, 100% 0, 100% 0);
-    opacity: 0;
-}
-.transition-overlay.wipe-diagonal-start.active {
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-    opacity: 1;
-}
-
 /* Image Frame Styles */
 .frame-rounded-top .image-panel {
     padding: 20px;
@@ -853,6 +839,8 @@ const initializeGameData = (): GameData => {
         frameTradingCardColor: '#FFFFFF',
         frameChamferedColor: '#FFFFFF',
         frameRoundedTopColor: '#FFFFFF',
+        gameSceneNameOverlayBg: '#0d1117',
+        gameSceneNameOverlayTextColor: '#c9d1d9',
         fixedVerbs: [],
     };
 };
@@ -1161,6 +1149,8 @@ const App: React.FC = () => {
             frameTradingCardColor={gameData.frameTradingCardColor || '#FFFFFF'}
             frameChamferedColor={gameData.frameChamferedColor || '#FFFFFF'}
             frameRoundedTopColor={gameData.frameRoundedTopColor || '#FFFFFF'}
+            gameSceneNameOverlayBg={gameData.gameSceneNameOverlayBg || '#0d1117'}
+            gameSceneNameOverlayTextColor={gameData.gameSceneNameOverlayTextColor || '#c9d1d9'}
             onUpdate={handleUpdateGameData}
             isDirty={isDirty}
             onSetDirty={setIsDirty}

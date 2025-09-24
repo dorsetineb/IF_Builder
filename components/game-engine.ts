@@ -414,10 +414,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 startClass = 'wipe-right-start';
                 transClass = 'is-wiping';
                 break;
-            case 'wipe-diagonal':
-                startClass = 'wipe-diagonal-start';
-                transClass = 'is-wiping-diagonal';
-                break;
             default:
                 // Fallback for unknown transition types to no transition
                 transitionOverlay.removeEventListener('transitionend', onTransitionEnd);

@@ -246,7 +246,6 @@ const InteractionItem: React.FC<{
                         <option className={optionBaseClasses} value="wipe-up">Cortina (Baixo)</option>
                         <option className={optionBaseClasses} value="wipe-right">Cortina (Esquerda)</option>
                         <option className={optionBaseClasses} value="wipe-left">Cortina (Direita)</option>
-                        <option className={optionBaseClasses} value="wipe-diagonal">Fade Diagonal</option>
                     </select>
                 </div>
             )}

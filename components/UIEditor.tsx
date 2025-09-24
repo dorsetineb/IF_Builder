@@ -4,6 +4,7 @@
 
 
 
+
 import React, { useState, useEffect } from 'react';
 import { GameData } from '../types';
 
@@ -43,6 +44,8 @@ interface UIEditorProps {
   frameTradingCardColor: string;
   frameChamferedColor: string;
   frameRoundedTopColor: string;
+  gameSceneNameOverlayBg: string;
+  gameSceneNameOverlayTextColor: string;
   onUpdate: (field: keyof GameData, value: any) => void;
   isDirty: boolean;
   onSetDirty: (isDirty: boolean) => void;
@@ -152,7 +155,9 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
       gameTheme, textColorLight, titleColorLight, focusColorLight,
       frameBookColor, frameTradingCardColor,
       frameChamferedColor,
-      frameRoundedTopColor
+      frameRoundedTopColor,
+      gameSceneNameOverlayBg,
+      gameSceneNameOverlayTextColor
   } = props;
 
   // State from UIEditor
@@ -192,6 +197,8 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localFrameTradingCardColor, setLocalFrameTradingCardColor] = useState(frameTradingCardColor);
   const [localFrameChamferedColor, setLocalFrameChamferedColor] = useState(frameChamferedColor);
   const [localFrameRoundedTopColor, setLocalFrameRoundedTopColor] = useState(frameRoundedTopColor);
+  const [localGameSceneNameOverlayBg, setLocalGameSceneNameOverlayBg] = useState(gameSceneNameOverlayBg);
+  const [localGameSceneNameOverlayTextColor, setLocalGameSceneNameOverlayTextColor] = useState(gameSceneNameOverlayTextColor);
   const [focusPreview, setFocusPreview] = useState(false);
   const [isCustomizing, setIsCustomizing] = useState(false);
 
@@ -230,12 +237,14 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalFrameTradingCardColor(frameTradingCardColor);
     setLocalFrameChamferedColor(frameChamferedColor);
     setLocalFrameRoundedTopColor(frameRoundedTopColor);
+    setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg);
+    setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor);
   }, [
     layoutOrientation, layoutOrder, imageFrame, actionButtonText, verbInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, enableChances, maxChances,
     textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
     chanceIconColor, gameFontFamily, chanceIcon, chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight,
     frameBookColor, frameTradingCardColor, frameChamferedColor,
-    frameRoundedTopColor
+    frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor
   ]);
   
   useEffect(() => {
@@ -279,13 +288,15 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localFrameBookColor !== frameBookColor ||
                   localFrameTradingCardColor !== frameTradingCardColor ||
                   localFrameChamferedColor !== frameChamferedColor ||
-                  localFrameRoundedTopColor !== frameRoundedTopColor;
+                  localFrameRoundedTopColor !== frameRoundedTopColor ||
+                  localGameSceneNameOverlayBg !== gameSceneNameOverlayBg ||
+                  localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor;
     onSetDirty(dirty);
   }, [
     localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localEnableChances, localMaxChances,
     localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
     localFrameBookColor, localFrameTradingCardColor, localFrameChamferedColor,
-    localFrameRoundedTopColor,
+    localFrameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
     props, onSetDirty
   ]);
 
@@ -325,6 +336,8 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localFrameTradingCardColor !== frameTradingCardColor) onUpdate('frameTradingCardColor', localFrameTradingCardColor);
     if (localFrameChamferedColor !== frameChamferedColor) onUpdate('frameChamferedColor', localFrameChamferedColor);
     if (localFrameRoundedTopColor !== frameRoundedTopColor) onUpdate('frameRoundedTopColor', localFrameRoundedTopColor);
+    if (localGameSceneNameOverlayBg !== gameSceneNameOverlayBg) onUpdate('gameSceneNameOverlayBg', localGameSceneNameOverlayBg);
+    if (localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor) onUpdate('gameSceneNameOverlayTextColor', localGameSceneNameOverlayTextColor);
   };
   
   const handleUndo = () => {
@@ -363,6 +376,8 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalFrameTradingCardColor(frameTradingCardColor);
     setLocalFrameChamferedColor(frameChamferedColor);
     setLocalFrameRoundedTopColor(frameRoundedTopColor);
+    setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg);
+    setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor);
   };
 
   const applyTheme = (theme: typeof PREDEFINED_THEMES[0]) => {
@@ -767,6 +782,14 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                         )}
                     </div>
 
+                    <div className="pt-6 border-t border-brand-border/50">
+                        <h3 className="text-lg font-semibold text-brand-text mb-4">Box de Nome da Cena</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <ColorInput label="Cor de Fundo do Box" id="sceneNameOverlayBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#0d1117" />
+                            <ColorInput label="Cor do Texto do Box" id="sceneNameOverlayTextColor" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#c9d1d9" />
+                        </div>
+                    </div>
+
                     {!isCustomizing && (
                          <div className="pt-6 border-t border-brand-border/50">
                              <button 
@@ -882,9 +905,19 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                         {/* Upper Part */}
                         <div className="flex flex-1 p-4 gap-4">
                             {/* Image Panel Mock */}
-                            <div className="w-2/5 h-full flex items-center justify-center" style={panelStyles}>
+                            <div className="w-2/5 h-full flex items-center justify-center relative" style={panelStyles}>
                                 <div className="font-semibold" style={containerStyles}>
                                     Imagem
+                                </div>
+                                <div 
+                                    className="absolute bottom-4 text-xs font-bold px-2 py-1 rounded" 
+                                    style={{ 
+                                        backgroundColor: localGameSceneNameOverlayBg, 
+                                        color: localGameSceneNameOverlayTextColor,
+                                        border: `1px solid ${localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}`
+                                    }}
+                                >
+                                    Nome da Cena
                                 </div>
                             </div>
                             {/* Text Panel Mock */}
