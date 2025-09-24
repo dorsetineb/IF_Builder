@@ -168,25 +168,42 @@ const InteractionItem: React.FC<{
               <div className="flex flex-col flex-grow h-full">
                   {outcomeType === 'goToScene' && (
                       <>
-                          <label className="block text-sm font-medium text-brand-text-dim mb-1">Cena de Destino</label>
-                          <select 
-                              value={interaction.goToScene || ''} 
-                              onChange={e => handleInteractionChange('goToScene', e.target.value)} 
-                              className={`${selectBaseClasses} mb-2`}
-                              style={selectStyle}
-                          >
-                              <option className={optionDimClasses} value="">Selecione a cena...</option>
-                              {otherScenes.map(scene => (
-                                  <option 
-                                      className={optionBaseClasses} 
-                                      key={scene.id} 
-                                      value={scene.id}
-                                  >
-                                      {scene.name} ({scene.id}) {scene.isEndingScene ? '(Fim de Jogo)' : ''}
-                                  </option>
-                              ))}
-                          </select>
-                          <div className="flex-grow flex items-center justify-center bg-brand-bg border-2 border-dashed border-brand-border/50 rounded-md p-4">
+                          <div>
+                              <label className="block text-sm font-medium text-brand-text-dim mb-1">Cena de Destino</label>
+                              <select 
+                                  value={interaction.goToScene || ''} 
+                                  onChange={e => handleInteractionChange('goToScene', e.target.value)} 
+                                  className={`${selectBaseClasses} mb-2`}
+                                  style={selectStyle}
+                              >
+                                  <option className={optionDimClasses} value="">Selecione a cena...</option>
+                                  {otherScenes.map(scene => (
+                                      <option 
+                                          className={optionBaseClasses} 
+                                          key={scene.id} 
+                                          value={scene.id}
+                                      >
+                                          {scene.name} ({scene.id}) {scene.isEndingScene ? '(Fim de Jogo)' : ''}
+                                      </option>
+                                  ))}
+                              </select>
+                          </div>
+                          <div>
+                            <label htmlFor={`transition-type-${index}`} className="block text-sm font-medium text-brand-text-dim mb-1 mt-2">Transição Visual</label>
+                            <select 
+                                id={`transition-type-${index}`}
+                                value={interaction.transitionType || 'fade'} 
+                                onChange={e => handleInteractionChange('transitionType', e.target.value)} 
+                                className={`${selectBaseClasses} mb-2`}
+                                style={selectStyle}
+                            >
+                                <option className={optionBaseClasses} value="fade">Fade (Padrão)</option>
+                                <option className={optionBaseClasses} value="slide-left">Deslizar da Direita</option>
+                                <option className={optionBaseClasses} value="slide-right">Deslizar da Esquerda</option>
+                                <option className={optionBaseClasses} value="wipe-down">Cortina (de Cima)</option>
+                            </select>
+                          </div>
+                          <div className="flex-grow flex items-center justify-center bg-brand-bg border-2 border-dashed border-brand-border/50 rounded-md p-4 mt-2">
                               <p className="text-center text-sm text-brand-text-dim">O feedback para o jogador será a nova cena.</p>
                           </div>
                       </>

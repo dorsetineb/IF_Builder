@@ -14,6 +14,7 @@ export interface Interaction {
   requiresInInventory?: string; // name of object in inventory, e.g., 'chave'
   successMessage?: string;
   soundEffect?: string; // base64 data URL for interaction sound
+  transitionType?: 'fade' | 'slide-left' | 'slide-right' | 'wipe-down';
   // --- Outcomes ---
   consumesItem?: boolean; // if requiresInInventory is used, is it consumed?
   removesTargetFromScene?: boolean; // remove the target object from the scene

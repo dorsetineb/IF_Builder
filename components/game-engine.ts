@@ -1,4 +1,5 @@
 
+
 import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
@@ -341,48 +342,97 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function performSceneChange(sceneId, soundEffectUrl) {
+    function performSceneChange(sceneId, soundEffectUrl, transitionType = 'fade') {
         if (!transitionOverlay) {
-            // Fallback for older HTML or if element is missing
-            if (soundEffectUrl && sceneSoundEffectElement) {
-                sceneSoundEffectElement.src = soundEffectUrl;
-                sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
-            }
             changeScene(sceneId);
-            if(sceneNameOverlayElement) {
-                sceneNameOverlayElement.style.opacity = '1';
-            }
             return;
+        }
+        
+        const newScene = currentState.scenesState[sceneId];
+        if (!newScene) {
+            console.error('New scene not found for transition:', sceneId);
+            changeScene(sceneId);
+            return;
+        }
+
+        if (soundEffectUrl && sceneSoundEffectElement) {
+            sceneSoundEffectElement.src = soundEffectUrl;
+            sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
         }
 
         if (sceneNameOverlayElement) {
             sceneNameOverlayElement.style.opacity = '0';
         }
-        
-        // Play sound as fade-out starts
-        if (soundEffectUrl && sceneSoundEffectElement) {
-            sceneSoundEffectElement.src = soundEffectUrl;
-            sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
-        }
-        
-        transitionOverlay.classList.add('active');
 
-        const transitionHandler = () => {
-            transitionOverlay.removeEventListener('transitionend', transitionHandler);
-            
+        if (transitionType === 'fade' || !transitionType) {
+            transitionOverlay.className = 'transition-overlay';
+            const onFadeInEnd = () => {
+                transitionOverlay.removeEventListener('transitionend', onFadeInEnd);
+                changeScene(sceneId);
+                requestAnimationFrame(() => {
+                    transitionOverlay.classList.remove('active');
+                    if (sceneNameOverlayElement) {
+                        setTimeout(() => { sceneNameOverlayElement.style.opacity = '1'; }, 50);
+                    }
+                });
+            };
+            transitionOverlay.addEventListener('transitionend', onFadeInEnd, { once: true });
+            transitionOverlay.classList.add('active');
+            return;
+        }
+
+        const onTransitionEnd = () => {
+            transitionOverlay.removeEventListener('transitionend', onTransitionEnd);
             changeScene(sceneId);
-            
-            // Use requestAnimationFrame to ensure DOM has updated before fading back in
-            requestAnimationFrame(() => {
-                transitionOverlay.classList.remove('active');
+
+            transitionOverlay.style.transition = 'opacity 0.2s ease-out';
+            transitionOverlay.style.opacity = '0';
+
+            const onFadeOutEnd = () => {
+                transitionOverlay.removeEventListener('transitionend', onFadeOutEnd);
+                transitionOverlay.className = 'transition-overlay';
+                transitionOverlay.style.cssText = '';
                 if (sceneNameOverlayElement) {
-                    setTimeout(() => {
-                        sceneNameOverlayElement.style.opacity = '1';
-                    }, 50);
+                    setTimeout(() => { sceneNameOverlayElement.style.opacity = '1'; }, 50);
                 }
-            });
+            };
+            transitionOverlay.addEventListener('transitionend', onFadeOutEnd, { once: true });
         };
-        transitionOverlay.addEventListener('transitionend', transitionHandler, { once: true });
+        
+        transitionOverlay.addEventListener('transitionend', onTransitionEnd, { once: true });
+
+        transitionOverlay.style.backgroundImage = \`url('\${newScene.image || "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"}')\`;
+        transitionOverlay.style.opacity = '1';
+
+        let startClass = '';
+        let transClass = '';
+
+        switch (transitionType) {
+            case 'slide-left':
+                startClass = 'slide-left-start';
+                transClass = 'is-transitioning';
+                break;
+            case 'slide-right':
+                startClass = 'slide-right-start';
+                transClass = 'is-transitioning';
+                break;
+            case 'wipe-down':
+                startClass = 'wipe-down-start';
+                transClass = 'is-wiping';
+                break;
+            default:
+                onTransitionEnd();
+                return;
+        }
+
+        transitionOverlay.className = 'transition-overlay';
+        transitionOverlay.classList.add(startClass, transClass);
+
+        requestAnimationFrame(() => {
+             requestAnimationFrame(() => {
+                transitionOverlay.classList.add('active');
+             });
+        });
     }
     
     function processVerb() {
@@ -474,7 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Then process navigation/display changes
                         if (interaction.goToScene) {
                             currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: '', sceneId: currentState.currentSceneId } });
-                            performSceneChange(interaction.goToScene, interaction.soundEffect);
+                            performSceneChange(interaction.goToScene, interaction.soundEffect, interaction.transitionType);
                         } else {
                             if (interaction.newSceneDescription) {
                                 responseText = interaction.newSceneDescription;

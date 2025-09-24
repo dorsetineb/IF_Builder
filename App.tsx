@@ -583,11 +583,35 @@ body.light-theme .scene-name-overlay {
     pointer-events: none;
     transition: opacity 0.4s ease-in-out;
     z-index: 500;
+    background-size: cover;
+    background-position: center;
 }
 .transition-overlay.active {
     opacity: 1;
     pointer-events: auto;
 }
+.transition-overlay.is-transitioning {
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.transition-overlay.is-wiping {
+    transition: clip-path 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.transition-overlay.slide-left-start {
+    transform: translateX(100%);
+}
+.transition-overlay.slide-right-start {
+    transform: translateX(-100%);
+}
+.transition-overlay.slide-left-start.active, .transition-overlay.slide-right-start.active {
+    transform: translateX(0);
+}
+.transition-overlay.wipe-down-start {
+    clip-path: inset(0 0 100% 0);
+}
+.transition-overlay.wipe-down-start.active {
+    clip-path: inset(0 0 0 0);
+}
+
 
 /* Image Frame Styles */
 .frame-rounded-top .image-panel {
