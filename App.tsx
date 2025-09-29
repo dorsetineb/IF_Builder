@@ -1,9 +1,4 @@
 
-
-
-
-
-
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -107,7 +102,7 @@ body {
     padding: 0;
 }
 body.with-spacing {
-    padding: 0;
+    padding: 2rem;
 }
 body.dark-theme {
     --bg-color: #0d1117;
@@ -175,7 +170,7 @@ body {
     margin: 0 auto;
 }
 body.with-spacing .main-wrapper {
-    height: 100vh;
+    height: 100%;
 }
 
 
@@ -616,14 +611,14 @@ body.with-spacing .main-wrapper {
 
 /* Image Frame Styles */
 .frame-rounded-top .image-panel {
-    padding: 20px;
+    padding: 10px;
     background: __FRAME_ROUNDED_TOP_COLOR__;
     border: none;
     border-radius: 150px 150px 6px 6px;
     box-shadow: none;
 }
 .frame-rounded-top .image-container {
-    border-radius: 130px 130px 0 0;
+    border-radius: 140px 140px 0 0;
 }
 
 /* --- New Frame Styles --- */
@@ -638,10 +633,10 @@ body.with-spacing .main-wrapper {
 }
 
 .frame-trading-card .image-panel {
-    padding: 15px;
+    padding: 8px;
     background: __FRAME_TRADING_CARD_COLOR__;
     border-right-color: transparent;
-    border-radius: 28px;
+    border-radius: 20px;
 }
 .frame-trading-card .image-container {
     border: none;
@@ -651,25 +646,18 @@ body.with-spacing .main-wrapper {
     border-radius: 10px;
 }
 
-/*
-  The two-element clip-path technique for a mitered frame.
-  .image-panel is the outer element, creating the frame with its background color and padding.
-  .image-container is the inner element, which holds the actual image.
-*/
 .frame-chamfered .image-panel {
-    padding: 15px; /* This becomes the frame width */
-    background: __FRAME_CHAMFERED_COLOR__; /* The frame color */
+    padding: 10px;
+    background: __FRAME_CHAMFERED_COLOR__;
     border: none;
-    /* A 25px chamfer. The value is the distance from the corner along the edge. */
-    clip-path: polygon(25px 0, calc(100% - 25px) 0, 100% 25px, 100% calc(100% - 25px), calc(100% - 25px) 100%, 25px 100%, 0 calc(100% - 25px), 0 25px);
+    clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px);
 }
 .frame-chamfered .image-container {
     width: 100%;
     height: 100%;
     border: none;
-    background-color: transparent; /* This is crucial for the image to be visible */
-    /* Clip the inner container to match the frame's inner shape */
-    clip-path: polygon(25px 0, calc(100% - 25px) 0, 100% 25px, 100% calc(100% - 25px), calc(100% - 25px) 100%, 25px 100%, 0 calc(100% - 25px), 0 25px);
+    background-color: transparent;
+    clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px);
 }
 
 /* Font Size Adjustments */

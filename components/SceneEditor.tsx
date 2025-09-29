@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
 import { Scene, Interaction, GameObject } from '../types';
 import ObjectEditor from './ObjectEditor';
@@ -107,22 +108,24 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     }
 
     // FIX: Refactored from reduce to map/filter to avoid potential type inference issues.
-    const inputConnections: ConnectionDetail[] = Array.from(inputConnectionsMap.entries()).reduce((acc: ConnectionDetail[], [sceneId, interactions]) => {
+    const inputConnections: ConnectionDetail[] = Array.from(inputConnectionsMap.entries()).map(([sceneId, interactions]) => {
         const scene = sceneMap.get(sceneId);
         if (scene) {
-            acc.push({ scene, interactions });
+            return { scene, interactions };
         }
-        return acc;
-    }, []);
+        return null;
+    }).filter((connection): connection is ConnectionDetail => connection !== null);
+
 
     // FIX: Refactored from reduce to map/filter to avoid potential type inference issues.
-    const outputConnections: ConnectionDetail[] = Array.from(outputConnectionsMap.entries()).reduce((acc: ConnectionDetail[], [sceneId, interactions]) => {
+    const outputConnections: ConnectionDetail[] = Array.from(outputConnectionsMap.entries()).map(([sceneId, interactions]) => {
         const scene = sceneMap.get(sceneId);
         if (scene) {
-            acc.push({ scene, interactions });
+            return { scene, interactions };
         }
-        return acc;
-    }, []);
+        return null;
+    }).filter((connection): connection is ConnectionDetail => connection !== null);
+
 
     return { inputConnections, outputConnections };
   }, [allScenes, localScene.id, localScene.interactions]);

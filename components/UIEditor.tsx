@@ -1,10 +1,4 @@
 
-
-
-
-
-
-
 import React, { useState, useEffect } from 'react';
 import { GameData } from '../types';
 
@@ -437,11 +431,11 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
 
       switch (frame) {
           case 'rounded-top':
-              panelStyles.padding = '8px';
+              panelStyles.padding = '5px';
               panelStyles.backgroundColor = localFrameRoundedTopColor;
               panelStyles.border = 'none';
               panelStyles.borderRadius = '40px 40px 4px 4px';
-              containerStyles.borderRadius = '32px 32px 0 0';
+              containerStyles.borderRadius = '35px 35px 0 0';
               break;
           case 'book-cover':
               panelStyles.padding = '8px';
@@ -450,13 +444,13 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
           case 'trading-card':
               panelStyles.backgroundColor = localFrameTradingCardColor;
               panelStyles.borderRadius = '12px';
-              panelStyles.padding = '8px';
+              panelStyles.padding = '4px';
               containerStyles.border = 'none';
-              containerStyles.borderRadius = '6px';
+              containerStyles.borderRadius = '8px';
               break;
           case 'chamfered':
-              const previewChamferSize = '18px';
-              const previewBorderWidth = '8px';
+              const previewChamferSize = '8px';
+              const previewBorderWidth = '5px';
               const previewChamferPath = `polygon(${previewChamferSize} 0, calc(100% - ${previewChamferSize}) 0, 100% ${previewChamferSize}, 100% calc(100% - ${previewChamferSize}), calc(100% - ${previewChamferSize}) 100%, ${previewChamferSize} 100%, 0 calc(100% - ${previewChamferSize}), 0 ${previewChamferSize})`;
               
               panelStyles.padding = previewBorderWidth;
