@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
 import { Scene, Interaction, GameObject } from '../types';
 import ObjectEditor from './ObjectEditor';
@@ -105,8 +106,8 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         }
     }
 
-    // FIX: Use reduce with explicit generic type for safer type inference.
-    const inputConnections: ConnectionDetail[] = Array.from(inputConnectionsMap.entries()).reduce<ConnectionDetail[]>((acc, [sceneId, interactions]) => {
+    // FIX: Refactored from reduce to map/filter to avoid potential type inference issues.
+    const inputConnections: ConnectionDetail[] = Array.from(inputConnectionsMap.entries()).reduce((acc: ConnectionDetail[], [sceneId, interactions]) => {
         const scene = sceneMap.get(sceneId);
         if (scene) {
             acc.push({ scene, interactions });
@@ -114,8 +115,8 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         return acc;
     }, []);
 
-    // FIX: Use reduce with explicit generic type for safer type inference.
-    const outputConnections: ConnectionDetail[] = Array.from(outputConnectionsMap.entries()).reduce<ConnectionDetail[]>((acc, [sceneId, interactions]) => {
+    // FIX: Refactored from reduce to map/filter to avoid potential type inference issues.
+    const outputConnections: ConnectionDetail[] = Array.from(outputConnectionsMap.entries()).reduce((acc: ConnectionDetail[], [sceneId, interactions]) => {
         const scene = sceneMap.get(sceneId);
         if (scene) {
             acc.push({ scene, interactions });
@@ -131,29 +132,27 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     setLocalScene(prev => ({ ...prev, [key]: value }));
   };
 
-  // FIX: This function was simplified to let TypeScript infer types from `useState<Scene>`, resolving potential conflicts if the inferred type of `prev` is not a `Scene`.
   const handleToggle = (key: 'isEndingScene' | 'removesChanceOnEntry' | 'restoresChanceOnEntry', value: boolean) => {
-    // FIX: Reworked the state update to be more explicit with types, avoiding potential inference issues.
     setLocalScene(prev => {
-        const newScene: Partial<Scene> = {};
+        const newSceneState = { ...prev };
 
-        // If we are checking a box, uncheck all others first.
+        // If checking a box, uncheck others to enforce radio-button-like behavior.
         if (value) {
-            newScene.isEndingScene = false;
-            newScene.removesChanceOnEntry = false;
-            newScene.restoresChanceOnEntry = false;
+            newSceneState.isEndingScene = false;
+            newSceneState.removesChanceOnEntry = false;
+            newSceneState.restoresChanceOnEntry = false;
         }
 
-        // Now, set the value for the box that was clicked.
-        newScene[key] = value;
+        // Set the toggled property's value.
+        newSceneState[key] = value;
 
-        // Special handling for winning scene
+        // If it's an ending scene, it cannot have objects or interactions.
         if (key === 'isEndingScene' && value) {
-            newScene.objects = [];
-            newScene.interactions = [];
+            newSceneState.objects = [];
+            newSceneState.interactions = [];
         }
 
-        return { ...prev, ...newScene };
+        return newSceneState;
     });
   };
   
@@ -203,9 +202,10 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     onUpdateScene(finalScene);
   }
   
-  // FIX: Cast the result of JSON.parse to 'Scene' as it returns 'unknown' by default, which is not assignable to Scene.
   const handleUndo = () => {
-    setLocalScene(JSON.parse(initialSceneJson.current) as Scene);
+    // FIX: Cast the result of JSON.parse to 'Scene' as it returns 'unknown' by default, which is not assignable to Scene.
+    const restoredScene = JSON.parse(initialSceneJson.current) as Scene;
+    setLocalScene(restoredScene);
   };
 
   const handlePreview = () => {
@@ -214,7 +214,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
   const TABS = {
     properties: 'Propriedades',
-    objects: 'Objetos',
+    objects: 'Objetos de interesse',
     interactions: 'Interações',
     connections: 'Conexões',
   };

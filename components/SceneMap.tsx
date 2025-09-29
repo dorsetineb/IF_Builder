@@ -1,8 +1,9 @@
 
 
 
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
-import { Scene, GameData } from '../types';
+import { Scene, GameData, GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
 import { MinusIcon } from './icons/MinusIcon';
 
@@ -33,6 +34,18 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
   const [dragInfo, setDragInfo] = useState<{ id: string; offsetX: number; offsetY: number } | null>(null);
   const dragStartPos = useRef({ x: 0, y: 0 });
+
+  const allObjectsMap = useMemo(() => {
+    const map = new Map<string, GameObject>();
+    Object.values(allScenesMap).forEach((scene: Scene) => {
+        if (scene.objects) {
+            scene.objects.forEach(obj => {
+                map.set(obj.id, obj);
+            });
+        }
+    });
+    return map;
+  }, [allScenesMap]);
 
   const { initialNodes, edges, bounds, nodeLevels, nodesWithForwardIncomingEdges, nodesWithBackwardIncomingEdges, interactionsWithForwardOutgoingEdges, interactionsWithBackwardOutgoingEdges } = useMemo(() => {
     // 1. Calculate the actual height of each node first
@@ -367,13 +380,17 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
                   
                   {linkingInteractions.length > 0 && (
                     <div className="flex flex-col gap-1 pb-2">
-                        {linkingInteractions.map(inter => (
+                        {linkingInteractions.map(inter => {
+                                const targetObject = allObjectsMap.get(inter.target);
+                                const targetName = targetObject ? targetObject.name : inter.target;
+                                return (
                                 <div key={inter.id} className="relative bg-brand-primary/10 text-brand-primary-hover font-medium py-1 flex items-center rounded-md" style={{height: INTERACTION_ITEM_HEIGHT}}>
                                     <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-10 transition-colors ${interactionsWithBackwardOutgoingEdges.has(inter.id) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
-                                    <span className="truncate px-4 text-center w-full text-sm">{inter.target}</span>
+                                    <span className="truncate px-4 text-center w-full text-sm" title={targetName}>{targetName}</span>
                                     <div className={`absolute top-1/2 -translate-y-1/2 w-4 h-4 rounded-full z-10 right-0 translate-x-1/2 transition-colors ${interactionsWithForwardOutgoingEdges.has(inter.id) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
                                 </div>
-                          ))
+                                );
+                          })
                         }
                     </div>
                   )}

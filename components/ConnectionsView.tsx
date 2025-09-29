@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Scene, Interaction, GameObject } from '../types';
 import { ConnectionDetail } from './SceneEditor';
@@ -47,17 +48,21 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                       <span>Requer</span>
                     </div>
                   )}
-                  {interactions.map(inter => (
-                    <div key={inter.id} className="grid grid-cols-3 gap-2 text-brand-text bg-brand-surface p-2 rounded items-center">
-                      <span className="truncate" title={inter.verbs.join(', ')}>{inter.verbs.join(', ')}</span>
-                      <span className="truncate" title={inter.target}>{inter.target}</span>
-                      <span className="truncate" title={inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory) ? allObjectsMap.get(inter.requiresInInventory)!.name : '-'}>
-                        {inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory)
-                          ? allObjectsMap.get(inter.requiresInInventory)!.name
-                          : '-'}
-                      </span>
-                    </div>
-                  ))}
+                  {interactions.map(inter => {
+                    const targetObject = allObjectsMap.get(inter.target);
+                    const targetName = targetObject ? targetObject.name : (inter.target || '-');
+                    return (
+                      <div key={inter.id} className="grid grid-cols-3 gap-2 text-brand-text bg-brand-surface p-2 rounded items-center">
+                        <span className="truncate" title={inter.verbs.join(', ')}>{inter.verbs.join(', ')}</span>
+                        <span className="truncate" title={targetName}>{targetName}</span>
+                        <span className="truncate" title={inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory) ? allObjectsMap.get(inter.requiresInInventory)!.name : '-'}>
+                          {inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory)
+                            ? allObjectsMap.get(inter.requiresInInventory)!.name
+                            : '-'}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))
@@ -95,17 +100,21 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                       <span>Requer</span>
                     </div>
                   )}
-                  {interactions.map(inter => (
-                    <div key={inter.id} className="grid grid-cols-3 gap-2 text-brand-text bg-brand-surface p-2 rounded items-center">
-                      <span className="truncate" title={inter.verbs.join(', ')}>{inter.verbs.join(', ')}</span>
-                      <span className="truncate" title={inter.target}>{inter.target}</span>
-                      <span className="truncate" title={inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory) ? allObjectsMap.get(inter.requiresInInventory)!.name : '-'}>
-                        {inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory)
-                          ? allObjectsMap.get(inter.requiresInInventory)!.name
-                          : '-'}
-                      </span>
-                    </div>
-                  ))}
+                  {interactions.map(inter => {
+                    const targetObject = allObjectsMap.get(inter.target);
+                    const targetName = targetObject ? targetObject.name : (inter.target || '-');
+                    return (
+                      <div key={inter.id} className="grid grid-cols-3 gap-2 text-brand-text bg-brand-surface p-2 rounded items-center">
+                        <span className="truncate" title={inter.verbs.join(', ')}>{inter.verbs.join(', ')}</span>
+                        <span className="truncate" title={targetName}>{targetName}</span>
+                        <span className="truncate" title={inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory) ? allObjectsMap.get(inter.requiresInInventory)!.name : '-'}>
+                          {inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory)
+                            ? allObjectsMap.get(inter.requiresInInventory)!.name
+                            : '-'}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))

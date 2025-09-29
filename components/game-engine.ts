@@ -1,3 +1,4 @@
+
 import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
@@ -494,7 +495,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentScene.interactions) {
             for (const interaction of currentScene.interactions) {
                 const verbMatch = interaction.verbs.includes(verb);
-                const targetMatch = target.includes(interaction.target);
+                const targetObject = currentScene.objetos.find(o => o.id === interaction.target);
+                const targetMatch = targetObject && target.includes(targetObject.name.toLowerCase());
 
                 if (verbMatch && targetMatch) {
                     let hasRequiredItem = true;
@@ -512,7 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (interaction.removesTargetFromScene) {
                             const sceneState = currentState.scenesState[currentState.currentSceneId];
                             if (sceneState.objetos) {
-                                sceneState.objetos = sceneState.objetos.filter(obj => obj.name.toLowerCase() !== interaction.target);
+                                sceneState.objetos = sceneState.objetos.filter(obj => obj.id !== interaction.target);
                             }
                         }
                         if (interaction.newSceneDescription) {

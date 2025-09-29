@@ -3,6 +3,7 @@
 
 
 
+
 export interface GameObject {
   id: string;
   name: string;
@@ -13,8 +14,8 @@ export interface GameObject {
 export interface Interaction {
   id: string;
   verbs: string[]; // e.g., ['usar', 'abrir']
-  target: string; // name of object in scene, e.g., 'porta'
-  requiresInInventory?: string; // name of object in inventory, e.g., 'chave'
+  target: string; // ID of object in scene, e.g., 'obj_porta'
+  requiresInInventory?: string; // ID of object in inventory, e.g., 'obj_chave_de_ferro'
   successMessage?: string;
   soundEffect?: string; // base64 data URL for interaction sound
   transitionType?: 'none' | 'fade' | 'wipe-down' | 'wipe-up' | 'wipe-left' | 'wipe-right';

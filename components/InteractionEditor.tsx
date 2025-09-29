@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Interaction, Scene, GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -126,10 +127,20 @@ const InteractionItem: React.FC<{
             </div>
              <div>
                 <label className="block text-sm font-medium text-brand-text-dim mb-1">Alvo</label>
-                <input type="text" value={interaction.target} onChange={e => handleInteractionChange('target', e.target.value.toLowerCase())} placeholder="ex: porta, norte, chave" className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"/>
+                <select 
+                    value={interaction.target || ''} 
+                    onChange={e => handleInteractionChange('target', e.target.value)} 
+                    className={selectBaseClasses}
+                    style={selectStyle}
+                >
+                    <option className={optionDimClasses} value="">Selecione um alvo...</option>
+                    {sceneObjects.map(obj => (
+                        <option className={optionBaseClasses} key={obj.id} value={obj.id}>{obj.name}</option>
+                    ))}
+                </select>
                 <div className="flex items-center mt-2">
-                    <input type="checkbox" id={`removesTarget-${index}`} checked={!!interaction.removesTargetFromScene} onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)} className="custom-checkbox"/>
-                    <label htmlFor={`removesTarget-${index}`} className="ml-2 block text-sm text-brand-text-dim">Remover o alvo da cena</label>
+                    <input type="checkbox" id={`removesTarget-${index}`} checked={!!interaction.removesTargetFromScene} onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)} disabled={!interaction.target} className="custom-checkbox"/>
+                    <label htmlFor={`removesTarget-${index}`} className={`ml-2 block text-sm text-brand-text-dim ${!interaction.target ? 'opacity-50' : ''}`}>Remover o alvo da cena</label>
                 </div>
             </div>
              <div>

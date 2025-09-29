@@ -3,6 +3,7 @@
 
 
 
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -692,7 +693,7 @@ const initialScenes: { [id: string]: Scene } = {
           {
               id: 'inter_1',
               verbs: ['mover', 'forçar', 'empurrar'],
-              target: 'pedra',
+              target: 'obj_pedra_solta',
               successMessage: 'Com um rangido, você move a pedra, revelando uma passagem escura.',
               removesTargetFromScene: true,
               goToScene: 'scn_corredor'
@@ -700,7 +701,7 @@ const initialScenes: { [id: string]: Scene } = {
           {
               id: 'inter_door_key',
               verbs: ['usar', 'abrir', 'destrancar'],
-              target: 'porta',
+              target: 'obj_porta_da_cela',
               requiresInInventory: 'obj_chave_de_ferro',
               successMessage: 'Você usa a chave de ferro na fechadura. Com um clique alto, a porta se destranca e se abre, revelando um corredor escuro.',
               removesTargetFromScene: true,
@@ -712,17 +713,9 @@ const initialScenes: { [id: string]: Scene } = {
       id: "scn_corredor",
       name: "Corredor",
       image: "",
-      description: "Você está em um corredor escuro e úmido. A única luz vem da <cela> atrás de você.",
+      description: "Você está em um corredor escuro e úmido. A única luz vem da cela atrás de você.",
       objects: [],
-      interactions: [
-          {
-              id: 'inter_2',
-              verbs: ['ir', 'voltar', 'mover'],
-              target: 'cela',
-              successMessage: 'Você volta para a cela.',
-              goToScene: 'scn_cela_inicial'
-          }
-      ]
+      interactions: []
     }
 };
 
@@ -771,6 +764,7 @@ const initializeGameData = (): GameData => {
         const newInteractions: Interaction[] = oldScene.interactions.map(inter => ({
             ...inter,
             id: generateUniqueId('inter', []), // Interaction IDs are local to the scene, no need for a global check
+            target: objIdMap[inter.target] || inter.target,
             goToScene: inter.goToScene ? sceneIdMap[inter.goToScene] : undefined,
             requiresInInventory: inter.requiresInInventory ? objIdMap[inter.requiresInInventory] : undefined,
         }));
