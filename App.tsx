@@ -57,7 +57,7 @@ const gameHTML = `
             </div>
         </div>
 
-        <div class="game-container">
+        <div class="game-container __LAYOUT_ORIENTATION_CLASS__ __LAYOUT_ORDER_CLASS__">
             <div class="image-panel">
                 <div id="transition-overlay" class="transition-overlay"></div>
                 <div id="image-container" class="image-container">
@@ -338,6 +338,38 @@ body.with-spacing .main-wrapper {
     padding: 30px;
     position: relative;
 }
+
+/* Layout Adjustments */
+.game-container.layout-horizontal {
+    flex-direction: column;
+}
+.game-container.layout-horizontal .image-panel {
+    flex-basis: 45%; /* Use flex-basis for height in column layout */
+    max-width: none;
+    width: 100%;
+    border-right: none;
+    border-bottom: 2px solid var(--border-color);
+}
+.game-container.layout-horizontal .text-panel {
+    min-height: 0; /* Fix for flexbox scrolling issues */
+}
+.game-container.layout-image-last {
+    flex-direction: row-reverse;
+}
+.game-container.layout-image-last .image-panel {
+    border-right: none;
+    border-left: 2px solid var(--border-color);
+}
+.game-container.layout-horizontal.layout-image-last {
+    flex-direction: column-reverse;
+}
+.game-container.layout-horizontal.layout-image-last .image-panel {
+    border-left: none; /* Reset from row-reverse */
+    border-bottom: none;
+    border-top: 2px solid var(--border-color);
+}
+
+
 .scene-description {
     flex-grow: 1;
     overflow-y: auto;
@@ -663,6 +695,22 @@ body.with-spacing .main-wrapper {
 /* Font Size Adjustments */
 body.font-adjust-gothic {
     font-size: 1.15em;
+}
+
+/* Custom Scrollbar */
+.scene-description::-webkit-scrollbar, .diary-log::-webkit-scrollbar {
+  width: 12px;
+}
+.scene-description::-webkit-scrollbar-track, .diary-log::-webkit-scrollbar-track {
+  background: var(--panel-bg); 
+}
+.scene-description::-webkit-scrollbar-thumb, .diary-log::-webkit-scrollbar-thumb {
+  background-color: var(--text-dim-color);
+  border-radius: 6px;
+  border: 3px solid var(--panel-bg);
+}
+.scene-description::-webkit-scrollbar-thumb:hover, .diary-log::-webkit-scrollbar-thumb:hover {
+  background-color: var(--text-color);
 }
 `;
 

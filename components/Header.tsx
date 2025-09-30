@@ -1,3 +1,4 @@
+
 // FIX: Corrected React import to properly include 'useRef'. The previous syntax 'import React, a from ...' was invalid.
 import React, { useRef } from 'react';
 import { GameData } from '../types';
@@ -165,6 +166,8 @@ const Header: React.FC<{
     let html = exportData.gameHTML
         .replace('__GAME_TITLE__', exportData.gameTitle || 'IF Builder Game')
         .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme`)
+        .replace('__LAYOUT_ORIENTATION_CLASS__', exportData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : '')
+        .replace('__LAYOUT_ORDER_CLASS__', exportData.gameLayoutOrder === 'image-last' ? 'layout-image-last' : '')
         .replace('__FRAME_CLASS__', getFrameClass(exportData.gameImageFrame))
         .replace('__FONT_STYLESHEET__', fontStylesheet)
         .replace('__FONT_ADJUST_CLASS__', fontAdjustClass)

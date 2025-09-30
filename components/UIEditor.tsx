@@ -290,7 +290,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localEnableChances, localMaxChances,
     localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
     localFrameBookColor, localFrameTradingCardColor, localFrameChamferedColor,
-    localFrameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
+    frameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
     props, onSetDirty
   ]);
 
@@ -557,11 +557,11 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                       <div className="flex flex-col items-center justify-center">
                           <p className="text-sm text-brand-text-dim mb-2">Pré-visualização do Layout</p>
                           <div 
-                              className={`w-full max-w-sm aspect-video bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
+                              className={`w-full max-w-sm ${localLayoutOrientation === 'horizontal' ? 'aspect-[4/5]' : 'aspect-video'} bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
                               style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
                           >
                             <div 
-                                className={`flex items-center justify-center ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'} transition-all duration-300 w-1/2`}
+                                className={`flex items-center justify-center ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'} transition-all duration-300 ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}
                                 style={getFramePreviewStyles(localImageFrame).panelStyles}
                             >
                                   <div 
@@ -571,7 +571,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                       Imagem
                                   </div>
                               </div>
-                              <div className={`w-1/2 flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'}`}>
+                              <div className={`flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}>
                                   Descrição
                               </div>
                           </div>

@@ -1,7 +1,4 @@
 
-
-
-
 import React, { useMemo } from 'react';
 import { GameData } from '../types';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
@@ -35,6 +32,8 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
         let finalHtml = gameData.gameHTML
             .replace('__GAME_TITLE__', gameData.gameTitle || 'IF Builder Game')
             .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme with-spacing`)
+            .replace('__LAYOUT_ORIENTATION_CLASS__', gameData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : '')
+            .replace('__LAYOUT_ORDER_CLASS__', gameData.gameLayoutOrder === 'image-last' ? 'layout-image-last' : '')
             .replace('__FRAME_CLASS__', getFrameClass(gameData.gameImageFrame))
             .replace('__FONT_STYLESHEET__', fontStylesheet)
             .replace('__LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="game-logo">` : '')
