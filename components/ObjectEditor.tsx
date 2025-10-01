@@ -95,7 +95,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({ objects = [], onUpdateObjec
                  </div>
                  {/* Right Column */}
                  <div className="flex flex-col h-full">
-                    <label htmlFor={`obj-desc-${index}`} className="block text-sm font-medium text-brand-text-dim mb-1">Descrição ao olhar</label>
+                    <label htmlFor={`obj-desc-${index}`} className="block text-sm font-medium text-brand-text-dim mb-1">Descrição ao olhar/examinar</label>
                     <textarea
                       id={`obj-desc-${index}`}
                       value={obj.examineDescription}

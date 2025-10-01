@@ -433,6 +433,11 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                   <p className="text-brand-text-dim text-sm">
                       Defina verbos fixos que o jogador pode usar a qualquer momento. Estes verbos têm prioridade sobre as interações de cena.
                   </p>
+                  <div className="bg-brand-bg p-3 rounded-md border border-brand-border/50">
+                      <p className="text-brand-text-dim text-sm">
+                          <strong>Nota:</strong> Os verbos <strong>olhar</strong> e <strong>examinar</strong> são ações padrão do jogo para inspecionar objetos na cena ou no inventário. Eles já funcionam por padrão e não precisam ser adicionados aqui.
+                      </p>
+                  </div>
                   {localFixedVerbs.map((verb) => (
                       <FixedVerbItem
                           key={verb.id}

@@ -179,7 +179,7 @@ const Header: React.FC<{
         .replace('__SPLASH_DESCRIPTION__', exportData.gameSplashDescription || '')
         .replace('__SPLASH_BUTTON_TEXT__', exportData.gameSplashButtonText || 'Start')
         .replace('__CONTINUE_BUTTON_TEXT__', exportData.gameContinueButtonText || 'Continue')
-        .replace('__RESTART_BUTTON_TEXT__', exportData.gameRestartButtonText || 'Reiniciar Aventura')
+        .replace(/__RESTART_BUTTON_TEXT__/g, exportData.gameRestartButtonText || 'Reiniciar Aventura')
         .replace('__ACTION_BUTTON_TEXT__', exportData.gameActionButtonText || 'Action')
         .replace('__VERB_INPUT_PLACEHOLDER__', exportData.gameVerbInputPlaceholder || 'What do you do?')
         .replace('__POSITIVE_ENDING_BG_STYLE__', exportData.positiveEndingImage ? `style="background-image: url('${exportData.positiveEndingImage}')"` : '')

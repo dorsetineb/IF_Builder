@@ -27,8 +27,6 @@ interface UIEditorProps {
   chanceIconColor: string;
   gameFontFamily: string;
   chanceIcon: 'circle' | 'cross' | 'heart';
-  chanceLossMessage: string;
-  chanceRestoreMessage: string;
   chanceReturnButtonText: string;
   gameTheme: 'dark' | 'light';
   textColorLight: string;
@@ -145,7 +143,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
       textColor, titleColor, splashButtonColor, splashButtonHoverColor,
       splashButtonTextColor, actionButtonColor, actionButtonTextColor,
       focusColor, chanceIconColor, gameFontFamily, chanceIcon,
-      chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText,
+      chanceReturnButtonText,
       gameTheme, textColorLight, titleColorLight, focusColorLight,
       frameBookColor, frameTradingCardColor,
       frameChamferedColor,
@@ -180,8 +178,6 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localChanceIconColor, setLocalChanceIconColor] = useState(chanceIconColor);
   const [localFontFamily, setLocalFontFamily] = useState(gameFontFamily);
   const [localChanceIcon, setLocalChanceIcon] = useState(chanceIcon);
-  const [localChanceLossMessage, setLocalChanceLossMessage] = useState(chanceLossMessage);
-  const [localChanceRestoreMessage, setLocalChanceRestoreMessage] = useState(chanceRestoreMessage);
   const [localChanceReturnButtonText, setLocalChanceReturnButtonText] = useState(chanceReturnButtonText);
   const [localGameTheme, setLocalGameTheme] = useState(gameTheme);
   const [localTextColorLight, setLocalTextColorLight] = useState(textColorLight);
@@ -220,8 +216,6 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalChanceIconColor(chanceIconColor);
     setLocalFontFamily(gameFontFamily);
     setLocalChanceIcon(chanceIcon);
-    setLocalChanceLossMessage(chanceLossMessage);
-    setLocalChanceRestoreMessage(chanceRestoreMessage);
     setLocalChanceReturnButtonText(chanceReturnButtonText);
     setLocalGameTheme(gameTheme);
     setLocalTextColorLight(textColorLight);
@@ -236,7 +230,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   }, [
     layoutOrientation, layoutOrder, imageFrame, actionButtonText, verbInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, enableChances, maxChances,
     textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
-    chanceIconColor, gameFontFamily, chanceIcon, chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight,
+    chanceIconColor, gameFontFamily, chanceIcon, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight,
     frameBookColor, frameTradingCardColor, frameChamferedColor,
     frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor
   ]);
@@ -272,8 +266,6 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localChanceIconColor !== chanceIconColor ||
                   localFontFamily !== gameFontFamily ||
                   localChanceIcon !== chanceIcon ||
-                  localChanceLossMessage !== chanceLossMessage ||
-                  localChanceRestoreMessage !== chanceRestoreMessage ||
                   localChanceReturnButtonText !== chanceReturnButtonText ||
                   localGameTheme !== gameTheme ||
                   localTextColorLight !== textColorLight ||
@@ -288,7 +280,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     onSetDirty(dirty);
   }, [
     localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localEnableChances, localMaxChances,
-    localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
+    localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
     localFrameBookColor, localFrameTradingCardColor, localFrameChamferedColor,
     frameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
     props, onSetDirty
@@ -319,8 +311,6 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localChanceIconColor !== chanceIconColor) onUpdate('gameChanceIconColor', localChanceIconColor);
     if (localFontFamily !== gameFontFamily) onUpdate('gameFontFamily', localFontFamily);
     if (localChanceIcon !== chanceIcon) onUpdate('gameChanceIcon', localChanceIcon);
-    if (localChanceLossMessage !== chanceLossMessage) onUpdate('gameChanceLossMessage', localChanceLossMessage);
-    if (localChanceRestoreMessage !== chanceRestoreMessage) onUpdate('gameChanceRestoreMessage', localChanceRestoreMessage);
     if (localChanceReturnButtonText !== chanceReturnButtonText) onUpdate('gameChanceReturnButtonText', localChanceReturnButtonText);
     if (localGameTheme !== gameTheme) onUpdate('gameTheme', localGameTheme);
     if (localTextColorLight !== textColorLight) onUpdate('gameTextColorLight', localTextColorLight);
@@ -359,8 +349,6 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalChanceIconColor(chanceIconColor);
     setLocalFontFamily(gameFontFamily);
     setLocalChanceIcon(chanceIcon);
-    setLocalChanceLossMessage(chanceLossMessage);
-    setLocalChanceRestoreMessage(chanceRestoreMessage);
     setLocalChanceReturnButtonText(chanceReturnButtonText);
     setLocalGameTheme(gameTheme);
     setLocalTextColorLight(textColorLight);
@@ -592,16 +580,44 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                       </div>
                       {localEnableChances && (
                           <div className="mt-4 pl-6 border-l-2 border-brand-border/50">
-                              <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
-                              <input
-                                  type="number"
-                                  id="maxChances"
-                                  value={localMaxChances}
-                                  onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
-                                  min="1"
-                                  max="10"
-                                  className="w-full max-w-xs bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                              />
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4 pt-4">
+                                  <div>
+                                      <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
+                                      <input
+                                          type="number"
+                                          id="maxChances"
+                                          value={localMaxChances}
+                                          onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
+                                          min="1"
+                                          max="10"
+                                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                      />
+                                  </div>
+                                  <div>
+                                      <label htmlFor="chanceIcon" className="block text-sm font-medium text-brand-text-dim mb-1">Formato do Ícone</label>
+                                      <select
+                                          id="chanceIcon"
+                                          value={localChanceIcon}
+                                          onChange={(e) => setLocalChanceIcon(e.target.value as any)}
+                                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                      >
+                                          <option value="heart">Corações</option>
+                                          <option value="circle">Círculos</option>
+                                          <option value="cross">Cruzes</option>
+                                      </select>
+                                  </div>
+                                  <div>
+                                      <label htmlFor="chanceReturnButton" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Retorno</label>
+                                      <input
+                                          type="text"
+                                          id="chanceReturnButton"
+                                          value={localChanceReturnButtonText}
+                                          onChange={(e) => setLocalChanceReturnButtonText(e.target.value)}
+                                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                      />
+                                      <p className="text-xs text-brand-text-dim mt-1">Aparece após perder uma chance.</p>
+                                  </div>
+                              </div>
                           </div>
                       )}
                   </div>
@@ -834,56 +850,12 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                     )}
                      {enableChances && (
                         <div className="pt-6 border-t border-brand-border/50">
-                            <h3 className="text-lg font-semibold text-brand-text mb-4">Sistema de Chances (Vidas)</h3>
+                            <h3 className="text-lg font-semibold text-brand-text mb-4">Cor do Ícone de Chance</h3>
                             <div className="space-y-6 mt-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     {isCustomizing && (
                                       <ColorInput label="Cor dos Ícones de Vidas" id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
                                     )}
-                                    <div>
-                                        <label htmlFor="chanceIcon" className="block text-sm font-medium text-brand-text-dim mb-1">Formato do Ícone</label>
-                                        <select
-                                            id="chanceIcon"
-                                            value={localChanceIcon}
-                                            onChange={(e) => setLocalChanceIcon(e.target.value as any)}
-                                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                        >
-                                            <option value="heart">Corações</option>
-                                            <option value="circle">Círculos</option>
-                                            <option value="cross">Cruzes</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div>
-                                    <label htmlFor="chanceLossMessage" className="block text-sm font-medium text-brand-text-dim mb-1">Mensagem de Perda de Chance</label>
-                                    <input
-                                        type="text"
-                                        id="chanceLossMessage"
-                                        value={localChanceLossMessage}
-                                        onChange={(e) => setLocalChanceLossMessage(e.target.value)}
-                                        className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                    />
-                                    <p className="text-xs text-brand-text-dim mt-1">Use {'{chances}'} para mostrar as chances restantes.</p>
-                                </div>
-                                <div>
-                                    <label htmlFor="chanceRestoreMessage" className="block text-sm font-medium text-brand-text-dim mb-1">Mensagem de Recuperação de Chance</label>
-                                    <input
-                                        type="text"
-                                        id="chanceRestoreMessage"
-                                        value={localChanceRestoreMessage}
-                                        onChange={(e) => setLocalChanceRestoreMessage(e.target.value)}
-                                        className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                    />
-                                </div>
-                                <div>
-                                    <label htmlFor="chanceReturnButton" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Retorno</label>
-                                    <input
-                                        type="text"
-                                        id="chanceReturnButton"
-                                        value={localChanceReturnButtonText}
-                                        onChange={(e) => setLocalChanceReturnButtonText(e.target.value)}
-                                        className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                    />
                                 </div>
                             </div>
                         </div>

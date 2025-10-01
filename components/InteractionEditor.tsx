@@ -11,6 +11,7 @@ interface InteractionEditorProps {
   allScenes: Scene[];
   currentSceneId: string;
   sceneObjects: GameObject[];
+  allTakableObjects: GameObject[];
 }
 
 // Helper to determine the current outcome type for the UI
@@ -29,7 +30,8 @@ const InteractionItem: React.FC<{
   allScenes: Scene[];
   currentSceneId: string;
   sceneObjects: GameObject[];
-}> = ({ interaction, index, onUpdate, onRemove, allScenes, currentSceneId, sceneObjects }) => {
+  allTakableObjects: GameObject[];
+}> = ({ interaction, index, onUpdate, onRemove, allScenes, currentSceneId, sceneObjects, allTakableObjects }) => {
     
     const [localVerbs, setLocalVerbs] = useState(interaction.verbs.join(', '));
     const verbInputId = `verbs-input-${interaction.id}`;
@@ -90,7 +92,6 @@ const InteractionItem: React.FC<{
     };
     
     const otherScenes = allScenes.filter(s => s.id !== currentSceneId);
-    const takableObjectsInScene = sceneObjects.filter(obj => obj.isTakable);
 
     const whiteChevron = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20' stroke-width='1.5' stroke='white'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='m5.25 7.5 4.5 4.5 4.5-4.5' /%3e%3c/svg%3e";
     const selectBaseClasses = "w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text appearance-none bg-no-repeat pr-8 focus:ring-0";
@@ -125,7 +126,25 @@ const InteractionItem: React.FC<{
                     className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
                 />
             </div>
-             <div>
+            <div>
+                <label className="block text-sm font-medium text-brand-text-dim mb-1">Requer Item no Inventário (opcional)</label>
+                <select 
+                  value={interaction.requiresInInventory || ''} 
+                  onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)} 
+                  className={selectBaseClasses}
+                  style={selectStyle}
+                >
+                    <option className={optionDimClasses} value="">Não requer item</option>
+                    {allTakableObjects.map(obj => (
+                        <option className={optionBaseClasses} key={obj.id} value={obj.id}>{obj.name} ({obj.id})</option>
+                    ))}
+                </select>
+                <div className="flex items-center mt-2">
+                    <input type="checkbox" id={`consumesItem-${index}`} checked={!!interaction.consumesItem} onChange={e => handleInteractionChange('consumesItem', e.target.checked)} disabled={!interaction.requiresInInventory} className="custom-checkbox"/>
+                    <label htmlFor={`consumesItem-${index}`} className={`ml-2 block text-sm text-brand-text-dim ${!interaction.requiresInInventory ? 'opacity-50' : ''}`}>Consumir o item do inventário</label>
+                </div>
+            </div>
+            <div>
                 <label className="block text-sm font-medium text-brand-text-dim mb-1">Alvo</label>
                 <select 
                     value={interaction.target || ''} 
@@ -141,24 +160,6 @@ const InteractionItem: React.FC<{
                 <div className="flex items-center mt-2">
                     <input type="checkbox" id={`removesTarget-${index}`} checked={!!interaction.removesTargetFromScene} onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)} disabled={!interaction.target} className="custom-checkbox"/>
                     <label htmlFor={`removesTarget-${index}`} className={`ml-2 block text-sm text-brand-text-dim ${!interaction.target ? 'opacity-50' : ''}`}>Remover o alvo da cena</label>
-                </div>
-            </div>
-             <div>
-                <label className="block text-sm font-medium text-brand-text-dim mb-1">Requer Item no Inventário (opcional)</label>
-                <select 
-                  value={interaction.requiresInInventory || ''} 
-                  onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)} 
-                  className={selectBaseClasses}
-                  style={selectStyle}
-                >
-                    <option className={optionDimClasses} value="">Não requer item</option>
-                    {takableObjectsInScene.map(obj => (
-                        <option className={optionBaseClasses} key={obj.id} value={obj.id}>{obj.name} ({obj.id})</option>
-                    ))}
-                </select>
-                <div className="flex items-center mt-2">
-                    <input type="checkbox" id={`consumesItem-${index}`} checked={!!interaction.consumesItem} onChange={e => handleInteractionChange('consumesItem', e.target.checked)} disabled={!interaction.requiresInInventory} className="custom-checkbox"/>
-                    <label htmlFor={`consumesItem-${index}`} className={`ml-2 block text-sm text-brand-text-dim ${!interaction.requiresInInventory ? 'opacity-50' : ''}`}>Consumir o item do inventário</label>
                 </div>
             </div>
           </div>
@@ -266,7 +267,7 @@ const InteractionItem: React.FC<{
 };
 
 
-const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = [], onUpdateInteractions, allScenes, currentSceneId, sceneObjects = [] }) => {
+const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = [], onUpdateInteractions, allScenes, currentSceneId, sceneObjects = [], allTakableObjects = [] }) => {
   const handleAddInteraction = () => {
     const newInteraction: Interaction = {
       id: `inter_${Math.random().toString(36).substring(2, 9)}`,
@@ -299,6 +300,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = []
                 allScenes={allScenes}
                 currentSceneId={currentSceneId}
                 sceneObjects={sceneObjects}
+                allTakableObjects={allTakableObjects}
             />
         ))}
          {interactions.length === 0 && <p className="text-center text-brand-text-dim">Nenhuma interação customizada nesta cena.</p>}

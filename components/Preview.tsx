@@ -45,7 +45,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace('__SPLASH_DESCRIPTION__', gameData.gameSplashDescription || '')
             .replace('__SPLASH_BUTTON_TEXT__', gameData.gameSplashButtonText || 'Start')
             .replace('__CONTINUE_BUTTON_TEXT__', gameData.gameContinueButtonText || 'Continue')
-            .replace('__RESTART_BUTTON_TEXT__', gameData.gameRestartButtonText || 'Reiniciar Aventura')
+            .replace(/__RESTART_BUTTON_TEXT__/g, gameData.gameRestartButtonText || 'Reiniciar Aventura')
             .replace('__ACTION_BUTTON_TEXT__', gameData.gameActionButtonText || 'Action')
             .replace('__VERB_INPUT_PLACEHOLDER__', gameData.gameVerbInputPlaceholder || 'What do you do?')
             .replace('__POSITIVE_ENDING_BG_STYLE__', gameData.positiveEndingImage ? `style="background-image: url('${gameData.positiveEndingImage}')"` : '')

@@ -1,5 +1,4 @@
 
-
 import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
 import { Scene, Interaction, GameObject } from '../types';
 import ObjectEditor from './ObjectEditor';
@@ -79,6 +78,10 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         }
     });
     return map;
+  }, [allScenes]);
+
+  const allTakableObjects = useMemo(() => {
+    return allScenes.flatMap(s => s.objects?.filter(o => o.isTakable) || []);
   }, [allScenes]);
 
   const connections = useMemo(() => {
@@ -398,6 +401,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                   allScenes={allScenes}
                   currentSceneId={localScene.id}
                   sceneObjects={localScene.objects || []}
+                  allTakableObjects={allTakableObjects}
               />
           )}
 

@@ -95,8 +95,6 @@ export interface GameData {
   gameMaxChances?: number;
   gameChanceIcon?: 'circle' | 'cross' | 'heart';
   gameChanceIconColor?: string;
-  gameChanceLossMessage?: string;
-  gameChanceRestoreMessage?: string;
   gameChanceReturnButtonText?: string;
   gameTheme?: 'dark' | 'light';
   gameTextColorLight?: string;

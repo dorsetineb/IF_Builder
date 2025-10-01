@@ -22,8 +22,6 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameMaxChances: data.gameMaxChances,
         gameChanceIcon: data.gameChanceIcon,
         gameChanceIconColor: data.gameChanceIconColor,
-        gameChanceLossMessage: data.gameChanceLossMessage,
-        gameChanceRestoreMessage: data.gameChanceRestoreMessage,
         gameChanceReturnButtonText: data.gameChanceReturnButtonText,
         gameTheme: data.gameTheme,
         gameTextColorLight: data.gameTextColorLight,
@@ -80,6 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameHeader = document.querySelector('.game-header');
     const gameContainer = document.querySelector('.game-container');
     const sceneNameOverlayElement = document.getElementById('scene-name-overlay');
+    const actionBar = document.querySelector('.action-bar');
 
 
     // --- State Variables ---
@@ -97,6 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
         scenesState: {},
         chances: null,
     };
+    let onRenderCompleteCallback = null;
 
     // --- Game Logic ---
     function saveState() {
@@ -183,11 +183,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     function renderNextParagraph() {
-        const scene = currentState.scenesState[currentState.currentSceneId];
-
         if (!sceneDescriptionElement || currentParagraphIndex >= currentSceneParagraphs.length) {
-            if (scene.isEndingScene) {
-                showEnding('positive');
+            if (onRenderCompleteCallback) {
+                onRenderCompleteCallback();
+                onRenderCompleteCallback = null; // Use only once
             } else {
                 if (verbInputElement) verbInputElement.disabled = false;
                 if (submitVerbButton) submitVerbButton.disabled = false;
@@ -253,48 +252,67 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
         
+        onRenderCompleteCallback = null;
+        if(actionBar) actionBar.classList.remove('hidden');
+
         // Instant game over if chances are disabled and scene is deadly
         if (!isStateLoad && !gameData.gameEnableChances && scene.removesChanceOnEntry) {
-            if (sceneDescriptionElement) {
-                sceneDescriptionElement.innerHTML = '';
-            }
+            if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
             showEnding('negative');
             return; // Stop processing
         }
-
+        
+        const createEndButton = (text, onClick) => {
+            if (actionBar) actionBar.classList.add('hidden');
+            const button = document.createElement('button');
+            button.textContent = text;
+            button.style.width = '100%';
+            button.style.padding = '15px 20px';
+            button.style.border = '2px solid var(--border-color)';
+            button.style.backgroundColor = 'var(--action-button-bg)';
+            button.style.color = 'var(--action-button-text-color)';
+            button.style.fontFamily = 'var(--font-family)';
+            button.style.cursor = 'pointer';
+            button.style.fontWeight = 'bold';
+            button.style.fontSize = '1.1em';
+            button.style.marginTop = '20px';
+            button.onclick = onClick;
+            sceneDescriptionElement.appendChild(button);
+            sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
+        };
 
         // --- Handle scene entry effects before rendering description ---
-        let extraMessages = [];
-        if (!isStateLoad && gameData.gameEnableChances) {
-            if (scene.removesChanceOnEntry) {
-                currentState.chances--;
-                renderChances();
-                const messageTemplate = gameData.gameChanceLossMessage || 'Você perdeu uma chance. Restam {chances} chance(s).';
-                const message = messageTemplate.replace('{chances}', ('' + currentState.chances));
-                extraMessages.push(message);
-                currentState.diaryLog.push({ type: 'action', data: { command: '[EFEITO DE CENA]', response: message, sceneId: sceneId } });
-
-                if (currentState.chances <= 0) {
-                    if (sceneDescriptionElement) {
-                        sceneDescriptionElement.innerHTML = '';
-                        const p = document.createElement('p');
-                        p.innerHTML = message.replace(/\\*\\*(.*?)\\*\\*/g, '<span class="highlight-item">$1</span>');
-                        sceneDescriptionElement.appendChild(p);
-                    }
-                    showEnding('negative');
-                    return; // Stop processing this scene
-                }
-            } else if (scene.restoresChanceOnEntry) {
-                if (currentState.chances < gameData.gameMaxChances) {
-                    currentState.chances++;
+        if (!isStateLoad) {
+            if (scene.isEndingScene) {
+                onRenderCompleteCallback = () => {
+                    createEndButton('Fim de Jogo', () => showEnding('positive'));
+                };
+            } else if (gameData.gameEnableChances) {
+                if (scene.removesChanceOnEntry) {
+                    currentState.chances--;
                     renderChances();
-                    const message = gameData.gameChanceRestoreMessage || 'Você recupera uma chance.';
-                    extraMessages.push(message);
-                    currentState.diaryLog.push({ type: 'action', data: { command: '[EFEITO DE CENA]', response: message, sceneId: sceneId } });
+                    if (currentState.chances <= 0) {
+                        onRenderCompleteCallback = () => {
+                           createEndButton('Fim de Jogo', () => showEnding('negative'));
+                        };
+                    } else {
+                        onRenderCompleteCallback = () => {
+                            createEndButton(gameData.gameChanceReturnButtonText || 'Tentar Novamente', () => {
+                                if (actionBar) actionBar.classList.remove('hidden');
+                                performSceneChange(currentState.previousSceneId);
+                            });
+                        };
+                    }
+                } else if (scene.restoresChanceOnEntry) {
+                    if (currentState.chances < gameData.gameMaxChances) {
+                        currentState.chances++;
+                        renderChances();
+                    }
                 }
             }
         }
         // --- End of scene entry effects ---
+
 
         if (!isStateLoad && currentState.currentSceneId !== sceneId) {
             currentState.previousSceneId = currentState.currentSceneId;
@@ -302,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         currentState.currentSceneId = sceneId;
         const rawDescription = scene.description ? ('' + scene.description).trim() : '';
-        currentSceneParagraphs = [...extraMessages, ...rawDescription.split('\\n').filter(p => p.trim() !== '')];
+        currentSceneParagraphs = rawDescription.split('\\n').filter(p => p.trim() !== '');
         currentParagraphIndex = 0;
 
         if (!isStateLoad) {
@@ -486,66 +504,77 @@ document.addEventListener('DOMContentLoaded', () => {
              return;
         }
 
-        // Basic parser: verb + target
+        // 1. Look for matching custom interactions
         const verbParts = lowerCaseVerbText.split(/\\s+/);
         const verb = verbParts[0];
-        const target = verbParts.slice(1).join(' ');
+        const remainingText = verbParts.slice(1).join(' ');
+        let bestMatch = null;
 
-        // 1. Look for matching custom interactions
         if (currentScene.interactions) {
-            for (const interaction of currentScene.interactions) {
+            const interactionsWithItems = currentScene.interactions.filter(i => i.requiresInInventory);
+            const interactionsWithoutItems = currentScene.interactions.filter(i => !i.requiresInInventory);
+
+            for (const interaction of interactionsWithItems) {
                 const verbMatch = interaction.verbs.includes(verb);
+                if (!verbMatch) continue;
+                
                 const targetObject = currentScene.objetos.find(o => o.id === interaction.target);
-                const targetMatch = targetObject && target.includes(targetObject.name.toLowerCase());
+                if (!targetObject || !remainingText.includes(targetObject.name.toLowerCase())) continue;
+                
+                const requiredItem = allTakableObjects[interaction.requiresInInventory];
+                if (!requiredItem || !remainingText.includes(requiredItem.name.toLowerCase())) continue;
 
-                if (verbMatch && targetMatch) {
-                    let hasRequiredItem = true;
-                    if (interaction.requiresInInventory) {
-                        hasRequiredItem = currentState.inventory.includes(interaction.requiresInInventory);
-                    }
+                if (currentState.inventory.includes(interaction.requiresInInventory)) {
+                    bestMatch = interaction;
+                    break;
+                }
+            }
 
-                    if (hasRequiredItem) {
-                        verbProcessed = true;
-                        
-                        // Process state changes first
-                        if (interaction.consumesItem && interaction.requiresInInventory) {
-                            currentState.inventory = currentState.inventory.filter(itemId => itemId !== interaction.requiresInInventory);
-                        }
-                        if (interaction.removesTargetFromScene) {
-                            const sceneState = currentState.scenesState[currentState.currentSceneId];
-                            if (sceneState.objetos) {
-                                sceneState.objetos = sceneState.objetos.filter(obj => obj.id !== interaction.target);
-                            }
-                        }
-                        if (interaction.newSceneDescription) {
-                            currentState.scenesState[currentState.currentSceneId].description = interaction.newSceneDescription;
-                        }
-                        
-                        // Then process navigation/display changes
-                        if (interaction.goToScene) {
-                            currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: '', sceneId: currentState.currentSceneId } });
-                            performSceneChange(interaction.goToScene, interaction.soundEffect, interaction.transitionType);
-                        } else {
-                            if (interaction.newSceneDescription) {
-                                responseText = interaction.newSceneDescription;
-                                if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
-                                currentSceneParagraphs = responseText.split('\\n').filter(p => p.trim() !== '');
-                                currentParagraphIndex = 0;
-                                renderNextParagraph();
-                            } else if (interaction.successMessage) {
-                                responseText = interaction.successMessage;
-                                const successP = document.createElement('p');
-                                successP.innerHTML = responseText;
-                                sceneDescriptionElement.appendChild(successP);
-                            }
-                             if (interaction.soundEffect && sceneSoundEffectElement) {
-                                sceneSoundEffectElement.src = interaction.soundEffect;
-                                sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
-                            }
-                        }
-                        
-                        break;
-                    }
+            if (!bestMatch) {
+                for (const interaction of interactionsWithoutItems) {
+                    const verbMatch = interaction.verbs.includes(verb);
+                    if (!verbMatch) continue;
+
+                    const targetObject = currentScene.objetos.find(o => o.id === interaction.target);
+                    if (!targetObject || !remainingText.includes(targetObject.name.toLowerCase())) continue;
+                    
+                    bestMatch = interaction;
+                    break;
+                }
+            }
+        }
+
+        if (bestMatch) {
+            verbProcessed = true;
+            const interaction = bestMatch;
+
+            if (interaction.consumesItem && interaction.requiresInInventory) {
+                currentState.inventory = currentState.inventory.filter(itemId => itemId !== interaction.requiresInInventory);
+            }
+            if (interaction.removesTargetFromScene) {
+                const sceneState = currentState.scenesState[currentState.currentSceneId];
+                if (sceneState.objetos) {
+                    sceneState.objetos = sceneState.objetos.filter(obj => obj.id !== interaction.target);
+                }
+            }
+            if (interaction.newSceneDescription) {
+                currentState.scenesState[currentState.currentSceneId].description = interaction.newSceneDescription;
+            }
+            
+            if (interaction.goToScene) {
+                currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: '', sceneId: currentState.currentSceneId } });
+                performSceneChange(interaction.goToScene, interaction.soundEffect, interaction.transitionType);
+            } else {
+                if (interaction.newSceneDescription) {
+                    responseText = interaction.newSceneDescription;
+                    if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
+                    currentSceneParagraphs = responseText.split('\\n').filter(p => p.trim() !== '');
+                    currentParagraphIndex = 0;
+                    renderNextParagraph();
+                }
+                 if (interaction.soundEffect && sceneSoundEffectElement) {
+                    sceneSoundEffectElement.src = interaction.soundEffect;
+                    sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
                 }
             }
         }
@@ -560,6 +589,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // 2. Built-in command processing
         const allSceneObjects = [...(currentScene.objetos || []), ...currentState.inventory.map(id => allTakableObjects[id])];
+        const targetForBuiltIn = verbParts.slice(1).join(' ');
         
         switch (verb) {
             case 'olhar':
@@ -567,21 +597,21 @@ document.addEventListener('DOMContentLoaded', () => {
             case 'ver':
                 let foundObject = false;
                 for (const obj of allSceneObjects) {
-                    if (target.includes(obj.name.toLowerCase())) {
+                    if (obj && targetForBuiltIn.includes(obj.name.toLowerCase())) {
                         responseText = obj.examineDescription;
                         foundObject = true;
                         break;
                     }
                 }
                 if (!foundObject) {
-                    if (target === '' || target === 'cena' || target === 'ao redor' || target === 'lugar') {
+                    if (targetForBuiltIn === '' || targetForBuiltIn === 'cena' || targetForBuiltIn === 'ao redor' || targetForBuiltIn === 'lugar') {
                         if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
                          currentSceneParagraphs = currentScene.description.split('\\n').filter(p => p.trim() !== '');
                          currentParagraphIndex = 0;
                          renderNextParagraph();
                          verbProcessed = true;
                     } else {
-                        responseText = "Não vejo nenhum(a) " + target + " aqui.";
+                        responseText = "Não vejo nenhum(a) " + targetForBuiltIn + " aqui.";
                     }
                 }
                 break;
@@ -592,7 +622,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (currentScene.objetos) {
                     for (let i = 0; i < currentScene.objetos.length; i++) {
                         const obj = currentScene.objetos[i];
-                        if (target.includes(obj.name.toLowerCase())) {
+                        if (targetForBuiltIn.includes(obj.name.toLowerCase())) {
                             objectToTake = obj;
                             objectIndex = i;
                             break;
@@ -612,7 +642,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         responseText = "Não consigo pegar " + objectToTake.name + ".";
                     }
                 } else {
-                     responseText = "Não vejo nenhum(a) " + target + " para pegar.";
+                     responseText = "Não vejo nenhum(a) " + targetForBuiltIn + " para pegar.";
                 }
                 break;
             case 'voltar':
@@ -626,7 +656,9 @@ document.addEventListener('DOMContentLoaded', () => {
                  }
                  break;
             default:
-                responseText = gameData.mensagem_falha_padrao;
+                if (!verbProcessed) { // Only show default failure if no interaction was matched
+                    responseText = gameData.mensagem_falha_padrao;
+                }
         }
 
         if (responseText) {
@@ -860,8 +892,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     endingRestartButtons.forEach(button => {
         button.addEventListener('click', () => {
-            localStorage.removeItem(SAVE_KEY);
-            window.location.reload();
+            if (positiveEndingScreen) positiveEndingScreen.classList.add('hidden');
+            if (negativeEndingScreen) negativeEndingScreen.classList.add('hidden');
+            if (splashScreen) splashScreen.classList.add('hidden');
+            if (gameContainer) gameContainer.classList.remove('hidden');
+            
+            initializeGame(true); // true to force a fresh start
         });
     });
 
