@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -715,44 +716,151 @@ body.font-adjust-gothic {
 `;
 
 const initialScenes: { [id: string]: Scene } = {
-    "scn_cela_inicial": {
-      id: "scn_cela_inicial",
-      name: "Cela Inicial",
-      image: "",
-      description: "Sua cabeça dói. Você não sabe seu nome, nem onde está.\nVocê está em uma cela pequena e escura. O chão é de pedra fria e úmida. Há uma <porta> de madeira reforçada na sua frente.",
-      objects: [
-        { id: "obj_chave_de_ferro", name: "chave de ferro", examineDescription: "Uma chave de ferro pesada e enferrujada. Parece antiga.", isTakable: true },
-        { id: "obj_pedra_solta", name: "pedra", examineDescription: "Uma das pedras da parede parece estar solta. Talvez você consiga movê-la.", isTakable: false },
-        { id: "obj_porta_da_cela", name: "porta", examineDescription: "Uma porta de madeira reforçada com ferro. Parece trancada.", isTakable: false }
-      ],
-      interactions: [
-          {
-              id: 'inter_1',
-              verbs: ['mover', 'forçar', 'empurrar'],
-              target: 'obj_pedra_solta',
-              successMessage: 'Com um rangido, você move a pedra, revelando uma passagem escura.',
-              removesTargetFromScene: true,
-              goToScene: 'scn_corredor'
-          },
-          {
-              id: 'inter_door_key',
-              verbs: ['usar', 'abrir', 'destrancar'],
-              target: 'obj_porta_da_cela',
-              requiresInInventory: 'obj_chave_de_ferro',
-              successMessage: 'Você usa a chave de ferro na fechadura. Com um clique alto, a porta se destranca e se abre, revelando um corredor escuro.',
-              removesTargetFromScene: true,
-              goToScene: 'scn_corredor'
-          }
-      ]
-    },
-    "scn_corredor": {
-      id: "scn_corredor",
-      name: "Corredor",
-      image: "",
-      description: "Você está em um corredor escuro e úmido. A única luz vem da cela atrás de você.",
-      objects: [],
-      interactions: []
-    }
+  "cena_1": {
+    id: "cena_1",
+    name: "Cela Escura",
+    description: "Você desperta em uma <cela> úmida e apertada. O ar cheira a mofo. Uma <porta de ferro> trancada bloqueia a saída. No canto, um <balde> enferrujado. Um <tijolo solto> chama a atenção na parede.",
+    image: "",
+    objects: [
+      { id: "obj_balde", name: "balde", examineDescription: "Um balde usado como penico, fedendo fortemente, com ferrugem em toda sua superfície.", isTakable: false },
+      { id: "obj_tijolo", name: "tijolo solto", examineDescription: "Um dos tijolos da parede parece mal encaixado.", isTakable: false },
+      { id: "obj_porta_ferro_c1", name: "porta de ferro", examineDescription: "Uma porta de ferro maciça e trancada.", isTakable: false }
+    ],
+    interactions: [
+      {
+        id: 'inter_1_1',
+        verbs: ['examinar', 'puxar', 'empurrar'],
+        target: 'obj_tijolo',
+        successMessage: 'Você força o tijolo e descobre um espaço vazio atrás dele. Algo brilha ali.',
+        goToScene: 'cena_2'
+      },
+      {
+        id: 'inter_1_2',
+        verbs: ['chutar', 'bater', 'arrombar'],
+        target: 'obj_porta_ferro_c1',
+        successMessage: 'Você reúne forças e tenta arrombar a porta. O impacto ecoa alto no corredor.',
+        goToScene: 'cena_3'
+      },
+      {
+        id: 'inter_1_3',
+        verbs: ['olhar', 'mexer', 'revirar'],
+        target: 'obj_balde',
+        successMessage: 'Com nojo, você mexe no balde. Algo se move na água suja.',
+        goToScene: 'cena_4'
+      }
+    ]
+  },
+  "cena_2": {
+    id: "cena_2",
+    name: "O Esconderijo do Tijolo",
+    description: "Atrás do tijolo solto, você encontra uma <chave velha>, coberta de ferrugem.",
+    image: "",
+    objects: [
+      { id: "obj_chave", name: "chave velha", examineDescription: "Uma chave pesada, coberta de ferrugem.", isTakable: true }
+    ],
+    interactions: [
+      {
+        id: 'inter_2_1',
+        verbs: ['pegar', 'coletar'],
+        target: 'obj_chave',
+        successMessage: 'Você pega a chave velha.',
+        removesTargetFromScene: true,
+        goToScene: 'cena_5'
+      }
+    ]
+  },
+  "cena_3": {
+    id: "cena_3",
+    name: "Tentativa de Arrombar a Porta",
+    description: "Você chuta a porta de ferro com força. Ela range, mas algo estala dentro do seu pé. A dor é insuportável.",
+    image: "",
+    objects: [
+      { id: "obj_porta_ferro_c3", name: "porta de ferro", examineDescription: "A porta de ferro maciça que você tentou arrombar.", isTakable: false }
+    ],
+    interactions: [
+      {
+        id: 'inter_3_1',
+        verbs: ['continuar', 'insistir'],
+        target: 'obj_porta_ferro_c3',
+        successMessage: 'Seu pé se quebra por completo e você desmaia de dor.',
+        goToScene: 'cena_6'
+      }
+    ]
+  },
+  "cena_4": {
+    id: "cena_4",
+    name: "O Balde Movimentado",
+    description: "Algo se agita dentro do balde. Um <rato> salta e crava os dentes na sua mão.",
+    image: "",
+    objects: [
+      { id: "obj_rato", name: "rato", examineDescription: "Um rato agressivo, os olhos vermelhos, dentes expostos.", isTakable: false }
+    ],
+    interactions: [
+      {
+        id: 'inter_4_1',
+        verbs: ['bater', 'esmagar', 'matar'],
+        target: 'obj_rato',
+        successMessage: 'Você tenta se livrar do rato, mas ele rasga sua mão em pedaços antes de morrer.',
+        goToScene: 'cena_7'
+      }
+    ]
+  },
+  "cena_5": {
+    id: "cena_5",
+    name: "Porta Aberta",
+    description: "A porta de ferro range quando você gira a chave velha na fechadura. O caminho para a liberdade se abre diante de você.",
+    image: "",
+    objects: [
+      { id: "obj_porta_ferro_c5", name: "porta de ferro", examineDescription: "A porta de ferro agora está aberta.", isTakable: false }
+    ],
+    interactions: [
+      {
+        id: 'inter_5_1',
+        verbs: ['atravessar', 'sair'],
+        target: 'obj_porta_ferro_c5',
+        requiresInInventory: 'obj_chave',
+        successMessage: 'Você escapa da cela e corre para fora, sentindo o ar fresco da liberdade.',
+        goToScene: 'cena_8'
+      }
+    ]
+  },
+  "cena_6": {
+    id: "cena_6",
+    name: "Morte pelo Pé Quebrado",
+    description: "O esforço foi em vão. Seu pé está destruído e você cai inconsciente. O mundo escurece lentamente.",
+    image: "",
+    objects: [],
+    interactions: [],
+    isEndingScene: true
+  },
+  "cena_7": {
+    id: "cena_7",
+    name: "Morte pelo Rato",
+    description: "O rato infectado destroça sua mão e você cai em choque, sem forças para resistir.",
+    image: "",
+    objects: [
+      { id: "obj_rato_morto", name: "rato morto", examineDescription: "O pequeno corpo imóvel de um rato encharcado de sangue.", isTakable: false }
+    ],
+    interactions: [],
+    isEndingScene: true
+  },
+  "cena_8": {
+    id: "cena_8",
+    name: "Liberdade",
+    description: "Você sai da cela e sente o vento fresco da noite. O corredor diante de você leva para o desconhecido, mas está livre.",
+    image: "",
+    objects: [
+      { id: "obj_corredor", name: "corredor", examineDescription: "Um corredor escuro que leva ao desconhecido.", isTakable: false }
+    ],
+    interactions: [
+      {
+        id: 'inter_8_1',
+        verbs: ['avançar', 'seguir'],
+        target: 'obj_corredor',
+        successMessage: 'Você segue adiante, pronto para a próxima etapa da fuga.'
+      }
+    ]
+  }
 };
 
 const generateUniqueId = (prefix: 'scn' | 'obj' | 'inter', existingIds: string[]): string => {
@@ -814,7 +922,7 @@ const initializeGameData = (): GameData => {
     });
 
     const newSceneOrder = initialSceneOrder.map(oldId => sceneIdMap[oldId]);
-    const oldStartScene = "scn_cela_inicial";
+    const oldStartScene = "cena_1";
     const newStartScene = sceneIdMap[oldStartScene];
     
     return {
