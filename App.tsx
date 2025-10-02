@@ -1,6 +1,7 @@
 
 
 
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -773,94 +774,29 @@ const initialScenes: { [id: string]: Scene } = {
   "cena_3": {
     id: "cena_3",
     name: "Tentativa de Arrombar a Porta",
-    description: "Você chuta a porta de ferro com força. Ela range, mas algo estala dentro do seu pé. A dor é insuportável.",
-    image: "",
-    objects: [
-      { id: "obj_porta_ferro_c3", name: "porta de ferro", examineDescription: "A porta de ferro maciça que você tentou arrombar.", isTakable: false }
-    ],
-    interactions: [
-      {
-        id: 'inter_3_1',
-        verbs: ['continuar', 'insistir'],
-        target: 'obj_porta_ferro_c3',
-        successMessage: 'Seu pé se quebra por completo e você desmaia de dor.',
-        goToScene: 'cena_6'
-      }
-    ]
-  },
-  "cena_4": {
-    id: "cena_4",
-    name: "O Balde Movimentado",
-    description: "Algo se agita dentro do balde. Um <rato> salta e crava os dentes na sua mão.",
-    image: "",
-    objects: [
-      { id: "obj_rato", name: "rato", examineDescription: "Um rato agressivo, os olhos vermelhos, dentes expostos.", isTakable: false }
-    ],
-    interactions: [
-      {
-        id: 'inter_4_1',
-        verbs: ['bater', 'esmagar', 'matar'],
-        target: 'obj_rato',
-        successMessage: 'Você tenta se livrar do rato, mas ele rasga sua mão em pedaços antes de morrer.',
-        goToScene: 'cena_7'
-      }
-    ]
-  },
-  "cena_5": {
-    id: "cena_5",
-    name: "Porta Aberta",
-    description: "A porta de ferro range quando você gira a chave velha na fechadura. O caminho para a liberdade se abre diante de você.",
-    image: "",
-    objects: [
-      { id: "obj_porta_ferro_c5", name: "porta de ferro", examineDescription: "A porta de ferro agora está aberta.", isTakable: false }
-    ],
-    interactions: [
-      {
-        id: 'inter_5_1',
-        verbs: ['atravessar', 'sair'],
-        target: 'obj_porta_ferro_c5',
-        requiresInInventory: 'obj_chave',
-        successMessage: 'Você escapa da cela e corre para fora, sentindo o ar fresco da liberdade.',
-        goToScene: 'cena_8'
-      }
-    ]
-  },
-  "cena_6": {
-    id: "cena_6",
-    name: "Morte pelo Pé Quebrado",
-    description: "O esforço foi em vão. Seu pé está destruído e você cai inconsciente. O mundo escurece lentamente.",
+    description: "Você chuta a porta de ferro com força. Ela range, mas algo estala dentro do seu pé. A dor é insuportável. O esforço foi em vão. Seu pé está destruído e você cai inconsciente. O mundo escurece lentamente.",
     image: "",
     objects: [],
     interactions: [],
     isEndingScene: true
   },
-  "cena_7": {
-    id: "cena_7",
-    name: "Morte pelo Rato",
-    description: "O rato infectado destroça sua mão e você cai em choque, sem forças para resistir.",
+  "cena_4": {
+    id: "cena_4",
+    name: "O Balde Movimentado",
+    description: "Algo se agita dentro do balde. Um rato salta e crava os dentes na sua mão. O rato infectado destroça sua mão e você cai em choque, sem forças para resistir.",
     image: "",
-    objects: [
-      { id: "obj_rato_morto", name: "rato morto", examineDescription: "O pequeno corpo imóvel de um rato encharcado de sangue.", isTakable: false }
-    ],
+    objects: [],
     interactions: [],
     isEndingScene: true
   },
-  "cena_8": {
-    id: "cena_8",
+  "cena_5": {
+    id: "cena_5",
     name: "Liberdade",
-    description: "Você sai da cela e sente o vento fresco da noite. O corredor diante de você leva para o desconhecido, mas está livre.",
+    description: "A porta de ferro range quando você gira a chave velha na fechadura. O caminho para a liberdade se abre diante de você. Você sai da cela e sente o vento fresco da noite. O corredor diante de você leva para o desconhecido, mas está livre.",
     image: "",
-    objects: [
-      { id: "obj_corredor", name: "corredor", examineDescription: "Um corredor escuro que leva ao desconhecido.", isTakable: false }
-    ],
-    interactions: [
-      {
-        id: 'inter_8_1',
-        verbs: ['avançar', 'seguir'],
-        target: 'obj_corredor',
-        successMessage: 'Você segue adiante, pronto para a próxima etapa da fuga.'
-      }
-    ]
+    objects: [],
+    interactions: [],
+    isEndingScene: true
   }
 };
 
