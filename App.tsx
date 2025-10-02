@@ -642,6 +642,9 @@ body.with-spacing .main-wrapper {
 }
 
 /* Image Frame Styles */
+.frame-none .image-panel {
+    border: none;
+}
 .frame-rounded-top .image-panel {
     padding: 10px;
     background: __FRAME_ROUNDED_TOP_COLOR__;
@@ -788,7 +791,7 @@ const initialScenes: { [id: string]: Scene } = {
   },
   "cena_5": {
     id: "cena_5",
-    name: "Liberdade",
+    name: "Fuga da cela",
     description: "A porta range quando você gira a chave na fechadura. O caminho para a liberdade se abre diante de você. Você sai da cela e sente o vento fresco da noite. O corredor diante de você leva para o desconhecido, mas está livre.",
     image: "",
     objects: [],

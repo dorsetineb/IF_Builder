@@ -24,7 +24,7 @@ const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
         case 'book-cover': return 'frame-book-cover';
         case 'trading-card': return 'frame-trading-card';
         case 'chamfered': return 'frame-chamfered';
-        default: return '';
+        default: return 'frame-none';
     }
 }
 

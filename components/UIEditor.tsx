@@ -449,9 +449,9 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
               containerStyles.clipPath = previewChamferPath;
               containerStyles.border = 'none';
               break;
-          default:
-              panelStyles.border = `2px solid ${localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}`;
-              panelStyles.padding = '4px';
+          default: // 'none' frame
+              panelStyles.border = 'none';
+              panelStyles.padding = '0';
       }
       return { panelStyles, containerStyles };
   };
