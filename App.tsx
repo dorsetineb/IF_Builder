@@ -1,7 +1,4 @@
 
-
-
-
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -721,12 +718,12 @@ const initialScenes: { [id: string]: Scene } = {
   "cena_1": {
     id: "cena_1",
     name: "Cela Escura",
-    description: "Você desperta em uma <cela> úmida e apertada. O ar cheira a mofo. Uma <porta de ferro> trancada bloqueia a saída. No canto, um <balde> enferrujado. Um <tijolo solto> chama a atenção na parede.",
+    description: "Você desperta em uma <cela> úmida e apertada. O ar cheira a mofo. Uma <porta> trancada bloqueia a saída. No canto, um <balde> enferrujado. Um <tijolo> chama a atenção na parede.",
     image: "",
     objects: [
       { id: "obj_balde", name: "balde", examineDescription: "Um balde usado como penico, fedendo fortemente, com ferrugem em toda sua superfície.", isTakable: false },
-      { id: "obj_tijolo", name: "tijolo solto", examineDescription: "Um dos tijolos da parede parece mal encaixado.", isTakable: false },
-      { id: "obj_porta_ferro_c1", name: "porta de ferro", examineDescription: "Uma porta de ferro maciça e trancada.", isTakable: false }
+      { id: "obj_tijolo", name: "tijolo", examineDescription: "Um dos tijolos da parede parece mal encaixado.", isTakable: false },
+      { id: "obj_porta_ferro_c1", name: "porta", examineDescription: "Uma porta de ferro maciça e trancada.", isTakable: false }
     ],
     interactions: [
       {
@@ -755,17 +752,17 @@ const initialScenes: { [id: string]: Scene } = {
   "cena_2": {
     id: "cena_2",
     name: "O Esconderijo do Tijolo",
-    description: "Atrás do tijolo solto, você encontra uma <chave velha>, coberta de ferrugem.",
+    description: "Atrás do tijolo, você encontra uma <chave>, coberta de ferrugem.",
     image: "",
     objects: [
-      { id: "obj_chave", name: "chave velha", examineDescription: "Uma chave pesada, coberta de ferrugem.", isTakable: true }
+      { id: "obj_chave", name: "chave", examineDescription: "Uma chave pesada, coberta de ferrugem.", isTakable: true }
     ],
     interactions: [
       {
         id: 'inter_2_1',
         verbs: ['pegar', 'coletar'],
         target: 'obj_chave',
-        successMessage: 'Você pega a chave velha.',
+        successMessage: 'Você pega a chave.',
         removesTargetFromScene: true,
         goToScene: 'cena_5'
       }
@@ -774,7 +771,7 @@ const initialScenes: { [id: string]: Scene } = {
   "cena_3": {
     id: "cena_3",
     name: "Tentativa de Arrombar a Porta",
-    description: "Você chuta a porta de ferro com força. Ela range, mas algo estala dentro do seu pé. A dor é insuportável. O esforço foi em vão. Seu pé está destruído e você cai inconsciente. O mundo escurece lentamente.",
+    description: "Você chuta a porta com força. Ela range, mas algo estala dentro do seu pé. A dor é insuportável. O esforço foi em vão. Seu pé está destruído e você cai inconsciente. O mundo escurece lentamente.",
     image: "",
     objects: [],
     interactions: [],
@@ -792,7 +789,7 @@ const initialScenes: { [id: string]: Scene } = {
   "cena_5": {
     id: "cena_5",
     name: "Liberdade",
-    description: "A porta de ferro range quando você gira a chave velha na fechadura. O caminho para a liberdade se abre diante de você. Você sai da cela e sente o vento fresco da noite. O corredor diante de você leva para o desconhecido, mas está livre.",
+    description: "A porta range quando você gira a chave na fechadura. O caminho para a liberdade se abre diante de você. Você sai da cela e sente o vento fresco da noite. O corredor diante de você leva para o desconhecido, mas está livre.",
     image: "",
     objects: [],
     interactions: [],
