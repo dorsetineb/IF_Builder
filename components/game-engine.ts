@@ -468,8 +468,22 @@ document.addEventListener('DOMContentLoaded', () => {
         const verbText = verbInputElement.value.trim();
         if (!verbText) return;
 
-        verbInputElement.value = '';
+        if (verbText.toLowerCase() === 'salvar jogo') {
+            saveState();
+            const saveP = document.createElement('p');
+            saveP.textContent = 'Jogo salvo.';
+            sceneDescriptionElement.appendChild(saveP);
+            sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
+            verbInputElement.value = '';
+            return;
+        }
+        
         const lowerCaseVerbText = verbText.toLowerCase();
+
+        verbInputElement.value = '';
+
+        const currentScene = currentState.scenesState[currentState.currentSceneId];
+        if (!currentScene) return;
 
         // Echo the verb
         const echoP = document.createElement('p');
@@ -477,180 +491,200 @@ document.addEventListener('DOMContentLoaded', () => {
         echoP.textContent = '> ' + verbText;
         sceneDescriptionElement.appendChild(echoP);
 
+        let verbProcessed = false;
         let responseText = '';
-        let actionHandled = false;
         
-        const currentScene = currentState.scenesState[currentState.currentSceneId];
-        if (!currentScene) return;
-
-        // 1. Check for fixed verbs first
+        // 0. Check for fixed verbs
         if (gameData.fixedVerbs && gameData.fixedVerbs.length > 0) {
             for (const fixedVerb of gameData.fixedVerbs) {
                 const verbMatch = fixedVerb.verbs.find(verb => verb.toLowerCase() === lowerCaseVerbText);
                 if (verbMatch) {
                     responseText = fixedVerb.description;
-                    actionHandled = true;
+                    const fixedVerbP = document.createElement('p');
+                    fixedVerbP.innerHTML = responseText.replace(/\\n/g, '<br>');
+                    sceneDescriptionElement.appendChild(fixedVerbP);
+                    verbProcessed = true;
                     break;
                 }
             }
         }
+        
+        if (verbProcessed) {
+             currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: responseText, sceneId: currentState.currentSceneId } });
+             sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
+             return;
+        }
 
-        // 2. Look for matching custom interactions
-        if (!actionHandled) {
-            let bestMatch = null;
-            if (currentScene.interactions) {
-                const interactionsWithItems = currentScene.interactions.filter(i => i.requiresInInventory);
-                const interactionsWithoutItems = currentScene.interactions.filter(i => !i.requiresInInventory);
+        // 1. Look for matching custom interactions (flexible parsing)
+        let bestMatch = null;
 
-                for (const interaction of interactionsWithItems) {
+        if (currentScene.interactions) {
+            const interactionsWithItems = currentScene.interactions.filter(i => i.requiresInInventory);
+            const interactionsWithoutItems = currentScene.interactions.filter(i => !i.requiresInInventory);
+
+            // Prioritize interactions with inventory items to resolve ambiguity
+            for (const interaction of interactionsWithItems) {
+                const verbMatch = interaction.verbs.some(v => lowerCaseVerbText.includes(v));
+                if (!verbMatch) continue;
+                
+                const targetObject = currentScene.objetos.find(o => o.id === interaction.target);
+                if (!targetObject || !lowerCaseVerbText.includes(targetObject.name.toLowerCase())) continue;
+                
+                const requiredItem = allTakableObjects[interaction.requiresInInventory];
+                if (!requiredItem || !lowerCaseVerbText.includes(requiredItem.name.toLowerCase())) continue;
+
+                if (currentState.inventory.includes(interaction.requiresInInventory)) {
+                    bestMatch = interaction;
+                    break; 
+                }
+            }
+
+            if (!bestMatch) {
+                for (const interaction of interactionsWithoutItems) {
                     const verbMatch = interaction.verbs.some(v => lowerCaseVerbText.includes(v));
                     if (!verbMatch) continue;
-                    
+
                     const targetObject = currentScene.objetos.find(o => o.id === interaction.target);
                     if (!targetObject || !lowerCaseVerbText.includes(targetObject.name.toLowerCase())) continue;
                     
-                    const requiredItem = allTakableObjects[interaction.requiresInInventory];
-                    if (!requiredItem || !lowerCaseVerbText.includes(requiredItem.name.toLowerCase())) continue;
-
-                    if (currentState.inventory.includes(interaction.requiresInInventory)) {
-                        bestMatch = interaction;
-                        break; 
-                    }
-                }
-
-                if (!bestMatch) {
-                    for (const interaction of interactionsWithoutItems) {
-                        const verbMatch = interaction.verbs.some(v => lowerCaseVerbText.includes(v));
-                        if (!verbMatch) continue;
-
-                        const targetObject = currentScene.objetos.find(o => o.id === interaction.target);
-                        if (!targetObject || !lowerCaseVerbText.includes(targetObject.name.toLowerCase())) continue;
-                        
-                        bestMatch = interaction;
-                        break;
-                    }
+                    bestMatch = interaction;
+                    break;
                 }
             }
+        }
 
-            if (bestMatch) {
-                actionHandled = true;
-                const interaction = bestMatch;
-                responseText = interaction.successMessage || '';
+        if (bestMatch) {
+            verbProcessed = true;
+            const interaction = bestMatch;
 
-                if (interaction.consumesItem && interaction.requiresInInventory) {
-                    currentState.inventory = currentState.inventory.filter(itemId => itemId !== interaction.requiresInInventory);
+            if (interaction.addsToInventory) {
+                const objectToTake = currentScene.objetos.find(o => o.id === interaction.target);
+                if (objectToTake && !currentState.inventory.includes(objectToTake.id)) {
+                    currentState.inventory.push(objectToTake.id);
                 }
-                if (interaction.removesTargetFromScene) {
-                    currentScene.objetos = currentScene.objetos.filter(obj => obj.id !== interaction.target);
+            }
+            if (interaction.consumesItem && interaction.requiresInInventory) {
+                currentState.inventory = currentState.inventory.filter(itemId => itemId !== interaction.requiresInInventory);
+            }
+            if (interaction.removesTargetFromScene) {
+                const sceneState = currentState.scenesState[currentState.currentSceneId];
+                if (sceneState.objetos) {
+                    sceneState.objetos = sceneState.objetos.filter(obj => obj.id !== interaction.target);
                 }
+            }
+            if (interaction.newSceneDescription) {
+                currentState.scenesState[currentState.currentSceneId].description = interaction.newSceneDescription;
+            }
+            
+            if (interaction.goToScene) {
+                currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: '', sceneId: currentState.currentSceneId } });
+                performSceneChange(interaction.goToScene, interaction.soundEffect, interaction.transitionType);
+            } else {
                 if (interaction.newSceneDescription) {
-                    currentScene.description = interaction.newSceneDescription;
+                    responseText = interaction.newSceneDescription;
+                    if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
+                    currentSceneParagraphs = responseText.split('\\n').filter(p => p.trim() !== '');
+                    currentParagraphIndex = 0;
+                    renderNextParagraph();
                 }
-
-                currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: responseText, sceneId: currentState.currentSceneId } });
-                saveState();
-
-                if (responseText) {
-                    const responseP = document.createElement('p');
-                    responseP.innerHTML = responseText;
-                    sceneDescriptionElement.appendChild(responseP);
-                }
-
-                if (interaction.goToScene) {
-                    performSceneChange(interaction.goToScene, interaction.soundEffect, interaction.transitionType);
-                } else if (interaction.soundEffect && sceneSoundEffectElement) {
+                 if (interaction.soundEffect && sceneSoundEffectElement) {
                     sceneSoundEffectElement.src = interaction.soundEffect;
                     sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
                 }
-                sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
-                return;
             }
         }
         
-        // 3. Built-in command processing
-        if (!actionHandled) {
-            const verbParts = lowerCaseVerbText.split(/\s+/);
-            const verb = verbParts[0];
-            const allSceneObjects = [...(currentScene.objetos || []), ...currentState.inventory.map(id => allTakableObjects[id])];
-            const targetForBuiltIn = verbParts.slice(1).join(' ');
-            
-            switch (verb) {
-                case 'olhar': case 'examinar': case 'ver':
-                    let foundObject = false;
-                    for (const obj of allSceneObjects) {
-                        if (obj && targetForBuiltIn.includes(obj.name.toLowerCase())) {
-                            responseText = obj.examineDescription;
-                            foundObject = true;
+        if (verbProcessed) {
+            if (responseText) {
+                currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: responseText, sceneId: currentState.currentSceneId } });
+            }
+            if (sceneDescriptionElement) sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
+            return;
+        }
+
+        // 2. Built-in command processing
+        const verbParts = lowerCaseVerbText.split(/\\s+/);
+        const verb = verbParts[0];
+        const allSceneObjects = [...(currentScene.objetos || []), ...currentState.inventory.map(id => allTakableObjects[id])];
+        const targetForBuiltIn = verbParts.slice(1).join(' ');
+        
+        switch (verb) {
+            case 'olhar':
+            case 'examinar':
+            case 'ver':
+                let foundObject = false;
+                for (const obj of allSceneObjects) {
+                    if (obj && targetForBuiltIn.includes(obj.name.toLowerCase())) {
+                        responseText = obj.examineDescription;
+                        foundObject = true;
+                        break;
+                    }
+                }
+                if (!foundObject) {
+                    if (targetForBuiltIn === '' || targetForBuiltIn === 'cena' || targetForBuiltIn === 'ao redor' || targetForBuiltIn === 'lugar') {
+                        if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
+                         currentSceneParagraphs = currentScene.description.split('\\n').filter(p => p.trim() !== '');
+                         currentParagraphIndex = 0;
+                         renderNextParagraph();
+                         verbProcessed = true;
+                    } else {
+                        responseText = "Não vejo nenhum(a) " + targetForBuiltIn + " aqui.";
+                    }
+                }
+                break;
+            case 'pegar':
+            case 'apanhar':
+                let objectToTake = null;
+                let objectIndex = -1;
+                if (currentScene.objetos) {
+                    for (let i = 0; i < currentScene.objetos.length; i++) {
+                        const obj = currentScene.objetos[i];
+                        if (targetForBuiltIn.includes(obj.name.toLowerCase())) {
+                            objectToTake = obj;
+                            objectIndex = i;
                             break;
                         }
                     }
-                    if (!foundObject) {
-                        if (targetForBuiltIn === '' || targetForBuiltIn === 'cena' || targetForBuiltIn === 'ao redor' || targetForBuiltIn === 'lugar') {
-                            if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
-                             currentSceneParagraphs = currentScene.description.split('\\n').filter(p => p.trim() !== '');
-                             currentParagraphIndex = 0;
-                             renderNextParagraph();
+                }
+                if (objectToTake) {
+                    if (objectToTake.isTakable) {
+                        if (!currentState.inventory.includes(objectToTake.id)) {
+                             currentState.inventory.push(objectToTake.id);
+                             currentScene.objetos.splice(objectIndex, 1);
+                             responseText = objectToTake.name + " adicionado(a) ao inventário.";
                         } else {
-                            responseText = "Não vejo nenhum(a) " + targetForBuiltIn + " aqui.";
-                        }
-                    }
-                    break;
-                case 'pegar': case 'apanhar':
-                    let objectToTake = null;
-                    let objectIndex = -1;
-                    if (currentScene.objetos) {
-                        for (let i = 0; i < currentScene.objetos.length; i++) {
-                            const obj = currentScene.objetos[i];
-                            if (targetForBuiltIn.includes(obj.name.toLowerCase())) {
-                                objectToTake = obj;
-                                objectIndex = i;
-                                break;
-                            }
-                        }
-                    }
-                    if (objectToTake) {
-                        if (objectToTake.isTakable) {
-                            if (!currentState.inventory.includes(objectToTake.id)) {
-                                 currentState.inventory.push(objectToTake.id);
-                                 currentScene.objetos.splice(objectIndex, 1);
-                                 responseText = objectToTake.name + " adicionado(a) ao inventário.";
-                            } else {
-                                responseText = "Você já tem isso.";
-                            }
-                        } else {
-                            responseText = "Não consigo pegar " + objectToTake.name + ".";
+                            responseText = "Você já tem isso.";
                         }
                     } else {
-                         responseText = "Não vejo nenhum(a) " + targetForBuiltIn + " para pegar.";
+                        responseText = "Não consigo pegar " + objectToTake.name + ".";
                     }
-                    break;
-                case 'voltar':
-                     if (currentState.previousSceneId && currentState.previousSceneId !== currentState.currentSceneId) {
-                        const sceneToReturn = currentState.previousSceneId;
-                        responseText = '';
-                        currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: 'Você voltou.', sceneId: currentState.currentSceneId } });
-                        saveState();
-                        performSceneChange(sceneToReturn);
-                        return; // Exit here as scene change is handled
-                     } else {
-                        responseText = "Não há para onde voltar.";
-                     }
-                     break;
-                default:
+                } else {
+                     responseText = "Não vejo nenhum(a) " + targetForBuiltIn + " para pegar.";
+                }
+                break;
+            case 'voltar':
+                 if (currentState.previousSceneId && currentState.previousSceneId !== currentState.currentSceneId) {
+                    const sceneToReturn = currentState.previousSceneId;
+                    responseText = '';
+                    verbProcessed = true;
+                    performSceneChange(sceneToReturn);
+                 } else {
+                    responseText = "Não há para onde voltar.";
+                 }
+                 break;
+            default:
+                if (!verbProcessed) { // Only show default failure if no interaction was matched
                     responseText = gameData.mensagem_falha_padrao;
-            }
+                }
         }
-        
-        // 4. Final response, logging, and saving
-        currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: responseText, sceneId: currentState.currentSceneId } });
-        
+
         if (responseText) {
             const responseP = document.createElement('p');
-            responseP.innerHTML = responseText.replace(/\\n/g, '<br>');
+            responseP.innerHTML = responseText;
             sceneDescriptionElement.appendChild(responseP);
+            currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: responseText, sceneId: currentState.currentSceneId } });
         }
         
-        saveState();
         if (sceneDescriptionElement) sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
     }
 
@@ -774,24 +808,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 \`;
                 diaryLogElement.appendChild(div);
-            } else if (entry.type === 'action') {
+            } else if (entry.type === 'action' && entry.data.command) {
                 const lastEntry = diaryLogElement.querySelector('.diary-entry:last-child .text-container');
                 if (lastEntry) {
                     const p = document.createElement('p');
                     p.className = 'verb-echo';
-                    
-                    let content = '';
-                    if (entry.data.command) {
-                        content += \`<strong>\${gameData.nome_jogador_diario || 'VOCÊ'}:</strong> "\${entry.data.command}"<br>\`;
-                    }
-                    if (entry.data.response) {
-                        content += \`<em>\${entry.data.response.replace(/\\n/g, '<br>')}</em>\`;
-                    }
-
-                    if (content) {
-                        p.innerHTML = content;
-                        lastEntry.appendChild(p);
-                    }
+                    p.innerHTML = \`
+                        <strong>\${gameData.nome_jogador_diario || 'VOCÊ'}:</strong> 
+                        "\${entry.data.command}"
+                        <br>
+                        <em>\${entry.data.response.replace(/\\n/g, '<br>')}</em>
+                    \`;
+                    lastEntry.appendChild(p);
                 }
             }
         });
