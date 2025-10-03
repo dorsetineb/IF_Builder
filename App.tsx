@@ -754,11 +754,12 @@ const initialScenes: { [id: string]: Scene } = {
   },
   "cena_2": {
     id: "cena_2",
-    name: "O Esconderijo do Tijolo",
-    description: "Atrás do tijolo, você encontra uma <chave>, coberta de ferrugem.",
+    name: "Atrás do tijolo",
+    description: "Atrás do tijolo, você encontra uma <chave>, coberta de ferrugem. Você pode voltar para a <cela> a qualquer momento.",
     image: "",
     objects: [
-      { id: "obj_chave", name: "chave", examineDescription: "Uma chave pesada, coberta de ferrugem.", isTakable: true }
+      { id: "obj_chave", name: "chave", examineDescription: "Uma chave pesada, coberta de ferrugem.", isTakable: true },
+      { id: "obj_cela_retorno", name: "cela", examineDescription: "É a cela de onde você acabou de vir.", isTakable: false }
     ],
     interactions: [
       {
@@ -768,26 +769,33 @@ const initialScenes: { [id: string]: Scene } = {
         successMessage: 'Você pega a chave.',
         removesTargetFromScene: true,
         goToScene: 'cena_5'
+      },
+      {
+        id: 'inter_2_2',
+        verbs: ['voltar', 'retornar'],
+        target: 'obj_cela_retorno',
+        successMessage: 'Você se afasta do buraco na parede e volta para o centro da cela.',
+        goToScene: 'cena_1'
       }
     ]
   },
   "cena_3": {
     id: "cena_3",
-    name: "Tentativa de Arrombar a Porta",
+    name: "Machucado pela porta!",
     description: "Você chuta a porta com força. Ela range, mas algo estala dentro do seu pé. A dor é insuportável. O esforço foi em vão. Seu pé está destruído e você cai inconsciente. O mundo escurece lentamente.",
     image: "",
     objects: [],
     interactions: [],
-    isEndingScene: true
+    removesChanceOnEntry: true
   },
   "cena_4": {
     id: "cena_4",
-    name: "O Balde Movimentado",
+    name: "Um rato ataca!",
     description: "Algo se agita dentro do balde. Um rato salta e crava os dentes na sua mão. O rato infectado destroça sua mão e você cai em choque, sem forças para resistir.",
     image: "",
     objects: [],
     interactions: [],
-    isEndingScene: true
+    removesChanceOnEntry: true
   },
   "cena_5": {
     id: "cena_5",
@@ -893,8 +901,8 @@ const initializeGameData = (): GameData => {
         gameVerbInputPlaceholder: 'O QUE VOCÊ FAZ?',
         gameDiaryPlayerName: 'VOCÊ',
         gameFocusColor: '#58a6ff',
-        gameEnableChances: false,
-        gameMaxChances: 3,
+        gameEnableChances: true,
+        gameMaxChances: 2,
         gameChanceIcon: 'heart',
         gameChanceIconColor: '#ff4d4d',
         gameChanceReturnButtonText: "Tentar Novamente",
