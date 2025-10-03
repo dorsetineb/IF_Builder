@@ -1,4 +1,3 @@
-
 import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
@@ -948,5 +947,3 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeGame();
 });
 `
-  </change>
-</changes>
