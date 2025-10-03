@@ -1,4 +1,5 @@
 
+
 // FIX: Corrected React import to properly include 'useRef'. The previous syntax 'import React, a from ...' was invalid.
 import React, { useRef } from 'react';
 import { GameData } from '../types';
@@ -50,31 +51,57 @@ const Header: React.FC<{
 
     const exportData = JSON.parse(JSON.stringify(gameData));
 
-    const assetPromises: Promise<void>[] = [];
     const assetMap = new Map<string, string>();
 
     const processAsset = (base64String: string | undefined, baseName: string): string | undefined => {
-        if (!base64String || !base64String.startsWith('data:')) {
+        // 1. Guard clauses for invalid input
+        if (!base64String || !base64String.startsWith('data:image')) {
             return base64String;
         }
+        
+        // 2. Check cache to avoid processing the same asset multiple times
         if (assetMap.has(base64String)) {
             return assetMap.get(base64String);
         }
-        const match = base64String.match(/^data:(.+);base64,(.+)$/);
-        if (!match) return base64String;
+
+        // 3. Robustly parse the data URL without a fragile regex.
+        // Find the boundary between the header and the data.
+        const commaIndex = base64String.indexOf(',');
+        if (commaIndex === -1) {
+            console.warn(`Invalid data URL format for asset: ${baseName}`);
+            return base64String;
+        }
+
+        const header = base64String.substring(0, commaIndex); // e.g., "data:image/png;base64"
+        const data = base64String.substring(commaIndex + 1);
+
+        // Extract MIME type from the header.
+        const mimeMatch = header.match(/data:(image\/[^;]+)/);
+        if (!mimeMatch || !mimeMatch[1]) {
+            console.warn(`Could not extract MIME type for asset: ${baseName}`);
+            return base64String;
+        }
         
-        const mimeType = match[1];
-        const data = match[2];
-        const extension = mimeType.split('/')[1] || 'bin';
+        // 4. Determine a safe file extension from the clean MIME type.
+        const mimeType = mimeMatch[1]; // e.g., "image/png"
+        let extension = mimeType.split('/')[1];
+        
+        if (extension === 'svg+xml') {
+            extension = 'svg'; // Sanitize svg+xml
+        }
+
         const filename = `assets/${baseName}.${extension}`;
-        assetMap.set(base64String, filename);
-        
-        const promise = fetch(base64String).then(res => res.blob()).then(blob => {
-             assetsFolder.file(`${baseName}.${extension}`, blob);
-        });
-        assetPromises.push(promise);
-        
-        return filename;
+        const filePathInZip = `${baseName}.${extension}`;
+
+        // 5. Add to zip and cache the result
+        try {
+            assetsFolder.file(filePathInZip, data, { base64: true });
+            assetMap.set(base64String, filename);
+            return filename; // Return the new relative path
+        } catch (error) {
+            console.error(`Failed to add asset '${filePathInZip}' to zip.`, error);
+            return base64String; // Fallback to original data URL on error
+        }
     };
 
     exportData.gameLogo = processAsset(exportData.gameLogo, 'logo');
@@ -91,9 +118,7 @@ const Header: React.FC<{
             });
         }
     }
-
-    await Promise.all(assetPromises);
-
+    
     const chancesContainerHTML = exportData.gameEnableChances 
         ? '<div id="chances-container" class="chances-container"></div>' 
         : '';
@@ -150,7 +175,7 @@ const Header: React.FC<{
             }
 
             await Promise.all(fontPromises);
-            finalCss = fontCssText;
+            finalCss = fontCssText + '\n\n' + finalCss;
             fontStylesheet = '';
         } catch (error) {
             console.error("Failed to embed fonts, falling back to online version:", error);
