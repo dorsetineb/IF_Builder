@@ -310,7 +310,7 @@ const Header: React.FC<{
                         const promise = zipObject.async('base64').then(base64Data => {
                             const mimeType = getMimeTypeFromFileName(zipObject.name);
                             const dataUrl = `data:${mimeType};base64,${base64Data}`;
-                            assetMap.set(`assets/${zipObject.name}`, dataUrl);
+                            assetMap.set(zipObject.name, dataUrl);
                         });
                         assetPromises.push(promise);
                     });
