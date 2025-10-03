@@ -1,7 +1,4 @@
 
-
-
-
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -354,18 +351,20 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
           {nodes.map(node => {
             const linkingInteractions = node.interactions.filter(inter => inter.goToScene && allScenesMap[inter.goToScene]);
             
+            const borderColorClass = (() => {
+                if (node.id === startSceneId) return 'border-yellow-400';
+                if (node.isEndingScene) return 'border-brand-primary';
+                if (node.removesChanceOnEntry) return 'border-red-500';
+                if (node.restoresChanceOnEntry) return 'border-white';
+                return 'border-brand-border';
+            })();
+
             return (
               <div
                 key={node.id}
                 onMouseDown={(e) => handleNodeMouseDown(e, node.id)}
                 onClick={(e) => handleNodeClick(e, node.id)}
-                className={`absolute bg-brand-surface rounded-xl shadow-lg flex flex-col transition-all duration-300 border ${
-                  node.id === startSceneId
-                    ? 'border-yellow-400'
-                    : node.isEndingScene
-                    ? 'border-red-500'
-                    : 'border-brand-border'
-                } cursor-pointer hover:border-yellow-400 hover:shadow-xl`}
+                className={`absolute bg-brand-surface rounded-xl shadow-lg flex flex-col transition-all duration-300 border-2 ${borderColorClass} cursor-pointer hover:border-yellow-400 hover:shadow-xl`}
                 style={{ width: NODE_WIDTH, transform: `translate(${node.x}px, ${node.y}px)`, height: node.height, userSelect: 'none' }}
               >
                   <div className="p-3 relative flex-shrink-0 text-center" style={{height: NODE_HEADER_HEIGHT}}>
@@ -375,7 +374,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
                       <h3 className="font-bold text-brand-text truncate">{node.name}</h3>
                       <p className="text-xs text-brand-text-dim">(ID: {node.id})</p>
                       {node.id === startSceneId && <p className="text-xs font-bold text-yellow-400 mt-1">(Início)</p>}
-                      {node.isEndingScene && <p className="text-xs font-bold text-red-500 mt-1">(Fim de Jogo)</p>}
+                      {node.isEndingScene && <p className="text-xs font-bold text-brand-primary mt-1">(Fim de Jogo)</p>}
                   </div>
                   
                   {linkingInteractions.length > 0 && (
@@ -398,6 +397,27 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
             )
           })}
         </div>
+      </div>
+      <div className="absolute bottom-4 left-4 z-10 bg-brand-surface/80 backdrop-blur-sm p-3 rounded-lg border border-brand-border text-xs text-brand-text-dim">
+          <h4 className="font-bold text-sm text-brand-text mb-2">Legenda</h4>
+          <ul className="space-y-1.5">
+              <li className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-sm border-2 border-yellow-400"></div>
+                  <span>Cena Inicial</span>
+              </li>
+              <li className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-sm border-2 border-brand-primary"></div>
+                  <span>Fim de Jogo</span>
+              </li>
+              <li className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-sm border-2 border-red-500"></div>
+                  <span>Remove Chance</span>
+              </li>
+              <li className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-sm border-2 border-white"></div>
+                  <span>Restaura Chance</span>
+              </li>
+          </ul>
       </div>
       <div className="absolute bottom-4 right-4 z-10 flex items-end gap-2">
           <button 
