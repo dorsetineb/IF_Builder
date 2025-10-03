@@ -29,6 +29,22 @@ const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
     }
 }
 
+const getMimeTypeFromFileName = (name: string): string => {
+    const ext = name.split('.').pop()?.toLowerCase();
+    switch(ext) {
+        case 'png': return 'image/png';
+        case 'jpg':
+        case 'jpeg': return 'image/jpeg';
+        case 'gif': return 'image/gif';
+        case 'svg': return 'image/svg+xml';
+        // Add audio types for sound effects
+        case 'mp3': return 'audio/mpeg';
+        case 'ogg': return 'audio/ogg';
+        case 'wav': return 'audio/wav';
+        default: return 'application/octet-stream';
+    }
+}
+
 const Header: React.FC<{ 
   gameData: GameData; 
   onImportGame: (data: GameData) => void;
@@ -55,7 +71,7 @@ const Header: React.FC<{
 
     const processAsset = (base64String: string | undefined, baseName: string): string | undefined => {
         // 1. Guard clauses for invalid input
-        if (!base64String || !base64String.startsWith('data:image')) {
+        if (!base64String || !base64String.startsWith('data:')) {
             return base64String;
         }
         
@@ -76,7 +92,7 @@ const Header: React.FC<{
         const data = base64String.substring(commaIndex + 1);
 
         // Extract MIME type from the header.
-        const mimeMatch = header.match(/data:(image\/[^;]+)/);
+        const mimeMatch = header.match(/data:([^;]+)/);
         if (!mimeMatch || !mimeMatch[1]) {
             console.warn(`Could not extract MIME type for asset: ${baseName}`);
             return base64String;
@@ -86,9 +102,12 @@ const Header: React.FC<{
         const mimeType = mimeMatch[1]; // e.g., "image/png"
         let extension = mimeType.split('/')[1];
         
-        if (extension === 'svg+xml') {
-            extension = 'svg'; // Sanitize svg+xml
+        if (extension) {
+            extension = extension.split('+')[0]; // Handles 'svg+xml' -> 'svg'
+        } else {
+            extension = 'bin'; // fallback extension
         }
+
 
         const filename = `assets/${baseName}.${extension}`;
         const filePathInZip = `${baseName}.${extension}`;
@@ -119,6 +138,9 @@ const Header: React.FC<{
         }
     }
     
+    // Add the full editor data to the zip for re-importing.
+    zip.file("editor_data.json", JSON.stringify(exportData));
+
     const chancesContainerHTML = exportData.gameEnableChances 
         ? '<div id="chances-container" class="chances-container"></div>' 
         : '';
@@ -258,26 +280,97 @@ const Header: React.FC<{
 
   const handleFileImport = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        try {
-          const result = e.target?.result;
-          if (typeof result === 'string') {
-            const data = JSON.parse(result);
-            onImportGame(data);
-          }
-        } catch (error) {
-          console.error("Error parsing JSON file:", error);
-          alert("Erro ao importar o arquivo. Verifique se é um arquivo JSON válido.");
-        }
-      };
-      reader.readAsText(file);
+    if (!file) {
+        if (event.target) event.target.value = '';
+        return;
     }
+
+    const reader = new FileReader();
+
+    if (file.name.endsWith('.zip')) {
+        reader.onload = async (e) => {
+            try {
+                const result = e.target?.result;
+                if (!(result instanceof ArrayBuffer)) throw new Error("Falha ao ler o arquivo zip.");
+                
+                const zip = await JSZip.loadAsync(result);
+
+                const editorDataFile = zip.file('editor_data.json');
+                if (!editorDataFile) throw new Error('editor_data.json não encontrado no arquivo zip. O arquivo pode ser de uma versão mais antiga ou estar corrompido.');
+                
+                const editorDataContent = await editorDataFile.async('string');
+                const importedData = JSON.parse(editorDataContent) as GameData;
+
+                const assetMap = new Map<string, string>();
+                const assetsFolder = zip.folder('assets');
+                if (assetsFolder) {
+                    const assetPromises: Promise<void>[] = [];
+                    assetsFolder.forEach((_, zipObject) => {
+                        if (zipObject.dir) return; // pular diretórios
+                        const promise = zipObject.async('base64').then(base64Data => {
+                            const mimeType = getMimeTypeFromFileName(zipObject.name);
+                            const dataUrl = `data:${mimeType};base64,${base64Data}`;
+                            assetMap.set(`assets/${zipObject.name}`, dataUrl);
+                        });
+                        assetPromises.push(promise);
+                    });
+                    await Promise.all(assetPromises);
+                }
+
+                const replacePathWithData = (path: string | undefined): string | undefined => {
+                    if (path && assetMap.has(path)) {
+                        return assetMap.get(path);
+                    }
+                    return path;
+                };
+
+                importedData.gameLogo = replacePathWithData(importedData.gameLogo);
+                importedData.gameSplashImage = replacePathWithData(importedData.gameSplashImage);
+                importedData.positiveEndingImage = replacePathWithData(importedData.positiveEndingImage);
+                importedData.negativeEndingImage = replacePathWithData(importedData.negativeEndingImage);
+
+                if (importedData.scenes) {
+                    for (const sceneId in importedData.scenes) {
+                        const scene = importedData.scenes[sceneId];
+                        scene.image = replacePathWithData(scene.image) as string;
+                        if (scene.interactions) {
+                            scene.interactions.forEach(inter => {
+                                inter.soundEffect = replacePathWithData(inter.soundEffect);
+                            });
+                        }
+                    }
+                }
+
+                onImportGame(importedData);
+
+            } catch (error: any) {
+                console.error("Error importing ZIP file:", error);
+                alert(`Erro ao importar o arquivo ZIP: ${error.message}`);
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    } else if (file.name.endsWith('.json')) {
+        reader.onload = (e) => {
+            try {
+                const result = e.target?.result;
+                if (typeof result === 'string') {
+                    const data = JSON.parse(result);
+                    onImportGame(data);
+                }
+            } catch (error) {
+                console.error("Error parsing JSON file:", error);
+                alert("Erro ao importar o arquivo. Verifique se é um arquivo JSON válido.");
+            }
+        };
+        reader.readAsText(file);
+    } else {
+        alert("Tipo de arquivo não suportado. Por favor, selecione um arquivo .json ou .zip.");
+    }
+    
     if (event.target) {
         event.target.value = '';
     }
-  };
+};
 
   return (
     <header className="flex-shrink-0 bg-brand-sidebar p-4 flex justify-between items-center border-b border-brand-border">
@@ -295,7 +388,7 @@ const Header: React.FC<{
             type="file"
             ref={importInputRef}
             className="hidden"
-            accept=".json"
+            accept=".json,.zip"
             onChange={handleFileImport}
         />
         <button 
