@@ -504,39 +504,37 @@ document.addEventListener('DOMContentLoaded', () => {
              return;
         }
 
-        // 1. Look for matching custom interactions
-        const verbParts = lowerCaseVerbText.split(/\\s+/);
-        const verb = verbParts[0];
-        const remainingText = verbParts.slice(1).join(' ');
+        // 1. Look for matching custom interactions (flexible parsing)
         let bestMatch = null;
 
         if (currentScene.interactions) {
             const interactionsWithItems = currentScene.interactions.filter(i => i.requiresInInventory);
             const interactionsWithoutItems = currentScene.interactions.filter(i => !i.requiresInInventory);
 
+            // Prioritize interactions with inventory items to resolve ambiguity
             for (const interaction of interactionsWithItems) {
-                const verbMatch = interaction.verbs.includes(verb);
+                const verbMatch = interaction.verbs.some(v => lowerCaseVerbText.includes(v));
                 if (!verbMatch) continue;
                 
                 const targetObject = currentScene.objetos.find(o => o.id === interaction.target);
-                if (!targetObject || !remainingText.includes(targetObject.name.toLowerCase())) continue;
+                if (!targetObject || !lowerCaseVerbText.includes(targetObject.name.toLowerCase())) continue;
                 
                 const requiredItem = allTakableObjects[interaction.requiresInInventory];
-                if (!requiredItem || !remainingText.includes(requiredItem.name.toLowerCase())) continue;
+                if (!requiredItem || !lowerCaseVerbText.includes(requiredItem.name.toLowerCase())) continue;
 
                 if (currentState.inventory.includes(interaction.requiresInInventory)) {
                     bestMatch = interaction;
-                    break;
+                    break; 
                 }
             }
 
             if (!bestMatch) {
                 for (const interaction of interactionsWithoutItems) {
-                    const verbMatch = interaction.verbs.includes(verb);
+                    const verbMatch = interaction.verbs.some(v => lowerCaseVerbText.includes(v));
                     if (!verbMatch) continue;
 
                     const targetObject = currentScene.objetos.find(o => o.id === interaction.target);
-                    if (!targetObject || !remainingText.includes(targetObject.name.toLowerCase())) continue;
+                    if (!targetObject || !lowerCaseVerbText.includes(targetObject.name.toLowerCase())) continue;
                     
                     bestMatch = interaction;
                     break;
@@ -548,6 +546,12 @@ document.addEventListener('DOMContentLoaded', () => {
             verbProcessed = true;
             const interaction = bestMatch;
 
+            if (interaction.addsToInventory) {
+                const objectToTake = currentScene.objetos.find(o => o.id === interaction.target);
+                if (objectToTake && !currentState.inventory.includes(objectToTake.id)) {
+                    currentState.inventory.push(objectToTake.id);
+                }
+            }
             if (interaction.consumesItem && interaction.requiresInInventory) {
                 currentState.inventory = currentState.inventory.filter(itemId => itemId !== interaction.requiresInInventory);
             }
@@ -588,6 +592,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // 2. Built-in command processing
+        const verbParts = lowerCaseVerbText.split(/\\s+/);
+        const verb = verbParts[0];
         const allSceneObjects = [...(currentScene.objetos || []), ...currentState.inventory.map(id => allTakableObjects[id])];
         const targetForBuiltIn = verbParts.slice(1).join(' ');
         
@@ -684,7 +690,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentState.inventory.forEach(itemId => {
                     const item = allTakableObjects[itemId];
                     if (item) {
-                        content += \`<p title="\${item.examineDescription}">\${item.name}</p>\`;
+                        content += \`<button data-item-name="\${item.name}" title="\${item.examineDescription}">\${item.name}</button>\`;
                     }
                 });
             }
@@ -752,6 +758,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         const verb = button.getAttribute('data-verb');
                         const currentValue = verbInputElement.value.trim();
                         verbInputElement.value = (verb + ' ' + currentValue).trim() + ' ';
+                        verbInputElement.focus();
+                        actionPopup.classList.add('hidden');
+                    }
+                });
+            });
+        }
+        if (type === 'inventory') {
+            actionPopup.querySelectorAll('button[data-item-name]').forEach(button => {
+                button.addEventListener('click', () => {
+                    if (verbInputElement) {
+                        const itemName = button.getAttribute('data-item-name');
+                        const currentValue = verbInputElement.value.trim();
+                        verbInputElement.value = (currentValue ? currentValue + ' ' + itemName : itemName) + ' ';
                         verbInputElement.focus();
                         actionPopup.classList.add('hidden');
                     }
@@ -850,7 +869,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (inventoryButton) {
         inventoryButton.addEventListener('click', () => {
-             if (actionPopup && !actionPopup.classList.contains('hidden') && actionPopup.innerHTML.includes('inventário')) {
+             if (actionPopup && !actionPopup.classList.contains('hidden') && actionPopup.innerHTML.includes('O inventário está vazio') || actionPopup.querySelector('button[data-item-name]')) {
                 actionPopup.classList.add('hidden');
             } else {
                 populateAndShowPopup('inventory');

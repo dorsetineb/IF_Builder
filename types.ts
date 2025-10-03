@@ -20,6 +20,7 @@ export interface Interaction {
   soundEffect?: string; // base64 data URL for interaction sound
   transitionType?: 'none' | 'fade' | 'wipe-down' | 'wipe-up' | 'wipe-left' | 'wipe-right';
   // --- Outcomes ---
+  addsToInventory?: boolean;
   consumesItem?: boolean; // if requiresInInventory is used, is it consumed?
   removesTargetFromScene?: boolean; // remove the target object from the scene
   goToScene?: string; // ID of the scene to move to

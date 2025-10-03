@@ -1,4 +1,5 @@
 
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -724,14 +725,14 @@ const initialScenes: { [id: string]: Scene } = {
     description: "Você desperta em uma <cela> úmida e apertada. O ar cheira a mofo. Uma <porta> trancada bloqueia a saída. No canto, um <balde> enferrujado. Um <tijolo> chama a atenção na parede.",
     image: "",
     objects: [
-      { id: "obj_balde", name: "balde", examineDescription: "Um balde usado como penico, fedendo fortemente, com ferrugem em toda sua superfície.", isTakable: false },
+      { id: "obj_balde", name: "balde", examineDescription: "Um balde usado como penico, fedendo fortemente, com ferrugem em toda sua superfície. Parece que tem algo dentro dele", isTakable: false },
       { id: "obj_tijolo", name: "tijolo", examineDescription: "Um dos tijolos da parede parece mal encaixado.", isTakable: false },
       { id: "obj_porta_ferro_c1", name: "porta", examineDescription: "Uma porta de ferro maciça e trancada.", isTakable: false }
     ],
     interactions: [
       {
         id: 'inter_1_1',
-        verbs: ['examinar', 'puxar', 'empurrar'],
+        verbs: ['examinar', 'puxar', 'empurrar', 'mover', 'retirar', 'tirar'],
         target: 'obj_tijolo',
         successMessage: 'Você força o tijolo e descobre um espaço vazio atrás dele. Algo brilha ali.',
         goToScene: 'cena_2'
@@ -745,10 +746,18 @@ const initialScenes: { [id: string]: Scene } = {
       },
       {
         id: 'inter_1_3',
-        verbs: ['olhar', 'mexer', 'revirar'],
+        verbs: ['mexer', 'revirar', 'chutar', 'pegar', 'levantar', 'mover'],
         target: 'obj_balde',
         successMessage: 'Com nojo, você mexe no balde. Algo se move na água suja.',
         goToScene: 'cena_4'
+      },
+      {
+        id: 'inter_1_4',
+        verbs: ['usar', 'abrir', 'destrancar', 'inserir', 'enfiar'],
+        target: 'obj_porta_ferro_c1',
+        requiresInInventory: 'obj_chave',
+        consumesItem: true,
+        goToScene: 'cena_5'
       }
     ]
   },
@@ -763,16 +772,8 @@ const initialScenes: { [id: string]: Scene } = {
     ],
     interactions: [
       {
-        id: 'inter_2_1',
-        verbs: ['pegar', 'coletar'],
-        target: 'obj_chave',
-        successMessage: 'Você pega a chave.',
-        removesTargetFromScene: true,
-        goToScene: 'cena_5'
-      },
-      {
         id: 'inter_2_2',
-        verbs: ['voltar', 'retornar'],
+        verbs: ['voltar', 'retornar', 'ir'],
         target: 'obj_cela_retorno',
         successMessage: 'Você se afasta do buraco na parede e volta para o centro da cela.',
         goToScene: 'cena_1'
@@ -922,7 +923,13 @@ const initializeGameData = (): GameData => {
         frameRoundedTopColor: '#FFFFFF',
         gameSceneNameOverlayBg: '#0d1117',
         gameSceneNameOverlayTextColor: '#c9d1d9',
-        fixedVerbs: [],
+        fixedVerbs: [
+            {
+                id: 'verb_help_1',
+                verbs: ['ajuda', 'me ajude'],
+                description: `Como Interagir com o mundo:\nA base de tudo é o campo de texto, e a maioria dos comandos segue um formato simples:\n\nAções diretas: Para interagir com algo na cena, use VERBO + ALVO.\nPor exemplo: pegar chave ou olhar porta.\n\nUsando itens do inventário: Para usar um item que você coletou em algo na cena, o formato é VERBO + ITEM + ALVO.\nPor exemplo: usar chave na porta.\nLembre-se: o item (como a chave) precisa estar no seu inventário para que a ação funcione.\nFique de olho nas palavras destacadas na descrição da cena, como <esta>. Elas indicam pontos de interesse importantes!\n\nAlguns verbos são universais e muito úteis:\n\nOLHAR ou EXAMINAR: Use para descobrir mais detalhes sobre o que está ao seu redor. Você pode usar em um objeto específico (olhar tijolo) ou no ambiente em geral (olhar ao redor).\n\PEGAR: Alguns objetos podem ser coletados e guardados no seu inventário para uso posterior. Se algo parecer útil e solto, tente pegá-lo!\n\nINVENTÁRIO: Para ver todos os itens que você carrega, clique no botão Inventário.\n\nVOLTAR: Se quiser retornar para a cena de onde acabou de vir, este comando pode funcionar.\n\nEstou Travado, e Agora?\nSeja criativo! Tente verbos diferentes para um mesmo objeto. empurrar, puxar, chutar, usar... a experimentação é a chave!\nBotão de Sugestões: Se estiver sem ideias, o botão Sugestões é seu melhor amigo. Ele pode te dar uma luz sobre as ações mais óbvias na cena atual.\n\nDiário: Esqueceu o que aconteceu ou um detalhe importante? O Diário guarda um registro de todas as cenas que você visitou e de suas ações. Use-o para relembrar pistas.`
+            }
+        ],
     };
 };
 
