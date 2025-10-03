@@ -2,16 +2,28 @@
 import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
-    // This robustly translates the editor's data format (using 'objects')
-    // to the game engine's format (using 'objetos').
-    const translatedCenas = Object.entries(data.scenes).reduce((acc, [sceneId, scene]) => {
-        const { objects, ...restOfScene } = scene;
-        acc[sceneId] = {
-            ...restOfScene,
-            objetos: objects || []
-        };
-        return acc;
-    }, {} as { [id: string]: any });
+    const translatedCenas: { [id: string]: any } = {};
+    for (const sceneId in data.scenes) {
+        // Ensure we are iterating over own properties
+        if (Object.prototype.hasOwnProperty.call(data.scenes, sceneId)) {
+            const scene = data.scenes[sceneId];
+            // Explicitly copy properties to avoid issues with rest/spread,
+            // ensuring the 'image' property is preserved for the diary.
+            translatedCenas[sceneId] = {
+                id: scene.id,
+                name: scene.name,
+                image: scene.image,
+                description: scene.description,
+                interactions: scene.interactions,
+                exits: scene.exits,
+                isEndingScene: scene.isEndingScene,
+                removesChanceOnEntry: scene.removesChanceOnEntry,
+                restoresChanceOnEntry: scene.restoresChanceOnEntry,
+                // Rename 'objects' to 'objetos' for the game engine.
+                objetos: scene.objects || []
+            };
+        }
+    }
 
     return {
         cena_inicial: data.startScene,
@@ -936,3 +948,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeGame();
 });
 `
+  </change>
+</changes>
