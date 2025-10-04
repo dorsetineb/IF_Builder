@@ -793,7 +793,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderDiary() {
         if (!diaryLogElement) return;
         diaryLogElement.innerHTML = '';
-        
+        let currentSceneEntryElement = null;
+
         currentState.diaryLog.forEach(entry => {
             if (entry.type === 'scene_load') {
                 const div = document.createElement('div');
@@ -804,22 +805,30 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                     <div class="text-container">
                         <span class="scene-name">\${entry.data.name}</span>
-                        <p>\${entry.data.description.replace(/\\n/g, '<br>')}</p>
+                        <p>\${entry.data.description.replace(/\\\\n/g, '<br>')}</p>
                     </div>
                 \`;
                 diaryLogElement.appendChild(div);
-            } else if (entry.type === 'action' && entry.data.command) {
-                const lastEntry = diaryLogElement.querySelector('.diary-entry:last-child .text-container');
-                if (lastEntry) {
-                    const p = document.createElement('p');
-                    p.className = 'verb-echo';
-                    p.innerHTML = \`
-                        <strong>\${gameData.nome_jogador_diario || 'VOCÊ'}:</strong> 
-                        "\${entry.data.command}"
-                        <br>
-                        <em>\${entry.data.response.replace(/\\n/g, '<br>')}</em>
-                    \`;
-                    lastEntry.appendChild(p);
+                currentSceneEntryElement = div.querySelector('.text-container');
+            } else if (entry.type === 'action') {
+                if (currentSceneEntryElement) {
+                    let actionHTML = '';
+                    if (entry.data.command) {
+                        actionHTML += \`<strong>\${gameData.nome_jogador_diario || 'VOCÊ'}:</strong> "\${entry.data.command}"\`;
+                    }
+                    if (entry.data.response) {
+                        if (entry.data.command) {
+                            actionHTML += '<br>';
+                        }
+                        actionHTML += \`<em>\${entry.data.response.replace(/\\\\n/g, '<br>')}</em>\`;
+                    }
+                    
+                    if (actionHTML.trim()) {
+                        const p = document.createElement('p');
+                        p.className = 'verb-echo';
+                        p.innerHTML = actionHTML;
+                        currentSceneEntryElement.appendChild(p);
+                    }
                 }
             }
         });

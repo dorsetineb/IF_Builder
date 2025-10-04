@@ -93,7 +93,6 @@ const gameHTML = `
             <div id="diary-log" class="diary-log"></div>
         </div>
     </div>
-    <script src="game.js"></script>
 </body>
 </html>
 `;
