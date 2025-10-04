@@ -335,15 +335,19 @@ document.addEventListener('DOMContentLoaded', () => {
         currentParagraphIndex = 0;
 
         if (!isStateLoad) {
-            currentState.diaryLog.push({
-                type: 'scene_load',
-                data: {
-                    id: scene.id,
-                    name: scene.name,
-                    image: scene.image,
-                    description: rawDescription,
-                }
-            });
+            const lastLogEntry = currentState.diaryLog[currentState.diaryLog.length - 1];
+            // Prevent duplicate scene logs when returning to a scene after losing a chance
+            if (!lastLogEntry || lastLogEntry.type !== 'scene_load' || lastLogEntry.data.id !== scene.id) {
+                currentState.diaryLog.push({
+                    type: 'scene_load',
+                    data: {
+                        id: scene.id,
+                        name: scene.name,
+                        image: scene.image,
+                        description: rawDescription,
+                    }
+                });
+            }
         }
         
         if (sceneImageElement && scene.image) {
@@ -793,50 +797,72 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderDiary() {
         if (!diaryLogElement) return;
         diaryLogElement.innerHTML = '';
-        let currentSceneEntryElement = null;
 
+        // Group actions by scene
+        const scenesVisited = {};
         currentState.diaryLog.forEach(entry => {
             if (entry.type === 'scene_load') {
-                const div = document.createElement('div');
-                div.className = 'diary-entry';
-                div.innerHTML = \`
-                    <div class="image-container">
-                        <img src="\${entry.data.image || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}" alt="\${entry.data.name}">
-                    </div>
-                    <div class="text-container">
-                        <span class="scene-name">\${entry.data.name}</span>
-                        <p>\${entry.data.description.replace(/\\\\n/g, '<br>')}</p>
-                    </div>
-                \`;
-                diaryLogElement.appendChild(div);
-                currentSceneEntryElement = div.querySelector('.text-container');
-            } else if (entry.type === 'action') {
-                if (currentSceneEntryElement) {
-                    let actionHTML = '';
-                    if (entry.data.command) {
-                        actionHTML += \`<strong>\${gameData.nome_jogador_diario || 'VOCÊ'}:</strong> "\${entry.data.command}"\`;
-                    }
-                    if (entry.data.response) {
-                        if (entry.data.command) {
-                            actionHTML += '<br>';
-                        }
-                        actionHTML += \`<em>\${entry.data.response.replace(/\\\\n/g, '<br>')}</em>\`;
-                    }
-                    
-                    if (actionHTML.trim()) {
-                        const p = document.createElement('p');
-                        p.className = 'verb-echo';
-                        p.innerHTML = actionHTML;
-                        currentSceneEntryElement.appendChild(p);
-                    }
-                }
+                scenesVisited[entry.data.id] = {
+                    ...entry.data,
+                    actions: []
+                };
+            } else if (entry.type === 'action' && entry.data.sceneId && scenesVisited[entry.data.sceneId]) {
+                scenesVisited[entry.data.sceneId].actions.push(entry.data);
             }
         });
+
+        Object.values(scenesVisited).forEach(scene => {
+            const div = document.createElement('div');
+            div.className = 'diary-entry';
+            
+            let textContainerHTML = \`
+                <span class="scene-name">\${scene.name}</span>
+                <p>\${scene.description.replace(/\\\\n/g, '<br>')}</p>
+            \`;
+
+            if (scene.actions.length > 0) {
+                scene.actions.forEach(action => {
+                    let actionHTML = '';
+                     if (action.command) {
+                        actionHTML += \`<strong>\${gameData.nome_jogador_diario || 'VOCÊ'}:</strong> "\${action.command}"\`;
+                    }
+                    if (action.response) {
+                        if (action.command) {
+                            actionHTML += '<br>';
+                        }
+                        actionHTML += \`<em>\${action.response.replace(/\\\\n/g, '<br>')}</em>\`;
+                    }
+                    if (actionHTML.trim()) {
+                        textContainerHTML += \`<p class="verb-echo">\${actionHTML}</p>\`;
+                    }
+                });
+            }
+
+            div.innerHTML = \`
+                <div class="image-container">
+                    <img src="\${scene.image || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}" alt="\${scene.name}">
+                </div>
+                <div class="text-container">
+                    \${textContainerHTML}
+                </div>
+            \`;
+            diaryLogElement.appendChild(div);
+        });
+
         diaryLogElement.scrollTop = diaryLogElement.scrollHeight;
     }
 
+
     // --- Initialization ---
     function initializeGame(startFresh = false) {
+        if (startFresh) {
+            try {
+                localStorage.removeItem(SAVE_KEY);
+            } catch (e) {
+                console.warn("Could not remove saved game state from localStorage:", e);
+            }
+        }
+
         gameData = window.embeddedGameData;
         if (!gameData) {
             console.error('Game data not found!');
@@ -922,6 +948,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (startButton) {
         startButton.addEventListener('click', () => {
+            initializeGame(true); // Force a fresh start
             if (splashScreen) splashScreen.classList.add('hidden');
             if(sceneNameOverlayElement) {
                 setTimeout(() => sceneNameOverlayElement.style.opacity = '1', 500);
