@@ -815,9 +815,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const div = document.createElement('div');
             div.className = 'diary-entry';
             
+            // Process highlights for the diary entry, making them visible but not interactive.
+            const processedDescription = scene.description
+                .replace(/\\*\\*(.*?)\\*\\*/g, '<span class="highlight-item">$1</span>') // Preserves bolding
+                .replace(/<(.*?)>/g, '<span class="highlight-word">$1</span>'); // Handles clickable words
+
             let textContainerHTML = \`
                 <span class="scene-name">\${scene.name}</span>
-                <p>\${scene.description.replace(/\\\\n/g, '<br>')}</p>
+                <p>\${processedDescription.replace(/\\n/g, '<br>')}</p>
             \`;
 
             if (scene.actions.length > 0) {
@@ -830,7 +835,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         if (action.command) {
                             actionHTML += '<br>';
                         }
-                        actionHTML += \`<em>\${action.response.replace(/\\\\n/g, '<br>')}</em>\`;
+                        actionHTML += \`<em>\${action.response.replace(/\\n/g, '<br>')}</em>\`;
                     }
                     if (actionHTML.trim()) {
                         textContainerHTML += \`<p class="verb-echo">\${actionHTML}</p>\`;

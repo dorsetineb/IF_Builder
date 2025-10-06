@@ -599,6 +599,14 @@ body.with-spacing .main-wrapper {
     color: var(--text-dim-color);
     font-style: italic;
 }
+.diary-entry .highlight-word {
+    cursor: default;
+}
+.diary-entry .highlight-word:hover {
+    filter: none;
+    text-decoration: none;
+}
+
 
 /* Transition Overlay */
 .transition-overlay {
