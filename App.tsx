@@ -1,8 +1,5 @@
 
 
-
-
-
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -936,14 +933,90 @@ const initializeGameData = (): GameData => {
     };
 };
 
+const createNewGameData = (): GameData => {
+    const newSceneId = 'scn_start';
+    const newScene: Scene = {
+        id: newSceneId,
+        name: "Cena Inicial",
+        description: "Esta é a sua primeira cena. Descreva o que o jogador vê.",
+        image: "",
+        objects: [],
+        interactions: []
+    };
+
+    // Return a fresh, default GameData object
+    return {
+        startScene: newSceneId,
+        scenes: { [newSceneId]: newScene },
+        sceneOrder: [newSceneId],
+        defaultFailureMessage: "Isso não parece ter nenhum efeito.",
+        gameHTML: gameHTML,
+        gameCSS: gameCSS,
+        gameTitle: "Meu Novo Jogo",
+        gameFontFamily: "'Silkscreen', sans-serif",
+        gameLogo: "",
+        gameSplashImage: "",
+        gameSplashContentAlignment: 'right',
+        gameSplashDescription: "A descrição da sua nova aventura vai aqui...",
+        gameTextColor: "#c9d1d9",
+        gameTitleColor: "#58a6ff",
+        gameOmitSplashTitle: false,
+        gameSplashButtonText: "INICIAR",
+        gameContinueButtonText: "CONTINUAR",
+        gameRestartButtonText: "REINICIAR",
+        gameSplashButtonColor: "#2ea043",
+        gameSplashButtonHoverColor: "#238636",
+        gameSplashButtonTextColor: "#ffffff",
+        gameLayoutOrientation: 'vertical',
+        gameLayoutOrder: 'image-first',
+        gameImageFrame: 'none',
+        gameActionButtonColor: '#ffffff',
+        gameActionButtonTextColor: '#0d1117',
+        gameActionButtonText: 'AÇÃO',
+        gameVerbInputPlaceholder: 'O QUE VOCÊ FAZ?',
+        gameDiaryPlayerName: 'VOCÊ',
+        gameFocusColor: '#58a6ff',
+        gameEnableChances: true,
+        gameMaxChances: 3,
+        gameChanceIcon: 'heart',
+        gameChanceIconColor: '#ff4d4d',
+        gameChanceReturnButtonText: "Tentar Novamente",
+        gameTheme: 'dark',
+        gameTextColorLight: '#24292f',
+        gameTitleColorLight: '#0969da',
+        gameFocusColorLight: '#0969da',
+        positiveEndingImage: "",
+        positiveEndingContentAlignment: 'right',
+        positiveEndingDescription: "Você venceu!",
+        negativeEndingImage: "",
+        negativeEndingContentAlignment: 'right',
+        negativeEndingDescription: "Fim de jogo.",
+        frameBookColor: '#FFFFFF',
+        frameTradingCardColor: '#FFFFFF',
+        frameChamferedColor: '#FFFFFF',
+        frameRoundedTopColor: '#FFFFFF',
+        gameSceneNameOverlayBg: '#0d1117',
+        gameSceneNameOverlayTextColor: '#c9d1d9',
+        fixedVerbs: [],
+    };
+};
+
 
 const App: React.FC = () => {
   const [gameData, setGameData] = useState<GameData>(() => initializeGameData());
-  const [selectedSceneId, setSelectedSceneId] = useState<string | null>(gameData.startScene);
+  const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<View>('scenes');
   const [isPreviewMode, setIsPreviewMode] = useState(false);
   const [gameDataForPreview, setGameDataForPreview] = useState<GameData | null>(null);
   const [isDirty, setIsDirty] = useState(false);
+
+  // If the selected scene ID is not set or doesn't exist in the current game data
+  // (e.g., after loading a new game), default to the start scene. This makes the
+  // state more resilient.
+  const effectiveSelectedSceneId = 
+    selectedSceneId && gameData.scenes[selectedSceneId]
+    ? selectedSceneId
+    : gameData.startScene;
 
   const confirmNavigation = useCallback((callback: () => void) => {
     // The confirmation prompt has been removed as per user request.
@@ -1135,7 +1208,7 @@ const App: React.FC = () => {
         
         // If the currently selected scene is the one being deleted,
         // select the start scene instead.
-        if (selectedSceneId === idToDelete) {
+        if (effectiveSelectedSceneId === idToDelete) {
             setSelectedSceneId(prev.startScene);
         }
         
@@ -1147,7 +1220,7 @@ const App: React.FC = () => {
     });
 
     setIsDirty(false);
-  }, [gameData.startScene, selectedSceneId]);
+  }, [gameData.startScene, effectiveSelectedSceneId]);
   
   const handleReorderScenes = useCallback((newOrder: string[]) => {
       setGameData(prev => {
@@ -1174,8 +1247,17 @@ const App: React.FC = () => {
     // Position changes are saved immediately and don't make the app "dirty"
   }, []);
 
+  const handleNewGame = useCallback(() => {
+    const newGameData = createNewGameData();
+    setGameData(newGameData);
+    setSelectedSceneId(newGameData.startScene);
+    setCurrentView('scenes');
+    setIsPreviewMode(false);
+    setIsDirty(false);
+  }, []);
+
   const scenesInOrder = gameData.sceneOrder.map(id => gameData.scenes[id]).filter(Boolean);
-  const selectedScene = selectedSceneId ? gameData.scenes[selectedSceneId] : null;
+  const selectedScene = effectiveSelectedSceneId ? gameData.scenes[effectiveSelectedSceneId] : null;
 
   const allObjectIds = useMemo(() => {
     // FIX: Add type annotation to handle potentially malformed scene data from imports.
@@ -1297,13 +1379,14 @@ const App: React.FC = () => {
           <Sidebar
             scenes={scenesInOrder}
             startSceneId={gameData.startScene}
-            selectedSceneId={selectedSceneId}
+            selectedSceneId={effectiveSelectedSceneId}
             currentView={currentView}
             onSelectScene={handleSelectSceneAndSwitchView}
             onAddScene={handleAddScene}
             onDeleteScene={handleDeleteScene}
             onReorderScenes={handleReorderScenes}
             onSetView={handleSetView}
+            onNewGame={handleNewGame}
           />
           <main className="flex-1 p-6 overflow-y-auto">
             {renderCurrentView()}
