@@ -1,5 +1,8 @@
 
 
+
+
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -221,6 +224,7 @@ body.with-spacing .main-wrapper {
     margin-top: 10px;
     color: var(--text-color);
     max-width: 60ch;
+    white-space: pre-wrap;
 }
 .splash-buttons {
     display: flex;
@@ -720,8 +724,8 @@ body.font-adjust-gothic {
 const initialScenes: { [id: string]: Scene } = {
   "cena_1": {
     id: "cena_1",
-    name: "Cela Escura",
-    description: "Você desperta em uma <cela> úmida e apertada. O ar cheira a mofo. Uma <porta> trancada bloqueia a saída. No canto, um <balde> enferrujado. Um <tijolo> chama a atenção na parede.",
+    name: "CELA ESCURA",
+    description: "Você desperta em uma <cela> úmida e apertada. O ar cheira a mofo.\nUma <porta> trancada bloqueia a saída. No canto, um <balde> enferrujado. \nUm <tijolo> chama a atenção na parede.",
     image: "",
     objects: [
       { id: "obj_balde", name: "balde", examineDescription: "Um balde usado como penico, fedendo fortemente, com ferrugem em toda sua superfície. Parece que tem algo dentro dele", isTakable: false },
@@ -762,8 +766,8 @@ const initialScenes: { [id: string]: Scene } = {
   },
   "cena_2": {
     id: "cena_2",
-    name: "Atrás do tijolo",
-    description: "Atrás do tijolo, você encontra uma <chave>, coberta de ferrugem. Você pode voltar para a <cela> a qualquer momento.",
+    name: "ATRÁS DO TIJOLO",
+    description: "Atrás do tijolo, você encontra uma <chave> enferrujada. \nVocê pode voltar para a <cela> a qualquer momento.",
     image: "",
     objects: [
       { id: "obj_chave", name: "chave", examineDescription: "Uma chave pesada, coberta de ferrugem.", isTakable: true },
@@ -781,8 +785,8 @@ const initialScenes: { [id: string]: Scene } = {
   },
   "cena_3": {
     id: "cena_3",
-    name: "Machucado pela porta!",
-    description: "Você chuta a porta com força. Ela range, mas algo estala dentro do seu pé. A dor é insuportável. O esforço foi em vão. Seu pé está destruído e você cai inconsciente. O mundo escurece lentamente.",
+    name: "MACHUCADO PELA PORTA!",
+    description: "CLANK!\nVocê chuta a porta com força. \nEla range, mas algo estala dentro do seu pé. A dor é insuportável.",
     image: "",
     objects: [],
     interactions: [],
@@ -790,8 +794,8 @@ const initialScenes: { [id: string]: Scene } = {
   },
   "cena_4": {
     id: "cena_4",
-    name: "Um rato ataca!",
-    description: "Algo se agita dentro do balde. Um rato salta e crava os dentes na sua mão. O rato infectado destroça sua mão e você cai em choque, sem forças para resistir.",
+    name: "UM RATO ATACA!",
+    description: "Algo se agita dentro do balde.\nSQUEEK!\nUm rato ataca e crava os dentes na sua mão.",
     image: "",
     objects: [],
     interactions: [],
@@ -799,8 +803,8 @@ const initialScenes: { [id: string]: Scene } = {
   },
   "cena_5": {
     id: "cena_5",
-    name: "Fuga da cela",
-    description: "A porta range quando você gira a chave na fechadura. O caminho para a liberdade se abre diante de você. Você sai da cela e sente o vento fresco da noite. O corredor diante de você leva para o desconhecido, mas está livre.",
+    name: "FUGA DA CELA",
+    description: "A porta range quando você gira a chave na fechadura. \nVocê sai da cela e sente o vento fresco da noite.",
     image: "",
     objects: [],
     interactions: [],
@@ -882,13 +886,13 @@ const initializeGameData = (): GameData => {
         gameLogo: "", // base64 string
         gameSplashImage: "", // base64 string
         gameSplashContentAlignment: 'right',
-        gameSplashDescription: "Uma breve descrição da sua aventura começa aqui. O que o jogador deve saber antes de iniciar?",
+        gameSplashDescription: "Você acorda em uma cela escura... Escreva para fugir da cela!\n\n(digite AJUDA para acessar o tutorial)",
         gameTextColor: "#c9d1d9",
         gameTitleColor: "#58a6ff",
         gameOmitSplashTitle: false,
-        gameSplashButtonText: "INICIAR AVENTURA",
-        gameContinueButtonText: "Continuar Aventura",
-        gameRestartButtonText: "Reiniciar Aventura",
+        gameSplashButtonText: "COMEÇAR",
+        gameContinueButtonText: "CONTINUAR",
+        gameRestartButtonText: "RECOMEÇAR",
         gameSplashButtonColor: "#2ea043",
         gameSplashButtonHoverColor: "#238636",
         gameSplashButtonTextColor: "#ffffff",
@@ -912,10 +916,10 @@ const initializeGameData = (): GameData => {
         gameFocusColorLight: '#0969da',
         positiveEndingImage: "",
         positiveEndingContentAlignment: 'right',
-        positiveEndingDescription: "Parabéns! Você concluiu a aventura com sucesso.",
+        positiveEndingDescription: "Você conseguiu fugir da masmorra!",
         negativeEndingImage: "",
         negativeEndingContentAlignment: 'right',
-        negativeEndingDescription: "Fim de jogo. Suas chances acabaram. Tente novamente!",
+        negativeEndingDescription: "Você morreu...",
         frameBookColor: '#FFFFFF',
         frameTradingCardColor: '#FFFFFF',
         frameChamferedColor: '#FFFFFF',
