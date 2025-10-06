@@ -772,11 +772,12 @@ const initialScenes: { [id: string]: Scene } = {
   "cena_2": {
     id: "cena_2",
     name: "ATRÁS DO TIJOLO",
-    description: "Atrás do tijolo, você encontra uma <chave> enferrujada. \nVocê pode voltar para a <cela> a qualquer momento.",
+    description: "Atrás do tijolo, você encontra uma <chave> enferrujada. A <porta> da cela também está aqui.\nVocê pode voltar para a <cela> a qualquer momento.",
     image: "",
     objects: [
       { id: "obj_chave", name: "chave", examineDescription: "Uma chave pesada, coberta de ferrugem.", isTakable: true },
-      { id: "obj_cela_retorno", name: "cela", examineDescription: "É a cela de onde você acabou de vir.", isTakable: false }
+      { id: "obj_cela_retorno", name: "cela", examineDescription: "É a cela de onde você acabou de vir.", isTakable: false },
+      { id: "obj_porta_ferro_c2", name: "porta", examineDescription: "Uma porta de ferro maciça e trancada.", isTakable: false }
     ],
     interactions: [
       {
@@ -785,6 +786,14 @@ const initialScenes: { [id: string]: Scene } = {
         target: 'obj_cela_retorno',
         successMessage: 'Você se afasta do buraco na parede e volta para o centro da cela.',
         goToScene: 'cena_1'
+      },
+      {
+        id: 'inter_2_1',
+        verbs: ['usar', 'abrir', 'destrancar', 'inserir', 'enfiar'],
+        target: 'obj_porta_ferro_c2',
+        requiresInInventory: 'obj_chave',
+        consumesItem: true,
+        goToScene: 'cena_5'
       }
     ]
   },
