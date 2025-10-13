@@ -340,6 +340,52 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                       <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Positivo</h3>
                       <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador alcança uma cena marcada como "final".</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                          <div className="space-y-6">
+                              <div className="space-y-4">
+                                  <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
+                                  <div className="flex items-start gap-4">
+                                      {localPositiveEndingImage && <img src={localPositiveEndingImage} alt="Fundo do final positivo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />}
+                                      <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                          <UploadIcon className="w-5 h-5 mr-2" /> 
+                                          {positiveEndingImage ? 'Alterar Imagem' : 'Carregar Imagem'}
+                                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
+                                      </label>
+                                  </div>
+                                  <div className="pt-2">
+                                      <label htmlFor="positiveEndingContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento Horizontal</label>
+                                      <select
+                                          id="positiveEndingContentAlignment"
+                                          value={localPositiveEndingContentAlignment}
+                                          onChange={(e) => setLocalPositiveEndingContentAlignment(e.target.value as 'left' | 'right')}
+                                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                      >
+                                          <option value="right">Direita</option>
+                                          <option value="left">Esquerda</option>
+                                      </select>
+                                  </div>
+                              </div>
+                              <div className="space-y-2">
+                                  <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
+                                  <div
+                                    className="relative w-full aspect-video bg-indigo-500/30 border border-indigo-400 rounded-md flex"
+                                    style={{
+                                        justifyContent: localPositiveEndingContentAlignment === 'left' ? 'flex-start' : 'flex-end',
+                                        alignItems: 'flex-end'
+                                    }}
+                                    title="Área da Imagem de Fundo"
+                                >
+                                    <div className="absolute top-2 left-2 text-indigo-200 font-semibold text-sm">
+                                        Imagem de Fundo
+                                    </div>
+                                    <div
+                                        className="w-2/3 h-1/2 m-4 bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold"
+                                        title="Área de Texto"
+                                    >
+                                        Texto de Fim de Jogo
+                                    </div>
+                                </div>
+                              </div>
+                          </div>
                           <div className="space-y-2 flex flex-col">
                               <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Vitória</h4>
                               <textarea
@@ -351,32 +397,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                                   placeholder="Parabéns! Você venceu."
                               />
                           </div>
-                          <div className="space-y-6">
-                              <div className="space-y-2">
-                                  <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
-                                  <label htmlFor="positiveEndingContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento Horizontal</label>
-                                  <select
-                                      id="positiveEndingContentAlignment"
-                                      value={localPositiveEndingContentAlignment}
-                                      onChange={(e) => setLocalPositiveEndingContentAlignment(e.target.value as 'left' | 'right')}
-                                      className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                  >
-                                      <option value="right">Direita</option>
-                                      <option value="left">Esquerda</option>
-                                  </select>
-                              </div>
-                              <div className="space-y-2">
-                                  <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
-                                  <div className="flex items-start gap-4">
-                                      {localPositiveEndingImage && <img src={localPositiveEndingImage} alt="Fundo do final positivo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />}
-                                      <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
-                                          <UploadIcon className="w-5 h-5 mr-2" /> 
-                                          {positiveEndingImage ? 'Alterar Imagem' : 'Carregar Imagem'}
-                                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
-                                      </label>
-                                  </div>
-                              </div>
-                          </div>
                       </div>
                   </div>
 
@@ -385,32 +405,8 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                       <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Negativo</h3>
                       <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador fica sem chances (vidas).</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                          <div className="space-y-2 flex flex-col">
-                              <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Derrota</h4>
-                              <textarea
-                                  id="negativeEndingDescription"
-                                  value={localNegativeEndingDescription}
-                                  onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
-                                  rows={4}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
-                                  placeholder="Fim de jogo."
-                              />
-                          </div>
-                           <div className="space-y-6">
-                              <div className="space-y-2">
-                                  <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
-                                  <label htmlFor="negativeEndingContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento Horizontal</label>
-                                  <select
-                                      id="negativeEndingContentAlignment"
-                                      value={localNegativeEndingContentAlignment}
-                                      onChange={(e) => setLocalNegativeEndingContentAlignment(e.target.value as 'left' | 'right')}
-                                      className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                  >
-                                      <option value="right">Direita</option>
-                                      <option value="left">Esquerda</option>
-                                  </select>
-                              </div>
-                              <div className="space-y-2">
+                          <div className="space-y-6">
+                              <div className="space-y-4">
                                   <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
                                   <div className="flex items-start gap-4">
                                       {localNegativeEndingImage && <img src={localNegativeEndingImage} alt="Fundo do final negativo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />}
@@ -420,7 +416,51 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                                           <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
                                       </label>
                                   </div>
+                                  <div className="pt-2">
+                                      <label htmlFor="negativeEndingContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento Horizontal</label>
+                                      <select
+                                          id="negativeEndingContentAlignment"
+                                          value={localNegativeEndingContentAlignment}
+                                          onChange={(e) => setLocalNegativeEndingContentAlignment(e.target.value as 'left' | 'right')}
+                                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                      >
+                                          <option value="right">Direita</option>
+                                          <option value="left">Esquerda</option>
+                                      </select>
+                                  </div>
                               </div>
+                              <div className="space-y-2">
+                                  <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
+                                   <div
+                                    className="relative w-full aspect-video bg-indigo-500/30 border border-indigo-400 rounded-md flex"
+                                    style={{
+                                        justifyContent: localNegativeEndingContentAlignment === 'left' ? 'flex-start' : 'flex-end',
+                                        alignItems: 'flex-end'
+                                    }}
+                                    title="Área da Imagem de Fundo"
+                                >
+                                    <div className="absolute top-2 left-2 text-indigo-200 font-semibold text-sm">
+                                        Imagem de Fundo
+                                    </div>
+                                    <div
+                                        className="w-2/3 h-1/2 m-4 bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold"
+                                        title="Área de Texto"
+                                    >
+                                        Texto de Fim de Jogo
+                                    </div>
+                                </div>
+                              </div>
+                          </div>
+                           <div className="space-y-2 flex flex-col">
+                              <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Derrota</h4>
+                              <textarea
+                                  id="negativeEndingDescription"
+                                  value={localNegativeEndingDescription}
+                                  onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
+                                  rows={4}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
+                                  placeholder="Fim de jogo."
+                              />
                           </div>
                       </div>
                   </div>
