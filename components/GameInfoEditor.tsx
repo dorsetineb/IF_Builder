@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { GameData, FixedVerb } from '../types';
 import { UploadIcon } from './icons/UploadIcon';
@@ -236,17 +235,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
           {activeTab === 'abertura' && (
               <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                      <div className="space-y-2 flex flex-col">
-                          <h4 className="text-lg font-semibold text-brand-text mb-2">Descrição do Jogo</h4>
-                          <textarea
-                            id="splashDescription"
-                            value={localSplashDescription}
-                            onChange={(e) => setLocalSplashDescription(e.target.value)}
-                            rows={8}
-                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
-                            placeholder="Uma breve descrição da sua aventura..."
-                          />
-                      </div>
                       <div className="space-y-6">
                            <div className="space-y-2">
                               <h4 className="text-lg font-semibold text-brand-text mb-2">Título do Jogo</h4>
@@ -281,10 +269,44 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                               </div>
                           </div>
                       </div>
+                      <div className="space-y-2 flex flex-col">
+                          <h4 className="text-lg font-semibold text-brand-text mb-2">Descrição do Jogo</h4>
+                          <textarea
+                            id="splashDescription"
+                            value={localSplashDescription}
+                            onChange={(e) => setLocalSplashDescription(e.target.value)}
+                            rows={8}
+                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
+                            placeholder="Uma breve descrição da sua aventura..."
+                          />
+                      </div>
                   </div>
 
                   <div className="pt-6 border-t border-brand-border/50">
                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div className="space-y-4">
+                            <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
+                            <div className="flex items-start gap-4">
+                                {localSplashImage && <img src={localSplashImage} alt="Fundo da tela de abertura" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />}
+                                <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                    <UploadIcon className="w-5 h-5 mr-2" /> 
+                                    {splashImage ? 'Alterar Imagem' : 'Carregar Imagem'}
+                                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
+                                </label>
+                            </div>
+                            <div className="pt-2">
+                                <label htmlFor="splashContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento horizontal</label>
+                                <select
+                                    id="splashContentAlignment"
+                                    value={localSplashContentAlignment}
+                                    onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                >
+                                    <option value="right">Direita</option>
+                                    <option value="left">Esquerda</option>
+                                </select>
+                            </div>
+                        </div>
                         <div className="space-y-2">
                           <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
                            <div
@@ -304,29 +326,6 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                               >
                                   Texto de Abertura
                               </div>
-                          </div>
-                           <div className="pt-2">
-                              <label htmlFor="splashContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento Horizontal</label>
-                              <select
-                                  id="splashContentAlignment"
-                                  value={localSplashContentAlignment}
-                                  onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                              >
-                                  <option value="right">Direita</option>
-                                  <option value="left">Esquerda</option>
-                              </select>
-                          </div>
-                        </div>
-                         <div className="space-y-2">
-                          <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
-                          <div className="flex items-start gap-4">
-                              {localSplashImage && <img src={localSplashImage} alt="Fundo da tela de abertura" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />}
-                              <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
-                                  <UploadIcon className="w-5 h-5 mr-2" /> 
-                                  {splashImage ? 'Alterar Imagem' : 'Carregar Imagem'}
-                                  <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
-                              </label>
                           </div>
                         </div>
                      </div>
