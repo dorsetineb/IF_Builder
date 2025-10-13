@@ -57,6 +57,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             
         let finalCss = gameData.gameCSS
             .replace(/__FONT_FAMILY__/g, fontFamily)
+            .replace(/__GAME_FONT_SIZE__/g, gameData.gameFontSize || '1em')
             .replace(/__GAME_TEXT_COLOR__/g, gameData.gameTextColor || '#c9d1d9')
             .replace(/__GAME_TITLE_COLOR__/g, gameData.gameTitleColor || '#58a6ff')
             .replace(/__GAME_FOCUS_COLOR__/g, gameData.gameFocusColor || '#58a6ff')

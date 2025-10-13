@@ -1,9 +1,4 @@
 
-
-
-
-
-
 export interface GameObject {
   id: string;
   name: string;
@@ -69,6 +64,7 @@ export interface GameData {
   gameCSS: string;
   gameTitle?: string;
   gameFontFamily?: string;
+  gameFontSize?: string;
   gameLogo?: string; // base64 string
   gameSplashImage?: string; // base64 string
   gameTextColor?: string;

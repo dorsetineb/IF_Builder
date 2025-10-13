@@ -1,5 +1,4 @@
 
-
 // FIX: Corrected React import to properly include 'useRef'. The previous syntax 'import React, a from ...' was invalid.
 import React, { useRef } from 'react';
 import { GameData } from '../types';
@@ -240,6 +239,7 @@ const Header: React.FC<{
 
     const css = finalCss
         .replace(/__FONT_FAMILY__/g, fontFamily)
+        .replace(/__GAME_FONT_SIZE__/g, exportData.gameFontSize || '1em')
         .replace(/__GAME_TEXT_COLOR__/g, exportData.gameTextColor || '#c9d1d9')
         .replace(/__GAME_TITLE_COLOR__/g, exportData.gameTitleColor || '#58a6ff')
         .replace(/__GAME_FOCUS_COLOR__/g, exportData.gameFocusColor || '#58a6ff')

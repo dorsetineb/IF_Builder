@@ -1,5 +1,4 @@
 
-
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -136,6 +135,7 @@ body.light-theme {
 
 :root {
     --font-family: __FONT_FAMILY__;
+    --font-size: __GAME_FONT_SIZE__;
     --splash-button-bg: __SPLASH_BUTTON_COLOR__;
     --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__;
     --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__;
@@ -153,6 +153,7 @@ body.light-theme {
 * { box-sizing: border-box; }
 body {
     font-family: var(--font-family);
+    font-size: var(--font-size);
     background-color: var(--bg-color);
     color: var(--text-color);
     margin: 0;
@@ -897,6 +898,7 @@ const initializeGameData = (): GameData => {
         gameCSS: gameCSS,
         gameTitle: "Fuja da Masmorra",
         gameFontFamily: "'Silkscreen', sans-serif",
+        gameFontSize: "1em",
         gameLogo: "", // base64 string
         gameSplashImage: "", // base64 string
         gameSplashContentAlignment: 'right',
@@ -971,6 +973,7 @@ const createNewGameData = (): GameData => {
         gameCSS: gameCSS,
         gameTitle: "Meu Novo Jogo",
         gameFontFamily: "'Silkscreen', sans-serif",
+        gameFontSize: "1em",
         gameLogo: "",
         gameSplashImage: "",
         gameSplashContentAlignment: 'right',
@@ -1327,6 +1330,7 @@ const App: React.FC = () => {
             focusColor={gameData.gameFocusColor || '#58a6ff'}
             chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
             gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
+            gameFontSize={gameData.gameFontSize || '1em'}
             chanceIcon={gameData.gameChanceIcon || 'heart'}
             chanceReturnButtonText={gameData.gameChanceReturnButtonText || ''}
             gameTheme={gameData.gameTheme || 'dark'}
