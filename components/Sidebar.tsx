@@ -1,4 +1,3 @@
-
 import React from 'react';
 import SceneList from './SceneList';
 import { Scene, View } from '../types';
@@ -43,10 +42,8 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           <CodeIcon className="w-5 h-5 mr-3" />
           <span className="font-semibold">Interface</span>
         </button>
-        <button className={getButtonClass('global_objects')} onClick={() => onSetView('global_objects')}>
-            <ArchiveBoxIcon className="w-5 h-5 mr-3" />
-            <span className="font-semibold">Painel de Objetos</span>
-        </button>
+
+        <div className="my-2 border-t border-brand-border/50"></div>
       
         {/* Scene Editor Section */}
         <div>
@@ -67,6 +64,13 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         <button className={getButtonClass('map')} onClick={() => onSetView('map')}>
             <MapIcon className="w-5 h-5 mr-3" />
             <span className="font-semibold">Mapa de Cenas</span>
+        </button>
+
+        <div className="my-2 border-t border-brand-border/50"></div>
+
+        <button className={getButtonClass('global_objects')} onClick={() => onSetView('global_objects')}>
+            <ArchiveBoxIcon className="w-5 h-5 mr-3" />
+            <span className="font-semibold">Painel de Objetos</span>
         </button>
       </nav>
       <div className="flex-shrink-0 mt-4 pt-4 border-t border-brand-border">
