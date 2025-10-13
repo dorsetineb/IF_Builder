@@ -729,7 +729,7 @@ body.font-adjust-gothic {
 const initialScenes: { [id: string]: Scene } = {
   "cena_1": {
     id: "cena_1",
-    name: "CELA ESCURA",
+    name: "Cela escura",
     description: "Você desperta em uma <cela> úmida e apertada. O ar cheira a mofo.\nUma <porta> trancada bloqueia a saída. No canto, um <balde> enferrujado. \nUm <tijolo> chama a atenção na parede.",
     image: "",
     objects: [
@@ -771,7 +771,7 @@ const initialScenes: { [id: string]: Scene } = {
   },
   "cena_2": {
     id: "cena_2",
-    name: "ATRÁS DO TIJOLO",
+    name: "Atrás do tijolo",
     description: "Atrás do tijolo, você encontra uma <chave> enferrujada. A <porta> da cela também está aqui.\nVocê pode voltar para a <cela> a qualquer momento.",
     image: "",
     objects: [
@@ -799,7 +799,7 @@ const initialScenes: { [id: string]: Scene } = {
   },
   "cena_3": {
     id: "cena_3",
-    name: "MACHUCADO PELA PORTA!",
+    name: "Machucado pela porta!",
     description: "CLANK!\nVocê chuta a porta com força. \nEla range, mas algo estala dentro do seu pé. A dor é insuportável.",
     image: "",
     objects: [],
@@ -808,7 +808,7 @@ const initialScenes: { [id: string]: Scene } = {
   },
   "cena_4": {
     id: "cena_4",
-    name: "UM RATO ATACA!",
+    name: "Um rato ataca!",
     description: "Algo se agita dentro do balde.\nSQUEEK!\nUm rato ataca e crava os dentes na sua mão.",
     image: "",
     objects: [],
@@ -817,7 +817,7 @@ const initialScenes: { [id: string]: Scene } = {
   },
   "cena_5": {
     id: "cena_5",
-    name: "FUGA DA CELA",
+    name: "Fuga da cela",
     description: "A porta range quando você gira a chave na fechadura. \nVocê sai da cela e sente o vento fresco da noite.",
     image: "",
     objects: [],
