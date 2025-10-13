@@ -103,10 +103,8 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
     const [localSplashContentAlignment, setLocalSplashContentAlignment] = useState(splashContentAlignment);
     const [localSplashDescription, setLocalSplashDescription] = useState(splashDescription);
     const [localPositiveEndingImage, setLocalPositiveEndingImage] = useState(positiveEndingImage);
-    const [localPositiveEndingContentAlignment, setLocalPositiveEndingContentAlignment] = useState(positiveEndingContentAlignment);
     const [localPositiveEndingDescription, setLocalPositiveEndingDescription] = useState(positiveEndingDescription);
     const [localNegativeEndingImage, setLocalNegativeEndingImage] = useState(negativeEndingImage);
-    const [localNegativeEndingContentAlignment, setLocalNegativeEndingContentAlignment] = useState(negativeEndingContentAlignment);
     const [localNegativeEndingDescription, setLocalNegativeEndingDescription] = useState(negativeEndingDescription);
     const [localFixedVerbs, setLocalFixedVerbs] = useState(fixedVerbs);
     const [activeTab, setActiveTab] = useState('abertura');
@@ -119,14 +117,14 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                          localSplashContentAlignment !== splashContentAlignment ||
                          localSplashDescription !== splashDescription ||
                          localPositiveEndingImage !== positiveEndingImage ||
-                         localPositiveEndingContentAlignment !== positiveEndingContentAlignment ||
+                         positiveEndingContentAlignment !== splashContentAlignment ||
                          localPositiveEndingDescription !== positiveEndingDescription ||
                          localNegativeEndingImage !== negativeEndingImage ||
-                         localNegativeEndingContentAlignment !== negativeEndingContentAlignment ||
+                         negativeEndingContentAlignment !== splashContentAlignment ||
                          localNegativeEndingDescription !== negativeEndingDescription ||
                          JSON.stringify(localFixedVerbs) !== JSON.stringify(fixedVerbs);
         onSetDirty(hasChanged);
-    }, [localTitle, localLogo, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, localPositiveEndingImage, localPositiveEndingContentAlignment, localPositiveEndingDescription, localNegativeEndingImage, localNegativeEndingContentAlignment, localNegativeEndingDescription, localFixedVerbs, props, onSetDirty]);
+    }, [localTitle, localLogo, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, localPositiveEndingImage, localPositiveEndingDescription, localNegativeEndingImage, localNegativeEndingDescription, localFixedVerbs, props, onSetDirty]);
 
     const handleSave = () => {
         if (localTitle !== title) onUpdate('gameTitle', localTitle);
@@ -136,10 +134,8 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         if (localSplashContentAlignment !== splashContentAlignment) onUpdate('gameSplashContentAlignment', localSplashContentAlignment);
         if (localSplashDescription !== splashDescription) onUpdate('gameSplashDescription', localSplashDescription);
         if (localPositiveEndingImage !== positiveEndingImage) onUpdate('positiveEndingImage', localPositiveEndingImage);
-        if (localPositiveEndingContentAlignment !== positiveEndingContentAlignment) onUpdate('positiveEndingContentAlignment', localPositiveEndingContentAlignment);
         if (localPositiveEndingDescription !== positiveEndingDescription) onUpdate('positiveEndingDescription', localPositiveEndingDescription);
         if (localNegativeEndingImage !== negativeEndingImage) onUpdate('negativeEndingImage', localNegativeEndingImage);
-        if (localNegativeEndingContentAlignment !== negativeEndingContentAlignment) onUpdate('negativeEndingContentAlignment', localNegativeEndingContentAlignment);
         if (localNegativeEndingDescription !== negativeEndingDescription) onUpdate('negativeEndingDescription', localNegativeEndingDescription);
         if (JSON.stringify(localFixedVerbs) !== JSON.stringify(fixedVerbs)) onUpdate('fixedVerbs', localFixedVerbs);
     };
@@ -152,10 +148,8 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
         setLocalSplashContentAlignment(splashContentAlignment);
         setLocalSplashDescription(splashDescription);
         setLocalPositiveEndingImage(positiveEndingImage);
-        setLocalPositiveEndingContentAlignment(positiveEndingContentAlignment);
         setLocalPositiveEndingDescription(positiveEndingDescription);
         setLocalNegativeEndingImage(negativeEndingImage);
-        setLocalNegativeEndingContentAlignment(negativeEndingContentAlignment);
         setLocalNegativeEndingDescription(negativeEndingDescription);
         setLocalFixedVerbs(fixedVerbs);
     };
@@ -169,6 +163,9 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
               }
           };
           reader.readAsDataURL(e.target.files[0]);
+      }
+      if (e.target) {
+        (e.target as HTMLInputElement).value = '';
       }
     };
     
@@ -259,13 +256,26 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                           </div>
                           <div className="space-y-2">
                               <h4 className="text-lg font-semibold text-brand-text mb-2">Logotipo do Jogo (Opcional)</h4>
-                              <div className="flex items-center gap-4">
-                                  {localLogo && <img src={localLogo} alt="Pré-visualização do logo" className="h-16 w-auto bg-brand-bg p-1 border border-brand-border rounded" />}
-                                  <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
-                                      <UploadIcon className="w-5 h-5 mr-2" /> 
-                                      {logo ? 'Alterar Logo' : 'Carregar Logo'}
-                                      <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalLogo)} className="hidden" />
-                                  </label>
+                              <div className="flex items-start gap-4">
+                                  {localLogo && (
+                                      <img src={localLogo} alt="Pré-visualização do logo" className="h-16 w-auto bg-brand-bg p-1 border border-brand-border rounded" />
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                      <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                          <UploadIcon className="w-5 h-5 mr-2" />
+                                          {logo ? 'Alterar Logo' : 'Carregar Logo'}
+                                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalLogo)} className="hidden" />
+                                      </label>
+                                      {localLogo && (
+                                          <button
+                                              onClick={() => setLocalLogo('')}
+                                              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                              title="Remover logo"
+                                          >
+                                              <TrashIcon className="w-5 h-5" />
+                                          </button>
+                                      )}
+                                  </div>
                               </div>
                           </div>
                       </div>
@@ -287,12 +297,25 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                         <div className="space-y-4">
                             <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
                             <div className="flex items-start gap-4">
-                                {localSplashImage && <img src={localSplashImage} alt="Fundo da tela de abertura" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />}
-                                <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
-                                    <UploadIcon className="w-5 h-5 mr-2" /> 
-                                    {splashImage ? 'Alterar Imagem' : 'Carregar Imagem'}
-                                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
-                                </label>
+                                {localSplashImage && (
+                                    <img src={localSplashImage} alt="Fundo da tela de abertura" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />
+                                )}
+                                <div className="flex items-center gap-2">
+                                    <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                        <UploadIcon className="w-5 h-5 mr-2" />
+                                        {splashImage ? 'Alterar Imagem' : 'Carregar Imagem'}
+                                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
+                                    </label>
+                                    {localSplashImage && (
+                                        <button
+                                            onClick={() => setLocalSplashImage('')}
+                                            className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                            title="Remover imagem"
+                                        >
+                                            <TrashIcon className="w-5 h-5" />
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                             <div className="pt-2">
                                 <label htmlFor="splashContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento horizontal</label>
@@ -340,50 +363,28 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                       <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Positivo</h3>
                       <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador alcança uma cena marcada como "final".</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                          <div className="space-y-6">
-                              <div className="space-y-4">
-                                  <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
-                                  <div className="flex items-start gap-4">
-                                      {localPositiveEndingImage && <img src={localPositiveEndingImage} alt="Fundo do final positivo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />}
+                          <div className="space-y-4">
+                              <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
+                              <div className="flex items-start gap-4">
+                                  {localPositiveEndingImage && (
+                                      <img src={localPositiveEndingImage} alt="Fundo do final positivo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />
+                                  )}
+                                  <div className="flex items-center gap-2">
                                       <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
-                                          <UploadIcon className="w-5 h-5 mr-2" /> 
+                                          <UploadIcon className="w-5 h-5 mr-2" />
                                           {positiveEndingImage ? 'Alterar Imagem' : 'Carregar Imagem'}
                                           <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
                                       </label>
+                                      {localPositiveEndingImage && (
+                                          <button
+                                              onClick={() => setLocalPositiveEndingImage('')}
+                                              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                              title="Remover imagem"
+                                          >
+                                              <TrashIcon className="w-5 h-5" />
+                                          </button>
+                                      )}
                                   </div>
-                                  <div className="pt-2">
-                                      <label htmlFor="positiveEndingContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento Horizontal</label>
-                                      <select
-                                          id="positiveEndingContentAlignment"
-                                          value={localPositiveEndingContentAlignment}
-                                          onChange={(e) => setLocalPositiveEndingContentAlignment(e.target.value as 'left' | 'right')}
-                                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                      >
-                                          <option value="right">Direita</option>
-                                          <option value="left">Esquerda</option>
-                                      </select>
-                                  </div>
-                              </div>
-                              <div className="space-y-2">
-                                  <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
-                                  <div
-                                    className="relative w-full aspect-video bg-indigo-500/30 border border-indigo-400 rounded-md flex"
-                                    style={{
-                                        justifyContent: localPositiveEndingContentAlignment === 'left' ? 'flex-start' : 'flex-end',
-                                        alignItems: 'flex-end'
-                                    }}
-                                    title="Área da Imagem de Fundo"
-                                >
-                                    <div className="absolute top-2 left-2 text-indigo-200 font-semibold text-sm">
-                                        Imagem de Fundo
-                                    </div>
-                                    <div
-                                        className="w-2/3 h-1/2 m-4 bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold"
-                                        title="Área de Texto"
-                                    >
-                                        Texto de Fim de Jogo
-                                    </div>
-                                </div>
                               </div>
                           </div>
                           <div className="space-y-2 flex flex-col">
@@ -405,50 +406,28 @@ const GameInfoEditor: React.FC<GameInfoEditorProps> = (props) => {
                       <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Negativo</h3>
                       <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador fica sem chances (vidas).</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                          <div className="space-y-6">
-                              <div className="space-y-4">
-                                  <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
-                                  <div className="flex items-start gap-4">
-                                      {localNegativeEndingImage && <img src={localNegativeEndingImage} alt="Fundo do final negativo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />}
+                          <div className="space-y-4">
+                              <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
+                              <div className="flex items-start gap-4">
+                                  {localNegativeEndingImage && (
+                                      <img src={localNegativeEndingImage} alt="Fundo do final negativo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />
+                                  )}
+                                  <div className="flex items-center gap-2">
                                       <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
-                                          <UploadIcon className="w-5 h-5 mr-2" /> 
+                                          <UploadIcon className="w-5 h-5 mr-2" />
                                           {negativeEndingImage ? 'Alterar Imagem' : 'Carregar Imagem'}
                                           <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
                                       </label>
+                                      {localNegativeEndingImage && (
+                                          <button
+                                              onClick={() => setLocalNegativeEndingImage('')}
+                                              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                              title="Remover imagem"
+                                          >
+                                              <TrashIcon className="w-5 h-5" />
+                                          </button>
+                                      )}
                                   </div>
-                                  <div className="pt-2">
-                                      <label htmlFor="negativeEndingContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento Horizontal</label>
-                                      <select
-                                          id="negativeEndingContentAlignment"
-                                          value={localNegativeEndingContentAlignment}
-                                          onChange={(e) => setLocalNegativeEndingContentAlignment(e.target.value as 'left' | 'right')}
-                                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                      >
-                                          <option value="right">Direita</option>
-                                          <option value="left">Esquerda</option>
-                                      </select>
-                                  </div>
-                              </div>
-                              <div className="space-y-2">
-                                  <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
-                                   <div
-                                    className="relative w-full aspect-video bg-indigo-500/30 border border-indigo-400 rounded-md flex"
-                                    style={{
-                                        justifyContent: localNegativeEndingContentAlignment === 'left' ? 'flex-start' : 'flex-end',
-                                        alignItems: 'flex-end'
-                                    }}
-                                    title="Área da Imagem de Fundo"
-                                >
-                                    <div className="absolute top-2 left-2 text-indigo-200 font-semibold text-sm">
-                                        Imagem de Fundo
-                                    </div>
-                                    <div
-                                        className="w-2/3 h-1/2 m-4 bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold"
-                                        title="Área de Texto"
-                                    >
-                                        Texto de Fim de Jogo
-                                    </div>
-                                </div>
                               </div>
                           </div>
                            <div className="space-y-2 flex flex-col">

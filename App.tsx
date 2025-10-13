@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View } from './types';
@@ -1253,7 +1252,14 @@ const App: React.FC = () => {
   }, []);
   
   const handleUpdateGameData = useCallback((field: keyof GameData, value: any) => {
-    setGameData(prev => ({ ...prev, [field]: value }));
+    setGameData(prev => {
+        const newState = { ...prev, [field]: value };
+        if (field === 'gameSplashContentAlignment') {
+            newState.positiveEndingContentAlignment = value as 'left' | 'right';
+            newState.negativeEndingContentAlignment = value as 'left' | 'right';
+        }
+        return newState;
+    });
     setIsDirty(false);
   }, []);
 

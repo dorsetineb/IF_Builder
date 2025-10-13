@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
 import { Scene, Interaction, GameObject } from '../types';
 import ObjectEditor from './ObjectEditor';
@@ -6,6 +5,7 @@ import InteractionEditor from './InteractionEditor';
 import ConnectionsView from './ConnectionsView';
 import { UploadIcon } from './icons/UploadIcon';
 import { EyeIcon } from './icons/EyeIcon';
+import { TrashIcon } from './icons/TrashIcon';
 
 interface SceneEditorProps {
   scene: Scene;
@@ -180,6 +180,9 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
           };
           reader.readAsDataURL(e.target.files[0]);
       }
+      if (e.target) {
+        (e.target as HTMLInputElement).value = '';
+      }
   };
 
   const handleDrop = (e: DragEvent<HTMLLabelElement>) => {
@@ -307,6 +310,15 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                   <UploadIcon className="w-5 h-5 mr-2" /> {localScene.image ? 'Alterar Imagem' : 'Carregar Imagem'}
                               </label>
                               <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                              {localScene.image && (
+                                <button
+                                    onClick={() => updateLocalScene('image', '')}
+                                    className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                    title="Remover Imagem"
+                                >
+                                    <TrashIcon className="w-5 h-5" />
+                                </button>
+                              )}
                           </div>
                           <p className="text-xs text-brand-text-dim mt-2">
                               {layoutOrientation === 'horizontal'
