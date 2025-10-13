@@ -688,7 +688,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
           )}
 
           {activeTab === 'cores' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                 <div className="bg-brand-surface space-y-6">
                     <div className="space-y-2">
                         <h3 className="text-lg font-semibold text-brand-text">Cor da Interface</h3>
@@ -738,7 +738,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     onChange={(e) => setLocalGameFontSize(e.target.value)}
                                     className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
                                 >
-                                    <option value="0.9em">Pequeno</option>
+                                    <option value="0.85em">Pequeno</option>
                                     <option value="1em">Médio (Padrão)</option>
                                     <option value="1.1em">Grande</option>
                                     <option value="1.2em">Extra Grande</option>
@@ -861,7 +861,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <ColorInput label="Cor do Texto do Box" id="sceneNameOverlayTextColor" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#c9d1d9" />
                             </div>
                         </div>
-                        {enableChances && (
+                        {localEnableChances && (
                             <div className="pt-6 border-t border-brand-border/50">
                                 <h3 className="text-lg font-semibold text-brand-text mb-4">Cor do Ícone de Chance</h3>
                                 <div className="space-y-6 mt-4">
@@ -875,16 +875,16 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                     )}
                 </div>
 
-                <div className="flex flex-col sticky top-6 h-[600px]">
+                <div className="flex flex-col sticky top-6 self-start">
                     <p className="text-sm text-brand-text-dim mb-2 text-center">Pré-visualização ao vivo</p>
                     <div 
-                        className={`flex-1 border-2 flex flex-col transition-colors ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-brand-border' : 'bg-[#ffffff] border-[#d0d7de]'}`}
+                        className={`border-2 flex flex-col transition-colors ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-brand-border' : 'bg-[#ffffff] border-[#d0d7de]'}`}
                         style={{ fontFamily: localFontFamily, fontSize: localGameFontSize }}
                     >
                         {/* Upper Part */}
-                        <div className="flex flex-1 p-4 gap-4">
+                        <div className="flex p-4 gap-4">
                             {/* Image Panel Mock */}
-                            <div className="w-2/5 h-full flex items-center justify-center relative" style={panelStyles}>
+                            <div className="w-2/5 aspect-[9/16] flex items-center justify-center relative" style={panelStyles}>
                                 <div className="font-semibold" style={containerStyles}>
                                     Imagem
                                 </div>
@@ -893,19 +893,22 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     style={{ 
                                         backgroundColor: localGameSceneNameOverlayBg, 
                                         color: localGameSceneNameOverlayTextColor,
-                                        border: `1px solid ${localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}`
+                                        border: `1px solid ${localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}`,
+                                        fontSize: '0.8em'
                                     }}
                                 >
                                     Nome da Cena
                                 </div>
                             </div>
                             {/* Text Panel Mock */}
-                            <div className="w-3/5 flex flex-col">
-                                <h1 style={{ color: localGameTheme === 'dark' ? localTitleColor : localTitleColorLight, fontSize: '1.5em' }}>Título do Jogo</h1>
-                                <p className="mt-2" style={{ color: localGameTheme === 'dark' ? localTextColor : localTextColorLight }}>Esta é uma descrição de exemplo para a cena.</p>
-                                <p className="mt-2 italic" style={{ color: localGameTheme === 'dark' ? '#8b949e' : '#57606a' }}>&gt; comando de exemplo</p>
-                                {enableChances && (
-                                <div className="flex gap-1 mt-auto">
+                            <div className="w-3/5 flex flex-col justify-between">
+                                <div>
+                                    <h1 style={{ color: localGameTheme === 'dark' ? localTitleColor : localTitleColorLight, fontSize: '1.5em' }}>Título do Jogo</h1>
+                                    <p className="mt-2" style={{ color: localGameTheme === 'dark' ? localTextColor : localTextColorLight, fontSize: '1em' }}>Esta é uma descrição de exemplo para a cena.</p>
+                                    <p className="mt-2 italic" style={{ color: localGameTheme === 'dark' ? '#8b949e' : '#57606a', fontSize: '0.9em' }}>&gt; comando de exemplo</p>
+                                </div>
+                                {localEnableChances && (
+                                <div className="flex gap-1">
                                     <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
                                     <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
                                     <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
@@ -926,13 +929,14 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         color: localGameTheme === 'dark' ? localTextColor : localTextColorLight,
                                         borderColor: focusPreview 
                                             ? (localGameTheme === 'dark' ? localFocusColor : localFocusColorLight) 
-                                            : (localGameTheme === 'dark' ? '#3036d' : '#d0d7de'),
+                                            : (localGameTheme === 'dark' ? '#30363d' : '#d0d7de'),
                                         fontFamily: localFontFamily,
+                                        fontSize: '1em'
                                     }}
                                     onFocus={() => setFocusPreview(true)}
                                     onBlur={() => setFocusPreview(false)}
                                 />
-                                <button className="font-bold py-2 px-4 rounded" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily }}>Ação</button>
+                                <button className="font-bold py-2 px-4 rounded" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily, fontSize: '1em' }}>Ação</button>
                              </div>
                               <button
                                     className="w-full font-bold transition-all duration-200 ease-in-out py-3"
