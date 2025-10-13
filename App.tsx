@@ -10,6 +10,7 @@ import UIEditor from './components/UIEditor';
 import GameInfoEditor from './components/GameInfoEditor';
 import Preview from './components/Preview';
 import SceneMap from './components/SceneMap';
+import GlobalObjectsEditor from './components/GlobalObjectsEditor';
 
 const gameHTML = `
 <!DOCTYPE html>
@@ -1276,6 +1277,61 @@ const App: React.FC = () => {
     setIsDirty(false);
   }, []);
 
+  const handleUpdateGlobalObject = useCallback((sceneId: string, objectId: string, updatedData: Partial<GameObject>) => {
+    setGameData(prev => {
+      const newScenes = { ...prev.scenes };
+      const sceneToUpdate = { ...newScenes[sceneId] };
+      
+      if (sceneToUpdate && sceneToUpdate.objects) {
+        sceneToUpdate.objects = sceneToUpdate.objects.map(obj => {
+          if (obj.id === objectId) {
+            return { ...obj, ...updatedData };
+          }
+          return obj;
+        });
+        newScenes[sceneId] = sceneToUpdate;
+        return { ...prev, scenes: newScenes };
+      }
+      return prev; // Return previous state if scene/object not found
+    });
+    setIsDirty(false); // Mark as saved
+  }, []);
+
+  const handleDeleteGlobalObject = useCallback((sceneId: string, objectId: string) => {
+    setGameData(prev => {
+      const newScenes = { ...prev.scenes };
+      
+      // Clean up interactions throughout the game that reference the object ID.
+      Object.keys(newScenes).forEach(sId => {
+        const scene = { ...newScenes[sId] }; // Create a mutable copy
+        if (scene.interactions) {
+            scene.interactions = scene.interactions.map(inter => {
+                const updatedInter = { ...inter };
+                if (inter.target === objectId) {
+                    delete updatedInter.target;
+                }
+                if (inter.requiresInInventory === objectId) {
+                    delete updatedInter.requiresInInventory;
+                    delete updatedInter.consumesItem;
+                }
+                return updatedInter;
+            });
+        }
+        newScenes[sId] = scene; // Put the updated scene back
+      });
+      
+      // Now, remove the object itself from its home scene.
+      const sceneToUpdate = { ...newScenes[sceneId] };
+      if (sceneToUpdate && sceneToUpdate.objects) {
+        sceneToUpdate.objects = sceneToUpdate.objects.filter(obj => obj.id !== objectId);
+        newScenes[sceneId] = sceneToUpdate;
+      }
+
+      return { ...prev, scenes: newScenes };
+    });
+    setIsDirty(false);
+  }, []);
+
   const scenesInOrder = gameData.sceneOrder.map(id => gameData.scenes[id]).filter(Boolean);
   const selectedScene = effectiveSelectedSceneId ? gameData.scenes[effectiveSelectedSceneId] : null;
 
@@ -1365,6 +1421,17 @@ const App: React.FC = () => {
             negativeEndingDescription={gameData.negativeEndingDescription || ''}
             fixedVerbs={gameData.fixedVerbs || []}
             onUpdate={handleUpdateGameData}
+            isDirty={isDirty}
+            onSetDirty={setIsDirty}
+          />
+        );
+       case 'global_objects':
+        return (
+          <GlobalObjectsEditor
+            scenes={gameData.scenes}
+            onUpdateObject={handleUpdateGlobalObject}
+            onDeleteObject={handleDeleteGlobalObject}
+            onSelectScene={handleSelectSceneAndSwitchView}
             isDirty={isDirty}
             onSetDirty={setIsDirty}
           />

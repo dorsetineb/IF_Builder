@@ -1,4 +1,3 @@
-
 export interface GameObject {
   id: string;
   name: string;
@@ -112,4 +111,4 @@ export interface GameData {
   fixedVerbs?: FixedVerb[];
 }
 
-export type View = 'scenes' | 'interface' | 'game_info' | 'map';
+export type View = 'scenes' | 'interface' | 'game_info' | 'map' | 'global_objects';
