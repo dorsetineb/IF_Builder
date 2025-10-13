@@ -6,7 +6,7 @@ import { BookOpenIcon } from './icons/BookOpenIcon';
 import { InformationCircleIcon } from './icons/InformationCircleIcon';
 import { MapIcon } from './icons/MapIcon';
 import { DocumentPlusIcon } from './icons/DocumentPlusIcon';
-import { ArchiveBoxIcon } from './icons/ArchiveBoxIcon';
+import { KeyIcon } from './icons/KeyIcon';
 
 interface SidebarProps {
   scenes: Scene[];
@@ -69,7 +69,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         <div className="my-2 border-t border-brand-border/50"></div>
 
         <button className={getButtonClass('global_objects')} onClick={() => onSetView('global_objects')}>
-            <ArchiveBoxIcon className="w-5 h-5 mr-3" />
+            <KeyIcon className="w-5 h-5 mr-3" />
             <span className="font-semibold">Painel de Objetos</span>
         </button>
       </nav>
