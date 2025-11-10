@@ -7,6 +7,7 @@ import { InformationCircleIcon } from './icons/InformationCircleIcon';
 import { MapIcon } from './icons/MapIcon';
 import { DocumentPlusIcon } from './icons/DocumentPlusIcon';
 import { KeyIcon } from './icons/KeyIcon';
+import { SignalIcon } from './icons/SignalIcon';
 
 interface SidebarProps {
   scenes: Scene[];
@@ -41,6 +42,10 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         <button className={getButtonClass('interface')} onClick={() => onSetView('interface')}>
           <CodeIcon className="w-5 h-5 mr-3" />
           <span className="font-semibold">Interface</span>
+        </button>
+        <button className={getButtonClass('trackers')} onClick={() => onSetView('trackers')}>
+            <SignalIcon className="w-5 h-5 mr-3" />
+            <span className="font-semibold">Rastreadores</span>
         </button>
 
         <div className="my-2 border-t border-brand-border/50"></div>

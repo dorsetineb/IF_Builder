@@ -47,6 +47,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameRestartButtonText: data.gameRestartButtonText,
         gameContinueButtonText: data.gameContinueButtonText,
         fixedVerbs: data.fixedVerbs || [],
+        consequenceTrackers: data.consequenceTrackers || [],
     };
 };
 
@@ -106,6 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         diaryLog: [], // Array of {type: 'scene_load' | 'action', data: {...}}
         scenesState: {},
         chances: null,
+        trackerValues: {},
     };
     let onRenderCompleteCallback = null;
 
@@ -576,24 +578,47 @@ document.addEventListener('DOMContentLoaded', () => {
                     sceneState.objetos = sceneState.objetos.filter(obj => obj.id !== interaction.target);
                 }
             }
-            if (interaction.newSceneDescription) {
-                currentState.scenesState[currentState.currentSceneId].description = interaction.newSceneDescription;
+
+            let consequenceTriggered = false;
+
+            if (interaction.trackerEffects && Array.isArray(interaction.trackerEffects)) {
+                interaction.trackerEffects.forEach(effect => {
+                    if (effect && effect.trackerId && currentState.trackerValues.hasOwnProperty(effect.trackerId)) {
+                        currentState.trackerValues[effect.trackerId] += (effect.valueChange || 0);
+                    }
+                });
+
+                if (gameData.consequenceTrackers && Array.isArray(gameData.consequenceTrackers)) {
+                    for (const tracker of gameData.consequenceTrackers) {
+                        if (tracker && tracker.id && tracker.consequenceSceneId && currentState.trackerValues[tracker.id] >= tracker.maxValue) {
+                            performSceneChange(tracker.consequenceSceneId);
+                            consequenceTriggered = true;
+                            currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: \`[CONSEQUÊNCIA ATIVADA: \${tracker.name}]\`, sceneId: currentState.currentSceneId } });
+                            break;
+                        }
+                    }
+                }
             }
             
-            if (interaction.goToScene) {
-                currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: '', sceneId: currentState.currentSceneId } });
-                performSceneChange(interaction.goToScene, interaction.soundEffect, interaction.transitionType);
-            } else {
+            if (!consequenceTriggered) {
                 if (interaction.newSceneDescription) {
-                    responseText = interaction.newSceneDescription;
-                    if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
-                    currentSceneParagraphs = responseText.split('\\n').filter(p => p.trim() !== '');
-                    currentParagraphIndex = 0;
-                    renderNextParagraph();
+                    currentState.scenesState[currentState.currentSceneId].description = interaction.newSceneDescription;
                 }
-                 if (interaction.soundEffect && sceneSoundEffectElement) {
-                    sceneSoundEffectElement.src = interaction.soundEffect;
-                    sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
+                if (interaction.goToScene) {
+                    currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: '', sceneId: currentState.currentSceneId } });
+                    performSceneChange(interaction.goToScene, interaction.soundEffect, interaction.transitionType);
+                } else {
+                    if (interaction.newSceneDescription) {
+                        responseText = interaction.newSceneDescription;
+                        if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
+                        currentSceneParagraphs = responseText.split('\\n').filter(p => p.trim() !== '');
+                        currentParagraphIndex = 0;
+                        renderNextParagraph();
+                    }
+                     if (interaction.soundEffect && sceneSoundEffectElement) {
+                        sceneSoundEffectElement.src = interaction.soundEffect;
+                        sceneSoundEffectElement.play().catch(e => console.warn("Sound autoplay failed:", e));
+                    }
                 }
             }
         }
@@ -603,6 +628,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentState.diaryLog.push({ type: 'action', data: { command: verbText, response: responseText, sceneId: currentState.currentSceneId } });
             }
             if (sceneDescriptionElement) sceneDescriptionElement.scrollTop = sceneDescriptionElement.scrollHeight;
+            saveState();
             return;
         }
 
@@ -898,6 +924,29 @@ document.addEventListener('DOMContentLoaded', () => {
             if (gameData.gameEnableChances) {
                 currentState.chances = gameData.gameMaxChances;
             }
+            currentState.trackerValues = {};
+            if (gameData.consequenceTrackers && Array.isArray(gameData.consequenceTrackers)) {
+                gameData.consequenceTrackers.forEach(tracker => {
+                    if (tracker && tracker.id) {
+                        currentState.trackerValues[tracker.id] = tracker.initialValue || 0;
+                    }
+                });
+            }
+        } else {
+            // Reconcile trackers for loaded save games
+            const currentTrackers = gameData.consequenceTrackers || [];
+            const savedTrackerValues = currentState.trackerValues || {};
+            const newTrackerValues = {};
+            currentTrackers.forEach(tracker => {
+                if (tracker && tracker.id) {
+                    if (savedTrackerValues.hasOwnProperty(tracker.id)) {
+                        newTrackerValues[tracker.id] = savedTrackerValues[tracker.id];
+                    } else {
+                        newTrackerValues[tracker.id] = tracker.initialValue || 0;
+                    }
+                }
+            });
+            currentState.trackerValues = newTrackerValues;
         }
         
         changeScene(currentState.currentSceneId, hasSave && !startFresh);

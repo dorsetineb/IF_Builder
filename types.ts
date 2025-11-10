@@ -5,6 +5,11 @@ export interface GameObject {
   isTakable: boolean;
 }
 
+export interface TrackerEffect {
+  trackerId: string;
+  valueChange: number;
+}
+
 export interface Interaction {
   id: string;
   verbs: string[]; // e.g., ['usar', 'abrir']
@@ -19,6 +24,7 @@ export interface Interaction {
   removesTargetFromScene?: boolean; // remove the target object from the scene
   goToScene?: string; // ID of the scene to move to
   newSceneDescription?: string;
+  trackerEffects?: TrackerEffect[];
 }
 
 export interface Exits {
@@ -50,6 +56,14 @@ export interface FixedVerb {
   id: string;
   verbs: string[];
   description: string;
+}
+
+export interface ConsequenceTracker {
+  id: string;
+  name: string;
+  initialValue: number;
+  maxValue: number;
+  consequenceSceneId: string;
 }
 
 export interface GameData {
@@ -109,6 +123,7 @@ export interface GameData {
   gameSceneNameOverlayBg?: string;
   gameSceneNameOverlayTextColor?: string;
   fixedVerbs?: FixedVerb[];
+  consequenceTrackers?: ConsequenceTracker[];
 }
 
-export type View = 'scenes' | 'interface' | 'game_info' | 'map' | 'global_objects';
+export type View = 'scenes' | 'interface' | 'game_info' | 'map' | 'global_objects' | 'trackers';

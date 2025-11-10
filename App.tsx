@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
-import { GameData, Scene, GameObject, Interaction, View } from './types';
+import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker } from './types';
 import Sidebar from './components/Sidebar';
 import SceneEditor from './components/SceneEditor';
 import Header from './components/Header';
@@ -10,6 +10,7 @@ import GameInfoEditor from './components/GameInfoEditor';
 import Preview from './components/Preview';
 import SceneMap from './components/SceneMap';
 import GlobalObjectsEditor from './components/GlobalObjectsEditor';
+import TrackersEditor from './components/TrackersEditor';
 
 const gameHTML = `
 <!DOCTYPE html>
@@ -827,7 +828,7 @@ const initialScenes: { [id: string]: Scene } = {
   }
 };
 
-const generateUniqueId = (prefix: 'scn' | 'obj' | 'inter', existingIds: string[]): string => {
+const generateUniqueId = (prefix: 'scn' | 'obj' | 'inter' | 'trk' | 'verb', existingIds: string[]): string => {
     let id;
     do {
         id = `${prefix}_${Math.random().toString(36).substring(2, 5)}`;
@@ -949,6 +950,7 @@ const initializeGameData = (): GameData => {
                 description: `Como Interagir com o mundo:\nA base de tudo é o campo de texto, e a maioria dos comandos segue um formato simples:\n\nAções diretas: Para interagir com algo na cena, use VERBO + ALVO.\nPor exemplo: pegar chave ou olhar porta.\n\nUsando itens do inventário: Para usar um item que você coletou em algo na cena, o formato é VERBO + ITEM + ALVO.\nPor exemplo: usar chave na porta.\nLembre-se: o item (como a chave) precisa estar no seu inventário para que a ação funcione.\nFique de olho nas palavras destacadas na descrição da cena, como <esta>. Elas indicam pontos de interesse importantes!\n\nAlguns verbos são universais e muito úteis:\n\nOLHAR ou EXAMINAR: Use para descobrir mais detalhes sobre o que está ao seu redor. Você pode usar em um objeto específico (olhar tijolo) ou no ambiente em geral (olhar ao redor).\n\PEGAR: Alguns objetos podem ser coletados e guardados no seu inventário para uso posterior. Se algo parecer útil e solto, tente pegá-lo!\n\nINVENTÁRIO: Para ver todos os itens que você carrega, clique no botão Inventário.\n\nVOLTAR: Se quiser retornar para a cena de onde acabou de vir, este comando pode funcionar.\n\nEstou Travado, e Agora?\nSeja criativo! Tente verbos diferentes para um mesmo objeto. empurrar, puxar, chutar, usar... a experimentação é a chave!\nBotão de Sugestões: Se estiver sem ideias, o botão Sugestões é seu melhor amigo. Ele pode te dar uma luz sobre as ações mais óbvias na cena atual.\n\nDiário: Esqueceu o que aconteceu ou um detalhe importante? O Diário guarda um registro de todas as cenas que você visitou e de suas ações. Use-o para relembrar pistas.`
             }
         ],
+        consequenceTrackers: [],
     };
 };
 
@@ -1018,6 +1020,7 @@ const createNewGameData = (): GameData => {
         gameSceneNameOverlayBg: '#0d1117',
         gameSceneNameOverlayTextColor: '#c9d1d9',
         fixedVerbs: [],
+        consequenceTrackers: [],
     };
 };
 
@@ -1346,6 +1349,10 @@ const App: React.FC = () => {
     return Object.values(gameData.scenes).flatMap((s: any) => s.objects?.map((o: any) => o.id) || []);
   }, [gameData.scenes]);
 
+  const allTrackerIds = useMemo(() => {
+    return (gameData.consequenceTrackers || []).map(t => t.id);
+  }, [gameData.consequenceTrackers]);
+
   const renderCurrentView = () => {
     switch (currentView) {
       case 'scenes':
@@ -1362,6 +1369,7 @@ const App: React.FC = () => {
             isDirty={isDirty}
             onSetDirty={setIsDirty}
             layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
+            consequenceTrackers={gameData.consequenceTrackers || []}
           />
         ) : (
           <WelcomePlaceholder />
@@ -1438,6 +1446,19 @@ const App: React.FC = () => {
             onUpdateObject={handleUpdateGlobalObject}
             onDeleteObject={handleDeleteGlobalObject}
             onSelectScene={handleSelectSceneAndSwitchView}
+            isDirty={isDirty}
+            onSetDirty={setIsDirty}
+          />
+        );
+      case 'trackers':
+        return (
+          <TrackersEditor
+            trackers={gameData.consequenceTrackers || []}
+            onUpdateTrackers={(newTrackers: ConsequenceTracker[]) => {
+              handleUpdateGameData('consequenceTrackers', newTrackers);
+            }}
+            allScenes={scenesInOrder}
+            allTrackerIds={allTrackerIds}
             isDirty={isDirty}
             onSetDirty={setIsDirty}
           />

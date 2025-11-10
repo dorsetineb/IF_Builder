@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Interaction, Scene, GameObject } from '../types';
+import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
 import { TrashIcon } from './icons/TrashIcon';
 import { UploadIcon } from './icons/UploadIcon';
@@ -12,6 +11,7 @@ interface InteractionEditorProps {
   currentSceneId: string;
   sceneObjects: GameObject[];
   allTakableObjects: GameObject[];
+  consequenceTrackers: ConsequenceTracker[];
 }
 
 // Helper to determine the current outcome type for the UI
@@ -31,7 +31,8 @@ const InteractionItem: React.FC<{
   currentSceneId: string;
   sceneObjects: GameObject[];
   allTakableObjects: GameObject[];
-}> = ({ interaction, index, onUpdate, onRemove, allScenes, currentSceneId, sceneObjects, allTakableObjects }) => {
+  consequenceTrackers: ConsequenceTracker[];
+}> = ({ interaction, index, onUpdate, onRemove, allScenes, currentSceneId, sceneObjects, allTakableObjects, consequenceTrackers }) => {
     
     const [localVerbs, setLocalVerbs] = useState(interaction.verbs.join(', '));
     const verbInputId = `verbs-input-${interaction.id}`;
@@ -46,6 +47,26 @@ const InteractionItem: React.FC<{
     
     const handleInteractionChange = (field: keyof Interaction, value: any) => {
         onUpdate(index, { ...interaction, [field]: value });
+    };
+
+    const handleTrackerEffectChange = (effectIndex: number, field: keyof TrackerEffect, value: any) => {
+        const newEffects = [...(interaction.trackerEffects || [])];
+        newEffects[effectIndex] = { ...newEffects[effectIndex], [field]: value };
+        handleInteractionChange('trackerEffects', newEffects);
+    };
+
+    const handleAddTrackerEffect = () => {
+        const newEffect: TrackerEffect = {
+            trackerId: '',
+            valueChange: 10,
+        };
+        const newEffects = [...(interaction.trackerEffects || []), newEffect];
+        handleInteractionChange('trackerEffects', newEffects);
+    };
+
+    const handleRemoveTrackerEffect = (effectIndex: number) => {
+        const newEffects = (interaction.trackerEffects || []).filter((_, i) => i !== effectIndex);
+        handleInteractionChange('trackerEffects', newEffects);
     };
 
     const handleVerbsBlur = () => {
@@ -262,12 +283,58 @@ const InteractionItem: React.FC<{
                 </div>
             )}
         </div>
+         <div className="mt-4 pt-4 border-t border-brand-border/50">
+            <h4 className="text-sm font-medium text-brand-text-dim mb-2">Efeitos nos Rastreadores</h4>
+            <div className="space-y-2">
+                {(interaction.trackerEffects || []).map((effect, effectIndex) => (
+                    <div key={effectIndex} className="flex items-center gap-2 p-2 bg-brand-border/20 rounded-md">
+                        <select
+                            value={effect.trackerId}
+                            onChange={(e) => handleTrackerEffectChange(effectIndex, 'trackerId', e.target.value)}
+                            className={`${selectBaseClasses} flex-1`}
+                            style={selectStyle}
+                        >
+                            <option value="" className={optionDimClasses}>Selecione o rastreador...</option>
+                            {consequenceTrackers.map(tracker => (
+                                <option key={tracker.id} value={tracker.id} className={optionBaseClasses}>
+                                    {tracker.name}
+                                </option>
+                            ))}
+                        </select>
+                        <input
+                            type="number"
+                            value={effect.valueChange}
+                            onChange={(e) => handleTrackerEffectChange(effectIndex, 'valueChange', parseInt(e.target.value, 10) || 0)}
+                            className="w-24 bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                        />
+                        <button
+                            onClick={() => handleRemoveTrackerEffect(effectIndex)}
+                            className="p-2 text-brand-text-dim hover:text-red-500"
+                            title="Remover efeito"
+                        >
+                            <TrashIcon className="w-5 h-5" />
+                        </button>
+                    </div>
+                ))}
+                {consequenceTrackers.length === 0 && <p className="text-xs text-brand-text-dim text-center">Nenhum rastreador criado. Vá para a tela de Rastreadores para adicioná-los.</p>}
+            </div>
+             {consequenceTrackers.length > 0 && (
+                <div className="flex justify-end mt-2">
+                    <button
+                        onClick={handleAddTrackerEffect}
+                        className="flex items-center px-3 py-1 text-xs bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors"
+                    >
+                        <PlusIcon className="w-4 h-4 mr-1" /> Adicionar Efeito
+                    </button>
+                </div>
+            )}
+        </div>
       </div>
     );
 };
 
 
-const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = [], onUpdateInteractions, allScenes, currentSceneId, sceneObjects = [], allTakableObjects = [] }) => {
+const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = [], onUpdateInteractions, allScenes, currentSceneId, sceneObjects = [], allTakableObjects = [], consequenceTrackers = [] }) => {
   const handleAddInteraction = () => {
     const newInteraction: Interaction = {
       id: `inter_${Math.random().toString(36).substring(2, 9)}`,
@@ -301,6 +368,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = []
                 currentSceneId={currentSceneId}
                 sceneObjects={sceneObjects}
                 allTakableObjects={allTakableObjects}
+                consequenceTrackers={consequenceTrackers}
             />
         ))}
          {interactions.length === 0 && <p className="text-center text-brand-text-dim">Nenhuma interação customizada nesta cena.</p>}

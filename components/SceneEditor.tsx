@@ -1,5 +1,5 @@
 import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
-import { Scene, Interaction, GameObject } from '../types';
+import { Scene, Interaction, GameObject, ConsequenceTracker } from '../types';
 import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
 import ConnectionsView from './ConnectionsView';
@@ -18,6 +18,7 @@ interface SceneEditorProps {
   isDirty: boolean;
   onSetDirty: (isDirty: boolean) => void;
   layoutOrientation: 'vertical' | 'horizontal';
+  consequenceTrackers: ConsequenceTracker[];
 }
 
 const getCleanSceneState = (s: Scene): Scene => {
@@ -47,6 +48,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     isDirty,
     onSetDirty,
     layoutOrientation,
+    consequenceTrackers,
 }) => {
   const [localScene, setLocalScene] = useState<Scene>(() => getCleanSceneState(scene));
   const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions' | 'connections'>('properties');
@@ -414,6 +416,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                   currentSceneId={localScene.id}
                   sceneObjects={localScene.objects || []}
                   allTakableObjects={allTakableObjects}
+                  consequenceTrackers={consequenceTrackers}
               />
           )}
 
