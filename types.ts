@@ -124,6 +124,11 @@ export interface GameData {
   gameSceneNameOverlayTextColor?: string;
   fixedVerbs?: FixedVerb[];
   consequenceTrackers?: ConsequenceTracker[];
+  gameShowTrackersUI?: boolean;
+  gameSuggestionsButtonText?: string;
+  gameInventoryButtonText?: string;
+  gameDiaryButtonText?: string;
+  gameTrackersButtonText?: string;
 }
 
 export type View = 'scenes' | 'interface' | 'game_info' | 'map' | 'global_objects' | 'trackers';

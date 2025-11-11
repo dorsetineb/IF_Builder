@@ -69,12 +69,14 @@ const gameHTML = `
             <div class="text-panel">
                 <div id="scene-description" class="scene-description"></div>
                 <div id="action-popup" class="action-popup hidden"></div>
+                __TRACKERS_POPUP__
                 __CHANCES_CONTAINER__
                 <div class="action-bar">
                     <div class="action-buttons">
-                        <button id="suggestions-button">Sugestões</button>
-                        <button id="inventory-button">Inventário</button>
-                        <button id="diary-button">Diário</button>
+                        <button id="suggestions-button">__SUGGESTIONS_BUTTON_TEXT__</button>
+                        <button id="inventory-button">__INVENTORY_BUTTON_TEXT__</button>
+                        <button id="diary-button">__DIARY_BUTTON_TEXT__</button>
+                        __TRACKERS_BUTTON__
                     </div>
                     <div class="input-area">
                         <input type="text" id="verb-input" placeholder="__VERB_INPUT_PLACEHOLDER__">
@@ -726,6 +728,36 @@ body.font-adjust-gothic {
 .scene-description::-webkit-scrollbar-thumb:hover, .diary-log::-webkit-scrollbar-thumb:hover {
   background-color: var(--text-color);
 }
+
+/* Tracker UI */
+.tracker-item {
+    margin-bottom: 12px;
+}
+.tracker-item-name {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 0.9em;
+    color: var(--text-dim-color);
+}
+.tracker-bar-container {
+    width: 100%;
+    height: 22px;
+    background-color: var(--input-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+.tracker-bar {
+    height: 100%;
+    background-color: var(--accent-color);
+    transition: width 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8em;
+    color: #000;
+    font-weight: bold;
+}
 `;
 
 const initialScenes: { [id: string]: Scene } = {
@@ -951,6 +983,11 @@ const initializeGameData = (): GameData => {
             }
         ],
         consequenceTrackers: [],
+        gameShowTrackersUI: true,
+        gameSuggestionsButtonText: "Sugestões",
+        gameInventoryButtonText: "Inventário",
+        gameDiaryButtonText: "Diário",
+        gameTrackersButtonText: "Rastreadores",
     };
 };
 
@@ -1021,6 +1058,11 @@ const createNewGameData = (): GameData => {
         gameSceneNameOverlayTextColor: '#c9d1d9',
         fixedVerbs: [],
         consequenceTrackers: [],
+        gameShowTrackersUI: true,
+        gameSuggestionsButtonText: "Sugestões",
+        gameInventoryButtonText: "Inventário",
+        gameDiaryButtonText: "Diário",
+        gameTrackersButtonText: "Rastreadores",
     };
 };
 
@@ -1423,6 +1465,11 @@ const App: React.FC = () => {
             onUpdate={handleUpdateGameData}
             isDirty={isDirty}
             onSetDirty={setIsDirty}
+            gameShowTrackersUI={gameData.gameShowTrackersUI}
+            suggestionsButtonText={gameData.gameSuggestionsButtonText}
+            inventoryButtonText={gameData.gameInventoryButtonText}
+            diaryButtonText={gameData.gameDiaryButtonText}
+            trackersButtonText={gameData.gameTrackersButtonText}
           />
         );
       case 'game_info':

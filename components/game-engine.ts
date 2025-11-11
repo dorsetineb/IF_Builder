@@ -48,6 +48,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameContinueButtonText: data.gameContinueButtonText,
         fixedVerbs: data.fixedVerbs || [],
         consequenceTrackers: data.consequenceTrackers || [],
+        gameShowTrackersUI: data.gameShowTrackersUI,
     };
 };
 
@@ -80,7 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const inventoryButton = document.getElementById('inventory-button');
     const suggestionsButton = document.getElementById('suggestions-button');
     const diaryButton = document.getElementById('diary-button');
+    const trackersButton = document.getElementById('trackers-button');
     const actionPopup = document.getElementById('action-popup');
+    const trackersPopup = document.getElementById('trackers-popup');
     const diaryModal = document.getElementById('diary-modal');
     const diaryLogElement = document.getElementById('diary-log');
     const diaryModalCloseButton = diaryModal ? diaryModal.querySelector('.modal-close-button') : null;
@@ -172,6 +175,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function renderTrackersUI() {
+        if (!trackersPopup || !gameData.consequenceTrackers || gameData.consequenceTrackers.length === 0) return;
+        let content = '';
+        gameData.consequenceTrackers.forEach(tracker => {
+            if (!tracker || !tracker.id) return;
+            const currentValue = currentState.trackerValues[tracker.id] || 0;
+            const maxValue = tracker.maxValue || 100;
+            const percentage = Math.max(0, Math.min(100, (currentValue / maxValue) * 100));
+            content += \`
+                <div class="tracker-item">
+                    <span class="tracker-item-name">\${tracker.name}</span>
+                    <div class="tracker-bar-container">
+                        <div class="tracker-bar" style="width: \${percentage}%;">\${Math.round(currentValue)} / \${maxValue}</div>
+                    </div>
+                </div>
+            \`;
+        });
+        trackersPopup.innerHTML = content;
+    }
+
+
     function showEnding(type) {
         let screenToShow;
         if (type === 'positive' && positiveEndingScreen) {
@@ -212,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const p = document.createElement('p');
         
         // Process highlights: **bold** and <clickable>
-        let processedText = paragraphText.replace(/\\*\\*(.*?)\\*\\*/g, '<span class="highlight-item">$1</span>');
+        let processedText = paragraphText.replace(/\\*\\*(.*?}\\*\\*/g, '<span class="highlight-item">$1</span>');
         processedText = processedText.replace(/<(.*?)>/g, '<span class="highlight-word" data-word="$1">$1</span>');
         p.innerHTML = processedText;
 
@@ -721,6 +745,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- UI Logic ---
     function populateAndShowPopup(type) {
         if (!actionPopup) return;
+        
+        // Hide other popups
+        if (trackersPopup) trackersPopup.classList.add('hidden');
+
         actionPopup.innerHTML = '';
         let content = '<div class="action-popup-list">';
 
@@ -968,7 +996,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (inventoryButton) {
         inventoryButton.addEventListener('click', () => {
-             if (actionPopup && !actionPopup.classList.contains('hidden') && actionPopup.innerHTML.includes('O inventário está vazio') || actionPopup.querySelector('button[data-item-name]')) {
+             if (actionPopup && !actionPopup.classList.contains('hidden') && actionPopup.querySelector('button[data-item-name]')) {
                 actionPopup.classList.add('hidden');
             } else {
                 populateAndShowPopup('inventory');
@@ -978,10 +1006,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (suggestionsButton) {
         suggestionsButton.addEventListener('click', () => {
-            if (actionPopup && !actionPopup.classList.contains('hidden') && actionPopup.innerHTML.includes('Sugestões')) {
+            if (actionPopup && !actionPopup.classList.contains('hidden') && actionPopup.querySelector('button[data-verb]')) {
                 actionPopup.classList.add('hidden');
             } else {
                 populateAndShowPopup('suggestions');
+            }
+        });
+    }
+    
+    if (trackersButton) {
+        trackersButton.addEventListener('click', () => {
+            if (trackersPopup) {
+                if (trackersPopup.classList.contains('hidden')) {
+                    renderTrackersUI(); // Update content before showing
+                }
+                trackersPopup.classList.toggle('hidden');
+                // Hide other popups if we are opening this one
+                if (!trackersPopup.classList.contains('hidden')) {
+                    if (actionPopup) actionPopup.classList.add('hidden');
+                }
             }
         });
     }

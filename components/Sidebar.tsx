@@ -43,11 +43,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           <CodeIcon className="w-5 h-5 mr-3" />
           <span className="font-semibold">Interface</span>
         </button>
-        <button className={getButtonClass('trackers')} onClick={() => onSetView('trackers')}>
-            <SignalIcon className="w-5 h-5 mr-3" />
-            <span className="font-semibold">Rastreadores</span>
-        </button>
-
+        
         <div className="my-2 border-t border-brand-border/50"></div>
       
         {/* Scene Editor Section */}
@@ -75,7 +71,11 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
         <button className={getButtonClass('global_objects')} onClick={() => onSetView('global_objects')}>
             <KeyIcon className="w-5 h-5 mr-3" />
-            <span className="font-semibold">Painel de Objetos</span>
+            <span className="font-semibold">Objetos</span>
+        </button>
+        <button className={getButtonClass('trackers')} onClick={() => onSetView('trackers')}>
+            <SignalIcon className="w-5 h-5 mr-3" />
+            <span className="font-semibold">Rastreadores</span>
         </button>
       </nav>
       <div className="flex-shrink-0 mt-4 pt-4 border-t border-brand-border">

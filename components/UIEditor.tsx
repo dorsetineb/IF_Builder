@@ -41,6 +41,11 @@ interface UIEditorProps {
   onUpdate: (field: keyof GameData, value: any) => void;
   isDirty: boolean;
   onSetDirty: (isDirty: boolean) => void;
+  gameShowTrackersUI?: boolean;
+  suggestionsButtonText?: string;
+  inventoryButtonText?: string;
+  diaryButtonText?: string;
+  trackersButtonText?: string;
 }
 
 const FONTS = [
@@ -149,7 +154,8 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
       frameChamferedColor,
       frameRoundedTopColor,
       gameSceneNameOverlayBg,
-      gameSceneNameOverlayTextColor
+      gameSceneNameOverlayTextColor,
+      gameShowTrackersUI, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText
   } = props;
 
   // State from UIEditor
@@ -164,6 +170,11 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localRestartButtonText, setLocalRestartButtonText] = useState(restartButtonText);
   const [localGameSystemEnabled, setLocalGameSystemEnabled] = useState(gameSystemEnabled);
   const [localMaxChances, setLocalMaxChances] = useState(maxChances);
+  const [localGameShowTrackersUI, setLocalGameShowTrackersUI] = useState(gameShowTrackersUI);
+  const [localSuggestionsButtonText, setLocalSuggestionsButtonText] = useState(suggestionsButtonText);
+  const [localInventoryButtonText, setLocalInventoryButtonText] = useState(inventoryButtonText);
+  const [localDiaryButtonText, setLocalDiaryButtonText] = useState(diaryButtonText);
+  const [localTrackersButtonText, setLocalTrackersButtonText] = useState(trackersButtonText);
   const [activeTab, setActiveTab] = useState('layout');
 
   // State from ThemeEditor
@@ -206,6 +217,11 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalRestartButtonText(restartButtonText);
     setLocalGameSystemEnabled(gameSystemEnabled);
     setLocalMaxChances(maxChances);
+    setLocalGameShowTrackersUI(gameShowTrackersUI);
+    setLocalSuggestionsButtonText(suggestionsButtonText);
+    setLocalInventoryButtonText(inventoryButtonText);
+    setLocalDiaryButtonText(diaryButtonText);
+    setLocalTrackersButtonText(trackersButtonText);
     setLocalTextColor(textColor);
     setLocalTitleColor(titleColor);
     setLocalSplashButtonColor(splashButtonColor);
@@ -234,7 +250,8 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
     chanceIconColor, gameFontFamily, gameFontSize, chanceIcon, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight,
     frameBookColor, frameTradingCardColor, frameChamferedColor,
-    frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor
+    frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor,
+    gameShowTrackersUI, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText
   ]);
   
   useEffect(() => {
@@ -257,6 +274,11 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localDiaryPlayerName !== diaryPlayerName ||
                   localGameSystemEnabled !== gameSystemEnabled ||
                   localMaxChances !== maxChances ||
+                  localGameShowTrackersUI !== gameShowTrackersUI ||
+                  localSuggestionsButtonText !== suggestionsButtonText ||
+                  localInventoryButtonText !== inventoryButtonText ||
+                  localDiaryButtonText !== diaryButtonText ||
+                  localTrackersButtonText !== trackersButtonText ||
                   localTextColor !== textColor ||
                   localTitleColor !== titleColor ||
                   localSplashButtonColor !== splashButtonColor ||
@@ -282,7 +304,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor;
     onSetDirty(dirty);
   }, [
-    localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localGameSystemEnabled, localMaxChances,
+    localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI, localSuggestionsButtonText, localInventoryButtonText, localDiaryButtonText, localTrackersButtonText,
     localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
     localFrameBookColor, localFrameTradingCardColor, localFrameChamferedColor,
     frameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
@@ -302,6 +324,11 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localDiaryPlayerName !== diaryPlayerName) onUpdate('gameDiaryPlayerName', localDiaryPlayerName);
     if (localGameSystemEnabled !== gameSystemEnabled) onUpdate('gameSystemEnabled', localGameSystemEnabled);
     if (localMaxChances !== maxChances) onUpdate('gameMaxChances', localMaxChances);
+    if (localGameShowTrackersUI !== gameShowTrackersUI) onUpdate('gameShowTrackersUI', localGameShowTrackersUI);
+    if (localSuggestionsButtonText !== suggestionsButtonText) onUpdate('gameSuggestionsButtonText', localSuggestionsButtonText);
+    if (localInventoryButtonText !== inventoryButtonText) onUpdate('gameInventoryButtonText', localInventoryButtonText);
+    if (localDiaryButtonText !== diaryButtonText) onUpdate('gameDiaryButtonText', localDiaryButtonText);
+    if (localTrackersButtonText !== trackersButtonText) onUpdate('gameTrackersButtonText', localTrackersButtonText);
     // ThemeEditor fields
     if (localTextColor !== textColor) onUpdate('gameTextColor', localTextColor);
     if (localTitleColor !== titleColor) onUpdate('gameTitleColor', localTitleColor);
@@ -341,6 +368,11 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalDiaryPlayerName(diaryPlayerName);
     setLocalGameSystemEnabled(gameSystemEnabled);
     setLocalMaxChances(maxChances);
+    setLocalGameShowTrackersUI(gameShowTrackersUI);
+    setLocalSuggestionsButtonText(suggestionsButtonText);
+    setLocalInventoryButtonText(inventoryButtonText);
+    setLocalDiaryButtonText(diaryButtonText);
+    setLocalTrackersButtonText(trackersButtonText);
     // ThemeEditor fields
     setLocalTextColor(textColor);
     setLocalTitleColor(titleColor);
@@ -558,61 +590,86 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                   <div className="pt-6 border-t border-brand-border/50">
                       <h3 className="text-lg font-semibold text-brand-text mb-4">Sistemas</h3>
-                        <div>
-                            <label htmlFor="system-select" className="block text-sm font-medium text-brand-text-dim mb-1">Habilitar sistemas</label>
-                            <select
-                                id="system-select"
-                                value={localGameSystemEnabled}
-                                onChange={(e) => setLocalGameSystemEnabled(e.target.value as 'none' | 'chances' | 'trackers')}
-                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                            >
-                                <option value="none">Nenhum</option>
-                                <option value="chances">Chances</option>
-                                <option value="trackers">Rastreadores</option>
-                            </select>
+                        <div className="grid md:grid-cols-3 gap-x-8">
+                            <div className="md:col-span-1">
+                                <label htmlFor="system-select" className="block text-sm font-medium text-brand-text-dim mb-1">Habilitar sistemas</label>
+                                <select
+                                    id="system-select"
+                                    value={localGameSystemEnabled}
+                                    onChange={(e) => setLocalGameSystemEnabled(e.target.value as 'none' | 'chances' | 'trackers')}
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                >
+                                    <option value="none">Nenhum</option>
+                                    <option value="chances">Chances</option>
+                                    <option value="trackers">Rastreadores</option>
+                                </select>
+                            </div>
+                             <div className="md:col-span-2 mt-4 md:mt-0">
+                                {localGameSystemEnabled === 'chances' && (
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                            <div>
+                                                <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
+                                                <input
+                                                    type="number"
+                                                    id="maxChances"
+                                                    value={localMaxChances}
+                                                    onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
+                                                    min="1"
+                                                    max="10"
+                                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="chanceIcon" className="block text-sm font-medium text-brand-text-dim mb-1">Formato do Ícone</label>
+                                                <select
+                                                    id="chanceIcon"
+                                                    value={localChanceIcon}
+                                                    onChange={(e) => setLocalChanceIcon(e.target.value as any)}
+                                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                                >
+                                                    <option value="heart">Corações</option>
+                                                    <option value="circle">Círculos</option>
+                                                    <option value="cross">Cruzes</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label htmlFor="chanceReturnButton" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Retorno</label>
+                                            <input
+                                                type="text"
+                                                id="chanceReturnButton"
+                                                value={localChanceReturnButtonText}
+                                                onChange={(e) => setLocalChanceReturnButtonText(e.target.value)}
+                                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                            />
+                                            <p className="text-xs text-brand-text-dim mt-1">Aparece após perder uma chance.</p>
+                                        </div>
+                                    </div>
+                                )}
+                                {localGameSystemEnabled === 'trackers' && (
+                                    <div>
+                                       <div className="flex items-center">
+                                          <input
+                                              type="checkbox"
+                                              id="showTrackersUI"
+                                              checked={!!localGameShowTrackersUI}
+                                              onChange={e => setLocalGameShowTrackersUI(e.target.checked)}
+                                              className="custom-checkbox"
+                                          />
+                                          <label htmlFor="showTrackersUI" className="ml-2 block text-sm text-brand-text-dim">
+                                              Mostrar painel de rastreadores no jogo
+                                          </label>
+                                      </div>
+                                    </div>
+                                )}
+                                {localGameSystemEnabled === 'none' && (
+                                    <div className="h-full flex items-center justify-center bg-brand-bg rounded-md border-2 border-dashed border-brand-border">
+                                        <p className="text-brand-text-dim text-sm">Nenhum sistema de jogo habilitado.</p>
+                                    </div>
+                                )}
+                            </div>
                         </div>
-                      {localGameSystemEnabled === 'chances' && (
-                          <div className="mt-4 pl-6 border-l-2 border-brand-border/50">
-                              <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4 pt-4">
-                                  <div>
-                                      <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
-                                      <input
-                                          type="number"
-                                          id="maxChances"
-                                          value={localMaxChances}
-                                          onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
-                                          min="1"
-                                          max="10"
-                                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                      />
-                                  </div>
-                                  <div>
-                                      <label htmlFor="chanceIcon" className="block text-sm font-medium text-brand-text-dim mb-1">Formato do Ícone</label>
-                                      <select
-                                          id="chanceIcon"
-                                          value={localChanceIcon}
-                                          onChange={(e) => setLocalChanceIcon(e.target.value as any)}
-                                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                      >
-                                          <option value="heart">Corações</option>
-                                          <option value="circle">Círculos</option>
-                                          <option value="cross">Cruzes</option>
-                                      </select>
-                                  </div>
-                                  <div>
-                                      <label htmlFor="chanceReturnButton" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Retorno</label>
-                                      <input
-                                          type="text"
-                                          id="chanceReturnButton"
-                                          value={localChanceReturnButtonText}
-                                          onChange={(e) => setLocalChanceReturnButtonText(e.target.value)}
-                                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                      />
-                                      <p className="text-xs text-brand-text-dim mt-1">Aparece após perder uma chance.</p>
-                                  </div>
-                              </div>
-                          </div>
-                      )}
                   </div>
               </div>
           )}
@@ -684,6 +741,27 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
                                   placeholder="Reiniciar Aventura"
                               />
+                          </div>
+                          <div className="pt-4 border-t border-brand-border/50 col-span-full">
+                            <h4 className="text-md font-semibold text-brand-text mb-4">Textos dos Botões de Ação</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                                <div>
+                                    <label htmlFor="suggestionsButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Sugestões</label>
+                                    <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0" />
+                                </div>
+                                <div>
+                                    <label htmlFor="inventoryButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Inventário</label>
+                                    <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0" />
+                                </div>
+                                <div>
+                                    <label htmlFor="diaryButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Diário</label>
+                                    <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0" />
+                                </div>
+                                <div>
+                                    <label htmlFor="trackersButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Rastreadores</label>
+                                    <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0" disabled={localGameSystemEnabled !== 'trackers'} />
+                                </div>
+                            </div>
                           </div>
                       </div>
                   </div>
