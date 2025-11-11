@@ -23,7 +23,7 @@ const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
 
 const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
     const srcDoc = useMemo(() => {
-        const chancesContainerHTML = gameData.gameEnableChances ? '<div id="chances-container" class="chances-container"></div>' : '';
+        const chancesContainerHTML = gameData.gameSystemEnabled === 'chances' ? '<div id="chances-container" class="chances-container"></div>' : '';
 
         const fontFamily = gameData.gameFontFamily || "'Silkscreen', sans-serif";
         const fontUrl = getFontUrl(fontFamily);

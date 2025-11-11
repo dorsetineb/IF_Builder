@@ -140,7 +140,7 @@ const Header: React.FC<{
     // Add the full editor data to the zip for re-importing.
     zip.file("editor_data.json", JSON.stringify(exportData));
 
-    const chancesContainerHTML = exportData.gameEnableChances 
+    const chancesContainerHTML = exportData.gameSystemEnabled === 'chances' 
         ? '<div id="chances-container" class="chances-container"></div>' 
         : '';
     
@@ -318,8 +318,8 @@ const Header: React.FC<{
                 }
 
                 const replacePathWithData = (path: string | undefined): string | undefined => {
-                    if (path && assetMap.has(path)) {
-                        return assetMap.get(path);
+                    if (path && assetMap.has(path.replace('assets/', ''))) {
+                        return assetMap.get(path.replace('assets/', ''));
                     }
                     return path;
                 };

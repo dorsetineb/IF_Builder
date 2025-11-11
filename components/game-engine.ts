@@ -29,7 +29,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         cenas: translatedCenas,
         mensagem_falha_padrao: data.defaultFailureMessage,
         nome_jogador_diario: data.gameDiaryPlayerName,
-        gameEnableChances: data.gameEnableChances,
+        gameSystemEnabled: data.gameSystemEnabled,
         gameMaxChances: data.gameMaxChances,
         gameChanceIcon: data.gameChanceIcon,
         gameChanceIconColor: data.gameChanceIconColor,
@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function renderChances() {
-        if (!gameData.gameEnableChances) return;
+        if (gameData.gameSystemEnabled !== 'chances') return;
         const container = document.getElementById('chances-container');
         if (!container) return;
         container.innerHTML = '';
@@ -181,8 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         } else if (type === 'negative' && negativeEndingScreen) {
             screenToShow = negativeEndingScreen;
-            if (!currentState.diaryLog.find(e => e.type === 'action' && e.data.response === '[FIM DE JOGO - NEGATIVO]')) {
-                 currentState.diaryLog.push({ type: 'action', data: { command: '', response: '[FIM DE JOGO - NEGATIVO]', sceneId: currentState.currentSceneId } });
+            if (!currentState.diaryLog.find(e => e.type === 'action' && e.data.response === '[FIM DE JOGO - NEGATÍVO]')) {
+                 currentState.diaryLog.push({ type: 'action', data: { command: '', response: '[FIM DE JOGO - NEGATÍVO]', sceneId: currentState.currentSceneId } });
             }
         }
 
@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(actionBar) actionBar.classList.remove('hidden');
 
         // Instant game over if chances are disabled and scene is deadly
-        if (!isStateLoad && !gameData.gameEnableChances && scene.removesChanceOnEntry) {
+        if (!isStateLoad && gameData.gameSystemEnabled !== 'chances' && scene.removesChanceOnEntry) {
             if (sceneDescriptionElement) sceneDescriptionElement.innerHTML = '';
             showEnding('negative');
             return; // Stop processing
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 onRenderCompleteCallback = () => {
                     createEndButton('Fim de Jogo', () => showEnding('positive'));
                 };
-            } else if (gameData.gameEnableChances) {
+            } else if (gameData.gameSystemEnabled === 'chances') {
                 if (scene.removesChanceOnEntry) {
                     currentState.chances--;
                     renderChances();
@@ -581,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let consequenceTriggered = false;
 
-            if (interaction.trackerEffects && Array.isArray(interaction.trackerEffects)) {
+            if (gameData.gameSystemEnabled === 'trackers' && interaction.trackerEffects && Array.isArray(interaction.trackerEffects)) {
                 interaction.trackerEffects.forEach(effect => {
                     if (effect && effect.trackerId && currentState.trackerValues.hasOwnProperty(effect.trackerId)) {
                         currentState.trackerValues[effect.trackerId] += (effect.valueChange || 0);
@@ -921,9 +921,8 @@ document.addEventListener('DOMContentLoaded', () => {
             currentState.inventory = [];
             currentState.diaryLog = [];
             currentState.scenesState = JSON.parse(JSON.stringify(originalScenes));
-            if (gameData.gameEnableChances) {
-                currentState.chances = gameData.gameMaxChances;
-            }
+            currentState.chances = gameData.gameSystemEnabled === 'chances' ? gameData.gameMaxChances : null;
+            
             currentState.trackerValues = {};
             if (gameData.consequenceTrackers && Array.isArray(gameData.consequenceTrackers)) {
                 gameData.consequenceTrackers.forEach(tracker => {
@@ -950,7 +949,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         changeScene(currentState.currentSceneId, hasSave && !startFresh);
-        if(gameData.gameEnableChances) renderChances();
+        if(gameData.gameSystemEnabled === 'chances') renderChances();
     }
     
     // --- Event Listeners ---

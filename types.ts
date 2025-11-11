@@ -101,7 +101,7 @@ export interface GameData {
   gameVerbInputPlaceholder?: string;
   gameDiaryPlayerName?: string;
   gameFocusColor?: string;
-  gameEnableChances?: boolean;
+  gameSystemEnabled?: 'none' | 'chances' | 'trackers';
   gameMaxChances?: number;
   gameChanceIcon?: 'circle' | 'cross' | 'heart';
   gameChanceIconColor?: string;

@@ -922,7 +922,7 @@ const initializeGameData = (): GameData => {
         gameVerbInputPlaceholder: 'O QUE VOCÊ FAZ?',
         gameDiaryPlayerName: 'VOCÊ',
         gameFocusColor: '#58a6ff',
-        gameEnableChances: true,
+        gameSystemEnabled: 'chances',
         gameMaxChances: 2,
         gameChanceIcon: 'heart',
         gameChanceIconColor: '#ff4d4d',
@@ -998,7 +998,7 @@ const createNewGameData = (): GameData => {
         gameVerbInputPlaceholder: 'O QUE VOCÊ FAZ?',
         gameDiaryPlayerName: 'VOCÊ',
         gameFocusColor: '#58a6ff',
-        gameEnableChances: true,
+        gameSystemEnabled: 'chances',
         gameMaxChances: 3,
         gameChanceIcon: 'heart',
         gameChanceIconColor: '#ff4d4d',
@@ -1111,6 +1111,13 @@ const App: React.FC = () => {
                 }
             });
         }
+        
+        // --- Migration from old gameEnableChances to new gameSystemEnabled ---
+        if (importedData.hasOwnProperty('gameEnableChances')) {
+            importedData.gameSystemEnabled = importedData.gameEnableChances ? 'chances' : 'none';
+            delete importedData.gameEnableChances;
+        }
+
 
         setGameData(prev => ({...prev, ...importedData}));
         setSelectedSceneId(importedData.startScene || Object.keys(importedData.scenes)[0]);
@@ -1388,7 +1395,7 @@ const App: React.FC = () => {
             splashButtonText={gameData.gameSplashButtonText || 'INICIAR AVENTURA'}
             continueButtonText={gameData.gameContinueButtonText || 'Continuar Aventura'}
             restartButtonText={gameData.gameRestartButtonText || 'Reiniciar Aventura'}
-            enableChances={gameData.gameEnableChances || false}
+            gameSystemEnabled={gameData.gameSystemEnabled || 'none'}
             maxChances={gameData.gameMaxChances || 3}
             textColor={gameData.gameTextColor || '#c9d1d9'}
             titleColor={gameData.gameTitleColor || '#58a6ff'}
