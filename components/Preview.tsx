@@ -1,3 +1,6 @@
+
+
+
 import React, { useMemo } from 'react';
 import { GameData } from '../types';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
@@ -27,9 +30,6 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
         const trackersButtonHTML = (gameData.gameSystemEnabled === 'trackers' && gameData.gameShowTrackersUI)
             ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>'
             : '';
-        const trackersPopupHTML = (gameData.gameSystemEnabled === 'trackers' && gameData.gameShowTrackersUI)
-            ? '<div id="trackers-popup" class="action-popup hidden"></div>'
-            : '';
 
         const fontFamily = gameData.gameFontFamily || "'Silkscreen', sans-serif";
         const fontUrl = getFontUrl(fontFamily);
@@ -44,12 +44,11 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace('__FONT_STYLESHEET__', fontStylesheet)
             .replace('__LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="game-logo">` : '')
             .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
-            .replace('__TRACKERS_POPUP__', trackersPopupHTML)
             .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
             .replace('__SUGGESTIONS_BUTTON_TEXT__', gameData.gameSuggestionsButtonText || 'Sugestões')
             .replace('__INVENTORY_BUTTON_TEXT__', gameData.gameInventoryButtonText || 'Inventário')
             .replace('__DIARY_BUTTON_TEXT__', gameData.gameDiaryButtonText || 'Diário')
-            .replace('__TRACKERS_BUTTON_TEXT__', gameData.gameTrackersButtonText || 'Rastreadores')
+            .replace(/__TRACKERS_BUTTON_TEXT__/g, gameData.gameTrackersButtonText || 'Rastreadores')
             .replace('__SPLASH_BG_STYLE__', gameData.gameSplashImage ? `style="background-image: url('${gameData.gameSplashImage}')"` : '')
             .replace('__SPLASH_ALIGN_CLASS__', gameData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
             .replace('__SPLASH_LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="splash-logo">` : '')

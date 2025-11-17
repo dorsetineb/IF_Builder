@@ -46,8 +46,18 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
     setLocalTrackers(localTrackers.filter(t => t.id !== id));
   };
 
-  const handleTrackerChange = (id: string, field: keyof ConsequenceTracker, value: string | number) => {
-    setLocalTrackers(localTrackers.map(t => (t.id === id ? { ...t, [field]: value } : t)));
+  const handleTrackerChange = (id: string, field: keyof ConsequenceTracker, value: string | number | boolean) => {
+    setLocalTrackers(localTrackers.map(t => {
+        if (t.id === id) {
+            if (field === 'barColor' && value === '') {
+                const newTracker = { ...t };
+                delete newTracker.barColor;
+                return newTracker;
+            }
+            return { ...t, [field]: value };
+        }
+        return t;
+    }));
   };
   
   const handleSave = () => {
@@ -140,6 +150,40 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                         </p>
                     </div>
                  </div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-brand-border/50 col-span-full grid grid-cols-1 md:grid-cols-2 gap-x-8">
+              <div>
+                  <label className="block text-sm font-medium text-brand-text-dim mb-1">Cor da Barra (Opcional)</label>
+                  <p className="text-xs text-brand-text-dim mt-1 mb-2">Deixe em branco para usar a cor global definida em "Interface".</p>
+                  <div className="flex items-center gap-2">
+                      <input
+                          type="text"
+                          value={tracker.barColor || ''}
+                          onChange={e => handleTrackerChange(tracker.id, 'barColor', e.target.value)}
+                          placeholder="Use cor global"
+                          className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                      />
+                       <input
+                          type="color"
+                          value={tracker.barColor || '#58a6ff'}
+                          onChange={e => handleTrackerChange(tracker.id, 'barColor', e.target.value)}
+                          className="w-10 h-10 p-1 bg-transparent border-none rounded-md cursor-pointer"
+                          style={{backgroundColor: 'transparent'}}
+                      />
+                  </div>
+              </div>
+              <div className="flex items-center pt-7">
+                  <input
+                      type="checkbox"
+                      id={`invertBar-${tracker.id}`}
+                      checked={!!tracker.invertBar}
+                      onChange={e => handleTrackerChange(tracker.id, 'invertBar', e.target.checked)}
+                      className="custom-checkbox"
+                  />
+                  <label htmlFor={`invertBar-${tracker.id}`} className="ml-2 block text-sm text-brand-text-dim">
+                      Inverter cores da barra
+                  </label>
+              </div>
             </div>
           </div>
         ))}

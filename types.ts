@@ -1,3 +1,4 @@
+
 export interface GameObject {
   id: string;
   name: string;
@@ -64,6 +65,8 @@ export interface ConsequenceTracker {
   initialValue: number;
   maxValue: number;
   consequenceSceneId: string;
+  barColor?: string;
+  invertBar?: boolean;
 }
 
 export interface GameData {
@@ -129,6 +132,8 @@ export interface GameData {
   gameInventoryButtonText?: string;
   gameDiaryButtonText?: string;
   gameTrackersButtonText?: string;
+  gameTrackerBarColor?: string;
+  gameTrackerBarInvert?: boolean;
 }
 
 export type View = 'scenes' | 'interface' | 'game_info' | 'map' | 'global_objects' | 'trackers';

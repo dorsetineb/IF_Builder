@@ -35,6 +35,9 @@ const InteractionItem: React.FC<{
 }> = ({ interaction, index, onUpdate, onRemove, allScenes, currentSceneId, sceneObjects, allTakableObjects, consequenceTrackers }) => {
     
     const [localVerbs, setLocalVerbs] = useState(interaction.verbs.join(', '));
+    const [localTrackerValues, setLocalTrackerValues] = useState(() =>
+        (interaction.trackerEffects || []).map(e => e.valueChange.toString())
+    );
     const verbInputId = `verbs-input-${interaction.id}`;
 
     useEffect(() => {
@@ -44,6 +47,10 @@ const InteractionItem: React.FC<{
              setLocalVerbs(interaction.verbs.join(', '));
         }
     }, [interaction.verbs, verbInputId]);
+
+    useEffect(() => {
+        setLocalTrackerValues((interaction.trackerEffects || []).map(e => e.valueChange.toString()));
+    }, [interaction.trackerEffects]);
     
     const handleInteractionChange = (field: keyof Interaction, value: any) => {
         onUpdate(index, { ...interaction, [field]: value });
@@ -53,6 +60,26 @@ const InteractionItem: React.FC<{
         const newEffects = [...(interaction.trackerEffects || [])];
         newEffects[effectIndex] = { ...newEffects[effectIndex], [field]: value };
         handleInteractionChange('trackerEffects', newEffects);
+    };
+
+    const handleLocalTrackerValueChange = (effectIndex: number, stringValue: string) => {
+        const newValues = [...localTrackerValues];
+        newValues[effectIndex] = stringValue;
+        setLocalTrackerValues(newValues);
+    };
+
+    const handleLocalTrackerValueBlur = (effectIndex: number) => {
+        const stringValue = localTrackerValues[effectIndex];
+        const numericValue = parseInt(stringValue, 10);
+        const originalValue = (interaction.trackerEffects || [])[effectIndex]?.valueChange;
+
+        if (!isNaN(numericValue) && numericValue !== originalValue) {
+            handleTrackerEffectChange(effectIndex, 'valueChange', numericValue);
+        } else {
+            const newValues = [...localTrackerValues];
+            newValues[effectIndex] = (originalValue ?? 0).toString();
+            setLocalTrackerValues(newValues);
+        }
     };
 
     const handleAddTrackerEffect = () => {
@@ -303,8 +330,10 @@ const InteractionItem: React.FC<{
                         </select>
                         <input
                             type="number"
-                            value={effect.valueChange}
-                            onChange={(e) => handleTrackerEffectChange(effectIndex, 'valueChange', parseInt(e.target.value, 10) || 0)}
+                            id={`tracker-value-${interaction.id}-${effectIndex}`}
+                            value={localTrackerValues[effectIndex]}
+                            onChange={(e) => handleLocalTrackerValueChange(effectIndex, e.target.value)}
+                            onBlur={() => handleLocalTrackerValueBlur(effectIndex)}
                             className="w-24 bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
                         />
                         <button

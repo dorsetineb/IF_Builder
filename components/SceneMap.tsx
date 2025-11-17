@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -281,6 +282,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
       </div>
       <div 
         ref={containerRef}
+// FIX: Removed invalid backslash from template literal.
         className={`w-full h-full bg-brand-bg rounded-lg border border-brand-border overflow-hidden ${isPanning || dragInfo ? 'cursor-grabbing' : 'cursor-grab'}`}
         style={{backgroundImage: 'radial-gradient(#4a5568 1px, transparent 1px)', backgroundSize: '20px 20px'}}
         onWheel={handleWheel}

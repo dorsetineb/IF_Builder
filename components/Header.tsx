@@ -1,3 +1,5 @@
+
+
 // FIX: Corrected React import to properly include 'useRef'. The previous syntax 'import React, a from ...' was invalid.
 import React, { useRef } from 'react';
 import { GameData } from '../types';
@@ -211,9 +213,6 @@ const Header: React.FC<{
     const trackersButtonHTML = (exportData.gameSystemEnabled === 'trackers' && exportData.gameShowTrackersUI)
         ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>'
         : '';
-    const trackersPopupHTML = (exportData.gameSystemEnabled === 'trackers' && exportData.gameShowTrackersUI)
-        ? '<div id="trackers-popup" class="action-popup hidden"></div>'
-        : '';
 
     let html = exportData.gameHTML
         .replace('__GAME_TITLE__', exportData.gameTitle || 'IF Builder Game')
@@ -224,12 +223,11 @@ const Header: React.FC<{
         .replace('__FONT_STYLESHEET__', fontStylesheet)
         .replace('__FONT_ADJUST_CLASS__', fontAdjustClass)
         .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
-        .replace('__TRACKERS_POPUP__', trackersPopupHTML)
         .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
         .replace('__SUGGESTIONS_BUTTON_TEXT__', exportData.gameSuggestionsButtonText || 'Sugestões')
         .replace('__INVENTORY_BUTTON_TEXT__', exportData.gameInventoryButtonText || 'Inventário')
         .replace('__DIARY_BUTTON_TEXT__', exportData.gameDiaryButtonText || 'Diário')
-        .replace('__TRACKERS_BUTTON_TEXT__', exportData.gameTrackersButtonText || 'Rastreadores')
+        .replace(/__TRACKERS_BUTTON_TEXT__/g, exportData.gameTrackersButtonText || 'Rastreadores')
         .replace('__SPLASH_BG_STYLE__', exportData.gameSplashImage ? `style="background-image: url('${exportData.gameSplashImage}')"` : '')
         .replace('__SPLASH_ALIGN_CLASS__', exportData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
         .replace('__SPLASH_LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="splash-logo">` : '')

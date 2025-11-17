@@ -52,6 +52,8 @@ export const prepareGameDataForEngine = (data: GameData): object => {
     };
 };
 
+// FIX: Escaped template literal placeholders inside the gameJS string to prevent them from being evaluated at compile time.
+// This resolves numerous 'Cannot find name' errors.
 export const gameJS = `
 document.addEventListener('DOMContentLoaded', () => {
     // --- Icon SVGs ---
@@ -67,34 +69,14 @@ document.addEventListener('DOMContentLoaded', () => {
         cross: ICONS.cross // Cross is already an outline
     };
 
-    // --- DOM Elements ---
-    const sceneDescriptionElement = document.getElementById('scene-description');
-    const sceneImageElement = document.getElementById('scene-image');
-    const verbInputElement = document.getElementById('verb-input');
-    const sceneSoundEffectElement = document.getElementById('scene-sound-effect');
-    const transitionOverlay = document.getElementById('transition-overlay');
-    const splashScreen = document.getElementById('splash-screen');
-    const startButton = document.getElementById('splash-start-button');
-    const continueButton = document.getElementById('continue-button');
-    const restartButton = document.getElementById('restart-button');
-    const submitVerbButton = document.getElementById('submit-verb');
-    const inventoryButton = document.getElementById('inventory-button');
-    const suggestionsButton = document.getElementById('suggestions-button');
-    const diaryButton = document.getElementById('diary-button');
-    const trackersButton = document.getElementById('trackers-button');
-    const actionPopup = document.getElementById('action-popup');
-    const trackersPopup = document.getElementById('trackers-popup');
-    const diaryModal = document.getElementById('diary-modal');
-    const diaryLogElement = document.getElementById('diary-log');
-    const diaryModalCloseButton = diaryModal ? diaryModal.querySelector('.modal-close-button') : null;
-    const positiveEndingScreen = document.getElementById('positive-ending-screen');
-    const negativeEndingScreen = document.getElementById('negative-ending-screen');
-    const endingRestartButtons = document.querySelectorAll('.ending-restart-button');
-    const gameHeader = document.querySelector('.game-header');
-    const gameContainer = document.querySelector('.game-container');
-    const sceneNameOverlayElement = document.getElementById('scene-name-overlay');
-    const actionBar = document.querySelector('.action-bar');
-
+    // --- DOM Elements (grabbed when game starts) ---
+    let sceneDescriptionElement, sceneImageElement, verbInputElement, sceneSoundEffectElement,
+        transitionOverlay, splashScreen, startButton, continueButton, submitVerbButton,
+        inventoryButton, suggestionsButton, diaryButton, trackersButton, actionPopup,
+        diaryModal, diaryLogElement, diaryModalCloseButton,
+        trackersModal, trackersContentElement, trackersModalCloseButton,
+        positiveEndingScreen, negativeEndingScreen, gameHeader, gameContainer,
+        sceneNameOverlayElement, actionBar;
 
     // --- State Variables ---
     let gameData = null;
@@ -113,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
         trackerValues: {},
     };
     let onRenderCompleteCallback = null;
+    let gameInitialized = false;
 
     // --- Game Logic ---
     function saveState() {
@@ -176,23 +159,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function renderTrackersUI() {
-        if (!trackersPopup || !gameData.consequenceTrackers || gameData.consequenceTrackers.length === 0) return;
+        if (!trackersContentElement || !gameData.consequenceTrackers || gameData.consequenceTrackers.length === 0) return;
         let content = '';
         gameData.consequenceTrackers.forEach(tracker => {
             if (!tracker || !tracker.id) return;
+    
             const currentValue = currentState.trackerValues[tracker.id] || 0;
             const maxValue = tracker.maxValue || 100;
-            const percentage = Math.max(0, Math.min(100, (currentValue / maxValue) * 100));
+            
+            const barColor = tracker.barColor || 'var(--accent-color)';
+            const isInverted = tracker.invertBar || false;
+    
+            let percentage;
+            if (isInverted) {
+                percentage = Math.max(0, Math.min(100, ((maxValue - currentValue) / maxValue) * 100));
+            } else {
+                percentage = Math.max(0, Math.min(100, (currentValue / maxValue) * 100));
+            }
+            
+            const barStyle = \`width: \${percentage}%; background-color: \${barColor};\`;
+            
             content += \`
                 <div class="tracker-item">
-                    <span class="tracker-item-name">\${tracker.name}</span>
+                    <div class="tracker-item-header">
+                        <span class="tracker-item-name">\${tracker.name}</span>
+                        <span class="tracker-item-values">\${Math.round(currentValue)} / \${maxValue}</span>
+                    </div>
                     <div class="tracker-bar-container">
-                        <div class="tracker-bar" style="width: \${percentage}%;">\${Math.round(currentValue)} / \${maxValue}</div>
+                        <div class="tracker-bar" style="\${barStyle}"></div>
                     </div>
                 </div>
             \`;
         });
-        trackersPopup.innerHTML = content;
+        trackersContentElement.innerHTML = content;
     }
 
 
@@ -236,7 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const p = document.createElement('p');
         
         // Process highlights: **bold** and <clickable>
-        let processedText = paragraphText.replace(/\\*\\*(.*?}\\*\\*/g, '<span class="highlight-item">$1</span>');
+        let processedText = paragraphText.replace(/\\*\\*(.*?)\\*\\*/g, '<span class="highlight-item">$1</span>');
         processedText = processedText.replace(/<(.*?)>/g, '<span class="highlight-word" data-word="$1">$1</span>');
         p.innerHTML = processedText;
 
@@ -612,6 +611,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 });
 
+                if (gameData.gameShowTrackersUI) {
+                    renderTrackersUI();
+                }
+
                 if (gameData.consequenceTrackers && Array.isArray(gameData.consequenceTrackers)) {
                     for (const tracker of gameData.consequenceTrackers) {
                         if (tracker && tracker.id && tracker.consequenceSceneId && currentState.trackerValues[tracker.id] >= tracker.maxValue) {
@@ -746,9 +749,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function populateAndShowPopup(type) {
         if (!actionPopup) return;
         
-        // Hide other popups
-        if (trackersPopup) trackersPopup.classList.add('hidden');
-
         actionPopup.innerHTML = '';
         let content = '<div class="action-popup-list">';
 
@@ -759,180 +759,154 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentState.inventory.forEach(itemId => {
                     const item = allTakableObjects[itemId];
                     if (item) {
-                        content += \`<button data-item-name="\${item.name}" title="\${item.examineDescription}">\${item.name}</button>\`;
+                        content += \`<button data-item-id="\${item.id}">\${item.name}</button>\`;
                     }
                 });
             }
         } else if (type === 'suggestions') {
             const currentScene = currentState.scenesState[currentState.currentSceneId];
-            const suggestedVerbs = new Set();
-
-            const capitalize = (s) => {
-                if (typeof s !== 'string' || !s) return '';
-                return s.charAt(0).toUpperCase() + s.slice(1);
-            };
-
-            // Add verbs from all interactions in the scene
-            if (currentScene.interactions) {
-                currentScene.interactions.forEach(interaction => {
-                    interaction.verbs.forEach(verb => suggestedVerbs.add(capitalize(verb)));
-                });
-            }
-
-            // Add verbs based on objects present
-            if (currentScene.objetos && currentScene.objetos.length > 0) {
-                suggestedVerbs.add('Olhar');
-                suggestedVerbs.add('Examinar');
-                if (currentScene.objetos.some(obj => obj.isTakable)) {
-                    suggestedVerbs.add('Pegar');
-                }
-            } else {
-                // Can still look at the scene itself
-                suggestedVerbs.add('Olhar');
-                suggestedVerbs.add('Examinar');
-            }
-            
-            // Add 'Voltar' if applicable
-            if (currentState.previousSceneId) {
-                suggestedVerbs.add('Voltar');
-            }
-            
-            // Add fixed verbs
-            if (gameData.fixedVerbs && gameData.fixedVerbs.length > 0) {
-                gameData.fixedVerbs.forEach(fixed => {
-                    if (fixed.verbs && fixed.verbs.length > 0) {
-                        suggestedVerbs.add(capitalize(fixed.verbs[0]));
+            if (currentScene && currentScene.interactions && currentScene.interactions.length > 0) {
+                const suggestions = new Set();
+                currentScene.interactions.forEach(inter => {
+                    if (inter.verbs && inter.verbs.length > 0) {
+                        const targetObj = currentScene.objetos.find(o => o.id === inter.target);
+                        if (targetObj) {
+                            suggestions.add(\`\${inter.verbs[0]} \${targetObj.name}\`);
+                        }
                     }
                 });
-            }
-
-            if (suggestedVerbs.size === 0) {
-                content += '<p>Nenhuma sugestão óbvia no momento.</p>';
+                if (suggestions.size > 0) {
+                    suggestions.forEach(sugg => {
+                        content += \`<button data-suggestion="\${sugg}">\${sugg}</button>\`;
+                    });
+                } else {
+                     content += '<p>Nenhuma sugestão óbvia no momento.</p>';
+                }
             } else {
-                const sortedVerbs = Array.from(suggestedVerbs).sort();
-                sortedVerbs.forEach(verb => {
-                    content += \`<button data-verb="\${verb}">\${verb}</button>\`;
-                });
+                content += '<p>Nenhuma sugestão óbvia no momento.</p>';
             }
         }
-
+        
         content += '</div>';
         actionPopup.innerHTML = content;
         actionPopup.classList.remove('hidden');
 
-        if (type === 'suggestions') {
-            actionPopup.querySelectorAll('button[data-verb]').forEach(button => {
-                button.addEventListener('click', () => {
-                    if(verbInputElement) {
-                        const verb = button.getAttribute('data-verb');
-                        const currentValue = verbInputElement.value.trim();
-                        verbInputElement.value = (verb + ' ' + currentValue).trim() + ' ';
-                        verbInputElement.focus();
-                        actionPopup.classList.add('hidden');
+        // Add event listeners
+        actionPopup.querySelectorAll('button').forEach(button => {
+            button.addEventListener('click', () => {
+                if (verbInputElement) {
+                    if (button.dataset.suggestion) {
+                        verbInputElement.value = button.dataset.suggestion;
+                    } else if (button.dataset.itemId) {
+                        const item = allTakableObjects[button.dataset.itemId];
+                        if (item) {
+                            verbInputElement.value = 'examinar ' + item.name;
+                        }
                     }
-                });
+                    processVerb();
+                    actionPopup.classList.add('hidden');
+                }
             });
-        }
-        if (type === 'inventory') {
-            actionPopup.querySelectorAll('button[data-item-name]').forEach(button => {
-                button.addEventListener('click', () => {
-                    if (verbInputElement) {
-                        const itemName = button.getAttribute('data-item-name');
-                        const currentValue = verbInputElement.value.trim();
-                        verbInputElement.value = (currentValue ? currentValue + ' ' + itemName : itemName) + ' ';
-                        verbInputElement.focus();
-                        actionPopup.classList.add('hidden');
-                    }
-                });
-            });
-        }
+        });
     }
-    
+
     function renderDiary() {
         if (!diaryLogElement) return;
         diaryLogElement.innerHTML = '';
-
-        // Group actions by scene
-        const scenesVisited = {};
         currentState.diaryLog.forEach(entry => {
-            if (entry.type === 'scene_load') {
-                scenesVisited[entry.data.id] = {
-                    ...entry.data,
-                    actions: []
-                };
-            } else if (entry.type === 'action' && entry.data.sceneId && scenesVisited[entry.data.sceneId]) {
-                scenesVisited[entry.data.sceneId].actions.push(entry.data);
-            }
-        });
-
-        Object.values(scenesVisited).forEach(scene => {
-            const div = document.createElement('div');
-            div.className = 'diary-entry';
+            const entryDiv = document.createElement('div');
+            entryDiv.className = 'diary-entry';
             
-            // Process highlights for the diary entry, making them visible but not interactive.
-            const processedDescription = scene.description
-                .replace(/\\*\\*(.*?)\\*\\*/g, '<span class="highlight-item">$1</span>') // Preserves bolding
-                .replace(/<(.*?)>/g, '<span class="highlight-word">$1</span>'); // Handles clickable words
-
-            let textContainerHTML = \`
-                <span class="scene-name">\${scene.name}</span>
-                <p>\${processedDescription.replace(/\\n/g, '<br>')}</p>
-            \`;
-
-            if (scene.actions.length > 0) {
-                scene.actions.forEach(action => {
-                    let actionHTML = '';
-                     if (action.command) {
-                        actionHTML += \`<strong>\${gameData.nome_jogador_diario || 'VOCÊ'}:</strong> "\${action.command}"\`;
-                    }
-                    if (action.response) {
-                        if (action.command) {
-                            actionHTML += '<br>';
-                        }
-                        actionHTML += \`<em>\${action.response.replace(/\\n/g, '<br>')}</em>\`;
-                    }
-                    if (actionHTML.trim()) {
-                        textContainerHTML += \`<p class="verb-echo">\${actionHTML}</p>\`;
-                    }
-                });
+            if (entry.type === 'scene_load') {
+                const scene = entry.data;
+                entryDiv.innerHTML = \`
+                    <div class="image-container">
+                        <img src="\${scene.image || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}" alt="Imagem da cena \${scene.name}">
+                    </div>
+                    <div class="text-container">
+                        <span class="scene-name">\${scene.name}</span>
+                        <p>\${scene.description.replace(/\\*\\*(.*?)\\*\\*/g, '<span class="highlight-item">$1</span>').replace(/<(.*?)>/g, '<span class="highlight-word">$1</span>')}</p>
+                    </div>
+                \`;
+            } else if (entry.type === 'action') {
+                const action = entry.data;
+                const sceneName = (gameData.cenas[action.sceneId] || {}).name || 'Cena desconhecida';
+                entryDiv.innerHTML = \`
+                    <div class="image-container">
+                    </div>
+                    <div class="text-container">
+                        <span class="scene-name">\${sceneName}</span>
+                        <p>\${action.response}</p>
+                        <p class="verb-echo">&gt; \${gameData.nome_jogador_diario || 'VOCÊ'}: \${action.command}</p>
+                    </div>
+                \`;
             }
-
-            div.innerHTML = \`
-                <div class="image-container">
-                    <img src="\${scene.image || 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'}" alt="\${scene.name}">
-                </div>
-                <div class="text-container">
-                    \${textContainerHTML}
-                </div>
-            \`;
-            diaryLogElement.appendChild(div);
+            diaryLogElement.appendChild(entryDiv);
         });
-
         diaryLogElement.scrollTop = diaryLogElement.scrollHeight;
     }
 
-
-    // --- Initialization ---
-    function initializeGame(startFresh = false) {
-        if (startFresh) {
-            try {
-                localStorage.removeItem(SAVE_KEY);
-            } catch (e) {
-                console.warn("Could not remove saved game state from localStorage:", e);
-            }
-        }
+    // --- Game Initialization ---
+    function initializeAndStart(loadSaved = false) {
+        if (gameInitialized) return;
 
         gameData = window.embeddedGameData;
         if (!gameData) {
             console.error('Game data not found!');
-            if (sceneDescriptionElement) sceneDescriptionElement.textContent = 'Error: Game data is missing.';
+            return;
+        }
+
+        // --- DOM Elements ---
+        sceneDescriptionElement = document.getElementById('scene-description');
+        sceneImageElement = document.getElementById('scene-image');
+        verbInputElement = document.getElementById('verb-input');
+        submitVerbButton = document.getElementById('submit-verb');
+        sceneSoundEffectElement = document.getElementById('scene-sound-effect');
+        transitionOverlay = document.getElementById('transition-overlay');
+        splashScreen = document.getElementById('splash-screen');
+        inventoryButton = document.getElementById('inventory-button');
+        suggestionsButton = document.getElementById('suggestions-button');
+        diaryButton = document.getElementById('diary-button');
+        trackersButton = document.getElementById('trackers-button');
+        actionPopup = document.getElementById('action-popup');
+        diaryModal = document.getElementById('diary-modal');
+        diaryLogElement = document.getElementById('diary-log');
+        diaryModalCloseButton = diaryModal ? diaryModal.querySelector('.modal-close-button') : null;
+        trackersModal = document.getElementById('trackers-modal');
+        trackersContentElement = document.getElementById('trackers-content');
+        trackersModalCloseButton = trackersModal ? trackersModal.querySelector('.modal-close-button') : null;
+        positiveEndingScreen = document.getElementById('positive-ending-screen');
+        negativeEndingScreen = document.getElementById('negative-ending-screen');
+        gameContainer = document.querySelector('.game-container');
+        sceneNameOverlayElement = document.getElementById('scene-name-overlay');
+        actionBar = document.querySelector('.action-bar');
+
+        if (!sceneDescriptionElement || !splashScreen) {
+            console.error('Essential DOM elements not found. Game cannot start.');
             return;
         }
         
-        originalScenes = JSON.parse(JSON.stringify(gameData.cenas));
-        allTakableObjects = {};
-         Object.values(gameData.cenas).forEach(scene => {
-            if(scene.objetos) {
+        splashScreen.classList.add('hidden');
+        
+        if (loadSaved) {
+            // State is already loaded by loadState()
+        } else {
+            localStorage.removeItem(SAVE_KEY);
+            currentState.currentSceneId = gameData.cena_inicial;
+            currentState.inventory = [];
+            currentState.diaryLog = [];
+            currentState.scenesState = JSON.parse(JSON.stringify(gameData.cenas));
+            currentState.chances = gameData.gameMaxChances;
+            currentState.trackerValues = {};
+            if (gameData.consequenceTrackers) {
+                gameData.consequenceTrackers.forEach(tracker => {
+                    currentState.trackerValues[tracker.id] = tracker.initialValue;
+                });
+            }
+        }
+        
+        Object.values(currentState.scenesState).forEach(scene => {
+            if (scene.objetos) {
                 scene.objetos.forEach(obj => {
                     if (obj.isTakable) {
                         allTakableObjects[obj.id] = obj;
@@ -941,141 +915,95 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        const hasSave = loadState();
+        if (gameData.gameSystemEnabled === 'chances') renderChances();
+        if (gameData.gameSystemEnabled === 'trackers' && gameData.gameShowTrackersUI) renderTrackersUI();
 
-        if (startFresh || !hasSave) {
-            currentState.currentSceneId = gameData.cena_inicial;
-            currentState.previousSceneId = null;
-            currentState.inventory = [];
-            currentState.diaryLog = [];
-            currentState.scenesState = JSON.parse(JSON.stringify(originalScenes));
-            currentState.chances = gameData.gameSystemEnabled === 'chances' ? gameData.gameMaxChances : null;
-            
-            currentState.trackerValues = {};
-            if (gameData.consequenceTrackers && Array.isArray(gameData.consequenceTrackers)) {
-                gameData.consequenceTrackers.forEach(tracker => {
-                    if (tracker && tracker.id) {
-                        currentState.trackerValues[tracker.id] = tracker.initialValue || 0;
-                    }
-                });
-            }
-        } else {
-            // Reconcile trackers for loaded save games
-            const currentTrackers = gameData.consequenceTrackers || [];
-            const savedTrackerValues = currentState.trackerValues || {};
-            const newTrackerValues = {};
-            currentTrackers.forEach(tracker => {
-                if (tracker && tracker.id) {
-                    if (savedTrackerValues.hasOwnProperty(tracker.id)) {
-                        newTrackerValues[tracker.id] = savedTrackerValues[tracker.id];
-                    } else {
-                        newTrackerValues[tracker.id] = tracker.initialValue || 0;
-                    }
+        // --- Event Listeners ---
+        document.querySelectorAll('.ending-restart-button').forEach(button => {
+            button.addEventListener('click', () => {
+                localStorage.removeItem(SAVE_KEY);
+                window.location.reload();
+            });
+        });
+
+        if (verbInputElement) {
+            verbInputElement.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    processVerb();
                 }
             });
-            currentState.trackerValues = newTrackerValues;
+        }
+        if (submitVerbButton) submitVerbButton.addEventListener('click', processVerb);
+        
+        if (inventoryButton) {
+            inventoryButton.addEventListener('click', () => {
+                if (actionPopup.classList.contains('hidden') || actionPopup.querySelector('[data-item-id]') === null) {
+                    populateAndShowPopup('inventory');
+                } else {
+                    actionPopup.classList.add('hidden');
+                }
+            });
         }
         
-        changeScene(currentState.currentSceneId, hasSave && !startFresh);
-        if(gameData.gameSystemEnabled === 'chances') renderChances();
-    }
-    
-    // --- Event Listeners ---
-    if (verbInputElement) {
-        verbInputElement.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-                e.preventDefault();
-                processVerb();
-            }
-        });
-    }
-
-    if (submitVerbButton) {
-        submitVerbButton.addEventListener('click', processVerb);
-    }
-    
-    if (inventoryButton) {
-        inventoryButton.addEventListener('click', () => {
-             if (actionPopup && !actionPopup.classList.contains('hidden') && actionPopup.querySelector('button[data-item-name]')) {
-                actionPopup.classList.add('hidden');
-            } else {
-                populateAndShowPopup('inventory');
-            }
-        });
-    }
-
-    if (suggestionsButton) {
-        suggestionsButton.addEventListener('click', () => {
-            if (actionPopup && !actionPopup.classList.contains('hidden') && actionPopup.querySelector('button[data-verb]')) {
-                actionPopup.classList.add('hidden');
-            } else {
-                populateAndShowPopup('suggestions');
-            }
-        });
-    }
-    
-    if (trackersButton) {
-        trackersButton.addEventListener('click', () => {
-            if (trackersPopup) {
-                if (trackersPopup.classList.contains('hidden')) {
-                    renderTrackersUI(); // Update content before showing
+        if (suggestionsButton) {
+            suggestionsButton.addEventListener('click', () => {
+                if (actionPopup.classList.contains('hidden') || actionPopup.querySelector('[data-suggestion]') === null) {
+                    populateAndShowPopup('suggestions');
+                } else {
+                    actionPopup.classList.add('hidden');
                 }
-                trackersPopup.classList.toggle('hidden');
-                // Hide other popups if we are opening this one
-                if (!trackersPopup.classList.contains('hidden')) {
-                    if (actionPopup) actionPopup.classList.add('hidden');
+            });
+        }
+
+        if (diaryButton && diaryModal) {
+            diaryButton.addEventListener('click', () => {
+                renderDiary();
+                diaryModal.classList.remove('hidden');
+            });
+        }
+        if (diaryModalCloseButton) diaryModalCloseButton.addEventListener('click', () => diaryModal.classList.add('hidden'));
+        if (diaryModal) {
+            diaryModal.addEventListener('click', (e) => {
+                if (e.target === diaryModal) {
+                    diaryModal.classList.add('hidden');
                 }
-            }
-        });
+            });
+        }
+        
+        if (trackersButton && trackersModal) {
+            trackersButton.addEventListener('click', () => {
+                renderTrackersUI();
+                trackersModal.classList.remove('hidden');
+            });
+        }
+        if (trackersModalCloseButton) trackersModalCloseButton.addEventListener('click', () => trackersModal.classList.add('hidden'));
+        if (trackersModal) {
+            trackersModal.addEventListener('click', (e) => {
+                if (e.target === trackersModal) {
+                    trackersModal.classList.add('hidden');
+                }
+            });
+        }
+
+        changeScene(currentState.currentSceneId, true);
+        gameInitialized = true;
     }
     
-    if (diaryButton) {
-        diaryButton.addEventListener('click', () => {
-            renderDiary();
-            if (diaryModal) diaryModal.classList.remove('hidden');
-        });
-    }
-
-    if (diaryModalCloseButton) {
-        diaryModalCloseButton.addEventListener('click', () => {
-            if (diaryModal) diaryModal.classList.add('hidden');
-        });
+    // --- Initial Setup ---
+    startButton = document.getElementById('splash-start-button');
+    continueButton = document.getElementById('continue-button');
+    const hasSave = loadState();
+    
+    if (continueButton) {
+        continueButton.classList.toggle('hidden', !hasSave);
     }
     
     if (startButton) {
-        startButton.addEventListener('click', () => {
-            initializeGame(true); // Force a fresh start
-            if (splashScreen) splashScreen.classList.add('hidden');
-            if(sceneNameOverlayElement) {
-                setTimeout(() => sceneNameOverlayElement.style.opacity = '1', 500);
-            }
-        });
+        startButton.addEventListener('click', () => initializeAndStart(false), { once: true });
     }
-    
-    endingRestartButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            if (positiveEndingScreen) positiveEndingScreen.classList.add('hidden');
-            if (negativeEndingScreen) negativeEndingScreen.classList.add('hidden');
-            if (splashScreen) splashScreen.classList.add('hidden');
-            if (gameContainer) gameContainer.classList.remove('hidden');
-            
-            initializeGame(true); // true to force a fresh start
-        });
-    });
-
     if (continueButton) {
-        if (!window.isPreview && localStorage.getItem(SAVE_KEY)) {
-            continueButton.classList.remove('hidden');
-            continueButton.addEventListener('click', () => {
-                 if (splashScreen) splashScreen.classList.add('hidden');
-                 if(sceneNameOverlayElement) {
-                    setTimeout(() => sceneNameOverlayElement.style.opacity = '1', 500);
-                }
-            });
-        }
+        continueButton.addEventListener('click', () => initializeAndStart(true), { once: true });
     }
-
-    // --- Game Start ---
-    initializeGame();
 });
 `

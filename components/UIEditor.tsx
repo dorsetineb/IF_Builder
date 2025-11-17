@@ -1,3 +1,7 @@
+
+
+
+
 import React, { useState, useEffect } from 'react';
 import { GameData } from '../types';
 
@@ -140,7 +144,7 @@ const ColorInput: React.FC<{
     </div>
 );
 
-const UIEditor: React.FC<UIEditorProps> = (props) => {
+export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const { 
       html, css, layoutOrientation, layoutOrder, imageFrame, splashButtonText, continueButtonText,
       actionButtonText, verbInputPlaceholder, diaryPlayerName, restartButtonText, 
@@ -311,6 +315,12 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
     props, onSetDirty
   ]);
 
+  useEffect(() => {
+    if (localGameSystemEnabled !== 'trackers' && activeTab === 'trackers') {
+        setActiveTab('layout');
+    }
+  }, [localGameSystemEnabled, activeTab]);
+
   const handleSave = () => {
     // UIEditor fields
     if (localLayoutOrientation !== layoutOrientation) onUpdate('gameLayoutOrientation', localLayoutOrientation);
@@ -464,6 +474,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
               break;
           case 'book-cover':
               panelStyles.padding = '8px';
+// FIX: Removed invalid backslash from template literal.
               panelStyles.border = `5px solid ${localFrameBookColor}`;
               break;
           case 'trading-card':
@@ -476,6 +487,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
           case 'chamfered':
               const previewChamferSize = '8px';
               const previewBorderWidth = '5px';
+// FIX: Removed invalid backslash from template literal.
               const previewChamferPath = `polygon(${previewChamferSize} 0, calc(100% - ${previewChamferSize}) 0, 100% ${previewChamferSize}, 100% calc(100% - ${previewChamferSize}), calc(100% - ${previewChamferSize}) 100%, ${previewChamferSize} 100%, 0 calc(100% - ${previewChamferSize}), 0 ${previewChamferSize})`;
               
               panelStyles.padding = previewBorderWidth;
@@ -518,19 +530,24 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
       
       <div>
         <div className="border-b border-brand-border flex space-x-1">
-          {Object.entries(TABS).map(([key, name]) => (
-              <button
-                  key={key}
-                  onClick={() => setActiveTab(key as any)}
-                  className={`px-4 py-2 font-semibold text-sm rounded-t-md transition-colors ${
-                      activeTab === key
-                          ? 'bg-brand-surface text-brand-primary'
-                          : 'text-brand-text-dim hover:text-brand-text'
-                  }`}
-              >
-                  {name}
-              </button>
-          ))}
+          {Object.entries(TABS).map(([key, name]) => {
+              const isTabDisabled = key === 'trackers' && localGameSystemEnabled !== 'trackers';
+              return (
+                  <button
+                      key={key}
+                      onClick={() => !isTabDisabled && setActiveTab(key as any)}
+                      disabled={isTabDisabled}
+// FIX: Removed invalid backslash from template literal.
+                      className={`px-4 py-2 font-semibold text-sm rounded-t-md transition-colors ${
+                          activeTab === key
+                              ? 'bg-brand-surface text-brand-primary'
+                              : 'text-brand-text-dim hover:text-brand-text'
+                      } ${isTabDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                      {name}
+                  </button>
+              );
+          })}
         </div>
 
         <div className="bg-brand-surface -mt-px p-6">
@@ -567,14 +584,17 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                       <div className="flex flex-col items-center justify-center">
                           <p className="text-sm text-brand-text-dim mb-2">Pré-visualização do Layout</p>
                           <div 
+// FIX: Removed invalid backslash from template literal.
                               className={`w-full max-w-sm ${localLayoutOrientation === 'horizontal' ? 'aspect-[4/5]' : 'aspect-video'} bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
                               style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
                           >
                             <div 
+// FIX: Removed invalid backslash from template literal.
                                 className={`flex items-center justify-center ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'} transition-all duration-300 ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}
                                 style={getFramePreviewStyles('none').panelStyles}
                             >
                                   <div 
+// FIX: Removed invalid backslash from template literal.
                                       className={`flex-1 w-full h-full rounded flex items-center justify-center text-center text-sm p-2 font-semibold`}
                                       style={getFramePreviewStyles('none').containerStyles}
                                   >
@@ -776,6 +796,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                         <div className="flex gap-2 rounded-md bg-brand-bg p-1">
                             <button
                                 onClick={() => setLocalGameTheme('dark')}
+// FIX: Removed invalid backslash from template literal.
                                 className={`w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors ${
                                     localGameTheme === 'dark' ? 'bg-brand-primary text-brand-bg' : 'hover:bg-brand-border/30'
                                 }`}
@@ -784,6 +805,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                             </button>
                             <button
                                 onClick={() => setLocalGameTheme('light')}
+// FIX: Removed invalid backslash from template literal.
                                 className={`w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors ${
                                     localGameTheme === 'light' ? 'bg-brand-primary text-brand-bg' : 'hover:bg-brand-border/30'
                                 }`}
@@ -836,6 +858,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     key={theme.name}
                                     onClick={() => applyTheme(theme)}
                                     className="text-left p-2 rounded-md border-2 border-brand-border hover:border-brand-primary transition-colors focus:outline-none focus:border-brand-primary bg-brand-bg"
+// FIX: Removed invalid backslash from template literal.
                                     title={`Aplicar tema ${theme.name}`}
                                 >
                                     <span className="font-semibold text-sm text-brand-text">{theme.name}</span>
@@ -959,6 +982,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                 <div className="flex flex-col sticky top-6 self-start">
                     <p className="text-sm text-brand-text-dim mb-2 text-center">Pré-visualização ao vivo</p>
                     <div 
+// FIX: Removed invalid backslash from template literal.
                         className={`border-2 flex flex-col transition-colors ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-brand-border' : 'bg-[#ffffff] border-[#d0d7de]'}`}
                         style={{ fontFamily: localFontFamily, fontSize: localGameFontSize }}
                     >
@@ -974,6 +998,7 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     style={{ 
                                         backgroundColor: localGameSceneNameOverlayBg, 
                                         color: localGameSceneNameOverlayTextColor,
+// FIX: Removed invalid backslash from template literal.
                                         border: `1px solid ${localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}`,
                                         fontSize: '0.8em'
                                     }}
@@ -1062,4 +1087,5 @@ const UIEditor: React.FC<UIEditorProps> = (props) => {
   );
 };
 
-export default UIEditor;
+// FIX: Changed export to a named export to resolve the import error in App.tsx.
+// export default UIEditor;

@@ -1,3 +1,7 @@
+
+
+
+
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker } from './types';
@@ -5,7 +9,8 @@ import Sidebar from './components/Sidebar';
 import SceneEditor from './components/SceneEditor';
 import Header from './components/Header';
 import { WelcomePlaceholder } from './components/WelcomePlaceholder';
-import UIEditor from './components/UIEditor';
+// FIX: Changed default import to named import for UIEditor.
+import { UIEditor } from './components/UIEditor';
 import GameInfoEditor from './components/GameInfoEditor';
 import Preview from './components/Preview';
 import SceneMap from './components/SceneMap';
@@ -69,7 +74,6 @@ const gameHTML = `
             <div class="text-panel">
                 <div id="scene-description" class="scene-description"></div>
                 <div id="action-popup" class="action-popup hidden"></div>
-                __TRACKERS_POPUP__
                 __CHANCES_CONTAINER__
                 <div class="action-bar">
                     <div class="action-buttons">
@@ -84,6 +88,15 @@ const gameHTML = `
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Trackers Modal -->
+    <div id="trackers-modal" class="modal-overlay hidden">
+        <div class="modal-content trackers-modal-content">
+            <button class="modal-close-button">&times;</button>
+            <h2>__TRACKERS_BUTTON_TEXT__</h2>
+            <div id="trackers-content"></div>
         </div>
     </div>
 
@@ -150,6 +163,8 @@ body.light-theme {
     --splash-content-align-items: flex-end;
     --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__;
     --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__;
+    --tracker-bar-fill-color: var(--accent-color);
+    --tracker-bar-bg-color: var(--input-bg);
 }
 
 /* Reset and base styles */
@@ -523,7 +538,7 @@ body.with-spacing .main-wrapper {
     background-color: var(--button-hover-bg);
 }
 
-/* Diary Modal */
+/* Modals (Diary, Trackers) */
 .hidden { display: none !important; }
 .modal-overlay {
     position: fixed;
@@ -561,6 +576,19 @@ body.with-spacing .main-wrapper {
     cursor: pointer;
     line-height: 1;
 }
+
+.trackers-modal-content {
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+}
+#trackers-content {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding-right: 15px; /* space for scrollbar */
+    margin-right: -15px;
+}
+
 .diary-modal-content {
     max-width: 80vw;
     height: 80vh;
@@ -714,49 +742,52 @@ body.font-adjust-gothic {
 }
 
 /* Custom Scrollbar */
-.scene-description::-webkit-scrollbar, .diary-log::-webkit-scrollbar {
+.scene-description::-webkit-scrollbar, .diary-log::-webkit-scrollbar, #trackers-content::-webkit-scrollbar {
   width: 12px;
 }
-.scene-description::-webkit-scrollbar-track, .diary-log::-webkit-scrollbar-track {
+.scene-description::-webkit-scrollbar-track, .diary-log::-webkit-scrollbar-track, #trackers-content::-webkit-scrollbar-track {
   background: var(--panel-bg); 
 }
-.scene-description::-webkit-scrollbar-thumb, .diary-log::-webkit-scrollbar-thumb {
+.scene-description::-webkit-scrollbar-thumb, .diary-log::-webkit-scrollbar-thumb, #trackers-content::-webkit-scrollbar-thumb {
   background-color: var(--text-dim-color);
   border-radius: 6px;
   border: 3px solid var(--panel-bg);
 }
-.scene-description::-webkit-scrollbar-thumb:hover, .diary-log::-webkit-scrollbar-thumb:hover {
+.scene-description::-webkit-scrollbar-thumb:hover, .diary-log::-webkit-scrollbar-thumb:hover, #trackers-content::-webkit-scrollbar-thumb:hover {
   background-color: var(--text-color);
 }
 
 /* Tracker UI */
 .tracker-item {
-    margin-bottom: 12px;
+    margin-bottom: 15px;
+}
+.tracker-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
 }
 .tracker-item-name {
-    display: block;
-    margin-bottom: 4px;
     font-size: 0.9em;
     color: var(--text-dim-color);
+}
+.tracker-item-values {
+    font-size: 0.9em;
+    font-family: monospace;
+    color: var(--text-color);
 }
 .tracker-bar-container {
     width: 100%;
     height: 22px;
-    background-color: var(--input-bg);
+    background-color: var(--tracker-bar-bg-color);
     border: 1px solid var(--border-color);
     border-radius: 4px;
     overflow: hidden;
 }
 .tracker-bar {
     height: 100%;
-    background-color: var(--accent-color);
+    background-color: var(--tracker-bar-fill-color);
     transition: width 0.3s ease-in-out;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.8em;
-    color: #000;
-    font-weight: bold;
 }
 `;
 
