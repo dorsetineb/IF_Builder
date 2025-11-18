@@ -1,7 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { ConsequenceTracker, Scene } from '../types';
+
+import React, { useState, useEffect, useMemo } from 'react';
+import { ConsequenceTracker, Scene, Interaction, TrackerEffect } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
 import { TrashIcon } from './icons/TrashIcon';
+import CollapsibleCard from './CollapsibleCard';
 
 interface TrackersEditorProps {
   trackers: ConsequenceTracker[];
@@ -10,6 +12,7 @@ interface TrackersEditorProps {
   allTrackerIds: string[];
   isDirty: boolean;
   onSetDirty: (isDirty: boolean) => void;
+  onSelectScene: (sceneId: string) => void;
 }
 
 const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
@@ -20,8 +23,26 @@ const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
     return id;
 };
 
-const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrackers, allScenes, allTrackerIds, isDirty, onSetDirty }) => {
+const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrackers, allScenes, allTrackerIds, isDirty, onSetDirty, onSelectScene }) => {
   const [localTrackers, setLocalTrackers] = useState(trackers);
+
+  const allTrackerUsages = useMemo(() => {
+    const usageMap = new Map<string, { scene: Scene; interaction: Interaction; effect: TrackerEffect }[]>();
+
+    trackers.forEach(tracker => usageMap.set(tracker.id, []));
+
+    allScenes.forEach(scene => {
+        scene.interactions?.forEach(interaction => {
+            interaction.trackerEffects?.forEach(effect => {
+                if (usageMap.has(effect.trackerId)) {
+                    usageMap.get(effect.trackerId)!.push({ scene, interaction, effect });
+                }
+            });
+        });
+    });
+    return usageMap;
+  }, [allScenes, trackers]);
+
 
   useEffect(() => {
     setLocalTrackers(trackers);
@@ -82,112 +103,172 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
         </p>
       </div>
 
-      <div className="bg-brand-surface p-6 space-y-4">
-        {localTrackers.map((tracker) => (
-          <div key={tracker.id} className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
-            <button
-                onClick={() => handleRemoveTracker(tracker.id)}
-                className="absolute top-0 right-0 p-2 bg-red-500 text-white rounded-bl-lg hover:bg-red-600 transition-colors"
-                title="Remover rastreador"
-            >
-                <TrashIcon className="w-5 h-5" />
-            </button>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                 <div className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Rastreador</label>
-                        <input
-                            type="text"
-                            value={tracker.name}
-                            onChange={e => handleTrackerChange(tracker.id, 'name', e.target.value)}
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Rastreador</label>
-                        <p className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all">
-                            {tracker.id}
-                        </p>
-                    </div>
-                 </div>
-                 <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-brand-text-dim mb-1">Valor Inicial</label>
-                            <input
-                                type="number"
-                                value={tracker.initialValue}
-                                onChange={e => handleTrackerChange(tracker.id, 'initialValue', parseInt(e.target.value, 10) || 0)}
-                                className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-brand-text-dim mb-1">Valor Máximo</label>
-                            <input
-                                type="number"
-                                value={tracker.maxValue}
-                                onChange={e => handleTrackerChange(tracker.id, 'maxValue', parseInt(e.target.value, 10) || 0)}
-                                className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
-                            />
-                        </div>
-                    </div>
-                     <div>
-                        <label className="block text-sm font-medium text-brand-text-dim mb-1">Cena de Consequência</label>
-                        <select
-                            value={tracker.consequenceSceneId}
-                            onChange={e => handleTrackerChange(tracker.id, 'consequenceSceneId', e.target.value)}
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+      <div className="space-y-4">
+        {localTrackers.map((tracker) => {
+            const usages = allTrackerUsages.get(tracker.id) || [];
+            return (
+                <CollapsibleCard key={tracker.id} title={tracker.name}>
+                    <div className="relative space-y-4">
+                        <button
+                            onClick={() => handleRemoveTracker(tracker.id)}
+                            className="absolute -top-3 -right-3 p-2 text-brand-text-dim hover:text-red-500 transition-colors"
+                            title="Remover rastreador"
                         >
-                            <option value="">Selecione uma cena...</option>
-                            {allScenes.map(scene => (
-                                <option key={scene.id} value={scene.id}>
-                                    {scene.name}
-                                </option>
-                            ))}
-                        </select>
-                        <p className="text-xs text-brand-text-dim mt-1">
-                            O jogador será enviado para esta cena quando o valor máximo for atingido.
-                        </p>
+                            <TrashIcon className="w-5 h-5" />
+                        </button>
+                        
+                        <div>
+                            <h4 className="text-md font-semibold text-brand-text mb-3">Configuração</h4>
+                            <div className="p-4 bg-brand-bg rounded-md border border-brand-border/50">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                    <div className="space-y-4">
+                                        <div>
+                                            <label className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Rastreador</label>
+                                            <input
+                                                type="text"
+                                                value={tracker.name}
+                                                onChange={e => handleTrackerChange(tracker.id, 'name', e.target.value)}
+                                                className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Rastreador</label>
+                                            <p className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all">
+                                                {tracker.id}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <label className="block text-sm font-medium text-brand-text-dim mb-1">Valor Inicial</label>
+                                                <input
+                                                    type="number"
+                                                    value={tracker.initialValue}
+                                                    onChange={e => handleTrackerChange(tracker.id, 'initialValue', parseInt(e.target.value, 10) || 0)}
+                                                    className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label className="block text-sm font-medium text-brand-text-dim mb-1">Valor Máximo</label>
+                                                <input
+                                                    type="number"
+                                                    value={tracker.maxValue}
+                                                    onChange={e => handleTrackerChange(tracker.id, 'maxValue', parseInt(e.target.value, 10) || 0)}
+                                                    className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium text-brand-text-dim mb-1">Cena de Consequência</label>
+                                            <select
+                                                value={tracker.consequenceSceneId}
+                                                onChange={e => handleTrackerChange(tracker.id, 'consequenceSceneId', e.target.value)}
+                                                className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                                            >
+                                                <option value="">Selecione uma cena...</option>
+                                                {allScenes.map(scene => (
+                                                    <option key={scene.id} value={scene.id}>
+                                                        {scene.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <p className="text-xs text-brand-text-dim mt-1">
+                                                O jogador irá para esta cena quando o valor máximo for atingido.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="mt-4 pt-4 border-t border-brand-border/50 col-span-full grid grid-cols-1 md:grid-cols-2 gap-x-8">
+                                <div>
+                                    <label className="block text-sm font-medium text-brand-text-dim mb-1">Cor da Barra (Opcional)</label>
+                                    <p className="text-xs text-brand-text-dim mt-1 mb-2">Deixe em branco para usar a cor global.</p>
+                                    <div className="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            value={tracker.barColor || ''}
+                                            onChange={e => handleTrackerChange(tracker.id, 'barColor', e.target.value)}
+                                            placeholder="Use cor global"
+                                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                                        />
+                                        <input
+                                            type="color"
+                                            value={tracker.barColor || '#58a6ff'}
+                                            onChange={e => handleTrackerChange(tracker.id, 'barColor', e.target.value)}
+                                            className="w-10 h-10 p-1 bg-transparent border-none rounded-md cursor-pointer"
+                                            style={{backgroundColor: 'transparent'}}
+                                        />
+                                    </div>
+                                </div>
+                                <div className="flex flex-col space-y-2 pt-7">
+                                    <div className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id={`invertBar-${tracker.id}`}
+                                            checked={!!tracker.invertBar}
+                                            onChange={e => handleTrackerChange(tracker.id, 'invertBar', e.target.checked)}
+                                            className="custom-checkbox"
+                                        />
+                                        <label htmlFor={`invertBar-${tracker.id}`} className="ml-2 block text-sm text-brand-text-dim">
+                                            Inverter preenchimento da barra
+                                        </label>
+                                    </div>
+                                    <div className="flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            id={`hideValue-${tracker.id}`}
+                                            checked={!!tracker.hideValue}
+                                            onChange={e => handleTrackerChange(tracker.id, 'hideValue', e.target.checked)}
+                                            className="custom-checkbox"
+                                        />
+                                        <label htmlFor={`hideValue-${tracker.id}`} className="ml-2 block text-sm text-brand-text-dim">
+                                            Ocultar valores numéricos no jogo
+                                        </label>
+                                    </div>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="pt-4">
+                            <h4 className="text-md font-semibold text-brand-text mb-3">Onde este Rastreador é Usado?</h4>
+                            {usages.length > 0 ? (
+                                <ul className="space-y-2">
+                                {usages.map(({ scene, interaction, effect }, index) => {
+                                    const targetObject = scene.objects.find(o => o.id === interaction.target);
+                                    const interactionDesc = `${interaction.verbs[0] || 'Ação'} em ${targetObject?.name || '...'}`;
+                                    return (
+                                    <li key={`${interaction.id}-${index}`}>
+                                        <button 
+                                        onClick={() => onSelectScene(scene.id)}
+                                        className="w-full flex justify-between items-center text-left p-3 bg-brand-bg rounded-md border border-brand-border/50 hover:bg-brand-border/30 transition-colors"
+                                        title={`Ir para a cena: ${scene.name}`}
+                                        >
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-semibold text-brand-text truncate" title={scene.name}>{scene.name}</p>
+                                            <p className="text-xs text-brand-text-dim truncate" title={interactionDesc}>{interactionDesc}</p>
+                                        </div>
+                                        <div className="flex-shrink-0 ml-4 text-center">
+                                            <span className={`font-bold text-lg ${effect.valueChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                            {effect.valueChange >= 0 ? '+' : ''}{effect.valueChange}
+                                            </span>
+                                        </div>
+                                        </button>
+                                    </li>
+                                    );
+                                })}
+                                </ul>
+                            ) : (
+                                <div className="text-center p-4 bg-brand-bg border-2 border-dashed border-brand-border rounded-md">
+                                    <p className="text-brand-text-dim text-sm">Este rastreador ainda não é modificado por nenhuma interação.</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                 </div>
-            </div>
-            <div className="mt-4 pt-4 border-t border-brand-border/50 col-span-full grid grid-cols-1 md:grid-cols-2 gap-x-8">
-              <div>
-                  <label className="block text-sm font-medium text-brand-text-dim mb-1">Cor da Barra (Opcional)</label>
-                  <p className="text-xs text-brand-text-dim mt-1 mb-2">Deixe em branco para usar a cor global definida em "Interface".</p>
-                  <div className="flex items-center gap-2">
-                      <input
-                          type="text"
-                          value={tracker.barColor || ''}
-                          onChange={e => handleTrackerChange(tracker.id, 'barColor', e.target.value)}
-                          placeholder="Use cor global"
-                          className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
-                      />
-                       <input
-                          type="color"
-                          value={tracker.barColor || '#58a6ff'}
-                          onChange={e => handleTrackerChange(tracker.id, 'barColor', e.target.value)}
-                          className="w-10 h-10 p-1 bg-transparent border-none rounded-md cursor-pointer"
-                          style={{backgroundColor: 'transparent'}}
-                      />
-                  </div>
-              </div>
-              <div className="flex items-center pt-7">
-                  <input
-                      type="checkbox"
-                      id={`invertBar-${tracker.id}`}
-                      checked={!!tracker.invertBar}
-                      onChange={e => handleTrackerChange(tracker.id, 'invertBar', e.target.checked)}
-                      className="custom-checkbox"
-                  />
-                  <label htmlFor={`invertBar-${tracker.id}`} className="ml-2 block text-sm text-brand-text-dim">
-                      Inverter cores da barra
-                  </label>
-              </div>
-            </div>
-          </div>
-        ))}
-         {localTrackers.length === 0 && <p className="text-center text-brand-text-dim">Nenhum rastreador criado.</p>}
+                </CollapsibleCard>
+            );
+        })}
+        {localTrackers.length === 0 && <p className="text-center text-brand-text-dim bg-brand-surface p-6 rounded-md">Nenhum rastreador criado.</p>}
       </div>
       <div className="flex justify-end mt-4">
         <button 
@@ -211,6 +292,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                 onClick={handleSave}
                 disabled={!isDirty}
                 className="px-6 py-2 bg-yellow-400 text-black font-semibold rounded-md hover:bg-yellow-500 transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                title={isDirty ? "Salvar" : "Nenhuma alteração para salvar"}
             >
                 Salvar
             </button>

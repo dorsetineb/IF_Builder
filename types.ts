@@ -67,6 +67,7 @@ export interface ConsequenceTracker {
   consequenceSceneId: string;
   barColor?: string;
   invertBar?: boolean;
+  hideValue?: boolean;
 }
 
 export interface GameData {

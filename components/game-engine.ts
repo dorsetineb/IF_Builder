@@ -1,3 +1,4 @@
+
 import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
@@ -169,6 +170,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             const barColor = tracker.barColor || 'var(--accent-color)';
             const isInverted = tracker.invertBar || false;
+            const hideValue = tracker.hideValue || false;
     
             let percentage;
             if (isInverted) {
@@ -178,12 +180,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             
             const barStyle = \`width: \${percentage}%; background-color: \${barColor};\`;
+            const valueDisplay = hideValue ? '' : \`<span class="tracker-item-values">\${Math.round(currentValue)} / \${maxValue}</span>\`;
             
             content += \`
                 <div class="tracker-item">
                     <div class="tracker-item-header">
                         <span class="tracker-item-name">\${tracker.name}</span>
-                        <span class="tracker-item-values">\${Math.round(currentValue)} / \${maxValue}</span>
+                        \${valueDisplay}
                     </div>
                     <div class="tracker-bar-container">
                         <div class="tracker-bar" style="\${barStyle}"></div>

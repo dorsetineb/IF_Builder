@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useState, useCallback, useMemo } from 'react';
 // FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker } from './types';
@@ -780,7 +776,7 @@ body.font-adjust-gothic {
     width: 100%;
     height: 22px;
     background-color: var(--tracker-bar-bg-color);
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
     border-radius: 4px;
     overflow: hidden;
 }
@@ -1546,6 +1542,7 @@ const App: React.FC = () => {
             allTrackerIds={allTrackerIds}
             isDirty={isDirty}
             onSetDirty={setIsDirty}
+            onSelectScene={handleSelectSceneAndSwitchView}
           />
         );
       case 'map':
