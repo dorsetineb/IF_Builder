@@ -1,11 +1,10 @@
+
 import React from 'react';
 import SceneList from './SceneList';
 import { Scene, View } from '../types';
 import { CodeIcon } from './icons/CodeIcon';
 import { BookOpenIcon } from './icons/BookOpenIcon';
-import { InformationCircleIcon } from './icons/InformationCircleIcon';
 import { MapIcon } from './icons/MapIcon';
-import { DocumentPlusIcon } from './icons/DocumentPlusIcon';
 import { KeyIcon } from './icons/KeyIcon';
 import { SignalIcon } from './icons/SignalIcon';
 
@@ -35,13 +34,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   return (
     <aside className="w-1/4 xl:w-1/5 bg-brand-sidebar p-4 border-r border-brand-border flex flex-col">
       <nav className="flex flex-col gap-2 flex-grow overflow-y-auto">
-        <button className={getButtonClass('game_info')} onClick={() => onSetView('game_info')}>
-          <InformationCircleIcon className="w-5 h-5 mr-3" />
-          <span className="font-semibold">Informações do Jogo</span>
-        </button>
         <button className={getButtonClass('interface')} onClick={() => onSetView('interface')}>
           <CodeIcon className="w-5 h-5 mr-3" />
-          <span className="font-semibold">Interface</span>
+          <span className="font-semibold">Informações e Interface</span>
         </button>
         
         <div className="my-2 border-t border-brand-border/50"></div>

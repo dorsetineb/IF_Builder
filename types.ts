@@ -1,4 +1,5 @@
 
+
 export interface GameObject {
   id: string;
   name: string;
@@ -110,6 +111,8 @@ export interface GameData {
   gameChanceIcon?: 'circle' | 'cross' | 'heart';
   gameChanceIconColor?: string;
   gameChanceReturnButtonText?: string;
+  gameChanceLossMessage?: string;
+  gameChanceRestoreMessage?: string;
   gameTheme?: 'dark' | 'light';
   gameTextColorLight?: string;
   gameTitleColorLight?: string;
@@ -137,4 +140,4 @@ export interface GameData {
   gameTrackerBarInvert?: boolean;
 }
 
-export type View = 'scenes' | 'interface' | 'game_info' | 'map' | 'global_objects' | 'trackers';
+export type View = 'scenes' | 'interface' | 'map' | 'global_objects' | 'trackers';

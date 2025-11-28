@@ -1,9 +1,10 @@
 
-
-
-
 import React, { useState, useEffect } from 'react';
-import { GameData } from '../types';
+import { GameData, FixedVerb } from '../types';
+import { UploadIcon } from './icons/UploadIcon';
+import { TrashIcon } from './icons/TrashIcon';
+import { PlusIcon } from './icons/PlusIcon';
+import { ExclamationTriangleIcon } from './icons/ExclamationTriangleIcon';
 
 interface UIEditorProps {
   html: string;
@@ -50,6 +51,21 @@ interface UIEditorProps {
   inventoryButtonText?: string;
   diaryButtonText?: string;
   trackersButtonText?: string;
+  
+  // Game Info Props
+  title: string;
+  logo: string;
+  omitSplashTitle: boolean;
+  splashImage: string;
+  splashContentAlignment: 'left' | 'right';
+  splashDescription: string;
+  positiveEndingImage: string;
+  positiveEndingContentAlignment: 'left' | 'right';
+  positiveEndingDescription: string;
+  negativeEndingImage: string;
+  negativeEndingContentAlignment: 'left' | 'right';
+  negativeEndingDescription: string;
+  fixedVerbs: FixedVerb[];
 }
 
 const FONTS = [
@@ -144,6 +160,66 @@ const ColorInput: React.FC<{
     </div>
 );
 
+// Sub-component to manage local state for the verbs input field (Moved from GameInfoEditor)
+const FixedVerbItem: React.FC<{
+  verb: FixedVerb;
+  onUpdate: (id: string, field: 'verbs' | 'description', value: any) => void;
+  onRemove: (id: string) => void;
+}> = ({ verb, onUpdate, onRemove }) => {
+  const [localVerbs, setLocalVerbs] = useState(verb.verbs.join(', '));
+  const inputId = `verb-words-${verb.id}`;
+
+  useEffect(() => {
+    if (document.activeElement?.id !== inputId) {
+      setLocalVerbs(verb.verbs.join(', '));
+    }
+  }, [verb.verbs, inputId]);
+
+  const handleVerbsBlur = () => {
+    const cleanedVerbs = localVerbs.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
+    if (JSON.stringify(cleanedVerbs) !== JSON.stringify(verb.verbs)) {
+      onUpdate(verb.id, 'verbs', cleanedVerbs);
+    }
+  };
+
+  return (
+    <div className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
+      <button
+        onClick={() => onRemove(verb.id)}
+        className="absolute top-0 right-0 p-2 bg-red-500 text-white rounded-bl-lg hover:bg-red-600 transition-colors"
+        title="Remover verbo"
+      >
+        <TrashIcon className="w-5 h-5" />
+      </button>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+        <div>
+          <label htmlFor={inputId} className="block text-sm font-medium text-brand-text-dim mb-1">Verbos (separados por vírgula)</label>
+          <input
+            id={inputId}
+            type="text"
+            value={localVerbs}
+            onChange={e => setLocalVerbs(e.target.value)}
+            onBlur={handleVerbsBlur}
+            placeholder="ex: ajuda, help, ?"
+            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+          />
+        </div>
+        <div className="flex flex-col h-full">
+          <label htmlFor={`verb-desc-${verb.id}`} className="block text-sm font-medium text-brand-text-dim mb-1">Descrição / Resposta</label>
+          <textarea
+            id={`verb-desc-${verb.id}`}
+            value={verb.description}
+            onChange={e => onUpdate(verb.id, 'description', e.target.value)}
+            placeholder="Texto que será exibido para o jogador."
+            rows={3}
+            className="w-full flex-grow bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const { 
       html, css, layoutOrientation, layoutOrder, imageFrame, splashButtonText, continueButtonText,
@@ -159,7 +235,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
       frameRoundedTopColor,
       gameSceneNameOverlayBg,
       gameSceneNameOverlayTextColor,
-      gameShowTrackersUI, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText
+      gameShowTrackersUI, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText,
+      // Game Info props
+      title, logo, omitSplashTitle, 
+      splashImage, splashContentAlignment, splashDescription,
+      positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription,
+      negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription,
+      fixedVerbs,
   } = props;
 
   // State from UIEditor
@@ -208,6 +290,19 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [focusPreview, setFocusPreview] = useState(false);
   const [isCustomizing, setIsCustomizing] = useState(false);
 
+  // State from GameInfoEditor
+  const [localTitle, setLocalTitle] = useState(title);
+  const [localLogo, setLocalLogo] = useState(logo);
+  const [localOmitSplashTitle, setLocalOmitSplashTitle] = useState(omitSplashTitle);
+  const [localSplashImage, setLocalSplashImage] = useState(splashImage);
+  const [localSplashContentAlignment, setLocalSplashContentAlignment] = useState(splashContentAlignment);
+  const [localSplashDescription, setLocalSplashDescription] = useState(splashDescription);
+  const [localPositiveEndingImage, setLocalPositiveEndingImage] = useState(positiveEndingImage);
+  const [localPositiveEndingDescription, setLocalPositiveEndingDescription] = useState(positiveEndingDescription);
+  const [localNegativeEndingImage, setLocalNegativeEndingImage] = useState(negativeEndingImage);
+  const [localNegativeEndingDescription, setLocalNegativeEndingDescription] = useState(negativeEndingDescription);
+  const [localFixedVerbs, setLocalFixedVerbs] = useState(fixedVerbs);
+
   useEffect(() => {
     // Sync all local states with props
     setLocalLayoutOrientation(layoutOrientation);
@@ -249,13 +344,27 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalFrameRoundedTopColor(frameRoundedTopColor);
     setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg);
     setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor);
+    // Game Info Sync
+    setLocalTitle(title);
+    setLocalLogo(logo);
+    setLocalOmitSplashTitle(omitSplashTitle);
+    setLocalSplashImage(splashImage);
+    setLocalSplashContentAlignment(splashContentAlignment);
+    setLocalSplashDescription(splashDescription);
+    setLocalPositiveEndingImage(positiveEndingImage);
+    setLocalPositiveEndingDescription(positiveEndingDescription);
+    setLocalNegativeEndingImage(negativeEndingImage);
+    setLocalNegativeEndingDescription(negativeEndingDescription);
+    setLocalFixedVerbs(fixedVerbs);
   }, [
     layoutOrientation, layoutOrder, imageFrame, actionButtonText, verbInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, gameSystemEnabled, maxChances,
     textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
     chanceIconColor, gameFontFamily, gameFontSize, chanceIcon, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight,
     frameBookColor, frameTradingCardColor, frameChamferedColor,
     frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor,
-    gameShowTrackersUI, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText
+    gameShowTrackersUI, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText,
+    title, logo, omitSplashTitle, splashImage, splashContentAlignment, splashDescription,
+    positiveEndingImage, positiveEndingDescription, negativeEndingImage, negativeEndingDescription, fixedVerbs
   ]);
   
   useEffect(() => {
@@ -305,13 +414,25 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localFrameChamferedColor !== frameChamferedColor ||
                   localFrameRoundedTopColor !== frameRoundedTopColor ||
                   localGameSceneNameOverlayBg !== gameSceneNameOverlayBg ||
-                  localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor;
+                  localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor ||
+                  localTitle !== title || 
+                  localLogo !== logo || 
+                  localOmitSplashTitle !== omitSplashTitle ||
+                  localSplashImage !== splashImage ||
+                  localSplashContentAlignment !== splashContentAlignment ||
+                  localSplashDescription !== splashDescription ||
+                  localPositiveEndingImage !== positiveEndingImage ||
+                  localPositiveEndingDescription !== positiveEndingDescription ||
+                  localNegativeEndingImage !== negativeEndingImage ||
+                  localNegativeEndingDescription !== negativeEndingDescription ||
+                  JSON.stringify(localFixedVerbs) !== JSON.stringify(fixedVerbs);
     onSetDirty(dirty);
   }, [
     localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI, localSuggestionsButtonText, localInventoryButtonText, localDiaryButtonText, localTrackersButtonText,
     localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
     localFrameBookColor, localFrameTradingCardColor, localFrameChamferedColor,
     frameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
+    localTitle, localLogo, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, localPositiveEndingImage, localPositiveEndingDescription, localNegativeEndingImage, localNegativeEndingDescription, localFixedVerbs,
     props, onSetDirty
   ]);
 
@@ -363,6 +484,18 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localFrameRoundedTopColor !== frameRoundedTopColor) onUpdate('frameRoundedTopColor', localFrameRoundedTopColor);
     if (localGameSceneNameOverlayBg !== gameSceneNameOverlayBg) onUpdate('gameSceneNameOverlayBg', localGameSceneNameOverlayBg);
     if (localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor) onUpdate('gameSceneNameOverlayTextColor', localGameSceneNameOverlayTextColor);
+    // Game Info Fields
+    if (localTitle !== title) onUpdate('gameTitle', localTitle);
+    if (localLogo !== logo) onUpdate('gameLogo', localLogo);
+    if (localOmitSplashTitle !== omitSplashTitle) onUpdate('gameOmitSplashTitle', localOmitSplashTitle);
+    if (localSplashImage !== splashImage) onUpdate('gameSplashImage', localSplashImage);
+    if (localSplashContentAlignment !== splashContentAlignment) onUpdate('gameSplashContentAlignment', localSplashContentAlignment);
+    if (localSplashDescription !== splashDescription) onUpdate('gameSplashDescription', localSplashDescription);
+    if (localPositiveEndingImage !== positiveEndingImage) onUpdate('positiveEndingImage', localPositiveEndingImage);
+    if (localPositiveEndingDescription !== positiveEndingDescription) onUpdate('positiveEndingDescription', localPositiveEndingDescription);
+    if (localNegativeEndingImage !== negativeEndingImage) onUpdate('negativeEndingImage', localNegativeEndingImage);
+    if (localNegativeEndingDescription !== negativeEndingDescription) onUpdate('negativeEndingDescription', localNegativeEndingDescription);
+    if (JSON.stringify(localFixedVerbs) !== JSON.stringify(fixedVerbs)) onUpdate('fixedVerbs', localFixedVerbs);
   };
   
   const handleUndo = () => {
@@ -407,6 +540,18 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalFrameRoundedTopColor(frameRoundedTopColor);
     setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg);
     setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor);
+    // Game Info Fields
+    setLocalTitle(title);
+    setLocalLogo(logo);
+    setLocalOmitSplashTitle(omitSplashTitle);
+    setLocalSplashImage(splashImage);
+    setLocalSplashContentAlignment(splashContentAlignment);
+    setLocalSplashDescription(splashDescription);
+    setLocalPositiveEndingImage(positiveEndingImage);
+    setLocalPositiveEndingDescription(positiveEndingDescription);
+    setLocalNegativeEndingImage(negativeEndingImage);
+    setLocalNegativeEndingDescription(negativeEndingDescription);
+    setLocalFixedVerbs(fixedVerbs);
   };
 
   const applyTheme = (theme: typeof PREDEFINED_THEMES[0]) => {
@@ -422,6 +567,43 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
       setLocalActionButtonColor(theme.actionButtonColor);
       setLocalActionButtonTextColor(theme.actionButtonTextColor);
       setLocalChanceIconColor(theme.chanceIconColor);
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
+    if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            if (event.target && typeof event.target.result === 'string') {
+                setter(event.target.result);
+            }
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+    if (e.target) {
+      (e.target as HTMLInputElement).value = '';
+    }
+  };
+
+  const handleAddFixedVerb = () => {
+      const newVerb: FixedVerb = {
+          id: `verb_${Math.random().toString(36).substring(2, 9)}`,
+          verbs: [],
+          description: 'Nova resposta para o verbo.',
+      };
+      setLocalFixedVerbs([...localFixedVerbs, newVerb]);
+  };
+  
+  const handleRemoveFixedVerb = (id: string) => {
+      setLocalFixedVerbs(localFixedVerbs.filter(verb => verb.id !== id));
+  };
+  
+  const handleFixedVerbChange = (id: string, field: 'verbs' | 'description', value: any) => {
+      setLocalFixedVerbs(localFixedVerbs.map(verb => {
+          if (verb.id === id) {
+              return { ...verb, [field]: value };
+          }
+          return verb;
+      }));
   };
 
   const HeartIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
@@ -474,7 +656,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
               break;
           case 'book-cover':
               panelStyles.padding = '8px';
-// FIX: Removed invalid backslash from template literal.
               panelStyles.border = `5px solid ${localFrameBookColor}`;
               break;
           case 'trading-card':
@@ -487,7 +668,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
           case 'chamfered':
               const previewChamferSize = '8px';
               const previewBorderWidth = '5px';
-// FIX: Removed invalid backslash from template literal.
               const previewChamferPath = `polygon(${previewChamferSize} 0, calc(100% - ${previewChamferSize}) 0, 100% ${previewChamferSize}, 100% calc(100% - ${previewChamferSize}), calc(100% - ${previewChamferSize}) 100%, ${previewChamferSize} 100%, 0 calc(100% - ${previewChamferSize}), 0 ${previewChamferSize})`;
               
               panelStyles.padding = previewBorderWidth;
@@ -509,6 +689,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
   const TABS = {
     layout: 'Layout',
+    abertura: 'Abertura do Jogo',
+    fim_de_jogo: 'Fim de Jogo',
+    verbos: 'Verbos Fixos',
     textos: 'Textos da Interface',
     cores: 'Cores e Fontes',
   };
@@ -518,18 +701,18 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     <div className="space-y-6 pb-24">
       <div>
         <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-brand-text">Aparência e Interface</h2>
+            <h2 className="text-xl font-bold text-brand-text">Aparência e Informações</h2>
             {isDirty && (
                 <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Alterações não salvas"></div>
             )}
         </div>
         <p className="text-brand-text-dim mt-1">
-            Personalize o layout, as cores e os textos da interface do seu jogo.
+            Personalize as informações, o layout e a aparência do seu jogo.
         </p>
       </div>
       
       <div>
-        <div className="border-b border-brand-border flex space-x-1">
+        <div className="border-b border-brand-border flex space-x-1 overflow-x-auto">
           {Object.entries(TABS).map(([key, name]) => {
               const isTabDisabled = key === 'trackers' && localGameSystemEnabled !== 'trackers';
               return (
@@ -537,8 +720,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                       key={key}
                       onClick={() => !isTabDisabled && setActiveTab(key as any)}
                       disabled={isTabDisabled}
-// FIX: Removed invalid backslash from template literal.
-                      className={`px-4 py-2 font-semibold text-sm rounded-t-md transition-colors ${
+                      className={`px-4 py-2 font-semibold text-sm rounded-t-md transition-colors whitespace-nowrap ${
                           activeTab === key
                               ? 'bg-brand-surface text-brand-primary'
                               : 'text-brand-text-dim hover:text-brand-text'
@@ -584,17 +766,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                       <div className="flex flex-col items-center justify-center">
                           <p className="text-sm text-brand-text-dim mb-2">Pré-visualização do Layout</p>
                           <div 
-// FIX: Removed invalid backslash from template literal.
                               className={`w-full max-w-sm ${localLayoutOrientation === 'horizontal' ? 'aspect-[4/5]' : 'aspect-video'} bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
                               style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
                           >
                             <div 
-// FIX: Removed invalid backslash from template literal.
                                 className={`flex items-center justify-center ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'} transition-all duration-300 ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}
                                 style={getFramePreviewStyles('none').panelStyles}
                             >
                                   <div 
-// FIX: Removed invalid backslash from template literal.
                                       className={`flex-1 w-full h-full rounded flex items-center justify-center text-center text-sm p-2 font-semibold`}
                                       style={getFramePreviewStyles('none').containerStyles}
                                   >
@@ -690,6 +869,257 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 )}
                             </div>
                         </div>
+                  </div>
+              </div>
+          )}
+
+          {activeTab === 'abertura' && (
+              <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                      <div className="space-y-6">
+                           <div className="space-y-2">
+                              <h4 className="text-lg font-semibold text-brand-text mb-2">Título do Jogo</h4>
+                              <input
+                                type="text"
+                                id="gameTitle"
+                                value={localTitle}
+                                onChange={(e) => setLocalTitle(e.target.value)}
+                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                placeholder="Ex: A Masmorra Esquecida"
+                              />
+                              <div className="flex items-center pt-1">
+                                <input
+                                  type="checkbox"
+                                  id="omitSplashTitle"
+                                  checked={localOmitSplashTitle}
+                                  onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
+                                  className="custom-checkbox"
+                                />
+                                <label htmlFor="omitSplashTitle" className="ml-2 text-sm text-brand-text-dim">Omitir título da abertura</label>
+                              </div>
+                          </div>
+                          <div className="space-y-2">
+                              <h4 className="text-lg font-semibold text-brand-text mb-2">Logotipo do Jogo (Opcional)</h4>
+                              <div className="flex items-start gap-4">
+                                  {localLogo && (
+                                      <img src={localLogo} alt="Pré-visualização do logo" className="h-16 w-auto bg-brand-bg p-1 border border-brand-border rounded" />
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                      <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                          <UploadIcon className="w-5 h-5 mr-2" />
+                                          {localLogo ? 'Alterar Logo' : 'Carregar Logo'}
+                                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalLogo)} className="hidden" />
+                                      </label>
+                                      {localLogo && (
+                                          <button
+                                              onClick={() => setLocalLogo('')}
+                                              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                              title="Remover logo"
+                                          >
+                                              <TrashIcon className="w-5 h-5" />
+                                          </button>
+                                      )}
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div className="space-y-2 flex flex-col">
+                          <h4 className="text-lg font-semibold text-brand-text mb-2">Descrição do Jogo</h4>
+                          <textarea
+                            id="splashDescription"
+                            value={localSplashDescription}
+                            onChange={(e) => setLocalSplashDescription(e.target.value)}
+                            rows={8}
+                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
+                            placeholder="Uma breve descrição da sua aventura..."
+                          />
+                      </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-brand-border/50">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div className="space-y-4">
+                            <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
+                            <div className="flex items-start gap-4">
+                                {localSplashImage && (
+                                    <img src={localSplashImage} alt="Fundo da tela de abertura" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />
+                                )}
+                                <div className="flex items-center gap-2">
+                                    <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                        <UploadIcon className="w-5 h-5 mr-2" />
+                                        {localSplashImage ? 'Alterar Imagem' : 'Carregar Imagem'}
+                                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
+                                    </label>
+                                    {localSplashImage && (
+                                        <button
+                                            onClick={() => setLocalSplashImage('')}
+                                            className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                            title="Remover imagem"
+                                        >
+                                            <TrashIcon className="w-5 h-5" />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="pt-2">
+                                <label htmlFor="splashContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento horizontal</label>
+                                <select
+                                    id="splashContentAlignment"
+                                    value={localSplashContentAlignment}
+                                    onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                >
+                                    <option value="right">Direita</option>
+                                    <option value="left">Esquerda</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
+                           <div
+                              className="relative w-full aspect-video bg-indigo-500/30 border border-indigo-400 rounded-md flex"
+                              style={{
+                                  justifyContent: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
+                                  alignItems: 'flex-end'
+                              }}
+                              title="Área da Imagem de Fundo"
+                          >
+                              <div className="absolute top-2 left-2 text-indigo-200 font-semibold text-sm">
+                                  Imagem de Fundo
+                              </div>
+                              <div
+                                  className="w-2/3 h-1/2 m-4 bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold"
+                                  title="Área de Texto"
+                              >
+                                  Texto de Abertura
+                              </div>
+                          </div>
+                        </div>
+                     </div>
+                  </div>
+              </div>
+          )}
+
+          {activeTab === 'fim_de_jogo' && (
+              <div className="space-y-10">
+                  {/* Positive Ending */}
+                  <div className="space-y-6">
+                      <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Positivo</h3>
+                      <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador alcança uma cena marcada como "final".</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                          <div className="space-y-4">
+                              <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
+                              <div className="flex items-start gap-4">
+                                  {localPositiveEndingImage && (
+                                      <img src={localPositiveEndingImage} alt="Fundo do final positivo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                      <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                          <UploadIcon className="w-5 h-5 mr-2" />
+                                          {localPositiveEndingImage ? 'Alterar Imagem' : 'Carregar Imagem'}
+                                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
+                                      </label>
+                                      {localPositiveEndingImage && (
+                                          <button
+                                              onClick={() => setLocalPositiveEndingImage('')}
+                                              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                              title="Remover imagem"
+                                          >
+                                              <TrashIcon className="w-5 h-5" />
+                                          </button>
+                                      )}
+                                  </div>
+                              </div>
+                          </div>
+                          <div className="space-y-2 flex flex-col">
+                              <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Vitória</h4>
+                              <textarea
+                                  id="positiveEndingDescription"
+                                  value={localPositiveEndingDescription}
+                                  onChange={(e) => setLocalPositiveEndingDescription(e.target.value)}
+                                  rows={4}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
+                                  placeholder="Parabéns! Você venceu."
+                              />
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Negative Ending */}
+                  <div className="space-y-6 pt-6 border-t border-brand-border/50">
+                      <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Negativo</h3>
+                      <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador fica sem chances (vidas).</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                          <div className="space-y-4">
+                              <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
+                              <div className="flex items-start gap-4">
+                                  {localNegativeEndingImage && (
+                                      <img src={localNegativeEndingImage} alt="Fundo do final negativo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                      <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                          <UploadIcon className="w-5 h-5 mr-2" />
+                                          {localNegativeEndingImage ? 'Alterar Imagem' : 'Carregar Imagem'}
+                                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
+                                      </label>
+                                      {localNegativeEndingImage && (
+                                          <button
+                                              onClick={() => setLocalNegativeEndingImage('')}
+                                              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                              title="Remover imagem"
+                                          >
+                                              <TrashIcon className="w-5 h-5" />
+                                          </button>
+                                      )}
+                                  </div>
+                              </div>
+                          </div>
+                           <div className="space-y-2 flex flex-col">
+                              <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Derrota</h4>
+                              <textarea
+                                  id="negativeEndingDescription"
+                                  value={localNegativeEndingDescription}
+                                  onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
+                                  rows={4}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
+                                  placeholder="Fim de jogo."
+                              />
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          )}
+
+          {activeTab === 'verbos' && (
+              <div className="space-y-4">
+                  <p className="text-brand-text-dim text-sm">
+                      Defina verbos fixos que o jogador pode usar a qualquer momento. Estes verbos têm prioridade sobre as interações de cena.
+                  </p>
+                  <div className="bg-yellow-500/10 p-4 rounded-md border border-yellow-500/50 flex items-start gap-3">
+                      <ExclamationTriangleIcon className="w-6 h-6 text-yellow-500 flex-shrink-0" />
+                      <p className="text-yellow-200/90 text-sm">
+                          Os verbos <strong className="text-yellow-100">olhar</strong> e <strong className="text-yellow-100">examinar</strong> são ações padrão do jogo para inspecionar objetos na cena ou no inventário. Eles já funcionam por padrão e não precisam ser adicionados aqui.
+                      </p>
+                  </div>
+                  {localFixedVerbs.map((verb) => (
+                      <FixedVerbItem
+                          key={verb.id}
+                          verb={verb}
+                          onUpdate={handleFixedVerbChange}
+                          onRemove={handleRemoveFixedVerb}
+                      />
+                  ))}
+                  {localFixedVerbs.length === 0 && (
+                      <p className="text-center text-brand-text-dim py-4">Nenhum verbo fixo definido.</p>
+                  )}
+                  <div className="flex justify-end mt-4">
+                      <button 
+                          onClick={handleAddFixedVerb} 
+                          className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
+                      >
+                          <PlusIcon className="w-5 h-5 mr-2" />
+                          Adicionar Verbo Fixo
+                      </button>
                   </div>
               </div>
           )}
@@ -796,7 +1226,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         <div className="flex gap-2 rounded-md bg-brand-bg p-1">
                             <button
                                 onClick={() => setLocalGameTheme('dark')}
-// FIX: Removed invalid backslash from template literal.
                                 className={`w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors ${
                                     localGameTheme === 'dark' ? 'bg-brand-primary text-brand-bg' : 'hover:bg-brand-border/30'
                                 }`}
@@ -805,7 +1234,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             </button>
                             <button
                                 onClick={() => setLocalGameTheme('light')}
-// FIX: Removed invalid backslash from template literal.
                                 className={`w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors ${
                                     localGameTheme === 'light' ? 'bg-brand-primary text-brand-bg' : 'hover:bg-brand-border/30'
                                 }`}
@@ -858,7 +1286,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     key={theme.name}
                                     onClick={() => applyTheme(theme)}
                                     className="text-left p-2 rounded-md border-2 border-brand-border hover:border-brand-primary transition-colors focus:outline-none focus:border-brand-primary bg-brand-bg"
-// FIX: Removed invalid backslash from template literal.
                                     title={`Aplicar tema ${theme.name}`}
                                 >
                                     <span className="font-semibold text-sm text-brand-text">{theme.name}</span>
@@ -982,7 +1409,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 <div className="flex flex-col sticky top-6 self-start">
                     <p className="text-sm text-brand-text-dim mb-2 text-center">Pré-visualização ao vivo</p>
                     <div 
-// FIX: Removed invalid backslash from template literal.
                         className={`border-2 flex flex-col transition-colors ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-brand-border' : 'bg-[#ffffff] border-[#d0d7de]'}`}
                         style={{ fontFamily: localFontFamily, fontSize: localGameFontSize }}
                     >
@@ -998,7 +1424,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     style={{ 
                                         backgroundColor: localGameSceneNameOverlayBg, 
                                         color: localGameSceneNameOverlayTextColor,
-// FIX: Removed invalid backslash from template literal.
                                         border: `1px solid ${localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}`,
                                         fontSize: '0.8em'
                                     }}
@@ -1078,7 +1503,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
               onClick={handleSave}
               disabled={!isDirty}
               className="px-6 py-2 bg-yellow-400 text-black font-semibold rounded-md hover:bg-yellow-500 transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
-              title={isDirty ? "Salvar alterações na interface" : "Nenhuma alteração para salvar"}
+              title={isDirty ? "Salvar alterações" : "Nenhuma alteração para salvar"}
           >
               Salvar
           </button>
@@ -1087,5 +1512,4 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   );
 };
 
-// FIX: Changed export to a named export to resolve the import error in App.tsx.
-// export default UIEditor;
+export default UIEditor;

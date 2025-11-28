@@ -1,13 +1,11 @@
+
 import React, { useState, useCallback, useMemo } from 'react';
-// FIX: Added 'View' to the import from './types' to resolve the 'Cannot find name 'View'' error.
 import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker } from './types';
 import Sidebar from './components/Sidebar';
 import SceneEditor from './components/SceneEditor';
 import Header from './components/Header';
 import { WelcomePlaceholder } from './components/WelcomePlaceholder';
-// FIX: Changed default import to named import for UIEditor.
 import { UIEditor } from './components/UIEditor';
-import GameInfoEditor from './components/GameInfoEditor';
 import Preview from './components/Preview';
 import SceneMap from './components/SceneMap';
 import GlobalObjectsEditor from './components/GlobalObjectsEditor';
@@ -1497,11 +1495,7 @@ const App: React.FC = () => {
             inventoryButtonText={gameData.gameInventoryButtonText}
             diaryButtonText={gameData.gameDiaryButtonText}
             trackersButtonText={gameData.gameTrackersButtonText}
-          />
-        );
-      case 'game_info':
-        return (
-          <GameInfoEditor
+            // Passing Game Info Props
             title={gameData.gameTitle || 'Fuja da Masmorra'}
             logo={gameData.gameLogo || ''}
             omitSplashTitle={gameData.gameOmitSplashTitle || false}
@@ -1515,9 +1509,6 @@ const App: React.FC = () => {
             negativeEndingContentAlignment={gameData.negativeEndingContentAlignment || 'right'}
             negativeEndingDescription={gameData.negativeEndingDescription || ''}
             fixedVerbs={gameData.fixedVerbs || []}
-            onUpdate={handleUpdateGameData}
-            isDirty={isDirty}
-            onSetDirty={setIsDirty}
           />
         );
        case 'global_objects':
