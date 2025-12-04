@@ -5,6 +5,7 @@ export interface GameObject {
   name: string;
   examineDescription: string;
   isTakable: boolean;
+  image?: string; // Base64 string for the object's image
 }
 
 export interface TrackerEffect {
@@ -43,13 +44,13 @@ export interface Scene {
   name: string;
   image: string; // URL or base64 string
   description: string;
-  objects: GameObject[];
+  objectIds: string[]; // References to GameData.globalObjects
+  objects?: GameObject[]; // Deprecated: Kept for migration types
   interactions: Interaction[];
   exits?: Exits;
   isEndingScene?: boolean;
   removesChanceOnEntry?: boolean;
   restoresChanceOnEntry?: boolean;
-  // FIX: Add optional mapX and mapY properties for SceneMap positioning.
   mapX?: number;
   mapY?: number;
 }
@@ -75,6 +76,9 @@ export interface GameData {
   startScene: string;
   scenes: {
     [id: string]: Scene;
+  };
+  globalObjects: {
+    [id: string]: GameObject;
   };
   defaultFailureMessage: string;
   sceneOrder: string[];

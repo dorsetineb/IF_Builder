@@ -1,13 +1,17 @@
 
-import React from 'react';
+
+import React, { useState } from 'react';
 import { GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
 import { TrashIcon } from './icons/TrashIcon';
 
 interface ObjectEditorProps {
-  objects: GameObject[];
-  onUpdateObjects: (objects: GameObject[]) => void;
-  allObjectIds: string[];
+  sceneId: string;
+  objects: GameObject[]; // The objects currently linked to this scene
+  allGlobalObjects: GameObject[]; // All available objects
+  onCreateGlobalObject: (obj: GameObject, linkToSceneId: string) => void;
+  onLinkObject: (sceneId: string, objectId: string) => void;
+  onUnlinkObject: (sceneId: string, objectId: string) => void;
 }
 
 const generateUniqueId = (prefix: 'obj', existingIds: string[]): string => {
@@ -18,106 +22,112 @@ const generateUniqueId = (prefix: 'obj', existingIds: string[]): string => {
     return id;
 };
 
-const ObjectEditor: React.FC<ObjectEditorProps> = ({ objects = [], onUpdateObjects, allObjectIds }) => {
-  const handleAddObject = () => {
+const ObjectEditor: React.FC<ObjectEditorProps> = ({ 
+    sceneId, 
+    objects, 
+    allGlobalObjects, 
+    onCreateGlobalObject, 
+    onLinkObject, 
+    onUnlinkObject 
+}) => {
+  const [selectedGlobalObjectId, setSelectedGlobalObjectId] = useState<string>('');
+  
+  const handleCreateNewObject = () => {
+    const allIds = allGlobalObjects.map(o => o.id);
     const newObject: GameObject = {
-      id: generateUniqueId('obj', allObjectIds),
+      id: generateUniqueId('obj', allIds),
       name: 'Novo Objeto',
       examineDescription: 'Descrição do novo objeto.',
       isTakable: false,
     };
-    onUpdateObjects([...objects, newObject]);
+    onCreateGlobalObject(newObject, sceneId);
   };
 
-  const handleRemoveObject = (index: number) => {
-    onUpdateObjects(objects.filter((_, i) => i !== index));
+  const handleLinkExistingObject = () => {
+      if (selectedGlobalObjectId) {
+          onLinkObject(sceneId, selectedGlobalObjectId);
+          setSelectedGlobalObjectId('');
+      }
   };
 
-  const handleObjectChange = (index: number, field: keyof GameObject, value: string | boolean) => {
-    const newObjects = objects.map((obj, i) => {
-        if (i === index) {
-            // The 'id' field is now read-only, so we don't need special handling for it.
-            return { ...obj, [field]: value };
-        }
-        return obj;
-    });
-    onUpdateObjects(newObjects);
-  };
+  const availableObjects = allGlobalObjects.filter(gObj => !objects.some(linked => linked.id === gObj.id));
 
   return (
     <>
       <div className="space-y-4">
-        {objects.map((obj, index) => (
-          <div key={index} className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
-            <button
-                onClick={() => handleRemoveObject(index)}
-                className="absolute top-0 right-0 p-2 bg-red-500 text-white rounded-bl-lg hover:bg-red-600 transition-colors"
-                title="Remover objeto"
-            >
-                <TrashIcon className="w-5 h-5" />
-            </button>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                 {/* Left Column */}
-                 <div className="space-y-4">
-                    <div>
-                        <label htmlFor={`obj-name-${index}`} className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Objeto</label>
-                        <input
-                            id={`obj-name-${index}`}
-                            type="text"
-                            value={obj.name}
-                            onChange={e => handleObjectChange(index, 'name', e.target.value)}
-                            placeholder="Nome do Objeto"
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
-                        />
+        {objects.length > 0 ? (
+            objects.map((obj, index) => (
+            <div key={obj.id} className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
+                <button
+                    onClick={() => onUnlinkObject(sceneId, obj.id)}
+                    className="absolute top-0 right-0 p-2 bg-brand-border text-brand-text-dim rounded-bl-lg hover:bg-red-500 hover:text-white transition-colors"
+                    title="Desvincular objeto desta cena (não apaga do jogo)"
+                >
+                    <TrashIcon className="w-5 h-5" />
+                </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 opacity-75 pointer-events-none">
+                    {/* Read-only view of the object */}
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Objeto</label>
+                            <input type="text" value={obj.name} readOnly className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0 cursor-default" />
+                        </div>
+                        <div className="flex items-center pt-2">
+                        <input type="checkbox" checked={obj.isTakable} readOnly className="custom-checkbox cursor-default" />
+                        <label className="ml-2 block text-sm text-brand-text-dim">Pode ser pego pelo jogador</label>
+                        </div>
                     </div>
-                    <div>
-                        <label htmlFor={`obj-id-${index}`} className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
-                        <p
-                            id={`obj-id-${index}`}
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
-                            title="O ID do objeto é único e não pode ser alterado."
-                        >
-                            {obj.id}
-                        </p>
+                    <div className="flex flex-col h-full">
+                        <label className="block text-sm font-medium text-brand-text-dim mb-1">Descrição</label>
+                        <textarea value={obj.examineDescription} readOnly rows={3} className="w-full flex-grow bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0 cursor-default" />
                     </div>
-                    <div className="flex items-center pt-2">
-                      <input
-                        type="checkbox"
-                        id={`isTakable-${index}`}
-                        checked={obj.isTakable}
-                        onChange={e => handleObjectChange(index, 'isTakable', e.target.checked)}
-                        className="custom-checkbox"
-                      />
-                      <label htmlFor={`isTakable-${index}`} className="ml-2 block text-sm text-brand-text-dim">
-                        Pode ser pego pelo jogador
-                      </label>
-                    </div>
-                 </div>
-                 {/* Right Column */}
-                 <div className="flex flex-col h-full">
-                    <label htmlFor={`obj-desc-${index}`} className="block text-sm font-medium text-brand-text-dim mb-1">Descrição ao olhar/examinar</label>
-                    <textarea
-                      id={`obj-desc-${index}`}
-                      value={obj.examineDescription}
-                      onChange={e => handleObjectChange(index, 'examineDescription', e.target.value)}
-                      placeholder="Descrição ao olhar"
-                      rows={4}
-                      className="w-full flex-grow bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
-                    />
+                </div>
+                <div className="mt-2 text-center">
+                    <p className="text-xs text-brand-text-dim italic">Para editar as propriedades deste objeto, use a aba "Objetos" no menu lateral.</p>
                 </div>
             </div>
-          </div>
-        ))}
-         {objects.length === 0 && <p className="text-center text-brand-text-dim">Nenhum objeto nesta cena.</p>}
+            ))
+        ) : (
+             <p className="text-center text-brand-text-dim">Nenhum objeto vinculado a esta cena.</p>
+        )}
       </div>
-      <div className="flex justify-end mt-4">
-        <button 
-            onClick={handleAddObject} 
-            className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
-        >
-            <PlusIcon className="w-5 h-5 mr-2" />
-            Adicionar Objeto
-        </button>
+
+      <div className="mt-8 pt-6 border-t border-brand-border bg-brand-surface rounded-md p-4">
+        <h4 className="text-sm font-bold text-brand-text mb-4">Adicionar Objeto à Cena</h4>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2">
+                <p className="text-sm text-brand-text-dim">Vincular um objeto existente:</p>
+                <div className="flex gap-2">
+                    <select
+                        value={selectedGlobalObjectId}
+                        onChange={(e) => setSelectedGlobalObjectId(e.target.value)}
+                        className="flex-grow bg-brand-bg border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                    >
+                        <option value="">Selecione um objeto...</option>
+                        {availableObjects.map(obj => (
+                            <option key={obj.id} value={obj.id}>{obj.name} ({obj.id})</option>
+                        ))}
+                    </select>
+                    <button 
+                        onClick={handleLinkExistingObject}
+                        disabled={!selectedGlobalObjectId}
+                        className="px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        Vincular
+                    </button>
+                </div>
+            </div>
+            <div className="space-y-2 border-l border-brand-border/30 pl-6 md:border-l-0 md:pl-0 md:border-l border-brand-border/30 md:pl-6">
+                 <p className="text-sm text-brand-text-dim">Ou crie um novo:</p>
+                 <button 
+                    onClick={handleCreateNewObject} 
+                    className="w-full flex items-center justify-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
+                >
+                    <PlusIcon className="w-5 h-5 mr-2" />
+                    Criar Novo Objeto
+                </button>
+            </div>
+        </div>
       </div>
     </>
   );

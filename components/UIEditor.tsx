@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect } from 'react';
 import { GameData, FixedVerb } from '../types';
 import { UploadIcon } from './icons/UploadIcon';
@@ -367,13 +368,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     positiveEndingImage, positiveEndingDescription, negativeEndingImage, negativeEndingDescription, fixedVerbs
   ]);
   
-  useEffect(() => {
-    const newFrameColor = localGameTheme === 'dark' ? '#FFFFFF' : '#1a202c'; // White for dark, Dark for light
-    setLocalFrameBookColor(newFrameColor);
-    setLocalFrameTradingCardColor(newFrameColor);
-    setLocalFrameChamferedColor(newFrameColor);
-    setLocalFrameRoundedTopColor(newFrameColor);
-  }, [localGameTheme]);
+  // NOTE: Removed the useEffect that auto-reset frame colors on theme change to allow persistence.
 
   useEffect(() => {
     const dirty = localLayoutOrientation !== layoutOrientation ||
@@ -554,6 +549,15 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalFixedVerbs(fixedVerbs);
   };
 
+  const handleThemeChange = (theme: 'dark' | 'light') => {
+    setLocalGameTheme(theme);
+    const newFrameColor = theme === 'dark' ? '#FFFFFF' : '#1a202c';
+    setLocalFrameBookColor(newFrameColor);
+    setLocalFrameTradingCardColor(newFrameColor);
+    setLocalFrameChamferedColor(newFrameColor);
+    setLocalFrameRoundedTopColor(newFrameColor);
+  };
+
   const applyTheme = (theme: typeof PREDEFINED_THEMES[0]) => {
       setLocalTextColor(theme.textColor);
       setLocalTitleColor(theme.titleColor);
@@ -567,6 +571,18 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
       setLocalActionButtonColor(theme.actionButtonColor);
       setLocalActionButtonTextColor(theme.actionButtonTextColor);
       setLocalChanceIconColor(theme.chanceIconColor);
+      
+      // Also reset frame colors based on the theme being applied (usually implies a reset)
+      // Since predefined themes don't explicitly set frame colors, we infer reasonable defaults.
+      // Assuming typical themes will look best with white frames in dark mode and dark frames in light mode.
+      // Since localGameTheme doesn't change automatically here (user must set it manually or we assume a default),
+      // we'll stick to the current theme's default frame color or update if we were to support theme mode switching in predefined themes.
+      // For now, let's just reset based on the *current* localGameTheme to ensure consistency.
+      const newFrameColor = localGameTheme === 'dark' ? '#FFFFFF' : '#1a202c';
+      setLocalFrameBookColor(newFrameColor);
+      setLocalFrameTradingCardColor(newFrameColor);
+      setLocalFrameChamferedColor(newFrameColor);
+      setLocalFrameRoundedTopColor(newFrameColor);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
@@ -701,12 +717,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     <div className="space-y-6 pb-24">
       <div>
         <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-brand-text">Aparência e Informações</h2>
             {isDirty && (
                 <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Alterações não salvas"></div>
             )}
         </div>
-        <p className="text-brand-text-dim mt-1">
+        <p className="text-brand-text-dim mt-1 text-lg">
             Personalize as informações, o layout e a aparência do seu jogo.
         </p>
       </div>
@@ -873,7 +888,285 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
               </div>
           )}
 
+          {activeTab === 'cores' && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
+                <div className="bg-brand-surface space-y-6">
+                    <div className="space-y-2">
+                        <h3 className="text-lg font-semibold text-brand-text">Cor da Interface</h3>
+                        <div className="flex gap-2 rounded-md bg-brand-bg p-1">
+                            <button
+                                onClick={() => handleThemeChange('dark')}
+                                className={`w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors ${
+                                    localGameTheme === 'dark' ? 'bg-brand-primary text-brand-bg' : 'hover:bg-brand-border/30'
+                                }`}
+                            >
+                                Escuro
+                            </button>
+                            <button
+                                onClick={() => handleThemeChange('light')}
+                                className={`w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors ${
+                                    localGameTheme === 'light' ? 'bg-brand-primary text-brand-bg' : 'hover:bg-brand-border/30'
+                                }`}
+                            >
+                                Claro
+                            </button>
+                        </div>
+                    </div>
+                     <div>
+                        <h3 className="text-lg font-semibold text-brand-text mb-4">Fonte</h3>
+                         <div className="grid grid-cols-2 gap-4">
+                             <div>
+                                <label htmlFor="font-select" className="block text-sm font-medium text-brand-text-dim mb-1">Fonte</label>
+                                <select
+                                    id="font-select"
+                                    value={localFontFamily}
+                                    onChange={(e) => setLocalFontFamily(e.target.value)}
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                    style={{fontFamily: localFontFamily}}
+                                >
+                                    {FONTS.map(font => (
+                                        <option key={font.family} value={font.family} style={{fontFamily: font.family}}>
+                                            {font.name}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label htmlFor="font-size-select" className="block text-sm font-medium text-brand-text-dim mb-1">Tamanho</label>
+                                <select
+                                    id="font-size-select"
+                                    value={localGameFontSize}
+                                    onChange={(e) => setLocalGameFontSize(e.target.value)}
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                >
+                                    <option value="0.85em">Pequeno</option>
+                                    <option value="1em">Médio (Padrão)</option>
+                                    <option value="1.1em">Grande</option>
+                                    <option value="1.2em">Extra Grande</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-brand-border/50">
+                        <h3 className="text-lg font-semibold text-brand-text mb-4">Temas</h3>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                            {PREDEFINED_THEMES.map(theme => (
+                                <button
+                                    key={theme.name}
+                                    onClick={() => applyTheme(theme)}
+                                    className="text-left p-2 rounded-md border-2 border-brand-border hover:border-brand-primary transition-colors focus:outline-none focus:border-brand-primary bg-brand-bg"
+                                    title={`Aplicar tema ${theme.name}`}
+                                >
+                                    <span className="font-semibold text-sm text-brand-text">{theme.name}</span>
+                                    <div className="flex mt-2 gap-1">
+                                        <div className="w-1/3 h-4 rounded" style={{ backgroundColor: theme.titleColor }}></div>
+                                        <div className="w-1/3 h-4 rounded" style={{ backgroundColor: theme.textColor }}></div>
+                                        <div className="w-1/3 h-4 rounded" style={{ backgroundColor: theme.splashButtonColor }}></div>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="pt-6 border-t border-brand-border/50">
+                        <h3 className="text-lg font-semibold text-brand-text mb-4">Moldura</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+                           <div>
+                                <label htmlFor="frame-select" className="block text-sm font-medium text-brand-text-dim mb-1">Tipo de Moldura</label>
+                                <select
+                                    id="frame-select"
+                                    value={localImageFrame}
+                                    onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                >
+                                    <option value="none">Sem moldura</option>
+                                    <option value="rounded-top">Portal</option>
+                                    <option value="book-cover">Quadrada</option>
+                                    <option value="trading-card">Arredondada</option>
+                                    <option value="chamfered">Chanfrada</option>
+                                </select>
+                           </div>
+                            <div className="space-y-4">
+                                {localImageFrame === 'rounded-top' && (
+                                    <ColorInput label="Cor da Moldura" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
+                                )}
+                                {localImageFrame === 'book-cover' && (
+                                    <ColorInput label="Cor da Moldura" id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
+                                )}
+                                {localImageFrame === 'trading-card' && (
+                                    <ColorInput label="Cor da Moldura" id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
+                                )}
+                                {localImageFrame === 'chamfered' && (
+                                    <ColorInput label="Cor da Moldura" id="frameChamferedColor" value={localFrameChamferedColor} onChange={setLocalFrameChamferedColor} placeholder="#FFFFFF" />
+                                )}
+                                {localImageFrame === 'none' && (
+                                    <p className="text-brand-text-dim text-sm text-center py-4 bg-brand-bg rounded-md h-full flex items-center justify-center">
+                                        Nenhuma moldura especial selecionada.
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {!isCustomizing && (
+                         <div className="pt-6 border-t border-brand-border/50">
+                             <button 
+                                 onClick={() => setIsCustomizing(true)}
+                                 className="w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors bg-brand-primary/20 text-brand-primary hover:bg-brand-primary/30"
+                             >
+                                 Customizar Cores de Tema e Botões
+                             </button>
+                         </div>
+                    )}
+                    
+                    {isCustomizing && (
+                      <>
+                        {localGameTheme === 'dark' && (
+                            <div className="pt-6 border-t border-brand-border/50">
+                                <h3 className="text-lg font-semibold text-brand-text mb-4">Cores (Tema Escuro)</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <ColorInput label="Cor do Texto Padrão" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#c9d1d9" />
+                                    <ColorInput label="Cor do Título / Destaque" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58a6ff" />
+                                    <ColorInput label="Cor de Destaque (Foco)" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#58a6ff" />
+                                </div>
+                            </div>
+                        )}
+
+                        {localGameTheme === 'light' && (
+                            <div className="pt-6 border-t border-brand-border/50">
+                                <h3 className="text-lg font-semibold text-brand-text mb-4">Cores (Tema Claro)</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <ColorInput label="Cor do Texto Padrão" id="textColorLight" value={localTextColorLight} onChange={setLocalTextColorLight} placeholder="#24292f" />
+                                    <ColorInput label="Cor do Título / Destaque" id="titleColorLight" value={localTitleColorLight} onChange={setLocalTitleColorLight} placeholder="#0969da" />
+                                    <ColorInput label="Cor de Destaque (Foco)" id="focusColorLight" value={localFocusColorLight} onChange={setLocalFocusColorLight} placeholder="#0969da" />
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="pt-6 border-t border-brand-border/50">
+                            <h3 className="text-lg font-semibold text-brand-text mb-4">Botões (Geral)</h3>
+                            <p className="text-xs text-brand-text-dim mb-4 -mt-3">Estas cores são aplicadas a ambos os temas.</p>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <ColorInput label="Cor do Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#2ea043" />
+                                <ColorInput label="Cor do Texto do Botão de Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#ffffff" />
+                                <ColorInput label="Cor do Botão de Início (Hover)" id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#238636" />
+                                <ColorInput label="Cor do Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#ffffff" />
+                                <ColorInput label="Cor do Texto do Botão de Ação" id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#0d1117" />
+                            </div>
+                        </div>
+                        <div className="pt-6 border-t border-brand-border/50">
+                            <h3 className="text-lg font-semibold text-brand-text mb-4">Box de Nome da Cena</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <ColorInput label="Cor de Fundo do Box" id="sceneNameOverlayBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#0d1117" />
+                                <ColorInput label="Cor do Texto do Box" id="sceneNameOverlayTextColor" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#c9d1d9" />
+                            </div>
+                        </div>
+                        {localGameSystemEnabled === 'chances' && (
+                            <div className="pt-6 border-t border-brand-border/50">
+                                <h3 className="text-lg font-semibold text-brand-text mb-4">Sistema de Chances</h3>
+                                <div className="space-y-6 mt-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                        <ColorInput label="Cor dos Ícones de Chance" id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
+                                    </div>
+                                </div>
+                            </div>
+                         )}
+                      </>
+                    )}
+                </div>
+
+                <div className="flex flex-col sticky top-6 self-start">
+                    <p className="text-sm text-brand-text-dim mb-2 text-center">Pré-visualização ao vivo</p>
+                    <div 
+                        className={`border-2 flex flex-col transition-colors ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-brand-border' : 'bg-[#ffffff] border-[#d0d7de]'}`}
+                        style={{ fontFamily: localFontFamily, fontSize: localGameFontSize }}
+                    >
+                        {/* Upper Part */}
+                        <div className="flex p-4 gap-4">
+                            {/* Image Panel Mock */}
+                            <div className="w-2/5 aspect-[9/16] flex items-center justify-center relative" style={panelStyles}>
+                                <div className="font-semibold" style={containerStyles}>
+                                    Imagem
+                                </div>
+                                <div 
+                                    className="absolute bottom-4 text-xs font-bold px-2 py-1 rounded" 
+                                    style={{ 
+                                        backgroundColor: localGameSceneNameOverlayBg, 
+                                        color: localGameSceneNameOverlayTextColor,
+                                        border: `1px solid ${localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}`,
+                                        fontSize: '0.8em'
+                                    }}
+                                >
+                                    Nome da Cena
+                                </div>
+                            </div>
+                            {/* Text Panel Mock */}
+                            <div className="w-3/5 flex flex-col justify-between">
+                                <div>
+                                    <h1 style={{ color: localGameTheme === 'dark' ? localTitleColor : localTitleColorLight, fontSize: '1.5em' }}>Título do Jogo</h1>
+                                    <p className="mt-2" style={{ color: localGameTheme === 'dark' ? localTextColor : localTextColorLight, fontSize: '1em' }}>Esta é uma descrição de exemplo para a cena.</p>
+                                    <p className="mt-2 italic" style={{ color: localGameTheme === 'dark' ? '#8b949e' : '#57606a', fontSize: '0.9em' }}>&gt; comando de exemplo</p>
+                                </div>
+                                {localGameSystemEnabled === 'chances' && (
+                                <div className="flex gap-1">
+                                    <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
+                                    <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
+                                    <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
+                                </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Lower Part */}
+                        <div className="p-4 space-y-4 border-t" style={{borderColor: localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}}>
+                             <div className="flex items-center gap-4">
+                                <input 
+                                    type="text" 
+                                    placeholder="Campo de comando"
+                                    className="flex-1 border-2 rounded p-2 transition-colors focus:ring-0"
+                                    style={{
+                                        backgroundColor: localGameTheme === 'dark' ? '#010409' : '#f6f8fa',
+                                        color: localGameTheme === 'dark' ? localTextColor : localTextColorLight,
+                                        borderColor: focusPreview 
+                                            ? (localGameTheme === 'dark' ? localFocusColor : localFocusColorLight) 
+                                            : (localGameTheme === 'dark' ? '#30363d' : '#d0d7de'),
+                                        fontFamily: localFontFamily,
+                                        fontSize: '1em'
+                                    }}
+                                    onFocus={() => setFocusPreview(true)}
+                                    onBlur={() => setFocusPreview(false)}
+                                />
+                                <button className="font-bold py-2 px-4 rounded" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily, fontSize: '1em' }}>Ação</button>
+                             </div>
+                              <button
+                                    className="w-full font-bold transition-all duration-200 ease-in-out py-3"
+                                    style={{
+                                        backgroundColor: localSplashButtonColor,
+                                        color: localSplashButtonTextColor,
+                                        fontFamily: localFontFamily,
+                                        fontSize: '1.2em'
+                                    }}
+                                    onMouseEnter={e => e.currentTarget.style.backgroundColor = localSplashButtonHoverColor}
+                                    onMouseLeave={e => e.currentTarget.style.backgroundColor = localSplashButtonColor}
+                                >
+                                    Botão de Início
+                                </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+          )}
+          {/* Other tabs remain the same... */}
           {activeTab === 'abertura' && (
+              // ... existing content for abertura ...
+              // Re-rendering this part to ensure file completeness if it was truncated, 
+              // but since I only need to modify the file once, I will assume the structure 
+              // is preserved by replacing the whole component.
+              // To save space in response, I will omit unchanged tabs content if permitted, 
+              // but instructions say "Full content". I must provide full content.
+              
+              // Proceeding with full content for completeness.
               <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                       <div className="space-y-6">
@@ -1048,7 +1341,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                   {/* Negative Ending */}
                   <div className="space-y-6 pt-6 border-t border-brand-border/50">
                       <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Negativo</h3>
-                      <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador fica sem chances (vidas).</p>
+                      <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador fica sem chances.</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                           <div className="space-y-4">
                               <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
@@ -1216,276 +1509,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                       </div>
                   </div>
               </div>
-          )}
-
-          {activeTab === 'cores' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
-                <div className="bg-brand-surface space-y-6">
-                    <div className="space-y-2">
-                        <h3 className="text-lg font-semibold text-brand-text">Cor da Interface</h3>
-                        <div className="flex gap-2 rounded-md bg-brand-bg p-1">
-                            <button
-                                onClick={() => setLocalGameTheme('dark')}
-                                className={`w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors ${
-                                    localGameTheme === 'dark' ? 'bg-brand-primary text-brand-bg' : 'hover:bg-brand-border/30'
-                                }`}
-                            >
-                                Escuro
-                            </button>
-                            <button
-                                onClick={() => setLocalGameTheme('light')}
-                                className={`w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors ${
-                                    localGameTheme === 'light' ? 'bg-brand-primary text-brand-bg' : 'hover:bg-brand-border/30'
-                                }`}
-                            >
-                                Claro
-                            </button>
-                        </div>
-                    </div>
-                     <div>
-                        <h3 className="text-lg font-semibold text-brand-text mb-4">Fonte</h3>
-                         <div className="grid grid-cols-2 gap-4">
-                             <div>
-                                <label htmlFor="font-select" className="block text-sm font-medium text-brand-text-dim mb-1">Fonte</label>
-                                <select
-                                    id="font-select"
-                                    value={localFontFamily}
-                                    onChange={(e) => setLocalFontFamily(e.target.value)}
-                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                    style={{fontFamily: localFontFamily}}
-                                >
-                                    {FONTS.map(font => (
-                                        <option key={font.family} value={font.family} style={{fontFamily: font.family}}>
-                                            {font.name}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label htmlFor="font-size-select" className="block text-sm font-medium text-brand-text-dim mb-1">Tamanho</label>
-                                <select
-                                    id="font-size-select"
-                                    value={localGameFontSize}
-                                    onChange={(e) => setLocalGameFontSize(e.target.value)}
-                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                >
-                                    <option value="0.85em">Pequeno</option>
-                                    <option value="1em">Médio (Padrão)</option>
-                                    <option value="1.1em">Grande</option>
-                                    <option value="1.2em">Extra Grande</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="pt-6 border-t border-brand-border/50">
-                        <h3 className="text-lg font-semibold text-brand-text mb-4">Temas</h3>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                            {PREDEFINED_THEMES.map(theme => (
-                                <button
-                                    key={theme.name}
-                                    onClick={() => applyTheme(theme)}
-                                    className="text-left p-2 rounded-md border-2 border-brand-border hover:border-brand-primary transition-colors focus:outline-none focus:border-brand-primary bg-brand-bg"
-                                    title={`Aplicar tema ${theme.name}`}
-                                >
-                                    <span className="font-semibold text-sm text-brand-text">{theme.name}</span>
-                                    <div className="flex mt-2 gap-1">
-                                        <div className="w-1/3 h-4 rounded" style={{ backgroundColor: theme.titleColor }}></div>
-                                        <div className="w-1/3 h-4 rounded" style={{ backgroundColor: theme.textColor }}></div>
-                                        <div className="w-1/3 h-4 rounded" style={{ backgroundColor: theme.splashButtonColor }}></div>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    <div className="pt-6 border-t border-brand-border/50">
-                        <h3 className="text-lg font-semibold text-brand-text mb-4">Moldura</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-                           <div>
-                                <label htmlFor="frame-select" className="block text-sm font-medium text-brand-text-dim mb-1">Tipo de Moldura</label>
-                                <select
-                                    id="frame-select"
-                                    value={localImageFrame}
-                                    onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
-                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
-                                >
-                                    <option value="none">Sem moldura</option>
-                                    <option value="rounded-top">Portal</option>
-                                    <option value="book-cover">Quadrada</option>
-                                    <option value="trading-card">Arredondada</option>
-                                    <option value="chamfered">Chanfrada</option>
-                                </select>
-                           </div>
-                            <div className="space-y-4">
-                                {localImageFrame === 'rounded-top' && (
-                                    <ColorInput label="Cor da Moldura" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
-                                )}
-                                {localImageFrame === 'book-cover' && (
-                                    <ColorInput label="Cor da Moldura" id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
-                                )}
-                                {localImageFrame === 'trading-card' && (
-                                    <ColorInput label="Cor da Moldura" id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
-                                )}
-                                {localImageFrame === 'chamfered' && (
-                                    <ColorInput label="Cor da Moldura" id="frameChamferedColor" value={localFrameChamferedColor} onChange={setLocalFrameChamferedColor} placeholder="#FFFFFF" />
-                                )}
-                                {localImageFrame === 'none' && (
-                                    <p className="text-brand-text-dim text-sm text-center py-4 bg-brand-bg rounded-md h-full flex items-center justify-center">
-                                        Nenhuma moldura especial selecionada.
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {!isCustomizing && (
-                         <div className="pt-6 border-t border-brand-border/50">
-                             <button 
-                                 onClick={() => setIsCustomizing(true)}
-                                 className="w-full py-2 px-4 rounded-md text-sm font-semibold transition-colors bg-brand-primary/20 text-brand-primary hover:bg-brand-primary/30"
-                             >
-                                 Customizar Cores de Tema e Botões
-                             </button>
-                         </div>
-                    )}
-                    
-                    {isCustomizing && (
-                      <>
-                        {localGameTheme === 'dark' && (
-                            <div className="pt-6 border-t border-brand-border/50">
-                                <h3 className="text-lg font-semibold text-brand-text mb-4">Cores (Tema Escuro)</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <ColorInput label="Cor do Texto Padrão" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#c9d1d9" />
-                                    <ColorInput label="Cor do Título / Destaque" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58a6ff" />
-                                    <ColorInput label="Cor de Destaque (Foco)" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#58a6ff" />
-                                </div>
-                            </div>
-                        )}
-
-                        {localGameTheme === 'light' && (
-                            <div className="pt-6 border-t border-brand-border/50">
-                                <h3 className="text-lg font-semibold text-brand-text mb-4">Cores (Tema Claro)</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <ColorInput label="Cor do Texto Padrão" id="textColorLight" value={localTextColorLight} onChange={setLocalTextColorLight} placeholder="#24292f" />
-                                    <ColorInput label="Cor do Título / Destaque" id="titleColorLight" value={localTitleColorLight} onChange={setLocalTitleColorLight} placeholder="#0969da" />
-                                    <ColorInput label="Cor de Destaque (Foco)" id="focusColorLight" value={localFocusColorLight} onChange={setLocalFocusColorLight} placeholder="#0969da" />
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="pt-6 border-t border-brand-border/50">
-                            <h3 className="text-lg font-semibold text-brand-text mb-4">Botões (Geral)</h3>
-                            <p className="text-xs text-brand-text-dim mb-4 -mt-3">Estas cores são aplicadas a ambos os temas.</p>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <ColorInput label="Cor do Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#2ea043" />
-                                <ColorInput label="Cor do Texto do Botão de Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#ffffff" />
-                                <ColorInput label="Cor do Botão de Início (Hover)" id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#238636" />
-                                <ColorInput label="Cor do Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#ffffff" />
-                                <ColorInput label="Cor do Texto do Botão de Ação" id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#0d1117" />
-                            </div>
-                        </div>
-                        <div className="pt-6 border-t border-brand-border/50">
-                            <h3 className="text-lg font-semibold text-brand-text mb-4">Box de Nome da Cena</h3>
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                <ColorInput label="Cor de Fundo do Box" id="sceneNameOverlayBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#0d1117" />
-                                <ColorInput label="Cor do Texto do Box" id="sceneNameOverlayTextColor" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#c9d1d9" />
-                            </div>
-                        </div>
-                        {localGameSystemEnabled === 'chances' && (
-                            <div className="pt-6 border-t border-brand-border/50">
-                                <h3 className="text-lg font-semibold text-brand-text mb-4">Cor do Ícone de Chance</h3>
-                                <div className="space-y-6 mt-4">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        <ColorInput label="Cor dos Ícones de Vidas" id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
-                                    </div>
-                                </div>
-                            </div>
-                         )}
-                      </>
-                    )}
-                </div>
-
-                <div className="flex flex-col sticky top-6 self-start">
-                    <p className="text-sm text-brand-text-dim mb-2 text-center">Pré-visualização ao vivo</p>
-                    <div 
-                        className={`border-2 flex flex-col transition-colors ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-brand-border' : 'bg-[#ffffff] border-[#d0d7de]'}`}
-                        style={{ fontFamily: localFontFamily, fontSize: localGameFontSize }}
-                    >
-                        {/* Upper Part */}
-                        <div className="flex p-4 gap-4">
-                            {/* Image Panel Mock */}
-                            <div className="w-2/5 aspect-[9/16] flex items-center justify-center relative" style={panelStyles}>
-                                <div className="font-semibold" style={containerStyles}>
-                                    Imagem
-                                </div>
-                                <div 
-                                    className="absolute bottom-4 text-xs font-bold px-2 py-1 rounded" 
-                                    style={{ 
-                                        backgroundColor: localGameSceneNameOverlayBg, 
-                                        color: localGameSceneNameOverlayTextColor,
-                                        border: `1px solid ${localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}`,
-                                        fontSize: '0.8em'
-                                    }}
-                                >
-                                    Nome da Cena
-                                </div>
-                            </div>
-                            {/* Text Panel Mock */}
-                            <div className="w-3/5 flex flex-col justify-between">
-                                <div>
-                                    <h1 style={{ color: localGameTheme === 'dark' ? localTitleColor : localTitleColorLight, fontSize: '1.5em' }}>Título do Jogo</h1>
-                                    <p className="mt-2" style={{ color: localGameTheme === 'dark' ? localTextColor : localTextColorLight, fontSize: '1em' }}>Esta é uma descrição de exemplo para a cena.</p>
-                                    <p className="mt-2 italic" style={{ color: localGameTheme === 'dark' ? '#8b949e' : '#57606a', fontSize: '0.9em' }}>&gt; comando de exemplo</p>
-                                </div>
-                                {localGameSystemEnabled === 'chances' && (
-                                <div className="flex gap-1">
-                                    <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
-                                    <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
-                                    <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
-                                </div>
-                                )}
-                            </div>
-                        </div>
-
-                        {/* Lower Part */}
-                        <div className="p-4 space-y-4 border-t" style={{borderColor: localGameTheme === 'dark' ? '#30363d' : '#d0d7de'}}>
-                             <div className="flex items-center gap-4">
-                                <input 
-                                    type="text" 
-                                    placeholder="Campo de comando"
-                                    className="flex-1 border-2 rounded p-2 transition-colors focus:ring-0"
-                                    style={{
-                                        backgroundColor: localGameTheme === 'dark' ? '#010409' : '#f6f8fa',
-                                        color: localGameTheme === 'dark' ? localTextColor : localTextColorLight,
-                                        borderColor: focusPreview 
-                                            ? (localGameTheme === 'dark' ? localFocusColor : localFocusColorLight) 
-                                            : (localGameTheme === 'dark' ? '#30363d' : '#d0d7de'),
-                                        fontFamily: localFontFamily,
-                                        fontSize: '1em'
-                                    }}
-                                    onFocus={() => setFocusPreview(true)}
-                                    onBlur={() => setFocusPreview(false)}
-                                />
-                                <button className="font-bold py-2 px-4 rounded" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily, fontSize: '1em' }}>Ação</button>
-                             </div>
-                              <button
-                                    className="w-full font-bold transition-all duration-200 ease-in-out py-3"
-                                    style={{
-                                        backgroundColor: localSplashButtonColor,
-                                        color: localSplashButtonTextColor,
-                                        fontFamily: localFontFamily,
-                                        fontSize: '1.2em'
-                                    }}
-                                    onMouseEnter={e => e.currentTarget.style.backgroundColor = localSplashButtonHoverColor}
-                                    onMouseLeave={e => e.currentTarget.style.backgroundColor = localSplashButtonColor}
-                                >
-                                    Botão de Início
-                                </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
           )}
         </div>
       </div>

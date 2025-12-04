@@ -275,8 +275,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
   return (
     <div className="h-full flex flex-col relative">
       <div className="mb-4 flex-shrink-0">
-        <h2 className="text-xl font-bold text-brand-text">Mapa de Cenas</h2>
-        <p className="text-brand-text-dim mt-1">
+        <p className="text-brand-text-dim mt-1 text-lg">
           Visualize e organize a estrutura do seu jogo. Arraste as cenas para reposicioná-las e clique para editá-las.
         </p>
       </div>

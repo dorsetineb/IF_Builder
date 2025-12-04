@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
 import { Scene, Interaction, GameObject, ConsequenceTracker } from '../types';
 import ObjectEditor from './ObjectEditor';
@@ -10,9 +12,12 @@ import { TrashIcon } from './icons/TrashIcon';
 interface SceneEditorProps {
   scene: Scene;
   allScenes: Scene[];
+  globalObjects: { [id: string]: GameObject };
   onUpdateScene: (scene: Scene) => void;
   onCopyScene: (scene: Scene) => void;
-  allObjectIds: string[];
+  onCreateGlobalObject: (obj: GameObject, linkToSceneId: string) => void;
+  onLinkObjectToScene: (sceneId: string, objectId: string) => void;
+  onUnlinkObjectFromScene: (sceneId: string, objectId: string) => void;
   onPreviewScene: (scene: Scene) => void;
   onSelectScene: (id: string) => void;
   isDirty: boolean;
@@ -27,7 +32,7 @@ const getCleanSceneState = (s: Scene): Scene => {
     isEndingScene: !!s.isEndingScene,
     removesChanceOnEntry: !!s.removesChanceOnEntry,
     restoresChanceOnEntry: !!s.restoresChanceOnEntry,
-    objects: s.objects || [],
+    objectIds: s.objectIds || [],
     interactions: s.interactions || [],
   };
 };
@@ -40,9 +45,12 @@ export interface ConnectionDetail {
 const SceneEditor: React.FC<SceneEditorProps> = ({ 
     scene, 
     allScenes, 
+    globalObjects,
     onUpdateScene, 
     onCopyScene,
-    allObjectIds, 
+    onCreateGlobalObject,
+    onLinkObjectToScene,
+    onUnlinkObjectFromScene,
     onPreviewScene,
     onSelectScene,
     isDirty,
@@ -55,7 +63,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const initialSceneJson = useRef(JSON.stringify(getCleanSceneState(scene)));
   
-  // Reset state only when a different scene is selected
   useEffect(() => {
     const cleanScene = getCleanSceneState(scene);
     setLocalScene(cleanScene);
@@ -63,28 +70,21 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     setActiveTab('properties');
   }, [scene.id]);
 
-  // Check for changes against the stored initial JSON and report to parent
   useEffect(() => {
     const currentJson = JSON.stringify(localScene);
     const currentlyDirty = currentJson !== initialSceneJson.current;
     onSetDirty(currentlyDirty);
   }, [localScene, onSetDirty]);
 
-  const allObjectsMap = useMemo(() => {
-    const map = new Map<string, GameObject>();
-    allScenes.forEach(scene => {
-        if (scene.objects) {
-            scene.objects.forEach(obj => {
-                map.set(obj.id, obj);
-            });
-        }
-    });
-    return map;
-  }, [allScenes]);
+  // Construct the list of objects currently in this scene by ID lookup
+  const currentSceneObjects = useMemo(() => {
+      return (localScene.objectIds || []).map(id => globalObjects[id]).filter(Boolean);
+  }, [localScene.objectIds, globalObjects]);
 
   const allTakableObjects = useMemo(() => {
-    return allScenes.flatMap(s => s.objects?.filter(o => o.isTakable) || []);
-  }, [allScenes]);
+     // Return all takable objects from the global library
+     return Object.values(globalObjects).filter((o: GameObject) => o.isTakable);
+  }, [globalObjects]);
 
   const connections = useMemo(() => {
     const sceneMap = new Map(allScenes.map(s => [s.id, s]));
@@ -112,7 +112,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         }
     }
 
-    // FIX: Refactored from reduce to map/filter to avoid potential type inference issues.
     const inputConnections: ConnectionDetail[] = Array.from(inputConnectionsMap.entries()).map(([sceneId, interactions]) => {
         const scene = sceneMap.get(sceneId);
         if (scene) {
@@ -122,7 +121,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     }).filter((connection): connection is ConnectionDetail => connection !== null);
 
 
-    // FIX: Refactored from reduce to map/filter to avoid potential type inference issues.
     const outputConnections: ConnectionDetail[] = Array.from(outputConnectionsMap.entries()).map(([sceneId, interactions]) => {
         const scene = sceneMap.get(sceneId);
         if (scene) {
@@ -143,23 +141,16 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   const handleToggle = (key: 'isEndingScene' | 'removesChanceOnEntry' | 'restoresChanceOnEntry', value: boolean) => {
     setLocalScene(prev => {
         const newSceneState = { ...prev };
-
-        // If checking a box, uncheck others to enforce radio-button-like behavior.
         if (value) {
             newSceneState.isEndingScene = false;
             newSceneState.removesChanceOnEntry = false;
             newSceneState.restoresChanceOnEntry = false;
         }
-
-        // Set the toggled property's value.
         newSceneState[key] = value;
-
-        // If it's an ending scene, it cannot have objects or interactions.
         if (key === 'isEndingScene' && value) {
-            newSceneState.objects = [];
+            newSceneState.objectIds = [];
             newSceneState.interactions = [];
         }
-
         return newSceneState;
     });
   };
@@ -199,22 +190,19 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   
   const handleSave = () => {
     const finalScene: Scene = { ...localScene };
-    
-    // Clean up verbs in interactions, removing empty entries, trimming whitespace, and converting to lowercase.
     finalScene.interactions = finalScene.interactions.map(interaction => ({
         ...interaction,
         verbs: interaction.verbs.map(v => v.trim().toLowerCase()).filter(Boolean)
     }));
 
     if (finalScene.isEndingScene) {
-        finalScene.objects = [];
+        finalScene.objectIds = [];
         finalScene.interactions = [];
     }
     onUpdateScene(finalScene);
   }
   
   const handleUndo = () => {
-    // FIX: Cast the result of JSON.parse to 'Scene' as it returns 'unknown' by default, which is not assignable to Scene.
     const restoredScene = JSON.parse(initialSceneJson.current) as Scene;
     setLocalScene(restoredScene);
   };
@@ -225,7 +213,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
   const TABS = {
     properties: 'Propriedades',
-    objects: 'Objetos de interesse',
+    objects: 'Objetos',
     interactions: 'Interações',
     connections: 'Conexões',
   };
@@ -237,18 +225,11 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
       <div className="flex justify-between items-start">
         <div>
             <div className="flex items-center gap-3">
-                <h2 className="text-xl font-bold text-brand-text">Editor de Cena</h2>
-                <code
-                    className="bg-brand-bg px-2 py-1 rounded text-brand-primary-hover text-base align-middle"
-                    title={localScene.name}
-                >
-                    {localScene.name}
-                </code>
                 {isDirty && (
                     <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse self-center" title="Alterações não salvas"></div>
                 )}
             </div>
-            <p className="text-brand-text-dim mt-1">
+            <p className="text-brand-text-dim mt-1 text-lg">
             Defina a imagem, descrição, objetos e interações para esta cena.
             </p>
         </div>
@@ -287,8 +268,76 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
           <div className="bg-brand-surface -mt-px p-6">
           {activeTab === 'properties' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                  <div className="flex flex-col space-y-3">
-                      <div className="flex-grow relative">
+                  <div className="space-y-4 flex flex-col order-2 md:order-1">
+                      <div className="flex flex-col flex-1 min-h-0">
+                          <label htmlFor="sceneDescription" className="block text-sm font-medium text-brand-text-dim mb-1">
+                              {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição'}
+                          </label>
+                           <p className="text-xs text-brand-text-dim -mt-1 mb-2">Use <code>&lt;palavra&gt;</code> para destacar texto clicável.</p>
+                          <div className="relative flex-1">
+                              <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-brand-bg border border-brand-border rounded-md px-3 py-2 resize-y focus:ring-0 text-lg"/>
+                          </div>
+                      </div>
+                      <div className="space-y-4 pt-4">
+                          <div className="flex items-center">
+                              <input
+                                  type="checkbox"
+                                  id="isEndingScene"
+                                  checked={!!localScene.isEndingScene}
+                                  onChange={e => handleToggle('isEndingScene', e.target.checked)}
+                                  className="custom-checkbox"
+                                  disabled={isAnyCheckboxChecked && !localScene.isEndingScene}
+                              />
+                              <label htmlFor="isEndingScene" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
+                                  Esta cena vence o jogo.
+                              </label>
+                          </div>
+                          <div className="flex items-center">
+                              <input
+                                  type="checkbox"
+                                  id="removesChance"
+                                  checked={!!localScene.removesChanceOnEntry}
+                                  onChange={e => handleToggle('removesChanceOnEntry', e.target.checked)}
+                                  className="custom-checkbox"
+                                  disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
+                              />
+                              <label htmlFor="removesChance" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
+                                  Esta cena remove uma chance.
+                              </label>
+                          </div>
+                          <div className="flex items-center">
+                              <input
+                                  type="checkbox"
+                                  id="restoresChance"
+                                  checked={!!localScene.restoresChanceOnEntry}
+                                  onChange={e => handleToggle('restoresChanceOnEntry', e.target.checked)}
+                                  className="custom-checkbox"
+                                  disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
+                              />
+                              <label htmlFor="restoresChance" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
+                                  Esta cena restaura uma chance.
+                              </label>
+                          </div>
+                      </div>
+                  </div>
+                  <div className="flex flex-col space-y-3 order-1 md:order-2">
+                       <div className="flex-shrink-0">
+                          <div className="flex flex-col gap-2">
+                            <label htmlFor="sceneName" className="block text-sm font-medium text-brand-text-dim mb-1">Nome da Cena</label>
+                            <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"/>
+                          </div>
+                           <div className="mt-2">
+                              <label htmlFor="sceneId" className="block text-sm font-medium text-brand-text-dim mb-1">ID da Cena</label>
+                              <p 
+                              id="sceneId" 
+                              className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 text-brand-text-dim font-mono select-all"
+                              title="O ID da cena é único e não pode ser alterado."
+                              >
+                              {localScene.id}
+                              </p>
+                          </div>
+                       </div>
+                      <div className="flex-grow relative mt-2">
                           {localScene.image ? (
                               <img src={localScene.image} alt={localScene.name} className="w-full h-full min-h-[300px] object-cover bg-brand-bg" />
                           ) : (
@@ -330,81 +379,17 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                           </p>
                       </div>
                   </div>
-
-                  <div className="space-y-4 flex flex-col">
-                      <div>
-                          <label htmlFor="sceneName" className="block text-sm font-medium text-brand-text-dim mb-1">Nome da Cena</label>
-                          <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"/>
-                      </div>
-                      <div>
-                          <label htmlFor="sceneId" className="block text-sm font-medium text-brand-text-dim mb-1">ID da Cena</label>
-                          <p 
-                          id="sceneId" 
-                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 text-brand-text-dim font-mono select-all"
-                          title="O ID da cena é único e não pode ser alterado."
-                          >
-                          {localScene.id}
-                          </p>
-                      </div>
-                      <div className="flex flex-col flex-1 min-h-0">
-                          <label htmlFor="sceneDescription" className="block text-sm font-medium text-brand-text-dim mb-1">
-                              {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição'}
-                          </label>
-                           <p className="text-xs text-brand-text-dim -mt-1 mb-2">Use <code>&lt;palavra&gt;</code> para destacar texto clicável.</p>
-                          <div className="relative flex-1">
-                              <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-brand-bg border border-brand-border rounded-md px-3 py-2 resize-y focus:ring-0"/>
-                          </div>
-                      </div>
-                      <div className="space-y-4 pt-4">
-                          <div className="flex items-center">
-                              <input
-                                  type="checkbox"
-                                  id="isEndingScene"
-                                  checked={!!localScene.isEndingScene}
-                                  onChange={e => handleToggle('isEndingScene', e.target.checked)}
-                                  className="custom-checkbox"
-                                  disabled={isAnyCheckboxChecked && !localScene.isEndingScene}
-                              />
-                              <label htmlFor="isEndingScene" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
-                                  Esta cena vence o jogo.
-                              </label>
-                          </div>
-                          <div className="flex items-center">
-                              <input
-                                  type="checkbox"
-                                  id="removesChance"
-                                  checked={!!localScene.removesChanceOnEntry}
-                                  onChange={e => handleToggle('removesChanceOnEntry', e.target.checked)}
-                                  className="custom-checkbox"
-                                  disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
-                              />
-                              <label htmlFor="removesChance" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
-                                  Esta cena remove uma chance/vida.
-                              </label>
-                          </div>
-                          <div className="flex items-center">
-                              <input
-                                  type="checkbox"
-                                  id="restoresChance"
-                                  checked={!!localScene.restoresChanceOnEntry}
-                                  onChange={e => handleToggle('restoresChanceOnEntry', e.target.checked)}
-                                  className="custom-checkbox"
-                                  disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
-                              />
-                              <label htmlFor="restoresChance" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
-                                  Esta cena restaura uma chance/vida.
-                              </label>
-                          </div>
-                      </div>
-                  </div>
               </div>
           )}
           
           {activeTab === 'objects' && !localScene.isEndingScene && (
               <ObjectEditor
-                  objects={localScene.objects || []}
-                  onUpdateObjects={newObjects => updateLocalScene('objects', newObjects)}
-                  allObjectIds={allObjectIds}
+                  sceneId={localScene.id}
+                  objects={currentSceneObjects}
+                  allGlobalObjects={Object.values(globalObjects)}
+                  onCreateGlobalObject={onCreateGlobalObject}
+                  onLinkObject={onLinkObjectToScene}
+                  onUnlinkObject={onUnlinkObjectFromScene}
               />
           )}
           
@@ -414,7 +399,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                   onUpdateInteractions={newInteractions => updateLocalScene('interactions', newInteractions)}
                   allScenes={allScenes}
                   currentSceneId={localScene.id}
-                  sceneObjects={localScene.objects || []}
+                  sceneObjects={currentSceneObjects}
                   allTakableObjects={allTakableObjects}
                   consequenceTrackers={consequenceTrackers}
               />
@@ -425,7 +410,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                   currentScene={localScene}
                   inputConnections={connections.inputConnections}
                   outputConnections={connections.outputConnections}
-                  allObjectsMap={allObjectsMap}
+                  allObjectsMap={new Map(Object.entries(globalObjects))}
                   onSelectScene={onSelectScene}
               />
           )}

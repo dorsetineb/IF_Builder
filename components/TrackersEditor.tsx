@@ -1,4 +1,5 @@
 
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { ConsequenceTracker, Scene, Interaction, TrackerEffect } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -98,12 +99,11 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
     <div className="space-y-6 pb-24">
       <div>
         <div className="flex items-center gap-2">
-            <h2 className="text-xl font-bold text-brand-text">Rastreadores de Consequência</h2>
             {isDirty && (
                 <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Alterações não salvas"></div>
             )}
         </div>
-        <p className="text-brand-text-dim mt-1">
+        <p className="text-brand-text-dim mt-1 text-lg">
           Crie e gerencie variáveis que mudam com as ações do jogador.
         </p>
       </div>
