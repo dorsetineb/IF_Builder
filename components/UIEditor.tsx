@@ -66,6 +66,12 @@ interface UIEditorProps {
   negativeEndingContentAlignment: 'left' | 'right';
   negativeEndingDescription: string;
   fixedVerbs: FixedVerb[];
+
+  // Transition Props
+  textAnimationType: 'fade' | 'typewriter';
+  textSpeed: number;
+  imageTransitionType: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'page-turn' | 'pixelate' | 'none';
+  imageSpeed: number;
 }
 
 const FONTS = [
@@ -243,6 +249,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
       positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription,
       negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription,
       fixedVerbs,
+      // Transition Props
+      textAnimationType, textSpeed, imageTransitionType, imageSpeed
   } = props;
 
   // State from UIEditor
@@ -305,6 +313,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localNegativeEndingDescription, setLocalNegativeEndingDescription] = useState(negativeEndingDescription);
   const [localFixedVerbs, setLocalFixedVerbs] = useState(fixedVerbs);
 
+  // State from Transitions
+  const [localTextAnimationType, setLocalTextAnimationType] = useState(textAnimationType);
+  const [localTextSpeed, setLocalTextSpeed] = useState(textSpeed);
+  const [localImageTransitionType, setLocalImageTransitionType] = useState(imageTransitionType);
+  const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed);
+
   useEffect(() => {
     // Sync all local states with props
     setLocalLayoutOrientation(layoutOrientation);
@@ -359,6 +373,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalNegativeEndingImage(negativeEndingImage);
     setLocalNegativeEndingDescription(negativeEndingDescription);
     setLocalFixedVerbs(fixedVerbs);
+    // Transitions Sync
+    setLocalTextAnimationType(textAnimationType);
+    setLocalTextSpeed(textSpeed);
+    setLocalImageTransitionType(imageTransitionType);
+    setLocalImageSpeed(imageSpeed);
   }, [
     layoutOrientation, layoutOrder, imageFrame, actionButtonText, verbInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, gameSystemEnabled, maxChances,
     textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
@@ -367,7 +386,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, gameContinueIndicatorColor,
     gameShowTrackersUI, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText,
     title, logo, omitSplashTitle, splashImage, splashContentAlignment, splashDescription,
-    positiveEndingImage, positiveEndingDescription, negativeEndingImage, negativeEndingDescription, fixedVerbs
+    positiveEndingImage, positiveEndingDescription, negativeEndingImage, negativeEndingDescription, fixedVerbs,
+    textAnimationType, textSpeed, imageTransitionType, imageSpeed
   ]);
   
   // NOTE: Removed the useEffect that auto-reset frame colors on theme change to allow persistence.
@@ -423,7 +443,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localPositiveEndingDescription !== positiveEndingDescription ||
                   localNegativeEndingImage !== negativeEndingImage ||
                   localNegativeEndingDescription !== negativeEndingDescription ||
-                  JSON.stringify(localFixedVerbs) !== JSON.stringify(fixedVerbs);
+                  JSON.stringify(localFixedVerbs) !== JSON.stringify(fixedVerbs) ||
+                  localTextAnimationType !== textAnimationType ||
+                  localTextSpeed !== textSpeed ||
+                  localImageTransitionType !== imageTransitionType ||
+                  localImageSpeed !== imageSpeed;
     onSetDirty(dirty);
   }, [
     localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI, localSuggestionsButtonText, localInventoryButtonText, localDiaryButtonText, localTrackersButtonText,
@@ -431,6 +455,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     localFrameBookColor, localFrameTradingCardColor, localFrameChamferedColor,
     frameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor, localGameContinueIndicatorColor,
     localTitle, localLogo, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, localPositiveEndingImage, localPositiveEndingDescription, localNegativeEndingImage, localNegativeEndingDescription, localFixedVerbs,
+    localTextAnimationType, localTextSpeed, localImageTransitionType, localImageSpeed,
     props, onSetDirty
   ]);
 
@@ -495,6 +520,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localNegativeEndingImage !== negativeEndingImage) onUpdate('negativeEndingImage', localNegativeEndingImage);
     if (localNegativeEndingDescription !== negativeEndingDescription) onUpdate('negativeEndingDescription', localNegativeEndingDescription);
     if (JSON.stringify(localFixedVerbs) !== JSON.stringify(fixedVerbs)) onUpdate('fixedVerbs', localFixedVerbs);
+    // Transitions Fields
+    if (localTextAnimationType !== textAnimationType) onUpdate('gameTextAnimationType', localTextAnimationType);
+    if (localTextSpeed !== textSpeed) onUpdate('gameTextSpeed', localTextSpeed);
+    if (localImageTransitionType !== imageTransitionType) onUpdate('gameImageTransitionType', localImageTransitionType);
+    if (localImageSpeed !== imageSpeed) onUpdate('gameImageSpeed', localImageSpeed);
   };
   
   const handleUndo = () => {
@@ -552,6 +582,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalNegativeEndingImage(negativeEndingImage);
     setLocalNegativeEndingDescription(negativeEndingDescription);
     setLocalFixedVerbs(fixedVerbs);
+    // Transitions Fields
+    setLocalTextAnimationType(textAnimationType);
+    setLocalTextSpeed(textSpeed);
+    setLocalImageTransitionType(imageTransitionType);
+    setLocalImageSpeed(imageSpeed);
   };
 
   const handleThemeChange = (theme: 'dark' | 'light') => {
@@ -706,6 +741,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const TABS = {
     abertura: 'Abertura do Jogo',
     layout: 'Layout',
+    transicoes: 'Transições',
     fim_de_jogo: 'Fim de Jogo',
     verbos: 'Verbos Fixos',
     textos: 'Textos da Interface',
@@ -887,6 +923,83 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 )}
                             </div>
                         </div>
+                  </div>
+              </div>
+          )}
+
+          {activeTab === 'transicoes' && (
+              <div className="space-y-8">
+                  <div>
+                      <h3 className="text-lg font-semibold text-brand-text mb-4">Transição de Textos</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                          <div>
+                              <label htmlFor="textAnimationType" className="block text-sm font-medium text-brand-text-dim mb-1">Efeito de Animação</label>
+                              <select
+                                  id="textAnimationType"
+                                  value={localTextAnimationType}
+                                  onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                              >
+                                  <option value="fade">Esmaecer (Fade In)</option>
+                                  <option value="typewriter">Máquina de Escrever (Letra a letra)</option>
+                              </select>
+                          </div>
+                          <div>
+                              <label htmlFor="textSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Animação: {localTextSpeed}</label>
+                              <input
+                                  type="range"
+                                  id="textSpeed"
+                                  min="1"
+                                  max="10"
+                                  value={localTextSpeed}
+                                  onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
+                                  className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border"
+                              />
+                              <div className="flex justify-between text-xs text-brand-text-dim mt-1">
+                                  <span>Lento</span>
+                                  <span>Rápido</span>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-brand-border/50">
+                      <h3 className="text-lg font-semibold text-brand-text mb-4">Transição de Imagens</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                          <div>
+                              <label htmlFor="imageTransitionType" className="block text-sm font-medium text-brand-text-dim mb-1">Efeito de Transição Global</label>
+                              <select
+                                  id="imageTransitionType"
+                                  value={localImageTransitionType}
+                                  onChange={(e) => setLocalImageTransitionType(e.target.value as any)}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                              >
+                                  <option value="fade">Esmaecer (Fade)</option>
+                                  <option value="slide-left">Deslizar para Esquerda</option>
+                                  <option value="slide-right">Deslizar para Direita</option>
+                                  <option value="page-turn">Virar Página (Page Turn)</option>
+                                  <option value="pixelate">Surgimento Pixelado</option>
+                                  <option value="none">Nenhuma</option>
+                              </select>
+                              <p className="text-xs text-brand-text-dim mt-1">Esta transição será usada quando uma transição específica não for definida na interação.</p>
+                          </div>
+                          <div>
+                              <label htmlFor="imageSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Transição: {localImageSpeed}</label>
+                              <input
+                                  type="range"
+                                  id="imageSpeed"
+                                  min="1"
+                                  max="10"
+                                  value={localImageSpeed}
+                                  onChange={(e) => setLocalImageSpeed(parseInt(e.target.value, 10))}
+                                  className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border"
+                              />
+                              <div className="flex justify-between text-xs text-brand-text-dim mt-1">
+                                  <span>Lento</span>
+                                  <span>Rápido</span>
+                              </div>
+                          </div>
+                      </div>
                   </div>
               </div>
           )}

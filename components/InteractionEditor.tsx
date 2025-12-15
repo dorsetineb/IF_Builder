@@ -20,8 +20,7 @@ const getOutcomeType = (inter: Interaction): 'goToScene' | 'newSceneDescription'
     return 'goToScene';
 };
 
-
-// Sub-component to manage local state for each interaction item, especially for the verbs input.
+// Sub-component to manage local state for each interaction item
 const InteractionItem: React.FC<{
   interaction: Interaction;
   index: number;
@@ -41,8 +40,6 @@ const InteractionItem: React.FC<{
     const verbInputId = `verbs-input-${interaction.id}`;
 
     useEffect(() => {
-        // Sync local state with prop, but only if the user is not currently typing in the input.
-        // This prevents the cursor from jumping.
         if (document.activeElement?.id !== verbInputId) {
              setLocalVerbs(interaction.verbs.join(', '));
         }
@@ -98,7 +95,6 @@ const InteractionItem: React.FC<{
 
     const handleVerbsBlur = () => {
         const cleanedVerbs = localVerbs.split(',').map(v => v.trim()).filter(Boolean);
-        // Only call update if the cleaned array is different from the source
         if (JSON.stringify(cleanedVerbs) !== JSON.stringify(interaction.verbs)) {
             handleInteractionChange('verbs', cleanedVerbs);
         }
@@ -106,18 +102,15 @@ const InteractionItem: React.FC<{
 
     const handleOutcomeChange = (outcome: 'goToScene' | 'newSceneDescription') => {
         const newInteraction = { ...interaction };
-
         const currentNewDescription = newInteraction.newSceneDescription || '';
 
-        // Reset all outcome-specific fields
         delete newInteraction.goToScene;
         delete newInteraction.newSceneDescription;
-        delete newInteraction.successMessage;
-        delete newInteraction.transitionType; // Reset transition when outcome changes
+        // Keep successMessage if present, or let user edit it
 
         switch (outcome) {
             case 'goToScene':
-                newInteraction.goToScene = ''; // Set to empty string to show the dropdown
+                newInteraction.goToScene = ''; 
                 break;
             case 'newSceneDescription':
                 newInteraction.newSceneDescription = currentNewDescription || 'A cena mudou...';
@@ -136,6 +129,9 @@ const InteractionItem: React.FC<{
                 }
             };
             reader.readAsDataURL(e.target.files[0]);
+        }
+        if (e.target) {
+            (e.target as HTMLInputElement).value = '';
         }
     };
     
@@ -188,230 +184,240 @@ const InteractionItem: React.FC<{
                     ))}
                 </select>
                 <div className="flex items-center mt-2">
-                    <input type="checkbox" id={`consumesItem-${index}`} checked={!!interaction.consumesItem} onChange={e => handleInteractionChange('consumesItem', e.target.checked)} disabled={!interaction.requiresInInventory} className="custom-checkbox"/>
-                    <label htmlFor={`consumesItem-${index}`} className={`ml-2 block text-sm text-brand-text-dim ${!interaction.requiresInInventory ? 'opacity-50' : ''}`}>Consumir o item do inventário</label>
+                    <input 
+                        type="checkbox" 
+                        id={`consumesItem-${index}`} 
+                        checked={!!interaction.consumesItem} 
+                        onChange={e => handleInteractionChange('consumesItem', e.target.checked)} 
+                        disabled={!interaction.requiresInInventory}
+                        className="custom-checkbox"
+                    />
+                    <label htmlFor={`consumesItem-${index}`} className={`ml-2 block text-sm text-brand-text-dim ${!interaction.requiresInInventory ? 'opacity-50' : ''}`}>
+                        Consome item após uso
+                    </label>
                 </div>
             </div>
+
+            {/* Trackers Section */}
             <div>
-                <label className="block text-sm font-medium text-brand-text-dim mb-1">Alvo</label>
+                <div className="flex justify-between items-center mb-1">
+                    <label className="block text-sm font-medium text-brand-text-dim">Efeitos em Rastreadores</label>
+                    <button onClick={handleAddTrackerEffect} className="text-xs text-brand-primary hover:underline flex items-center">
+                        <PlusIcon className="w-3 h-3 mr-1" /> Adicionar
+                    </button>
+                </div>
+                <div className="space-y-2">
+                    {interaction.trackerEffects && interaction.trackerEffects.length > 0 ? (
+                        interaction.trackerEffects.map((effect, i) => (
+                            <div key={i} className="flex gap-2 items-center">
+                                <select
+                                    value={effect.trackerId}
+                                    onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)}
+                                    className={`flex-grow ${selectBaseClasses} py-1 px-2 text-xs`}
+                                    style={selectStyle}
+                                >
+                                    <option value="" className={optionDimClasses}>Selecione...</option>
+                                    {consequenceTrackers.map(t => (
+                                        <option key={t.id} value={t.id} className={optionBaseClasses}>{t.name}</option>
+                                    ))}
+                                </select>
+                                <input
+                                    type="number"
+                                    value={localTrackerValues[i]}
+                                    onChange={e => handleLocalTrackerValueChange(i, e.target.value)}
+                                    onBlur={() => handleLocalTrackerValueBlur(i)}
+                                    className="w-20 bg-brand-border/30 border border-brand-border rounded-md px-2 py-1 text-xs focus:ring-0"
+                                    placeholder="Valor"
+                                />
+                                <button onClick={() => handleRemoveTrackerEffect(i)} className="text-red-500 hover:text-red-400">
+                                    <TrashIcon className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-xs text-brand-text-dim italic">Nenhum efeito.</p>
+                    )}
+                </div>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-4">
+             <div>
+                <label className="block text-sm font-medium text-brand-text-dim mb-1">Alvo da Interação (Objeto na Cena)</label>
                 <select 
-                    value={interaction.target || ''} 
-                    onChange={e => handleInteractionChange('target', e.target.value)} 
-                    className={selectBaseClasses}
-                    style={selectStyle}
+                  value={interaction.target} 
+                  onChange={e => handleInteractionChange('target', e.target.value)} 
+                  className={selectBaseClasses}
+                  style={selectStyle}
                 >
-                    <option className={optionDimClasses} value="">Selecione um alvo...</option>
+                    <option className={optionDimClasses} value="">Nenhum / Ação Geral</option>
                     {sceneObjects.map(obj => (
                         <option className={optionBaseClasses} key={obj.id} value={obj.id}>{obj.name}</option>
                     ))}
                 </select>
-                <div className="flex items-center mt-2">
-                    <input type="checkbox" id={`removesTarget-${index}`} checked={!!interaction.removesTargetFromScene} onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)} disabled={!interaction.target} className="custom-checkbox"/>
-                    <label htmlFor={`removesTarget-${index}`} className={`ml-2 block text-sm text-brand-text-dim ${!interaction.target ? 'opacity-50' : ''}`}>Remover o alvo da cena</label>
-                </div>
-            </div>
-          </div>
-          {/* Right Column - Outcome */}
-          <div className="flex flex-col h-full space-y-4">
-              <div>
-                  <label className="block text-sm font-medium text-brand-text-dim mb-1">Resultado da Ação</label>
-                  <select 
-                      value={outcomeType} 
-                      onChange={e => handleOutcomeChange(e.target.value as any)} 
-                      className={selectBaseClasses}
-                      style={selectStyle}
-                  >
-                      <option className={optionBaseClasses} value="goToScene">Ir para outra cena</option>
-                      <option className={optionBaseClasses} value="newSceneDescription">Alterar a descrição da cena</option>
-                  </select>
-              </div>
-
-              <div className="flex flex-col flex-grow h-full">
-                  {outcomeType === 'goToScene' && (
-                      <>
-                          <div className="flex-grow">
-                              <label className="block text-sm font-medium text-brand-text-dim mb-1">Cena de Destino</label>
-                              <select 
-                                  value={interaction.goToScene || ''} 
-                                  onChange={e => handleInteractionChange('goToScene', e.target.value)} 
-                                  className={`${selectBaseClasses} mb-2`}
-                                  style={selectStyle}
-                              >
-                                  <option className={optionDimClasses} value="">Selecione a cena...</option>
-                                  {otherScenes.map(scene => (
-                                      <option 
-                                          className={optionBaseClasses} 
-                                          key={scene.id} 
-                                          value={scene.id}
-                                      >
-                                          {scene.name} ({scene.id}) {scene.isEndingScene ? '(Fim de Jogo)' : ''}
-                                      </option>
-                                  ))}
-                              </select>
-                          </div>
-                          <div className="flex-grow flex items-center justify-center bg-brand-bg border-2 border-dashed border-brand-border/50 rounded-md p-4 mt-2">
-                              <p className="text-center text-sm text-brand-text-dim">O feedback para o jogador será a nova cena.</p>
-                          </div>
-                      </>
-                  )}
-
-                  {outcomeType === 'newSceneDescription' && (
-                      <>
-                          <label className="block text-sm font-medium text-brand-text-dim mb-1">Nova Descrição da Cena</label>
-                          <textarea 
-                              value={interaction.newSceneDescription || ''} 
-                              onChange={e => handleInteractionChange('newSceneDescription', e.target.value)} 
-                              rows={5} 
-                              className="w-full flex-grow bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
-                              placeholder="Descreva como a cena mudou..."
-                          />
-                      </>
-                  )}
-              </div>
-          </div>
-        </div>
-        
-        <div className="mt-4 pt-4 border-t border-brand-border/50 grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-            <div>
-                <label className="block text-sm font-medium text-brand-text-dim">Efeito Sonoro (opcional)</label>
-                <p className="text-xs text-brand-text-dim mb-2">Será tocado no término da interação.</p>
-                {interaction.soundEffect ? (
-                  <div className="flex items-center gap-2">
-                    <audio controls src={interaction.soundEffect} className="w-full max-w-sm"></audio>
-                    <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="p-2 text-brand-text-dim hover:text-red-500" title="Remover som">
-                        <TrashIcon className="w-5 h-5" />
-                    </button>
-                  </div>
-                ) : (
-                <label className="inline-flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer">
-                    <UploadIcon className="w-5 h-5 mr-2" /> Carregar Áudio
-                    <input type="file" accept="audio/*" onChange={(e) => handleSoundUpload(e)} className="hidden" />
-                </label>
+                {interaction.target && (
+                     <div className="flex items-center mt-2">
+                        <input 
+                            type="checkbox" 
+                            id={`removesTarget-${index}`} 
+                            checked={!!interaction.removesTargetFromScene} 
+                            onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)} 
+                            className="custom-checkbox"
+                        />
+                        <label htmlFor={`removesTarget-${index}`} className="ml-2 block text-sm text-brand-text-dim">
+                            Remove objeto da cena após interação
+                        </label>
+                    </div>
                 )}
             </div>
-            {outcomeType === 'goToScene' && (
-                <div>
-                    <label htmlFor={`transition-type-${index}`} className="block text-sm font-medium text-brand-text-dim">Transição Visual (opcional)</label>
-                    <p className="text-xs text-brand-text-dim mb-2">Efeito visual ao mudar de cena.</p>
-                    <select 
-                        id={`transition-type-${index}`}
-                        value={interaction.transitionType || 'none'} 
-                        onChange={e => handleInteractionChange('transitionType', e.target.value)} 
-                        className={`${selectBaseClasses}`}
+
+            <div>
+                <label className="block text-sm font-medium text-brand-text-dim mb-1">Resultado da Ação</label>
+                <div className="flex gap-2 mb-2 p-1 bg-brand-border/30 rounded-md">
+                     <button 
+                        onClick={() => handleOutcomeChange('goToScene')}
+                        className={`flex-1 py-1 px-2 text-xs rounded transition-colors ${outcomeType === 'goToScene' ? 'bg-brand-primary text-brand-bg font-bold' : 'text-brand-text-dim hover:text-brand-text'}`}
+                     >
+                        Mudar de Cena
+                     </button>
+                     <button 
+                        onClick={() => handleOutcomeChange('newSceneDescription')}
+                        className={`flex-1 py-1 px-2 text-xs rounded transition-colors ${outcomeType === 'newSceneDescription' ? 'bg-brand-primary text-brand-bg font-bold' : 'text-brand-text-dim hover:text-brand-text'}`}
+                     >
+                        Atualizar Texto
+                     </button>
+                </div>
+                
+                {outcomeType === 'goToScene' ? (
+                     <select 
+                        value={interaction.goToScene || ''} 
+                        onChange={e => handleInteractionChange('goToScene', e.target.value)} 
+                        className={selectBaseClasses}
                         style={selectStyle}
                     >
-                        <option className={optionBaseClasses} value="none">Sem transição (Padrão)</option>
-                        <option className={optionBaseClasses} value="fade">Fade</option>
-                        <option className={optionBaseClasses} value="wipe-down">Cortina (Cima)</option>
-                        <option className={optionBaseClasses} value="wipe-up">Cortina (Baixo)</option>
-                        <option className={optionBaseClasses} value="wipe-right">Cortina (Esquerda)</option>
-                        <option className={optionBaseClasses} value="wipe-left">Cortina (Direita)</option>
+                        <option className={optionDimClasses} value="">Selecione uma cena...</option>
+                        {otherScenes.map(s => (
+                            <option className={optionBaseClasses} key={s.id} value={s.id}>{s.name}</option>
+                        ))}
                     </select>
-                </div>
-            )}
-        </div>
-         <div className="mt-4 pt-4 border-t border-brand-border/50">
-            <h4 className="text-sm font-medium text-brand-text-dim mb-2">Efeitos nos Rastreadores</h4>
-            <div className="space-y-2">
-                {(interaction.trackerEffects || []).map((effect, effectIndex) => (
-                    <div key={effectIndex} className="flex items-center gap-2 p-2 bg-brand-border/20 rounded-md">
-                        <select
-                            value={effect.trackerId}
-                            onChange={(e) => handleTrackerEffectChange(effectIndex, 'trackerId', e.target.value)}
-                            className={`${selectBaseClasses} flex-1`}
-                            style={selectStyle}
-                        >
-                            <option value="" className={optionDimClasses}>Selecione o rastreador...</option>
-                            {consequenceTrackers.map(tracker => (
-                                <option key={tracker.id} value={tracker.id} className={optionBaseClasses}>
-                                    {tracker.name}
-                                </option>
-                            ))}
-                        </select>
-                        <input
-                            type="number"
-                            id={`tracker-value-${interaction.id}-${effectIndex}`}
-                            value={localTrackerValues[effectIndex]}
-                            onChange={(e) => handleLocalTrackerValueChange(effectIndex, e.target.value)}
-                            onBlur={() => handleLocalTrackerValueBlur(effectIndex)}
-                            className="w-24 bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
-                        />
-                        <button
-                            onClick={() => handleRemoveTrackerEffect(effectIndex)}
-                            className="p-2 text-brand-text-dim hover:text-red-500"
-                            title="Remover efeito"
-                        >
-                            <TrashIcon className="w-5 h-5" />
-                        </button>
-                    </div>
-                ))}
-                {consequenceTrackers.length === 0 && <p className="text-xs text-brand-text-dim text-center">Nenhum rastreador criado. Vá para a tela de Rastreadores para adicioná-los.</p>}
+                ) : (
+                    <textarea 
+                        value={interaction.newSceneDescription || ''} 
+                        onChange={e => handleInteractionChange('newSceneDescription', e.target.value)} 
+                        rows={3}
+                        placeholder="Nova descrição para esta cena..."
+                        className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
+                    />
+                )}
             </div>
-             {consequenceTrackers.length > 0 && (
-                <div className="flex justify-end mt-2">
-                    <button
-                        onClick={handleAddTrackerEffect}
-                        className="flex items-center px-3 py-1 text-xs bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors"
-                    >
-                        <PlusIcon className="w-4 h-4 mr-1" /> Adicionar Efeito
-                    </button>
+
+            <div>
+                <label className="block text-sm font-medium text-brand-text-dim mb-1">Mensagem de Sucesso (Opcional)</label>
+                <input
+                    type="text"
+                    value={interaction.successMessage || ''}
+                    onChange={e => handleInteractionChange('successMessage', e.target.value)}
+                    placeholder="Ex: Você abriu a porta."
+                    className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                />
+            </div>
+            
+            <div className="flex flex-col space-y-2">
+                <label className="block text-sm font-medium text-brand-text-dim mb-1">Efeito Sonoro (Opcional)</label>
+                <div className="flex items-center gap-2">
+                    <label className="flex-grow flex items-center justify-center px-3 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer text-xs">
+                        <UploadIcon className="w-4 h-4 mr-2" /> {interaction.soundEffect ? 'Alterar Som' : 'Carregar Som'}
+                        <input type="file" accept="audio/*" onChange={handleSoundUpload} className="hidden" />
+                    </label>
+                    {interaction.soundEffect && (
+                        <button
+                            onClick={() => handleInteractionChange('soundEffect', undefined)}
+                            className="p-2 bg-red-500/20 text-red-500 rounded-md hover:bg-red-500/30 transition-colors"
+                            title="Remover Som"
+                        >
+                            <TrashIcon className="w-4 h-4" />
+                        </button>
+                    )}
                 </div>
-            )}
+            </div>
+
+          </div>
         </div>
       </div>
     );
 };
 
+const generateUniqueId = (prefix: 'inter', existingIds: string[]): string => {
+    let id;
+    do {
+        id = `${prefix}_${Math.random().toString(36).substring(2, 5)}`;
+    } while (existingIds.includes(id));
+    return id;
+};
 
-const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions = [], onUpdateInteractions, allScenes, currentSceneId, sceneObjects = [], allTakableObjects = [], consequenceTrackers = [] }) => {
-  const handleAddInteraction = () => {
+const InteractionEditor: React.FC<InteractionEditorProps> = ({ 
+    interactions, 
+    onUpdateInteractions, 
+    allScenes, 
+    currentSceneId,
+    sceneObjects,
+    allTakableObjects,
+    consequenceTrackers
+}) => {
+    
+  const handleUpdate = (index: number, updatedInteraction: Interaction) => {
+    const newInteractions = [...interactions];
+    newInteractions[index] = updatedInteraction;
+    onUpdateInteractions(newInteractions);
+  };
+
+  const handleRemove = (index: number) => {
+    const newInteractions = interactions.filter((_, i) => i !== index);
+    onUpdateInteractions(newInteractions);
+  };
+
+  const handleAdd = () => {
+    const allIds = interactions.map(i => i.id);
     const newInteraction: Interaction = {
-      id: `inter_${Math.random().toString(36).substring(2, 9)}`,
+      id: generateUniqueId('inter', allIds),
       verbs: [],
       target: '',
     };
     onUpdateInteractions([...interactions, newInteraction]);
   };
 
-  const handleRemoveInteraction = (index: number) => {
-    onUpdateInteractions(interactions.filter((_, i) => i !== index));
-  };
-  
-  const handleUpdateInteraction = (index: number, updatedInteraction: Interaction) => {
-    const newInteractions = [...interactions];
-    newInteractions[index] = updatedInteraction;
-    onUpdateInteractions(newInteractions);
-  };
-
   return (
-    <>
-      <div className="space-y-4">
-        {interactions.map((inter, index) => (
+    <div className="space-y-6">
+      {interactions.length > 0 ? (
+          interactions.map((interaction, index) => (
             <InteractionItem
-                key={inter.id}
-                interaction={inter}
+                key={interaction.id}
                 index={index}
-                onUpdate={handleUpdateInteraction}
-                onRemove={handleRemoveInteraction}
+                interaction={interaction}
+                onUpdate={handleUpdate}
+                onRemove={handleRemove}
                 allScenes={allScenes}
                 currentSceneId={currentSceneId}
                 sceneObjects={sceneObjects}
                 allTakableObjects={allTakableObjects}
                 consequenceTrackers={consequenceTrackers}
             />
-        ))}
-         {interactions.length === 0 && <p className="text-center text-brand-text-dim">Nenhuma interação customizada nesta cena.</p>}
-      </div>
-       <div className="flex justify-end mt-4">
-        <button 
-            onClick={handleAddInteraction} 
-            className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
+          ))
+      ) : (
+          <p className="text-center text-brand-text-dim py-8">Nenhuma interação definida para esta cena.</p>
+      )}
+
+      <div className="flex justify-center pt-4">
+        <button
+            onClick={handleAdd}
+            className="flex items-center px-6 py-3 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors"
         >
             <PlusIcon className="w-5 h-5 mr-2" />
             Adicionar Interação
         </button>
       </div>
-    </>
+    </div>
   );
 };
 

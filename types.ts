@@ -19,7 +19,6 @@ export interface Interaction {
   requiresInInventory?: string; // ID of object in inventory, e.g., 'obj_chave_de_ferro'
   successMessage?: string;
   soundEffect?: string; // base64 data URL for interaction sound
-  transitionType?: 'none' | 'fade' | 'wipe-down' | 'wipe-up' | 'wipe-left' | 'wipe-right';
   // --- Outcomes ---
   addsToInventory?: boolean;
   consumesItem?: boolean; // if requiresInInventory is used, is it consumed?
@@ -142,6 +141,12 @@ export interface GameData {
   gameTrackerBarColor?: string;
   gameTrackerBarInvert?: boolean;
   gameContinueIndicatorColor?: string;
+  
+  // Transitions
+  gameTextAnimationType?: 'fade' | 'typewriter';
+  gameTextSpeed?: number; // 1 (slow) to 10 (fast)
+  gameImageTransitionType?: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'page-turn' | 'pixelate' | 'none';
+  gameImageSpeed?: number; // 1 (slow) to 10 (fast)
 }
 
 export type View = 'scenes' | 'interface' | 'map' | 'global_objects' | 'trackers';

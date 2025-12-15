@@ -48,6 +48,11 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         fixedVerbs: data.fixedVerbs || [],
         consequenceTrackers: data.consequenceTrackers || [],
         gameShowTrackersUI: data.gameShowTrackersUI,
+        // Transitions
+        gameTextAnimationType: data.gameTextAnimationType,
+        gameTextSpeed: data.gameTextSpeed,
+        gameImageTransitionType: data.gameImageTransitionType,
+        gameImageSpeed: data.gameImageSpeed,
     };
 };
 
@@ -81,6 +86,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Map<SceneID, GameObject[]>
     let sceneObjectsState = {}; 
 
+    // Setup global CSS variables for animation speed
+    const textSpeedVal = gameData.gameTextSpeed || 5;
+    const imgSpeedVal = gameData.gameImageSpeed || 5;
+    
+    // Map 1-10 to seconds. Text: 1=0.1s/char, 10=0.01s/char. Image: 1=3s, 10=0.3s
+    const typeSpeedBase = Math.max(5, 60 - (textSpeedVal * 5)); // ms per char
+    const textAnimDuration = Math.max(0.1, 2.1 - (textSpeedVal * 0.2)) + 's';
+    const imageAnimDuration = Math.max(0.3, 3.3 - (imgSpeedVal * 0.3)) + 's';
+    
+    document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
+    document.documentElement.style.setProperty('--image-anim-speed', imageAnimDuration);
+
     // Initialize trackers
     (gameData.consequenceTrackers || []).forEach(t => {
         trackers[t.id] = t.initialValue;
@@ -95,7 +112,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const endingRestartButtons = document.querySelectorAll('.ending-restart-button');
     
     const imageContainer = document.getElementById('image-container');
-    const sceneImage = document.getElementById('scene-image');
+    const sceneImage = document.getElementById('scene-image'); // Front Image (Current)
+    const sceneImageBack = document.getElementById('scene-image-back'); // Back Image (Next)
     const sceneDescription = document.getElementById('scene-description');
     const verbInput = document.getElementById('verb-input');
     const submitVerb = document.getElementById('submit-verb');
@@ -105,7 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const diaryButton = document.getElementById('diary-button');
     const trackersButton = document.getElementById('trackers-button');
     const sceneNameOverlay = document.getElementById('scene-name-overlay');
-    const transitionOverlay = document.getElementById('transition-overlay');
     const soundEffectAudio = document.getElementById('scene-sound-effect');
     
     const diaryModal = document.getElementById('diary-modal');
@@ -185,7 +202,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         splashScreen.classList.add('hidden');
-        loadScene(currentSceneId);
+        // Initial load should NOT animate transition
+        loadScene(currentSceneId, false); 
     };
 
     const loadGame = () => {
@@ -318,20 +336,61 @@ document.addEventListener('DOMContentLoaded', () => {
             image: scene.image
         });
 
-        if (transition && transitionType !== 'none' && transitionOverlay) {
-             transitionOverlay.className = 'transition-overlay ' + transitionType + '-start active';
-             requestAnimationFrame(() => {
-                 requestAnimationFrame(() => {
-                      transitionOverlay.className = 'transition-overlay active is-wiping ' + transitionType + '-start';
-                      setTimeout(() => {
-                          renderScene(scene);
-                          setTimeout(() => {
-                              transitionOverlay.className = 'transition-overlay';
-                          }, 500);
-                      }, 700);
-                 });
-             });
+        // Determine effective transition type
+        let effectiveTransition = transitionType;
+        if (transitionType === 'none' || !transitionType) {
+            effectiveTransition = gameData.gameImageTransitionType || 'fade';
+        }
+        
+        if (effectiveTransition === 'none') {
+            transition = false;
+        }
+
+        if (transition && sceneImage && sceneImageBack) {
+             // Logic:
+             // 1. Put New Image in Back.
+             // 2. Animate Current (Front) Image OUT (to reveal back).
+             // 3. Swap and Reset.
+             
+             // Setup Back Image (Next Scene)
+             sceneImageBack.src = scene.image || '';
+             if (scene.image) {
+                 sceneImageBack.classList.remove('hidden');
+             } else {
+                 sceneImageBack.classList.add('hidden');
+             }
+
+             // Ensure Front Image is visible for transition
+             if (sceneImage.src) {
+                 sceneImage.classList.remove('hidden');
+                 
+                 // Apply Exit Animation to Front Image
+                 const animClass = 'trans-' + effectiveTransition + '-out';
+                 sceneImage.classList.add(animClass);
+                 
+                 // Get duration from CSS variable to match timeout
+                 const durationMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--image-anim-speed')) * 1000;
+
+                 setTimeout(() => {
+                     // Transition Complete
+                     renderScene(scene); // Updates Front Image src
+                     sceneImage.classList.remove(animClass);
+                     
+                     // Optional: Hide back image after transition to prevent z-fighting or transparency issues?
+                     // Not strictly necessary if front covers it, but good for cleanup.
+                     sceneImageBack.src = '';
+                     sceneImageBack.classList.add('hidden');
+                 }, durationMs + 50); // Small buffer
+             } else {
+                 // No front image to animate out, just render
+                 renderScene(scene);
+             }
         } else {
+            // No transition (Initial load or disabled)
+            if (sceneImageBack) {
+                sceneImageBack.src = ''; 
+                sceneImageBack.classList.add('hidden');
+            }
             renderScene(scene);
         }
 
@@ -357,14 +416,14 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 3000);
         }
 
-        // --- Text Pagination Logic ---
+        // --- Text Pagination & Animation Logic ---
         sceneDescription.innerHTML = '';
         
         const rawDesc = scene.description;
-        // Split by newline, preserve non-empty lines
         const paragraphs = rawDesc.split('\\n').filter(p => p.trim().length > 0);
         
         let pIndex = 0;
+        const textAnimType = gameData.gameTextAnimationType || 'fade';
 
         const renderNextParagraph = () => {
             if (pIndex >= paragraphs.length) {
@@ -378,15 +437,58 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const pText = paragraphs[pIndex];
             const p = document.createElement('p');
-            // Format highlights
-            let formatted = pText.replace(/<([^>]+)>/g, '<span class="highlight-word" data-word="$1">$1</span>');
-            p.innerHTML = formatted;
-            p.className = 'scene-paragraph'; // CSS for animation
             
-            sceneDescription.appendChild(p);
+            // Format first, to get final structure
+            const formatText = (text) => text.replace(/<([^>]+)>/g, '<span class="highlight-word" data-word="$1">$1</span>');
+            const formattedHTML = formatText(pText);
 
-            // Attach highlight listeners to new paragraph
-            p.querySelectorAll('.highlight-word').forEach(span => {
+            if (textAnimType === 'typewriter') {
+                p.className = 'scene-paragraph typewriter-cursor';
+                p.style.opacity = '1'; 
+                p.style.animation = 'none'; // Disable fade animation
+                sceneDescription.appendChild(p);
+                
+                // --- Typewriter Logic ---
+                // We need to type visible text char by char, but insert HTML tags instantly.
+                let charIndex = 0;
+                let currentHtml = '';
+                
+                // Simple parser to split into tags and text
+                // Matches <...> OR any single char
+                const tokens = formattedHTML.match(/<[^>]+>|./g) || [];
+                
+                const typeInterval = setInterval(() => {
+                    if (charIndex >= tokens.length) {
+                        clearInterval(typeInterval);
+                        p.classList.remove('typewriter-cursor');
+                        setupHighlights(p);
+                        finishParagraph();
+                        return;
+                    }
+                    
+                    const token = tokens[charIndex];
+                    p.innerHTML += token; // Append token
+                    
+                    // Auto-scroll logic
+                    if (sceneDescription) {
+                        sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                    }
+                    
+                    charIndex++;
+                }, typeSpeedBase);
+
+            } else {
+                // Fade animation (Default)
+                p.innerHTML = formattedHTML;
+                p.className = 'scene-paragraph'; // CSS for fade animation
+                sceneDescription.appendChild(p);
+                setupHighlights(p);
+                finishParagraph();
+            }
+        };
+        
+        const setupHighlights = (element) => {
+            element.querySelectorAll('.highlight-word').forEach(span => {
                 span.addEventListener('click', (e) => {
                     e.stopPropagation();
                     const word = span.dataset.word;
@@ -394,9 +496,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     verbInput.focus();
                 });
             });
+        };
 
+        const finishParagraph = () => {
             pIndex++;
-
             if (pIndex < paragraphs.length) {
                 // Add continue indicator
                 const continueBtn = document.createElement('div');
@@ -411,16 +514,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
 
                 continueBtn.addEventListener('click', continueHandler);
-                // Also allow clicking anywhere in the description area to continue
                 sceneDescription.addEventListener('click', continueHandler);
-                
                 sceneDescription.appendChild(continueBtn);
                 sceneDescription.scrollTop = sceneDescription.scrollHeight;
             } else {
-                // Final scroll
                 sceneDescription.scrollTop = sceneDescription.scrollHeight;
                 verbInput.focus();
-                
                 if (scene.isEndingScene) {
                     setTimeout(gameWin, 2000);
                 }
@@ -438,7 +537,6 @@ document.addEventListener('DOMContentLoaded', () => {
             
             for (let i = 0; i < (gameData.gameMaxChances || 3); i++) {
                 const icon = document.createElement('div');
-                // Use string concatenation instead of template literal to avoid syntax error risks
                 icon.className = 'chance-icon ' + (i < chances ? '' : 'lost');
                 icon.innerHTML = i < chances ? iconSvg : iconOutlineSvg;
                 chancesContainer.appendChild(icon);
@@ -600,15 +698,10 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             if (interaction.newSceneDescription) {
                  gameData.cenas[currentSceneId].description = interaction.newSceneDescription;
-                 const desc = interaction.newSceneDescription.replace(/<([^>]+)>/g, '<span class="highlight-word" data-word="$1">$1</span>');
-                 sceneDescription.innerHTML = desc;
-                 sceneDescription.querySelectorAll('.highlight-word').forEach(span => {
-                    span.addEventListener('click', () => {
-                        const word = span.dataset.word;
-                        verbInput.value = 'olhar ' + word;
-                        verbInput.focus();
-                    });
-                });
+                 // Re-render to show new description with animations if needed, 
+                 // but typically for minor updates we just replace content. 
+                 // Let's use the fancy render to support typewriters on description change.
+                 renderScene(gameData.cenas[currentSceneId]);
             }
             if (interaction.successMessage) {
                 printOutput(interaction.successMessage);
@@ -619,6 +712,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const printOutput = (text) => {
         const p = document.createElement('p');
         p.textContent = text;
+        p.className = 'scene-paragraph'; // Apply animation class
         sceneDescription.appendChild(p);
         sceneDescription.scrollTop = sceneDescription.scrollHeight;
         

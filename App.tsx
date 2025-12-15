@@ -58,9 +58,11 @@ const gameHTML = `
 
         <div class="game-container __LAYOUT_ORIENTATION_CLASS__ __LAYOUT_ORDER_CLASS__">
             <div class="image-panel">
-                <div id="transition-overlay" class="transition-overlay"></div>
                 <div id="image-container" class="image-container">
-                  <img id="scene-image" src="" alt="Ilustração da cena">
+                  <!-- Back image: The Next Scene (loads behind) -->
+                  <img id="scene-image-back" src="" alt="Cena seguinte" class="scene-image hidden">
+                  <!-- Front image: The Current Scene (animates out) -->
+                  <img id="scene-image" src="" alt="Cena atual" class="scene-image">
                   <div id="scene-name-overlay" class="scene-name-overlay"></div>
                 </div>
             </div>
@@ -124,7 +126,7 @@ body { padding: 0; }
 body.with-spacing { padding: 2rem; }
 body.dark-theme { --bg-color: #0d1117; --panel-bg: #161b22; --border-color: #30363d; --text-color: __GAME_TEXT_COLOR__; --text-dim-color: #8b949e; --accent-color: __GAME_TITLE_COLOR__; --danger-color: #f85149; --danger-hover-bg: #da3633; --highlight-color: #eab308; --input-bg: #010409; --button-bg: #21262d; --button-hover-bg: #30363d; }
 body.light-theme { --bg-color: #ffffff; --panel-bg: #f6f8fa; --border-color: #d0d7de; --text-color: __GAME_TEXT_COLOR_LIGHT__; --text-dim-color: #57606a; --accent-color: __GAME_TITLE_COLOR_LIGHT__; --danger-color: #cf222e; --danger-hover-bg: #a40e26; --highlight-color: #9a6700; --input-bg: #ffffff; --button-bg: #f6f8fa; --button-hover-bg: #e5e7eb; }
-:root { --font-family: __FONT_FAMILY__; --font-size: __GAME_FONT_SIZE__; --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: __CONTINUE_INDICATOR_COLOR__; }
+:root { --font-family: __FONT_FAMILY__; --font-size: __GAME_FONT_SIZE__; --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: __CONTINUE_INDICATOR_COLOR__; --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
 * { box-sizing: border-box; }
 body { font-family: var(--font-family); font-size: var(--font-size); background-color: var(--bg-color); color: var(--text-color); margin: 0; height: 100vh; overflow: hidden; }
 .main-wrapper { height: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative; max-width: 1280px; margin: 0 auto; }
@@ -145,10 +147,12 @@ body.with-spacing .main-wrapper { height: 100%; }
 .chances-container { display: flex; align-items: center; gap: 8px; justify-content: flex-end; margin-bottom: 15px; }
 .chance-icon { width: 28px; height: 28px; transition: all 0.3s ease; }
 .chance-icon.lost { opacity: 0.5; }
-.game-container { display: flex; flex-grow: 1; overflow: hidden; }
-.image-panel { flex: 0 0 45%; max-width: 650px; border-right: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); position: relative; transition: padding 0.3s ease-in-out, background-color 0.3s ease-in-out; }
+.game-container { display: flex; flex-grow: 1; overflow: hidden; perspective: 1000px; }
+.image-panel { flex: 0 0 45%; max-width: 650px; border-right: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); position: relative; transition: padding 0.3s ease-in-out, background-color 0.3s ease-in-out; transform-style: preserve-3d; }
 .image-container { width: 100%; height: 100%; position: relative; overflow: hidden; background-size: cover; background-position: center; transition: border 0.3s ease-in-out, outline 0.3s ease-in-out, box-shadow 0.3s ease-in-out; }
-#scene-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+.scene-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
+#scene-image-back { z-index: 1; }
+#scene-image { z-index: 2; }
 .scene-name-overlay { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 0.9em; font-weight: bold; z-index: 10; opacity: 0; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: center; padding: 8px 16px; box-sizing: border-box; }
 .text-panel { flex: 1; display: flex; flex-direction: column; padding: 30px; position: relative; }
 .game-container.layout-horizontal { flex-direction: column; }
@@ -209,14 +213,28 @@ body.with-spacing .main-wrapper { height: 100%; }
 .item-modal-image-container { width: 500px; height: 500px; overflow: hidden; border: 2px solid var(--border-color); border-radius: 8px; background-color: var(--input-bg); }
 .item-modal-image-container img { width: 100%; height: 100%; object-fit: contain; display: block; }
 #item-modal-description { color: var(--text-color); }
-.transition-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: transparent; opacity: 0; pointer-events: none; transition: opacity 0.5s ease-in-out; z-index: 500; background-size: cover; background-position: center; }
-.transition-overlay.active { opacity: 1; pointer-events: auto; }
-.transition-overlay.is-wiping { opacity: 1; transition: clip-path 0.7s cubic-bezier(0.4, 0, 0.2, 1); }
-.transition-overlay.wipe-down-start { clip-path: inset(0 0 100% 0); }
-.transition-overlay.wipe-up-start { clip-path: inset(100% 0 0 0); }
-.transition-overlay.wipe-left-start { clip-path: inset(0 0 0 100%); }
-.transition-overlay.wipe-right-start { clip-path: inset(0 100% 0 0); }
-.transition-overlay.wipe-down-start.active, .transition-overlay.wipe-up-start.active, .transition-overlay.wipe-left-start.active, .transition-overlay.wipe-right-start.active { clip-path: inset(0 0 0 0); }
+
+/* Animation Classes applied to #scene-image (Front Image) to reveal #scene-image-back (Back Image) */
+.trans-fade-out { animation: fadeOut var(--image-anim-speed) forwards; }
+.trans-slide-left-out { animation: slideLeftOut var(--image-anim-speed) forwards; }
+.trans-slide-right-out { animation: slideRightOut var(--image-anim-speed) forwards; }
+.trans-wipe-down-out { animation: wipeDownOut var(--image-anim-speed) forwards; }
+.trans-wipe-up-out { animation: wipeUpOut var(--image-anim-speed) forwards; }
+.trans-wipe-left-out { animation: wipeLeftOut var(--image-anim-speed) forwards; }
+.trans-wipe-right-out { animation: wipeRightOut var(--image-anim-speed) forwards; }
+.trans-page-turn-out { animation: pageTurnOut calc(var(--image-anim-speed) * 1.5) forwards; transform-origin: left center; }
+.trans-pixelate-out { animation: pixelateOut var(--image-anim-speed) steps(10) forwards; }
+
+@keyframes fadeOut { to { opacity: 0; } }
+@keyframes slideLeftOut { to { transform: translateX(-100%); } }
+@keyframes slideRightOut { to { transform: translateX(100%); } }
+@keyframes wipeDownOut { to { clip-path: inset(100% 0 0 0); } }
+@keyframes wipeUpOut { to { clip-path: inset(0 0 100% 0); } }
+@keyframes wipeLeftOut { to { clip-path: inset(0 100% 0 0); } }
+@keyframes wipeRightOut { to { clip-path: inset(0 0 0 100%); } }
+@keyframes pageTurnOut { 0% { transform: rotateY(0); } 100% { transform: rotateY(-90deg); opacity: 0; } }
+@keyframes pixelateOut { 0% { opacity: 1; filter: blur(0px); } 50% { filter: blur(10px); opacity: 0.5; } 100% { opacity: 0; filter: blur(20px); } }
+
 body.frame-none .image-panel { border: none; }
 body.frame-rounded-top .game-container .image-panel { padding: 10px; background: __FRAME_ROUNDED_TOP_COLOR__; border: none; border-radius: 150px 150px 6px 6px; box-shadow: none; }
 body.frame-rounded-top .game-container .image-container { border-radius: 140px 140px 0 0; }
@@ -228,6 +246,7 @@ body.frame-trading-card .game-container:not(.layout-image-last) .image-panel { b
 body.frame-trading-card .game-container.layout-image-last .image-panel { border-left-color: transparent; }
 body.frame-trading-card .image-container { border: none; border-radius: 12px; }
 #scene-image { border-radius: 10px; }
+#scene-image-back { border-radius: 10px; }
 body.frame-chamfered .game-container .image-panel { padding: 10px; background: __FRAME_CHAMFERED_COLOR__; border: none; clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px); }
 body.frame-chamfered .game-container .image-container { width: 100%; height: 100%; border: none; background-color: transparent; clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px); }
 body.font-adjust-gothic { font-size: 1.15em; }
@@ -244,7 +263,9 @@ body.font-adjust-gothic { font-size: 1.15em; }
 .empty-inventory-msg { font-size: 0.9em; color: var(--text-dim-color); font-style: italic; }
 .continue-indicator { text-align: left; cursor: pointer; padding: 10px 0; color: var(--continue-indicator-color); animation: bounce 1s infinite; font-size: 1.5em; user-select: none; width: 100%; margin-top: 10px; }
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
-.scene-paragraph { margin: 0 0 10px 0; opacity: 0; animation: fadeIn 0.5s forwards; }
+.scene-paragraph { margin: 0 0 10px 0; opacity: 0; animation: fadeIn var(--text-anim-speed) forwards; }
+.typewriter-cursor::after { content: '|'; animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
 @keyframes fadeIn { to { opacity: 1; } }
 `;
 
@@ -292,6 +313,12 @@ const initialGameData: GameData = {
     gameSceneNameOverlayTextColor: '#c9d1d9',
     gameContinueIndicatorColor: '#58a6ff',
     
+    // Transitions defaults
+    gameTextAnimationType: 'fade',
+    gameTextSpeed: 5,
+    gameImageTransitionType: 'fade',
+    gameImageSpeed: 5,
+    
     // Explicit Portuguese Defaults
     gameActionButtonText: 'Ação',
     gameSplashButtonText: 'INICIAR',
@@ -334,6 +361,11 @@ const App: React.FC = () => {
         gameCSS: gameCSS,
         fixedVerbs: data.fixedVerbs || [], // Ensure array
         consequenceTrackers: data.consequenceTrackers || [], // Ensure array
+        // Default new fields if importing old save
+        gameTextAnimationType: data.gameTextAnimationType || 'fade',
+        gameTextSpeed: data.gameTextSpeed || 5,
+        gameImageTransitionType: data.gameImageTransitionType || 'fade',
+        gameImageSpeed: data.gameImageSpeed || 5,
     }));
     if (data.startScene) {
         setSelectedSceneId(data.startScene);
@@ -673,6 +705,12 @@ const App: React.FC = () => {
                                 diaryButtonText={gameData.gameDiaryButtonText}
                                 trackersButtonText={gameData.gameTrackersButtonText}
                                 gameContinueIndicatorColor={gameData.gameContinueIndicatorColor || '#58a6ff'}
+                                
+                                // Transitions
+                                textAnimationType={gameData.gameTextAnimationType || 'fade'}
+                                textSpeed={gameData.gameTextSpeed || 5}
+                                imageTransitionType={gameData.gameImageTransitionType || 'fade'}
+                                imageSpeed={gameData.gameImageSpeed || 5}
                             />
                         )}
                         {currentView === 'scenes' && selectedScene ? (

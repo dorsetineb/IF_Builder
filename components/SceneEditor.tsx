@@ -101,6 +101,11 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
      return Object.values(globalObjects).filter((o: GameObject) => o.isTakable);
   }, [globalObjects]);
 
+  // Create a Map for ConnectionsView which expects Map<string, GameObject>
+  const allObjectsMap = useMemo(() => {
+      return new Map(Object.entries(globalObjects));
+  }, [globalObjects]);
+
   const connections = useMemo(() => {
     const sceneMap = new Map(allScenes.map(s => [s.id, s]));
 
@@ -452,7 +457,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                 currentScene={localScene}
                 inputConnections={connections.inputConnections}
                 outputConnections={connections.outputConnections}
-                allObjectsMap={globalObjects as unknown as Map<string, GameObject>}
+                allObjectsMap={allObjectsMap}
                 onSelectScene={onSelectScene}
               />
           )}
