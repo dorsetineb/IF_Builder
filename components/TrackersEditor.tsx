@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { ConsequenceTracker, Scene, Interaction, TrackerEffect } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -97,19 +95,29 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
 
   return (
     <div className="space-y-6 pb-24">
-      <div>
-        <div className="flex items-center gap-2">
-            {isDirty && (
-                <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Alterações não salvas"></div>
-            )}
+      <div className="flex justify-between items-start">
+        <div>
+            <div className="flex items-center gap-2">
+                {isDirty && (
+                    <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Alterações não salvas"></div>
+                )}
+            </div>
+            <p className="text-brand-text-dim mt-1 text-sm">
+              Crie e gerencie variáveis que mudam com as ações do jogador.
+            </p>
         </div>
-        <p className="text-brand-text-dim mt-1 text-lg">
-          Crie e gerencie variáveis que mudam com as ações do jogador.
-        </p>
+        <button
+            onClick={handleAddTracker}
+            className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors"
+        >
+            <PlusIcon className="w-5 h-5 mr-2" />
+            Novo Rastreador
+        </button>
       </div>
 
-      <div className="space-y-4">
-        {localTrackers.map((tracker) => {
+      <div className="bg-brand-surface p-6 space-y-4 rounded-md">
+        {localTrackers.length > 0 ? (
+            localTrackers.map((tracker) => {
             const usages = allTrackerUsages.get(tracker.id) || [];
             return (
                 <div key={tracker.id} className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
@@ -271,17 +279,10 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                     </div>
                 </div>
             );
-        })}
-        {localTrackers.length === 0 && <p className="text-center text-brand-text-dim bg-brand-surface p-6 rounded-md">Nenhum rastreador criado.</p>}
-      </div>
-      <div className="flex justify-end mt-4">
-        <button 
-            onClick={handleAddTracker} 
-            className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
-        >
-            <PlusIcon className="w-5 h-5 mr-2" />
-            Adicionar Rastreador
-        </button>
+        })
+        ) : (
+            <p className="text-center text-brand-text-dim py-4">Nenhum rastreador criado.</p>
+        )}
       </div>
 
        <div className="fixed bottom-6 right-10 z-10 flex gap-2">

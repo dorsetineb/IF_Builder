@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { GameData, GameObject, Scene } from '../types';
 import { TrashIcon } from './icons/TrashIcon';
@@ -123,7 +121,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Alterações não salvas"></div>
                 )}
             </div>
-            <p className="text-brand-text-dim mt-1 text-lg">
+            <p className="text-brand-text-dim mt-1 text-sm">
                 Aqui você gerencia todos os objetos do jogo. Vincule-os às cenas através do Editor de Cenas.
             </p>
         </div>
@@ -136,7 +134,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         </button>
       </div>
       
-      <div className="bg-brand-surface p-6 space-y-4">
+      <div className="bg-brand-surface p-6 space-y-4 rounded-md">
         {localObjects.length > 0 ? (
           localObjects.map(obj => {
             const usages = getObjectUsages(obj.id);

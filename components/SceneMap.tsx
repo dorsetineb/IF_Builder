@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -48,7 +46,6 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
   const { initialNodes, edges, bounds, nodeLevels, nodesWithForwardIncomingEdges, nodesWithBackwardIncomingEdges, interactionsWithForwardOutgoingEdges, interactionsWithBackwardOutgoingEdges } = useMemo(() => {
     // 1. Calculate the actual height of each node first
     const nodeData = new Map<string, { height: number }>();
-    // FIX: Explicitly type 'scene' as 'Scene' to prevent it from being inferred as 'unknown'.
     Object.values(allScenesMap).forEach((scene: Scene) => {
         const linkingInteractions = scene.interactions?.filter(inter => inter.goToScene) || [];
         const interactionsHeight = linkingInteractions.length > 0
@@ -58,7 +55,6 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
     });
     
     const createdEdges: Edge[] = [];
-    // FIX: Explicitly type 'scene' as 'Scene' to prevent it from being inferred as 'unknown'.
     Object.values(allScenesMap).forEach((scene: Scene) => {
         scene.interactions?.forEach(inter => {
             if (inter.goToScene && allScenesMap[inter.goToScene]) {
@@ -275,13 +271,12 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, startSceneId, onSelec
   return (
     <div className="h-full flex flex-col relative">
       <div className="mb-4 flex-shrink-0">
-        <p className="text-brand-text-dim mt-1 text-lg">
+        <p className="text-brand-text-dim mt-1 text-sm">
           Visualize e organize a estrutura do seu jogo. Arraste as cenas para reposicioná-las e clique para editá-las.
         </p>
       </div>
       <div 
         ref={containerRef}
-// FIX: Removed invalid backslash from template literal.
         className={`w-full h-full bg-brand-bg rounded-lg border border-brand-border overflow-hidden ${isPanning || dragInfo ? 'cursor-grabbing' : 'cursor-grab'}`}
         style={{backgroundImage: 'radial-gradient(#4a5568 1px, transparent 1px)', backgroundSize: '20px 20px'}}
         onWheel={handleWheel}

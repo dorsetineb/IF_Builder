@@ -1,5 +1,4 @@
 
-
 export interface GameObject {
   id: string;
   name: string;
@@ -142,6 +141,7 @@ export interface GameData {
   gameTrackersButtonText?: string;
   gameTrackerBarColor?: string;
   gameTrackerBarInvert?: boolean;
+  gameContinueIndicatorColor?: string;
 }
 
 export type View = 'scenes' | 'interface' | 'map' | 'global_objects' | 'trackers';

@@ -357,17 +357,78 @@ document.addEventListener('DOMContentLoaded', () => {
             }, 3000);
         }
 
-        let desc = scene.description;
-        desc = desc.replace(/<([^>]+)>/g, '<span class="highlight-word" data-word="$1">$1</span>');
-        sceneDescription.innerHTML = desc;
+        // --- Text Pagination Logic ---
+        sceneDescription.innerHTML = '';
+        
+        const rawDesc = scene.description;
+        // Split by newline, preserve non-empty lines
+        const paragraphs = rawDesc.split('\\n').filter(p => p.trim().length > 0);
+        
+        let pIndex = 0;
 
-        sceneDescription.querySelectorAll('.highlight-word').forEach(span => {
-            span.addEventListener('click', () => {
-                const word = span.dataset.word;
-                verbInput.value = \`olhar \${word}\`;
-                handleInput();
+        const renderNextParagraph = () => {
+            if (pIndex >= paragraphs.length) {
+                if (scene.isEndingScene) {
+                    setTimeout(() => {
+                        gameWin();
+                    }, 2000);
+                }
+                return;
+            }
+
+            const pText = paragraphs[pIndex];
+            const p = document.createElement('p');
+            // Format highlights
+            let formatted = pText.replace(/<([^>]+)>/g, '<span class="highlight-word" data-word="$1">$1</span>');
+            p.innerHTML = formatted;
+            p.className = 'scene-paragraph'; // CSS for animation
+            
+            sceneDescription.appendChild(p);
+
+            // Attach highlight listeners to new paragraph
+            p.querySelectorAll('.highlight-word').forEach(span => {
+                span.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const word = span.dataset.word;
+                    verbInput.value = word;
+                    verbInput.focus();
+                });
             });
-        });
+
+            pIndex++;
+
+            if (pIndex < paragraphs.length) {
+                // Add continue indicator
+                const continueBtn = document.createElement('div');
+                continueBtn.className = 'continue-indicator';
+                continueBtn.innerHTML = '<span>▼</span>';
+                
+                const continueHandler = (e) => {
+                    if(e) e.stopPropagation();
+                    continueBtn.remove();
+                    sceneDescription.removeEventListener('click', continueHandler);
+                    renderNextParagraph();
+                };
+
+                continueBtn.addEventListener('click', continueHandler);
+                // Also allow clicking anywhere in the description area to continue
+                sceneDescription.addEventListener('click', continueHandler);
+                
+                sceneDescription.appendChild(continueBtn);
+                sceneDescription.scrollTop = sceneDescription.scrollHeight;
+            } else {
+                // Final scroll
+                sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                verbInput.focus();
+                
+                if (scene.isEndingScene) {
+                    setTimeout(gameWin, 2000);
+                }
+            }
+        };
+
+        // Start rendering the first paragraph
+        renderNextParagraph();
 
         const chancesContainer = document.getElementById('chances-container');
         if (chancesContainer && gameData.gameSystemEnabled === 'chances') {
@@ -377,7 +438,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             for (let i = 0; i < (gameData.gameMaxChances || 3); i++) {
                 const icon = document.createElement('div');
-                icon.className = \`chance-icon \${i < chances ? '' : 'lost'}\`;
+                // Use string concatenation instead of template literal to avoid syntax error risks
+                icon.className = 'chance-icon ' + (i < chances ? '' : 'lost');
                 icon.innerHTML = i < chances ? iconSvg : iconOutlineSvg;
                 chancesContainer.appendChild(icon);
             }
@@ -385,13 +447,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         closeActionPopup();
         verbInput.value = '';
-        verbInput.focus();
-
-        if (scene.isEndingScene) {
-            setTimeout(() => {
-                gameWin();
-            }, 2000);
-        }
     };
 
     const gameOver = () => {
@@ -502,7 +557,7 @@ document.addEventListener('DOMContentLoaded', () => {
                      const newObjects = sceneObjects.filter(o => o.id !== sceneObj.id);
                      updateSceneObjects(currentSceneId, newObjects);
                      
-                     printOutput(\`Você pegou \${sceneObj.name}.\`);
+                     printOutput('Você pegou ' + sceneObj.name + '.');
                      saveGame();
                      return;
                  } else {
@@ -513,7 +568,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         if (hasWord('ajuda', inputLower) || hasWord('help', inputLower) || inputLower === '?') {
-             printOutput("Tente usar verbos como 'olhar', 'pegar', 'usar', 'mover'.");
+             printOutput("Descubra o que fazer interagindo com o cenário. Tente combinar ações e objetos, como 'examinar mesa', 'usar chave', 'empurrar porta'.");
              return;
         }
 
@@ -550,8 +605,8 @@ document.addEventListener('DOMContentLoaded', () => {
                  sceneDescription.querySelectorAll('.highlight-word').forEach(span => {
                     span.addEventListener('click', () => {
                         const word = span.dataset.word;
-                        verbInput.value = \`olhar \${word}\`;
-                        handleInput();
+                        verbInput.value = 'olhar ' + word;
+                        verbInput.focus();
                     });
                 });
             }
@@ -621,7 +676,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const btn = document.createElement('button');
                 btn.textContent = obj.name;
                 btn.addEventListener('click', () => {
-                    verbInput.value = \`examinar \${obj.name}\`;
+                    // Use string concatenation
+                    verbInput.value = 'examinar ' + obj.name;
                     closeActionPopup();
                     handleInput();
                 });
@@ -632,12 +688,24 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const row2 = document.createElement('div');
         row2.className = 'action-popup-row';
-        ['Olhar ao redor', 'Inventário', 'Ajuda'].forEach(action => {
+        
+        const verbs = ['Examinar', 'Empurrar', 'Puxar', 'Chutar', 'Falar'];
+        verbs.forEach(verb => {
+             const btn = document.createElement('button');
+             btn.textContent = verb;
+             btn.addEventListener('click', () => {
+                 verbInput.value = verb.toLowerCase() + ' ';
+                 verbInput.focus();
+                 closeActionPopup();
+             });
+             row2.appendChild(btn);
+        });
+
+        ['Olhar ao redor', 'Ajuda'].forEach(action => {
              const btn = document.createElement('button');
              btn.textContent = action;
              btn.addEventListener('click', () => {
                  if (action === 'Olhar ao redor') verbInput.value = 'olhar';
-                 if (action === 'Inventário') verbInput.value = 'inventario';
                  if (action === 'Ajuda') verbInput.value = 'ajuda';
                  closeActionPopup();
                  handleInput();
@@ -767,7 +835,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!def.hideValue) {
                     const valSpan = document.createElement('span');
                     valSpan.className = 'tracker-item-values';
-                    valSpan.textContent = \`\${val} / \${def.maxValue}\`;
+                    // Use string concatenation
+                    valSpan.textContent = val + ' / ' + def.maxValue;
                     header.appendChild(valSpan);
                 }
                 
@@ -784,7 +853,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     width = 100 - percentage;
                 }
                 
-                bar.style.width = \`\${width}%\`;
+                // Use string concatenation
+                bar.style.width = width + '%';
                 if (def.barColor) {
                     bar.style.backgroundColor = def.barColor;
                 }

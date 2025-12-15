@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 import { GameData, FixedVerb } from '../types';
 import { UploadIcon } from './icons/UploadIcon';
@@ -52,6 +50,7 @@ interface UIEditorProps {
   inventoryButtonText?: string;
   diaryButtonText?: string;
   trackersButtonText?: string;
+  gameContinueIndicatorColor: string;
   
   // Game Info Props
   title: string;
@@ -237,6 +236,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
       gameSceneNameOverlayBg,
       gameSceneNameOverlayTextColor,
       gameShowTrackersUI, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText,
+      gameContinueIndicatorColor,
       // Game Info props
       title, logo, omitSplashTitle, 
       splashImage, splashContentAlignment, splashDescription,
@@ -262,7 +262,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localInventoryButtonText, setLocalInventoryButtonText] = useState(inventoryButtonText);
   const [localDiaryButtonText, setLocalDiaryButtonText] = useState(diaryButtonText);
   const [localTrackersButtonText, setLocalTrackersButtonText] = useState(trackersButtonText);
-  const [activeTab, setActiveTab] = useState('layout');
+  const [activeTab, setActiveTab] = useState('abertura');
 
   // State from ThemeEditor
   const [localTextColor, setLocalTextColor] = useState(textColor);
@@ -288,6 +288,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localFrameRoundedTopColor, setLocalFrameRoundedTopColor] = useState(frameRoundedTopColor);
   const [localGameSceneNameOverlayBg, setLocalGameSceneNameOverlayBg] = useState(gameSceneNameOverlayBg);
   const [localGameSceneNameOverlayTextColor, setLocalGameSceneNameOverlayTextColor] = useState(gameSceneNameOverlayTextColor);
+  const [localGameContinueIndicatorColor, setLocalGameContinueIndicatorColor] = useState(gameContinueIndicatorColor);
   const [focusPreview, setFocusPreview] = useState(false);
   const [isCustomizing, setIsCustomizing] = useState(false);
 
@@ -345,6 +346,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalFrameRoundedTopColor(frameRoundedTopColor);
     setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg);
     setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor);
+    setLocalGameContinueIndicatorColor(gameContinueIndicatorColor);
     // Game Info Sync
     setLocalTitle(title);
     setLocalLogo(logo);
@@ -362,7 +364,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
     chanceIconColor, gameFontFamily, gameFontSize, chanceIcon, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight,
     frameBookColor, frameTradingCardColor, frameChamferedColor,
-    frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor,
+    frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, gameContinueIndicatorColor,
     gameShowTrackersUI, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText,
     title, logo, omitSplashTitle, splashImage, splashContentAlignment, splashDescription,
     positiveEndingImage, positiveEndingDescription, negativeEndingImage, negativeEndingDescription, fixedVerbs
@@ -410,6 +412,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localFrameRoundedTopColor !== frameRoundedTopColor ||
                   localGameSceneNameOverlayBg !== gameSceneNameOverlayBg ||
                   localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor ||
+                  localGameContinueIndicatorColor !== gameContinueIndicatorColor ||
                   localTitle !== title || 
                   localLogo !== logo || 
                   localOmitSplashTitle !== omitSplashTitle ||
@@ -426,14 +429,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI, localSuggestionsButtonText, localInventoryButtonText, localDiaryButtonText, localTrackersButtonText,
     localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
     localFrameBookColor, localFrameTradingCardColor, localFrameChamferedColor,
-    frameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
+    frameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor, localGameContinueIndicatorColor,
     localTitle, localLogo, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, localPositiveEndingImage, localPositiveEndingDescription, localNegativeEndingImage, localNegativeEndingDescription, localFixedVerbs,
     props, onSetDirty
   ]);
 
   useEffect(() => {
     if (localGameSystemEnabled !== 'trackers' && activeTab === 'trackers') {
-        setActiveTab('layout');
+        setActiveTab('abertura');
     }
   }, [localGameSystemEnabled, activeTab]);
 
@@ -479,6 +482,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localFrameRoundedTopColor !== frameRoundedTopColor) onUpdate('frameRoundedTopColor', localFrameRoundedTopColor);
     if (localGameSceneNameOverlayBg !== gameSceneNameOverlayBg) onUpdate('gameSceneNameOverlayBg', localGameSceneNameOverlayBg);
     if (localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor) onUpdate('gameSceneNameOverlayTextColor', localGameSceneNameOverlayTextColor);
+    if (localGameContinueIndicatorColor !== gameContinueIndicatorColor) onUpdate('gameContinueIndicatorColor', localGameContinueIndicatorColor);
     // Game Info Fields
     if (localTitle !== title) onUpdate('gameTitle', localTitle);
     if (localLogo !== logo) onUpdate('gameLogo', localLogo);
@@ -535,6 +539,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalFrameRoundedTopColor(frameRoundedTopColor);
     setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg);
     setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor);
+    setLocalGameContinueIndicatorColor(gameContinueIndicatorColor);
     // Game Info Fields
     setLocalTitle(title);
     setLocalLogo(logo);
@@ -572,12 +577,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
       setLocalActionButtonTextColor(theme.actionButtonTextColor);
       setLocalChanceIconColor(theme.chanceIconColor);
       
-      // Also reset frame colors based on the theme being applied (usually implies a reset)
-      // Since predefined themes don't explicitly set frame colors, we infer reasonable defaults.
-      // Assuming typical themes will look best with white frames in dark mode and dark frames in light mode.
-      // Since localGameTheme doesn't change automatically here (user must set it manually or we assume a default),
-      // we'll stick to the current theme's default frame color or update if we were to support theme mode switching in predefined themes.
-      // For now, let's just reset based on the *current* localGameTheme to ensure consistency.
       const newFrameColor = localGameTheme === 'dark' ? '#FFFFFF' : '#1a202c';
       setLocalFrameBookColor(newFrameColor);
       setLocalFrameTradingCardColor(newFrameColor);
@@ -681,7 +680,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
               containerStyles.border = 'none';
               containerStyles.borderRadius = '8px';
               break;
-          case 'chamfered':
+          case 'chamfered': {
               const previewChamferSize = '8px';
               const previewBorderWidth = '5px';
               const previewChamferPath = `polygon(${previewChamferSize} 0, calc(100% - ${previewChamferSize}) 0, 100% ${previewChamferSize}, 100% calc(100% - ${previewChamferSize}), calc(100% - ${previewChamferSize}) 100%, ${previewChamferSize} 100%, 0 calc(100% - ${previewChamferSize}), 0 ${previewChamferSize})`;
@@ -694,6 +693,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
               containerStyles.clipPath = previewChamferPath;
               containerStyles.border = 'none';
               break;
+          }
           default: // 'none' frame
               panelStyles.border = 'none';
               panelStyles.padding = '0';
@@ -704,8 +704,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const { panelStyles, containerStyles } = getFramePreviewStyles(localImageFrame);
 
   const TABS = {
-    layout: 'Layout',
     abertura: 'Abertura do Jogo',
+    layout: 'Layout',
     fim_de_jogo: 'Fim de Jogo',
     verbos: 'Verbos Fixos',
     textos: 'Textos da Interface',
@@ -715,15 +715,18 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
   return (
     <div className="space-y-6 pb-24">
-      <div>
-        <div className="flex items-center gap-2">
-            {isDirty && (
-                <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Alterações não salvas"></div>
-            )}
+      <div className="flex justify-between items-start">
+        <div>
+            <p className="text-brand-text-dim mt-1 text-sm">
+                Configure o título, a interface, as cores e as telas de vitória/derrota do seu jogo.
+            </p>
         </div>
-        <p className="text-brand-text-dim mt-1 text-lg">
-            Personalize as informações, o layout e a aparência do seu jogo.
-        </p>
+        {isDirty && (
+            <div className="flex items-center gap-2 text-yellow-400 text-xs font-medium animate-pulse">
+                <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                <span>Alterações não salvas</span>
+            </div>
+        )}
       </div>
       
       <div>
@@ -1062,6 +1065,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <ColorInput label="Cor do Texto do Box" id="sceneNameOverlayTextColor" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#c9d1d9" />
                             </div>
                         </div>
+                        <div className="pt-6 border-t border-brand-border/50">
+                            <h3 className="text-lg font-semibold text-brand-text mb-4">Outros</h3>
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                <ColorInput label="Cor da Seta de Continuar" id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#58a6ff" />
+                            </div>
+                        </div>
                         {localGameSystemEnabled === 'chances' && (
                             <div className="pt-6 border-t border-brand-border/50">
                                 <h3 className="text-lg font-semibold text-brand-text mb-4">Sistema de Chances</h3>
@@ -1159,14 +1168,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
           )}
           {/* Other tabs remain the same... */}
           {activeTab === 'abertura' && (
-              // ... existing content for abertura ...
-              // Re-rendering this part to ensure file completeness if it was truncated, 
-              // but since I only need to modify the file once, I will assume the structure 
-              // is preserved by replacing the whole component.
-              // To save space in response, I will omit unchanged tabs content if permitted, 
-              // but instructions say "Full content". I must provide full content.
-              
-              // Proceeding with full content for completeness.
               <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                       <div className="space-y-6">

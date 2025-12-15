@@ -1,7 +1,5 @@
-
-
 import React, { useState, useCallback, useMemo } from 'react';
-import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker } from './types';
+import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker, FixedVerb } from './types';
 import Sidebar from './components/Sidebar';
 import SceneEditor from './components/SceneEditor';
 import Header from './components/Header';
@@ -11,9 +9,6 @@ import Preview from './components/Preview';
 import SceneMap from './components/SceneMap';
 import GlobalObjectsEditor from './components/GlobalObjectsEditor';
 import TrackersEditor from './components/TrackersEditor';
-
-// Define defaults outside for reuse
-const gameHTMLDefault = `...`; // (Truncated for brevity, assuming existing HTML/CSS string logic is preserved in logic below)
 
 const gameHTML = `
 <!DOCTYPE html>
@@ -129,7 +124,7 @@ body { padding: 0; }
 body.with-spacing { padding: 2rem; }
 body.dark-theme { --bg-color: #0d1117; --panel-bg: #161b22; --border-color: #30363d; --text-color: __GAME_TEXT_COLOR__; --text-dim-color: #8b949e; --accent-color: __GAME_TITLE_COLOR__; --danger-color: #f85149; --danger-hover-bg: #da3633; --highlight-color: #eab308; --input-bg: #010409; --button-bg: #21262d; --button-hover-bg: #30363d; }
 body.light-theme { --bg-color: #ffffff; --panel-bg: #f6f8fa; --border-color: #d0d7de; --text-color: __GAME_TEXT_COLOR_LIGHT__; --text-dim-color: #57606a; --accent-color: __GAME_TITLE_COLOR_LIGHT__; --danger-color: #cf222e; --danger-hover-bg: #a40e26; --highlight-color: #9a6700; --input-bg: #ffffff; --button-bg: #f6f8fa; --button-hover-bg: #e5e7eb; }
-:root { --font-family: __FONT_FAMILY__; --font-size: __GAME_FONT_SIZE__; --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); }
+:root { --font-family: __FONT_FAMILY__; --font-size: __GAME_FONT_SIZE__; --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: __CONTINUE_INDICATOR_COLOR__; }
 * { box-sizing: border-box; }
 body { font-family: var(--font-family); font-size: var(--font-size); background-color: var(--bg-color); color: var(--text-color); margin: 0; height: 100vh; overflow: hidden; }
 .main-wrapper { height: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative; max-width: 1280px; margin: 0 auto; }
@@ -247,805 +242,501 @@ body.font-adjust-gothic { font-size: 1.15em; }
 .tracker-bar-container { width: 100%; height: 22px; background-color: var(--tracker-bar-bg-color); border: 2px solid var(--border-color); border-radius: 4px; overflow: hidden; }
 .tracker-bar { height: 100%; background-color: var(--tracker-bar-fill-color); transition: width 0.3s ease-in-out; }
 .empty-inventory-msg { font-size: 0.9em; color: var(--text-dim-color); font-style: italic; }
+.continue-indicator { text-align: left; cursor: pointer; padding: 10px 0; color: var(--continue-indicator-color); animation: bounce 1s infinite; font-size: 1.5em; user-select: none; width: 100%; margin-top: 10px; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
+.scene-paragraph { margin: 0 0 10px 0; opacity: 0; animation: fadeIn 0.5s forwards; }
+@keyframes fadeIn { to { opacity: 1; } }
 `;
 
 const generateUniqueId = (prefix: 'scn' | 'obj' | 'inter' | 'trk' | 'verb', existingIds: string[]): string => {
     let id;
     do {
-        id = `${prefix}_${Math.random().toString(36).substring(2, 5)}`;
+        id = `${prefix}_${Math.random().toString(36).substring(2, 9)}`;
     } while (existingIds.includes(id));
     return id;
 };
 
-// --- MIGRATION HELPER ---
-const migrateToGlobalObjects = (data: any): any => {
-    // If we already have globalObjects, we assume it's migrated.
-    if (data.globalObjects) return data;
-
-    const globalObjects: { [id: string]: GameObject } = {};
-    const scenes = data.scenes || data.cenas || {};
-
-    // Iterate through all scenes to extract objects
-    Object.values(scenes).forEach((scene: any) => {
-        // Handle both 'objects' (new) and 'objetos' (old export format)
-        const sceneObjects = scene.objects || scene.objetos || [];
-        
-        const objectIds: string[] = [];
-
-        sceneObjects.forEach((obj: any) => {
-            // Add to global dictionary
-            globalObjects[obj.id] = obj;
-            objectIds.push(obj.id);
-        });
-
-        // Update the scene to use objectIds
-        scene.objectIds = objectIds;
-        
-        // Remove the old objects array to clean up
-        delete scene.objects;
-        delete scene.objetos;
-    });
-
-    return {
-        ...data,
-        globalObjects,
-        scenes
-    };
-};
-
-const initializeGameData = (): GameData => {
-    // Initial static data
-    const initialScenes = {
-      "cena_1": {
-        id: "cena_1",
-        name: "Cela escura",
-        description: "Você desperta em uma <cela> úmida e apertada. O ar cheira a mofo.\nUma <porta> trancada bloqueia a saída. No canto, um <balde> enferrujado. \nUm <tijolo> chama a atenção na parede.",
-        image: "",
-        objects: [
-          { id: "obj_balde", name: "balde", examineDescription: "Um balde usado como penico, fedendo fortemente, com ferrugem em toda sua superfície. Parece que tem algo dentro dele", isTakable: false },
-          { id: "obj_tijolo", name: "tijolo", examineDescription: "Um dos tijolos da parede parece mal encaixado.", isTakable: false },
-          { id: "obj_porta_ferro_c1", name: "porta", examineDescription: "Uma porta de ferro maciça e trancada.", isTakable: false }
-        ],
-        interactions: [
-          {
-            id: 'inter_1_1',
-            verbs: ['examinar', 'puxar', 'empurrar', 'mover', 'retirar', 'tirar'],
-            target: 'obj_tijolo',
-            goToScene: 'cena_2'
-          },
-          {
-            id: 'inter_1_2',
-            verbs: ['chutar', 'bater', 'arrombar'],
-            target: 'obj_porta_ferro_c1',
-            successMessage: 'Você reúne forças e tenta arrombar a porta. O impacto ecoa alto no corredor.',
-            goToScene: 'cena_3'
-          },
-          {
-            id: 'inter_1_3',
-            verbs: ['mexer', 'revirar', 'chutar', 'pegar', 'levantar', 'mover'],
-            target: 'obj_balde',
-            successMessage: 'Com nojo, você mexe no balde. Algo se move na água suja.',
-            goToScene: 'cena_4'
-          },
-          {
-            id: 'inter_1_4',
-            verbs: ['usar', 'abrir', 'destrancar', 'inserir', 'enfiar'],
-            target: 'obj_porta_ferro_c1',
-            requiresInInventory: 'obj_chave',
-            consumesItem: true,
-            goToScene: 'cena_5'
-          }
-        ]
-      },
-      "cena_2": {
-        id: "cena_2",
-        name: "Atrás do tijolo",
-        description: "Atrás do tijolo, você encontra uma <chave> enferrujada. A <porta> da cela também está aqui.\nVocê pode voltar para a <cela> a qualquer momento.",
-        image: "",
-        objects: [
-          { id: "obj_chave", name: "chave", examineDescription: "Uma chave pesada, coberta de ferrugem.", isTakable: true },
-          { id: "obj_cela_retorno", name: "cela", examineDescription: "É a cela de onde você acabou de vir.", isTakable: false },
-          { id: "obj_porta_ferro_c2", name: "porta", examineDescription: "Uma porta de ferro maciça e trancada.", isTakable: false }
-        ],
-        interactions: [
-          {
-            id: 'inter_2_2',
-            verbs: ['voltar', 'retornar', 'ir'],
-            target: 'obj_cela_retorno',
-            successMessage: 'Você se afasta do buraco na parede e volta para a cela.',
-            goToScene: 'cena_1'
-          },
-          {
-            id: 'inter_2_1',
-            verbs: ['usar', 'abrir', 'destrancar', 'inserir', 'enfiar'],
-            target: 'obj_porta_ferro_c2',
-            requiresInInventory: 'obj_chave',
-            consumesItem: true,
-            goToScene: 'cena_5'
-          }
-        ]
-      },
-      "cena_3": {
-        id: "cena_3",
-        name: "Machucado pela porta!",
-        description: "CLANK!\nVocê chuta a porta com força. \nEla range, mas algo estala dentro do seu pé. A dor é insuportável.",
-        image: "",
-        objects: [],
-        interactions: [],
-        removesChanceOnEntry: true
-      },
-      "cena_4": {
-        id: "cena_4",
-        name: "Um rato ataca!",
-        description: "Algo se agita dentro do balde.\nSQUEEK!\nUm rato ataca e crava os dentes na sua mão.",
-        image: "",
-        objects: [],
-        interactions: [],
-        removesChanceOnEntry: true
-      },
-      "cena_5": {
-        id: "cena_5",
-        name: "Fuga da cela",
-        description: "A porta range quando você gira a chave na fechadura. \nVocê sai da cela e sente o vento fresco da noite.",
-        image: "",
-        objects: [],
-        interactions: [],
-        isEndingScene: true
-      }
-    };
-
-    // Run migration on initial data
-    const migratedData = migrateToGlobalObjects({
-        startScene: "cena_1",
-        scenes: initialScenes,
-        sceneOrder: Object.keys(initialScenes)
-    });
+const initialGameData: GameData = {
+    startScene: '',
+    scenes: {},
+    globalObjects: {},
+    sceneOrder: [],
+    defaultFailureMessage: 'Não aconteceu nada.',
+    gameHTML: gameHTML,
+    gameCSS: gameCSS,
+    gameTitle: 'Minha Aventura de Texto',
+    gameSystemEnabled: 'none',
+    gameMaxChances: 3,
+    gameTheme: 'dark',
+    gameImageFrame: 'none',
+    gameLayoutOrientation: 'vertical',
+    gameLayoutOrder: 'image-first',
+    gameTextColor: '#c9d1d9',
+    gameTitleColor: '#58a6ff',
+    gameFocusColor: '#58a6ff',
+    gameTextColorLight: '#24292f',
+    gameTitleColorLight: '#0969da',
+    gameFocusColorLight: '#0969da',
+    gameSplashButtonColor: '#2ea043',
+    gameSplashButtonHoverColor: '#238636',
+    gameSplashButtonTextColor: '#ffffff',
+    gameActionButtonColor: '#ffffff',
+    gameActionButtonTextColor: '#0d1117',
+    gameChanceIcon: 'heart',
+    gameChanceIconColor: '#ff4d4d',
+    frameBookColor: '#FFFFFF',
+    frameTradingCardColor: '#1c1917',
+    frameChamferedColor: '#FFFFFF',
+    frameRoundedTopColor: '#facc15',
+    gameSceneNameOverlayBg: '#0d1117',
+    gameSceneNameOverlayTextColor: '#c9d1d9',
+    gameContinueIndicatorColor: '#58a6ff',
     
-    // Assign other properties
-    return {
-        ...migratedData,
-        defaultFailureMessage: "Isso não parece ter nenhum efeito.",
-        gameHTML: gameHTML,
-        gameCSS: gameCSS,
-        gameTitle: "Fuja da Masmorra",
-        gameFontFamily: "'Silkscreen', sans-serif",
-        gameFontSize: "1em",
-        gameLogo: "", 
-        gameSplashImage: "",
-        gameSplashContentAlignment: 'right',
-        gameSplashDescription: "Você acorda em uma cela escura... Escreva para fugir da cela!\n\n(digite AJUDA para acessar o tutorial)",
-        gameTextColor: "#c9d1d9",
-        gameTitleColor: "#58a6ff",
-        gameOmitSplashTitle: false,
-        gameSplashButtonText: "COMEÇAR",
-        gameContinueButtonText: "CONTINUAR",
-        gameRestartButtonText: "RECOMEÇAR",
-        gameSplashButtonColor: "#2ea043",
-        gameSplashButtonHoverColor: "#238636",
-        gameSplashButtonTextColor: "#ffffff",
-        gameLayoutOrientation: 'vertical',
-        gameLayoutOrder: 'image-first',
-        gameImageFrame: 'none',
-        gameActionButtonColor: '#ffffff',
-        gameActionButtonTextColor: '#0d1117',
-        gameActionButtonText: 'AÇÃO',
-        gameVerbInputPlaceholder: 'O QUE VOCÊ FAZ?',
-        gameDiaryPlayerName: 'VOCÊ',
-        gameFocusColor: '#58a6ff',
-        gameSystemEnabled: 'chances',
-        gameMaxChances: 2,
-        gameChanceIcon: 'heart',
-        gameChanceIconColor: '#ff4d4d',
-        gameChanceReturnButtonText: "Tentar Novamente",
-        gameTheme: 'dark',
-        gameTextColorLight: '#24292f',
-        gameTitleColorLight: '#0969da',
-        gameFocusColorLight: '#0969da',
-        positiveEndingImage: "",
-        positiveEndingContentAlignment: 'right',
-        positiveEndingDescription: "Você conseguiu fugir da masmorra!",
-        negativeEndingImage: "",
-        negativeEndingContentAlignment: 'right',
-        negativeEndingDescription: "Você morreu...",
-        frameBookColor: '#FFFFFF',
-        frameTradingCardColor: '#FFFFFF',
-        frameChamferedColor: '#FFFFFF',
-        frameRoundedTopColor: '#FFFFFF',
-        gameSceneNameOverlayBg: '#0d1117',
-        gameSceneNameOverlayTextColor: '#c9d1d9',
-        fixedVerbs: [
-            {
-                id: 'verb_help_1',
-                verbs: ['ajuda', 'me ajude'],
-                description: `Como Interagir com o mundo:\nA base de tudo é o campo de texto, e a maioria dos comandos segue um formato simples:\n\nAções diretas: Para interagir com algo na cena, use VERBO + ALVO.\nPor exemplo: pegar chave ou olhar porta.\n\nUsando itens do inventário: Para usar um item que você coletou em algo na cena, o formato é VERBO + ITEM + ALVO.\nPor exemplo: usar chave na porta.\nLembre-se: o item (como a chave) precisa estar no seu inventário para que a ação funcione.\nFique de olho nas palavras destacadas na descrição da cena, como <esta>. Elas indicam pontos de interesse importantes!\n\nAlguns verbos são universais e muito úteis:\n\nOLHAR ou EXAMINAR: Use para descobrir mais detalhes sobre o que está ao seu redor. Você pode usar em um objeto específico (olhar tijolo) ou no ambiente em geral (olhar ao redor).\n\PEGAR: Alguns objetos podem ser coletados e guardados no seu inventário para uso posterior. Se algo parecer útil e solto, tente pegá-lo!\n\nINVENTÁRIO: Para ver todos os itens que você carrega, clique no botão Inventário.\n\nVOLTAR: Se quiser retornar para a cena de onde acabou de vir, este comando pode funcionar.\n\nEstou Travado, e Agora?\nSeja criativo! Tente verbos diferentes para um mesmo objeto. empurrar, puxar, chutar, usar... a experimentação é a chave!\nBotão de Sugestões: Se estiver sem ideias, o botão Sugestões é seu melhor amigo. Ele pode te dar uma luz sobre as ações mais óbvias na cena atual.\n\nDiário: Esqueceu o que aconteceu ou um detalhe importante? O Diário guarda um registro de todas as cenas que você visitou e de suas ações. Use-o para relembrar pistas.`
-            }
-        ],
-        consequenceTrackers: [],
-        gameShowTrackersUI: true,
-        gameSuggestionsButtonText: "Sugestões",
-        gameInventoryButtonText: "Inventário",
-        gameDiaryButtonText: "Diário",
-        gameTrackersButtonText: "Rastreadores",
-    };
+    // Explicit Portuguese Defaults
+    gameActionButtonText: 'Ação',
+    gameSplashButtonText: 'INICIAR',
+    gameContinueButtonText: 'Continuar Aventura',
+    gameRestartButtonText: 'Reiniciar Aventura',
+    gameVerbInputPlaceholder: 'O que você faz?',
+    gameDiaryPlayerName: 'Jogador',
+    gameSuggestionsButtonText: 'Sugestões',
+    gameInventoryButtonText: 'Inventário',
+    gameDiaryButtonText: 'Diário',
+    gameTrackersButtonText: 'Rastreadores',
+    gameChanceReturnButtonText: 'Tentar Novamente',
+    fixedVerbs: [],
+    consequenceTrackers: [],
 };
 
-const createNewGameData = (): GameData => {
-    const newSceneId = 'scn_start';
+const App: React.FC = () => {
+  const [gameData, setGameData] = useState<GameData>(initialGameData);
+  const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
+  const [currentView, setCurrentView] = useState<View>('scenes');
+  const [isPreviewing, setIsPreviewing] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+
+  // Derived state for scene list
+  const scenesList = useMemo(() => {
+    return gameData.sceneOrder.map(id => gameData.scenes[id]).filter(Boolean);
+  }, [gameData.scenes, gameData.sceneOrder]);
+
+  const selectedScene = selectedSceneId ? gameData.scenes[selectedSceneId] : null;
+
+  // Memoize arrays to ensure referential stability and prevent UIEditor field reset loops
+  const fixedVerbs = useMemo(() => gameData.fixedVerbs || [], [gameData.fixedVerbs]);
+  const consequenceTrackers = useMemo(() => gameData.consequenceTrackers || [], [gameData.consequenceTrackers]);
+
+  const handleImportGame = useCallback((data: GameData) => {
+    setGameData(prev => ({
+        ...prev,
+        ...data,
+        gameHTML: gameHTML, // Ensure templates are preserved/updated
+        gameCSS: gameCSS,
+        fixedVerbs: data.fixedVerbs || [], // Ensure array
+        consequenceTrackers: data.consequenceTrackers || [], // Ensure array
+    }));
+    if (data.startScene) {
+        setSelectedSceneId(data.startScene);
+    } else if (data.sceneOrder.length > 0) {
+        setSelectedSceneId(data.sceneOrder[0]);
+    }
+    setIsDirty(false);
+  }, []);
+
+  const handleUpdateGameData = (field: keyof GameData, value: any) => {
+    setGameData(prev => ({ ...prev, [field]: value }));
+    setIsDirty(true);
+  };
+
+  const handleAddScene = () => {
+    const newId = generateUniqueId('scn', Object.keys(gameData.scenes));
     const newScene: Scene = {
-        id: newSceneId,
-        name: "Cena Inicial",
-        description: "Esta é a sua primeira cena. Descreva o que o jogador vê.",
-        image: "",
+        id: newId,
+        name: 'Nova Cena',
+        image: '',
+        description: 'Descrição da nova cena.',
         objectIds: [],
         interactions: []
     };
-
-    return {
-        startScene: newSceneId,
-        scenes: { [newSceneId]: newScene },
-        globalObjects: {}, // Empty global library
-        sceneOrder: [newSceneId],
-        defaultFailureMessage: "Isso não parece ter nenhum efeito.",
-        gameHTML: gameHTML,
-        gameCSS: gameCSS,
-        gameTitle: "Meu Novo Jogo",
-        gameFontFamily: "'Silkscreen', sans-serif",
-        gameFontSize: "1em",
-        gameLogo: "",
-        gameSplashImage: "",
-        gameSplashContentAlignment: 'right',
-        gameSplashDescription: "A descrição da sua nova aventura vai aqui...",
-        gameTextColor: "#c9d1d9",
-        gameTitleColor: "#58a6ff",
-        gameOmitSplashTitle: false,
-        gameSplashButtonText: "INICIAR",
-        gameContinueButtonText: "CONTINUAR",
-        gameRestartButtonText: "REINICIAR",
-        gameSplashButtonColor: "#2ea043",
-        gameSplashButtonHoverColor: "#238636",
-        gameSplashButtonTextColor: "#ffffff",
-        gameLayoutOrientation: 'vertical',
-        gameLayoutOrder: 'image-first',
-        gameImageFrame: 'none',
-        gameActionButtonColor: '#ffffff',
-        gameActionButtonTextColor: '#0d1117',
-        gameActionButtonText: 'AÇÃO',
-        gameVerbInputPlaceholder: 'O QUE VOCÊ FAZ?',
-        gameDiaryPlayerName: 'VOCÊ',
-        gameFocusColor: '#58a6ff',
-        gameSystemEnabled: 'chances',
-        gameMaxChances: 3,
-        gameChanceIcon: 'heart',
-        gameChanceIconColor: '#ff4d4d',
-        gameChanceReturnButtonText: "Tentar Novamente",
-        gameTheme: 'dark',
-        gameTextColorLight: '#24292f',
-        gameTitleColorLight: '#0969da',
-        gameFocusColorLight: '#0969da',
-        positiveEndingImage: "",
-        positiveEndingContentAlignment: 'right',
-        positiveEndingDescription: "Você venceu!",
-        negativeEndingImage: "",
-        negativeEndingContentAlignment: 'right',
-        negativeEndingDescription: "Fim de jogo.",
-        frameBookColor: '#FFFFFF',
-        frameTradingCardColor: '#FFFFFF',
-        frameChamferedColor: '#FFFFFF',
-        frameRoundedTopColor: '#FFFFFF',
-        gameSceneNameOverlayBg: '#0d1117',
-        gameSceneNameOverlayTextColor: '#c9d1d9',
-        fixedVerbs: [],
-        consequenceTrackers: [],
-        gameShowTrackersUI: true,
-        gameSuggestionsButtonText: "Sugestões",
-        gameInventoryButtonText: "Inventário",
-        gameDiaryButtonText: "Diário",
-        gameTrackersButtonText: "Rastreadores",
-    };
-};
-
-
-const App: React.FC = () => {
-  const [gameData, setGameData] = useState<GameData>(() => initializeGameData());
-  const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<View>('scenes');
-  const [isPreviewMode, setIsPreviewMode] = useState(false);
-  const [gameDataForPreview, setGameDataForPreview] = useState<GameData | null>(null);
-  const [isDirty, setIsDirty] = useState(false);
-
-  const effectiveSelectedSceneId = 
-    selectedSceneId && gameData.scenes[selectedSceneId]
-    ? selectedSceneId
-    : gameData.startScene;
-
-  const confirmNavigation = useCallback((callback: () => void) => {
-    if (isDirty) {
-      setIsDirty(false);
-    }
-    callback();
-  }, [isDirty]);
-
-  const handleTogglePreview = useCallback(() => {
-    confirmNavigation(() => {
-        setIsPreviewMode(prev => {
-            const isOpening = !prev;
-            if (isOpening) {
-                setGameDataForPreview(null);
-            }
-            return isOpening;
-        });
-    });
-  }, [confirmNavigation]);
-  
-  const handlePreviewSingleScene = useCallback((sceneWithUnsavedChanges: Scene) => {
-    const tempGameData = JSON.parse(JSON.stringify(gameData));
-    tempGameData.scenes[sceneWithUnsavedChanges.id] = sceneWithUnsavedChanges;
-    tempGameData.startScene = sceneWithUnsavedChanges.id;
     
-    setGameDataForPreview(tempGameData);
-    setIsPreviewMode(true);
-  }, [gameData]);
-
-  const handleSelectSceneAndSwitchView = useCallback((id: string) => {
-    confirmNavigation(() => {
-        setSelectedSceneId(id);
-        setCurrentView('scenes');
-        setIsPreviewMode(false);
-    });
-  }, [confirmNavigation]);
-
-  const handleSetView = useCallback((view: View) => {
-    confirmNavigation(() => {
-        setCurrentView(view);
-    });
-  }, [confirmNavigation]);
-
-  const handleImportGame = useCallback((dataToImport: any) => {
-    confirmNavigation(() => {
-        let importedData = { ...dataToImport };
-
-        if (importedData.cenas && !importedData.scenes) {
-          importedData.scenes = importedData.cenas;
-          delete importedData.cenas;
-        }
-        if (importedData.cena_inicial && !importedData.startScene) {
-            importedData.startScene = importedData.cena_inicial;
-            delete importedData.cena_inicial;
-        }
-        if (importedData.mensagem_falha_padrao && !importedData.defaultFailureMessage) {
-            importedData.defaultFailureMessage = importedData.mensagem_falha_padrao;
-            delete importedData.mensagem_falha_padrao;
-        }
-
-        // Run migration for global objects if necessary
-        importedData = migrateToGlobalObjects(importedData);
-        
-        // --- Migration from old gameEnableChances to new gameSystemEnabled ---
-        if (importedData.hasOwnProperty('gameEnableChances')) {
-            importedData.gameSystemEnabled = importedData.gameEnableChances ? 'chances' : 'none';
-            delete importedData.gameEnableChances;
-        }
-
-
-        setGameData(prev => ({...prev, ...importedData}));
-        setSelectedSceneId(importedData.startScene || Object.keys(importedData.scenes)[0]);
-        setCurrentView('scenes');
-        setIsPreviewMode(false);
-    });
-  }, [confirmNavigation]);
-
-  const handleAddScene = useCallback(() => {
-    confirmNavigation(() => {
-        const newSceneId = generateUniqueId('scn', Object.keys(gameData.scenes));
-        const newScene: Scene = {
-          id: newSceneId,
-          name: "Nova Cena",
-          description: "Descreva esta nova cena...",
-          image: "",
-          objectIds: [],
-          interactions: []
-        };
-        setGameData(prev => ({
-          ...prev,
-          scenes: { ...prev.scenes, [newSceneId]: newScene },
-          sceneOrder: [...prev.sceneOrder, newSceneId],
-        }));
-        setSelectedSceneId(newSceneId);
-        setCurrentView('scenes');
-    });
-  }, [gameData.scenes, confirmNavigation]);
-
-  const handleCopyScene = useCallback((sceneToCopy: Scene) => {
-    confirmNavigation(() => {
-        const allScnIds = Object.keys(gameData.scenes);
-
-        const newSceneId = generateUniqueId('scn', allScnIds);
-        const newScene: Scene = JSON.parse(JSON.stringify(sceneToCopy));
-
-        newScene.id = newSceneId;
-        newScene.name = `${sceneToCopy.name} (Cópia)`;
-        
-        // When copying, we keep the references to the same Global Objects
-        // No new objects are created, just linked to the new scene.
-        
-        // Interaction IDs are only locally significant, regenerate.
-        newScene.interactions = newScene.interactions.map(inter => ({
-            ...inter,
-            id: `inter_${Math.random().toString(36).substring(2, 9)}`
-        }));
-
-        const originalSceneIndex = gameData.sceneOrder.indexOf(sceneToCopy.id);
-        const newSceneOrder = [...gameData.sceneOrder];
-        newSceneOrder.splice(originalSceneIndex + 1, 0, newSceneId);
-
-        setGameData(prev => ({
-            ...prev,
-            scenes: { ...prev.scenes, [newSceneId]: newScene },
-            sceneOrder: newSceneOrder,
-        }));
-        
-        setSelectedSceneId(newSceneId);
-        setCurrentView('scenes');
-    });
-}, [gameData, confirmNavigation]);
-
-  const handleUpdateScene = useCallback((updatedScene: Scene) => {
     setGameData(prev => {
-      const newScenes = { 
-          ...prev.scenes,
-          [updatedScene.id]: updatedScene 
-      };
-      
-      return {
-        ...prev,
-        scenes: newScenes,
-      };
-    });
-    setIsDirty(false);
-  }, []);
-
-  const handleDeleteScene = useCallback((idToDelete: string) => {
-    if (idToDelete === gameData.startScene) {
-        alert("A cena inicial não pode ser deletada.");
-        return;
-    }
-
-    setGameData(prev => {
-        const newScenes = { ...prev.scenes };
-        delete newScenes[idToDelete];
-
-        const cleanedScenes = Object.keys(newScenes).reduce((acc, sceneId) => {
-            const scene = newScenes[sceneId];
-            const needsCleaning = scene.interactions.some(inter => inter.goToScene === idToDelete);
-
-            if (needsCleaning) {
-                const cleanedInteractions = scene.interactions.map(inter => {
-                    if (inter.goToScene === idToDelete) {
-                        const { goToScene, ...restOfInteraction } = inter;
-                        return restOfInteraction;
-                    }
-                    return inter;
-                });
-                acc[sceneId] = { ...scene, interactions: cleanedInteractions };
-            } else {
-                acc[sceneId] = scene;
-            }
-            return acc;
-        }, {} as { [id: string]: Scene });
-
-        const newSceneOrder = prev.sceneOrder.filter(id => id !== idToDelete);
-        
-        if (effectiveSelectedSceneId === idToDelete) {
-            setSelectedSceneId(prev.startScene);
-        }
-        
-        return {
-            ...prev,
-            scenes: cleanedScenes,
-            sceneOrder: newSceneOrder,
+        const newScenes = { ...prev.scenes, [newId]: newScene };
+        const newOrder = [...prev.sceneOrder, newId];
+        const isFirst = newOrder.length === 1;
+        return { 
+            ...prev, 
+            scenes: newScenes, 
+            sceneOrder: newOrder,
+            startScene: isFirst ? newId : prev.startScene 
         };
     });
-
-    setIsDirty(false);
-  }, [gameData.startScene, effectiveSelectedSceneId]);
-  
-  const handleReorderScenes = useCallback((newOrder: string[]) => {
-      setGameData(prev => {
-        const filteredOrder = newOrder.filter(id => id !== prev.startScene);
-        const finalOrder = [prev.startScene, ...filteredOrder];
-        return { ...prev, sceneOrder: finalOrder };
-      });
-  }, []);
-  
-  const handleUpdateGameData = useCallback((field: keyof GameData, value: any) => {
-    setGameData(prev => {
-        const newState = { ...prev, [field]: value };
-        if (field === 'gameSplashContentAlignment') {
-            newState.positiveEndingContentAlignment = value as 'left' | 'right';
-            newState.negativeEndingContentAlignment = value as 'left' | 'right';
-        }
-        return newState;
-    });
-    setIsDirty(false);
-  }, []);
-
-  const handleUpdateScenePosition = useCallback((sceneId: string, x: number, y: number) => {
-    setGameData(prev => {
-        const newScenes = { ...prev.scenes };
-        if (newScenes[sceneId]) {
-            newScenes[sceneId] = { ...newScenes[sceneId], mapX: x, mapY: y };
-        }
-        return { ...prev, scenes: newScenes };
-    });
-  }, []);
-
-  const handleNewGame = useCallback(() => {
-    const newGameData = createNewGameData();
-    setGameData(newGameData);
-    setSelectedSceneId(newGameData.startScene);
-    setCurrentView('scenes');
-    setIsPreviewMode(false);
-    setIsDirty(false);
-  }, []);
-
-  // --- Global Object Handlers ---
-  
-  const handleUpdateGlobalObject = useCallback((objectId: string, updatedData: Partial<GameObject>) => {
-    setGameData(prev => {
-        const newGlobalObjects = { ...prev.globalObjects };
-        if (newGlobalObjects[objectId]) {
-            newGlobalObjects[objectId] = { ...newGlobalObjects[objectId], ...updatedData };
-        }
-        return { ...prev, globalObjects: newGlobalObjects };
-    });
-    setIsDirty(false);
-  }, []);
-
-  const handleDeleteGlobalObject = useCallback((objectId: string) => {
-    setGameData(prev => {
-        const newGlobalObjects = { ...prev.globalObjects };
-        delete newGlobalObjects[objectId];
-
-        const newScenes = { ...prev.scenes };
-        Object.keys(newScenes).forEach(sId => {
-             const scene = { ...newScenes[sId] };
-             
-             // Remove object reference from scene
-             if (scene.objectIds.includes(objectId)) {
-                 scene.objectIds = scene.objectIds.filter(id => id !== objectId);
-             }
-
-             // Clean up interactions
-             if (scene.interactions) {
-                scene.interactions = scene.interactions.map(inter => {
-                    const updatedInter = { ...inter };
-                    if (inter.target === objectId) {
-                        delete updatedInter.target;
-                    }
-                    if (inter.requiresInInventory === objectId) {
-                        delete updatedInter.requiresInInventory;
-                        delete updatedInter.consumesItem;
-                    }
-                    return updatedInter;
-                });
-            }
-            newScenes[sId] = scene;
-        });
-
-        return { ...prev, globalObjects: newGlobalObjects, scenes: newScenes };
-    });
-    setIsDirty(false);
-  }, []);
-
-  const handleCreateGlobalObject = useCallback((newObject: GameObject, linkToSceneId?: string) => {
-      setGameData(prev => {
-          const newGlobalObjects = { ...prev.globalObjects, [newObject.id]: newObject };
-          let newScenes = prev.scenes;
-
-          if (linkToSceneId && newScenes[linkToSceneId]) {
-              const updatedScene = { ...newScenes[linkToSceneId] };
-              updatedScene.objectIds = [...updatedScene.objectIds, newObject.id];
-              newScenes = { ...newScenes, [linkToSceneId]: updatedScene };
-          }
-
-          return { ...prev, globalObjects: newGlobalObjects, scenes: newScenes };
-      });
-      setIsDirty(false);
-  }, []);
-
-  const handleLinkObjectToScene = useCallback((sceneId: string, objectId: string) => {
-      setGameData(prev => {
-          const scene = prev.scenes[sceneId];
-          if (scene && !scene.objectIds.includes(objectId)) {
-              const updatedScene = { ...scene, objectIds: [...scene.objectIds, objectId] };
-              return { ...prev, scenes: { ...prev.scenes, [sceneId]: updatedScene } };
-          }
-          return prev;
-      });
-      setIsDirty(false);
-  }, []);
-
-  const handleUnlinkObjectFromScene = useCallback((sceneId: string, objectId: string) => {
-    setGameData(prev => {
-        const scene = prev.scenes[sceneId];
-        if (scene) {
-            const updatedScene = { ...scene, objectIds: scene.objectIds.filter(id => id !== objectId) };
-            return { ...prev, scenes: { ...prev.scenes, [sceneId]: updatedScene } };
-        }
-        return prev;
-    });
-    setIsDirty(false);
-}, []);
-
-
-  const scenesInOrder = gameData.sceneOrder.map(id => gameData.scenes[id]).filter(Boolean);
-  const selectedScene = effectiveSelectedSceneId ? gameData.scenes[effectiveSelectedSceneId] : null;
-
-  const allObjectIds = useMemo(() => {
-    return Object.keys(gameData.globalObjects);
-  }, [gameData.globalObjects]);
-
-  const allTrackerIds = useMemo(() => {
-    return (gameData.consequenceTrackers || []).map(t => t.id);
-  }, [gameData.consequenceTrackers]);
-
-  const renderCurrentView = () => {
-    switch (currentView) {
-      case 'scenes':
-        return selectedScene ? (
-          <SceneEditor
-            key={selectedScene.id}
-            scene={selectedScene}
-            allScenes={scenesInOrder}
-            globalObjects={gameData.globalObjects}
-            onUpdateScene={handleUpdateScene}
-            onCopyScene={handleCopyScene}
-            onCreateGlobalObject={handleCreateGlobalObject}
-            onLinkObjectToScene={handleLinkObjectToScene}
-            onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
-            onPreviewScene={handlePreviewSingleScene}
-            onSelectScene={handleSelectSceneAndSwitchView}
-            isDirty={isDirty}
-            onSetDirty={setIsDirty}
-            layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
-            consequenceTrackers={gameData.consequenceTrackers || []}
-          />
-        ) : (
-          <WelcomePlaceholder />
-        );
-      case 'interface':
-        return (
-          <UIEditor
-            html={gameData.gameHTML}
-            css={gameData.gameCSS}
-            layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
-            layoutOrder={gameData.gameLayoutOrder || 'image-first'}
-            imageFrame={gameData.gameImageFrame || 'none'}
-            actionButtonText={gameData.gameActionButtonText || 'AÇÃO'}
-            verbInputPlaceholder={gameData.gameVerbInputPlaceholder || 'O QUE VOCÊ FAZ?'}
-            diaryPlayerName={gameData.gameDiaryPlayerName || 'VOCÊ'}
-            splashButtonText={gameData.gameSplashButtonText || 'INICIAR AVENTURA'}
-            continueButtonText={gameData.gameContinueButtonText || 'Continuar Aventura'}
-            restartButtonText={gameData.gameRestartButtonText || 'Reiniciar Aventura'}
-            gameSystemEnabled={gameData.gameSystemEnabled || 'none'}
-            maxChances={gameData.gameMaxChances || 3}
-            textColor={gameData.gameTextColor || '#c9d1d9'}
-            titleColor={gameData.gameTitleColor || '#58a6ff'}
-            splashButtonColor={gameData.gameSplashButtonColor || '#2ea043'}
-            splashButtonHoverColor={gameData.gameSplashButtonHoverColor || '#238636'}
-            splashButtonTextColor={gameData.gameSplashButtonTextColor || '#ffffff'}
-            actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
-            actionButtonTextColor={gameData.gameActionButtonTextColor || '#0d1117'}
-            focusColor={gameData.gameFocusColor || '#58a6ff'}
-            chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
-            gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
-            gameFontSize={gameData.gameFontSize || '1em'}
-            chanceIcon={gameData.gameChanceIcon || 'heart'}
-            chanceReturnButtonText={gameData.gameChanceReturnButtonText || ''}
-            gameTheme={gameData.gameTheme || 'dark'}
-            textColorLight={gameData.gameTextColorLight || '#24292f'}
-            titleColorLight={gameData.gameTitleColorLight || '#0969da'}
-            focusColorLight={gameData.gameFocusColorLight || '#0969da'}
-            frameBookColor={gameData.frameBookColor || '#FFFFFF'}
-            frameTradingCardColor={gameData.frameTradingCardColor || '#FFFFFF'}
-            frameChamferedColor={gameData.frameChamferedColor || '#FFFFFF'}
-            frameRoundedTopColor={gameData.frameRoundedTopColor || '#FFFFFF'}
-            gameSceneNameOverlayBg={gameData.gameSceneNameOverlayBg || '#0d1117'}
-            gameSceneNameOverlayTextColor={gameData.gameSceneNameOverlayTextColor || '#c9d1d9'}
-            onUpdate={handleUpdateGameData}
-            isDirty={isDirty}
-            onSetDirty={setIsDirty}
-            gameShowTrackersUI={gameData.gameShowTrackersUI}
-            suggestionsButtonText={gameData.gameSuggestionsButtonText}
-            inventoryButtonText={gameData.gameInventoryButtonText}
-            diaryButtonText={gameData.gameDiaryButtonText}
-            trackersButtonText={gameData.gameTrackersButtonText}
-            title={gameData.gameTitle || 'Fuja da Masmorra'}
-            logo={gameData.gameLogo || ''}
-            omitSplashTitle={gameData.gameOmitSplashTitle || false}
-            splashImage={gameData.gameSplashImage || ''}
-            splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
-            splashDescription={gameData.gameSplashDescription || ''}
-            positiveEndingImage={gameData.positiveEndingImage || ''}
-            positiveEndingContentAlignment={gameData.positiveEndingContentAlignment || 'right'}
-            positiveEndingDescription={gameData.positiveEndingDescription || ''}
-            negativeEndingImage={gameData.negativeEndingImage || ''}
-            negativeEndingContentAlignment={gameData.negativeEndingContentAlignment || 'right'}
-            negativeEndingDescription={gameData.negativeEndingDescription || ''}
-            fixedVerbs={gameData.fixedVerbs || []}
-          />
-        );
-       case 'global_objects':
-        return (
-          <GlobalObjectsEditor
-            scenes={gameData.scenes}
-            globalObjects={gameData.globalObjects}
-            onUpdateObject={handleUpdateGlobalObject}
-            onDeleteObject={handleDeleteGlobalObject}
-            onCreateObject={handleCreateGlobalObject}
-            onSelectScene={handleSelectSceneAndSwitchView}
-            isDirty={isDirty}
-            onSetDirty={setIsDirty}
-          />
-        );
-      case 'trackers':
-        return (
-          <TrackersEditor
-            trackers={gameData.consequenceTrackers || []}
-            onUpdateTrackers={(newTrackers: ConsequenceTracker[]) => {
-              handleUpdateGameData('consequenceTrackers', newTrackers);
-            }}
-            allScenes={scenesInOrder}
-            allTrackerIds={allTrackerIds}
-            isDirty={isDirty}
-            onSetDirty={setIsDirty}
-            onSelectScene={handleSelectSceneAndSwitchView}
-          />
-        );
-      case 'map':
-        return (
-          <SceneMap
-            allScenesMap={gameData.scenes}
-            startSceneId={gameData.startScene}
-            onSelectScene={handleSelectSceneAndSwitchView}
-            onUpdateScenePosition={handleUpdateScenePosition}
-            onAddScene={handleAddScene}
-          />
-        );
-      default:
-        return <WelcomePlaceholder />;
-    }
+    setSelectedSceneId(newId);
+    setIsDirty(true);
   };
 
+  const handleDeleteScene = (id: string) => {
+      if (id === gameData.startScene && Object.keys(gameData.scenes).length > 1) {
+          alert("Você não pode deletar a cena inicial. Defina outra cena como inicial antes de excluir esta.");
+          return;
+      }
+      
+      const confirmDelete = window.confirm("Tem certeza que deseja deletar esta cena?");
+      if (!confirmDelete) return;
+
+      setGameData(prev => {
+          const newScenes = { ...prev.scenes };
+          delete newScenes[id];
+          const newOrder = prev.sceneOrder.filter(sid => sid !== id);
+          let newStart = prev.startScene;
+          if (newStart === id) {
+              newStart = newOrder.length > 0 ? newOrder[0] : '';
+          }
+
+          // Remove interactions pointing to this scene
+          Object.values(newScenes).forEach((scene: Scene) => {
+              if (scene.interactions) {
+                  scene.interactions = scene.interactions.filter(i => i.goToScene !== id);
+              }
+              if (scene.exits) {
+                  const exits = scene.exits as any;
+                  Object.keys(exits).forEach(key => {
+                      if (exits[key] === id) delete exits[key];
+                  });
+              }
+          });
+
+          return { ...prev, scenes: newScenes, sceneOrder: newOrder, startScene: newStart };
+      });
+      
+      if (selectedSceneId === id) setSelectedSceneId(null);
+      setIsDirty(true);
+  };
+
+  const handleUpdateScene = (updatedScene: Scene) => {
+      setGameData(prev => ({
+          ...prev,
+          scenes: { ...prev.scenes, [updatedScene.id]: updatedScene }
+      }));
+      setIsDirty(true);
+  };
+  
+  const handleCopyScene = (sceneToCopy: Scene) => {
+      const newId = generateUniqueId('scn', Object.keys(gameData.scenes));
+      const newScene: Scene = {
+          ...JSON.parse(JSON.stringify(sceneToCopy)),
+          id: newId,
+          name: `${sceneToCopy.name} (Cópia)`,
+      };
+      
+      setGameData(prev => {
+          const newScenes = { ...prev.scenes, [newId]: newScene };
+          const newOrder = [...prev.sceneOrder, newId];
+          return { ...prev, scenes: newScenes, sceneOrder: newOrder };
+      });
+      setSelectedSceneId(newId);
+      setIsDirty(true);
+  };
+
+  const handleReorderScenes = (newOrder: string[]) => {
+      setGameData(prev => ({ ...prev, sceneOrder: newOrder }));
+      setIsDirty(true);
+  };
+
+  const handleSelectScene = (id: string) => {
+      if (currentView === 'global_objects' || currentView === 'trackers') {
+        setCurrentView('scenes');
+      }
+      setSelectedSceneId(id);
+  };
+
+  const handleSetView = (view: View) => {
+      setCurrentView(view);
+      if (view === 'scenes' && !selectedSceneId && scenesList.length > 0) {
+          setSelectedSceneId(scenesList[0].id);
+      }
+  };
+
+  const handleNewGame = () => {
+      if (isDirty) {
+          if (!window.confirm("Existem alterações não salvas. Deseja iniciar um novo jogo e perder as alterações atuais?")) {
+              return;
+          }
+      }
+      setGameData(initialGameData);
+      setSelectedSceneId(null);
+      setIsDirty(false);
+  };
+  
+  // Object management
+  const handleCreateGlobalObject = (obj: GameObject, linkToSceneId?: string) => {
+      setGameData(prev => {
+          const newObjects = { ...prev.globalObjects, [obj.id]: obj };
+          let newScenes = prev.scenes;
+          
+          if (linkToSceneId && prev.scenes[linkToSceneId]) {
+              const scene = prev.scenes[linkToSceneId];
+              newScenes = {
+                  ...prev.scenes,
+                  [linkToSceneId]: {
+                      ...scene,
+                      objectIds: [...(scene.objectIds || []), obj.id]
+                  }
+              };
+          }
+          
+          return { ...prev, globalObjects: newObjects, scenes: newScenes };
+      });
+      setIsDirty(true);
+  };
+  
+  const handleUpdateGlobalObject = (objectId: string, updatedData: Partial<GameObject>) => {
+      setGameData(prev => ({
+          ...prev,
+          globalObjects: {
+              ...prev.globalObjects,
+              [objectId]: { ...prev.globalObjects[objectId], ...updatedData }
+          }
+      }));
+      setIsDirty(true);
+  };
+
+  const handleDeleteGlobalObject = (objectId: string) => {
+      if (!window.confirm("Tem certeza que deseja excluir este objeto? Ele será removido de todas as cenas.")) return;
+      
+      setGameData(prev => {
+          const newObjects = { ...prev.globalObjects };
+          delete newObjects[objectId];
+          
+          const newScenes = { ...prev.scenes };
+          Object.values(newScenes).forEach((scene: Scene) => {
+              if (scene.objectIds) {
+                  scene.objectIds = scene.objectIds.filter(id => id !== objectId);
+              }
+              if (scene.interactions) {
+                  scene.interactions.forEach(inter => {
+                      if (inter.target === objectId) inter.target = '';
+                      if (inter.requiresInInventory === objectId) inter.requiresInInventory = '';
+                  });
+              }
+          });
+          
+          return { ...prev, globalObjects: newObjects, scenes: newScenes };
+      });
+      setIsDirty(true);
+  };
+  
+  const handleLinkObjectToScene = (sceneId: string, objectId: string) => {
+      setGameData(prev => {
+          const scene = prev.scenes[sceneId];
+          if (scene.objectIds.includes(objectId)) return prev;
+          
+          return {
+              ...prev,
+              scenes: {
+                  ...prev.scenes,
+                  [sceneId]: {
+                      ...scene,
+                      objectIds: [...scene.objectIds, objectId]
+                  }
+              }
+          };
+      });
+      setIsDirty(true);
+  };
+  
+  const handleUnlinkObjectFromScene = (sceneId: string, objectId: string) => {
+       setGameData(prev => {
+          const scene = prev.scenes[sceneId];
+          return {
+              ...prev,
+              scenes: {
+                  ...prev.scenes,
+                  [sceneId]: {
+                      ...scene,
+                      objectIds: scene.objectIds.filter(id => id !== objectId)
+                  }
+              }
+          };
+      });
+      setIsDirty(true);
+  };
+
+  const handleUpdateTrackers = (trackers: ConsequenceTracker[]) => {
+      setGameData(prev => ({ ...prev, consequenceTrackers: trackers }));
+      setIsDirty(true);
+  };
+  
+  const handleUpdateScenePosition = (sceneId: string, x: number, y: number) => {
+    setGameData(prev => ({
+        ...prev,
+        scenes: {
+            ...prev.scenes,
+            [sceneId]: { ...prev.scenes[sceneId], mapX: x, mapY: y }
+        }
+    }));
+    setIsDirty(true);
+  };
+
+
   return (
-    <div className="flex flex-col h-screen bg-brand-bg text-brand-text font-sans">
-      <Header
-        gameData={gameData}
-        onImportGame={handleImportGame}
-        isPreviewing={isPreviewMode}
-        onTogglePreview={handleTogglePreview}
-      />
-      {isPreviewMode ? (
-        <Preview gameData={gameDataForPreview || gameData} />
-      ) : (
-        <div className="flex flex-1 overflow-hidden">
-          <Sidebar
-            scenes={scenesInOrder}
-            startSceneId={gameData.startScene}
-            selectedSceneId={effectiveSelectedSceneId}
-            currentView={currentView}
-            onSelectScene={handleSelectSceneAndSwitchView}
-            onAddScene={handleAddScene}
-            onDeleteScene={handleDeleteScene}
-            onReorderScenes={handleReorderScenes}
-            onSetView={handleSetView}
-            onNewGame={handleNewGame}
-          />
-          <main className="flex-1 p-6 overflow-y-auto">
-            {renderCurrentView()}
-          </main>
-        </div>
-      )}
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-brand-bg text-brand-text">
+        {isPreviewing ? (
+             <div className="flex flex-col w-full h-full">
+                <Header 
+                    gameData={gameData} 
+                    onImportGame={handleImportGame} 
+                    isPreviewing={isPreviewing} 
+                    onTogglePreview={() => setIsPreviewing(false)} 
+                />
+                <Preview gameData={gameData} />
+             </div>
+        ) : (
+            <>
+                <Header 
+                    gameData={gameData} 
+                    onImportGame={handleImportGame} 
+                    isPreviewing={isPreviewing} 
+                    onTogglePreview={() => setIsPreviewing(true)} 
+                />
+                <div className="flex flex-1 overflow-hidden">
+                    <Sidebar 
+                        scenes={scenesList}
+                        startSceneId={gameData.startScene}
+                        selectedSceneId={selectedSceneId}
+                        currentView={currentView}
+                        onSelectScene={handleSelectScene}
+                        onAddScene={handleAddScene}
+                        onDeleteScene={handleDeleteScene}
+                        onReorderScenes={handleReorderScenes}
+                        onSetView={handleSetView}
+                        onNewGame={handleNewGame}
+                    />
+                    <main className="flex-1 overflow-y-auto p-6 relative bg-brand-bg">
+                        {currentView === 'interface' && (
+                            <UIEditor
+                                {...gameData}
+                                onUpdate={handleUpdateGameData}
+                                isDirty={isDirty}
+                                onSetDirty={setIsDirty}
+                                title={gameData.gameTitle || ''}
+                                logo={gameData.gameLogo || ''}
+                                omitSplashTitle={!!gameData.gameOmitSplashTitle}
+                                splashImage={gameData.gameSplashImage || ''}
+                                splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
+                                splashDescription={gameData.gameSplashDescription || ''}
+                                positiveEndingImage={gameData.positiveEndingImage || ''}
+                                positiveEndingContentAlignment={gameData.positiveEndingContentAlignment || 'right'}
+                                positiveEndingDescription={gameData.positiveEndingDescription || ''}
+                                negativeEndingImage={gameData.negativeEndingImage || ''}
+                                negativeEndingContentAlignment={gameData.negativeEndingContentAlignment || 'right'}
+                                negativeEndingDescription={gameData.negativeEndingDescription || ''}
+                                fixedVerbs={fixedVerbs}
+                                actionButtonText={gameData.gameActionButtonText || 'Ação'}
+                                verbInputPlaceholder={gameData.gameVerbInputPlaceholder || 'O que você faz?'}
+                                diaryPlayerName={gameData.gameDiaryPlayerName || 'Jogador'}
+                                splashButtonText={gameData.gameSplashButtonText || 'INICIAR'}
+                                continueButtonText={gameData.gameContinueButtonText || 'Continuar'}
+                                restartButtonText={gameData.gameRestartButtonText || 'Reiniciar'}
+                                gameSystemEnabled={gameData.gameSystemEnabled || 'none'}
+                                maxChances={gameData.gameMaxChances || 3}
+                                textColor={gameData.gameTextColor || '#c9d1d9'}
+                                titleColor={gameData.gameTitleColor || '#58a6ff'}
+                                splashButtonColor={gameData.gameSplashButtonColor || '#2ea043'}
+                                splashButtonHoverColor={gameData.gameSplashButtonHoverColor || '#238636'}
+                                splashButtonTextColor={gameData.gameSplashButtonTextColor || '#ffffff'}
+                                actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
+                                actionButtonTextColor={gameData.gameActionButtonTextColor || '#0d1117'}
+                                focusColor={gameData.gameFocusColor || '#58a6ff'}
+                                chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
+                                gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
+                                gameFontSize={gameData.gameFontSize || '1em'}
+                                chanceIcon={gameData.gameChanceIcon || 'heart'}
+                                chanceReturnButtonText={gameData.gameChanceReturnButtonText || 'Tentar Novamente'}
+                                gameTheme={gameData.gameTheme || 'dark'}
+                                textColorLight={gameData.gameTextColorLight || '#24292f'}
+                                titleColorLight={gameData.gameTitleColorLight || '#0969da'}
+                                focusColorLight={gameData.gameFocusColorLight || '#0969da'}
+                                frameBookColor={gameData.frameBookColor || '#FFFFFF'}
+                                frameTradingCardColor={gameData.frameTradingCardColor || '#1c1917'}
+                                frameChamferedColor={gameData.frameChamferedColor || '#FFFFFF'}
+                                frameRoundedTopColor={gameData.frameRoundedTopColor || '#facc15'}
+                                gameSceneNameOverlayBg={gameData.gameSceneNameOverlayBg || '#0d1117'}
+                                gameSceneNameOverlayTextColor={gameData.gameSceneNameOverlayTextColor || '#c9d1d9'}
+                                gameShowTrackersUI={!!gameData.gameShowTrackersUI}
+                                imageFrame={gameData.gameImageFrame || 'none'}
+                                layoutOrder={gameData.gameLayoutOrder || 'image-first'}
+                                layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
+                                suggestionsButtonText={gameData.gameSuggestionsButtonText}
+                                inventoryButtonText={gameData.gameInventoryButtonText}
+                                diaryButtonText={gameData.gameDiaryButtonText}
+                                trackersButtonText={gameData.gameTrackersButtonText}
+                                gameContinueIndicatorColor={gameData.gameContinueIndicatorColor || '#58a6ff'}
+                            />
+                        )}
+                        {currentView === 'scenes' && selectedScene ? (
+                            <SceneEditor 
+                                scene={selectedScene}
+                                allScenes={scenesList}
+                                globalObjects={gameData.globalObjects}
+                                onUpdateScene={handleUpdateScene}
+                                onCopyScene={handleCopyScene}
+                                onCreateGlobalObject={handleCreateGlobalObject}
+                                onLinkObjectToScene={handleLinkObjectToScene}
+                                onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
+                                onPreviewScene={(scene) => {
+                                    // Hacky preview scene: Create a temp gameData with this scene as start
+                                    const previewData = { ...gameData, startScene: scene.id };
+                                    handleImportGame(previewData);
+                                    setIsPreviewing(true);
+                                }}
+                                onSelectScene={handleSelectScene}
+                                isDirty={isDirty}
+                                onSetDirty={setIsDirty}
+                                layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
+                                consequenceTrackers={consequenceTrackers}
+                            />
+                        ) : currentView === 'scenes' ? (
+                            <WelcomePlaceholder />
+                        ) : null}
+                        
+                        {currentView === 'map' && (
+                            <SceneMap 
+                                allScenesMap={gameData.scenes}
+                                startSceneId={gameData.startScene}
+                                onSelectScene={handleSelectScene}
+                                onUpdateScenePosition={handleUpdateScenePosition}
+                                onAddScene={handleAddScene}
+                            />
+                        )}
+                        
+                        {currentView === 'global_objects' && (
+                            <GlobalObjectsEditor
+                                scenes={gameData.scenes}
+                                globalObjects={gameData.globalObjects}
+                                onUpdateObject={handleUpdateGlobalObject}
+                                onDeleteObject={handleDeleteGlobalObject}
+                                onCreateObject={handleCreateGlobalObject}
+                                onSelectScene={handleSelectScene}
+                                isDirty={isDirty}
+                                onSetDirty={setIsDirty}
+                            />
+                        )}
+                        
+                        {currentView === 'trackers' && (
+                            <TrackersEditor
+                                trackers={consequenceTrackers}
+                                onUpdateTrackers={handleUpdateTrackers}
+                                allScenes={scenesList}
+                                allTrackerIds={(gameData.consequenceTrackers || []).map(t => t.id)}
+                                isDirty={isDirty}
+                                onSetDirty={setIsDirty}
+                                onSelectScene={handleSelectScene}
+                            />
+                        )}
+                    </main>
+                </div>
+            </>
+        )}
     </div>
   );
 };

@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
 import { Scene, Interaction, GameObject, ConsequenceTracker } from '../types';
 import ObjectEditor from './ObjectEditor';
@@ -63,6 +61,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const initialSceneJson = useRef(JSON.stringify(getCleanSceneState(scene)));
   
+  // Reset local state when scene ID changes (switching scenes)
   useEffect(() => {
     const cleanScene = getCleanSceneState(scene);
     setLocalScene(cleanScene);
@@ -70,11 +69,25 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     setActiveTab('properties');
   }, [scene.id]);
 
+  // Check for dirty state
   useEffect(() => {
     const currentJson = JSON.stringify(localScene);
     const currentlyDirty = currentJson !== initialSceneJson.current;
     onSetDirty(currentlyDirty);
   }, [localScene, onSetDirty]);
+
+  // Sync initial state when scene prop updates content (e.g. after a save)
+  useEffect(() => {
+      const cleanSceneProp = getCleanSceneState(scene);
+      // If the prop matches our current local state, it means we are in sync (saved)
+      if (JSON.stringify(cleanSceneProp) === JSON.stringify(localScene)) {
+          initialSceneJson.current = JSON.stringify(cleanSceneProp);
+          // If we were dirty, we are no longer dirty
+          if (isDirty) {
+             onSetDirty(false);
+          }
+      }
+  }, [scene, localScene, isDirty, onSetDirty]);
 
   // Construct the list of objects currently in this scene by ID lookup
   const currentSceneObjects = useMemo(() => {
@@ -224,16 +237,17 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     <div className="space-y-6 pb-24">
       <div className="flex justify-between items-start">
         <div>
-            <div className="flex items-center gap-3">
-                {isDirty && (
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse self-center" title="Alterações não salvas"></div>
-                )}
-            </div>
-            <p className="text-brand-text-dim mt-1 text-lg">
+            <p className="text-brand-text-dim mt-1 text-sm">
             Defina a imagem, descrição, objetos e interações para esta cena.
             </p>
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0 mt-1">
+        <div className="flex items-center gap-4 flex-shrink-0 mt-1">
+            {isDirty && (
+                <div className="flex items-center gap-2 text-yellow-400 text-xs font-medium animate-pulse">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    <span>Alterações não salvas</span>
+                </div>
+            )}
             <button
                 onClick={() => onCopyScene(localScene)}
                 className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors"
@@ -371,87 +385,68 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                 </button>
                               )}
                           </div>
-                          <p className="text-xs text-brand-text-dim mt-2">
-                              {layoutOrientation === 'horizontal'
-                                  ? 'imagens na proporção 16:9 (horizontal), recomendado 1920x1080 pixels (.jpg, .png ou .gif)'
-                                  : 'imagens na proporção 9:16 (vertical), recomendado 1080x1920 pixels (.jpg, .png ou .gif)'
-                                  }
-                          </p>
                       </div>
                   </div>
               </div>
           )}
-          
-          {activeTab === 'objects' && !localScene.isEndingScene && (
+
+          {activeTab === 'objects' && (
               <ObjectEditor
-                  sceneId={localScene.id}
-                  objects={currentSceneObjects}
-                  allGlobalObjects={Object.values(globalObjects)}
-                  onCreateGlobalObject={onCreateGlobalObject}
-                  onLinkObject={onLinkObjectToScene}
-                  onUnlinkObject={onUnlinkObjectFromScene}
-              />
-          )}
-          
-          {activeTab === 'interactions' && !localScene.isEndingScene && (
-              <InteractionEditor
-                  interactions={localScene.interactions || []}
-                  onUpdateInteractions={newInteractions => updateLocalScene('interactions', newInteractions)}
-                  allScenes={allScenes}
-                  currentSceneId={localScene.id}
-                  sceneObjects={currentSceneObjects}
-                  allTakableObjects={allTakableObjects}
-                  consequenceTrackers={consequenceTrackers}
+                sceneId={localScene.id}
+                objects={currentSceneObjects}
+                allGlobalObjects={Object.values(globalObjects)}
+                onCreateGlobalObject={onCreateGlobalObject}
+                onLinkObject={onLinkObjectToScene}
+                onUnlinkObject={onUnlinkObjectFromScene}
               />
           )}
 
+          {activeTab === 'interactions' && (
+              <InteractionEditor
+                interactions={localScene.interactions}
+                onUpdateInteractions={(interactions) => updateLocalScene('interactions', interactions)}
+                allScenes={allScenes}
+                currentSceneId={localScene.id}
+                sceneObjects={currentSceneObjects}
+                allTakableObjects={allTakableObjects}
+                consequenceTrackers={consequenceTrackers}
+              />
+          )}
+          
           {activeTab === 'connections' && (
               <ConnectionsView
-                  currentScene={localScene}
-                  inputConnections={connections.inputConnections}
-                  outputConnections={connections.outputConnections}
-                  allObjectsMap={new Map(Object.entries(globalObjects))}
-                  onSelectScene={onSelectScene}
+                currentScene={localScene}
+                inputConnections={connections.inputConnections}
+                outputConnections={connections.outputConnections}
+                allObjectsMap={globalObjects as unknown as Map<string, GameObject>}
+                onSelectScene={onSelectScene}
               />
-          )}
-
-          {localScene.isEndingScene && (activeTab === 'objects' || activeTab === 'interactions') && (
-              <div className="text-center p-4 bg-brand-bg border-2 border-dashed border-brand-border rounded-md text-brand-text-dim">
-                  Cenas finais não possuem objetos ou interações.
-              </div>
           )}
           </div>
       </div>
-
-
-      {activeTab !== 'connections' && (
-        <div className="fixed bottom-6 right-10 z-10 flex gap-2">
-            <button
-                onClick={handlePreview}
-                className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors"
-                title="Pré-visualizar esta cena (com alterações não salvas)"
-                >
-                <EyeIcon className="w-5 h-5 mr-2" />
-                Pré-visualizar Cena
-                </button>
-            <button
-                onClick={handleUndo}
-                disabled={!isDirty}
-                className="px-6 py-2 bg-brand-surface border border-brand-border text-brand-text-dim font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                title={isDirty ? "Desfazer alterações" : "Nenhuma alteração para desfazer"}
-                >
-                Desfazer
-            </button>
-            <button
-                onClick={handleSave}
-                disabled={!isDirty}
-                className="px-6 py-2 bg-yellow-400 text-black font-semibold rounded-md hover:bg-yellow-500 transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
-                title={isDirty ? "Salvar alterações na cena" : "Nenhuma alteração para salvar"}
-            >
-                Salvar
-            </button>
-        </div>
-      )}
+      <div className="fixed bottom-6 right-10 z-10 flex gap-2">
+        <button
+            onClick={handlePreview}
+            className="px-6 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200"
+        >
+            <EyeIcon className="w-5 h-5 inline-block mr-2" />
+            Testar Cena
+        </button>
+        <button
+            onClick={handleUndo}
+            disabled={!isDirty}
+            className="px-6 py-2 bg-brand-surface border border-brand-border text-brand-text-dim font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+            Desfazer
+        </button>
+        <button
+            onClick={handleSave}
+            disabled={!isDirty}
+            className="px-6 py-2 bg-yellow-400 text-black font-semibold rounded-md hover:bg-yellow-500 transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
+        >
+            Salvar
+        </button>
+      </div>
     </div>
   );
 };
