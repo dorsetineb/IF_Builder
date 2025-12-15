@@ -615,6 +615,8 @@ const App: React.FC = () => {
                         {currentView === 'interface' && (
                             <UIEditor
                                 {...gameData}
+                                html={gameData.gameHTML}
+                                css={gameData.gameCSS}
                                 onUpdate={handleUpdateGameData}
                                 isDirty={isDirty}
                                 onSetDirty={setIsDirty}
@@ -683,6 +685,7 @@ const App: React.FC = () => {
                                 onCreateGlobalObject={handleCreateGlobalObject}
                                 onLinkObjectToScene={handleLinkObjectToScene}
                                 onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
+                                onUpdateGlobalObject={handleUpdateGlobalObject}
                                 onPreviewScene={(scene) => {
                                     // Hacky preview scene: Create a temp gameData with this scene as start
                                     const previewData = { ...gameData, startScene: scene.id };

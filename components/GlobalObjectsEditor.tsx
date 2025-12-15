@@ -40,6 +40,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
 
   const [localObjects, setLocalObjects] = useState<GameObject[]>(sortedObjects);
 
+  // Sync local objects whenever the global list changes (e.g., after a delete)
   useEffect(() => {
     setLocalObjects(sortedObjects);
   }, [sortedObjects]);
@@ -116,22 +117,25 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     <div className="space-y-6 pb-24">
       <div className="flex justify-between items-start">
         <div>
-            <div className="flex items-center gap-2">
-                {isDirty && (
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Alterações não salvas"></div>
-                )}
-            </div>
             <p className="text-brand-text-dim mt-1 text-sm">
                 Aqui você gerencia todos os objetos do jogo. Vincule-os às cenas através do Editor de Cenas.
             </p>
         </div>
-        <button
-            onClick={handleCreate}
-            className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors"
-        >
-            <PlusIcon className="w-5 h-5 mr-2" />
-            Novo Objeto
-        </button>
+        <div className="flex items-center gap-4 flex-shrink-0 mt-1">
+            {isDirty && (
+                <div className="flex items-center gap-2 text-yellow-400 text-xs font-medium animate-pulse">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    <span>Alterações não salvas</span>
+                </div>
+            )}
+            <button
+                onClick={handleCreate}
+                className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors"
+            >
+                <PlusIcon className="w-5 h-5 mr-2" />
+                Novo Objeto
+            </button>
+        </div>
       </div>
       
       <div className="bg-brand-surface p-6 space-y-4 rounded-md">
@@ -141,11 +145,17 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
             return (
                 <div key={obj.id} className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
                 <button
-                    onClick={() => onDeleteObject(obj.id)}
-                    className="absolute top-0 right-0 p-2 bg-red-500 text-white rounded-bl-lg hover:bg-red-600 transition-colors"
+                    onClick={(e) => {
+                        // Prevent any bubbling that might interfere
+                        e.stopPropagation();
+                        e.preventDefault();
+                        onDeleteObject(obj.id);
+                    }}
+                    className="absolute top-0 right-0 p-2 bg-red-500 text-white rounded-bl-lg hover:bg-red-600 transition-colors z-20 cursor-pointer"
                     title="Excluir objeto do jogo"
+                    type="button"
                 >
-                    <TrashIcon className="w-5 h-5" />
+                    <TrashIcon className="w-5 h-5 pointer-events-none" />
                 </button>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                     <div className="space-y-4">

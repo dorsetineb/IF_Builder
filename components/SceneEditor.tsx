@@ -16,6 +16,7 @@ interface SceneEditorProps {
   onCreateGlobalObject: (obj: GameObject, linkToSceneId: string) => void;
   onLinkObjectToScene: (sceneId: string, objectId: string) => void;
   onUnlinkObjectFromScene: (sceneId: string, objectId: string) => void;
+  onUpdateGlobalObject: (objectId: string, updatedData: Partial<GameObject>) => void;
   onPreviewScene: (scene: Scene) => void;
   onSelectScene: (id: string) => void;
   isDirty: boolean;
@@ -49,6 +50,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     onCreateGlobalObject,
     onLinkObjectToScene,
     onUnlinkObjectFromScene,
+    onUpdateGlobalObject,
     onPreviewScene,
     onSelectScene,
     isDirty,
@@ -149,6 +151,37 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
   const updateLocalScene = <K extends keyof Scene,>(key: K, value: Scene[K]) => {
     setLocalScene(prev => ({ ...prev, [key]: value }));
+  };
+
+  // WRAPPER FUNCTIONS TO UPDATE LOCAL STATE IMMEDIATELY
+  const handleCreateGlobalObjectWrapper = (obj: GameObject, linkToSceneId: string) => {
+      // 1. Update Global State via App.tsx
+      onCreateGlobalObject(obj, linkToSceneId);
+      
+      // 2. Update Local State immediately so it shows up in the UI
+      setLocalScene(prev => ({
+          ...prev,
+          objectIds: [...(prev.objectIds || []), obj.id]
+      }));
+  };
+
+  const handleLinkObjectWrapper = (sceneId: string, objectId: string) => {
+      onLinkObjectToScene(sceneId, objectId);
+      setLocalScene(prev => {
+          if (prev.objectIds.includes(objectId)) return prev;
+          return {
+              ...prev,
+              objectIds: [...prev.objectIds, objectId]
+          };
+      });
+  };
+
+  const handleUnlinkObjectWrapper = (sceneId: string, objectId: string) => {
+      onUnlinkObjectFromScene(sceneId, objectId);
+      setLocalScene(prev => ({
+          ...prev,
+          objectIds: prev.objectIds.filter(id => id !== objectId)
+      }));
   };
 
   const handleToggle = (key: 'isEndingScene' | 'removesChanceOnEntry' | 'restoresChanceOnEntry', value: boolean) => {
@@ -289,7 +322,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                           </label>
                            <p className="text-xs text-brand-text-dim -mt-1 mb-2">Use <code>&lt;palavra&gt;</code> para destacar texto clicável.</p>
                           <div className="relative flex-1">
-                              <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-brand-bg border border-brand-border rounded-md px-3 py-2 resize-y focus:ring-0 text-lg"/>
+                              <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-brand-bg border border-brand-border rounded-md px-3 py-2 resize-y focus:ring-0 text-sm"/>
                           </div>
                       </div>
                       <div className="space-y-4 pt-4">
@@ -338,7 +371,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                        <div className="flex-shrink-0">
                           <div className="flex flex-col gap-2">
                             <label htmlFor="sceneName" className="block text-sm font-medium text-brand-text-dim mb-1">Nome da Cena</label>
-                            <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"/>
+                            <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"/>
                           </div>
                            <div className="mt-2">
                               <label htmlFor="sceneId" className="block text-sm font-medium text-brand-text-dim mb-1">ID da Cena</label>
@@ -395,9 +428,10 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                 sceneId={localScene.id}
                 objects={currentSceneObjects}
                 allGlobalObjects={Object.values(globalObjects)}
-                onCreateGlobalObject={onCreateGlobalObject}
-                onLinkObject={onLinkObjectToScene}
-                onUnlinkObject={onUnlinkObjectFromScene}
+                onCreateGlobalObject={handleCreateGlobalObjectWrapper}
+                onLinkObject={handleLinkObjectWrapper}
+                onUnlinkObject={handleUnlinkObjectWrapper}
+                onUpdateGlobalObject={onUpdateGlobalObject}
               />
           )}
 

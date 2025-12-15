@@ -97,22 +97,25 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
     <div className="space-y-6 pb-24">
       <div className="flex justify-between items-start">
         <div>
-            <div className="flex items-center gap-2">
-                {isDirty && (
-                    <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" title="Alterações não salvas"></div>
-                )}
-            </div>
             <p className="text-brand-text-dim mt-1 text-sm">
               Crie e gerencie variáveis que mudam com as ações do jogador.
             </p>
         </div>
-        <button
-            onClick={handleAddTracker}
-            className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors"
-        >
-            <PlusIcon className="w-5 h-5 mr-2" />
-            Novo Rastreador
-        </button>
+        <div className="flex items-center gap-4 flex-shrink-0 mt-1">
+            {isDirty && (
+                <div className="flex items-center gap-2 text-yellow-400 text-xs font-medium animate-pulse">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    <span>Alterações não salvas</span>
+                </div>
+            )}
+            <button
+                onClick={handleAddTracker}
+                className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors"
+            >
+                <PlusIcon className="w-5 h-5 mr-2" />
+                Novo Rastreador
+            </button>
+        </div>
       </div>
 
       <div className="bg-brand-surface p-6 space-y-4 rounded-md">
@@ -138,7 +141,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                     type="text"
                                     value={tracker.name}
                                     onChange={e => handleTrackerChange(tracker.id, 'name', e.target.value)}
-                                    className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-base font-bold text-brand-text focus:ring-0"
+                                    className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text focus:ring-0"
                                     placeholder="Nome do Rastreador"
                                 />
                             </div>

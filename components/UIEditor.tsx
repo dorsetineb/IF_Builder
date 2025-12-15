@@ -761,7 +761,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   id="orientation-select"
                                   value={localLayoutOrientation}
                                   onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                               >
                                   <option value="vertical">Vertical</option>
                                   <option value="horizontal">Horizontal</option>
@@ -773,7 +773,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   id="order-select"
                                   value={localLayoutOrder}
                                   onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                               >
                                   <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
                                   <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
@@ -814,7 +814,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     id="system-select"
                                     value={localGameSystemEnabled}
                                     onChange={(e) => setLocalGameSystemEnabled(e.target.value as 'none' | 'chances' | 'trackers')}
-                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                 >
                                     <option value="none">Nenhum</option>
                                     <option value="chances">Chances</option>
@@ -834,7 +834,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
                                                     min="1"
                                                     max="10"
-                                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                                 />
                                             </div>
                                             <div>
@@ -843,7 +843,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     id="chanceIcon"
                                                     value={localChanceIcon}
                                                     onChange={(e) => setLocalChanceIcon(e.target.value as any)}
-                                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                                 >
                                                     <option value="heart">Corações</option>
                                                     <option value="circle">Círculos</option>
@@ -858,7 +858,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 id="chanceReturnButton"
                                                 value={localChanceReturnButtonText}
                                                 onChange={(e) => setLocalChanceReturnButtonText(e.target.value)}
-                                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                             />
                                             <p className="text-xs text-brand-text-dim mt-1">Aparece após perder uma chance.</p>
                                         </div>
@@ -924,7 +924,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     id="font-select"
                                     value={localFontFamily}
                                     onChange={(e) => setLocalFontFamily(e.target.value)}
-                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                     style={{fontFamily: localFontFamily}}
                                 >
                                     {FONTS.map(font => (
@@ -940,7 +940,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     id="font-size-select"
                                     value={localGameFontSize}
                                     onChange={(e) => setLocalGameFontSize(e.target.value)}
-                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                 >
                                     <option value="0.85em">Pequeno</option>
                                     <option value="1em">Médio (Padrão)</option>
@@ -981,7 +981,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     id="frame-select"
                                     value={localImageFrame}
                                     onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
-                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                 >
                                     <option value="none">Sem moldura</option>
                                     <option value="rounded-top">Portal</option>
@@ -1178,7 +1178,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 id="gameTitle"
                                 value={localTitle}
                                 onChange={(e) => setLocalTitle(e.target.value)}
-                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                 placeholder="Ex: A Masmorra Esquecida"
                               />
                               <div className="flex items-center pt-1">
@@ -1224,7 +1224,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             value={localSplashDescription}
                             onChange={(e) => setLocalSplashDescription(e.target.value)}
                             rows={8}
-                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
+                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow text-sm"
                             placeholder="Uma breve descrição da sua aventura..."
                           />
                       </div>
@@ -1261,7 +1261,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     id="splashContentAlignment"
                                     value={localSplashContentAlignment}
                                     onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                 >
                                     <option value="right">Direita</option>
                                     <option value="left">Esquerda</option>
@@ -1332,7 +1332,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   value={localPositiveEndingDescription}
                                   onChange={(e) => setLocalPositiveEndingDescription(e.target.value)}
                                   rows={4}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow text-sm"
                                   placeholder="Parabéns! Você venceu."
                               />
                           </div>
@@ -1375,7 +1375,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   value={localNegativeEndingDescription}
                                   onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
                                   rows={4}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow"
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow text-sm"
                                   placeholder="Fim de jogo."
                               />
                           </div>
@@ -1430,7 +1430,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   id="actionButtonText"
                                   value={localActionButtonText}
                                   onChange={(e) => setLocalActionButtonText(e.target.value)}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                               />
                           </div>
                           <div>
@@ -1440,7 +1440,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   id="verbInputPlaceholder"
                                   value={localVerbInputPlaceholder}
                                   onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                               />
                           </div>
                           <div>
@@ -1450,7 +1450,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   id="diaryPlayerName"
                                   value={localDiaryPlayerName}
                                   onChange={(e) => setLocalDiaryPlayerName(e.target.value)}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                               />
                           </div>
                           <div>
@@ -1460,7 +1460,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   id="splashButtonText"
                                   value={localSplashButtonText}
                                   onChange={(e) => setLocalSplashButtonText(e.target.value)}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                   placeholder="INICIAR"
                               />
                           </div>
@@ -1471,7 +1471,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   id="continueButtonText"
                                   value={localContinueButtonText}
                                   onChange={(e) => setLocalContinueButtonText(e.target.value)}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                   placeholder="Continuar Aventura"
                               />
                           </div>
@@ -1482,7 +1482,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   id="restartButtonText"
                                   value={localRestartButtonText}
                                   onChange={(e) => setLocalRestartButtonText(e.target.value)}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0"
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                   placeholder="Reiniciar Aventura"
                               />
                           </div>
@@ -1491,19 +1491,19 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                                 <div>
                                     <label htmlFor="suggestionsButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Sugestões</label>
-                                    <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0" />
+                                    <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" />
                                 </div>
                                 <div>
                                     <label htmlFor="inventoryButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Inventário</label>
-                                    <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0" />
+                                    <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" />
                                 </div>
                                 <div>
                                     <label htmlFor="diaryButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Diário</label>
-                                    <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0" />
+                                    <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" />
                                 </div>
                                 <div>
                                     <label htmlFor="trackersButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Rastreadores</label>
-                                    <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0" disabled={localGameSystemEnabled !== 'trackers'} />
+                                    <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" disabled={localGameSystemEnabled !== 'trackers'} />
                                 </div>
                             </div>
                           </div>
