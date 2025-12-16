@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { GameData, GameObject, Scene } from '../types';
 import { TrashIcon } from './icons/TrashIcon';
-import { UploadIcon } from './icons/UploadIcon';
 import { PlusIcon } from './icons/PlusIcon';
+import { ImageUploader } from './ImageUploader';
 
 interface GlobalObjectsEditorProps {
   scenes: GameData['scenes'];
@@ -56,21 +56,6 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         obj.id === objectId ? { ...obj, [field]: value } : obj
       )
     );
-  };
-
-  const handleImageUpload = (objectId: string, e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files[0]) {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-              if (event.target && typeof event.target.result === 'string') {
-                  handleObjectChange(objectId, 'image', event.target.result);
-              }
-          };
-          reader.readAsDataURL(e.target.files[0]);
-      }
-      if (e.target) {
-        (e.target as HTMLInputElement).value = '';
-      }
   };
 
   const handleSave = () => {
@@ -138,7 +123,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         </div>
       </div>
       
-      <div className="bg-brand-surface p-6 space-y-4 rounded-md">
+      <div className="space-y-4">
         {localObjects.length > 0 ? (
           localObjects.map(obj => {
             const usages = getObjectUsages(obj.id);
@@ -151,7 +136,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                         e.preventDefault();
                         onDeleteObject(obj.id);
                     }}
-                    className="absolute top-0 right-0 p-2 bg-red-500 text-white rounded-bl-lg hover:bg-red-600 transition-colors z-20 cursor-pointer"
+                    className="absolute top-0 right-0 p-2 bg-brand-border text-brand-text-dim rounded-bl-lg hover:bg-red-500 hover:text-white transition-colors z-20 cursor-pointer"
                     title="Excluir objeto do jogo"
                     type="button"
                 >
@@ -169,37 +154,40 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                 className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
                             />
                         </div>
-                        <div>
-                            <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
-                            <p 
-                                className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
-                                title="Use este ID para referência interna."
-                            >
-                                {obj.id}
-                            </p>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
+                                <p 
+                                    className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
+                                    title="Use este ID para referência interna."
+                                >
+                                    {obj.id}
+                                </p>
+                            </div>
+                            <div className="flex items-center mt-6">
+                                <input
+                                    type="checkbox"
+                                    id={`isTakable-${obj.id}`}
+                                    checked={obj.isTakable}
+                                    onChange={e => handleObjectChange(obj.id, 'isTakable', e.target.checked)}
+                                    className="custom-checkbox"
+                                />
+                                <label htmlFor={`isTakable-${obj.id}`} className="ml-2 block text-sm text-brand-text-dim cursor-pointer">
+                                    Pode ser pego
+                                </label>
+                            </div>
                         </div>
-                        <div className="flex flex-col flex-grow">
+                        <div className="flex flex-col">
                             <label htmlFor={`obj-desc-${obj.id}`} className="block text-sm font-medium text-brand-text-dim mb-1">Descrição ao olhar/examinar</label>
                             <textarea
                                 id={`obj-desc-${obj.id}`}
                                 value={obj.examineDescription}
                                 onChange={e => handleObjectChange(obj.id, 'examineDescription', e.target.value)}
                                 rows={4}
-                                className="w-full h-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                                className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
                             />
                         </div>
-                        <div className="flex items-center pt-1">
-                            <input
-                                type="checkbox"
-                                id={`isTakable-${obj.id}`}
-                                checked={obj.isTakable}
-                                onChange={e => handleObjectChange(obj.id, 'isTakable', e.target.checked)}
-                                className="custom-checkbox"
-                            />
-                            <label htmlFor={`isTakable-${obj.id}`} className="ml-2 block text-sm text-brand-text-dim">
-                                Pode ser pego (Item de Inventário)
-                            </label>
-                        </div>
+                        
                         <div>
                             <label className="block text-sm font-medium text-brand-text-dim mb-1">Usado em:</label>
                             {usages.length > 0 ? (
@@ -220,37 +208,17 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                             )}
                         </div>
                     </div>
-                    <div className="flex flex-col space-y-3">
+                    <div className="flex flex-col h-full">
                         <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem do Objeto</label>
-                        <div className="flex-grow relative bg-brand-border/30 border border-brand-border rounded-md min-h-[200px] flex items-center justify-center overflow-hidden">
-                            {obj.image ? (
-                                <img src={obj.image} alt={obj.name} className="w-full h-full object-contain" />
-                            ) : (
-                                <label 
-                                    htmlFor={`image-upload-${obj.id}`} 
-                                    className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-brand-border/50 transition-colors"
-                                >
-                                    <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
-                                    <span className="text-xs text-brand-text-dim">Carregar Imagem</span>
-                                </label>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <label htmlFor={`image-upload-${obj.id}`} className="flex-grow flex items-center justify-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer text-sm">
-                                    <UploadIcon className="w-4 h-4 mr-2" /> {obj.image ? 'Alterar' : 'Carregar'}
-                                    <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={(e) => handleImageUpload(obj.id, e)} className="hidden" />
-                            </label>
-                                {obj.image && (
-                                    <button
-                                        onClick={() => handleObjectChange(obj.id, 'image', '')}
-                                        className="p-2 bg-red-500/20 text-red-500 rounded-md hover:bg-red-500/30 transition-colors"
-                                        title="Remover Imagem"
-                                    >
-                                        <TrashIcon className="w-4 h-4" />
-                                    </button>
-                                )}
-                        </div>
-                        <p className="text-xs text-brand-text-dim text-center">Imagem que aparece ao inspecionar o item.<br/>Recomendado: 1:1 (quadrado), ex: 512x512 pixels.</p>
+                        <ImageUploader
+                            id={`image-upload-${obj.id}`}
+                            image={obj.image}
+                            onImageUpload={(data) => handleObjectChange(obj.id, 'image', data)}
+                            onRemove={() => handleObjectChange(obj.id, 'image', '')}
+                            className="flex-grow"
+                            height="min-h-[200px]"
+                        />
+                        <p className="text-xs text-brand-text-dim text-center mt-2">Imagem que aparece ao clicar no item em Inventário.</p>
                     </div>
                 </div>
                 </div>
