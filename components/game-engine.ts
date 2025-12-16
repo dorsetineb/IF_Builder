@@ -92,13 +92,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let sceneObjectsState = {}; 
 
     // Setup global CSS variables for animation speed
-    const textSpeedVal = gameData.gameTextSpeed || 5;
-    const imgSpeedVal = gameData.gameImageSpeed || 5;
+    const textSpeedVal = Math.min(5, Math.max(1, gameData.gameTextSpeed || 5));
+    const imgSpeedVal = Math.min(5, Math.max(1, gameData.gameImageSpeed || 5));
     
-    // Map 1-10 to seconds. Text: 1=0.1s/char, 10=0.01s/char. Image: 1=3s, 10=0.3s
-    const typeSpeedBase = Math.max(5, 60 - (textSpeedVal * 5)); // ms per char
-    const textAnimDuration = Math.max(0.1, 2.1 - (textSpeedVal * 0.2)) + 's';
-    const imageAnimDuration = Math.max(0.3, 3.3 - (imgSpeedVal * 0.3)) + 's';
+    // Map 1-5 (Slider). 
+    // Typewriter: 1 -> 100ms/char (Very slow), 5 -> 20ms/char (Fast).
+    const typeSpeedBase = 120 - (textSpeedVal * 20); 
+    
+    // Text Fade Duration: 1 -> 3.0s, 5 -> 0.5s.
+    const textAnimDuration = (3.5 - (textSpeedVal * 0.6)).toFixed(1) + 's';
+    
+    // Image Fade Duration: 1 -> 4.5s, 5 -> 0.5s.
+    const imageAnimDuration = (5.5 - (imgSpeedVal * 1)).toFixed(1) + 's';
     
     document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
     document.documentElement.style.setProperty('--image-anim-speed', imageAnimDuration);

@@ -942,9 +942,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
           )}
 
           {activeTab === 'sistemas' && (
-                <div className="space-y-6">
+                <div className="space-y-6 h-full">
                     <h3 className="text-lg font-semibold text-brand-text mb-4">Configuração de Sistemas</h3>
-                    <div className="grid md:grid-cols-3 gap-x-8">
+                    <div className="grid md:grid-cols-3 gap-x-8 h-full">
                         <div className="md:col-span-1 space-y-4">
                             <div>
                                 <label htmlFor="system-select" className="block text-sm font-medium text-brand-text-dim mb-1">Habilitar sistemas</label>
@@ -975,17 +975,17 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     </p>
                                 </div>
                             )}
-                            
+                        </div>
+                        
+                        <div className="md:col-span-2 mt-4 md:mt-0 flex flex-col h-full">
                             {localGameSystemEnabled === 'none' && (
-                                <div className="p-3">
-                                    <p className="text-brand-text-dim text-sm">
+                                <div className="h-full flex items-center justify-center p-6 text-center border-2 border-dashed border-brand-border rounded-md opacity-50">
+                                    <p className="text-brand-text-dim text-sm max-w-xs">
                                         Nenhum sistema global ativo. O jogo funcionará apenas com a narrativa e navegação entre cenas.
                                     </p>
                                 </div>
                             )}
-                        </div>
-                        
-                        <div className="md:col-span-2 mt-4 md:mt-0">
+
                             {localGameSystemEnabled === 'chances' && (
                                 <div className="space-y-4">
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
@@ -1090,17 +1090,20 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                               </select>
                           </div>
                           <div>
-                              <label htmlFor="textSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Animação: {localTextSpeed}</label>
-                              <input
-                                  type="range"
-                                  id="textSpeed"
-                                  min="1"
-                                  max="10"
-                                  value={localTextSpeed}
-                                  onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
-                                  className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border"
-                              />
-                              <div className="flex justify-between text-xs text-brand-text-dim mt-1">
+                              <label htmlFor="textSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Animação</label>
+                              <div className="flex items-center gap-3">
+                                  <input
+                                      type="range"
+                                      id="textSpeed"
+                                      min="1"
+                                      max="5"
+                                      value={localTextSpeed}
+                                      onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
+                                      className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border accent-brand-primary"
+                                  />
+                                  <span className="font-mono text-brand-primary font-bold text-lg w-4 text-center">{localTextSpeed}</span>
+                              </div>
+                              <div className="flex justify-between text-xs text-brand-text-dim mt-1 pr-8">
                                   <span>Lento</span>
                                   <span>Rápido</span>
                               </div>
@@ -1126,20 +1129,22 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   <option value="pixelate">Surgimento Pixelado</option>
                                   <option value="none">Nenhuma</option>
                               </select>
-                              <p className="text-xs text-brand-text-dim mt-1">Esta transição será usada quando uma transição específica não for definida na interação.</p>
                           </div>
                           <div>
-                              <label htmlFor="imageSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Transição: {localImageSpeed}</label>
-                              <input
-                                  type="range"
-                                  id="imageSpeed"
-                                  min="1"
-                                  max="10"
-                                  value={localImageSpeed}
-                                  onChange={(e) => setLocalImageSpeed(parseInt(e.target.value, 10))}
-                                  className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border"
-                              />
-                              <div className="flex justify-between text-xs text-brand-text-dim mt-1">
+                              <label htmlFor="imageSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Transição</label>
+                              <div className="flex items-center gap-3">
+                                  <input
+                                      type="range"
+                                      id="imageSpeed"
+                                      min="1"
+                                      max="5"
+                                      value={localImageSpeed}
+                                      onChange={(e) => setLocalImageSpeed(parseInt(e.target.value, 10))}
+                                      className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border accent-brand-primary"
+                                  />
+                                  <span className="font-mono text-brand-primary font-bold text-lg w-4 text-center">{localImageSpeed}</span>
+                              </div>
+                              <div className="flex justify-between text-xs text-brand-text-dim mt-1 pr-8">
                                   <span>Lento</span>
                                   <span>Rápido</span>
                               </div>
