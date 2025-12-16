@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
 import { TrashIcon } from './icons/TrashIcon';
-import { ImageUploader } from './ImageUploader';
+import { UploadIcon } from './icons/UploadIcon';
 
 interface ObjectEditorProps {
   sceneId: string;
@@ -28,7 +28,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
     allGlobalObjects, 
     onCreateGlobalObject, 
     onLinkObject, 
-    onUnlinkObject, 
+    onUnlinkObject,
     onUpdateGlobalObject
 }) => {
   const [selectedGlobalObjectId, setSelectedGlobalObjectId] = useState<string>('');
@@ -48,6 +48,21 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
       if (selectedGlobalObjectId) {
           onLinkObject(sceneId, selectedGlobalObjectId);
           setSelectedGlobalObjectId('');
+      }
+  };
+  
+  const handleImageUpload = (objectId: string, e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+              if (event.target && typeof event.target.result === 'string') {
+                  onUpdateGlobalObject(objectId, { image: event.target.result });
+              }
+          };
+          reader.readAsDataURL(e.target.files[0]);
+      }
+      if (e.target) {
+        (e.target as HTMLInputElement).value = '';
       }
   };
 
@@ -78,31 +93,15 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                 className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
                             />
                         </div>
-                        
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
-                                <p 
-                                    className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
-                                    title="Use este ID para referência interna."
-                                >
-                                    {obj.id}
-                                </p>
-                            </div>
-                            <div className="flex items-center mt-6">
-                                <input 
-                                    type="checkbox"
-                                    id={`isTakable-${obj.id}`}
-                                    checked={obj.isTakable} 
-                                    onChange={(e) => onUpdateGlobalObject(obj.id, { isTakable: e.target.checked })}
-                                    className="custom-checkbox" 
-                                />
-                                <label htmlFor={`isTakable-${obj.id}`} className="ml-2 block text-sm text-brand-text-dim cursor-pointer">
-                                    Pode ser pego
-                                </label>
-                            </div>
+                        <div>
+                            <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
+                            <p 
+                                className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
+                                title="Use este ID para referência interna."
+                            >
+                                {obj.id}
+                            </p>
                         </div>
-
                         <div className="flex flex-col">
                             <label className="block text-sm font-medium text-brand-text-dim mb-1">Descrição ao olhar/examinar</label>
                             <textarea 
@@ -112,20 +111,51 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                 className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
                             />
                         </div>
+                        <div className="flex items-center pt-1">
+                            <input 
+                                type="checkbox" 
+                                checked={obj.isTakable} 
+                                onChange={(e) => onUpdateGlobalObject(obj.id, { isTakable: e.target.checked })}
+                                className="custom-checkbox" 
+                            />
+                            <label className="ml-2 block text-sm text-brand-text-dim">Pode ser pego (Item de Inventário)</label>
+                        </div>
                     </div>
                     {/* Image Upload Column */}
-                    <div className="flex flex-col h-full">
+                    <div className="flex flex-col space-y-3">
                         <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem do Objeto</label>
-                        <ImageUploader
-                            id={`image-upload-${obj.id}`}
-                            image={obj.image}
-                            onImageUpload={(data) => onUpdateGlobalObject(obj.id, { image: data })}
-                            onRemove={() => onUpdateGlobalObject(obj.id, { image: '' })}
-                            className="flex-grow"
-                            height="min-h-[200px]"
-                        />
-                         <p className="text-xs text-brand-text-dim text-center mt-2">Imagem que aparece ao clicar no item em Inventário.</p>
+                        <div className="flex-grow relative bg-brand-border/30 border border-brand-border rounded-md min-h-[150px] flex items-center justify-center overflow-hidden">
+                            {obj.image ? (
+                                <img src={obj.image} alt={obj.name} className="w-full h-full object-contain" />
+                            ) : (
+                                <label 
+                                    htmlFor={`image-upload-${obj.id}`} 
+                                    className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-brand-border/50 transition-colors"
+                                >
+                                    <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
+                                    <span className="text-xs text-brand-text-dim">Carregar Imagem</span>
+                                </label>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <label htmlFor={`image-upload-${obj.id}`} className="flex-grow flex items-center justify-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer text-sm">
+                                    <UploadIcon className="w-4 h-4 mr-2" /> {obj.image ? 'Alterar' : 'Carregar'}
+                                    <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={(e) => handleImageUpload(obj.id, e)} className="hidden" />
+                            </label>
+                                {obj.image && (
+                                    <button
+                                        onClick={() => onUpdateGlobalObject(obj.id, { image: '' })}
+                                        className="p-2 bg-red-500/20 text-red-500 rounded-md hover:bg-red-500/30 transition-colors"
+                                        title="Remover Imagem"
+                                    >
+                                        <TrashIcon className="w-4 h-4" />
+                                    </button>
+                                )}
+                        </div>
                     </div>
+                </div>
+                <div className="mt-2 text-center">
+                    <p className="text-xs text-brand-text-dim italic">Alterações feitas aqui afetam o objeto em todo o jogo.</p>
                 </div>
             </div>
             ))
@@ -147,7 +177,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                     Criar Novo Objeto
                 </button>
             </div>
-            <div className="space-y-2">
+            <div className="space-y-2 md:border-l md:border-brand-border/30 md:pl-6">
                 <p className="text-sm text-brand-text-dim">Ou vincule um existente:</p>
                 <div className="flex gap-2">
                     <select

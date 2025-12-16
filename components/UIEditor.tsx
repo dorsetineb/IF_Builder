@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { GameData, FixedVerb, View } from '../types';
+import { GameData, FixedVerb } from '../types';
 import { UploadIcon } from './icons/UploadIcon';
 import { TrashIcon } from './icons/TrashIcon';
 import { PlusIcon } from './icons/PlusIcon';
 import { ExclamationTriangleIcon } from './icons/ExclamationTriangleIcon';
-import { ImageUploader } from './ImageUploader';
-import { AdjustmentsHorizontalIcon } from './icons/AdjustmentsHorizontalIcon';
 
 interface UIEditorProps {
   html: string;
@@ -32,7 +30,7 @@ interface UIEditorProps {
   chanceIconColor: string;
   gameFontFamily: string;
   gameFontSize: string;
-  chanceIcon: 'circle' | 'cross' | 'heart' | 'square' | 'diamond';
+  chanceIcon: 'circle' | 'cross' | 'heart';
   chanceReturnButtonText: string;
   gameTheme: 'dark' | 'light';
   textColorLight: string;
@@ -53,7 +51,6 @@ interface UIEditorProps {
   diaryButtonText?: string;
   trackersButtonText?: string;
   gameContinueIndicatorColor: string;
-  onSetView: (view: View) => void;
   
   // Game Info Props
   title: string;
@@ -145,10 +142,9 @@ const ColorInput: React.FC<{
     value: string;
     onChange: (value: string) => void;
     placeholder: string;
-    hideLabel?: boolean;
-}> = ({ label, id, value, onChange, placeholder, hideLabel }) => (
+}> = ({ label, id, value, onChange, placeholder }) => (
     <div>
-        {!hideLabel && <label htmlFor={id} className="block text-sm font-medium text-brand-text-dim mb-1">{label}</label>}
+        <label htmlFor={id} className="block text-sm font-medium text-brand-text-dim mb-1">{label}</label>
         <div className="flex items-center gap-2 p-1 bg-brand-bg border border-brand-border rounded-md focus-within:ring-0">
             <input
                 type="color"
@@ -170,7 +166,7 @@ const ColorInput: React.FC<{
     </div>
 );
 
-// Sub-component to manage local state for the verbs input field
+// Sub-component to manage local state for the verbs input field (Moved from GameInfoEditor)
 const FixedVerbItem: React.FC<{
   verb: FixedVerb;
   onUpdate: (id: string, field: 'verbs' | 'description', value: any) => void;
@@ -247,7 +243,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
       gameSceneNameOverlayTextColor,
       gameShowTrackersUI, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText,
       gameContinueIndicatorColor,
-      onSetView,
       // Game Info props
       title, logo, omitSplashTitle, 
       splashImage, splashContentAlignment, splashDescription,
@@ -395,6 +390,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     textAnimationType, textSpeed, imageTransitionType, imageSpeed
   ]);
   
+  // NOTE: Removed the useEffect that auto-reset frame colors on theme change to allow persistence.
+
   useEffect(() => {
     const dirty = localLayoutOrientation !== layoutOrientation ||
                   localLayoutOrder !== layoutOrder ||
@@ -464,7 +461,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
   useEffect(() => {
     if (localGameSystemEnabled !== 'trackers' && activeTab === 'trackers') {
-        // We do not force redirect if system is disabled, just disable tab button
+        setActiveTab('abertura');
     }
   }, [localGameSystemEnabled, activeTab]);
 
@@ -622,6 +619,21 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
       setLocalFrameRoundedTopColor(newFrameColor);
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
+    if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            if (event.target && typeof event.target.result === 'string') {
+                setter(event.target.result);
+            }
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+    if (e.target) {
+      (e.target as HTMLInputElement).value = '';
+    }
+  };
+
   const handleAddFixedVerb = () => {
       const newVerb: FixedVerb = {
           id: `verb_${Math.random().toString(36).substring(2, 9)}`,
@@ -657,30 +669,16 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   );
 
   const CrossIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
-    <svg stroke={color} strokeWidth="5" strokeLinecap="round" viewBox="0 0 24 24" className={className} fill="none">
+    <svg stroke={color} strokeWidth="3" strokeLinecap="round" viewBox="0 0 24 24" className={className} fill="none">
       <path d="M12 5 V19 M5 12 H19"/>
     </svg>
   );
 
-  const SquareIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
-    <svg fill={color} viewBox="0 0 24 24" className={className}>
-        <rect x="4" y="4" width="16" height="16" rx="2" />
-    </svg>
-  );
-
-  const DiamondIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
-    <svg fill={color} viewBox="0 0 24 24" className={className}>
-        <path d="M12 2L2 12l10 10 10-10L12 2z" />
-    </svg>
-  );
-
-  const ChanceIcon: React.FC<{ type: string, color: string, className?: string }> = ({ type, color, className }) => {
+  const ChanceIcon: React.FC<{ type: 'heart' | 'circle' | 'cross', color: string, className?: string }> = ({ type, color, className }) => {
       switch (type) {
           case 'heart': return <HeartIcon color={color} className={className} />;
           case 'circle': return <CircleIcon color={color} className={className} />;
           case 'cross': return <CrossIcon color={color} className={className} />;
-          case 'square': return <SquareIcon color={color} className={className} />;
-          case 'diamond': return <DiamondIcon color={color} className={className} />;
           default: return <HeartIcon color={color} className={className} />;
       }
   };
@@ -743,7 +741,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const TABS = {
     abertura: 'Abertura do Jogo',
     layout: 'Layout',
-    sistemas: 'Sistemas',
     transicoes: 'Transições',
     fim_de_jogo: 'Fim de Jogo',
     verbos: 'Verbos Fixos',
@@ -791,162 +788,63 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
         <div className="bg-brand-surface -mt-px p-6">
           {activeTab === 'layout' && (
-              <div className="space-y-8">
-                  <div className="border-b border-brand-border/50 pb-6">
-                      <h3 className="text-lg font-semibold text-brand-text mb-4">Tela de Abertura</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-center">
-                          <div className="space-y-6 flex flex-col justify-center">
-                              <div>
-                                  <label className="block text-sm font-medium text-brand-text-dim mb-1">Posicionamento do Conteúdo</label>
-                                  <select
-                                      id="splashContentAlignment"
-                                      value={localSplashContentAlignment}
-                                      onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                      className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+              <div className="space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-center">
+                      <div className="space-y-6">
+                          <div>
+                              <label htmlFor="orientation-select" className="block text-sm font-medium text-brand-text-dim mb-1">Orientação</label>
+                              <select
+                                  id="orientation-select"
+                                  value={localLayoutOrientation}
+                                  onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                              >
+                                  <option value="vertical">Vertical</option>
+                                  <option value="horizontal">Horizontal</option>
+                              </select>
+                          </div>
+                          <div>
+                              <label htmlFor="order-select" className="block text-sm font-medium text-brand-text-dim mb-1">Posição da Imagem</label>
+                              <select
+                                  id="order-select"
+                                  value={localLayoutOrder}
+                                  onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                              >
+                                  <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
+                                  <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
+                              </select>
+                          </div>
+                      </div>
+                      
+                      <div className="flex flex-col items-center justify-center">
+                          <p className="text-sm text-brand-text-dim mb-2">Pré-visualização do Layout</p>
+                          <div 
+                              className={`w-full max-w-sm ${localLayoutOrientation === 'horizontal' ? 'aspect-[4/5]' : 'aspect-video'} bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
+                              style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
+                          >
+                            <div 
+                                className={`flex items-center justify-center ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'} transition-all duration-300 ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}
+                                style={getFramePreviewStyles('none').panelStyles}
+                            >
+                                  <div 
+                                      className={`flex-1 w-full h-full rounded flex items-center justify-center text-center text-sm p-2 font-semibold`}
+                                      style={getFramePreviewStyles('none').containerStyles}
                                   >
-                                      <option value="right">Direita</option>
-                                      <option value="left">Esquerda</option>
-                                  </select>
-                              </div>
-                              <div className="flex items-center">
-                                <input
-                                  type="checkbox"
-                                  id="omitSplashTitle"
-                                  checked={localOmitSplashTitle}
-                                  onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
-                                  className="custom-checkbox"
-                                />
-                                <label htmlFor="omitSplashTitle" className="ml-2 text-sm text-brand-text-dim">Ocultar título do jogo e descrição da tela de abertura</label>
-                              </div>
-                            </div>
-                            <div className="flex flex-col items-center justify-center">
-                                <p className="text-sm text-brand-text-dim mb-2">Pré-visualização da Abertura</p>
-                                <div
-                                  className={`relative w-full max-w-sm ${localLayoutOrientation === 'horizontal' ? 'aspect-[4/5]' : 'aspect-video'} bg-brand-bg border-2 border-brand-border rounded-lg flex overflow-hidden`}
-                                  style={{
-                                      justifyContent: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
-                                      alignItems: 'flex-end'
-                                  }}
-                                  title="Área da Imagem de Fundo"
-                              >
-                                  <div className="absolute inset-0 flex items-start justify-center pt-8 text-sm font-semibold text-brand-text-dim z-0 pointer-events-none select-none">
-                                      Imagem de Fundo
-                                  </div>
-                                  
-                                  {!localOmitSplashTitle && (
-                                      <div
-                                          className="z-10 w-2/3 h-auto min-h-[40%] m-6 bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center p-4 backdrop-blur-sm shadow-lg text-brand-primary-hover font-semibold text-sm"
-                                      >
-                                          Título e Descrição
-                                      </div>
-                                  )}
-                              </div>
-                            </div>
-                      </div>
-                  </div>
-
-                  <div>
-                      <h3 className="text-lg font-semibold text-brand-text mb-4">Layout do Jogo</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-start">
-                          <div className="space-y-6">
-                              <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                      <label htmlFor="orientation-select" className="block text-sm font-medium text-brand-text-dim mb-1">Orientação</label>
-                                      <select
-                                          id="orientation-select"
-                                          value={localLayoutOrientation}
-                                          onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
-                                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                      >
-                                          <option value="vertical">Vertical</option>
-                                          <option value="horizontal">Horizontal</option>
-                                      </select>
-                                  </div>
-                                  <div>
-                                      <label htmlFor="order-select" className="block text-sm font-medium text-brand-text-dim mb-1">Posição da Imagem</label>
-                                      <select
-                                          id="order-select"
-                                          value={localLayoutOrder}
-                                          onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
-                                          className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                      >
-                                          <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
-                                          <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
-                                      </select>
+                                      Imagem
                                   </div>
                               </div>
-                              
-                              <div className="grid grid-cols-2 gap-4 items-end">
-                                   <div>
-                                        <label htmlFor="frame-select" className="block text-sm font-medium text-brand-text-dim mb-1">Tipo de Moldura</label>
-                                        <select
-                                            id="frame-select"
-                                            value={localImageFrame}
-                                            onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
-                                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                        >
-                                            <option value="none">Sem moldura</option>
-                                            <option value="rounded-top">Portal</option>
-                                            <option value="book-cover">Quadrada</option>
-                                            <option value="trading-card">Arredondada</option>
-                                            <option value="chamfered">Chanfrada</option>
-                                        </select>
-                                   </div>
-                                   <div>
-                                        {localImageFrame === 'rounded-top' && (
-                                            <ColorInput label="Cor da Moldura" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
-                                        )}
-                                        {localImageFrame === 'book-cover' && (
-                                            <ColorInput label="Cor da Moldura" id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
-                                        )}
-                                        {localImageFrame === 'trading-card' && (
-                                            <ColorInput label="Cor da Moldura" id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
-                                        )}
-                                        {localImageFrame === 'chamfered' && (
-                                            <ColorInput label="Cor da Moldura" id="frameChamferedColor" value={localFrameChamferedColor} onChange={setLocalFrameChamferedColor} placeholder="#FFFFFF" />
-                                        )}
-                                        {localImageFrame === 'none' && (
-                                            <div className="h-full flex items-center justify-center pb-2">
-                                                <p className="text-brand-text-dim text-xs italic">Sem opções de cor.</p>
-                                            </div>
-                                        )}
-                                   </div>
-                              </div>
-                          </div>
-                          
-                          <div className="flex flex-col items-center justify-center">
-                              <p className="text-sm text-brand-text-dim mb-2">Pré-visualização do Layout</p>
-                              <div 
-                                  className={`w-full max-w-sm ${localLayoutOrientation === 'horizontal' ? 'aspect-[4/5]' : 'aspect-video'} bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
-                                  style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
-                              >
-                                <div 
-                                    className={`flex items-center justify-center ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'} transition-all duration-300 ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}
-                                    style={getFramePreviewStyles(localImageFrame).panelStyles}
-                                >
-                                      <div 
-                                          className={`flex-1 w-full h-full rounded flex items-center justify-center text-center text-sm p-2 font-semibold`}
-                                          style={getFramePreviewStyles(localImageFrame).containerStyles}
-                                      >
-                                          Imagem da Cena
-                                      </div>
-                                  </div>
-                                  <div className={`flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}>
-                                      Descrição da Cena
-                                  </div>
+                              <div className={`flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}>
+                                  Descrição
                               </div>
                           </div>
                       </div>
                   </div>
-              </div>
-          )}
 
-          {activeTab === 'sistemas' && (
-                <div className="space-y-6 h-full">
-                    <h3 className="text-lg font-semibold text-brand-text mb-4">Configuração de Sistemas</h3>
-                    <div className="grid md:grid-cols-3 gap-x-8 h-full">
-                        <div className="md:col-span-1 space-y-4">
-                            <div>
+                  <div className="pt-6 border-t border-brand-border/50">
+                      <h3 className="text-lg font-semibold text-brand-text mb-4">Sistemas</h3>
+                        <div className="grid md:grid-cols-3 gap-x-8">
+                            <div className="md:col-span-1">
                                 <label htmlFor="system-select" className="block text-sm font-medium text-brand-text-dim mb-1">Habilitar sistemas</label>
                                 <select
                                     id="system-select"
@@ -959,51 +857,24 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <option value="trackers">Rastreadores</option>
                                 </select>
                             </div>
-                            
-                            {localGameSystemEnabled === 'chances' && (
-                                <div className="bg-brand-primary/10 border border-brand-primary/20 p-3 rounded-md">
-                                    <p className="text-sm text-brand-text">
-                                        Gerencie a 'vida' do jogador. Defina um máximo de tentativas. Se acabarem, o jogo exibe a tela de Final Negativo.
-                                    </p>
-                                </div>
-                            )}
-                            
-                            {localGameSystemEnabled === 'trackers' && (
-                                <div className="bg-brand-primary/10 border border-brand-primary/20 p-3 rounded-md">
-                                    <p className="text-sm text-brand-text">
-                                        Crie variáveis (Ex: Vida, Dinheiro, Sanidade). Defina valores iniciais e máximos. Ações podem alterar esses valores e levar a cenas específicas.
-                                    </p>
-                                </div>
-                            )}
-                        </div>
-                        
-                        <div className="md:col-span-2 mt-4 md:mt-0 flex flex-col h-full">
-                            {localGameSystemEnabled === 'none' && (
-                                <div className="h-full flex items-center justify-center p-6 text-center border-2 border-dashed border-brand-border rounded-md opacity-50">
-                                    <p className="text-brand-text-dim text-sm max-w-xs">
-                                        Nenhum sistema global ativo. O jogo funcionará apenas com a narrativa e navegação entre cenas.
-                                    </p>
-                                </div>
-                            )}
-
-                            {localGameSystemEnabled === 'chances' && (
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-4">
-                                        <div>
-                                            <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
-                                            <input
-                                                type="number"
-                                                id="maxChances"
-                                                value={localMaxChances}
-                                                onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
-                                                min="1"
-                                                max="10"
-                                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label htmlFor="chanceIcon" className="block text-sm font-medium text-brand-text-dim mb-1">Formato do Ícone</label>
-                                            <div className="flex items-center gap-3">
+                             <div className="md:col-span-2 mt-4 md:mt-0">
+                                {localGameSystemEnabled === 'chances' && (
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                            <div>
+                                                <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
+                                                <input
+                                                    type="number"
+                                                    id="maxChances"
+                                                    value={localMaxChances}
+                                                    onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
+                                                    min="1"
+                                                    max="10"
+                                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                                />
+                                            </div>
+                                            <div>
+                                                <label htmlFor="chanceIcon" className="block text-sm font-medium text-brand-text-dim mb-1">Formato do Ícone</label>
                                                 <select
                                                     id="chanceIcon"
                                                     value={localChanceIcon}
@@ -1013,65 +884,49 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     <option value="heart">Corações</option>
                                                     <option value="circle">Círculos</option>
                                                     <option value="cross">Cruzes</option>
-                                                    <option value="square">Quadrados</option>
-                                                    <option value="diamond">Losangos</option>
                                                 </select>
-                                                <div className="p-1 bg-brand-bg border border-brand-border rounded flex-shrink-0" title="Pré-visualização">
-                                                    <ChanceIcon type={localChanceIcon} color={localChanceIconColor} className="w-6 h-6" />
-                                                </div>
                                             </div>
                                         </div>
-                                        <div className="md:mt-0 mt-2">
-                                            <ColorInput label="Cor do Ícone" id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
+                                        <div>
+                                            <label htmlFor="chanceReturnButton" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Retorno</label>
+                                            <input
+                                                type="text"
+                                                id="chanceReturnButton"
+                                                value={localChanceReturnButtonText}
+                                                onChange={(e) => setLocalChanceReturnButtonText(e.target.value)}
+                                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                            />
+                                            <p className="text-xs text-brand-text-dim mt-1">Aparece após perder uma chance.</p>
                                         </div>
                                     </div>
+                                )}
+                                {localGameSystemEnabled === 'trackers' && (
                                     <div>
-                                        <label htmlFor="chanceReturnButton" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Retorno</label>
-                                        <input
-                                            type="text"
-                                            id="chanceReturnButton"
-                                            value={localChanceReturnButtonText}
-                                            onChange={(e) => setLocalChanceReturnButtonText(e.target.value)}
-                                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                        />
-                                        <p className="text-xs text-brand-text-dim mt-1">Aparece após perder uma chance.</p>
+                                       <div className="flex items-center">
+                                          <input
+                                              type="checkbox"
+                                              id="showTrackersUI"
+                                              checked={!!localGameShowTrackersUI}
+                                              onChange={e => setLocalGameShowTrackersUI(e.target.checked)}
+                                              className="custom-checkbox"
+                                          />
+                                          <label htmlFor="showTrackersUI" className="ml-2 block text-sm text-brand-text-dim">
+                                              Mostrar painel de rastreadores no jogo
+                                          </label>
+                                      </div>
                                     </div>
-                                </div>
-                            )}
-                            {localGameSystemEnabled === 'trackers' && (
-                                <div className="space-y-6">
-                                    <div className="flex items-center">
-                                        <input
-                                            type="checkbox"
-                                            id="showTrackersUI"
-                                            checked={!!localGameShowTrackersUI}
-                                            onChange={e => setLocalGameShowTrackersUI(e.target.checked)}
-                                            className="custom-checkbox"
-                                        />
-                                        <label htmlFor="showTrackersUI" className="ml-2 block text-sm text-brand-text-dim">
-                                            Mostrar painel de rastreadores no jogo
-                                        </label>
+                                )}
+                                {localGameSystemEnabled === 'none' && (
+                                    <div className="h-full flex items-center justify-center bg-brand-bg rounded-md border-2 border-dashed border-brand-border">
+                                        <p className="text-brand-text-dim text-sm">Nenhum sistema de jogo habilitado.</p>
                                     </div>
-                                    
-                                    <div className="pt-4 border-t border-brand-border/30">
-                                        <button 
-                                            onClick={() => onSetView('trackers')} 
-                                            className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors"
-                                        >
-                                            <AdjustmentsHorizontalIcon className="w-5 h-5 mr-2" />
-                                            Gerenciar Rastreadores
-                                        </button>
-                                        <p className="text-xs text-brand-text-dim mt-2">
-                                            Clique acima para configurar as variáveis do jogo (vida, dinheiro, etc.).
-                                        </p>
-                                    </div>
-                                </div>
-                            )}
+                                )}
+                            </div>
                         </div>
-                    </div>
-                </div>
+                  </div>
+              </div>
           )}
-          {/* ... rest of tabs ... */}
+
           {activeTab === 'transicoes' && (
               <div className="space-y-8">
                   <div>
@@ -1090,20 +945,17 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                               </select>
                           </div>
                           <div>
-                              <label htmlFor="textSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Animação</label>
-                              <div className="flex items-center gap-3">
-                                  <input
-                                      type="range"
-                                      id="textSpeed"
-                                      min="1"
-                                      max="5"
-                                      value={localTextSpeed}
-                                      onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
-                                      className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border accent-brand-primary"
-                                  />
-                                  <span className="font-mono text-brand-primary font-bold text-lg w-4 text-center">{localTextSpeed}</span>
-                              </div>
-                              <div className="flex justify-between text-xs text-brand-text-dim mt-1 pr-8">
+                              <label htmlFor="textSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Animação: {localTextSpeed}</label>
+                              <input
+                                  type="range"
+                                  id="textSpeed"
+                                  min="1"
+                                  max="10"
+                                  value={localTextSpeed}
+                                  onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
+                                  className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border"
+                              />
+                              <div className="flex justify-between text-xs text-brand-text-dim mt-1">
                                   <span>Lento</span>
                                   <span>Rápido</span>
                               </div>
@@ -1129,22 +981,20 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   <option value="pixelate">Surgimento Pixelado</option>
                                   <option value="none">Nenhuma</option>
                               </select>
+                              <p className="text-xs text-brand-text-dim mt-1">Esta transição será usada quando uma transição específica não for definida na interação.</p>
                           </div>
                           <div>
-                              <label htmlFor="imageSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Transição</label>
-                              <div className="flex items-center gap-3">
-                                  <input
-                                      type="range"
-                                      id="imageSpeed"
-                                      min="1"
-                                      max="5"
-                                      value={localImageSpeed}
-                                      onChange={(e) => setLocalImageSpeed(parseInt(e.target.value, 10))}
-                                      className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border accent-brand-primary"
-                                  />
-                                  <span className="font-mono text-brand-primary font-bold text-lg w-4 text-center">{localImageSpeed}</span>
-                              </div>
-                              <div className="flex justify-between text-xs text-brand-text-dim mt-1 pr-8">
+                              <label htmlFor="imageSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Transição: {localImageSpeed}</label>
+                              <input
+                                  type="range"
+                                  id="imageSpeed"
+                                  min="1"
+                                  max="10"
+                                  value={localImageSpeed}
+                                  onChange={(e) => setLocalImageSpeed(parseInt(e.target.value, 10))}
+                                  className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border"
+                              />
+                              <div className="flex justify-between text-xs text-brand-text-dim mt-1">
                                   <span>Lento</span>
                                   <span>Rápido</span>
                               </div>
@@ -1235,6 +1085,46 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         </div>
                     </div>
 
+                    <div className="pt-6 border-t border-brand-border/50">
+                        <h3 className="text-lg font-semibold text-brand-text mb-4">Moldura</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
+                           <div>
+                                <label htmlFor="frame-select" className="block text-sm font-medium text-brand-text-dim mb-1">Tipo de Moldura</label>
+                                <select
+                                    id="frame-select"
+                                    value={localImageFrame}
+                                    onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                >
+                                    <option value="none">Sem moldura</option>
+                                    <option value="rounded-top">Portal</option>
+                                    <option value="book-cover">Quadrada</option>
+                                    <option value="trading-card">Arredondada</option>
+                                    <option value="chamfered">Chanfrada</option>
+                                </select>
+                           </div>
+                            <div className="space-y-4">
+                                {localImageFrame === 'rounded-top' && (
+                                    <ColorInput label="Cor da Moldura" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
+                                )}
+                                {localImageFrame === 'book-cover' && (
+                                    <ColorInput label="Cor da Moldura" id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
+                                )}
+                                {localImageFrame === 'trading-card' && (
+                                    <ColorInput label="Cor da Moldura" id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
+                                )}
+                                {localImageFrame === 'chamfered' && (
+                                    <ColorInput label="Cor da Moldura" id="frameChamferedColor" value={localFrameChamferedColor} onChange={setLocalFrameChamferedColor} placeholder="#FFFFFF" />
+                                )}
+                                {localImageFrame === 'none' && (
+                                    <p className="text-brand-text-dim text-sm text-center py-4 bg-brand-bg rounded-md h-full flex items-center justify-center">
+                                        Nenhuma moldura especial selecionada.
+                                    </p>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
                     {!isCustomizing && (
                          <div className="pt-6 border-t border-brand-border/50">
                              <button 
@@ -1294,6 +1184,16 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <ColorInput label="Cor da Seta de Continuar" id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#58a6ff" />
                             </div>
                         </div>
+                        {localGameSystemEnabled === 'chances' && (
+                            <div className="pt-6 border-t border-brand-border/50">
+                                <h3 className="text-lg font-semibold text-brand-text mb-4">Sistema de Chances</h3>
+                                <div className="space-y-6 mt-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                        <ColorInput label="Cor dos Ícones de Chance" id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
+                                    </div>
+                                </div>
+                            </div>
+                         )}
                       </>
                     )}
                 </div>
@@ -1309,7 +1209,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             {/* Image Panel Mock */}
                             <div className="w-2/5 aspect-[9/16] flex items-center justify-center relative" style={panelStyles}>
                                 <div className="font-semibold" style={containerStyles}>
-                                    Imagem da Cena
+                                    Imagem
                                 </div>
                                 <div 
                                     className="absolute bottom-4 text-xs font-bold px-2 py-1 rounded" 
@@ -1379,12 +1279,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 </div>
             </div>
           )}
+          {/* Other tabs remain the same... */}
           {activeTab === 'abertura' && (
               <div className="space-y-6">
-                  {/* Top Section */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                      <div className="space-y-6 flex flex-col h-full">
-                           <div className="space-y-2 flex-shrink-0">
+                      <div className="space-y-6">
+                           <div className="space-y-2">
                               <h4 className="text-lg font-semibold text-brand-text mb-2">Título do Jogo</h4>
                               <input
                                 type="text"
@@ -1394,31 +1294,115 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                 placeholder="Ex: A Masmorra Esquecida"
                               />
+                              <div className="flex items-center pt-1">
+                                <input
+                                  type="checkbox"
+                                  id="omitSplashTitle"
+                                  checked={localOmitSplashTitle}
+                                  onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
+                                  className="custom-checkbox"
+                                />
+                                <label htmlFor="omitSplashTitle" className="ml-2 text-sm text-brand-text-dim">Omitir título da abertura</label>
+                              </div>
                           </div>
-                          <div className="space-y-2 flex flex-col flex-grow">
-                              <h4 className="text-lg font-semibold text-brand-text mb-2">Descrição do Jogo</h4>
-                              <textarea
-                                id="splashDescription"
-                                value={localSplashDescription}
-                                onChange={(e) => setLocalSplashDescription(e.target.value)}
-                                rows={8}
-                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow text-sm min-h-[160px]"
-                                placeholder="Uma breve descrição da sua aventura..."
-                              />
+                          <div className="space-y-2">
+                              <h4 className="text-lg font-semibold text-brand-text mb-2">Logotipo do Jogo (Opcional)</h4>
+                              <div className="flex items-start gap-4">
+                                  {localLogo && (
+                                      <img src={localLogo} alt="Pré-visualização do logo" className="h-16 w-auto bg-brand-bg p-1 border border-brand-border rounded" />
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                      <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                          <UploadIcon className="w-5 h-5 mr-2" />
+                                          {localLogo ? 'Alterar Logo' : 'Carregar Logo'}
+                                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalLogo)} className="hidden" />
+                                      </label>
+                                      {localLogo && (
+                                          <button
+                                              onClick={() => setLocalLogo('')}
+                                              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                              title="Remover logo"
+                                          >
+                                              <TrashIcon className="w-5 h-5" />
+                                          </button>
+                                      )}
+                                  </div>
+                              </div>
                           </div>
                       </div>
-                      
-                      {/* Background Image (Right) */}
-                      <div className="space-y-2 flex flex-col h-full">
-                          <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
-                          <ImageUploader
-                              id="splash-image-uploader"
-                              image={localSplashImage}
-                              onImageUpload={(data) => setLocalSplashImage(data)}
-                              onRemove={() => setLocalSplashImage('')}
-                              height="h-full min-h-[200px]"
+                      <div className="space-y-2 flex flex-col">
+                          <h4 className="text-lg font-semibold text-brand-text mb-2">Descrição do Jogo</h4>
+                          <textarea
+                            id="splashDescription"
+                            value={localSplashDescription}
+                            onChange={(e) => setLocalSplashDescription(e.target.value)}
+                            rows={8}
+                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow text-sm"
+                            placeholder="Uma breve descrição da sua aventura..."
                           />
                       </div>
+                  </div>
+
+                  <div className="pt-6 border-t border-brand-border/50">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                        <div className="space-y-4">
+                            <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
+                            <div className="flex items-start gap-4">
+                                {localSplashImage && (
+                                    <img src={localSplashImage} alt="Fundo da tela de abertura" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />
+                                )}
+                                <div className="flex items-center gap-2">
+                                    <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                        <UploadIcon className="w-5 h-5 mr-2" />
+                                        {localSplashImage ? 'Alterar Imagem' : 'Carregar Imagem'}
+                                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
+                                    </label>
+                                    {localSplashImage && (
+                                        <button
+                                            onClick={() => setLocalSplashImage('')}
+                                            className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                            title="Remover imagem"
+                                        >
+                                            <TrashIcon className="w-5 h-5" />
+                                        </button>
+                                    )}
+                                </div>
+                            </div>
+                            <div className="pt-2">
+                                <label htmlFor="splashContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento horizontal</label>
+                                <select
+                                    id="splashContentAlignment"
+                                    value={localSplashContentAlignment}
+                                    onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                >
+                                    <option value="right">Direita</option>
+                                    <option value="left">Esquerda</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
+                           <div
+                              className="relative w-full aspect-video bg-indigo-500/30 border border-indigo-400 rounded-md flex"
+                              style={{
+                                  justifyContent: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
+                                  alignItems: 'flex-end'
+                              }}
+                              title="Área da Imagem de Fundo"
+                          >
+                              <div className="absolute top-2 left-2 text-indigo-200 font-semibold text-sm">
+                                  Imagem de Fundo
+                              </div>
+                              <div
+                                  className="w-2/3 h-1/2 m-4 bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold"
+                                  title="Área de Texto"
+                              >
+                                  Texto de Abertura
+                              </div>
+                          </div>
+                        </div>
+                     </div>
                   </div>
               </div>
           )}
@@ -1430,15 +1414,29 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                       <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Positivo</h3>
                       <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador alcança uma cena marcada como "final".</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                          <div className="space-y-2 flex flex-col">
+                          <div className="space-y-4">
                               <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
-                              <ImageUploader
-                                    id="positive-ending-image-uploader"
-                                    image={localPositiveEndingImage}
-                                    onImageUpload={(data) => setLocalPositiveEndingImage(data)}
-                                    onRemove={() => setLocalPositiveEndingImage('')}
-                                    height="min-h-[200px]"
-                                />
+                              <div className="flex items-start gap-4">
+                                  {localPositiveEndingImage && (
+                                      <img src={localPositiveEndingImage} alt="Fundo do final positivo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                      <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                          <UploadIcon className="w-5 h-5 mr-2" />
+                                          {localPositiveEndingImage ? 'Alterar Imagem' : 'Carregar Imagem'}
+                                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
+                                      </label>
+                                      {localPositiveEndingImage && (
+                                          <button
+                                              onClick={() => setLocalPositiveEndingImage('')}
+                                              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                              title="Remover imagem"
+                                          >
+                                              <TrashIcon className="w-5 h-5" />
+                                          </button>
+                                      )}
+                                  </div>
+                              </div>
                           </div>
                           <div className="space-y-2 flex flex-col">
                               <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Vitória</h4>
@@ -1459,15 +1457,29 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                       <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Negativo</h3>
                       <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador fica sem chances.</p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                          <div className="space-y-2 flex flex-col">
+                          <div className="space-y-4">
                               <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
-                              <ImageUploader
-                                    id="negative-ending-image-uploader"
-                                    image={localNegativeEndingImage}
-                                    onImageUpload={(data) => setLocalNegativeEndingImage(data)}
-                                    onRemove={() => setLocalNegativeEndingImage('')}
-                                    height="min-h-[200px]"
-                                />
+                              <div className="flex items-start gap-4">
+                                  {localNegativeEndingImage && (
+                                      <img src={localNegativeEndingImage} alt="Fundo do final negativo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />
+                                  )}
+                                  <div className="flex items-center gap-2">
+                                      <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                          <UploadIcon className="w-5 h-5 mr-2" />
+                                          {localNegativeEndingImage ? 'Alterar Imagem' : 'Carregar Imagem'}
+                                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
+                                      </label>
+                                      {localNegativeEndingImage && (
+                                          <button
+                                              onClick={() => setLocalNegativeEndingImage('')}
+                                              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                              title="Remover imagem"
+                                          >
+                                              <TrashIcon className="w-5 h-5" />
+                                          </button>
+                                      )}
+                                  </div>
+                              </div>
                           </div>
                            <div className="space-y-2 flex flex-col">
                               <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Derrota</h4>

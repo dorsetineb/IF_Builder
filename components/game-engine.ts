@@ -1,4 +1,3 @@
-
 import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
@@ -63,17 +62,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const ICONS = {
         heart: '<svg fill="%COLOR%" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
         circle: '<svg fill="%COLOR%" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
-        cross: '<svg stroke="%COLOR%" stroke-width="5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 5 V19 M5 12 H19"/></svg>',
-        square: '<svg fill="%COLOR%" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>',
-        diamond: '<svg fill="%COLOR%" viewBox="0 0 24 24"><path d="M12 2L2 12l10 10 10-10L12 2z"/></svg>'
+        cross: '<svg stroke="%COLOR%" stroke-width="3" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 5 V19 M5 12 H19"/></svg>'
     };
     
     const ICONS_OUTLINE = {
         heart: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
         circle: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
-        cross: '<svg stroke="%COLOR%" stroke-width="5" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 5 V19 M5 12 H19"/></svg>',
-        square: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>',
-        diamond: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2L2 12l10 10 10-10L12 2z"/></svg>'
+        cross: '<svg stroke="%COLOR%" stroke-width="3" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 5 V19 M5 12 H19"/></svg>'
     };
 
     // --- Game State ---
@@ -92,18 +87,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let sceneObjectsState = {}; 
 
     // Setup global CSS variables for animation speed
-    const textSpeedVal = Math.min(5, Math.max(1, gameData.gameTextSpeed || 5));
-    const imgSpeedVal = Math.min(5, Math.max(1, gameData.gameImageSpeed || 5));
+    const textSpeedVal = gameData.gameTextSpeed || 5;
+    const imgSpeedVal = gameData.gameImageSpeed || 5;
     
-    // Map 1-5 (Slider). 
-    // Typewriter: 1 -> 100ms/char (Very slow), 5 -> 20ms/char (Fast).
-    const typeSpeedBase = 120 - (textSpeedVal * 20); 
-    
-    // Text Fade Duration: 1 -> 3.0s, 5 -> 0.5s.
-    const textAnimDuration = (3.5 - (textSpeedVal * 0.6)).toFixed(1) + 's';
-    
-    // Image Fade Duration: 1 -> 4.5s, 5 -> 0.5s.
-    const imageAnimDuration = (5.5 - (imgSpeedVal * 1)).toFixed(1) + 's';
+    // Map 1-10 to seconds. Text: 1=0.1s/char, 10=0.01s/char. Image: 1=3s, 10=0.3s
+    const typeSpeedBase = Math.max(5, 60 - (textSpeedVal * 5)); // ms per char
+    const textAnimDuration = Math.max(0.1, 2.1 - (textSpeedVal * 0.2)) + 's';
+    const imageAnimDuration = Math.max(0.3, 3.3 - (imgSpeedVal * 0.3)) + 's';
     
     document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
     document.documentElement.style.setProperty('--image-anim-speed', imageAnimDuration);

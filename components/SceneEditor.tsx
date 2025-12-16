@@ -1,10 +1,11 @@
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
 import { Scene, Interaction, GameObject, ConsequenceTracker } from '../types';
 import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
 import ConnectionsView from './ConnectionsView';
+import { UploadIcon } from './icons/UploadIcon';
 import { EyeIcon } from './icons/EyeIcon';
-import { ImageUploader } from './ImageUploader';
+import { TrashIcon } from './icons/TrashIcon';
 
 interface SceneEditorProps {
   scene: Scene;
@@ -59,6 +60,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 }) => {
   const [localScene, setLocalScene] = useState<Scene>(() => getCleanSceneState(scene));
   const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions' | 'connections'>('properties');
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
   const initialSceneJson = useRef(JSON.stringify(getCleanSceneState(scene)));
   
   // Reset local state when scene ID changes (switching scenes)
@@ -212,6 +214,31 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     updateLocalScene('description', e.target.value);
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+              if (event.target && typeof event.target.result === 'string') {
+                  updateLocalScene('image', event.target.result);
+              }
+          };
+          reader.readAsDataURL(e.target.files[0]);
+      }
+      if (e.target) {
+        (e.target as HTMLInputElement).value = '';
+      }
+  };
+
+  const handleDrop = (e: DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        const event = { target: { files: e.dataTransfer.files } } as unknown as React.ChangeEvent<HTMLInputElement>;
+        handleImageUpload(event);
+    }
+  };
+  
   const handleSave = () => {
     const finalScene: Scene = { ...localScene };
     finalScene.interactions = finalScene.interactions.map(interaction => ({
@@ -270,29 +297,24 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
       </div>
 
       <div>
-          <div className="border-b border-brand-border flex justify-between items-end">
-            <div className="flex space-x-1">
-                {Object.entries(TABS).map(([key, name]) => {
-                    const isTabDisabled = localScene.isEndingScene && (key === 'objects' || key === 'interactions');
-                    return (
-                        <button
-                            key={key}
-                            onClick={() => !isTabDisabled && setActiveTab(key as any)}
-                            disabled={isTabDisabled}
-                            className={`px-4 py-2 font-semibold text-sm rounded-t-md transition-colors ${
-                                activeTab === key
-                                    ? 'bg-brand-surface text-brand-primary'
-                                    : 'text-brand-text-dim hover:text-brand-text'
-                            } ${isTabDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        >
-                            {name}
-                        </button>
-                    );
-                })}
-            </div>
-            {activeTab === 'objects' && (
-                <span className="text-xs text-yellow-500 italic mr-2 mb-2">Alterações feitas aqui afetam o objeto em todo o jogo.</span>
-            )}
+          <div className="border-b border-brand-border flex space-x-1">
+            {Object.entries(TABS).map(([key, name]) => {
+                const isTabDisabled = localScene.isEndingScene && (key === 'objects' || key === 'interactions');
+                return (
+                    <button
+                        key={key}
+                        onClick={() => !isTabDisabled && setActiveTab(key as any)}
+                        disabled={isTabDisabled}
+                        className={`px-4 py-2 font-semibold text-sm rounded-t-md transition-colors ${
+                            activeTab === key
+                                ? 'bg-brand-surface text-brand-primary'
+                                : 'text-brand-text-dim hover:text-brand-text'
+                        } ${isTabDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        {name}
+                    </button>
+                );
+            })}
           </div>
 
           <div className="bg-brand-surface -mt-px p-6">
@@ -367,15 +389,40 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                               </p>
                           </div>
                        </div>
-                      <div className="flex-grow flex flex-col mt-2 h-full min-h-0">
-                          <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem da Cena</label>
-                          <ImageUploader
-                            id="scene-image-uploader"
-                            image={localScene.image}
-                            onImageUpload={(data) => updateLocalScene('image', data)}
-                            onRemove={() => updateLocalScene('image', '')}
-                            height="h-full min-h-[300px]"
-                          />
+                      <div className="flex-grow relative mt-2">
+                          {localScene.image ? (
+                              <img src={localScene.image} alt={localScene.name} className="w-full h-full min-h-[300px] object-cover bg-brand-bg" />
+                          ) : (
+                              <label 
+                                  htmlFor="image-upload-input" 
+                                  className={`flex flex-col items-center justify-center w-full h-full min-h-[300px] border-2 border-dashed bg-brand-bg cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
+                                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
+                                  onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
+                                  onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
+                                  onDrop={handleDrop}
+                              >
+                                  <UploadIcon className="w-10 h-10 text-brand-text-dim mb-4" />
+                                  <span className="text-brand-text font-semibold">Clique para Enviar uma Imagem</span>
+                                  <span className="text-xs text-brand-text-dim mt-1">ou arraste e solte aqui</span>
+                              </label>
+                          )}
+                      </div>
+                      <div className="flex-shrink-0">
+                          <div className="flex items-center gap-2">
+                              <label htmlFor="image-upload-input" className="inline-flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
+                                  <UploadIcon className="w-5 h-5 mr-2" /> {localScene.image ? 'Alterar Imagem' : 'Carregar Imagem'}
+                              </label>
+                              <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                              {localScene.image && (
+                                <button
+                                    onClick={() => updateLocalScene('image', '')}
+                                    className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                    title="Remover Imagem"
+                                >
+                                    <TrashIcon className="w-5 h-5" />
+                                </button>
+                              )}
+                          </div>
                       </div>
                   </div>
               </div>

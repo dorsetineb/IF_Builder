@@ -170,8 +170,80 @@ const InteractionItem: React.FC<{
                     className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
                 />
             </div>
-            
             <div>
+                <label className="block text-sm font-medium text-brand-text-dim mb-1">Requer Item no Inventário (opcional)</label>
+                <select 
+                  value={interaction.requiresInInventory || ''} 
+                  onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)} 
+                  className={selectBaseClasses}
+                  style={selectStyle}
+                >
+                    <option className={optionDimClasses} value="">Não requer item</option>
+                    {allTakableObjects.map(obj => (
+                        <option className={optionBaseClasses} key={obj.id} value={obj.id}>{obj.name} ({obj.id})</option>
+                    ))}
+                </select>
+                <div className="flex items-center mt-2">
+                    <input 
+                        type="checkbox" 
+                        id={`consumesItem-${index}`} 
+                        checked={!!interaction.consumesItem} 
+                        onChange={e => handleInteractionChange('consumesItem', e.target.checked)} 
+                        disabled={!interaction.requiresInInventory}
+                        className="custom-checkbox"
+                    />
+                    <label htmlFor={`consumesItem-${index}`} className={`ml-2 block text-sm text-brand-text-dim ${!interaction.requiresInInventory ? 'opacity-50' : ''}`}>
+                        Consome item após uso
+                    </label>
+                </div>
+            </div>
+
+            {/* Trackers Section */}
+            <div>
+                <div className="flex justify-between items-center mb-1">
+                    <label className="block text-sm font-medium text-brand-text-dim">Efeitos em Rastreadores</label>
+                    <button onClick={handleAddTrackerEffect} className="text-xs text-brand-primary hover:underline flex items-center">
+                        <PlusIcon className="w-3 h-3 mr-1" /> Adicionar
+                    </button>
+                </div>
+                <div className="space-y-2">
+                    {interaction.trackerEffects && interaction.trackerEffects.length > 0 ? (
+                        interaction.trackerEffects.map((effect, i) => (
+                            <div key={i} className="flex gap-2 items-center">
+                                <select
+                                    value={effect.trackerId}
+                                    onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)}
+                                    className={`flex-grow ${selectBaseClasses} py-1 px-2 text-xs`}
+                                    style={selectStyle}
+                                >
+                                    <option value="" className={optionDimClasses}>Selecione...</option>
+                                    {consequenceTrackers.map(t => (
+                                        <option key={t.id} value={t.id} className={optionBaseClasses}>{t.name}</option>
+                                    ))}
+                                </select>
+                                <input
+                                    type="number"
+                                    value={localTrackerValues[i]}
+                                    onChange={e => handleLocalTrackerValueChange(i, e.target.value)}
+                                    onBlur={() => handleLocalTrackerValueBlur(i)}
+                                    className="w-20 bg-brand-border/30 border border-brand-border rounded-md px-2 py-1 text-xs focus:ring-0"
+                                    placeholder="Valor"
+                                />
+                                <button onClick={() => handleRemoveTrackerEffect(i)} className="text-red-500 hover:text-red-400">
+                                    <TrashIcon className="w-4 h-4" />
+                                </button>
+                            </div>
+                        ))
+                    ) : (
+                        <p className="text-xs text-brand-text-dim italic">Nenhum efeito.</p>
+                    )}
+                </div>
+            </div>
+          </div>
+
+          {/* Right Column */}
+          <div className="space-y-4">
+             <div>
                 <label className="block text-sm font-medium text-brand-text-dim mb-1">Alvo da Interação (Objeto na Cena)</label>
                 <select 
                   value={interaction.target} 
@@ -201,76 +273,43 @@ const InteractionItem: React.FC<{
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-brand-text-dim mb-1">Requer Item no Inventário (opcional)</label>
-                <select 
-                  value={interaction.requiresInInventory || ''} 
-                  onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)} 
-                  className={selectBaseClasses}
-                  style={selectStyle}
-                >
-                    <option className={optionDimClasses} value="">Não requer item</option>
-                    {allTakableObjects.map(obj => (
-                        <option className={optionBaseClasses} key={obj.id} value={obj.id}>{obj.name} ({obj.id})</option>
-                    ))}
-                </select>
-                <div className="flex items-center mt-2">
-                    <input 
-                        type="checkbox" 
-                        id={`consumesItem-${index}`} 
-                        checked={!!interaction.consumesItem} 
-                        onChange={e => handleInteractionChange('consumesItem', e.target.checked)} 
-                        disabled={!interaction.requiresInInventory}
-                        className="custom-checkbox"
-                    />
-                    <label htmlFor={`consumesItem-${index}`} className={`ml-2 block text-sm text-brand-text-dim ${!interaction.requiresInInventory ? 'opacity-50' : ''}`}>
-                        Consome item após uso
-                    </label>
-                </div>
-            </div>
-          </div>
-
-          {/* Right Column */}
-          <div className="space-y-4">
-            <div>
                 <label className="block text-sm font-medium text-brand-text-dim mb-1">Resultado da Ação</label>
-                <div className="flex gap-2 mb-2">
+                <div className="flex gap-2 mb-2 p-1 bg-brand-border/30 rounded-md">
                      <button 
                         onClick={() => handleOutcomeChange('goToScene')}
-                        className={`flex-1 py-2 text-xs rounded-md transition-colors font-semibold border ${outcomeType === 'goToScene' ? 'bg-brand-primary text-brand-bg border-brand-primary shadow-sm' : 'bg-brand-surface text-brand-text-dim border-brand-border hover:bg-brand-border/50 hover:text-brand-text'}`}
-                    >
+                        className={`flex-1 py-1 px-2 text-xs rounded transition-colors ${outcomeType === 'goToScene' ? 'bg-brand-primary text-brand-bg font-bold' : 'text-brand-text-dim hover:text-brand-text'}`}
+                     >
                         Mudar de Cena
-                    </button>
-                    <button 
+                     </button>
+                     <button 
                         onClick={() => handleOutcomeChange('newSceneDescription')}
-                        className={`flex-1 py-2 text-xs rounded-md transition-colors font-semibold border ${outcomeType === 'newSceneDescription' ? 'bg-brand-primary text-brand-bg border-brand-primary shadow-sm' : 'bg-brand-surface text-brand-text-dim border-brand-border hover:bg-brand-border/50 hover:text-brand-text'}`}
-                    >
+                        className={`flex-1 py-1 px-2 text-xs rounded transition-colors ${outcomeType === 'newSceneDescription' ? 'bg-brand-primary text-brand-bg font-bold' : 'text-brand-text-dim hover:text-brand-text'}`}
+                     >
                         Atualizar Texto
-                    </button>
+                     </button>
                 </div>
                 
-                <div>
-                    {outcomeType === 'goToScene' ? (
-                        <select 
-                            value={interaction.goToScene || ''} 
-                            onChange={e => handleInteractionChange('goToScene', e.target.value)} 
-                            className={`${selectBaseClasses}`}
-                            style={selectStyle}
-                        >
-                            <option className={optionDimClasses} value="">Selecione uma cena...</option>
-                            {otherScenes.map(s => (
-                                <option className={optionBaseClasses} key={s.id} value={s.id}>{s.name}</option>
-                            ))}
-                        </select>
-                    ) : (
-                        <textarea 
-                            value={interaction.newSceneDescription || ''} 
-                            onChange={e => handleInteractionChange('newSceneDescription', e.target.value)} 
-                            rows={3}
-                            placeholder="Nova descrição..."
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
-                        />
-                    )}
-                </div>
+                {outcomeType === 'goToScene' ? (
+                     <select 
+                        value={interaction.goToScene || ''} 
+                        onChange={e => handleInteractionChange('goToScene', e.target.value)} 
+                        className={selectBaseClasses}
+                        style={selectStyle}
+                    >
+                        <option className={optionDimClasses} value="">Selecione uma cena...</option>
+                        {otherScenes.map(s => (
+                            <option className={optionBaseClasses} key={s.id} value={s.id}>{s.name}</option>
+                        ))}
+                    </select>
+                ) : (
+                    <textarea 
+                        value={interaction.newSceneDescription || ''} 
+                        onChange={e => handleInteractionChange('newSceneDescription', e.target.value)} 
+                        rows={3}
+                        placeholder="Nova descrição para esta cena..."
+                        className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
+                    />
+                )}
             </div>
 
             <div>
@@ -283,7 +322,7 @@ const InteractionItem: React.FC<{
                     className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
                 />
             </div>
-
+            
             <div className="flex flex-col space-y-2">
                 <label className="block text-sm font-medium text-brand-text-dim mb-1">Efeito Sonoro (Opcional)</label>
                 <div className="flex items-center gap-2">
@@ -302,51 +341,8 @@ const InteractionItem: React.FC<{
                     )}
                 </div>
             </div>
+
           </div>
-        </div>
-        
-        {/* Trackers Section (Full Width) */}
-        <div className="mt-4 pt-4 border-t border-brand-border/30">
-            <label className="block text-sm font-medium text-brand-text-dim mb-2">Efeitos em Rastreadores</label>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 mb-3">
-                {interaction.trackerEffects && interaction.trackerEffects.length > 0 ? (
-                    interaction.trackerEffects.map((effect, i) => (
-                        <div key={i} className="flex gap-2 items-center bg-brand-border/20 p-2 rounded-md">
-                            <select
-                                value={effect.trackerId}
-                                onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)}
-                                className={`flex-grow ${selectBaseClasses} py-1 px-2 text-xs`}
-                                style={selectStyle}
-                            >
-                                <option value="" className={optionDimClasses}>Selecione...</option>
-                                {consequenceTrackers.map(t => (
-                                    <option key={t.id} value={t.id} className={optionBaseClasses}>{t.name}</option>
-                                ))}
-                            </select>
-                            <input
-                                type="number"
-                                value={localTrackerValues[i]}
-                                onChange={e => handleLocalTrackerValueChange(i, e.target.value)}
-                                onBlur={() => handleLocalTrackerValueBlur(i)}
-                                className="w-16 bg-brand-border/30 border border-brand-border rounded-md px-2 py-1 text-xs focus:ring-0 text-center"
-                                placeholder="Val"
-                            />
-                            <button onClick={() => handleRemoveTrackerEffect(i)} className="text-red-500 hover:text-red-400 p-1">
-                                <TrashIcon className="w-4 h-4" />
-                            </button>
-                        </div>
-                    ))
-                ) : (
-                    <p className="text-xs text-brand-text-dim italic col-span-full">Nenhum efeito definido.</p>
-                )}
-            </div>
-             <button 
-                onClick={handleAddTrackerEffect} 
-                className="flex items-center px-3 py-2 bg-brand-primary/10 text-brand-primary border border-brand-primary/20 hover:bg-brand-primary/20 rounded-md transition-colors text-sm font-medium"
-            >
-                <PlusIcon className="w-4 h-4 mr-2" />
-                Adicionar Efeito
-            </button>
         </div>
       </div>
     );
