@@ -76,6 +76,7 @@ const gameHTML = `
                         <button id="inventory-button">__INVENTORY_BUTTON_TEXT__</button>
                         <button id="diary-button">__DIARY_BUTTON_TEXT__</button>
                         __TRACKERS_BUTTON__
+                        __SYSTEM_BUTTON__
                     </div>
                     <div class="input-area">
                         <input type="text" id="verb-input" placeholder="__VERB_INPUT_PLACEHOLDER__">
@@ -99,8 +100,31 @@ const gameHTML = `
     <div id="diary-modal" class="modal-overlay hidden">
         <div class="modal-content diary-modal-content">
             <button class="modal-close-button">&times;</button>
-            <h2>Diário</h2>
+            <h2>__DIARY_BUTTON_TEXT__</h2>
             <div id="diary-log" class="diary-log"></div>
+        </div>
+    </div>
+    
+    <!-- System Modal -->
+    <div id="system-modal" class="modal-overlay hidden">
+        <div class="modal-content system-modal-content">
+            <button class="modal-close-button">&times;</button>
+            <h2 id="system-modal-title">__SYSTEM_BUTTON_TEXT__</h2>
+            
+            <!-- Main System Menu -->
+            <div id="system-menu-main" class="system-menu">
+                <button id="btn-save-menu">__SAVE_MENU_TITLE__</button>
+                <button id="btn-load-menu">__LOAD_MENU_TITLE__</button>
+                <button id="btn-main-menu" class="danger-button">__MAIN_MENU_BUTTON_TEXT__</button>
+            </div>
+
+            <!-- Slots Container -->
+            <div id="system-slots-container" class="system-slots hidden">
+                <div id="slots-list">
+                    <!-- Slots will be injected here -->
+                </div>
+                <button id="btn-back-system" class="mt-4">Voltar</button>
+            </div>
         </div>
     </div>
     
@@ -147,8 +171,8 @@ body.with-spacing .main-wrapper { height: 100%; }
 .chances-container { display: flex; align-items: center; gap: 8px; justify-content: flex-end; margin-bottom: 15px; }
 .chance-icon { width: 28px; height: 28px; transition: all 0.3s ease; }
 .chance-icon.lost { opacity: 0.5; }
-.game-container { display: flex; flex-grow: 1; overflow: hidden; perspective: 1000px; }
-.image-panel { flex: 0 0 45%; max-width: 650px; border-right: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); position: relative; transition: padding 0.3s ease-in-out, background-color 0.3s ease-in-out; transform-style: preserve-3d; }
+.game-container { display: flex; flex-grow: 1; overflow: hidden; }
+.image-panel { flex: 0 0 45%; max-width: 650px; border-right: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); position: relative; transition: padding 0.3s ease-in-out, background-color 0.3s ease-in-out; }
 .image-container { width: 100%; height: 100%; position: relative; overflow: hidden; background-size: cover; background-position: center; transition: border 0.3s ease-in-out, outline 0.3s ease-in-out, box-shadow 0.3s ease-in-out; }
 .scene-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
 #scene-image-back { z-index: 1; }
@@ -214,41 +238,54 @@ body.with-spacing .main-wrapper { height: 100%; }
 .item-modal-image-container img { width: 100%; height: 100%; object-fit: contain; display: block; }
 #item-modal-description { color: var(--text-color); }
 
-/* Animation Classes applied to #scene-image (Front Image) to reveal #scene-image-back (Back Image) */
+/* System Modal Styles */
+.system-modal-content { max-width: 400px; text-align: center; }
+.system-menu { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
+.system-menu button { width: 100%; padding: 15px; font-size: 1.1em; background-color: var(--button-bg); border: 2px solid var(--border-color); color: var(--text-color); cursor: pointer; transition: all 0.2s; font-family: var(--font-family); }
+.system-menu button:hover { background-color: var(--button-hover-bg); border-color: var(--accent-color); }
+.system-menu button.danger-button { color: var(--danger-color); border-color: var(--danger-color); }
+.system-menu button.danger-button:hover { background-color: var(--danger-hover-bg); color: #fff; }
+.system-slots { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; text-align: left; }
+.slot-item { background-color: var(--input-bg); border: 2px solid var(--border-color); padding: 15px; cursor: pointer; transition: border-color 0.2s; display: flex; justify-content: space-between; align-items: center; }
+.slot-item:hover { border-color: var(--accent-color); }
+.slot-info { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
+.slot-title { font-weight: bold; color: var(--accent-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.slot-meta { font-size: 0.8em; color: var(--text-dim-color); }
+.slot-empty { font-style: italic; color: var(--text-dim-color); }
+.slot-actions { display: flex; gap: 10px; align-items: center; }
+.slot-delete-btn { background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1.5em; padding: 0 10px; line-height: 1; }
+.slot-delete-btn:hover { color: #fff; background-color: var(--danger-color); border-radius: 4px; }
+#btn-back-system { width: auto; padding: 10px 20px; align-self: center; margin-top: 10px; background-color: var(--button-bg); border: 1px solid var(--border-color); color: var(--text-color); cursor: pointer; font-family: var(--font-family); font-size: 0.9em; }
+
+/* Animações de Imagem */
 .trans-fade-out { animation: fadeOut var(--image-anim-speed) forwards; }
 .trans-slide-left-out { animation: slideLeftOut var(--image-anim-speed) forwards; }
 .trans-slide-right-out { animation: slideRightOut var(--image-anim-speed) forwards; }
-.trans-wipe-down-out { animation: wipeDownOut var(--image-anim-speed) forwards; }
-.trans-wipe-up-out { animation: wipeUpOut var(--image-anim-speed) forwards; }
-.trans-wipe-left-out { animation: wipeLeftOut var(--image-anim-speed) forwards; }
-.trans-wipe-right-out { animation: wipeRightOut var(--image-anim-speed) forwards; }
-.trans-page-turn-out { animation: pageTurnOut calc(var(--image-anim-speed) * 1.5) forwards; transform-origin: left center; }
-.trans-pixelate-out { animation: pixelateOut var(--image-anim-speed) steps(10) forwards; }
+.trans-slide-up-out { animation: slideUpOut var(--image-anim-speed) forwards; }
+.trans-slide-down-out { animation: slideDownOut var(--image-anim-speed) forwards; }
+.trans-zoom-out { animation: zoomOut var(--image-anim-speed) ease-in forwards; }
+.trans-blur-out { animation: blurOut var(--image-anim-speed) ease-in forwards; }
 
 @keyframes fadeOut { to { opacity: 0; } }
 @keyframes slideLeftOut { to { transform: translateX(-100%); } }
 @keyframes slideRightOut { to { transform: translateX(100%); } }
-@keyframes wipeDownOut { to { clip-path: inset(100% 0 0 0); } }
-@keyframes wipeUpOut { to { clip-path: inset(0 0 100% 0); } }
-@keyframes wipeLeftOut { to { clip-path: inset(0 100% 0 0); } }
-@keyframes wipeRightOut { to { clip-path: inset(0 0 0 100%); } }
-@keyframes pageTurnOut { 0% { transform: rotateY(0); } 100% { transform: rotateY(-90deg); opacity: 0; } }
-@keyframes pixelateOut { 0% { opacity: 1; filter: blur(0px); } 50% { filter: blur(10px); opacity: 0.5; } 100% { opacity: 0; filter: blur(20px); } }
+@keyframes slideUpOut { to { transform: translateY(-100%); } }
+@keyframes slideDownOut { to { transform: translateY(100%); } }
+@keyframes zoomOut { from { transform: scale(1); opacity: 1; } to { transform: scale(1.3); opacity: 0; } }
+@keyframes blurOut { from { filter: blur(0); opacity: 1; } to { filter: blur(20px); opacity: 0; } }
 
 body.frame-none .image-panel { border: none; }
 body.frame-rounded-top .game-container .image-panel { padding: 10px; background: __FRAME_ROUNDED_TOP_COLOR__; border: none; border-radius: 150px 150px 6px 6px; box-shadow: none; }
 body.frame-rounded-top .game-container .image-container { border-radius: 140px 140px 0 0; }
-body.frame-book-cover .game-container .image-panel { padding: 15px; background: var(--bg-color); border: 10px solid __FRAME_BOOK_COLOR__; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
-body.frame-book-cover .game-container .image-container { box-shadow: 0 0 15px rgba(0,0,0,0.7); }
-body.frame-book-cover .game-container.layout-image-last .image-panel { border-left: 10px solid __FRAME_BOOK_COLOR__; border-right: 10px solid __FRAME_BOOK_COLOR__; }
+body.frame-book-cover .game-container .image-panel { padding: 10px; background: __FRAME_BOOK_COLOR__; border: none; }
+body.frame-book-cover .game-container .image-container { box-shadow: none; border-radius: 0 !important; }
+body.frame-book-cover #scene-image, body.frame-book-cover #scene-image-back { border-radius: 0 !important; }
 body.frame-trading-card .image-panel { padding: 8px; background: __FRAME_TRADING_CARD_COLOR__; border-radius: 20px; }
 body.frame-trading-card .game-container:not(.layout-image-last) .image-panel { border-right-color: transparent; }
 body.frame-trading-card .game-container.layout-image-last .image-panel { border-left-color: transparent; }
 body.frame-trading-card .image-container { border: none; border-radius: 12px; }
 #scene-image { border-radius: 10px; }
 #scene-image-back { border-radius: 10px; }
-body.frame-chamfered .game-container .image-panel { padding: 10px; background: __FRAME_CHAMFERED_COLOR__; border: none; clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px); }
-body.frame-chamfered .game-container .image-container { width: 100%; height: 100%; border: none; background-color: transparent; clip-path: polygon(15px 0, calc(100% - 15px) 0, 100% 15px, 100% calc(100% - 15px), calc(100% - 15px) 100%, 15px 100%, 0 calc(100% - 15px), 0 15px); }
 body.font-adjust-gothic { font-size: 1.15em; }
 .scene-description::-webkit-scrollbar, .diary-log::-webkit-scrollbar, #trackers-content::-webkit-scrollbar { width: 12px; }
 .scene-description::-webkit-scrollbar-track, .diary-log::-webkit-scrollbar-track, #trackers-content::-webkit-scrollbar-track { background: var(--panel-bg); }
@@ -307,7 +344,6 @@ const initialGameData: GameData = {
     gameChanceIconColor: '#ff4d4d',
     frameBookColor: '#FFFFFF',
     frameTradingCardColor: '#1c1917',
-    frameChamferedColor: '#FFFFFF',
     frameRoundedTopColor: '#facc15',
     gameSceneNameOverlayBg: '#0d1117',
     gameSceneNameOverlayTextColor: '#c9d1d9',
@@ -331,7 +367,13 @@ const initialGameData: GameData = {
     gameInventoryButtonText: 'Inventário',
     gameDiaryButtonText: 'Diário',
     gameTrackersButtonText: 'Rastreadores',
+    gameSystemButtonText: 'Sistema',
+    gameSaveMenuTitle: 'Salvar Jogo',
+    gameLoadMenuTitle: 'Carregar Jogo',
+    gameMainMenuButtonText: 'Menu Principal',
     gameChanceReturnButtonText: 'Tentar Novamente',
+    gameShowTrackersUI: true, // Habilitar UI de rastreadores por padrão quando o sistema for escolhido
+    gameShowSystemButton: true, // Botão de sistema (save/load) visível por padrão
     fixedVerbs: [],
     consequenceTrackers: [],
 };
@@ -367,6 +409,8 @@ const App: React.FC = () => {
         gameTextSpeed: data.gameTextSpeed || 5,
         gameImageTransitionType: data.gameImageTransitionType || 'fade',
         gameImageSpeed: data.gameImageSpeed || 5,
+        gameShowTrackersUI: data.gameShowTrackersUI ?? true,
+        gameShowSystemButton: data.gameShowSystemButton ?? true,
     }));
     if (data.startScene) {
         setSelectedSceneId(data.startScene);
@@ -377,7 +421,13 @@ const App: React.FC = () => {
   }, []);
 
   const handleUpdateGameData = (field: keyof GameData, value: any) => {
-    setGameData(prev => ({ ...prev, [field]: value }));
+    setGameData(prev => {
+        // Lógica de conveniência: Se ativar rastreadores, garanta que a UI esteja ligada
+        if (field === 'gameSystemEnabled' && value === 'trackers') {
+            return { ...prev, [field]: value, gameShowTrackersUI: true };
+        }
+        return { ...prev, [field]: value };
+    });
     setIsDirty(true);
   };
 
@@ -691,13 +741,14 @@ const App: React.FC = () => {
                                 textColorLight={gameData.gameTextColorLight || '#24292f'}
                                 titleColorLight={gameData.gameTitleColorLight || '#0969da'}
                                 focusColorLight={gameData.gameFocusColorLight || '#0969da'}
+                                // FIX: Use gameData prefix to avoid 'Cannot find name' errors for frame color variables
                                 frameBookColor={gameData.frameBookColor || '#FFFFFF'}
                                 frameTradingCardColor={gameData.frameTradingCardColor || '#1c1917'}
-                                frameChamferedColor={gameData.frameChamferedColor || '#FFFFFF'}
                                 frameRoundedTopColor={gameData.frameRoundedTopColor || '#facc15'}
                                 gameSceneNameOverlayBg={gameData.gameSceneNameOverlayBg || '#0d1117'}
                                 gameSceneNameOverlayTextColor={gameData.gameSceneNameOverlayTextColor || '#c9d1d9'}
-                                gameShowTrackersUI={!!gameData.gameShowTrackersUI}
+                                gameShowTrackersUI={gameData.gameShowTrackersUI ?? true}
+                                gameShowSystemButton={gameData.gameShowSystemButton ?? true}
                                 imageFrame={gameData.gameImageFrame || 'none'}
                                 layoutOrder={gameData.gameLayoutOrder || 'image-first'}
                                 layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
@@ -705,6 +756,10 @@ const App: React.FC = () => {
                                 inventoryButtonText={gameData.gameInventoryButtonText}
                                 diaryButtonText={gameData.gameDiaryButtonText}
                                 trackersButtonText={gameData.gameTrackersButtonText}
+                                gameSystemButtonText={gameData.gameSystemButtonText}
+                                gameSaveMenuTitle={gameData.gameSaveMenuTitle}
+                                gameLoadMenuTitle={gameData.gameLoadMenuTitle}
+                                gameMainMenuButtonText={gameData.gameMainMenuButtonText}
                                 gameContinueIndicatorColor={gameData.gameContinueIndicatorColor || '#58a6ff'}
                                 
                                 // Transitions

@@ -45,6 +45,12 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         negativeEndingDescription: data.negativeEndingDescription,
         gameRestartButtonText: data.gameRestartButtonText,
         gameContinueButtonText: data.gameContinueButtonText,
+        // System Menu Texts
+        gameSystemButtonText: data.gameSystemButtonText,
+        gameSaveMenuTitle: data.gameSaveMenuTitle,
+        gameLoadMenuTitle: data.gameLoadMenuTitle,
+        gameMainMenuButtonText: data.gameMainMenuButtonText,
+        
         fixedVerbs: data.fixedVerbs || [],
         consequenceTrackers: data.consequenceTrackers || [],
         gameShowTrackersUI: data.gameShowTrackersUI,
@@ -85,30 +91,17 @@ document.addEventListener('DOMContentLoaded', () => {
     let isGameEnded = false;
     let trackers = {};
     let activePopupSource = null;
-    
-    // Runtime scene object cache (to simulate state like 'removed from scene')
-    // Map<SceneID, GameObject[]>
     let sceneObjectsState = {}; 
 
-    // Setup global CSS variables for animation speed
-    // Input is 1-5 (where 1 is slow, 5 is fast)
     const textSpeedVal = gameData.gameTextSpeed || 3; 
     const imgSpeedVal = gameData.gameImageSpeed || 3;
-    
-    // Calculations:
-    // Typewriter (ms per char): 1 (Slow) = 90ms, 5 (Fast) = 10ms
-    const typeSpeedBase = Math.max(10, 110 - (textSpeedVal * 20)); 
-    
-    // Text Fade (seconds): 1 (Slow) = 3.0s, 5 (Fast) = 0.2s
-    const textAnimDuration = Math.max(0.2, 3.7 - (textSpeedVal * 0.7)) + 's';
-    
-    // Image Transition (seconds): 1 (Slow) = 5.0s, 5 (Fast) = 0.5s
-    const imageAnimDuration = Math.max(0.5, 6.0 - (imgSpeedVal * 1.1)) + 's';
+    const typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
+    const textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
+    const imageAnimDuration = Math.max(0.3, 5.0 - (imgSpeedVal * 1.0)) + 's';
     
     document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
     document.documentElement.style.setProperty('--image-anim-speed', imageAnimDuration);
 
-    // Initialize trackers
     (gameData.consequenceTrackers || []).forEach(t => {
         trackers[t.id] = t.initialValue;
     });
@@ -122,8 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const endingRestartButtons = document.querySelectorAll('.ending-restart-button');
     
     const imageContainer = document.getElementById('image-container');
-    const sceneImage = document.getElementById('scene-image'); // Front Image (Current)
-    const sceneImageBack = document.getElementById('scene-image-back'); // Back Image (Next)
+    const sceneImage = document.getElementById('scene-image');
+    const sceneImageBack = document.getElementById('scene-image-back');
     const sceneDescription = document.getElementById('scene-description');
     const verbInput = document.getElementById('verb-input');
     const submitVerb = document.getElementById('submit-verb');
@@ -132,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const inventoryButton = document.getElementById('inventory-button');
     const diaryButton = document.getElementById('diary-button');
     const trackersButton = document.getElementById('trackers-button');
+    const systemButton = document.getElementById('system-button');
     const sceneNameOverlay = document.getElementById('scene-name-overlay');
     const soundEffectAudio = document.getElementById('scene-sound-effect');
     
@@ -145,6 +139,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemModalImage = document.getElementById('item-modal-image');
     const itemModalDescription = document.getElementById('item-modal-description');
     
+    const systemModal = document.getElementById('system-modal');
+    const systemModalTitle = document.getElementById('system-modal-title');
+    const systemMenuMain = document.getElementById('system-menu-main');
+    const systemSlotsContainer = document.getElementById('system-slots-container');
+    const slotsList = document.getElementById('slots-list');
+    const btnSaveMenu = document.getElementById('btn-save-menu');
+    const btnLoadMenu = document.getElementById('btn-load-menu');
+    const btnMainMenu = document.getElementById('btn-main-menu');
+    const btnBackSystem = document.getElementById('btn-back-system');
+    
     const closeButtons = document.querySelectorAll('.modal-close-button');
 
     // --- Audio Helper ---
@@ -156,13 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Initialization ---
     const init = () => {
-        const hasSave = localStorage.getItem('if_builder_save_' + document.title);
-        if (hasSave) {
+        const hasAutoSave = localStorage.getItem('if_builder_autosave_' + document.title);
+        if (hasAutoSave) {
             continueButton.classList.remove('hidden');
         }
 
         splashStartButton.addEventListener('click', startGame);
-        continueButton.addEventListener('click', loadGame);
+        continueButton.addEventListener('click', () => loadGameFromData(hasAutoSave));
         endingRestartButtons.forEach(btn => btn.addEventListener('click', () => {
              positiveEndingScreen.classList.add('hidden');
              negativeEndingScreen.classList.add('hidden');
@@ -178,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
         inventoryButton.addEventListener('click', () => togglePopup('inventory'));
         diaryButton.addEventListener('click', showDiary);
         if (trackersButton) trackersButton.addEventListener('click', showTrackers);
+        if (systemButton) systemButton.addEventListener('click', toggleSystemMenu);
         
         closeButtons.forEach(btn => btn.addEventListener('click', (e) => {
             e.target.closest('.modal-overlay').classList.add('hidden');
@@ -189,16 +194,47 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
+        btnSaveMenu.addEventListener('click', () => renderSlots('save'));
+        btnLoadMenu.addEventListener('click', () => renderSlots('load'));
+        btnBackSystem.addEventListener('click', () => {
+            systemSlotsContainer.classList.add('hidden');
+            systemMenuMain.classList.remove('hidden');
+            systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema';
+        });
+        btnMainMenu.addEventListener('click', () => {
+            if (confirm("Voltar ao menu principal? Progresso não salvo manualmente será perdido.")) {
+                systemModal.classList.add('hidden');
+                splashScreen.classList.remove('hidden');
+            }
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (!itemModal.classList.contains('hidden')) {
+                    itemModal.classList.add('hidden');
+                } else if (!diaryModal.classList.contains('hidden')) {
+                    diaryModal.classList.add('hidden');
+                } else if (!trackersModal.classList.contains('hidden')) {
+                    trackersModal.classList.add('hidden');
+                } else if (!systemModal.classList.contains('hidden')) {
+                    systemModal.classList.add('hidden');
+                } else if (!splashScreen.classList.contains('hidden')) {
+                    // Do nothing
+                } else {
+                    toggleSystemMenu();
+                }
+            }
+        });
+
         document.addEventListener('click', (e) => {
              if (e.target && e.target.id === 'btn-return-chance') {
-                 // Force re-render of current scene
                  loadScene(currentSceneId, false);
              }
         });
     };
 
     const startGame = () => {
-        localStorage.removeItem('if_builder_save_' + document.title);
+        localStorage.removeItem('if_builder_autosave_' + document.title);
         currentSceneId = gameData.cena_inicial;
         inventory = [];
         visitedScenes = [];
@@ -206,21 +242,19 @@ document.addEventListener('DOMContentLoaded', () => {
         chances = gameData.gameMaxChances || 3;
         isGameEnded = false;
         trackers = {};
-        sceneObjectsState = {}; // Reset object state
+        sceneObjectsState = {}; 
         (gameData.consequenceTrackers || []).forEach(t => {
             trackers[t.id] = t.initialValue;
         });
         
         splashScreen.classList.add('hidden');
-        // Initial load should NOT animate transition
         loadScene(currentSceneId, false); 
     };
 
-    const loadGame = () => {
+    const loadGameFromData = (jsonString) => {
         try {
-            const savedData = localStorage.getItem('if_builder_save_' + document.title);
-            if (savedData) {
-                const save = JSON.parse(savedData);
+            if (jsonString) {
+                const save = JSON.parse(jsonString);
                 if (save) {
                     currentSceneId = save.currentSceneId;
                     inventory = save.inventory;
@@ -228,17 +262,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     actionLog = save.actionLog || [];
                     chances = save.chances;
                     trackers = save.trackers || {};
-                    
-                    // Restore scene object states
                     sceneObjectsState = save.sceneObjectsState || {};
 
                     splashScreen.classList.add('hidden');
+                    systemModal.classList.add('hidden');
                     loadScene(currentSceneId, false);
                 } else {
                     startGame();
                 }
-            } else {
-                startGame();
             }
         } catch (e) {
             console.error("Failed to load save:", e);
@@ -246,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const saveGame = () => {
+    const autoSaveGame = () => {
         if (window.isPreview) return; 
         const save = {
             currentSceneId,
@@ -255,29 +286,114 @@ document.addEventListener('DOMContentLoaded', () => {
             actionLog,
             chances,
             trackers,
-            sceneObjectsState // Persist which objects are still in scenes
+            sceneObjectsState,
+            timestamp: new Date().toLocaleString()
         };
-        localStorage.setItem('if_builder_save_' + document.title, JSON.stringify(save));
+        localStorage.setItem('if_builder_autosave_' + document.title, JSON.stringify(save));
     };
 
-    // Helper to get objects for a scene (handling initial vs modified state)
+    const toggleSystemMenu = () => {
+        if (systemModal.classList.contains('hidden')) {
+            systemModal.classList.remove('hidden');
+            systemMenuMain.classList.remove('hidden');
+            systemSlotsContainer.classList.add('hidden');
+            systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema';
+        } else {
+            systemModal.classList.add('hidden');
+        }
+    };
+
+    const renderSlots = (mode) => {
+        systemMenuMain.classList.add('hidden');
+        systemSlotsContainer.classList.remove('hidden');
+        slotsList.innerHTML = '';
+        
+        systemModalTitle.textContent = mode === 'save' 
+            ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') 
+            : (gameData.gameLoadMenuTitle || 'Carregar Jogo');
+
+        for (let i = 1; i <= 3; i++) {
+            const slotKey = 'if_builder_slot_' + i + '_' + document.title;
+            const savedData = localStorage.getItem(slotKey);
+            const slotDiv = document.createElement('div');
+            slotDiv.className = 'slot-item';
+            
+            let contentHtml = '';
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                const sceneName = gameData.cenas[data.currentSceneId] ? gameData.cenas[data.currentSceneId].name : 'Desconhecido';
+                contentHtml = '<div class="slot-info">' +
+                    '<span class="slot-title">Slot ' + i + ' - ' + sceneName + '</span>' +
+                    '<span class="slot-meta">' + data.timestamp + '</span>' +
+                    '</div>';
+                if (mode === 'save') {
+                    contentHtml += '<div class="slot-actions"><span class="highlight-word">Sobrescrever</span></div>';
+                } else {
+                    contentHtml += '<div class="slot-actions">' +
+                        '<button class="slot-delete-btn" data-slot="' + i + '">×</button>' +
+                        '</div>';
+                }
+            } else {
+                contentHtml = '<div class="slot-info">' +
+                    '<span class="slot-title">Slot ' + i + '</span>' +
+                    '<span class="slot-empty">Vazio</span>' +
+                    '</div>';
+                if (mode === 'save') {
+                    contentHtml += '<div class="slot-actions"><span class="highlight-word">Salvar</span></div>';
+                }
+            }
+            
+            slotDiv.innerHTML = contentHtml;
+            slotDiv.addEventListener('click', (e) => {
+                if (e.target.classList.contains('slot-delete-btn')) return;
+                if (mode === 'save') {
+                    performSave(i);
+                } else if (mode === 'load' && savedData) {
+                    loadGameFromData(savedData);
+                }
+            });
+
+            const deleteBtn = slotDiv.querySelector('.slot-delete-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm('Apagar este save?')) {
+                        localStorage.removeItem(slotKey);
+                        renderSlots(mode);
+                    }
+                });
+            }
+            slotsList.appendChild(slotDiv);
+        }
+    };
+
+    const performSave = (slotIndex) => {
+        const slotKey = 'if_builder_slot_' + slotIndex + '_' + document.title;
+        const save = {
+            currentSceneId,
+            inventory,
+            visitedScenes,
+            actionLog,
+            chances,
+            trackers,
+            sceneObjectsState,
+            timestamp: new Date().toLocaleString()
+        };
+        localStorage.setItem(slotKey, JSON.stringify(save));
+        alert('Jogo salvo no Slot ' + slotIndex);
+        renderSlots('save');
+    };
+
     const getObjectsForScene = (sceneId) => {
-        // If we have a modified state for this scene, use it
         if (sceneObjectsState[sceneId]) {
             return sceneObjectsState[sceneId];
         }
-        
-        // Otherwise, construct from global library using objectIds
         const scene = gameData.cenas[sceneId];
         if (!scene) return [];
-        
         const objects = (scene.objectIds || []).map(id => {
             const globalObj = gameData.globalObjects[id];
-            // We create a copy so runtime modifications (if any) don't affect the global library structure in memory
             return globalObj ? JSON.parse(JSON.stringify(globalObj)) : null;
         }).filter(obj => obj !== null);
-        
-        // Initialize state for this scene
         sceneObjectsState[sceneId] = objects;
         return objects;
     };
@@ -312,13 +428,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadScene = (sceneId, transition = true, transitionType = 'none') => {
         if (isGameEnded) return;
-
         const scene = gameData.cenas[sceneId];
-        if (!scene) {
-            console.error('Cena não encontrada:', sceneId);
-            return;
-        }
-
+        if (!scene) return;
         if (scene.removesChanceOnEntry) {
             chances--;
             if (chances <= 0) {
@@ -331,80 +442,36 @@ document.addEventListener('DOMContentLoaded', () => {
                 chances = Math.min(chances + 1, gameData.gameMaxChances);
             }
         }
-        
         currentSceneId = sceneId;
-        
-        if (!visitedScenes.includes(sceneId)) {
-            visitedScenes.push(sceneId);
-        }
-        
-        actionLog.push({
-            type: 'scene',
-            name: scene.name,
-            timestamp: new Date().toLocaleTimeString(),
-            description: scene.description,
-            image: scene.image
-        });
-
-        // Determine effective transition type
-        let effectiveTransition = transitionType;
-        if (transitionType === 'none' || !transitionType) {
-            effectiveTransition = gameData.gameImageTransitionType || 'fade';
-        }
-        
-        if (effectiveTransition === 'none') {
-            transition = false;
-        }
-
+        if (!visitedScenes.includes(sceneId)) visitedScenes.push(sceneId);
+        actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
+        let effectiveTransition = transitionType === 'none' || !transitionType ? (gameData.gameImageTransitionType || 'fade') : transitionType;
+        if (effectiveTransition === 'none') transition = false;
         if (transition && sceneImage && sceneImageBack) {
-             // Logic:
-             // 1. Put New Image in Back.
-             // 2. Animate Current (Front) Image OUT (to reveal back).
-             // 3. Swap and Reset.
-             
-             // Setup Back Image (Next Scene)
              sceneImageBack.src = scene.image || '';
-             if (scene.image) {
-                 sceneImageBack.classList.remove('hidden');
-             } else {
-                 sceneImageBack.classList.add('hidden');
-             }
-
-             // Ensure Front Image is visible for transition
+             sceneImageBack.classList.toggle('hidden', !scene.image);
              if (sceneImage.src) {
                  sceneImage.classList.remove('hidden');
-                 
-                 // Apply Exit Animation to Front Image
                  const animClass = 'trans-' + effectiveTransition + '-out';
                  sceneImage.classList.add(animClass);
-                 
-                 // Get duration from CSS variable to match timeout
                  const durationMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--image-anim-speed')) * 1000;
-
                  setTimeout(() => {
-                     // Transition Complete
-                     renderScene(scene); // Updates Front Image src
+                     renderScene(scene);
                      sceneImage.classList.remove(animClass);
-                     
-                     // Optional: Hide back image after transition to prevent z-fighting or transparency issues?
-                     // Not strictly necessary if front covers it, but good for cleanup.
                      sceneImageBack.src = '';
                      sceneImageBack.classList.add('hidden');
-                 }, durationMs + 50); // Small buffer
+                 }, durationMs + 50);
              } else {
-                 // No front image to animate out, just render
                  renderScene(scene);
              }
         } else {
-            // No transition (Initial load or disabled)
             if (sceneImageBack) {
                 sceneImageBack.src = ''; 
                 sceneImageBack.classList.add('hidden');
             }
             renderScene(scene);
         }
-
-        saveGame();
+        autoSaveGame();
     };
 
     const renderScene = (scene) => {
@@ -417,112 +484,98 @@ document.addEventListener('DOMContentLoaded', () => {
             sceneImage.classList.add('hidden');
             imageContainer.classList.add('no-image');
         }
-
         if (sceneNameOverlay) {
             sceneNameOverlay.textContent = scene.name;
             sceneNameOverlay.style.opacity = '1';
-            setTimeout(() => {
-                sceneNameOverlay.style.opacity = '0';
-            }, 3000);
+            setTimeout(() => { sceneNameOverlay.style.opacity = '0'; }, 3000);
         }
-
-        // --- Text Pagination & Animation Logic ---
         sceneDescription.innerHTML = '';
-        
         const rawDesc = scene.description;
         const paragraphs = rawDesc.split('\\n').filter(p => p.trim().length > 0);
-        
         let pIndex = 0;
         const textAnimType = gameData.gameTextAnimationType || 'fade';
 
+        const setupHighlights = (element) => {
+            element.querySelectorAll('.highlight-word').forEach(span => {
+                span.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    verbInput.value = span.dataset.word;
+                    verbInput.focus();
+                });
+            });
+        };
+
         const renderNextParagraph = () => {
             if (pIndex >= paragraphs.length) {
-                if (scene.isEndingScene) {
-                    setTimeout(() => {
-                        gameWin();
-                    }, 2000);
-                }
+                if (scene.isEndingScene) setTimeout(gameWin, 2000);
                 return;
             }
-
             const pText = paragraphs[pIndex];
             const p = document.createElement('p');
-            
-            // Format first, to get final structure
             const formatText = (text) => text.replace(/<([^>]+)>/g, '<span class="highlight-word" data-word="$1">$1</span>');
             const formattedHTML = formatText(pText);
-
+            
             if (textAnimType === 'typewriter') {
                 p.className = 'scene-paragraph typewriter-cursor';
                 p.style.opacity = '1'; 
-                p.style.animation = 'none'; // Disable fade animation
+                p.innerHTML = formattedHTML; // Set full HTML structure first
                 sceneDescription.appendChild(p);
+
+                const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
+                let node;
+                const textNodes = [];
+                while(node = walker.nextNode()) textNodes.push(node);
                 
-                // --- Typewriter Logic ---
-                // We need to type visible text char by char, but insert HTML tags instantly.
-                let charIndex = 0;
-                let currentHtml = '';
+                const fullTexts = textNodes.map(n => n.nodeValue);
+                textNodes.forEach(n => n.nodeValue = ''); // Hide content
                 
-                // Simple parser to split into tags and text
-                // Matches <...> OR any single char
-                const tokens = formattedHTML.match(/<[^>]+>|./g) || [];
+                let nodeIdx = 0;
+                let charIdx = 0;
                 
-                const typeInterval = setInterval(() => {
-                    if (charIndex >= tokens.length) {
-                        clearInterval(typeInterval);
+                const type = () => {
+                    if (nodeIdx >= textNodes.length) {
                         p.classList.remove('typewriter-cursor');
                         setupHighlights(p);
                         finishParagraph();
                         return;
                     }
                     
-                    const token = tokens[charIndex];
-                    p.innerHTML += token; // Append token
+                    const currentNode = textNodes[nodeIdx];
+                    const fullText = fullTexts[nodeIdx];
                     
-                    // Auto-scroll logic
-                    if (sceneDescription) {
-                        sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                    if (charIdx < fullText.length) {
+                        currentNode.nodeValue += fullText[charIdx];
+                        charIdx++;
+                        if (sceneDescription) sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                        setTimeout(type, typeSpeedBase);
+                    } else {
+                        nodeIdx++;
+                        charIdx = 0;
+                        type();
                     }
-                    
-                    charIndex++;
-                }, typeSpeedBase);
-
+                };
+                type();
             } else {
-                // Fade animation (Default)
                 p.innerHTML = formattedHTML;
-                p.className = 'scene-paragraph'; // CSS for fade animation
+                p.className = 'scene-paragraph';
                 sceneDescription.appendChild(p);
                 setupHighlights(p);
                 finishParagraph();
             }
         };
-        
-        const setupHighlights = (element) => {
-            element.querySelectorAll('.highlight-word').forEach(span => {
-                span.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const word = span.dataset.word;
-                    verbInput.value = word;
-                    verbInput.focus();
-                });
-            });
-        };
 
         const finishParagraph = () => {
             pIndex++;
             if (pIndex < paragraphs.length) {
-                // Add continue indicator
                 const continueBtn = document.createElement('div');
                 continueBtn.className = 'continue-indicator';
                 continueBtn.innerHTML = '<span>▼</span>';
-                
                 const continueHandler = (e) => {
                     if(e) e.stopPropagation();
                     continueBtn.remove();
                     sceneDescription.removeEventListener('click', continueHandler);
                     renderNextParagraph();
                 };
-
                 continueBtn.addEventListener('click', continueHandler);
                 sceneDescription.addEventListener('click', continueHandler);
                 sceneDescription.appendChild(continueBtn);
@@ -530,21 +583,15 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 sceneDescription.scrollTop = sceneDescription.scrollHeight;
                 verbInput.focus();
-                if (scene.isEndingScene) {
-                    setTimeout(gameWin, 2000);
-                }
+                if (scene.isEndingScene) setTimeout(gameWin, 2000);
             }
         };
-
-        // Start rendering the first paragraph
         renderNextParagraph();
-
         const chancesContainer = document.getElementById('chances-container');
         if (chancesContainer && gameData.gameSystemEnabled === 'chances') {
             chancesContainer.innerHTML = '';
             const iconSvg = ICONS[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
             const iconOutlineSvg = ICONS_OUTLINE[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
-            
             for (let i = 0; i < (gameData.gameMaxChances || 3); i++) {
                 const icon = document.createElement('div');
                 icon.className = 'chance-icon ' + (i < chances ? '' : 'lost');
@@ -552,7 +599,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 chancesContainer.appendChild(icon);
             }
         }
-
         closeActionPopup();
         verbInput.value = '';
     };
@@ -560,126 +606,91 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameOver = () => {
         isGameEnded = true;
         negativeEndingScreen.classList.remove('hidden');
-        localStorage.removeItem('if_builder_save_' + document.title);
+        localStorage.removeItem('if_builder_autosave_' + document.title);
     };
 
     const gameWin = () => {
         isGameEnded = true;
         positiveEndingScreen.classList.remove('hidden');
-        localStorage.removeItem('if_builder_save_' + document.title);
+        localStorage.removeItem('if_builder_autosave_' + document.title);
     };
 
     const handleInput = () => {
         const rawInput = verbInput.value.trim();
         if (!rawInput) return;
-
         processCommand(rawInput);
         verbInput.value = '';
     };
 
     const processCommand = (input) => {
         const inputLower = input.toLowerCase().trim();
-        
         const echo = document.createElement('p');
         echo.className = 'verb-echo';
         echo.textContent = '> ' + input;
         sceneDescription.appendChild(echo);
         sceneDescription.scrollTop = sceneDescription.scrollHeight;
-
         actionLog.push({ type: 'input', text: '> ' + input });
-
         const scene = gameData.cenas[currentSceneId];
-        const sceneObjects = getObjectsForScene(currentSceneId); // Get active objects
-        
+        const sceneObjects = getObjectsForScene(currentSceneId); 
         const hasWord = (word, text) => {
              const safe = word.replace(/[.*+?^$\{}()|[\\]\\\\]/g, '\\\\$&');
              return new RegExp('\\\\b' + safe + '\\\\b', 'i').test(text);
         };
-
         for (const fv of (gameData.fixedVerbs || [])) {
             if (fv.verbs.some(v => hasWord(v, inputLower))) {
                 printOutput(fv.description);
                 return;
             }
         }
-
         const interaction = scene.interactions.find(i => {
             const verbMatch = i.verbs.some(v => hasWord(v, inputLower));
             if (!verbMatch) return false;
-            
             if (i.target) {
                 const targetObj = sceneObjects.find(o => o.id === i.target);
                 const invObj = findItemInInventoryById(i.target);
                 const obj = targetObj || invObj;
-                
                 if (obj) {
                     if (!hasWord(obj.name.toLowerCase(), inputLower)) return false;
-                } else {
-                    return false;
-                }
+                } else return false;
             }
-            
-            if (i.requiresInInventory) {
-                if (!inventory.some(o => o.id === i.requiresInInventory)) return false;
-            }
-
+            if (i.requiresInInventory && !inventory.some(o => o.id === i.requiresInInventory)) return false;
             return true;
         });
-
         if (interaction) {
             executeInteraction(interaction);
             return;
         }
-
         if (hasWord('inventario', inputLower) || hasWord('i', inputLower) || hasWord('items', inputLower) || (hasWord('ver', inputLower) && hasWord('inventario', inputLower))) {
             closeActionPopup();
             togglePopup('inventory');
             return;
         }
-
         const lookVerbs = ['olhar', 'examinar', 'l', 'x', 'ver', 'ler'];
         if (lookVerbs.some(v => hasWord(v, inputLower))) {
              const sceneObj = sceneObjects.find(o => hasWord(o.name.toLowerCase(), inputLower));
-             if (sceneObj) {
-                 printOutput(sceneObj.examineDescription);
-                 return;
-             }
-             
+             if (sceneObj) { printOutput(sceneObj.examineDescription); return; }
              const invObj = inventory.find(item => hasWord(item.name.toLowerCase(), inputLower));
-             if (invObj) {
-                 printOutput(invObj.examineDescription);
-                 return;
-             }
-             
+             if (invObj) { printOutput(invObj.examineDescription); return; }
              printOutput(scene.description.replace(/<|>/g, ''));
              return;
         }
-
         const takeVerbs = ['pegar', 'coletar', 'apanhar', 'levar'];
         if (takeVerbs.some(v => hasWord(v, inputLower))) {
              const sceneObj = sceneObjects.find(o => hasWord(o.name.toLowerCase(), inputLower));
              if (sceneObj) {
                  if (sceneObj.isTakable) {
                      addToInventory(sceneObj);
-                     // Remove from scene state
                      const newObjects = sceneObjects.filter(o => o.id !== sceneObj.id);
                      updateSceneObjects(currentSceneId, newObjects);
-                     
                      printOutput('Você pegou ' + sceneObj.name + '.');
-                     saveGame();
                      return;
-                 } else {
-                     printOutput("Você não pode pegar isso.");
-                     return;
-                 }
+                 } else { printOutput("Você não pode pegar isso."); return; }
              }
         }
-        
         if (hasWord('ajuda', inputLower) || hasWord('help', inputLower) || inputLower === '?') {
              printOutput("Descubra o que fazer interagindo com o cenário. Tente combinar ações e objetos, como 'examinar mesa', 'usar chave', 'empurrar porta'.");
              return;
         }
-
         printOutput(gameData.mensagem_falha_padrao || "Não aconteceu nada.");
     };
 
@@ -688,146 +699,78 @@ document.addEventListener('DOMContentLoaded', () => {
             removeFromInventory(interaction.requiresInInventory);
             printOutput("(Item perdido: " + findItemName(interaction.requiresInInventory) + ")");
         }
-
-        if (interaction.trackerEffects) {
-            updateTrackers(interaction.trackerEffects);
-        }
-
+        if (interaction.trackerEffects) updateTrackers(interaction.trackerEffects);
         if (interaction.removesTargetFromScene) {
              const sceneObjects = getObjectsForScene(currentSceneId);
              const newObjects = sceneObjects.filter(o => o.id !== interaction.target);
              updateSceneObjects(currentSceneId, newObjects);
         }
-
-        if (interaction.soundEffect) {
-            playSound(interaction.soundEffect);
-        }
-
-        if (interaction.goToScene) {
-             loadScene(interaction.goToScene, true, interaction.transitionType);
-        } else {
+        if (interaction.soundEffect) playSound(interaction.soundEffect);
+        if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType);
+        else {
             if (interaction.newSceneDescription) {
                  gameData.cenas[currentSceneId].description = interaction.newSceneDescription;
-                 // Re-render to show new description with animations if needed, 
-                 // but typically for minor updates we just replace content. 
-                 // Let's use the fancy render to support typewriters on description change.
                  renderScene(gameData.cenas[currentSceneId]);
             }
-            if (interaction.successMessage) {
-                printOutput(interaction.successMessage);
-            }
+            if (interaction.successMessage) printOutput(interaction.successMessage);
         }
     };
 
     const printOutput = (text) => {
         const p = document.createElement('p');
         p.textContent = text;
-        p.className = 'scene-paragraph'; // Apply animation class
+        p.className = 'scene-paragraph';
         sceneDescription.appendChild(p);
         sceneDescription.scrollTop = sceneDescription.scrollHeight;
-        
         actionLog.push({ type: 'output', text: text });
-        saveGame();
     };
 
-    const findItemInInventoryById = (id) => {
-        return inventory.find(o => o.id === id) || null;
-    };
-
-    const findItemName = (id) => {
-        const item = findItemInInventoryById(id) || gameData.globalObjects[id];
-        return item ? item.name : 'item';
-    };
-
-    const addToInventory = (obj) => {
-        if (!inventory.some(o => o.id === obj.id)) {
-            inventory.push(obj);
-        }
-    };
-
-    const removeFromInventory = (id) => {
-        inventory = inventory.filter(i => i.id !== id);
-    };
-
-    const togglePopup = (type) => {
-        if (!actionPopup.classList.contains('hidden') && activePopupSource === type) {
-            closeActionPopup();
-        } else {
-            if (type === 'suggestions') showSuggestions();
-            if (type === 'inventory') showInventory();
-            activePopupSource = type;
-        }
-    };
-
-    const closeActionPopup = () => {
-        actionPopup.classList.add('hidden');
-        activePopupSource = null;
-    };
-
+    const findItemInInventoryById = (id) => inventory.find(o => o.id === id) || null;
+    const findItemName = (id) => { const item = findItemInInventoryById(id) || gameData.globalObjects[id]; return item ? item.name : 'item'; };
+    const addToInventory = (obj) => { if (!inventory.some(o => o.id === obj.id)) inventory.push(obj); };
+    const removeFromInventory = (id) => { inventory = inventory.filter(i => i.id !== id); };
+    const togglePopup = (type) => { if (!actionPopup.classList.contains('hidden') && activePopupSource === type) closeActionPopup(); else { if (type === 'suggestions') showSuggestions(); if (type === 'inventory') showInventory(); activePopupSource = type; } };
+    const closeActionPopup = () => { actionPopup.classList.add('hidden'); activePopupSource = null; };
     const showSuggestions = () => {
         actionPopup.classList.remove('hidden');
         actionPopup.innerHTML = '';
-        
         const sceneObjects = getObjectsForScene(currentSceneId);
         const container = document.createElement('div');
         container.className = 'action-popup-container';
-
         if (sceneObjects.length > 0) {
             const row1 = document.createElement('div');
             row1.className = 'action-popup-row';
-            
             sceneObjects.forEach(obj => {
                 const btn = document.createElement('button');
                 btn.textContent = obj.name;
-                btn.addEventListener('click', () => {
-                    // Use string concatenation
-                    verbInput.value = 'examinar ' + obj.name;
-                    closeActionPopup();
-                    handleInput();
-                });
+                btn.addEventListener('click', () => { verbInput.value = 'examinar ' + obj.name; closeActionPopup(); handleInput(); });
                 row1.appendChild(btn);
             });
             container.appendChild(row1);
         }
-        
         const row2 = document.createElement('div');
         row2.className = 'action-popup-row';
-        
         const verbs = ['Examinar', 'Empurrar', 'Puxar', 'Chutar', 'Falar'];
         verbs.forEach(verb => {
              const btn = document.createElement('button');
              btn.textContent = verb;
-             btn.addEventListener('click', () => {
-                 verbInput.value = verb.toLowerCase() + ' ';
-                 verbInput.focus();
-                 closeActionPopup();
-             });
+             btn.addEventListener('click', () => { verbInput.value = verb.toLowerCase() + ' '; verbInput.focus(); closeActionPopup(); });
              row2.appendChild(btn);
         });
-
         ['Olhar ao redor', 'Ajuda'].forEach(action => {
              const btn = document.createElement('button');
              btn.textContent = action;
-             btn.addEventListener('click', () => {
-                 if (action === 'Olhar ao redor') verbInput.value = 'olhar';
-                 if (action === 'Ajuda') verbInput.value = 'ajuda';
-                 closeActionPopup();
-                 handleInput();
-             });
+             btn.addEventListener('click', () => { if (action === 'Olhar ao redor') verbInput.value = 'olhar'; if (action === 'Ajuda') verbInput.value = 'ajuda'; closeActionPopup(); handleInput(); });
              row2.appendChild(btn);
         });
         container.appendChild(row2);
-
         actionPopup.appendChild(container);
     };
-
     const showInventory = () => {
         actionPopup.classList.remove('hidden');
         actionPopup.innerHTML = '';
-        
         const list = document.createElement('div');
         list.className = 'action-popup-list';
-        
         if (inventory.length === 0) {
             const msg = document.createElement('div');
             msg.className = 'empty-inventory-msg';
@@ -838,141 +781,69 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (item) {
                     const btn = document.createElement('button');
                     btn.textContent = item.name;
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        openItemModal(item);
-                        closeActionPopup();
-                    });
+                    btn.addEventListener('click', (e) => { e.stopPropagation(); openItemModal(item); closeActionPopup(); });
                     list.appendChild(btn);
                 }
             });
         }
         actionPopup.appendChild(list);
     };
-
     const openItemModal = (item) => {
         itemModalName.textContent = item.name;
         itemModalDescription.textContent = item.examineDescription;
-        
-        if (item.image) {
-            itemModalImage.src = item.image;
-            itemModalImageContainer.classList.remove('hidden');
-        } else {
-            itemModalImage.src = '';
-            itemModalImageContainer.classList.add('hidden');
-        }
-        
+        if (item.image) { itemModalImage.src = item.image; itemModalImageContainer.classList.remove('hidden'); }
+        else { itemModalImage.src = ''; itemModalImageContainer.classList.add('hidden'); }
         itemModal.classList.remove('hidden');
     };
-
     const showDiary = () => {
         diaryLog.innerHTML = '';
-        
         actionLog.forEach(entry => {
             if (entry.type === 'scene') {
                 const div = document.createElement('div');
                 div.className = 'diary-entry';
-                
-                if (entry.image) {
-                    const imgContainer = document.createElement('div');
-                    imgContainer.className = 'image-container';
-                    const img = document.createElement('img');
-                    img.src = entry.image;
-                    imgContainer.appendChild(img);
-                    div.appendChild(imgContainer);
-                }
-                
-                const textContainer = document.createElement('div');
-                textContainer.className = 'text-container';
-                const title = document.createElement('span');
-                title.className = 'scene-name';
-                title.textContent = entry.name;
-                const desc = document.createElement('p');
-                desc.textContent = entry.description ? entry.description.replace(/<|>/g, '') : '';
-                
-                textContainer.appendChild(title);
-                textContainer.appendChild(desc);
-                div.appendChild(textContainer);
-                diaryLog.appendChild(div);
+                if (entry.image) { const imgContainer = document.createElement('div'); imgContainer.className = 'image-container'; const img = document.createElement('img'); img.src = entry.image; imgContainer.appendChild(img); div.appendChild(imgContainer); }
+                const textContainer = document.createElement('div'); textContainer.className = 'text-container'; const title = document.createElement('span'); title.className = 'scene-name'; title.textContent = entry.name; const desc = document.createElement('p'); desc.textContent = entry.description ? entry.description.replace(/<|>/g, '') : ''; textContainer.appendChild(title); textContainer.appendChild(desc); div.appendChild(textContainer); diaryLog.appendChild(div);
             } else if (entry.type === 'input') {
-                const p = document.createElement('p');
-                p.className = 'diary-input';
-                p.textContent = entry.text;
-                diaryLog.appendChild(p);
+                const p = document.createElement('p'); p.className = 'diary-input'; p.textContent = entry.text; diaryLog.appendChild(p);
             } else if (entry.type === 'output') {
-                const p = document.createElement('p');
-                p.className = 'diary-output';
-                p.textContent = entry.text;
-                diaryLog.appendChild(p);
+                const p = document.createElement('p'); p.className = 'diary-output'; p.textContent = entry.text; diaryLog.appendChild(p);
             }
         });
-        
         diaryModal.classList.remove('hidden');
-        setTimeout(() => {
-             diaryLog.scrollTop = diaryLog.scrollHeight;
-        }, 10);
+        setTimeout(() => { diaryLog.scrollTop = diaryLog.scrollHeight; }, 10);
     };
-    
     const showTrackers = () => {
         trackersContent.innerHTML = '';
         const defs = gameData.consequenceTrackers || [];
-        
-        if (defs.length === 0) {
-            trackersContent.textContent = 'Nenhum rastreador ativo.';
-        } else {
+        if (defs.length === 0) trackersContent.textContent = 'Nenhum rastreador ativo.';
+        else {
             defs.forEach(def => {
                 const val = trackers[def.id] || 0;
                 const percentage = Math.min(100, Math.max(0, (val / def.maxValue) * 100));
-                
                 const item = document.createElement('div');
                 item.className = 'tracker-item';
-                
                 const header = document.createElement('div');
                 header.className = 'tracker-item-header';
-                
                 const nameSpan = document.createElement('span');
                 nameSpan.className = 'tracker-item-name';
                 nameSpan.textContent = def.name;
-                
                 header.appendChild(nameSpan);
-                
-                if (!def.hideValue) {
-                    const valSpan = document.createElement('span');
-                    valSpan.className = 'tracker-item-values';
-                    // Use string concatenation
-                    valSpan.textContent = val + ' / ' + def.maxValue;
-                    header.appendChild(valSpan);
-                }
-                
+                if (!def.hideValue) { const valSpan = document.createElement('span'); valSpan.className = 'tracker-item-values'; valSpan.textContent = val + ' / ' + def.maxValue; header.appendChild(valSpan); }
                 item.appendChild(header);
-                
                 const barContainer = document.createElement('div');
                 barContainer.className = 'tracker-bar-container';
-                
                 const bar = document.createElement('div');
                 bar.className = 'tracker-bar';
-                
-                let width = percentage;
-                if (def.invertBar) {
-                    width = 100 - percentage;
-                }
-                
-                // Use string concatenation
+                let width = def.invertBar ? (100 - percentage) : percentage;
                 bar.style.width = width + '%';
-                if (def.barColor) {
-                    bar.style.backgroundColor = def.barColor;
-                }
-                
+                if (def.barColor) bar.style.backgroundColor = def.barColor;
                 barContainer.appendChild(bar);
                 item.appendChild(barContainer);
-                
                 trackersContent.appendChild(item);
             });
         }
-        
         trackersModal.classList.remove('hidden');
     };
-
     init();
 });
 `;

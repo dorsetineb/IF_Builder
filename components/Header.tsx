@@ -1,6 +1,3 @@
-
-
-
 // FIX: Corrected React import to properly include 'useRef'. The previous syntax 'import React, a from ...' was invalid.
 import React, { useRef } from 'react';
 import { GameData } from '../types';
@@ -25,7 +22,6 @@ const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
         case 'rounded-top': return 'frame-rounded-top';
         case 'book-cover': return 'frame-book-cover';
         case 'trading-card': return 'frame-trading-card';
-        case 'chamfered': return 'frame-chamfered';
         default: return 'frame-none';
     }
 }
@@ -211,8 +207,12 @@ const Header: React.FC<{
     const safeJson = JSON.stringify(engineData).replace(/<\/script/g, '<\\/script>');
     const finalGameScript = `window.embeddedGameData = ${safeJson};\n\n${gameJS}`;
     
-    const trackersButtonHTML = (exportData.gameSystemEnabled === 'trackers' && exportData.gameShowTrackersUI)
+    const trackersButtonHTML = (exportData.gameSystemEnabled === 'trackers' && (exportData.gameShowTrackersUI ?? true))
         ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>'
+        : '';
+
+    const systemButtonHTML = (exportData.gameShowSystemButton ?? true)
+        ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>'
         : '';
 
     let html = exportData.gameHTML
@@ -225,10 +225,15 @@ const Header: React.FC<{
         .replace('__FONT_ADJUST_CLASS__', fontAdjustClass)
         .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
         .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
+        .replace('__SYSTEM_BUTTON__', systemButtonHTML)
         .replace('__SUGGESTIONS_BUTTON_TEXT__', exportData.gameSuggestionsButtonText || 'Sugestões')
         .replace('__INVENTORY_BUTTON_TEXT__', exportData.gameInventoryButtonText || 'Inventário')
         .replace('__DIARY_BUTTON_TEXT__', exportData.gameDiaryButtonText || 'Diário')
         .replace(/__TRACKERS_BUTTON_TEXT__/g, exportData.gameTrackersButtonText || 'Rastreadores')
+        .replace(/__SYSTEM_BUTTON_TEXT__/g, exportData.gameSystemButtonText || 'Sistema')
+        .replace('__SAVE_MENU_TITLE__', exportData.gameSaveMenuTitle || 'Salvar Jogo')
+        .replace('__LOAD_MENU_TITLE__', exportData.gameLoadMenuTitle || 'Carregar Jogo')
+        .replace('__MAIN_MENU_BUTTON_TEXT__', exportData.gameMainMenuButtonText || 'Menu Principal')
         .replace('__SPLASH_BG_STYLE__', exportData.gameSplashImage ? `style="background-image: url('${exportData.gameSplashImage}')"` : '')
         .replace('__SPLASH_ALIGN_CLASS__', exportData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
         .replace('__SPLASH_LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="splash-logo">` : '')
@@ -264,7 +269,6 @@ const Header: React.FC<{
         .replace(/__ACTION_BUTTON_TEXT_COLOR__/g, exportData.gameActionButtonTextColor || '#0d1117')
         .replace(/__FRAME_BOOK_COLOR__/g, exportData.frameBookColor || '#FFFFFF')
         .replace(/__FRAME_TRADING_CARD_COLOR__/g, exportData.frameTradingCardColor || '#1c1917')
-        .replace(/__FRAME_CHAMFERED_COLOR__/g, exportData.frameChamferedColor || '#FFFFFF')
         .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, exportData.frameRoundedTopColor || '#facc15')
         .replace(/__SCENE_NAME_OVERLAY_BG__/g, exportData.gameSceneNameOverlayBg || '#0d1117')
         .replace(/__SCENE_NAME_OVERLAY_TEXT_COLOR__/g, exportData.gameSceneNameOverlayTextColor || '#c9d1d9')
@@ -376,7 +380,7 @@ const Header: React.FC<{
         };
         reader.readAsText(file);
     } else {
-        alert("Tipo de arquivo não suportado. Por favor, selecione um arquivo .json ou .zip.");
+        alert("Tipo de arquivo não suportado. Por favor, selecione um arquivo .json or .zip.");
     }
     
     if (event.target) {

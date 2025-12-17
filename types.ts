@@ -1,4 +1,3 @@
-
 export interface GameObject {
   id: string;
   name: string;
@@ -101,7 +100,7 @@ export interface GameData {
   gameSplashButtonTextColor?: string;
   gameLayoutOrientation?: 'vertical' | 'horizontal';
   gameLayoutOrder?: 'image-first' | 'image-last';
-  gameImageFrame?: 'none' | 'book-cover' | 'trading-card' | 'chamfered' | 'rounded-top';
+  gameImageFrame?: 'none' | 'book-cover' | 'trading-card' | 'rounded-top';
   gameActionButtonColor?: string;
   gameActionButtonTextColor?: string;
   gameActionButtonText?: string;
@@ -127,25 +126,27 @@ export interface GameData {
   negativeEndingDescription?: string;
   frameBookColor?: string;
   frameTradingCardColor?: string;
-  frameChamferedColor?: string;
   frameRoundedTopColor?: string;
   gameSceneNameOverlayBg?: string;
   gameSceneNameOverlayTextColor?: string;
   fixedVerbs?: FixedVerb[];
   consequenceTrackers?: ConsequenceTracker[];
   gameShowTrackersUI?: boolean;
+  gameShowSystemButton?: boolean;
   gameSuggestionsButtonText?: string;
   gameInventoryButtonText?: string;
   gameDiaryButtonText?: string;
   gameTrackersButtonText?: string;
-  gameTrackerBarColor?: string;
-  gameTrackerBarInvert?: boolean;
+  gameSystemButtonText?: string;
+  gameSaveMenuTitle?: string;
+  gameLoadMenuTitle?: string;
+  gameMainMenuButtonText?: string;
   gameContinueIndicatorColor?: string;
   
   // Transitions
   gameTextAnimationType?: 'fade' | 'typewriter';
   gameTextSpeed?: number; // 1 (slow) to 10 (fast)
-  gameImageTransitionType?: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'page-turn' | 'pixelate' | 'none';
+  gameImageTransitionType?: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom' | 'blur' | 'none';
   gameImageSpeed?: number; // 1 (slow) to 10 (fast)
 }
 

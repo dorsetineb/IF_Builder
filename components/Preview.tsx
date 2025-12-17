@@ -1,7 +1,3 @@
-
-
-
-
 import React, { useMemo } from 'react';
 import { GameData } from '../types';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
@@ -19,7 +15,6 @@ const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
         case 'rounded-top': return 'frame-rounded-top';
         case 'book-cover': return 'frame-book-cover';
         case 'trading-card': return 'frame-trading-card';
-        case 'chamfered': return 'frame-chamfered';
         default: return 'frame-none';
     }
 }
@@ -28,8 +23,12 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
     const srcDoc = useMemo(() => {
         const chancesContainerHTML = gameData.gameSystemEnabled === 'chances' ? '<div id="chances-container" class="chances-container"></div>' : '';
 
-        const trackersButtonHTML = (gameData.gameSystemEnabled === 'trackers' && gameData.gameShowTrackersUI)
+        const trackersButtonHTML = (gameData.gameSystemEnabled === 'trackers' && (gameData.gameShowTrackersUI ?? true))
             ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>'
+            : '';
+
+        const systemButtonHTML = (gameData.gameShowSystemButton ?? true)
+            ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>'
             : '';
 
         const fontFamily = gameData.gameFontFamily || "'Silkscreen', sans-serif";
@@ -43,13 +42,17 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace('__LAYOUT_ORDER_CLASS__', gameData.gameLayoutOrder === 'image-last' ? 'layout-image-last' : '')
             .replace('__FRAME_CLASS__', getFrameClass(gameData.gameImageFrame))
             .replace('__FONT_STYLESHEET__', fontStylesheet)
-            .replace('__LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="game-logo">` : '')
             .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
             .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
+            .replace('__SYSTEM_BUTTON__', systemButtonHTML)
             .replace('__SUGGESTIONS_BUTTON_TEXT__', gameData.gameSuggestionsButtonText || 'Sugestões')
             .replace('__INVENTORY_BUTTON_TEXT__', gameData.gameInventoryButtonText || 'Inventário')
             .replace('__DIARY_BUTTON_TEXT__', gameData.gameDiaryButtonText || 'Diário')
             .replace(/__TRACKERS_BUTTON_TEXT__/g, gameData.gameTrackersButtonText || 'Rastreadores')
+            .replace(/__SYSTEM_BUTTON_TEXT__/g, gameData.gameSystemButtonText || 'Sistema')
+            .replace('__SAVE_MENU_TITLE__', gameData.gameSaveMenuTitle || 'Salvar Jogo')
+            .replace('__LOAD_MENU_TITLE__', gameData.gameLoadMenuTitle || 'Carregar Jogo')
+            .replace('__MAIN_MENU_BUTTON_TEXT__', gameData.gameMainMenuButtonText || 'Menu Principal')
             .replace('__SPLASH_BG_STYLE__', gameData.gameSplashImage ? `style="background-image: url('${gameData.gameSplashImage}')"` : '')
             .replace('__SPLASH_ALIGN_CLASS__', gameData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
             .replace('__SPLASH_LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="splash-logo">` : '')
@@ -83,7 +86,6 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace(/__ACTION_BUTTON_TEXT_COLOR__/g, gameData.gameActionButtonTextColor || '#0d1117')
             .replace(/__FRAME_BOOK_COLOR__/g, gameData.frameBookColor || '#2d2d2d')
             .replace(/__FRAME_TRADING_CARD_COLOR__/g, gameData.frameTradingCardColor || '#1c1917')
-            .replace(/__FRAME_CHAMFERED_COLOR__/g, gameData.frameChamferedColor || '#4a5568')
             .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, gameData.frameRoundedTopColor || '#facc15')
             .replace(/__SCENE_NAME_OVERLAY_BG__/g, gameData.gameSceneNameOverlayBg || '#0d1117')
             .replace(/__SCENE_NAME_OVERLAY_TEXT_COLOR__/g, gameData.gameSceneNameOverlayTextColor || '#c9d1d9')
