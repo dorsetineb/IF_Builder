@@ -11,6 +11,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 name: scene.name,
                 image: scene.image,
                 description: scene.description,
+                backgroundMusic: scene.backgroundMusic, // Track specific BGM
                 interactions: scene.interactions,
                 exits: scene.exits,
                 isEndingScene: scene.isEndingScene,
@@ -37,6 +38,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameTextColorLight: data.gameTextColorLight,
         gameTitleColorLight: data.gameTitleColorLight,
         gameFocusColorLight: data.gameFocusColorLight,
+        gameBackgroundMusic: data.gameBackgroundMusic, // Initial music
         positiveEndingImage: data.positiveEndingImage,
         positiveEndingContentAlignment: data.positiveEndingContentAlignment,
         positiveEndingDescription: data.positiveEndingDescription,
@@ -92,6 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let trackers = {};
     let activePopupSource = null;
     let sceneObjectsState = {}; 
+    let currentBgmSrc = "";
 
     const textSpeedVal = gameData.gameTextSpeed || 3; 
     const imgSpeedVal = gameData.gameImageSpeed || 3;
@@ -128,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const systemButton = document.getElementById('system-button');
     const sceneNameOverlay = document.getElementById('scene-name-overlay');
     const soundEffectAudio = document.getElementById('scene-sound-effect');
+    const bgmAudio = document.getElementById('bgm-audio');
     
     const diaryModal = document.getElementById('diary-modal');
     const diaryLog = document.getElementById('diary-log');
@@ -151,11 +155,25 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const closeButtons = document.querySelectorAll('.modal-close-button');
 
-    // --- Audio Helper ---
+    // --- Audio Helpers ---
     const playSound = (src) => {
         if (!src || !soundEffectAudio) return;
         soundEffectAudio.src = src;
         soundEffectAudio.play().catch(e => console.log('Audio play failed', e));
+    };
+
+    const playBgm = (src) => {
+        if (!bgmAudio) return;
+        if (!src) {
+            bgmAudio.pause();
+            currentBgmSrc = "";
+            return;
+        }
+        if (src === currentBgmSrc) return;
+        
+        bgmAudio.src = src;
+        currentBgmSrc = src;
+        bgmAudio.play().catch(e => console.log('BGM play failed. Needs user interaction.', e));
     };
 
     // --- Initialization ---
@@ -205,6 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (confirm("Voltar ao menu principal? Progresso não salvo manualmente será perdido.")) {
                 systemModal.classList.add('hidden');
                 splashScreen.classList.remove('hidden');
+                playBgm(""); 
             }
         });
 
@@ -248,6 +267,12 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         
         splashScreen.classList.add('hidden');
+        
+        // Inicia BGM global se definida
+        if (gameData.gameBackgroundMusic) {
+            playBgm(gameData.gameBackgroundMusic);
+        }
+
         loadScene(currentSceneId, false); 
     };
 
@@ -266,6 +291,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     splashScreen.classList.add('hidden');
                     systemModal.classList.add('hidden');
+                    
+                    // Resume BGM logic
+                    const startScene = gameData.cenas[currentSceneId];
+                    if (startScene && startScene.backgroundMusic) {
+                        playBgm(startScene.backgroundMusic);
+                    } else if (gameData.gameBackgroundMusic) {
+                        playBgm(gameData.gameBackgroundMusic);
+                    }
+
                     loadScene(currentSceneId, false);
                 } else {
                     startGame();
@@ -430,6 +464,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isGameEnded) return;
         const scene = gameData.cenas[sceneId];
         if (!scene) return;
+        
+        // BGM Change logic: If scene defines a BGM, switch to it.
+        if (scene.backgroundMusic) {
+            playBgm(scene.backgroundMusic);
+        }
+
         if (scene.removesChanceOnEntry) {
             chances--;
             if (chances <= 0) {
@@ -607,12 +647,14 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameEnded = true;
         negativeEndingScreen.classList.remove('hidden');
         localStorage.removeItem('if_builder_autosave_' + document.title);
+        playBgm(""); // Stop music on game over
     };
 
     const gameWin = () => {
         isGameEnded = true;
         positiveEndingScreen.classList.remove('hidden');
         localStorage.removeItem('if_builder_autosave_' + document.title);
+        // Maybe keep music for victory?
     };
 
     const handleInput = () => {

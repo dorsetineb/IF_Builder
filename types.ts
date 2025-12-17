@@ -41,6 +41,7 @@ export interface Scene {
   name: string;
   image: string; // URL or base64 string
   description: string;
+  backgroundMusic?: string; // Base64 data URL for BGM
   objectIds: string[]; // References to GameData.globalObjects
   objects?: GameObject[]; // Deprecated: Kept for migration types
   interactions: Interaction[];
@@ -86,6 +87,7 @@ export interface GameData {
   gameFontSize?: string;
   gameLogo?: string; // base64 string
   gameSplashImage?: string; // base64 string
+  gameBackgroundMusic?: string; // Global starting music
   gameTextColor?: string;
   gameTitleColor?: string;
   gameHideTitle?: boolean;

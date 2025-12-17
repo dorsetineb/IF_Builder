@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useState, useEffect } from 'react';
 import SceneList from './SceneList';
 import { Scene, View } from '../types';
 import { CodeIcon } from './icons/CodeIcon';
@@ -22,6 +23,14 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
   const { currentView, onSetView, scenes, onNewGame, ...sceneListProps } = props;
+  const [isExpanded, setIsExpanded] = useState(currentView === 'scenes');
+
+  // Garante que a seção expanda automaticamente se a visão mudar para cenas (ex: via mapa ou importação)
+  useEffect(() => {
+    if (currentView === 'scenes') {
+      setIsExpanded(true);
+    }
+  }, [currentView]);
 
   const getButtonClass = (view: View) => 
     `w-full flex items-center p-2 rounded-md transition-colors text-left ${
@@ -29,6 +38,15 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         ? 'bg-brand-primary/20 text-brand-primary' 
         : 'hover:bg-brand-border/50'
     }`;
+
+  const handleToggleScenes = () => {
+    if (currentView !== 'scenes') {
+      onSetView('scenes');
+      setIsExpanded(true);
+    } else {
+      setIsExpanded(!isExpanded);
+    }
+  };
 
   return (
     <aside className="w-1/4 xl:w-1/5 bg-brand-sidebar p-4 border-r border-brand-border flex flex-col">
@@ -42,15 +60,15 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       
         {/* Scene Editor Section */}
         <div>
-            <button className={getButtonClass('scenes')} onClick={() => onSetView('scenes')}>
+            <button className={getButtonClass('scenes')} onClick={handleToggleScenes}>
                 <BookOpenIcon className="w-5 h-5 mr-3" />
                 <span className="font-semibold">Editor de Cenas</span>
                 <span className="ml-auto bg-white text-brand-bg text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
                     {scenes.length}
                 </span>
             </button>
-            {currentView === 'scenes' && (
-              <div className="pl-4 pt-2 mt-2 border-l-2 border-brand-border/50 ml-2">
+            {isExpanded && (
+              <div className="pl-4 pt-2 mt-2 ml-2">
                 <SceneList scenes={scenes} {...sceneListProps} />
               </div>
             )}

@@ -64,6 +64,7 @@ interface UIEditorProps {
   splashImage: string;
   splashContentAlignment: 'left' | 'right';
   splashDescription: string;
+  backgroundMusic: string; // Global BGM
   positiveEndingImage: string;
   positiveEndingContentAlignment: 'left' | 'right';
   positiveEndingDescription: string;
@@ -254,6 +255,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
       // Game Info Props
       title, logo, omitSplashTitle, 
       splashImage, splashContentAlignment, splashDescription,
+      backgroundMusic,
       positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription,
       negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription,
       fixedVerbs,
@@ -320,6 +322,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localSplashImage, setLocalSplashImage] = useState(splashImage);
   const [localSplashContentAlignment, setLocalSplashContentAlignment] = useState(splashContentAlignment);
   const [localSplashDescription, setLocalSplashDescription] = useState(splashDescription);
+  const [localBackgroundMusic, setLocalBackgroundMusic] = useState(backgroundMusic);
   const [localPositiveEndingImage, setLocalPositiveEndingImage] = useState(positiveEndingImage);
   const [localPositiveEndingContentAlignment, setLocalPositiveEndingContentAlignment] = useState(positiveEndingContentAlignment);
   const [localPositiveEndingDescription, setLocalPositiveEndingDescription] = useState(positiveEndingDescription);
@@ -418,6 +421,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalSplashImage(splashImage);
     setLocalSplashContentAlignment(splashContentAlignment);
     setLocalSplashDescription(splashDescription);
+    setLocalBackgroundMusic(backgroundMusic);
     setLocalPositiveEndingImage(positiveEndingImage);
     setLocalPositiveEndingContentAlignment(positiveEndingContentAlignment);
     setLocalPositiveEndingDescription(positiveEndingDescription);
@@ -438,7 +442,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, gameContinueIndicatorColor,
     gameShowTrackersUI, gameShowSystemButton, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText,
     gameSystemButtonText, gameSaveMenuTitle, gameLoadMenuTitle, gameMainMenuButtonText,
-    title, logo, omitSplashTitle, splashImage, splashContentAlignment, splashDescription,
+    title, logo, omitSplashTitle, splashImage, splashContentAlignment, splashDescription, backgroundMusic,
     positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription,
     negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription, fixedVerbs,
     textAnimationType, textSpeed, imageTransitionType, imageSpeed
@@ -495,6 +499,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localSplashImage !== splashImage ||
                   localSplashContentAlignment !== splashContentAlignment ||
                   localSplashDescription !== splashDescription ||
+                  localBackgroundMusic !== backgroundMusic ||
                   localPositiveEndingImage !== positiveEndingImage ||
                   localPositiveEndingContentAlignment !== positiveEndingContentAlignment ||
                   localPositiveEndingDescription !== positiveEndingDescription ||
@@ -513,7 +518,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
     localFrameBookColor, localFrameTradingCardColor,
     frameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor, localGameContinueIndicatorColor,
-    localTitle, localLogo, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, 
+    localTitle, localLogo, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, localBackgroundMusic,
     localPositiveEndingImage, localPositiveEndingContentAlignment, localPositiveEndingDescription,
     localNegativeEndingImage, localNegativeEndingContentAlignment, localNegativeEndingDescription, localFixedVerbs,
     localTextAnimationType, localTextSpeed, localImageTransitionType, localImageSpeed,
@@ -574,6 +579,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localSplashImage !== splashImage) onUpdate('gameSplashImage', localSplashImage);
     if (localSplashContentAlignment !== splashContentAlignment) onUpdate('gameSplashContentAlignment', localSplashContentAlignment);
     if (localSplashDescription !== splashDescription) onUpdate('gameSplashDescription', localSplashDescription);
+    if (localBackgroundMusic !== backgroundMusic) onUpdate('gameBackgroundMusic', localBackgroundMusic);
     if (localPositiveEndingImage !== positiveEndingImage) onUpdate('positiveEndingImage', localPositiveEndingImage);
     if (localPositiveEndingContentAlignment !== positiveEndingContentAlignment) onUpdate('positiveEndingContentAlignment', localPositiveEndingContentAlignment);
     if (localPositiveEndingDescription !== positiveEndingDescription) onUpdate('positiveEndingDescription', localPositiveEndingDescription);
@@ -642,6 +648,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalSplashImage(splashImage);
     setLocalSplashContentAlignment(splashContentAlignment);
     setLocalSplashDescription(splashDescription);
+    setLocalBackgroundMusic(backgroundMusic);
     setLocalPositiveEndingImage(positiveEndingImage);
     setLocalPositiveEndingContentAlignment(positiveEndingContentAlignment);
     setLocalPositiveEndingDescription(positiveEndingDescription);
@@ -685,6 +692,21 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
+    if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            if (event.target && typeof event.target.result === 'string') {
+                setter(event.target.result);
+            }
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+    if (e.target) {
+      (e.target as HTMLInputElement).value = '';
+    }
+  };
+
+  const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
     if (e.target.files && e.target.files[0]) {
         const reader = new FileReader();
         reader.onload = (event) => {
@@ -1116,10 +1138,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                       </div>
                   </div>
 
-                  <div className="h-full">
-                        <div className="space-y-4 h-full flex flex-col">
+                  <div className="space-y-6 flex flex-col h-full">
+                        <div className="space-y-4">
                             <h4 className="text-lg font-semibold text-brand-text">Imagem de Fundo</h4>
-                            <div className="flex-grow flex flex-col relative min-h-[250px]">
+                            <div className="relative w-full h-[200px]">
                                 {localSplashImage ? (
                                     <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
                                          <img src={localSplashImage} alt="Fundo" className="w-full h-full object-cover" />
@@ -1137,11 +1159,30 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-brand-border bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors">
                                         <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
                                         <span className="text-sm font-semibold text-brand-text">Clique para Enviar</span>
-                                        <span className="text-xs text-brand-text-dim mt-1">ou arraste e solte</span>
                                         <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
                                     </label>
                                 )}
                             </div>
+                        </div>
+
+                        <div className="space-y-4 pt-4 border-t border-brand-border/30">
+                            <h4 className="text-lg font-semibold text-brand-text">Trilha Sonora Inicial</h4>
+                            <div className="flex items-center gap-2">
+                                <label className="flex-grow flex items-center justify-center px-3 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer text-sm">
+                                    <UploadIcon className="w-4 h-4 mr-2" /> {localBackgroundMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
+                                    <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalBackgroundMusic)} className="hidden" />
+                                </label>
+                                {localBackgroundMusic && (
+                                    <button
+                                        onClick={() => setLocalBackgroundMusic('')}
+                                        className="p-2 bg-red-500/20 text-red-500 rounded-md hover:bg-red-500/30 transition-colors"
+                                        title="Remover Música"
+                                    >
+                                        <TrashIcon className="w-5 h-5" />
+                                    </button>
+                                )}
+                            </div>
+                            <p className="text-xs text-brand-text-dim italic">Esta trilha começará a tocar assim que o jogo for iniciado.</p>
                         </div>
                   </div>
               </div>
@@ -1172,7 +1213,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                       {localPositiveEndingImage ? (
                                         <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
                                             <img src={localPositiveEndingImage} alt="Final Positivo" className="w-full h-full object-cover" />
-                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
+                                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
                                                   <label className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover">
                                                     <UploadIcon className="w-5 h-5" />
                                                     <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />

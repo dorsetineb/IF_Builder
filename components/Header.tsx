@@ -122,12 +122,14 @@ const Header: React.FC<{
 
     exportData.gameLogo = processAsset(exportData.gameLogo, 'logo');
     exportData.gameSplashImage = processAsset(exportData.gameSplashImage, 'splash_image');
+    exportData.gameBackgroundMusic = processAsset(exportData.gameBackgroundMusic, 'global_bgm');
     exportData.positiveEndingImage = processAsset(exportData.positiveEndingImage, 'positive_ending');
     exportData.negativeEndingImage = processAsset(exportData.negativeEndingImage, 'negative_ending');
 
     for (const sceneId in exportData.scenes) {
         const scene = exportData.scenes[sceneId];
         scene.image = processAsset(scene.image, `scene_image_${sceneId}`);
+        scene.backgroundMusic = processAsset(scene.backgroundMusic, `scene_bgm_${sceneId}`);
         if (scene.interactions) {
             scene.interactions.forEach((inter: any, index: number) => {
                 inter.soundEffect = processAsset(inter.soundEffect, `sfx_${sceneId}_${index}`);
@@ -342,6 +344,7 @@ const Header: React.FC<{
 
                 importedData.gameLogo = replacePathWithData(importedData.gameLogo);
                 importedData.gameSplashImage = replacePathWithData(importedData.gameSplashImage);
+                importedData.gameBackgroundMusic = replacePathWithData(importedData.gameBackgroundMusic);
                 importedData.positiveEndingImage = replacePathWithData(importedData.positiveEndingImage);
                 importedData.negativeEndingImage = replacePathWithData(importedData.negativeEndingImage);
 
@@ -349,6 +352,7 @@ const Header: React.FC<{
                     for (const sceneId in importedData.scenes) {
                         const scene = importedData.scenes[sceneId];
                         scene.image = replacePathWithData(scene.image) as string;
+                        scene.backgroundMusic = replacePathWithData(scene.backgroundMusic);
                         if (scene.interactions) {
                             scene.interactions.forEach(inter => {
                                 inter.soundEffect = replacePathWithData(inter.soundEffect);

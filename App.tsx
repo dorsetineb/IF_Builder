@@ -24,6 +24,7 @@ const gameHTML = `
 </head>
 <body class="__THEME_CLASS__ __FRAME_CLASS__ __FONT_ADJUST_CLASS__">
     <audio id="scene-sound-effect" preload="auto"></audio>
+    <audio id="bgm-audio" preload="auto" loop></audio>
     <div class="main-wrapper">
         <div id="splash-screen" class="splash-screen __SPLASH_ALIGN_CLASS__" __SPLASH_BG_STYLE__>
           <div class="splash-content" __SPLASH_TEXT_STYLE__>
@@ -526,9 +527,8 @@ const App: React.FC = () => {
   };
 
   const handleSelectScene = (id: string) => {
-      if (currentView === 'global_objects' || currentView === 'trackers') {
-        setCurrentView('scenes');
-      }
+      // Navega automaticamente para a visualização de cenas se estiver em outras abas
+      setCurrentView('scenes');
       setSelectedSceneId(id);
   };
 
@@ -709,6 +709,7 @@ const App: React.FC = () => {
                                 splashImage={gameData.gameSplashImage || ''}
                                 splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
                                 splashDescription={gameData.gameSplashDescription || ''}
+                                backgroundMusic={gameData.gameBackgroundMusic || ''}
                                 positiveEndingImage={gameData.positiveEndingImage || ''}
                                 positiveEndingContentAlignment={gameData.positiveEndingContentAlignment || 'right'}
                                 positiveEndingDescription={gameData.positiveEndingDescription || ''}
@@ -741,7 +742,6 @@ const App: React.FC = () => {
                                 textColorLight={gameData.gameTextColorLight || '#24292f'}
                                 titleColorLight={gameData.gameTitleColorLight || '#0969da'}
                                 focusColorLight={gameData.gameFocusColorLight || '#0969da'}
-                                // FIX: Use gameData prefix to avoid 'Cannot find name' errors for frame color variables
                                 frameBookColor={gameData.frameBookColor || '#FFFFFF'}
                                 frameTradingCardColor={gameData.frameTradingCardColor || '#1c1917'}
                                 frameRoundedTopColor={gameData.frameRoundedTopColor || '#facc15'}
@@ -801,6 +801,7 @@ const App: React.FC = () => {
                         {currentView === 'map' && (
                             <SceneMap 
                                 allScenesMap={gameData.scenes}
+                                globalObjects={gameData.globalObjects}
                                 startSceneId={gameData.startScene}
                                 onSelectScene={handleSelectScene}
                                 onUpdateScenePosition={handleUpdateScenePosition}

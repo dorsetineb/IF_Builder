@@ -229,6 +229,21 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
       }
   };
 
+  const handleMusicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.files && e.target.files[0]) {
+          const reader = new FileReader();
+          reader.onload = (event) => {
+              if (event.target && typeof event.target.result === 'string') {
+                  updateLocalScene('backgroundMusic', event.target.result);
+              }
+          };
+          reader.readAsDataURL(e.target.files[0]);
+      }
+      if (e.target) {
+        (e.target as HTMLInputElement).value = '';
+      }
+  };
+
   const handleDrop = (e: DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -337,7 +352,28 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                               <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-brand-bg border border-brand-border rounded-md px-3 py-2 resize-y focus:ring-0 text-sm"/>
                           </div>
                       </div>
-                      <div className="space-y-4 pt-4">
+                      
+                      <div className="pt-4 border-t border-brand-border/30">
+                          <label className="block text-sm font-medium text-brand-text-dim mb-2">Trilha Sonora (Mudar música ao entrar)</label>
+                          <div className="flex items-center gap-2">
+                                <label className="flex-grow flex items-center justify-center px-3 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer text-xs">
+                                    <UploadIcon className="w-4 h-4 mr-2" /> {localScene.backgroundMusic ? 'Alterar Trilha' : 'Carregar Trilha (.mp3)'}
+                                    <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={handleMusicUpload} className="hidden" />
+                                </label>
+                                {localScene.backgroundMusic && (
+                                    <button
+                                        onClick={() => updateLocalScene('backgroundMusic', undefined)}
+                                        className="p-2 bg-red-500/20 text-red-500 rounded-md hover:bg-red-500/30 transition-colors"
+                                        title="Remover Troca de Música"
+                                    >
+                                        <TrashIcon className="w-4 h-4" />
+                                    </button>
+                                )}
+                          </div>
+                          <p className="text-[10px] text-brand-text-dim mt-1 italic">Deixe vazio para continuar tocando a música da cena anterior.</p>
+                      </div>
+
+                      <div className="space-y-4 pt-4 border-t border-brand-border/30">
                           <div className="flex items-center">
                               <input
                                   type="checkbox"
