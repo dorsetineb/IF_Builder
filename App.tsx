@@ -320,6 +320,7 @@ const initialGameData: GameData = {
     gameImageSpeed: 5,
     
     // Explicit Portuguese Defaults
+    gameFontSize: '0.85em', // Default changed to Small
     gameActionButtonText: 'Ação',
     gameSplashButtonText: 'INICIAR',
     gameContinueButtonText: 'Continuar Aventura',
@@ -683,7 +684,7 @@ const App: React.FC = () => {
                                 focusColor={gameData.gameFocusColor || '#58a6ff'}
                                 chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
                                 gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
-                                gameFontSize={gameData.gameFontSize || '1em'}
+                                gameFontSize={gameData.gameFontSize || '0.85em'}
                                 chanceIcon={gameData.gameChanceIcon || 'heart'}
                                 chanceReturnButtonText={gameData.gameChanceReturnButtonText || 'Tentar Novamente'}
                                 gameTheme={gameData.gameTheme || 'dark'}
@@ -711,6 +712,8 @@ const App: React.FC = () => {
                                 textSpeed={gameData.gameTextSpeed || 5}
                                 imageTransitionType={gameData.gameImageTransitionType || 'fade'}
                                 imageSpeed={gameData.gameImageSpeed || 5}
+                                
+                                onNavigateToTrackers={() => handleSetView('trackers')}
                             />
                         )}
                         {currentView === 'scenes' && selectedScene ? (

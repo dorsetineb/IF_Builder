@@ -110,7 +110,7 @@ export interface GameData {
   gameFocusColor?: string;
   gameSystemEnabled?: 'none' | 'chances' | 'trackers';
   gameMaxChances?: number;
-  gameChanceIcon?: 'circle' | 'cross' | 'heart';
+  gameChanceIcon?: 'circle' | 'cross' | 'heart' | 'square' | 'diamond';
   gameChanceIconColor?: string;
   gameChanceReturnButtonText?: string;
   gameChanceLossMessage?: string;

@@ -297,24 +297,31 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
       </div>
 
       <div>
-          <div className="border-b border-brand-border flex space-x-1">
-            {Object.entries(TABS).map(([key, name]) => {
-                const isTabDisabled = localScene.isEndingScene && (key === 'objects' || key === 'interactions');
-                return (
-                    <button
-                        key={key}
-                        onClick={() => !isTabDisabled && setActiveTab(key as any)}
-                        disabled={isTabDisabled}
-                        className={`px-4 py-2 font-semibold text-sm rounded-t-md transition-colors ${
-                            activeTab === key
-                                ? 'bg-brand-surface text-brand-primary'
-                                : 'text-brand-text-dim hover:text-brand-text'
-                        } ${isTabDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-                    >
-                        {name}
-                    </button>
-                );
-            })}
+          <div className="border-b border-brand-border flex justify-between items-end">
+            <div className="flex space-x-1">
+                {Object.entries(TABS).map(([key, name]) => {
+                    const isTabDisabled = localScene.isEndingScene && (key === 'objects' || key === 'interactions');
+                    return (
+                        <button
+                            key={key}
+                            onClick={() => !isTabDisabled && setActiveTab(key as any)}
+                            disabled={isTabDisabled}
+                            className={`px-4 py-2 font-semibold text-sm rounded-t-md transition-colors ${
+                                activeTab === key
+                                    ? 'bg-brand-surface text-brand-primary'
+                                    : 'text-brand-text-dim hover:text-brand-text'
+                            } ${isTabDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            {name}
+                        </button>
+                    );
+                })}
+            </div>
+            {activeTab === 'objects' && (
+                <span className="text-xs text-yellow-400 mb-2 italic">
+                    Alterações feitas aqui afetam o objeto em todo o jogo.
+                </span>
+            )}
           </div>
 
           <div className="bg-brand-surface -mt-px p-6">
@@ -389,39 +396,42 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                               </p>
                           </div>
                        </div>
-                      <div className="flex-grow relative mt-2">
-                          {localScene.image ? (
-                              <img src={localScene.image} alt={localScene.name} className="w-full h-full min-h-[300px] object-cover bg-brand-bg" />
-                          ) : (
-                              <label 
-                                  htmlFor="image-upload-input" 
-                                  className={`flex flex-col items-center justify-center w-full h-full min-h-[300px] border-2 border-dashed bg-brand-bg cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
-                                  onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
-                                  onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
-                                  onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
-                                  onDrop={handleDrop}
-                              >
-                                  <UploadIcon className="w-10 h-10 text-brand-text-dim mb-4" />
-                                  <span className="text-brand-text font-semibold">Clique para Enviar uma Imagem</span>
-                                  <span className="text-xs text-brand-text-dim mt-1">ou arraste e solte aqui</span>
-                              </label>
-                          )}
-                      </div>
-                      <div className="flex-shrink-0">
-                          <div className="flex items-center gap-2">
-                              <label htmlFor="image-upload-input" className="inline-flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
-                                  <UploadIcon className="w-5 h-5 mr-2" /> {localScene.image ? 'Alterar Imagem' : 'Carregar Imagem'}
-                              </label>
-                              <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                              {localScene.image && (
-                                <button
-                                    onClick={() => updateLocalScene('image', '')}
-                                    className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                                    title="Remover Imagem"
+                      <div className="flex flex-col flex-grow mt-2 min-h-[300px]">
+                          <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem da Cena</label>
+                          <div className="relative flex-grow w-full">
+                            {localScene.image ? (
+                                <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
+                                    <img src={localScene.image} alt={localScene.name} className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
+                                        <label htmlFor="image-upload-input" className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover flex items-center gap-2 font-semibold text-sm">
+                                            <UploadIcon className="w-5 h-5" />
+                                            <span className="hidden sm:inline">Alterar</span>
+                                            <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                        </label>
+                                        <button 
+                                            onClick={() => updateLocalScene('image', '')}
+                                            className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                            title="Remover Imagem"
+                                        >
+                                            <TrashIcon className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <label 
+                                    htmlFor="image-upload-input" 
+                                    className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
+                                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
+                                    onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
+                                    onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
+                                    onDrop={handleDrop}
                                 >
-                                    <TrashIcon className="w-5 h-5" />
-                                </button>
-                              )}
+                                    <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
+                                    <span className="text-sm font-semibold text-brand-text">Clique para Enviar</span>
+                                    <span className="text-xs text-brand-text-dim mt-1">ou arraste e solte</span>
+                                    <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                </label>
+                            )}
                           </div>
                       </div>
                   </div>

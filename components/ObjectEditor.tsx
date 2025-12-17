@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, DragEvent } from 'react';
 import { GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
 import { TrashIcon } from './icons/TrashIcon';
@@ -20,6 +20,132 @@ const generateUniqueId = (prefix: 'obj', existingIds: string[]): string => {
         id = `${prefix}_${Math.random().toString(36).substring(2, 5)}`;
     } while (existingIds.includes(id));
     return id;
+};
+
+// Sub-component for individual Scene Object Item to handle Drag state properly
+const SceneObjectItem: React.FC<{
+    obj: GameObject;
+    sceneId: string;
+    onUnlinkObject: (sceneId: string, objectId: string) => void;
+    onUpdateGlobalObject: (objectId: string, updatedData: Partial<GameObject>) => void;
+}> = ({ obj, sceneId, onUnlinkObject, onUpdateGlobalObject }) => {
+    const [isDraggingOver, setIsDraggingOver] = useState(false);
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target && typeof event.target.result === 'string') {
+                    onUpdateGlobalObject(obj.id, { image: event.target.result });
+                }
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+        if (e.target) {
+            (e.target as HTMLInputElement).value = '';
+        }
+    };
+
+    const handleDrop = (e: DragEvent<HTMLLabelElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsDraggingOver(false);
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            const event = { target: { files: e.dataTransfer.files } } as unknown as React.ChangeEvent<HTMLInputElement>;
+            handleImageUpload(event);
+        }
+    };
+
+    return (
+        <div className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
+            <button
+                onClick={() => onUnlinkObject(sceneId, obj.id)}
+                className="absolute top-0 right-0 p-2 bg-brand-border text-brand-text-dim rounded-bl-lg hover:bg-red-500 hover:text-white transition-colors"
+                title="Desvincular objeto desta cena (não apaga do jogo)"
+            >
+                <TrashIcon className="w-5 h-5" />
+            </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                {/* Editable fields */}
+                <div className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Objeto</label>
+                        <input 
+                            type="text" 
+                            value={obj.name} 
+                            onChange={(e) => onUpdateGlobalObject(obj.id, { name: e.target.value })}
+                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
+                        />
+                    </div>
+                    <div>
+                        <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
+                        <p 
+                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
+                            title="Use este ID para referência interna."
+                        >
+                            {obj.id}
+                        </p>
+                    </div>
+                    <div className="flex flex-col">
+                        <label className="block text-sm font-medium text-brand-text-dim mb-1">Descrição ao olhar/examinar</label>
+                        <textarea 
+                            value={obj.examineDescription} 
+                            onChange={(e) => onUpdateGlobalObject(obj.id, { examineDescription: e.target.value })}
+                            rows={4} 
+                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
+                        />
+                    </div>
+                    <div className="flex items-center pt-1">
+                        <input 
+                            type="checkbox" 
+                            checked={obj.isTakable} 
+                            onChange={(e) => onUpdateGlobalObject(obj.id, { isTakable: e.target.checked })}
+                            className="custom-checkbox" 
+                        />
+                        <label className="ml-2 block text-sm text-brand-text-dim">Pode ser pego (Item de Inventário)</label>
+                    </div>
+                </div>
+                {/* Image Upload Column */}
+                <div className="flex flex-col space-y-3 h-full">
+                    <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem do Objeto</label>
+                    <div className="relative flex-grow w-full min-h-[150px]">
+                        {obj.image ? (
+                            <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
+                                <img src={obj.image} alt={obj.name} className="w-full h-full object-cover bg-brand-bg" />
+                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
+                                    <label htmlFor={`image-upload-${obj.id}`} className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover flex items-center gap-2 font-semibold text-sm">
+                                        <UploadIcon className="w-5 h-5" />
+                                        <span className="hidden sm:inline">Alterar</span>
+                                        <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                    </label>
+                                    <button
+                                        onClick={() => onUpdateGlobalObject(obj.id, { image: '' })}
+                                        className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                        title="Remover Imagem"
+                                    >
+                                        <TrashIcon className="w-5 h-5" />
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <label 
+                                htmlFor={`image-upload-${obj.id}`} 
+                                className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
+                                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
+                                onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
+                                onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
+                                onDrop={handleDrop}
+                            >
+                                <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
+                                <span className="text-xs text-brand-text-dim">Carregar Imagem</span>
+                                <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                            </label>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 const ObjectEditor: React.FC<ObjectEditorProps> = ({ 
@@ -51,113 +177,20 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
       }
   };
   
-  const handleImageUpload = (objectId: string, e: React.ChangeEvent<HTMLInputElement>) => {
-      if (e.target.files && e.target.files[0]) {
-          const reader = new FileReader();
-          reader.onload = (event) => {
-              if (event.target && typeof event.target.result === 'string') {
-                  onUpdateGlobalObject(objectId, { image: event.target.result });
-              }
-          };
-          reader.readAsDataURL(e.target.files[0]);
-      }
-      if (e.target) {
-        (e.target as HTMLInputElement).value = '';
-      }
-  };
-
   const availableObjects = allGlobalObjects.filter(gObj => !objects.some(linked => linked.id === gObj.id));
 
   return (
     <>
       <div className="space-y-4">
         {objects.length > 0 ? (
-            objects.map((obj, index) => (
-            <div key={obj.id} className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
-                <button
-                    onClick={() => onUnlinkObject(sceneId, obj.id)}
-                    className="absolute top-0 right-0 p-2 bg-brand-border text-brand-text-dim rounded-bl-lg hover:bg-red-500 hover:text-white transition-colors"
-                    title="Desvincular objeto desta cena (não apaga do jogo)"
-                >
-                    <TrashIcon className="w-5 h-5" />
-                </button>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                    {/* Editable fields */}
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Objeto</label>
-                            <input 
-                                type="text" 
-                                value={obj.name} 
-                                onChange={(e) => onUpdateGlobalObject(obj.id, { name: e.target.value })}
-                                className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
-                            <p 
-                                className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
-                                title="Use este ID para referência interna."
-                            >
-                                {obj.id}
-                            </p>
-                        </div>
-                        <div className="flex flex-col">
-                            <label className="block text-sm font-medium text-brand-text-dim mb-1">Descrição ao olhar/examinar</label>
-                            <textarea 
-                                value={obj.examineDescription} 
-                                onChange={(e) => onUpdateGlobalObject(obj.id, { examineDescription: e.target.value })}
-                                rows={4} 
-                                className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
-                            />
-                        </div>
-                        <div className="flex items-center pt-1">
-                            <input 
-                                type="checkbox" 
-                                checked={obj.isTakable} 
-                                onChange={(e) => onUpdateGlobalObject(obj.id, { isTakable: e.target.checked })}
-                                className="custom-checkbox" 
-                            />
-                            <label className="ml-2 block text-sm text-brand-text-dim">Pode ser pego (Item de Inventário)</label>
-                        </div>
-                    </div>
-                    {/* Image Upload Column */}
-                    <div className="flex flex-col space-y-3">
-                        <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem do Objeto</label>
-                        <div className="flex-grow relative bg-brand-border/30 border border-brand-border rounded-md min-h-[150px] flex items-center justify-center overflow-hidden">
-                            {obj.image ? (
-                                <img src={obj.image} alt={obj.name} className="w-full h-full object-contain" />
-                            ) : (
-                                <label 
-                                    htmlFor={`image-upload-${obj.id}`} 
-                                    className="flex flex-col items-center justify-center w-full h-full cursor-pointer hover:bg-brand-border/50 transition-colors"
-                                >
-                                    <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
-                                    <span className="text-xs text-brand-text-dim">Carregar Imagem</span>
-                                </label>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <label htmlFor={`image-upload-${obj.id}`} className="flex-grow flex items-center justify-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer text-sm">
-                                    <UploadIcon className="w-4 h-4 mr-2" /> {obj.image ? 'Alterar' : 'Carregar'}
-                                    <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={(e) => handleImageUpload(obj.id, e)} className="hidden" />
-                            </label>
-                                {obj.image && (
-                                    <button
-                                        onClick={() => onUpdateGlobalObject(obj.id, { image: '' })}
-                                        className="p-2 bg-red-500/20 text-red-500 rounded-md hover:bg-red-500/30 transition-colors"
-                                        title="Remover Imagem"
-                                    >
-                                        <TrashIcon className="w-4 h-4" />
-                                    </button>
-                                )}
-                        </div>
-                    </div>
-                </div>
-                <div className="mt-2 text-center">
-                    <p className="text-xs text-brand-text-dim italic">Alterações feitas aqui afetam o objeto em todo o jogo.</p>
-                </div>
-            </div>
+            objects.map((obj) => (
+                <SceneObjectItem
+                    key={obj.id}
+                    obj={obj}
+                    sceneId={sceneId}
+                    onUnlinkObject={onUnlinkObject}
+                    onUpdateGlobalObject={onUpdateGlobalObject}
+                />
             ))
         ) : (
              <p className="text-center text-brand-text-dim">Nenhum objeto vinculado a esta cena.</p>

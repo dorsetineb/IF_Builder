@@ -13,7 +13,7 @@ interface ThemeEditorProps {
   chanceIconColor: string;
   gameFontFamily: string;
   enableChances: boolean;
-  chanceIcon: 'circle' | 'cross' | 'heart';
+  chanceIcon: 'circle' | 'cross' | 'heart' | 'square' | 'diamond';
   chanceLossMessage: string;
   chanceRestoreMessage: string;
   chanceReturnButtonText: string;
@@ -245,16 +245,30 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
     );
 
     const CrossIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
-      <svg stroke={color} strokeWidth="3" strokeLinecap="round" viewBox="0 0 24 24" className={className} fill="none">
+      <svg stroke={color} strokeWidth="8" strokeLinecap="round" viewBox="0 0 24 24" className={className} fill="none">
         <path d="M12 5 V19 M5 12 H19"/>
       </svg>
     );
 
-    const ChanceIcon: React.FC<{ type: 'heart' | 'circle' | 'cross', color: string, className?: string }> = ({ type, color, className }) => {
+    const SquareIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
+      <svg fill={color} viewBox="0 0 24 24" className={className}>
+        <rect x="5" y="5" width="14" height="14" rx="1" />
+      </svg>
+    );
+
+    const DiamondIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
+      <svg fill={color} viewBox="0 0 24 24" className={className}>
+        <path d="M12 2l10 10-10 10L2 12z" />
+      </svg>
+    );
+
+    const ChanceIcon: React.FC<{ type: 'heart' | 'circle' | 'cross' | 'square' | 'diamond', color: string, className?: string }> = ({ type, color, className }) => {
         switch (type) {
             case 'heart': return <HeartIcon color={color} className={className} />;
             case 'circle': return <CircleIcon color={color} className={className} />;
             case 'cross': return <CrossIcon color={color} className={className} />;
+            case 'square': return <SquareIcon color={color} className={className} />;
+            case 'diamond': return <DiamondIcon color={color} className={className} />;
             default: return <HeartIcon color={color} className={className} />;
         }
     };
@@ -404,7 +418,8 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                         >
                                             <option value="heart">Corações</option>
                                             <option value="circle">Círculos</option>
-                                            <option value="cross">Cruzes</option>
+                                            <option value="square">Quadrados</option>
+                                            <option value="diamond">Losangos</option>
                                         </select>
                                     </div>
                                 </div>
@@ -475,7 +490,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                         color: localGameTheme === 'dark' ? localTextColor : localTextColorLight,
                                         borderColor: focusPreview 
                                             ? (localGameTheme === 'dark' ? localFocusColor : localFocusColorLight) 
-                                            : (localGameTheme === 'dark' ? '#3036d' : '#d0d7de'),
+                                            : (localGameTheme === 'dark' ? '#30363d' : '#d0d7de'),
                                         fontFamily: localFontFamily,
                                     }}
                                     onFocus={() => setFocusPreview(true)}

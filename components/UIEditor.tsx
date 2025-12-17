@@ -4,6 +4,7 @@ import { UploadIcon } from './icons/UploadIcon';
 import { TrashIcon } from './icons/TrashIcon';
 import { PlusIcon } from './icons/PlusIcon';
 import { ExclamationTriangleIcon } from './icons/ExclamationTriangleIcon';
+import { AdjustmentsHorizontalIcon } from './icons/AdjustmentsHorizontalIcon';
 
 interface UIEditorProps {
   html: string;
@@ -30,7 +31,7 @@ interface UIEditorProps {
   chanceIconColor: string;
   gameFontFamily: string;
   gameFontSize: string;
-  chanceIcon: 'circle' | 'cross' | 'heart';
+  chanceIcon: 'circle' | 'cross' | 'heart' | 'square' | 'diamond';
   chanceReturnButtonText: string;
   gameTheme: 'dark' | 'light';
   textColorLight: string;
@@ -72,6 +73,8 @@ interface UIEditorProps {
   textSpeed: number;
   imageTransitionType: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'page-turn' | 'pixelate' | 'none';
   imageSpeed: number;
+  
+  onNavigateToTrackers?: () => void;
 }
 
 const FONTS = [
@@ -166,7 +169,7 @@ const ColorInput: React.FC<{
     </div>
 );
 
-// Sub-component to manage local state for the verbs input field (Moved from GameInfoEditor)
+// Sub-component to manage local state for the verbs input field
 const FixedVerbItem: React.FC<{
   verb: FixedVerb;
   onUpdate: (id: string, field: 'verbs' | 'description', value: any) => void;
@@ -250,7 +253,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
       negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription,
       fixedVerbs,
       // Transition Props
-      textAnimationType, textSpeed, imageTransitionType, imageSpeed
+      textAnimationType, textSpeed, imageTransitionType, imageSpeed,
+      onNavigateToTrackers
   } = props;
 
   // State from UIEditor
@@ -318,6 +322,37 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localTextSpeed, setLocalTextSpeed] = useState(textSpeed);
   const [localImageTransitionType, setLocalImageTransitionType] = useState(imageTransitionType);
   const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed);
+
+  const TABS = {
+    abertura: 'Início',
+    layout: 'Layout',
+    sistemas: 'Sistemas',
+    verbos: 'Verbos Fixos',
+    textos: 'Textos',
+    cores: 'Cores & Tema',
+    fim_de_jogo: 'Fim de Jogo',
+    transicoes: 'Transições'
+  };
+
+  const handleFixedVerbChange = (id: string, field: 'verbs' | 'description', value: any) => {
+    setLocalFixedVerbs(prev => prev.map(verb => 
+        verb.id === id ? { ...verb, [field]: value } : verb
+    ));
+  };
+
+  const handleRemoveFixedVerb = (id: string) => {
+      setLocalFixedVerbs(prev => prev.filter(verb => verb.id !== id));
+  };
+
+  const handleAddFixedVerb = () => {
+      const newId = `verb_${Math.random().toString(36).substring(2, 9)}`;
+      const newVerb: FixedVerb = {
+          id: newId,
+          verbs: [],
+          description: ''
+      };
+      setLocalFixedVerbs(prev => [...prev, newVerb]);
+  };
 
   useEffect(() => {
     // Sync all local states with props
@@ -390,8 +425,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     textAnimationType, textSpeed, imageTransitionType, imageSpeed
   ]);
   
-  // NOTE: Removed the useEffect that auto-reset frame colors on theme change to allow persistence.
-
   useEffect(() => {
     const dirty = localLayoutOrientation !== layoutOrientation ||
                   localLayoutOrder !== layoutOrder ||
@@ -458,12 +491,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     localTextAnimationType, localTextSpeed, localImageTransitionType, localImageSpeed,
     props, onSetDirty
   ]);
-
-  useEffect(() => {
-    if (localGameSystemEnabled !== 'trackers' && activeTab === 'trackers') {
-        setActiveTab('abertura');
-    }
-  }, [localGameSystemEnabled, activeTab]);
 
   const handleSave = () => {
     // UIEditor fields
@@ -634,28 +661,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     }
   };
 
-  const handleAddFixedVerb = () => {
-      const newVerb: FixedVerb = {
-          id: `verb_${Math.random().toString(36).substring(2, 9)}`,
-          verbs: [],
-          description: 'Nova resposta para o verbo.',
-      };
-      setLocalFixedVerbs([...localFixedVerbs, newVerb]);
-  };
-  
-  const handleRemoveFixedVerb = (id: string) => {
-      setLocalFixedVerbs(localFixedVerbs.filter(verb => verb.id !== id));
-  };
-  
-  const handleFixedVerbChange = (id: string, field: 'verbs' | 'description', value: any) => {
-      setLocalFixedVerbs(localFixedVerbs.map(verb => {
-          if (verb.id === id) {
-              return { ...verb, [field]: value };
-          }
-          return verb;
-      }));
-  };
-
+  // ... (Icons and other helper functions remain same) ...
   const HeartIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
       <svg fill={color} viewBox="0 0 24 24" className={className}>
           <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
@@ -669,16 +675,30 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   );
 
   const CrossIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
-    <svg stroke={color} strokeWidth="3" strokeLinecap="round" viewBox="0 0 24 24" className={className} fill="none">
+    <svg stroke={color} strokeWidth="8" strokeLinecap="round" viewBox="0 0 24 24" className={className} fill="none">
       <path d="M12 5 V19 M5 12 H19"/>
     </svg>
   );
 
-  const ChanceIcon: React.FC<{ type: 'heart' | 'circle' | 'cross', color: string, className?: string }> = ({ type, color, className }) => {
+  const SquareIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
+    <svg fill={color} viewBox="0 0 24 24" className={className}>
+      <rect x="5" y="5" width="14" height="14" rx="1" />
+    </svg>
+  );
+
+  const DiamondIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
+    <svg fill={color} viewBox="0 0 24 24" className={className}>
+      <path d="M12 2l10 10-10 10L2 12z" />
+    </svg>
+  );
+
+  const ChanceIcon: React.FC<{ type: 'heart' | 'circle' | 'cross' | 'square' | 'diamond', color: string, className?: string }> = ({ type, color, className }) => {
       switch (type) {
           case 'heart': return <HeartIcon color={color} className={className} />;
           case 'circle': return <CircleIcon color={color} className={className} />;
           case 'cross': return <CrossIcon color={color} className={className} />;
+          case 'square': return <SquareIcon color={color} className={className} />;
+          case 'diamond': return <DiamondIcon color={color} className={className} />;
           default: return <HeartIcon color={color} className={className} />;
       }
   };
@@ -738,19 +758,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
   const { panelStyles, containerStyles } = getFramePreviewStyles(localImageFrame);
 
-  const TABS = {
-    abertura: 'Abertura do Jogo',
-    layout: 'Layout',
-    transicoes: 'Transições',
-    fim_de_jogo: 'Fim de Jogo',
-    verbos: 'Verbos Fixos',
-    textos: 'Textos da Interface',
-    cores: 'Cores e Fontes',
-  };
-
 
   return (
     <div className="space-y-6 pb-24">
+      {/* ... Header and Tabs ... */}
       <div className="flex justify-between items-start">
         <div>
             <p className="text-brand-text-dim mt-1 text-sm">
@@ -768,17 +779,15 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
       <div>
         <div className="border-b border-brand-border flex space-x-1 overflow-x-auto">
           {Object.entries(TABS).map(([key, name]) => {
-              const isTabDisabled = key === 'trackers' && localGameSystemEnabled !== 'trackers';
               return (
                   <button
                       key={key}
-                      onClick={() => !isTabDisabled && setActiveTab(key as any)}
-                      disabled={isTabDisabled}
+                      onClick={() => setActiveTab(key as any)}
                       className={`px-4 py-2 font-semibold text-sm rounded-t-md transition-colors whitespace-nowrap ${
                           activeTab === key
                               ? 'bg-brand-surface text-brand-primary'
                               : 'text-brand-text-dim hover:text-brand-text'
-                      } ${isTabDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                      }`}
                   >
                       {name}
                   </button>
@@ -788,93 +797,221 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
         <div className="bg-brand-surface -mt-px p-6">
           {activeTab === 'layout' && (
-              <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 items-center">
-                      <div className="space-y-6">
-                          <div>
-                              <label htmlFor="orientation-select" className="block text-sm font-medium text-brand-text-dim mb-1">Orientação</label>
-                              <select
-                                  id="orientation-select"
-                                  value={localLayoutOrientation}
-                                  onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                              >
-                                  <option value="vertical">Vertical</option>
-                                  <option value="horizontal">Horizontal</option>
-                              </select>
-                          </div>
-                          <div>
-                              <label htmlFor="order-select" className="block text-sm font-medium text-brand-text-dim mb-1">Posição da Imagem</label>
-                              <select
-                                  id="order-select"
-                                  value={localLayoutOrder}
-                                  onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                              >
-                                  <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
-                                  <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
-                              </select>
-                          </div>
+              // ... Layout Tab Content ...
+              <div className="space-y-12">
+                  {/* Tela de Abertura Section */}
+                  <div>
+                      <h3 className="text-lg font-semibold text-brand-text mb-4">Tela de Abertura</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                        <div className="space-y-6">
+                            {/* ... Inputs ... */}
+                            <div>
+                                <label htmlFor="splashContentAlignment" className="text-sm font-medium text-brand-text-dim mb-1 block">Posicionamento do Conteúdo</label>
+                                <select
+                                    id="splashContentAlignment"
+                                    value={localSplashContentAlignment}
+                                    onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                >
+                                    <option value="right">Direita</option>
+                                    <option value="left">Esquerda</option>
+                                </select>
+                            </div>
+                            <div className="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  id="omitSplashTitle"
+                                  checked={localOmitSplashTitle}
+                                  onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
+                                  className="custom-checkbox"
+                                />
+                                <label htmlFor="omitSplashTitle" className="ml-2 text-sm text-brand-text-dim">Ocultar título do jogo e descrição da tela de abertura</label>
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                           <p className="text-sm text-brand-text-dim mb-1 text-center">Pré-visualização da Abertura</p>
+                           {/* ... Preview Box ... */}
+                           <div className="bg-brand-bg border border-brand-border rounded-lg p-4 flex items-center justify-center">
+                                <div
+                                    className="relative w-full max-w-[400px] aspect-video bg-brand-bg border border-brand-border rounded-md flex"
+                                    style={{
+                                        justifyContent: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
+                                        alignItems: 'flex-end'
+                                    }}
+                                >
+                                    <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 text-brand-text-dim font-semibold text-xs">
+                                        Imagem de Fundo
+                                    </div>
+                                    {!localOmitSplashTitle && (
+                                        <div
+                                            className="w-2/3 h-1/3 m-8 bg-brand-primary/10 border border-brand-primary rounded-md flex items-center justify-center text-center text-xs p-2 text-brand-primary font-semibold"
+                                        >
+                                            Título e Descrição
+                                        </div>
+                                    )}
+                                </div>
+                           </div>
+                        </div>
                       </div>
-                      
-                      <div className="flex flex-col items-center justify-center">
-                          <p className="text-sm text-brand-text-dim mb-2">Pré-visualização do Layout</p>
-                          <div 
-                              className={`w-full max-w-sm ${localLayoutOrientation === 'horizontal' ? 'aspect-[4/5]' : 'aspect-video'} bg-brand-bg border-2 border-brand-border rounded-lg flex p-2 gap-2`}
-                              style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
-                          >
-                            <div 
-                                className={`flex items-center justify-center ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'} transition-all duration-300 ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}
-                                style={getFramePreviewStyles('none').panelStyles}
-                            >
-                                  <div 
-                                      className={`flex-1 w-full h-full rounded flex items-center justify-center text-center text-sm p-2 font-semibold`}
-                                      style={getFramePreviewStyles('none').containerStyles}
-                                  >
-                                      Imagem
-                                  </div>
-                              </div>
-                              <div className={`flex-1 bg-brand-primary/30 border border-brand-primary rounded flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}>
-                                  Descrição
+                  </div>
+                  
+                  {/* Layout do Jogo Section */}
+                  <div className="pt-8 border-t border-brand-border/50">
+                      <h3 className="text-lg font-semibold text-brand-text mb-4">Layout do Jogo</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                          <div className="space-y-6">
+                            {/* ... Layout Inputs ... */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="orientation-select" className="block text-sm font-medium text-brand-text-dim mb-1">Orientação</label>
+                                    <select
+                                        id="orientation-select"
+                                        value={localLayoutOrientation}
+                                        onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
+                                        className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                    >
+                                        <option value="vertical">Vertical</option>
+                                        <option value="horizontal">Horizontal</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label htmlFor="order-select" className="block text-sm font-medium text-brand-text-dim mb-1">Posição da Imagem</label>
+                                    <select
+                                        id="order-select"
+                                        value={localLayoutOrder}
+                                        onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
+                                        className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                    >
+                                        <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
+                                        <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label htmlFor="frame-select" className="block text-sm font-medium text-brand-text-dim mb-1">Tipo de Moldura</label>
+                                    <select
+                                        id="frame-select"
+                                        value={localImageFrame}
+                                        onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
+                                        className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                    >
+                                        <option value="none">Sem moldura</option>
+                                        <option value="rounded-top">Portal</option>
+                                        <option value="book-cover">Quadrada</option>
+                                        <option value="trading-card">Arredondada</option>
+                                        <option value="chamfered">Portal Tech</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    {localImageFrame === 'rounded-top' && (
+                                        <ColorInput label="Cor da Moldura" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
+                                    )}
+                                    {localImageFrame === 'book-cover' && (
+                                        <ColorInput label="Cor da Moldura" id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
+                                    )}
+                                    {localImageFrame === 'trading-card' && (
+                                        <ColorInput label="Cor da Moldura" id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
+                                    )}
+                                    {localImageFrame === 'chamfered' && (
+                                        <ColorInput label="Cor da Moldura" id="frameChamferedColor" value={localFrameChamferedColor} onChange={setLocalFrameChamferedColor} placeholder="#FFFFFF" />
+                                    )}
+                                </div>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-col">
+                              {/* ... Layout Preview ... */}
+                              <p className="text-sm text-brand-text-dim mb-1 text-center">Pré-visualização do Layout</p>
+                              <div className="bg-brand-bg border border-brand-border rounded-lg p-4 flex items-center justify-center h-full min-h-[200px]">
+                                <div 
+                                    className="w-full max-w-[400px] aspect-video border-2 border-brand-border/50 rounded-lg flex p-2 gap-2 transition-all"
+                                    style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
+                                >
+                                    <div 
+                                        className={`flex items-center justify-center ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'} transition-all duration-300 ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}
+                                        style={getFramePreviewStyles(localImageFrame).panelStyles}
+                                    >
+                                        <div 
+                                            className={`flex-1 w-full h-full rounded flex items-center justify-center text-center text-xs p-2 font-semibold text-brand-text-dim border border-brand-border bg-brand-bg`}
+                                            style={{
+                                                ...getFramePreviewStyles(localImageFrame).containerStyles,
+                                                backgroundColor: undefined
+                                            }}
+                                        >
+                                            Imagem da Cena
+                                        </div>
+                                    </div>
+                                    <div className={`flex-1 bg-brand-primary/10 border border-brand-primary rounded flex items-center justify-center text-center text-xs p-2 text-brand-primary font-semibold ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}>
+                                        Descrição da Cena
+                                    </div>
+                                </div>
                               </div>
                           </div>
                       </div>
                   </div>
+              </div>
+          )}
 
-                  <div className="pt-6 border-t border-brand-border/50">
-                      <h3 className="text-lg font-semibold text-brand-text mb-4">Sistemas</h3>
-                        <div className="grid md:grid-cols-3 gap-x-8">
-                            <div className="md:col-span-1">
-                                <label htmlFor="system-select" className="block text-sm font-medium text-brand-text-dim mb-1">Habilitar sistemas</label>
-                                <select
-                                    id="system-select"
-                                    value={localGameSystemEnabled}
-                                    onChange={(e) => setLocalGameSystemEnabled(e.target.value as 'none' | 'chances' | 'trackers')}
-                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                >
-                                    <option value="none">Nenhum</option>
-                                    <option value="chances">Chances</option>
-                                    <option value="trackers">Rastreadores</option>
-                                </select>
-                            </div>
-                             <div className="md:col-span-2 mt-4 md:mt-0">
+          {activeTab === 'sistemas' && (
+              // ... Sistemas Content ...
+              <div className="space-y-8">
+                   <h3 className="text-lg font-semibold text-brand-text mb-4">Configuração de Sistemas</h3>
+                   {/* ... content ... */}
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                        <div>
+                            <label htmlFor="system-select" className="block text-sm font-medium text-brand-text-dim mb-1">Habilitar sistemas</label>
+                            <select
+                                id="system-select"
+                                value={localGameSystemEnabled}
+                                onChange={(e) => setLocalGameSystemEnabled(e.target.value as 'none' | 'chances' | 'trackers')}
+                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                            >
+                                <option value="none">Nenhum</option>
+                                <option value="chances">Chances</option>
+                                <option value="trackers">Rastreadores</option>
+                            </select>
+                            
+                            <div className="mt-4 p-4 rounded-md bg-brand-bg/50 border border-brand-border text-sm text-brand-text-dim">
+                                {localGameSystemEnabled === 'none' && "Nenhum sistema de jogo adicional habilitado."}
                                 {localGameSystemEnabled === 'chances' && (
-                                    <div className="space-y-4">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                                            <div>
-                                                <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
-                                                <input
-                                                    type="number"
-                                                    id="maxChances"
-                                                    value={localMaxChances}
-                                                    onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
-                                                    min="1"
-                                                    max="10"
-                                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                                />
-                                            </div>
-                                            <div>
-                                                <label htmlFor="chanceIcon" className="block text-sm font-medium text-brand-text-dim mb-1">Formato do Ícone</label>
+                                    <>
+                                        Gerencie a 'vida' do jogador. Defina um máximo de tentativas.
+                                        <br />
+                                        Se acabarem, o jogo exibe a tela de Final Negativo.
+                                    </>
+                                )}
+                                {localGameSystemEnabled === 'trackers' && (
+                                    <>
+                                        Crie variáveis (Ex: Vida, Dinheiro, Sanidade). Defina valores iniciais e máximos.
+                                        <br />
+                                        Ações podem alterar esses valores e levar a cenas específicas.
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-6">
+                             {localGameSystemEnabled === 'chances' && (
+                                <>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div>
+                                            <label htmlFor="maxChances" className="block text-sm font-medium text-brand-text-dim mb-1">Número de Chances</label>
+                                            <input
+                                                type="number"
+                                                id="maxChances"
+                                                value={localMaxChances}
+                                                onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
+                                                min="1"
+                                                max="10"
+                                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label htmlFor="chanceIcon" className="block text-sm font-medium text-brand-text-dim mb-1">Formato do Ícone</label>
+                                            <div className="flex gap-2">
                                                 <select
                                                     id="chanceIcon"
                                                     value={localChanceIcon}
@@ -883,26 +1020,33 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 >
                                                     <option value="heart">Corações</option>
                                                     <option value="circle">Círculos</option>
-                                                    <option value="cross">Cruzes</option>
+                                                    <option value="square">Quadrados</option>
+                                                    <option value="diamond">Losangos</option>
                                                 </select>
+                                                <div className="flex-shrink-0 flex items-center justify-center w-10 bg-brand-bg border border-brand-border rounded-md">
+                                                    <ChanceIcon type={localChanceIcon} color={localChanceIconColor} className="w-5 h-5"/>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div>
-                                            <label htmlFor="chanceReturnButton" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Retorno</label>
-                                            <input
-                                                type="text"
-                                                id="chanceReturnButton"
-                                                value={localChanceReturnButtonText}
-                                                onChange={(e) => setLocalChanceReturnButtonText(e.target.value)}
-                                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                            />
-                                            <p className="text-xs text-brand-text-dim mt-1">Aparece após perder uma chance.</p>
-                                        </div>
                                     </div>
-                                )}
-                                {localGameSystemEnabled === 'trackers' && (
+                                    <ColorInput label="Cor do Ícone" id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
                                     <div>
-                                       <div className="flex items-center">
+                                        <label htmlFor="chanceReturnButton" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Retorno</label>
+                                        <input
+                                            type="text"
+                                            id="chanceReturnButton"
+                                            value={localChanceReturnButtonText}
+                                            onChange={(e) => setLocalChanceReturnButtonText(e.target.value)}
+                                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                        />
+                                        <p className="text-xs text-brand-text-dim mt-1">Aparece após perder uma chance.</p>
+                                    </div>
+                                </>
+                             )}
+
+                             {localGameSystemEnabled === 'trackers' && (
+                                <div className="flex flex-col gap-4">
+                                     <div className="flex items-center">
                                           <input
                                               type="checkbox"
                                               id="showTrackersUI"
@@ -914,12 +1058,78 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                               Mostrar painel de rastreadores no jogo
                                           </label>
                                       </div>
+                                      
+                                      <div className="pt-2">
+                                          <button
+                                              onClick={onNavigateToTrackers}
+                                              className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors text-sm"
+                                          >
+                                              <AdjustmentsHorizontalIcon className="w-4 h-4 mr-2" />
+                                              Gerenciar Rastreadores
+                                          </button>
+                                          <p className="text-xs text-brand-text-dim mt-2">Clique acima para configurar as variáveis do jogo (vida, dinheiro, etc.).</p>
+                                      </div>
+                                </div>
+                             )}
+                        </div>
+                   </div>
+              </div>
+          )}
+
+          {/* ... Other Tabs (transicoes, cores, etc.) ... */}
+          {/* ... (These sections remain mostly unchanged unless they contain images) ... */}
+          
+          {/* Abertura Tab */}
+          {activeTab === 'abertura' && (
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                  <div className="lg:col-span-2 space-y-6 flex flex-col h-full">
+                       <div className="space-y-2">
+                          <label htmlFor="gameTitle" className="text-lg font-semibold text-brand-text mb-2 block">Título do Jogo</label>
+                          <input
+                            type="text"
+                            id="gameTitle"
+                            value={localTitle}
+                            onChange={(e) => setLocalTitle(e.target.value)}
+                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                            placeholder="Ex: A Masmorra Esquecida"
+                          />
+                      </div>
+                      <div className="space-y-2 flex flex-col flex-grow">
+                          <label htmlFor="splashDescription" className="text-lg font-semibold text-brand-text mb-2 block">Descrição do Jogo</label>
+                          <textarea
+                            id="splashDescription"
+                            value={localSplashDescription}
+                            onChange={(e) => setLocalSplashDescription(e.target.value)}
+                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow text-sm min-h-[150px]"
+                            placeholder="Uma breve descrição da sua aventura..."
+                          />
+                      </div>
+                  </div>
+
+                  <div className="lg:col-span-1 h-full">
+                        <div className="space-y-4 h-full flex flex-col">
+                            <h4 className="text-lg font-semibold text-brand-text">Imagem de Fundo</h4>
+                            <div className="flex-grow flex flex-col relative min-h-[250px]">
+                                {localSplashImage ? (
+                                    <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
+                                         <img src={localSplashImage} alt="Fundo" className="w-full h-full object-cover" />
+                                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
+                                              <label className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover">
+                                                 <UploadIcon className="w-5 h-5" />
+                                                 <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
+                                              </label>
+                                              <button onClick={() => setLocalSplashImage('')} className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                                                  <TrashIcon className="w-5 h-5" />
+                                              </button>
+                                         </div>
                                     </div>
-                                )}
-                                {localGameSystemEnabled === 'none' && (
-                                    <div className="h-full flex items-center justify-center bg-brand-bg rounded-md border-2 border-dashed border-brand-border">
-                                        <p className="text-brand-text-dim text-sm">Nenhum sistema de jogo habilitado.</p>
-                                    </div>
+                                ) : (
+                                    <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-brand-border bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors">
+                                        <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
+                                        <span className="text-sm font-semibold text-brand-text">Clique para Enviar</span>
+                                        <span className="text-xs text-brand-text-dim mt-1">ou arraste e solte</span>
+                                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
+                                    </label>
                                 )}
                             </div>
                         </div>
@@ -927,11 +1137,113 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
               </div>
           )}
 
+          {activeTab === 'fim_de_jogo' && (
+              <div className="space-y-10">
+                  {/* Positive Ending */}
+                  <div className="space-y-6">
+                      <h3 className="text-lg font-bold text-brand-text border-b border-brand-border pb-2">Final Positivo</h3>
+                      <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador alcança uma cena marcada como "final".</p>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          {/* Image Column */}
+                          <div className="space-y-2 h-48 md:h-auto flex flex-col">
+                              <h4 className="text-sm font-semibold text-brand-text-dim">Imagem de Fundo</h4>
+                              <div className="relative flex-grow w-full min-h-[200px]">
+                                   {localPositiveEndingImage ? (
+                                    <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
+                                         <img src={localPositiveEndingImage} alt="Final Positivo" className="w-full h-full object-cover" />
+                                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
+                                              <label className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover">
+                                                 <UploadIcon className="w-5 h-5" />
+                                                 <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
+                                              </label>
+                                              <button onClick={() => setLocalPositiveEndingImage('')} className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                                                  <TrashIcon className="w-5 h-5" />
+                                              </button>
+                                         </div>
+                                    </div>
+                                ) : (
+                                    <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-brand-border bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors">
+                                        <UploadIcon className="w-6 h-6 text-brand-text-dim mb-2" />
+                                        <span className="text-xs font-semibold text-brand-text">Clique para Enviar</span>
+                                        <span className="text-[10px] text-brand-text-dim mt-1">ou arraste e solte</span>
+                                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
+                                    </label>
+                                )}
+                              </div>
+                          </div>
+                          
+                          {/* Text Column */}
+                          <div className="space-y-2 flex flex-col">
+                              <h4 className="text-sm font-semibold text-brand-text-dim">Mensagem de Vitória</h4>
+                              <textarea
+                                  id="positiveEndingDescription"
+                                  value={localPositiveEndingDescription}
+                                  onChange={(e) => setLocalPositiveEndingDescription(e.target.value)}
+                                  className="w-full h-48 bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm resize-none"
+                                  placeholder="Parabéns! Você venceu."
+                              />
+                          </div>
+                      </div>
+                  </div>
+
+                  {/* Negative Ending */}
+                  <div className="space-y-6 pt-6 border-t border-brand-border/50">
+                      <h3 className="text-lg font-bold text-brand-text border-b border-brand-border pb-2">Final Negativo</h3>
+                      <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador fica sem chances.</p>
+                      
+                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                          {/* Image Column */}
+                          <div className="space-y-2 h-48 md:h-auto flex flex-col">
+                              <h4 className="text-sm font-semibold text-brand-text-dim">Imagem de Fundo</h4>
+                              <div className="relative flex-grow w-full min-h-[200px]">
+                                   {localNegativeEndingImage ? (
+                                    <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
+                                         <img src={localNegativeEndingImage} alt="Final Negativo" className="w-full h-full object-cover" />
+                                         <div className="absolute inset-0 bg-black/50 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
+                                              <label className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover">
+                                                 <UploadIcon className="w-5 h-5" />
+                                                 <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
+                                              </label>
+                                              <button onClick={() => setLocalNegativeEndingImage('')} className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600">
+                                                  <TrashIcon className="w-5 h-5" />
+                                              </button>
+                                         </div>
+                                    </div>
+                                ) : (
+                                    <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-brand-border bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors">
+                                        <UploadIcon className="w-6 h-6 text-brand-text-dim mb-2" />
+                                        <span className="text-xs font-semibold text-brand-text">Clique para Enviar</span>
+                                        <span className="text-[10px] text-brand-text-dim mt-1">ou arraste e solte</span>
+                                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
+                                    </label>
+                                )}
+                              </div>
+                          </div>
+                          
+                          {/* Text Column */}
+                          <div className="space-y-2 flex flex-col">
+                              <h4 className="text-sm font-semibold text-brand-text-dim">Mensagem de Derrota</h4>
+                              <textarea
+                                  id="negativeEndingDescription"
+                                  value={localNegativeEndingDescription}
+                                  onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
+                                  className="w-full h-48 bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm resize-none"
+                                  placeholder="Fim de jogo."
+                              />
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          )}
+
+          {/* ... Verbos, Textos, Cores, Transicoes Tabs (no image upload changes needed, but keeping structure) ... */}
           {activeTab === 'transicoes' && (
+              // ... existing content ...
               <div className="space-y-8">
                   <div>
                       <h3 className="text-lg font-semibold text-brand-text mb-4">Transição de Textos</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                           <div>
                               <label htmlFor="textAnimationType" className="block text-sm font-medium text-brand-text-dim mb-1">Efeito de Animação</label>
                               <select
@@ -945,19 +1257,24 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                               </select>
                           </div>
                           <div>
-                              <label htmlFor="textSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Animação: {localTextSpeed}</label>
-                              <input
-                                  type="range"
-                                  id="textSpeed"
-                                  min="1"
-                                  max="10"
-                                  value={localTextSpeed}
-                                  onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
-                                  className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border"
-                              />
-                              <div className="flex justify-between text-xs text-brand-text-dim mt-1">
-                                  <span>Lento</span>
-                                  <span>Rápido</span>
+                              <label htmlFor="textSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Animação</label>
+                              <div className="flex items-center gap-4">
+                                  <div className="flex-grow relative">
+                                      <input
+                                          type="range"
+                                          id="textSpeed"
+                                          min="1"
+                                          max="5"
+                                          value={localTextSpeed}
+                                          onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
+                                          className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border accent-brand-primary"
+                                      />
+                                      <div className="flex justify-between text-xs text-brand-text-dim mt-1">
+                                          <span>Lento</span>
+                                          <span>Rápido</span>
+                                      </div>
+                                  </div>
+                                  <span className="font-mono font-bold text-brand-primary w-6 text-center">{localTextSpeed}</span>
                               </div>
                           </div>
                       </div>
@@ -965,7 +1282,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                   <div className="pt-6 border-t border-brand-border/50">
                       <h3 className="text-lg font-semibold text-brand-text mb-4">Transição de Imagens</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
                           <div>
                               <label htmlFor="imageTransitionType" className="block text-sm font-medium text-brand-text-dim mb-1">Efeito de Transição Global</label>
                               <select
@@ -981,22 +1298,26 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                   <option value="pixelate">Surgimento Pixelado</option>
                                   <option value="none">Nenhuma</option>
                               </select>
-                              <p className="text-xs text-brand-text-dim mt-1">Esta transição será usada quando uma transição específica não for definida na interação.</p>
                           </div>
                           <div>
-                              <label htmlFor="imageSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Transição: {localImageSpeed}</label>
-                              <input
-                                  type="range"
-                                  id="imageSpeed"
-                                  min="1"
-                                  max="10"
-                                  value={localImageSpeed}
-                                  onChange={(e) => setLocalImageSpeed(parseInt(e.target.value, 10))}
-                                  className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border"
-                              />
-                              <div className="flex justify-between text-xs text-brand-text-dim mt-1">
-                                  <span>Lento</span>
-                                  <span>Rápido</span>
+                              <label htmlFor="imageSpeed" className="block text-sm font-medium text-brand-text-dim mb-1">Velocidade da Transição</label>
+                              <div className="flex items-center gap-4">
+                                  <div className="flex-grow relative">
+                                      <input
+                                          type="range"
+                                          id="imageSpeed"
+                                          min="1"
+                                          max="5"
+                                          value={localImageSpeed}
+                                          onChange={(e) => setLocalImageSpeed(parseInt(e.target.value, 10))}
+                                          className="w-full h-2 bg-brand-bg rounded-lg appearance-none cursor-pointer border border-brand-border accent-brand-primary"
+                                      />
+                                      <div className="flex justify-between text-xs text-brand-text-dim mt-1">
+                                          <span>Lento</span>
+                                          <span>Rápido</span>
+                                      </div>
+                                  </div>
+                                  <span className="font-mono font-bold text-brand-primary w-6 text-center">{localImageSpeed}</span>
                               </div>
                           </div>
                       </div>
@@ -1004,9 +1325,141 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
               </div>
           )}
 
+          {activeTab === 'verbos' && (
+              <div className="space-y-4">
+                  {/* ... Verbs Content ... */}
+                  <p className="text-brand-text-dim text-sm">
+                      Defina verbos fixos que o jogador pode usar a qualquer momento. Estes verbos têm prioridade sobre as interações de cena.
+                  </p>
+                  <div className="bg-yellow-500/10 p-4 rounded-md border border-yellow-500/50 flex items-start gap-3">
+                      <ExclamationTriangleIcon className="w-6 h-6 text-yellow-500 flex-shrink-0" />
+                      <p className="text-yellow-200/90 text-sm">
+                          Os verbos <strong className="text-yellow-100">olhar</strong> e <strong className="text-yellow-100">examinar</strong> são ações padrão do jogo para inspecionar objetos na cena ou no inventário. Eles já funcionam por padrão e não precisam ser adicionados aqui.
+                      </p>
+                  </div>
+                  {localFixedVerbs.map((verb) => (
+                      <FixedVerbItem
+                          key={verb.id}
+                          verb={verb}
+                          onUpdate={handleFixedVerbChange}
+                          onRemove={handleRemoveFixedVerb}
+                      />
+                  ))}
+                  {localFixedVerbs.length === 0 && (
+                      <p className="text-center text-brand-text-dim py-4">Nenhum verbo fixo definido.</p>
+                  )}
+                  <div className="flex justify-end mt-4">
+                      <button 
+                          onClick={handleAddFixedVerb} 
+                          className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
+                      >
+                          <PlusIcon className="w-5 h-5 mr-2" />
+                          Adicionar Verbo Fixo
+                      </button>
+                  </div>
+              </div>
+          )}
+
+          {activeTab === 'textos' && (
+              // ... Textos Content ...
+              <div className="space-y-8">
+                  <div>
+                      <h3 className="text-lg font-semibold text-brand-text mb-4">Textos da Interface</h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                          <div>
+                              <label htmlFor="actionButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Ação</label>
+                              <input
+                                  type="text"
+                                  id="actionButtonText"
+                                  value={localActionButtonText}
+                                  onChange={(e) => setLocalActionButtonText(e.target.value)}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                              />
+                          </div>
+                          <div>
+                              <label htmlFor="verbInputPlaceholder" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Campo de Verbo</label>
+                              <input
+                                  type="text"
+                                  id="verbInputPlaceholder"
+                                  value={localVerbInputPlaceholder}
+                                  onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                              />
+                          </div>
+                          <div>
+                              <label htmlFor="diaryPlayerName" className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Jogador no Diário</label>
+                              <input
+                                  type="text"
+                                  id="diaryPlayerName"
+                                  value={localDiaryPlayerName}
+                                  onChange={(e) => setLocalDiaryPlayerName(e.target.value)}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                              />
+                          </div>
+                          <div>
+                              <label htmlFor="splashButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Início</label>
+                              <input
+                                  type="text"
+                                  id="splashButtonText"
+                                  value={localSplashButtonText}
+                                  onChange={(e) => setLocalSplashButtonText(e.target.value)}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                  placeholder="INICIAR"
+                              />
+                          </div>
+                          <div>
+                              <label htmlFor="continueButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Continuar</label>
+                              <input
+                                  type="text"
+                                  id="continueButtonText"
+                                  value={localContinueButtonText}
+                                  onChange={(e) => setLocalContinueButtonText(e.target.value)}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                  placeholder="Continuar Aventura"
+                              />
+                          </div>
+                          <div>
+                              <label htmlFor="restartButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Reiniciar (Fim de Jogo)</label>
+                              <input
+                                  type="text"
+                                  id="restartButtonText"
+                                  value={localRestartButtonText}
+                                  onChange={(e) => setLocalRestartButtonText(e.target.value)}
+                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                  placeholder="Reiniciar Aventura"
+                              />
+                          </div>
+                          <div className="pt-4 border-t border-brand-border/50 col-span-full">
+                            <h4 className="text-md font-semibold text-brand-text mb-4">Textos dos Botões de Ação</h4>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                                <div>
+                                    <label htmlFor="suggestionsButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Sugestões</label>
+                                    <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" />
+                                </div>
+                                <div>
+                                    <label htmlFor="inventoryButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Inventário</label>
+                                    <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" />
+                                </div>
+                                <div>
+                                    <label htmlFor="diaryButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Diário</label>
+                                    <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" />
+                                </div>
+                                <div>
+                                    <label htmlFor="trackersButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Rastreadores</label>
+                                    <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" disabled={localGameSystemEnabled !== 'trackers'} />
+                                </div>
+                            </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          )}
+
+          {/* ... Cores Content ... */}
           {activeTab === 'cores' && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-start">
                 <div className="bg-brand-surface space-y-6">
+                    {/* ... Existing Cores content ... */}
                     <div className="space-y-2">
                         <h3 className="text-lg font-semibold text-brand-text">Cor da Interface</h3>
                         <div className="flex gap-2 rounded-md bg-brand-bg p-1">
@@ -1055,10 +1508,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     onChange={(e) => setLocalGameFontSize(e.target.value)}
                                     className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                 >
-                                    <option value="0.85em">Pequeno</option>
-                                    <option value="1em">Médio (Padrão)</option>
+                                    <option value="0.85em">Pequeno (Padrão)</option>
+                                    <option value="1em">Médio</option>
                                     <option value="1.1em">Grande</option>
-                                    <option value="1.2em">Extra Grande</option>
                                 </select>
                             </div>
                         </div>
@@ -1082,46 +1534,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     </div>
                                 </button>
                             ))}
-                        </div>
-                    </div>
-
-                    <div className="pt-6 border-t border-brand-border/50">
-                        <h3 className="text-lg font-semibold text-brand-text mb-4">Moldura</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-start">
-                           <div>
-                                <label htmlFor="frame-select" className="block text-sm font-medium text-brand-text-dim mb-1">Tipo de Moldura</label>
-                                <select
-                                    id="frame-select"
-                                    value={localImageFrame}
-                                    onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
-                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                >
-                                    <option value="none">Sem moldura</option>
-                                    <option value="rounded-top">Portal</option>
-                                    <option value="book-cover">Quadrada</option>
-                                    <option value="trading-card">Arredondada</option>
-                                    <option value="chamfered">Chanfrada</option>
-                                </select>
-                           </div>
-                            <div className="space-y-4">
-                                {localImageFrame === 'rounded-top' && (
-                                    <ColorInput label="Cor da Moldura" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
-                                )}
-                                {localImageFrame === 'book-cover' && (
-                                    <ColorInput label="Cor da Moldura" id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
-                                )}
-                                {localImageFrame === 'trading-card' && (
-                                    <ColorInput label="Cor da Moldura" id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
-                                )}
-                                {localImageFrame === 'chamfered' && (
-                                    <ColorInput label="Cor da Moldura" id="frameChamferedColor" value={localFrameChamferedColor} onChange={setLocalFrameChamferedColor} placeholder="#FFFFFF" />
-                                )}
-                                {localImageFrame === 'none' && (
-                                    <p className="text-brand-text-dim text-sm text-center py-4 bg-brand-bg rounded-md h-full flex items-center justify-center">
-                                        Nenhuma moldura especial selecionada.
-                                    </p>
-                                )}
-                            </div>
                         </div>
                     </div>
 
@@ -1184,16 +1596,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <ColorInput label="Cor da Seta de Continuar" id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#58a6ff" />
                             </div>
                         </div>
-                        {localGameSystemEnabled === 'chances' && (
-                            <div className="pt-6 border-t border-brand-border/50">
-                                <h3 className="text-lg font-semibold text-brand-text mb-4">Sistema de Chances</h3>
-                                <div className="space-y-6 mt-4">
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        <ColorInput label="Cor dos Ícones de Chance" id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
-                                    </div>
-                                </div>
-                            </div>
-                         )}
                       </>
                     )}
                 </div>
@@ -1278,351 +1680,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     </div>
                 </div>
             </div>
-          )}
-          {/* Other tabs remain the same... */}
-          {activeTab === 'abertura' && (
-              <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                      <div className="space-y-6">
-                           <div className="space-y-2">
-                              <h4 className="text-lg font-semibold text-brand-text mb-2">Título do Jogo</h4>
-                              <input
-                                type="text"
-                                id="gameTitle"
-                                value={localTitle}
-                                onChange={(e) => setLocalTitle(e.target.value)}
-                                className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                placeholder="Ex: A Masmorra Esquecida"
-                              />
-                              <div className="flex items-center pt-1">
-                                <input
-                                  type="checkbox"
-                                  id="omitSplashTitle"
-                                  checked={localOmitSplashTitle}
-                                  onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
-                                  className="custom-checkbox"
-                                />
-                                <label htmlFor="omitSplashTitle" className="ml-2 text-sm text-brand-text-dim">Omitir título da abertura</label>
-                              </div>
-                          </div>
-                          <div className="space-y-2">
-                              <h4 className="text-lg font-semibold text-brand-text mb-2">Logotipo do Jogo (Opcional)</h4>
-                              <div className="flex items-start gap-4">
-                                  {localLogo && (
-                                      <img src={localLogo} alt="Pré-visualização do logo" className="h-16 w-auto bg-brand-bg p-1 border border-brand-border rounded" />
-                                  )}
-                                  <div className="flex items-center gap-2">
-                                      <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
-                                          <UploadIcon className="w-5 h-5 mr-2" />
-                                          {localLogo ? 'Alterar Logo' : 'Carregar Logo'}
-                                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalLogo)} className="hidden" />
-                                      </label>
-                                      {localLogo && (
-                                          <button
-                                              onClick={() => setLocalLogo('')}
-                                              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                                              title="Remover logo"
-                                          >
-                                              <TrashIcon className="w-5 h-5" />
-                                          </button>
-                                      )}
-                                  </div>
-                              </div>
-                          </div>
-                      </div>
-                      <div className="space-y-2 flex flex-col">
-                          <h4 className="text-lg font-semibold text-brand-text mb-2">Descrição do Jogo</h4>
-                          <textarea
-                            id="splashDescription"
-                            value={localSplashDescription}
-                            onChange={(e) => setLocalSplashDescription(e.target.value)}
-                            rows={8}
-                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow text-sm"
-                            placeholder="Uma breve descrição da sua aventura..."
-                          />
-                      </div>
-                  </div>
-
-                  <div className="pt-6 border-t border-brand-border/50">
-                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                        <div className="space-y-4">
-                            <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
-                            <div className="flex items-start gap-4">
-                                {localSplashImage && (
-                                    <img src={localSplashImage} alt="Fundo da tela de abertura" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />
-                                )}
-                                <div className="flex items-center gap-2">
-                                    <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
-                                        <UploadIcon className="w-5 h-5 mr-2" />
-                                        {localSplashImage ? 'Alterar Imagem' : 'Carregar Imagem'}
-                                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
-                                    </label>
-                                    {localSplashImage && (
-                                        <button
-                                            onClick={() => setLocalSplashImage('')}
-                                            className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                                            title="Remover imagem"
-                                        >
-                                            <TrashIcon className="w-5 h-5" />
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="pt-2">
-                                <label htmlFor="splashContentAlignment" className="text-sm text-brand-text-dim mb-1 block">Alinhamento horizontal</label>
-                                <select
-                                    id="splashContentAlignment"
-                                    value={localSplashContentAlignment}
-                                    onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                >
-                                    <option value="right">Direita</option>
-                                    <option value="left">Esquerda</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                          <h4 className="text-lg font-semibold text-brand-text mb-2">Posicionamento do Conteúdo</h4>
-                           <div
-                              className="relative w-full aspect-video bg-indigo-500/30 border border-indigo-400 rounded-md flex"
-                              style={{
-                                  justifyContent: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
-                                  alignItems: 'flex-end'
-                              }}
-                              title="Área da Imagem de Fundo"
-                          >
-                              <div className="absolute top-2 left-2 text-indigo-200 font-semibold text-sm">
-                                  Imagem de Fundo
-                              </div>
-                              <div
-                                  className="w-2/3 h-1/2 m-4 bg-brand-primary/30 border border-brand-primary rounded-md flex items-center justify-center text-center text-sm p-2 text-brand-primary-hover font-semibold"
-                                  title="Área de Texto"
-                              >
-                                  Texto de Abertura
-                              </div>
-                          </div>
-                        </div>
-                     </div>
-                  </div>
-              </div>
-          )}
-
-          {activeTab === 'fim_de_jogo' && (
-              <div className="space-y-10">
-                  {/* Positive Ending */}
-                  <div className="space-y-6">
-                      <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Positivo</h3>
-                      <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador alcança uma cena marcada como "final".</p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                          <div className="space-y-4">
-                              <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
-                              <div className="flex items-start gap-4">
-                                  {localPositiveEndingImage && (
-                                      <img src={localPositiveEndingImage} alt="Fundo do final positivo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />
-                                  )}
-                                  <div className="flex items-center gap-2">
-                                      <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
-                                          <UploadIcon className="w-5 h-5 mr-2" />
-                                          {localPositiveEndingImage ? 'Alterar Imagem' : 'Carregar Imagem'}
-                                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
-                                      </label>
-                                      {localPositiveEndingImage && (
-                                          <button
-                                              onClick={() => setLocalPositiveEndingImage('')}
-                                              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                                              title="Remover imagem"
-                                          >
-                                              <TrashIcon className="w-5 h-5" />
-                                          </button>
-                                      )}
-                                  </div>
-                              </div>
-                          </div>
-                          <div className="space-y-2 flex flex-col">
-                              <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Vitória</h4>
-                              <textarea
-                                  id="positiveEndingDescription"
-                                  value={localPositiveEndingDescription}
-                                  onChange={(e) => setLocalPositiveEndingDescription(e.target.value)}
-                                  rows={4}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow text-sm"
-                                  placeholder="Parabéns! Você venceu."
-                              />
-                          </div>
-                      </div>
-                  </div>
-
-                  {/* Negative Ending */}
-                  <div className="space-y-6 pt-6 border-t border-brand-border/50">
-                      <h3 className="text-2xl font-bold text-brand-text border-b border-brand-border pb-2">Final Negativo</h3>
-                      <p className="text-sm text-brand-text-dim -mt-4">Esta tela aparece quando o jogador fica sem chances.</p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                          <div className="space-y-4">
-                              <h4 className="text-lg font-semibold text-brand-text mb-2">Imagem de Fundo</h4>
-                              <div className="flex items-start gap-4">
-                                  {localNegativeEndingImage && (
-                                      <img src={localNegativeEndingImage} alt="Fundo do final negativo" className="h-24 w-auto aspect-video object-cover bg-brand-bg p-1 border border-brand-border rounded" />
-                                  )}
-                                  <div className="flex items-center gap-2">
-                                      <label className="flex items-center px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors cursor-pointer">
-                                          <UploadIcon className="w-5 h-5 mr-2" />
-                                          {localNegativeEndingImage ? 'Alterar Imagem' : 'Carregar Imagem'}
-                                          <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
-                                      </label>
-                                      {localNegativeEndingImage && (
-                                          <button
-                                              onClick={() => setLocalNegativeEndingImage('')}
-                                              className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                                              title="Remover imagem"
-                                          >
-                                              <TrashIcon className="w-5 h-5" />
-                                          </button>
-                                      )}
-                                  </div>
-                              </div>
-                          </div>
-                           <div className="space-y-2 flex flex-col">
-                              <h4 className="text-lg font-semibold text-brand-text mb-2">Mensagem de Derrota</h4>
-                              <textarea
-                                  id="negativeEndingDescription"
-                                  value={localNegativeEndingDescription}
-                                  onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
-                                  rows={4}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 flex-grow text-sm"
-                                  placeholder="Fim de jogo."
-                              />
-                          </div>
-                      </div>
-                  </div>
-              </div>
-          )}
-
-          {activeTab === 'verbos' && (
-              <div className="space-y-4">
-                  <p className="text-brand-text-dim text-sm">
-                      Defina verbos fixos que o jogador pode usar a qualquer momento. Estes verbos têm prioridade sobre as interações de cena.
-                  </p>
-                  <div className="bg-yellow-500/10 p-4 rounded-md border border-yellow-500/50 flex items-start gap-3">
-                      <ExclamationTriangleIcon className="w-6 h-6 text-yellow-500 flex-shrink-0" />
-                      <p className="text-yellow-200/90 text-sm">
-                          Os verbos <strong className="text-yellow-100">olhar</strong> e <strong className="text-yellow-100">examinar</strong> são ações padrão do jogo para inspecionar objetos na cena ou no inventário. Eles já funcionam por padrão e não precisam ser adicionados aqui.
-                      </p>
-                  </div>
-                  {localFixedVerbs.map((verb) => (
-                      <FixedVerbItem
-                          key={verb.id}
-                          verb={verb}
-                          onUpdate={handleFixedVerbChange}
-                          onRemove={handleRemoveFixedVerb}
-                      />
-                  ))}
-                  {localFixedVerbs.length === 0 && (
-                      <p className="text-center text-brand-text-dim py-4">Nenhum verbo fixo definido.</p>
-                  )}
-                  <div className="flex justify-end mt-4">
-                      <button 
-                          onClick={handleAddFixedVerb} 
-                          className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
-                      >
-                          <PlusIcon className="w-5 h-5 mr-2" />
-                          Adicionar Verbo Fixo
-                      </button>
-                  </div>
-              </div>
-          )}
-
-          {activeTab === 'textos' && (
-              <div className="space-y-8">
-                  <div>
-                      <h3 className="text-lg font-semibold text-brand-text mb-4">Textos da Interface</h3>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                          <div>
-                              <label htmlFor="actionButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Ação</label>
-                              <input
-                                  type="text"
-                                  id="actionButtonText"
-                                  value={localActionButtonText}
-                                  onChange={(e) => setLocalActionButtonText(e.target.value)}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                              />
-                          </div>
-                          <div>
-                              <label htmlFor="verbInputPlaceholder" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Campo de Verbo</label>
-                              <input
-                                  type="text"
-                                  id="verbInputPlaceholder"
-                                  value={localVerbInputPlaceholder}
-                                  onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                              />
-                          </div>
-                          <div>
-                              <label htmlFor="diaryPlayerName" className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Jogador no Diário</label>
-                              <input
-                                  type="text"
-                                  id="diaryPlayerName"
-                                  value={localDiaryPlayerName}
-                                  onChange={(e) => setLocalDiaryPlayerName(e.target.value)}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                              />
-                          </div>
-                          <div>
-                              <label htmlFor="splashButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Início</label>
-                              <input
-                                  type="text"
-                                  id="splashButtonText"
-                                  value={localSplashButtonText}
-                                  onChange={(e) => setLocalSplashButtonText(e.target.value)}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                  placeholder="INICIAR"
-                              />
-                          </div>
-                          <div>
-                              <label htmlFor="continueButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Continuar</label>
-                              <input
-                                  type="text"
-                                  id="continueButtonText"
-                                  value={localContinueButtonText}
-                                  onChange={(e) => setLocalContinueButtonText(e.target.value)}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                  placeholder="Continuar Aventura"
-                              />
-                          </div>
-                          <div>
-                              <label htmlFor="restartButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Reiniciar (Fim de Jogo)</label>
-                              <input
-                                  type="text"
-                                  id="restartButtonText"
-                                  value={localRestartButtonText}
-                                  onChange={(e) => setLocalRestartButtonText(e.target.value)}
-                                  className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
-                                  placeholder="Reiniciar Aventura"
-                              />
-                          </div>
-                          <div className="pt-4 border-t border-brand-border/50 col-span-full">
-                            <h4 className="text-md font-semibold text-brand-text mb-4">Textos dos Botões de Ação</h4>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                                <div>
-                                    <label htmlFor="suggestionsButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Sugestões</label>
-                                    <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" />
-                                </div>
-                                <div>
-                                    <label htmlFor="inventoryButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Inventário</label>
-                                    <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" />
-                                </div>
-                                <div>
-                                    <label htmlFor="diaryButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Diário</label>
-                                    <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" />
-                                </div>
-                                <div>
-                                    <label htmlFor="trackersButtonText" className="block text-sm font-medium text-brand-text-dim mb-1">Botão Rastreadores</label>
-                                    <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" disabled={localGameSystemEnabled !== 'trackers'} />
-                                </div>
-                            </div>
-                          </div>
-                      </div>
-                  </div>
-              </div>
           )}
         </div>
       </div>
