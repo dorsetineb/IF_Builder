@@ -19,7 +19,7 @@ const X_GAP = 150;
 const Y_GAP = 50;
 const INTERACTION_ITEM_MARGIN_Y = 4; // Corresponds to gap-1
 const PADDING = 8; // Corresponds to p-2 or py-2
-const CONNECTOR_RADIUS = 8; // Half of connector width (w-4)
+const CONNECTOR_GAP = 12; // Radius of circle (8) + gap (4)
 
 type Node = Scene & { x: number; y: number; level: number; height: number };
 type Edge = { 
@@ -255,9 +255,10 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
               const y1_offset = NODE_HEADER_HEIGHT + (interactionIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y)) + (INTERACTION_ITEM_HEIGHT / 2);
               const y2_offset = NODE_HEADER_HEIGHT / 2;
 
-              const x1 = (edge.sSide === 'L' ? sourceNode.x : sourceNode.x + NODE_WIDTH) - bounds.minX;
+              // Apply gap to start and end points
+              const x1 = (edge.sSide === 'L' ? sourceNode.x - CONNECTOR_GAP : sourceNode.x + NODE_WIDTH + CONNECTOR_GAP) - bounds.minX;
               const y1 = sourceNode.y + y1_offset - bounds.minY;
-              const x2 = (edge.tSide === 'L' ? targetNode.x : targetNode.x + NODE_WIDTH) - bounds.minX;
+              const x2 = (edge.tSide === 'L' ? targetNode.x - CONNECTOR_GAP : targetNode.x + NODE_WIDTH + CONNECTOR_GAP) - bounds.minX;
               const y2 = targetNode.y + y2_offset - bounds.minY;
 
               const dx = Math.abs(x2 - x1);
@@ -296,7 +297,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
                 onClick={(e) => {
                     if (Math.sqrt(Math.pow(e.clientX - dragStartPos.current.x, 2) + Math.pow(e.clientY - dragStartPos.current.y, 2)) < 5) onSelectScene(node.id);
                 }}
-                className={`absolute bg-brand-surface rounded-xl shadow-lg flex flex-col transition-all duration-300 border-2 ${borderColorClass} cursor-pointer hover:border-yellow-400 hover:shadow-xl`}
+                className={`absolute bg-brand-surface rounded-xl shadow-lg flex flex-col transition-all duration-300 border-2 ${borderColorClass} cursor-pointer hover:border-yellow-400 hover:shadow-xl overflow-visible`}
                 style={{ width: NODE_WIDTH, transform: `translate(${node.x}px, ${node.y}px)`, height: node.height, userSelect: 'none' }}
               >
                   <div className="p-3 relative flex-shrink-0 text-center" style={{height: NODE_HEADER_HEIGHT}}>
@@ -309,17 +310,17 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
                   </div>
                   
                   {linkingInteractions.length > 0 && (
-                    <div className="flex flex-col gap-1 pb-2">
+                    <div className="flex flex-col gap-1 pb-2 border-t border-brand-border/30">
                         {linkingInteractions.map(inter => {
                             const actionText = inter.verbs?.[0] || '';
                             const targetObj = inter.target ? globalObjects[inter.target] : null;
                             const displayLabel = targetObj ? `${actionText} ${targetObj.name}` : actionText;
 
                             return (
-                                <div key={inter.id} className="relative bg-brand-primary/10 text-brand-primary-hover font-bold py-1 flex items-center rounded-md mx-2" style={{height: INTERACTION_ITEM_HEIGHT}}>
-                                    <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-10 transition-colors ${activeAnchors.has(`${inter.id}-L`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
+                                <div key={inter.id} className="relative bg-brand-primary/10 text-brand-primary-hover font-bold py-1 flex items-center w-full" style={{height: INTERACTION_ITEM_HEIGHT}}>
+                                    <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${activeAnchors.has(`${inter.id}-L`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
                                     <span className="truncate px-4 text-center w-full text-sm" title={displayLabel}>{displayLabel}</span>
-                                    <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-10 transition-colors ${activeAnchors.has(`${inter.id}-R`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
+                                    <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${activeAnchors.has(`${inter.id}-R`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
                                 </div>
                             );
                         })}

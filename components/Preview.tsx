@@ -19,7 +19,7 @@ const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
     }
 }
 
-const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
+const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = ({ gameData, testSceneId }) => {
     const srcDoc = useMemo(() => {
         const chancesContainerHTML = gameData.gameSystemEnabled === 'chances' ? '<div id="chances-container" class="chances-container"></div>' : '';
 
@@ -92,10 +92,18 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
             .replace(/__CONTINUE_INDICATOR_COLOR__/g, gameData.gameContinueIndicatorColor || gameData.gameTitleColor || '#58a6ff');
             
         const engineData = prepareGameDataForEngine(gameData);
+        if (testSceneId) {
+            (engineData as any).cena_inicial = testSceneId;
+        }
+
         // Safely stringify JSON to prevent issues with '</script>' tags in user content.
         const safeJson = JSON.stringify(engineData).replace(/<\/script/g, '<\\/script>');
 
-        const dataScript = `<script>window.embeddedGameData = ${safeJson}; window.isPreview = true;</script>`;
+        const dataScript = `<script>
+            window.embeddedGameData = ${safeJson}; 
+            window.isPreview = true;
+            window.isSceneTest = ${!!testSceneId};
+        </script>`;
         const styleTag = `<style>${finalCss}</style>`;
         const gameScriptTag = `<script>${gameJS}</script>`;
 
@@ -103,7 +111,7 @@ const Preview: React.FC<{ gameData: GameData }> = ({ gameData }) => {
           .replace('</head>', `${styleTag}</head>`)
           .replace('</body>', `${dataScript}${gameScriptTag}</body>`);
 
-    }, [gameData]);
+    }, [gameData, testSceneId]);
 
     return (
         <div className="w-full h-full bg-brand-bg">

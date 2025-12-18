@@ -343,7 +343,25 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
           {activeTab === 'properties' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                   <div className="space-y-4 flex flex-col order-2 md:order-1">
-                      <div className="flex flex-col flex-1 min-h-0">
+                      {/* Name and ID Column */}
+                      <div className="space-y-4">
+                          <div>
+                            <label htmlFor="sceneName" className="block text-sm font-medium text-brand-text-dim mb-1">Nome da Cena</label>
+                            <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"/>
+                          </div>
+                           <div>
+                              <label htmlFor="sceneId" className="block text-sm font-medium text-brand-text-dim mb-1">ID da Cena</label>
+                              <p 
+                                id="sceneId" 
+                                className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
+                                title="O ID da cena é único e não pode ser alterado."
+                              >
+                                {localScene.id}
+                              </p>
+                          </div>
+                       </div>
+
+                      <div className="flex flex-col flex-1 min-h-0 pt-2">
                           <label htmlFor="sceneDescription" className="block text-sm font-medium text-brand-text-dim mb-1">
                               {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição'}
                           </label>
@@ -352,7 +370,48 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                               <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-brand-bg border border-brand-border rounded-md px-3 py-2 resize-y focus:ring-0 text-sm"/>
                           </div>
                       </div>
-                      
+                  </div>
+
+                  <div className="flex flex-col space-y-4 order-1 md:order-2">
+                      <div className="flex flex-col flex-grow min-h-[300px]">
+                          <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem da Cena</label>
+                          <div className="relative flex-grow w-full">
+                            {localScene.image ? (
+                                <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
+                                    <img src={localScene.image} alt={localScene.name} className="w-full h-full object-cover" />
+                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
+                                        <label htmlFor="image-upload-input" className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover flex items-center gap-2 font-semibold text-sm">
+                                            <UploadIcon className="w-5 h-5" />
+                                            <span className="hidden sm:inline">Alterar</span>
+                                            <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                        </label>
+                                        <button 
+                                            onClick={() => updateLocalScene('image', '')}
+                                            className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                            title="Remover Imagem"
+                                        >
+                                            <TrashIcon className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ) : (
+                                <label 
+                                    htmlFor="image-upload-input" 
+                                    className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
+                                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
+                                    onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
+                                    onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
+                                    onDrop={handleDrop}
+                                >
+                                    <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
+                                    <span className="text-sm font-semibold text-brand-text">Clique para Enviar</span>
+                                    <span className="text-xs text-brand-text-dim mt-1">ou arraste e solte</span>
+                                    <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                </label>
+                            )}
+                          </div>
+                      </div>
+
                       <div className="pt-4 border-t border-brand-border/30">
                           <label className="block text-sm font-medium text-brand-text-dim mb-2">Trilha Sonora (Mudar música ao entrar)</label>
                           <div className="flex items-center gap-2">
@@ -412,62 +471,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                               <label htmlFor="restoresChance" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
                                   Esta cena restaura uma chance.
                               </label>
-                          </div>
-                      </div>
-                  </div>
-                  <div className="flex flex-col space-y-3 order-1 md:order-2">
-                       <div className="flex-shrink-0">
-                          <div className="flex flex-col gap-2">
-                            <label htmlFor="sceneName" className="block text-sm font-medium text-brand-text-dim mb-1">Nome da Cena</label>
-                            <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"/>
-                          </div>
-                           <div className="mt-2">
-                              <label htmlFor="sceneId" className="block text-sm font-medium text-brand-text-dim mb-1">ID da Cena</label>
-                              <p 
-                              id="sceneId" 
-                              className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 text-brand-text-dim font-mono select-all"
-                              title="O ID da cena é único e não pode ser alterado."
-                              >
-                              {localScene.id}
-                              </p>
-                          </div>
-                       </div>
-                      <div className="flex flex-col flex-grow mt-2 min-h-[300px]">
-                          <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem da Cena</label>
-                          <div className="relative flex-grow w-full">
-                            {localScene.image ? (
-                                <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
-                                    <img src={localScene.image} alt={localScene.name} className="w-full h-full object-cover" />
-                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
-                                        <label htmlFor="image-upload-input" className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover flex items-center gap-2 font-semibold text-sm">
-                                            <UploadIcon className="w-5 h-5" />
-                                            <span className="hidden sm:inline">Alterar</span>
-                                            <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                        </label>
-                                        <button 
-                                            onClick={() => updateLocalScene('image', '')}
-                                            className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                                            title="Remover Imagem"
-                                        >
-                                            <TrashIcon className="w-5 h-5" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ) : (
-                                <label 
-                                    htmlFor="image-upload-input" 
-                                    className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
-                                    onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
-                                    onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
-                                    onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
-                                    onDrop={handleDrop}
-                                >
-                                    <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
-                                    <span className="text-sm font-semibold text-brand-text">Clique para Enviar</span>
-                                    <span className="text-xs text-brand-text-dim mt-1">ou arraste e solte</span>
-                                    <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                </label>
-                            )}
                           </div>
                       </div>
                   </div>

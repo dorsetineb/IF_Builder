@@ -11,13 +11,12 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 name: scene.name,
                 image: scene.image,
                 description: scene.description,
-                backgroundMusic: scene.backgroundMusic, // Track specific BGM
+                backgroundMusic: scene.backgroundMusic,
                 interactions: scene.interactions,
                 exits: scene.exits,
                 isEndingScene: scene.isEndingScene,
                 removesChanceOnEntry: scene.removesChanceOnEntry,
                 restoresChanceOnEntry: scene.restoresChanceOnEntry,
-                // Pass IDs only to the engine. The engine will look up full objects from global library.
                 objectIds: scene.objectIds || []
             };
         }
@@ -26,7 +25,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
     return {
         cena_inicial: data.startScene,
         cenas: translatedCenas,
-        globalObjects: data.globalObjects, // Pass the library
+        globalObjects: data.globalObjects,
         mensagem_falha_padrao: data.defaultFailureMessage,
         nome_jogador_diario: data.gameDiaryPlayerName,
         gameSystemEnabled: data.gameSystemEnabled,
@@ -38,7 +37,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameTextColorLight: data.gameTextColorLight,
         gameTitleColorLight: data.gameTitleColorLight,
         gameFocusColorLight: data.gameFocusColorLight,
-        gameBackgroundMusic: data.gameBackgroundMusic, // Initial music
+        gameBackgroundMusic: data.gameBackgroundMusic,
         positiveEndingImage: data.positiveEndingImage,
         positiveEndingContentAlignment: data.positiveEndingContentAlignment,
         positiveEndingDescription: data.positiveEndingDescription,
@@ -47,16 +46,13 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         negativeEndingDescription: data.negativeEndingDescription,
         gameRestartButtonText: data.gameRestartButtonText,
         gameContinueButtonText: data.gameContinueButtonText,
-        // System Menu Texts
         gameSystemButtonText: data.gameSystemButtonText,
         gameSaveMenuTitle: data.gameSaveMenuTitle,
         gameLoadMenuTitle: data.gameLoadMenuTitle,
         gameMainMenuButtonText: data.gameMainMenuButtonText,
-        
         fixedVerbs: data.fixedVerbs || [],
         consequenceTrackers: data.consequenceTrackers || [],
         gameShowTrackersUI: data.gameShowTrackersUI,
-        // Transitions
         gameTextAnimationType: data.gameTextAnimationType,
         gameTextSpeed: data.gameTextSpeed,
         gameImageTransitionType: data.gameImageTransitionType,
@@ -66,7 +62,6 @@ export const prepareGameDataForEngine = (data: GameData): object => {
 
 export const gameJS = `
 document.addEventListener('DOMContentLoaded', () => {
-    // --- Icon SVGs ---
     const ICONS = {
         heart: '<svg fill="%COLOR%" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
         circle: '<svg fill="%COLOR%" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
@@ -83,16 +78,14 @@ document.addEventListener('DOMContentLoaded', () => {
         diamond: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2l10 10-10 10L2 12z"/></svg>'
     };
 
-    // --- Game State ---
     const gameData = window.embeddedGameData;
     let currentSceneId = gameData.cena_inicial;
-    let inventory = []; // Array of Objects
+    let inventory = [];
     let visitedScenes = []; 
     let actionLog = []; 
     let chances = gameData.gameMaxChances || 3;
     let isGameEnded = false;
     let trackers = {};
-    let activePopupSource = null;
     let sceneObjectsState = {}; 
     let currentBgmSrc = "";
 
@@ -109,7 +102,6 @@ document.addEventListener('DOMContentLoaded', () => {
         trackers[t.id] = t.initialValue;
     });
 
-    // --- DOM Elements ---
     const splashScreen = document.getElementById('splash-screen');
     const positiveEndingScreen = document.getElementById('positive-ending-screen');
     const negativeEndingScreen = document.getElementById('negative-ending-screen');
@@ -155,7 +147,6 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const closeButtons = document.querySelectorAll('.modal-close-button');
 
-    // --- Audio Helpers ---
     const playSound = (src) => {
         if (!src || !soundEffectAudio) return;
         soundEffectAudio.src = src;
@@ -176,10 +167,9 @@ document.addEventListener('DOMContentLoaded', () => {
         bgmAudio.play().catch(e => console.log('BGM play failed. Needs user interaction.', e));
     };
 
-    // --- Initialization ---
     const init = () => {
         const hasAutoSave = localStorage.getItem('if_builder_autosave_' + document.title);
-        if (hasAutoSave) {
+        if (hasAutoSave && !window.isPreview) {
             continueButton.classList.remove('hidden');
         }
 
@@ -220,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
             systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema';
         });
         btnMainMenu.addEventListener('click', () => {
-            if (confirm("Voltar ao menu principal? Progresso não salvo manualmente será perdido.")) {
+            if (confirm("Voltar ao menu principal?")) {
                 systemModal.classList.add('hidden');
                 splashScreen.classList.remove('hidden');
                 playBgm(""); 
@@ -237,8 +227,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     trackersModal.classList.add('hidden');
                 } else if (!systemModal.classList.contains('hidden')) {
                     systemModal.classList.add('hidden');
-                } else if (!splashScreen.classList.contains('hidden')) {
-                    // Do nothing
                 } else {
                     toggleSystemMenu();
                 }
@@ -250,10 +238,16 @@ document.addEventListener('DOMContentLoaded', () => {
                  loadScene(currentSceneId, false);
              }
         });
+
+        if (window.isSceneTest) {
+            startGame();
+        }
     };
 
     const startGame = () => {
-        localStorage.removeItem('if_builder_autosave_' + document.title);
+        if (!window.isPreview) {
+            localStorage.removeItem('if_builder_autosave_' + document.title);
+        }
         currentSceneId = gameData.cena_inicial;
         inventory = [];
         visitedScenes = [];
@@ -268,7 +262,6 @@ document.addEventListener('DOMContentLoaded', () => {
         
         splashScreen.classList.add('hidden');
         
-        // Inicia BGM global se definida
         if (gameData.gameBackgroundMusic) {
             playBgm(gameData.gameBackgroundMusic);
         }
@@ -292,7 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     splashScreen.classList.add('hidden');
                     systemModal.classList.add('hidden');
                     
-                    // Resume BGM logic
                     const startScene = gameData.cenas[currentSceneId];
                     if (startScene && startScene.backgroundMusic) {
                         playBgm(startScene.backgroundMusic);
@@ -465,7 +457,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const scene = gameData.cenas[sceneId];
         if (!scene) return;
         
-        // BGM Change logic: If scene defines a BGM, switch to it.
         if (scene.backgroundMusic) {
             playBgm(scene.backgroundMusic);
         }
@@ -558,7 +549,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (textAnimType === 'typewriter') {
                 p.className = 'scene-paragraph typewriter-cursor';
                 p.style.opacity = '1'; 
-                p.innerHTML = formattedHTML; // Set full HTML structure first
+                p.innerHTML = formattedHTML;
                 sceneDescription.appendChild(p);
 
                 const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
@@ -567,7 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 while(node = walker.nextNode()) textNodes.push(node);
                 
                 const fullTexts = textNodes.map(n => n.nodeValue);
-                textNodes.forEach(n => n.nodeValue = ''); // Hide content
+                textNodes.forEach(n => n.nodeValue = '');
                 
                 let nodeIdx = 0;
                 let charIdx = 0;
@@ -646,15 +637,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameOver = () => {
         isGameEnded = true;
         negativeEndingScreen.classList.remove('hidden');
-        localStorage.removeItem('if_builder_autosave_' + document.title);
-        playBgm(""); // Stop music on game over
+        if (!window.isPreview) {
+            localStorage.removeItem('if_builder_autosave_' + document.title);
+        }
+        playBgm(""); 
     };
 
     const gameWin = () => {
         isGameEnded = true;
         positiveEndingScreen.classList.remove('hidden');
-        localStorage.removeItem('if_builder_autosave_' + document.title);
-        // Maybe keep music for victory?
+        if (!window.isPreview) {
+            localStorage.removeItem('if_builder_autosave_' + document.title);
+        }
     };
 
     const handleInput = () => {

@@ -382,6 +382,7 @@ const initialGameData: GameData = {
 const App: React.FC = () => {
   const [gameData, setGameData] = useState<GameData>(initialGameData);
   const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
+  const [previewSceneId, setPreviewSceneId] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<View>('scenes');
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [isDirty, setIsDirty] = useState(false);
@@ -671,7 +672,7 @@ const App: React.FC = () => {
                     isPreviewing={isPreviewing} 
                     onTogglePreview={() => setIsPreviewing(false)} 
                 />
-                <Preview gameData={gameData} />
+                <Preview gameData={gameData} testSceneId={previewSceneId} />
              </div>
         ) : (
             <>
@@ -679,7 +680,10 @@ const App: React.FC = () => {
                     gameData={gameData} 
                     onImportGame={handleImportGame} 
                     isPreviewing={isPreviewing} 
-                    onTogglePreview={() => setIsPreviewing(true)} 
+                    onTogglePreview={() => {
+                        setPreviewSceneId(null); // Full preview ignores specific scene test
+                        setIsPreviewing(true);
+                    }} 
                 />
                 <div className="flex flex-1 overflow-hidden">
                     <Sidebar 
@@ -783,9 +787,7 @@ const App: React.FC = () => {
                                 onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
                                 onUpdateGlobalObject={handleUpdateGlobalObject}
                                 onPreviewScene={(scene) => {
-                                    // Hacky preview scene: Create a temp gameData with this scene as start
-                                    const previewData = { ...gameData, startScene: scene.id };
-                                    handleImportGame(previewData);
+                                    setPreviewSceneId(scene.id);
                                     setIsPreviewing(true);
                                 }}
                                 onSelectScene={handleSelectScene}
