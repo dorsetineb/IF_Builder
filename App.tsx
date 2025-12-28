@@ -851,6 +851,7 @@ const App: React.FC = () => {
                                 onSetDirty={setIsDirty}
                                 layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
                                 consequenceTrackers={consequenceTrackers}
+                                isStartScene={selectedScene.id === gameData.startScene}
                             />
                         ) : currentView === 'scenes' ? (
                             <WelcomePlaceholder />

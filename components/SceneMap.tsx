@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -14,12 +15,13 @@ interface SceneMapProps {
 
 const NODE_WIDTH = 250;
 const NODE_HEADER_HEIGHT = 70;
+const THUMBNAIL_HEIGHT = 140; // 16:9 for 250px width is ~140px
 const INTERACTION_ITEM_HEIGHT = 36;
 const X_GAP = 150;
 const Y_GAP = 50;
 const INTERACTION_ITEM_MARGIN_Y = 4; // Corresponds to gap-1
-const PADDING = 8; // Corresponds to p-2 or py-2
-const CONNECTOR_GAP = 12; // Radius of circle (8) + gap (4)
+const PADDING_BOTTOM = 8; // Corresponds to pb-2
+const PADDING_TOP = 4; // Corresponds to gap-1 (4px)
 const BORDER_OFFSET = 2; // Compensate for border-2 on nodes
 
 type Node = Scene & { x: number; y: number; level: number; height: number };
@@ -46,9 +48,11 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
     Object.values(allScenesMap).forEach((scene: Scene) => {
         const linkingInteractions = scene.interactions?.filter(inter => inter.goToScene) || [];
         const interactionsHeight = linkingInteractions.length > 0
-            ? (linkingInteractions.length * INTERACTION_ITEM_HEIGHT) + ((linkingInteractions.length - 1) * INTERACTION_ITEM_MARGIN_Y) + PADDING
+            ? (linkingInteractions.length * INTERACTION_ITEM_HEIGHT) + ((linkingInteractions.length - 1) * INTERACTION_ITEM_MARGIN_Y) + PADDING_BOTTOM + PADDING_TOP
             : 0;
-        nodeData.set(scene.id, { height: NODE_HEADER_HEIGHT + interactionsHeight });
+        
+        const imagePadding = scene.image ? THUMBNAIL_HEIGHT : 0;
+        nodeData.set(scene.id, { height: NODE_HEADER_HEIGHT + imagePadding + interactionsHeight });
     });
     
     // Position Nodes logic
@@ -119,8 +123,10 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
             if (!targetPos) return;
 
             const interactionIndex = linkingInteractions.findIndex(i => i.id === inter.id);
+            const imagePadding = scene.image ? THUMBNAIL_HEIGHT : 0;
+            
             // Calculate center of the interaction output circle
-            const y1_offset = NODE_HEADER_HEIGHT + (interactionIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y)) + (INTERACTION_ITEM_HEIGHT / 2);
+            const y1_offset = NODE_HEADER_HEIGHT + imagePadding + PADDING_TOP + (interactionIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y)) + (INTERACTION_ITEM_HEIGHT / 2);
             // Calculate center of the target node input circle (header center)
             const y2_offset = NODE_HEADER_HEIGHT / 2;
 
@@ -242,7 +248,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
         >
           <svg className="absolute" width={bounds.maxX - bounds.minX + NODE_WIDTH + X_GAP * 4} height={bounds.maxY - bounds.minY + Y_GAP * 4} style={{ transform: `translate(${bounds.minX}px, ${bounds.minY}px)`, zIndex: 0 }}>
             <defs>
-              <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="#4fd1c5" />
               </marker>
             </defs>
@@ -253,15 +259,15 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
 
               const linkingInteractions = sourceNode.interactions.filter(inter => inter.goToScene);
               const interactionIndex = linkingInteractions.findIndex(inter => inter.id === edge.sourceInteractionId);
+              const imagePadding = sourceNode.image ? THUMBNAIL_HEIGHT : 0;
               
-              const y1_offset = NODE_HEADER_HEIGHT + (interactionIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y)) + (INTERACTION_ITEM_HEIGHT / 2);
+              const y1_offset = NODE_HEADER_HEIGHT + imagePadding + PADDING_TOP + (interactionIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y)) + (INTERACTION_ITEM_HEIGHT / 2);
               const y2_offset = NODE_HEADER_HEIGHT / 2;
 
-              // SOURCE: CENTER OF CIRCLE (touches edge perfectly). TARGET: GAP FOR ARROW
               const x1 = (edge.sSide === 'L' ? sourceNode.x : sourceNode.x + NODE_WIDTH) - bounds.minX;
               const y1 = sourceNode.y + y1_offset - bounds.minY;
               
-              const x2 = (edge.tSide === 'L' ? targetNode.x - CONNECTOR_GAP : targetNode.x + NODE_WIDTH + CONNECTOR_GAP) - bounds.minX;
+              const x2 = (edge.tSide === 'L' ? targetNode.x : targetNode.x + NODE_WIDTH) - bounds.minX;
               const y2 = targetNode.y + y2_offset - bounds.minY;
 
               const dx = Math.abs(x2 - x1);
@@ -300,20 +306,37 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
                 onClick={(e) => {
                     if (Math.sqrt(Math.pow(e.clientX - dragStartPos.current.x, 2) + Math.pow(e.clientY - dragStartPos.current.y, 2)) < 5) onSelectScene(node.id);
                 }}
-                className={`absolute bg-brand-surface rounded-xl shadow-lg flex flex-col transition-all duration-300 border-2 ${borderColorClass} cursor-pointer hover:border-yellow-400 hover:shadow-xl overflow-visible`}
+                className={`absolute bg-brand-surface rounded-xl shadow-lg flex flex-col transition-all duration-300 border-2 ${borderColorClass} cursor-pointer hover:border-yellow-400 hover:shadow-xl overflow-hidden`}
                 style={{ width: NODE_WIDTH, transform: `translate(${node.x}px, ${node.y}px)`, height: node.height, userSelect: 'none' }}
               >
                   <div className="p-3 relative flex-shrink-0 text-center" style={{height: NODE_HEADER_HEIGHT}}>
-                      <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${activeAnchors.has(`${node.id}-L`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
+                      {/* Removido o node no canto superior esquerdo da cena inicial conforme solicitado */}
+                      {node.id !== startSceneId && (
+                        <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${activeAnchors.has(`${node.id}-L`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
+                      )}
                       <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${activeAnchors.has(`${node.id}-R`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
                       <h3 className="font-bold text-brand-text truncate">{node.name}</h3>
                       <p className="text-xs text-brand-text-dim">(ID: {node.id})</p>
                       {node.id === startSceneId && <p className="text-xs font-bold text-yellow-400 mt-1">(Início)</p>}
                       {node.isEndingScene && <p className="text-xs font-bold text-brand-primary mt-1">(Fim de Jogo)</p>}
                   </div>
+
+                  {node.image && (
+                      <div 
+                        className="w-full bg-black flex-shrink-0" 
+                        style={{ height: THUMBNAIL_HEIGHT }}
+                      >
+                          <img 
+                            src={node.image} 
+                            alt={node.name} 
+                            className="w-full h-full object-cover opacity-80"
+                            style={{ pointerEvents: 'none' }}
+                          />
+                      </div>
+                  )}
                   
                   {linkingInteractions.length > 0 && (
-                    <div className="flex flex-col gap-1 pb-2 border-t border-brand-border/30">
+                    <div className="flex flex-col gap-1 pt-1 pb-2 border-t border-brand-border/30">
                         {linkingInteractions.map(inter => {
                             const actionText = inter.verbs?.[0] || 'Ação';
                             const reqObj = inter.requiresInInventory ? globalObjects[inter.requiresInInventory] : null;

@@ -24,6 +24,7 @@ interface SceneEditorProps {
   onSetDirty: (isDirty: boolean) => void;
   layoutOrientation: 'vertical' | 'horizontal';
   consequenceTrackers: ConsequenceTracker[];
+  isStartScene: boolean;
 }
 
 const getCleanSceneState = (s: Scene): Scene => {
@@ -58,6 +59,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     onSetDirty,
     layoutOrientation,
     consequenceTrackers,
+    isStartScene
 }) => {
   const [localScene, setLocalScene] = useState<Scene>(() => getCleanSceneState(scene));
   const [pendingObjectUpdates, setPendingObjectUpdates] = useState<{ [id: string]: Partial<GameObject> }>({});
@@ -457,47 +459,49 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                           <p className="text-[10px] text-brand-text-dim mt-1 italic">Deixe vazio para continuar tocando a música da cena anterior.</p>
                       </div>
 
-                      <div className="space-y-4 pt-4 border-t border-brand-border/30">
-                          <div className="flex items-center">
-                              <input
-                                  type="checkbox"
-                                  id="isEndingScene"
-                                  checked={!!localScene.isEndingScene}
-                                  onChange={e => handleToggle('isEndingScene', e.target.checked)}
-                                  className="custom-checkbox"
-                                  disabled={isAnyCheckboxChecked && !localScene.isEndingScene}
-                              />
-                              <label htmlFor="isEndingScene" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
-                                  Esta cena vence o jogo.
-                              </label>
-                          </div>
-                          <div className="flex items-center">
-                              <input
-                                  type="checkbox"
-                                  id="removesChance"
-                                  checked={!!localScene.removesChanceOnEntry}
-                                  onChange={e => handleToggle('removesChanceOnEntry', e.target.checked)}
-                                  className="custom-checkbox"
-                                  disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
-                              />
-                              <label htmlFor="removesChance" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
-                                  Esta cena remove uma chance.
-                              </label>
-                          </div>
-                          <div className="flex items-center">
-                              <input
-                                  type="checkbox"
-                                  id="restoresChance"
-                                  checked={!!localScene.restoresChanceOnEntry}
-                                  onChange={e => handleToggle('restoresChanceOnEntry', e.target.checked)}
-                                  className="custom-checkbox"
-                                  disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
-                              />
-                              <label htmlFor="restoresChance" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
-                                  Esta cena restaura uma chance.
-                              </label>
-                          </div>
-                      </div>
+                      {!isStartScene && (
+                        <div className="space-y-4 pt-4 border-t border-brand-border/30">
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="isEndingScene"
+                                    checked={!!localScene.isEndingScene}
+                                    onChange={e => handleToggle('isEndingScene', e.target.checked)}
+                                    className="custom-checkbox"
+                                    disabled={isAnyCheckboxChecked && !localScene.isEndingScene}
+                                />
+                                <label htmlFor="isEndingScene" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
+                                    Esta cena vence o jogo.
+                                </label>
+                            </div>
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="removesChance"
+                                    checked={!!localScene.removesChanceOnEntry}
+                                    onChange={e => handleToggle('removesChanceOnEntry', e.target.checked)}
+                                    className="custom-checkbox"
+                                    disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
+                                />
+                                <label htmlFor="removesChance" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
+                                    Esta cena remove uma chance.
+                                </label>
+                            </div>
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="restoresChance"
+                                    checked={!!localScene.restoresChanceOnEntry}
+                                    onChange={e => handleToggle('restoresChanceOnEntry', e.target.checked)}
+                                    className="custom-checkbox"
+                                    disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
+                                />
+                                <label htmlFor="restoresChance" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
+                                    Esta cena restaura uma chance.
+                                </label>
+                            </div>
+                        </div>
+                      )}
                   </div>
               </div>
           )}

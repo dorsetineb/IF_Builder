@@ -4,6 +4,7 @@ import { GameData, GameObject, Scene } from '../types';
 import { TrashIcon } from './icons/TrashIcon';
 import { UploadIcon } from './icons/UploadIcon';
 import { PlusIcon } from './icons/PlusIcon';
+import { ChevronDownIcon } from './icons/ChevronDownIcon';
 
 interface GlobalObjectsEditorProps {
   scenes: GameData['scenes'];
@@ -31,6 +32,7 @@ const GlobalObjectItem: React.FC<{
     onSelectScene: (sceneId: string) => void;
     scenes: GameData['scenes'];
 }> = ({ obj, onUpdate, onDelete, onSelectScene, scenes }) => {
+    const [isOpen, setIsOpen] = useState(false);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -58,123 +60,166 @@ const GlobalObjectItem: React.FC<{
         }
     };
 
-    const getObjectUsages = (objectId: string) => {
-        const usages: {id: string, name: string}[] = [];
+    const usages = useMemo(() => {
+        const result: {id: string, name: string}[] = [];
         Object.values(scenes).forEach((scene: Scene) => {
-            if (scene.objectIds && scene.objectIds.includes(objectId)) {
-                usages.push({ id: scene.id, name: scene.name });
+            if (scene.objectIds && scene.objectIds.includes(obj.id)) {
+                result.push({ id: scene.id, name: scene.name });
             }
         });
-        return usages;
-    };
-
-    const usages = getObjectUsages(obj.id);
+        return result;
+    }, [scenes, obj.id]);
 
     return (
-        <div className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
-            <button
-                onClick={(e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    onDelete(obj.id);
-                }}
-                className="absolute top-0 right-0 p-2 bg-red-500 text-white rounded-bl-lg hover:bg-red-600 transition-colors z-20 cursor-pointer"
-                title="Excluir objeto do jogo"
-                type="button"
+        <div className={`bg-brand-bg rounded-md border ${isOpen ? 'border-brand-primary' : 'border-brand-border/50'} overflow-hidden transition-all duration-300 relative`}>
+            {/* Header - Fixed height to allow full-height image */}
+            <div 
+                onClick={() => setIsOpen(!isOpen)}
+                className={`relative flex items-center h-16 cursor-pointer hover:bg-brand-surface/30 transition-colors overflow-hidden group ${isOpen ? 'bg-brand-primary/5 border-b border-brand-primary/20' : ''}`}
             >
-                <TrashIcon className="w-5 h-5 pointer-events-none" />
-            </button>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                <div className="space-y-4">
-                    <div>
-                        <label htmlFor={`obj-name-${obj.id}`} className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Objeto</label>
-                        <input
-                            id={`obj-name-${obj.id}`}
-                            type="text"
-                            value={obj.name}
-                            onChange={e => onUpdate(obj.id, 'name', e.target.value)}
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
-                        <p 
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
-                            title="Use este ID para referência interna."
-                        >
-                            {obj.id}
-                        </p>
-                    </div>
-                    <div className="flex flex-col flex-grow">
-                        <label htmlFor={`obj-desc-${obj.id}`} className="block text-sm font-medium text-brand-text-dim mb-1">Descrição ao olhar/examinar</label>
-                        <textarea
-                            id={`obj-desc-${obj.id}`}
-                            value={obj.examineDescription}
-                            onChange={e => onUpdate(obj.id, 'examineDescription', e.target.value)}
-                            rows={4}
-                            className="w-full h-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-brand-text-dim mb-1">Usado em:</label>
-                        {usages.length > 0 ? (
-                            <div className="flex flex-wrap gap-2">
-                                {usages.map(usage => (
-                                    <button
-                                        key={usage.id}
-                                        onClick={() => onSelectScene(usage.id)}
-                                        className="px-2 py-1 bg-brand-border/30 border border-brand-border rounded text-xs hover:bg-brand-border/50 transition-colors"
-                                        title={`Ir para cena ${usage.name}`}
-                                    >
-                                        {usage.name}
-                                    </button>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-xs text-brand-text-dim italic">Não vinculado a nenhuma cena.</p>
-                        )}
-                    </div>
+                {/* Sliding Trash Button */}
+                <button 
+                    onClick={(e) => { e.stopPropagation(); onDelete(obj.id); }} 
+                    className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20"
+                    title="Excluir objeto do jogo"
+                >
+                    <TrashIcon className="w-5 h-5" />
+                </button>
+
+                {/* Expansion Arrow */}
+                <div className="px-4 shrink-0">
+                    <ChevronDownIcon 
+                        className={`w-5 h-5 text-brand-text-dim transition-transform duration-300 ${isOpen ? '-rotate-90' : 'rotate-0'}`} 
+                    />
                 </div>
-                <div className="flex flex-col space-y-3 h-full">
-                    <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem do Objeto</label>
-                    <div className="relative flex-grow w-full min-h-[150px]">
-                        {obj.image ? (
-                            <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
-                                <img src={obj.image} alt={obj.name} className="w-full h-full object-cover bg-brand-bg" />
-                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
-                                    <label htmlFor={`image-upload-${obj.id}`} className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover flex items-center gap-2 font-semibold text-sm">
-                                        <UploadIcon className="w-5 h-5" />
-                                        <span className="hidden sm:inline">Alterar</span>
-                                        <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                    </label>
-                                    <button
-                                        onClick={() => onUpdate(obj.id, 'image', '')}
-                                        className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                                        title="Remover Imagem"
-                                    >
-                                        <TrashIcon className="w-5 h-5" />
-                                    </button>
+
+                {/* Larger Thumbnail - Only rendered if image exists, otherwise no space occupied */}
+                {obj.image && (
+                    <div className="w-16 h-16 shrink-0 bg-brand-surface border-r border-brand-border/30 overflow-hidden flex items-center justify-center">
+                        <img src={obj.image} alt="" className="w-full h-full object-cover" />
+                    </div>
+                )}
+
+                <div className="flex flex-1 items-center px-6 overflow-hidden">
+                    <div className="flex items-center min-w-0">
+                        <span className="text-sm font-semibold text-brand-primary truncate">{obj.name || '(Sem nome)'}</span>
+                        <span className="ml-2 text-[10px] text-brand-text-dim font-mono opacity-50 shrink-0">({obj.id})</span>
+                    </div>
+
+                    {usages.length > 0 && (
+                        <>
+                            <div className="mx-6 h-4 border-r border-brand-border/40 shrink-0"></div>
+                            <div className="flex items-center gap-2 overflow-hidden">
+                                <span className="text-[10px] uppercase font-bold text-brand-text-dim shrink-0">Cenas:</span>
+                                <div className="flex gap-1 overflow-hidden truncate">
+                                    {usages.map((u, i) => (
+                                        <span key={u.id} className="text-xs text-brand-text-dim whitespace-nowrap">
+                                            {u.name}{i < usages.length - 1 ? ',' : ''}
+                                        </span>
+                                    ))}
                                 </div>
                             </div>
-                        ) : (
-                            <label
-                                htmlFor={`image-upload-${obj.id}`}
-                                className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
-                                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
-                                onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
-                                onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
-                                onDrop={handleDrop}
-                            >
-                                <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
-                                <span className="text-sm font-semibold text-brand-text">Clique para Enviar</span>
-                                <span className="text-xs text-brand-text-dim mt-1">ou arraste e solte</span>
-                                <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                            </label>
-                        )}
-                    </div>
-                    <p className="text-xs text-brand-text-dim text-center">Imagem que aparece ao inspecionar o item.<br/>Recomendado: 1:1 (quadrado), ex: 512x512 pixels.</p>
+                        </>
+                    )}
                 </div>
             </div>
+
+            {/* Collapsible Content */}
+            {isOpen && (
+                <div className="p-6 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                        <div className="space-y-4">
+                            <div>
+                                <label htmlFor={`obj-name-${obj.id}`} className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Objeto</label>
+                                <input
+                                    id={`obj-name-${obj.id}`}
+                                    type="text"
+                                    value={obj.name}
+                                    onChange={e => onUpdate(obj.id, 'name', e.target.value)}
+                                    className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text focus:ring-0"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
+                                <p 
+                                    className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
+                                    title="Use este ID para referência interna."
+                                >
+                                    {obj.id}
+                                </p>
+                            </div>
+                            <div className="flex flex-col flex-grow">
+                                <label htmlFor={`obj-desc-${obj.id}`} className="block text-sm font-medium text-brand-text-dim mb-1">Descrição ao olhar/examinar</label>
+                                <textarea
+                                    id={`obj-desc-${obj.id}`}
+                                    value={obj.examineDescription}
+                                    onChange={e => onUpdate(obj.id, 'examineDescription', e.target.value)}
+                                    rows={4}
+                                    className="w-full h-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text focus:ring-0"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-brand-text-dim mb-1">Cenas vinculadas:</label>
+                                {usages.length > 0 ? (
+                                    <div className="flex flex-wrap gap-2">
+                                        {usages.map(usage => (
+                                            <button
+                                                key={usage.id}
+                                                onClick={() => onSelectScene(usage.id)}
+                                                className="px-2 py-1 bg-brand-border/30 border border-brand-border rounded text-xs hover:bg-brand-border/50 transition-colors"
+                                                title={`Ir para cena ${usage.name}`}
+                                            >
+                                                {usage.name}
+                                            </button>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="text-xs text-brand-text-dim italic">Não vinculado a nenhuma cena.</p>
+                                )}
+                            </div>
+                        </div>
+                        <div className="flex flex-col space-y-3 h-full">
+                            <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem do Objeto</label>
+                            <div className="relative flex-grow w-full min-h-[150px]">
+                                {obj.image ? (
+                                    <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group/img">
+                                        <img src={obj.image} alt={obj.name} className="w-full h-full object-cover bg-brand-bg" />
+                                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity gap-2">
+                                            <label htmlFor={`image-upload-${obj.id}`} className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover flex items-center gap-2 font-semibold text-sm">
+                                                <UploadIcon className="w-5 h-5" />
+                                                <span className="hidden sm:inline">Alterar</span>
+                                                <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                            </label>
+                                            <button
+                                                onClick={() => onUpdate(obj.id, 'image', '')}
+                                                className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                                title="Remover Imagem"
+                                            >
+                                                <TrashIcon className="w-5 h-5" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <label
+                                        htmlFor={`image-upload-${obj.id}`}
+                                        className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
+                                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
+                                        onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
+                                        onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
+                                        onDrop={handleDrop}
+                                    >
+                                        <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
+                                        <span className="text-sm font-semibold text-brand-text">Clique para Enviar</span>
+                                        <span className="text-xs text-brand-text-dim mt-1">ou arraste e solte</span>
+                                        <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                    </label>
+                                )}
+                            </div>
+                            <p className="text-xs text-brand-text-dim text-center">Imagem que aparece ao inspecionar o item.<br/>Recomendado: 1:1 (quadrado), ex: 512x512 pixels.</p>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
@@ -254,17 +299,10 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     <span>Alterações não salvas</span>
                 </div>
             )}
-            <button
-                onClick={handleCreate}
-                className="flex items-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors"
-            >
-                <PlusIcon className="w-5 h-5 mr-2" />
-                Novo Objeto
-            </button>
         </div>
       </div>
       
-      <div className="bg-brand-surface p-6 space-y-4 rounded-md">
+      <div className="space-y-4">
         {localObjects.length > 0 ? (
           localObjects.map(obj => (
             <GlobalObjectItem 
@@ -277,8 +315,19 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
             />
           ))
         ) : (
-          <p className="text-center text-brand-text-dim py-4">Nenhum objeto na biblioteca.</p>
+          <p className="text-center text-brand-text-dim py-8 border-2 border-dashed border-brand-border/50 rounded-md bg-brand-surface/30">Nenhum objeto na biblioteca.</p>
         )}
+      </div>
+
+      {/* Floating Add Button - Adjusted to match sidebar constraints */}
+      <div className="fixed bottom-6 left-[calc(25%+2.5rem)] xl:left-[calc(20%+2.5rem)] z-10 flex gap-2">
+        <button
+            onClick={handleCreate}
+            className="flex items-center px-6 py-3 bg-brand-primary text-brand-bg font-bold rounded-md hover:bg-brand-primary-hover transition-colors shadow-lg"
+        >
+            <PlusIcon className="w-5 h-5 mr-2" />
+            Novo Objeto
+        </button>
       </div>
 
       <div className="fixed bottom-6 right-10 z-10 flex gap-2">
