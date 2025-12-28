@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { ConsequenceTracker, Scene, Interaction, TrackerEffect } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -22,7 +23,8 @@ const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
 };
 
 const whiteChevron = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20' stroke-width='1.5' stroke='white'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='m5.25 7.5 4.5 4.5 4.5-4.5' /%3e%3c/svg%3e";
-const selectBaseClasses = "w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text appearance-none bg-no-repeat pr-8 focus:ring-0";
+// MODIFICADO: bg-brand-bg e text-brand-text
+const selectBaseClasses = "w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text appearance-none bg-no-repeat pr-8 focus:ring-0 [&>option]:bg-brand-sidebar";
 const selectStyle = { backgroundImage: `url("${whiteChevron}")`, backgroundPosition: 'right 0.5rem center', backgroundSize: '1.25em' };
 const optionBaseClasses = "bg-brand-surface text-brand-text";
 const optionDimClasses = "bg-brand-surface text-brand-text-dim";

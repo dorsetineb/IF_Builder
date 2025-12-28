@@ -1,3 +1,4 @@
+
 import React, { useMemo } from 'react';
 import { GameData } from '../types';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
@@ -36,7 +37,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
         const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
 
         let finalHtml = gameData.gameHTML
-            .replace('__GAME_TITLE__', gameData.gameTitle || 'IF Builder Game')
+            .replace(/__GAME_TITLE__/g, gameData.gameTitle || 'IF Builder Game')
             .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme with-spacing`)
             .replace('__LAYOUT_ORIENTATION_CLASS__', gameData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : '')
             .replace('__LAYOUT_ORDER_CLASS__', gameData.gameLayoutOrder === 'image-last' ? 'layout-image-last' : '')
@@ -45,14 +46,15 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
             .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
             .replace('__SYSTEM_BUTTON__', systemButtonHTML)
-            .replace('__SUGGESTIONS_BUTTON_TEXT__', gameData.gameSuggestionsButtonText || 'Sugestões')
-            .replace('__INVENTORY_BUTTON_TEXT__', gameData.gameInventoryButtonText || 'Inventário')
-            .replace('__DIARY_BUTTON_TEXT__', gameData.gameDiaryButtonText || 'Diário')
+            .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, gameData.gameSuggestionsButtonText || 'Sugestões')
+            .replace(/__INVENTORY_BUTTON_TEXT__/g, gameData.gameInventoryButtonText || 'Inventário')
+            .replace(/__DIARY_BUTTON_TEXT__/g, gameData.gameDiaryButtonText || 'Diário')
             .replace(/__TRACKERS_BUTTON_TEXT__/g, gameData.gameTrackersButtonText || 'Rastreadores')
             .replace(/__SYSTEM_BUTTON_TEXT__/g, gameData.gameSystemButtonText || 'Sistema')
             .replace('__SAVE_MENU_TITLE__', gameData.gameSaveMenuTitle || 'Salvar Jogo')
             .replace('__LOAD_MENU_TITLE__', gameData.gameLoadMenuTitle || 'Carregar Jogo')
             .replace('__MAIN_MENU_BUTTON_TEXT__', gameData.gameMainMenuButtonText || 'Menu Principal')
+            .replace('__VIEW_ENDING_BUTTON_TEXT__', gameData.gameViewEndingButtonText || 'Ver Final')
             .replace('__SPLASH_BG_STYLE__', gameData.gameSplashImage ? `style="background-image: url('${gameData.gameSplashImage}')"` : '')
             .replace('__SPLASH_ALIGN_CLASS__', gameData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
             .replace('__SPLASH_LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="splash-logo">` : '')
@@ -76,9 +78,9 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace(/__GAME_TEXT_COLOR__/g, gameData.gameTextColor || '#c9d1d9')
             .replace(/__GAME_TITLE_COLOR__/g, gameData.gameTitleColor || '#58a6ff')
             .replace(/__GAME_FOCUS_COLOR__/g, gameData.gameFocusColor || '#58a6ff')
-            .replace(/__GAME_TEXT_COLOR_LIGHT__/g, gameData.gameTextColorLight || '#24292f')
-            .replace(/__GAME_TITLE_COLOR_LIGHT__/g, gameData.gameTitleColorLight || '#0969da')
-            .replace(/__GAME_FOCUS_COLOR_LIGHT__/g, gameData.gameFocusColorLight || '#0969da')
+            .replace(/__GAME_TEXT_COLOR_LIGHT__/g, gameData.textColorLight || '#24292f')
+            .replace(/__GAME_TITLE_COLOR_LIGHT__/g, gameData.titleColorLight || '#0969da')
+            .replace(/__GAME_FOCUS_COLOR_LIGHT__/g, gameData.focusColorLight || '#0969da')
             .replace(/__SPLASH_BUTTON_COLOR__/g, gameData.gameSplashButtonColor || '#2ea043')
             .replace(/__SPLASH_BUTTON_HOVER_COLOR__/g, gameData.gameSplashButtonHoverColor || '#238636')
             .replace(/__SPLASH_BUTTON_TEXT_COLOR__/g, gameData.gameSplashButtonTextColor || '#ffffff')
@@ -96,7 +98,6 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             (engineData as any).cena_inicial = testSceneId;
         }
 
-        // Safely stringify JSON to prevent issues with '</script>' tags in user content.
         const safeJson = JSON.stringify(engineData).replace(/<\/script/g, '<\\/script>');
 
         const dataScript = `<script>

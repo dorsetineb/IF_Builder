@@ -1,9 +1,11 @@
+
 export interface GameObject {
   id: string;
   name: string;
   examineDescription: string;
-  isTakable: boolean;
   image?: string; // Base64 string for the object's image
+  // FIX: Added isTakable property to resolve type error in SceneEditor.tsx
+  isTakable?: boolean;
 }
 
 export interface TrackerEffect {
@@ -25,6 +27,8 @@ export interface Interaction {
   goToScene?: string; // ID of the scene to move to
   newSceneDescription?: string;
   trackerEffects?: TrackerEffect[];
+  transitionType?: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom' | 'blur' | 'none';
+  transitionSpeed?: number;
 }
 
 export interface Exits {
@@ -95,11 +99,12 @@ export interface GameData {
   gameSplashContentAlignment?: 'left' | 'right';
   gameSplashDescription?: string;
   gameSplashButtonText?: string;
-  gameContinueButtonText?: string;
-  gameRestartButtonText?: string;
+  // Added missing properties to support splash button customization
   gameSplashButtonColor?: string;
   gameSplashButtonHoverColor?: string;
   gameSplashButtonTextColor?: string;
+  gameContinueButtonText?: string;
+  gameRestartButtonText?: string;
   gameLayoutOrientation?: 'vertical' | 'horizontal';
   gameLayoutOrder?: 'image-first' | 'image-last';
   gameImageFrame?: 'none' | 'book-cover' | 'trading-card' | 'rounded-top';
@@ -117,15 +122,17 @@ export interface GameData {
   gameChanceLossMessage?: string;
   gameChanceRestoreMessage?: string;
   gameTheme?: 'dark' | 'light';
-  gameTextColorLight?: string;
-  gameTitleColorLight?: string;
-  gameFocusColorLight?: string;
+  textColorLight?: string;
+  titleColorLight?: string;
+  focusColorLight?: string;
   positiveEndingImage?: string;
   positiveEndingContentAlignment?: 'left' | 'right';
   positiveEndingDescription?: string;
+  positiveEndingMusic?: string;
   negativeEndingImage?: string;
   negativeEndingContentAlignment?: 'left' | 'right';
   negativeEndingDescription?: string;
+  negativeEndingMusic?: string;
   frameBookColor?: string;
   frameTradingCardColor?: string;
   frameRoundedTopColor?: string;
@@ -144,6 +151,7 @@ export interface GameData {
   gameLoadMenuTitle?: string;
   gameMainMenuButtonText?: string;
   gameContinueIndicatorColor?: string;
+  gameViewEndingButtonText?: string;
   
   // Transitions
   gameTextAnimationType?: 'fade' | 'typewriter';

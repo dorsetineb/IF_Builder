@@ -20,6 +20,7 @@ const Y_GAP = 50;
 const INTERACTION_ITEM_MARGIN_Y = 4; // Corresponds to gap-1
 const PADDING = 8; // Corresponds to p-2 or py-2
 const CONNECTOR_GAP = 12; // Radius of circle (8) + gap (4)
+const BORDER_OFFSET = 2; // Compensate for border-2 on nodes
 
 type Node = Scene & { x: number; y: number; level: number; height: number };
 type Edge = { 
@@ -87,8 +88,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
 
     levels.forEach((levelScenes, level) => {
         const calculatedX = level * (NODE_WIDTH + X_GAP);
-        const autoPlacedScenes = levelScenes.filter(id => allScenesMap[id]?.mapY === undefined);
-        const levelHeight = autoPlacedScenes.reduce((sum, id) => sum + (nodeData.get(id)?.height || 0) + Y_GAP, 0) - Y_GAP;
+        const levelHeight = levelScenes.reduce((sum, id) => sum + (nodeData.get(id)?.height || 0) + Y_GAP, 0) - Y_GAP;
         let currentY = -levelHeight / 2;
 
         levelScenes.forEach((id) => {
@@ -105,9 +105,8 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
         });
     });
 
-    // Edge Calculation with closest anchor selection
     const createdEdges: Edge[] = [];
-    const activeAnchors = new Set<string>(); // Format: "id-L" or "id-R"
+    const activeAnchors = new Set<string>();
 
     Object.values(allScenesMap).forEach((scene: Scene) => {
         const sourcePos = positionedNodes.find(n => n.id === scene.id);
@@ -120,7 +119,9 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
             if (!targetPos) return;
 
             const interactionIndex = linkingInteractions.findIndex(i => i.id === inter.id);
+            // Calculate center of the interaction output circle
             const y1_offset = NODE_HEADER_HEIGHT + (interactionIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y)) + (INTERACTION_ITEM_HEIGHT / 2);
+            // Calculate center of the target node input circle (header center)
             const y2_offset = NODE_HEADER_HEIGHT / 2;
 
             const sL = { x: sourcePos.x, y: sourcePos.y + y1_offset };
@@ -252,12 +253,14 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
 
               const linkingInteractions = sourceNode.interactions.filter(inter => inter.goToScene);
               const interactionIndex = linkingInteractions.findIndex(inter => inter.id === edge.sourceInteractionId);
+              
               const y1_offset = NODE_HEADER_HEIGHT + (interactionIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y)) + (INTERACTION_ITEM_HEIGHT / 2);
               const y2_offset = NODE_HEADER_HEIGHT / 2;
 
-              // Apply gap to start and end points
-              const x1 = (edge.sSide === 'L' ? sourceNode.x - CONNECTOR_GAP : sourceNode.x + NODE_WIDTH + CONNECTOR_GAP) - bounds.minX;
+              // SOURCE: CENTER OF CIRCLE (touches edge perfectly). TARGET: GAP FOR ARROW
+              const x1 = (edge.sSide === 'L' ? sourceNode.x : sourceNode.x + NODE_WIDTH) - bounds.minX;
               const y1 = sourceNode.y + y1_offset - bounds.minY;
+              
               const x2 = (edge.tSide === 'L' ? targetNode.x - CONNECTOR_GAP : targetNode.x + NODE_WIDTH + CONNECTOR_GAP) - bounds.minX;
               const y2 = targetNode.y + y2_offset - bounds.minY;
 
@@ -312,14 +315,16 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
                   {linkingInteractions.length > 0 && (
                     <div className="flex flex-col gap-1 pb-2 border-t border-brand-border/30">
                         {linkingInteractions.map(inter => {
-                            const actionText = inter.verbs?.[0] || '';
+                            const actionText = inter.verbs?.[0] || 'Ação';
+                            const reqObj = inter.requiresInInventory ? globalObjects[inter.requiresInInventory] : null;
                             const targetObj = inter.target ? globalObjects[inter.target] : null;
-                            const displayLabel = targetObj ? `${actionText} ${targetObj.name}` : actionText;
+                            
+                            const displayLabel = `${actionText}${reqObj ? ' ' + reqObj.name : ''}${targetObj ? ' ' + targetObj.name : ''}`;
 
                             return (
                                 <div key={inter.id} className="relative bg-brand-primary/10 text-brand-primary-hover font-bold py-1 flex items-center w-full" style={{height: INTERACTION_ITEM_HEIGHT}}>
                                     <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${activeAnchors.has(`${inter.id}-L`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
-                                    <span className="truncate px-4 text-center w-full text-sm" title={displayLabel}>{displayLabel}</span>
+                                    <span className="truncate px-4 text-center w-full text-xs" title={displayLabel}>{displayLabel}</span>
                                     <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${activeAnchors.has(`${inter.id}-R`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
                                 </div>
                             );

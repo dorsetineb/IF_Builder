@@ -1,3 +1,4 @@
+
 import React, { useRef } from 'react';
 import { Scene } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -56,7 +57,6 @@ const SceneList: React.FC<SceneListProps> = ({
           {scenes.map((scene, index) => (
           <li
               key={scene.id}
-// FIX: Removed invalid backslash from template literal.
               className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-md transition-colors overflow-hidden ${
               selectedSceneId === scene.id
                   ? 'bg-yellow-400 text-black'
@@ -70,18 +70,15 @@ const SceneList: React.FC<SceneListProps> = ({
           >
               <div className={`flex items-center flex-grow p-2`}>
                   {scene.id !== startSceneId ? (
-// FIX: Removed invalid backslash from template literal.
                     <Bars3Icon className={`w-5 h-5 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? 'text-black' : 'text-brand-text-dim'}`} />
                   ) : null }
                   
                   <div 
-// FIX: Removed invalid backslash from template literal.
                     className={`flex-1 min-w-0 flex items-center justify-between ${scene.id !== startSceneId ? 'cursor-pointer' : ''}`}
                     onClick={() => onSelectScene(scene.id)}
                   >
                       <span className="truncate font-medium">{scene.name}</span>
                       {startSceneId === scene.id && (
-// FIX: Removed invalid backslash from template literal.
                           <span className={`ml-2 text-xs font-bold px-2 py-0.5 rounded-full ${
                               selectedSceneId === scene.id ? 'bg-black/20 text-black' : 'bg-yellow-400/20 text-yellow-300'
                           }`}>
@@ -105,7 +102,7 @@ const SceneList: React.FC<SceneListProps> = ({
       </ul>
         <button
           onClick={onAddScene}
-          className="w-full flex items-center justify-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
+          className="w-full flex items-center justify-start px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
       >
           <PlusIcon className="w-5 h-5 mr-2" />
           Adicionar Cena

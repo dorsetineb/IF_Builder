@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
 import { Scene, Interaction, GameObject, ConsequenceTracker } from '../types';
 import ObjectEditor from './ObjectEditor';
@@ -59,6 +60,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     consequenceTrackers,
 }) => {
   const [localScene, setLocalScene] = useState<Scene>(() => getCleanSceneState(scene));
+  const [pendingObjectUpdates, setPendingObjectUpdates] = useState<{ [id: string]: Partial<GameObject> }>({});
   const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions' | 'connections'>('properties');
   const [isDraggingOver, setIsDraggingOver] = useState(false);
   const initialSceneJson = useRef(JSON.stringify(getCleanSceneState(scene)));
@@ -67,44 +69,54 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   useEffect(() => {
     const cleanScene = getCleanSceneState(scene);
     setLocalScene(cleanScene);
+    setPendingObjectUpdates({});
     initialSceneJson.current = JSON.stringify(cleanScene);
     setActiveTab('properties');
   }, [scene.id]);
 
   // Check for dirty state
   useEffect(() => {
-    const currentJson = JSON.stringify(localScene);
-    const currentlyDirty = currentJson !== initialSceneJson.current;
-    onSetDirty(currentlyDirty);
-  }, [localScene, onSetDirty]);
+    const isSceneDirty = JSON.stringify(localScene) !== initialSceneJson.current;
+    const areObjectsDirty = Object.keys(pendingObjectUpdates).length > 0;
+    onSetDirty(isSceneDirty || areObjectsDirty);
+  }, [localScene, pendingObjectUpdates, onSetDirty]);
 
   // Sync initial state when scene prop updates content (e.g. after a save)
   useEffect(() => {
       const cleanSceneProp = getCleanSceneState(scene);
-      // If the prop matches our current local state, it means we are in sync (saved)
-      if (JSON.stringify(cleanSceneProp) === JSON.stringify(localScene)) {
+      // If the prop matches our current local state and no pending object updates, we are in sync
+      if (JSON.stringify(cleanSceneProp) === JSON.stringify(localScene) && Object.keys(pendingObjectUpdates).length === 0) {
           initialSceneJson.current = JSON.stringify(cleanSceneProp);
-          // If we were dirty, we are no longer dirty
           if (isDirty) {
              onSetDirty(false);
           }
       }
-  }, [scene, localScene, isDirty, onSetDirty]);
+  }, [scene, localScene, pendingObjectUpdates, isDirty, onSetDirty]);
+
+  // Merge global objects with pending updates
+  const mergedGlobalObjects = useMemo(() => {
+    const merged = { ...globalObjects };
+    Object.keys(pendingObjectUpdates).forEach(id => {
+        if (merged[id]) {
+            merged[id] = { ...merged[id], ...pendingObjectUpdates[id] };
+        }
+    });
+    return merged;
+  }, [globalObjects, pendingObjectUpdates]);
 
   // Construct the list of objects currently in this scene by ID lookup
   const currentSceneObjects = useMemo(() => {
-      return (localScene.objectIds || []).map(id => globalObjects[id]).filter(Boolean);
-  }, [localScene.objectIds, globalObjects]);
+      return (localScene.objectIds || []).map(id => mergedGlobalObjects[id]).filter(Boolean);
+  }, [localScene.objectIds, mergedGlobalObjects]);
 
-  const allTakableObjects = useMemo(() => {
-     // Return all takable objects from the global library
-     return Object.values(globalObjects).filter((o: GameObject) => o.isTakable);
-  }, [globalObjects]);
+  // MODIFICADO: Agora todos os objetos globais podem ser usados como requerimento de inventário
+  const allAvailableInventoryObjects = useMemo(() => {
+     return Object.values(mergedGlobalObjects);
+  }, [mergedGlobalObjects]);
 
-  // Create a Map for ConnectionsView which expects Map<string, GameObject>
   const allObjectsMap = useMemo(() => {
-      return new Map(Object.entries(globalObjects));
-  }, [globalObjects]);
+      return new Map(Object.entries(mergedGlobalObjects));
+  }, [mergedGlobalObjects]);
 
   const connections = useMemo(() => {
     const sceneMap = new Map(allScenes.map(s => [s.id, s]));
@@ -158,12 +170,15 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     setLocalScene(prev => ({ ...prev, [key]: value }));
   };
 
-  // WRAPPER FUNCTIONS TO UPDATE LOCAL STATE IMMEDIATELY
+  const handleUpdateGlobalObjectLocal = (objectId: string, updatedData: Partial<GameObject>) => {
+      setPendingObjectUpdates(prev => ({
+          ...prev,
+          [objectId]: { ...(prev[objectId] || {}), ...updatedData }
+      }));
+  };
+
   const handleCreateGlobalObjectWrapper = (obj: GameObject, linkToSceneId: string) => {
-      // 1. Update Global State via App.tsx
-      onCreateGlobalObject(obj, linkToSceneId);
-      
-      // 2. Update Local State immediately so it shows up in the UI
+      onCreateGlobalObject(obj, ''); 
       setLocalScene(prev => ({
           ...prev,
           objectIds: [...(prev.objectIds || []), obj.id]
@@ -171,7 +186,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   };
 
   const handleLinkObjectWrapper = (sceneId: string, objectId: string) => {
-      onLinkObjectToScene(sceneId, objectId);
       setLocalScene(prev => {
           if (prev.objectIds.includes(objectId)) return prev;
           return {
@@ -182,7 +196,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   };
 
   const handleUnlinkObjectWrapper = (sceneId: string, objectId: string) => {
-      onUnlinkObjectFromScene(sceneId, objectId);
       setLocalScene(prev => ({
           ...prev,
           objectIds: prev.objectIds.filter(id => id !== objectId)
@@ -255,6 +268,11 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   };
   
   const handleSave = () => {
+    Object.keys(pendingObjectUpdates).forEach(id => {
+        onUpdateGlobalObject(id, pendingObjectUpdates[id]);
+    });
+    setPendingObjectUpdates({});
+
     const finalScene: Scene = { ...localScene };
     finalScene.interactions = finalScene.interactions.map(interaction => ({
         ...interaction,
@@ -271,6 +289,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
   const handleUndo = () => {
     const restoredScene = JSON.parse(initialSceneJson.current) as Scene;
     setLocalScene(restoredScene);
+    setPendingObjectUpdates({});
   };
 
   const handlePreview = () => {
@@ -410,6 +429,12 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                 </label>
                             )}
                           </div>
+                          {/* MODIFICADO: Recomendação contextual incluindo tamanho em pixels */}
+                          <p className="text-xs text-brand-text-dim text-center mt-3">
+                              {layoutOrientation === 'vertical' 
+                                  ? "Recomendado imagens em pé (ex: 9:16). Sugestão: 720x1280 pixels." 
+                                  : "Recomendado imagens deitadas (ex: 16:9). Sugestão: 1280x720 pixels."}
+                          </p>
                       </div>
 
                       <div className="pt-4 border-t border-brand-border/30">
@@ -481,11 +506,11 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
               <ObjectEditor
                 sceneId={localScene.id}
                 objects={currentSceneObjects}
-                allGlobalObjects={Object.values(globalObjects)}
+                allGlobalObjects={Object.values(mergedGlobalObjects)}
                 onCreateGlobalObject={handleCreateGlobalObjectWrapper}
                 onLinkObject={handleLinkObjectWrapper}
                 onUnlinkObject={handleUnlinkObjectWrapper}
-                onUpdateGlobalObject={onUpdateGlobalObject}
+                onUpdateGlobalObject={handleUpdateGlobalObjectLocal}
               />
           )}
 
@@ -496,7 +521,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                 allScenes={allScenes}
                 currentSceneId={localScene.id}
                 sceneObjects={currentSceneObjects}
-                allTakableObjects={allTakableObjects}
+                allTakableObjects={allAvailableInventoryObjects}
                 consequenceTrackers={consequenceTrackers}
               />
           )}

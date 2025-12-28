@@ -1,3 +1,4 @@
+
 import React, { useState, DragEvent } from 'react';
 import { GameObject } from '../types';
 import { PlusIcon } from './icons/PlusIcon';
@@ -95,15 +96,6 @@ const SceneObjectItem: React.FC<{
                             className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
                         />
                     </div>
-                    <div className="flex items-center pt-1">
-                        <input 
-                            type="checkbox" 
-                            checked={obj.isTakable} 
-                            onChange={(e) => onUpdateGlobalObject(obj.id, { isTakable: e.target.checked })}
-                            className="custom-checkbox" 
-                        />
-                        <label className="ml-2 block text-sm text-brand-text-dim">Pode ser pego (Item de Inventário)</label>
-                    </div>
                 </div>
                 {/* Image Upload Column */}
                 <div className="flex flex-col space-y-3 h-full">
@@ -165,7 +157,6 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
       id: generateUniqueId('obj', allIds),
       name: 'Novo Objeto',
       examineDescription: 'Descrição do novo objeto.',
-      isTakable: false,
     };
     onCreateGlobalObject(newObject, sceneId);
   };
@@ -216,7 +207,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                     <select
                         value={selectedGlobalObjectId}
                         onChange={(e) => setSelectedGlobalObjectId(e.target.value)}
-                        className="flex-grow bg-brand-bg border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                        className="flex-grow bg-brand-bg border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0 [&>option]:bg-brand-sidebar"
                     >
                         <option value="">Selecione um objeto...</option>
                         {availableObjects.map(obj => (

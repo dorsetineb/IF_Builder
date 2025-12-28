@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { GameData } from '../types';
 
@@ -175,6 +176,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         onSetDirty(dirty);
     }, [localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight, props, onSetDirty]);
 
+    // FIX: Using correct property names from types.ts (removed 'game' prefix for light theme colors)
     const handleSave = () => {
         if (localTextColor !== textColor) onUpdate('gameTextColor', localTextColor);
         if (localTitleColor !== titleColor) onUpdate('gameTitleColor', localTitleColor);
@@ -191,9 +193,9 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         if (localChanceRestoreMessage !== chanceRestoreMessage) onUpdate('gameChanceRestoreMessage', localChanceRestoreMessage);
         if (localChanceReturnButtonText !== chanceReturnButtonText) onUpdate('gameChanceReturnButtonText', localChanceReturnButtonText);
         if (localGameTheme !== gameTheme) onUpdate('gameTheme', localGameTheme);
-        if (localTextColorLight !== textColorLight) onUpdate('gameTextColorLight', localTextColorLight);
-        if (localTitleColorLight !== titleColorLight) onUpdate('gameTitleColorLight', localTitleColorLight);
-        if (localFocusColorLight !== focusColorLight) onUpdate('gameFocusColorLight', localFocusColorLight);
+        if (localTextColorLight !== textColorLight) onUpdate('textColorLight', localTextColorLight);
+        if (localTitleColorLight !== titleColorLight) onUpdate('titleColorLight', localTitleColorLight);
+        if (localFocusColorLight !== focusColorLight) onUpdate('focusColorLight', localFocusColorLight);
     };
     
     const handleUndo = () => {

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useMemo, DragEvent } from 'react';
 import { GameData, GameObject, Scene } from '../types';
 import { TrashIcon } from './icons/TrashIcon';
@@ -23,7 +24,6 @@ const generateUniqueId = (prefix: 'obj', existingIds: string[]): string => {
     return id;
 };
 
-// Sub-component for individual Object Item to handle Drag state properly
 const GlobalObjectItem: React.FC<{
     obj: GameObject;
     onUpdate: (id: string, field: keyof GameObject, value: any) => void;
@@ -61,7 +61,7 @@ const GlobalObjectItem: React.FC<{
     const getObjectUsages = (objectId: string) => {
         const usages: {id: string, name: string}[] = [];
         Object.values(scenes).forEach((scene: Scene) => {
-            if (scene.objectIds.includes(objectId)) {
+            if (scene.objectIds && scene.objectIds.includes(objectId)) {
                 usages.push({ id: scene.id, name: scene.name });
             }
         });
@@ -115,18 +115,6 @@ const GlobalObjectItem: React.FC<{
                             className="w-full h-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
                         />
                     </div>
-                    <div className="flex items-center pt-1">
-                        <input
-                            type="checkbox"
-                            id={`isTakable-${obj.id}`}
-                            checked={obj.isTakable}
-                            onChange={e => onUpdate(obj.id, 'isTakable', e.target.checked)}
-                            className="custom-checkbox"
-                        />
-                        <label htmlFor={`isTakable-${obj.id}`} className="ml-2 block text-sm text-brand-text-dim">
-                            Pode ser pego (Item de Inventário)
-                        </label>
-                    </div>
                     <div>
                         <label className="block text-sm font-medium text-brand-text-dim mb-1">Usado em:</label>
                         {usages.length > 0 ? (
@@ -149,7 +137,7 @@ const GlobalObjectItem: React.FC<{
                 </div>
                 <div className="flex flex-col space-y-3 h-full">
                     <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem do Objeto</label>
-                    <div className="relative flex-grow w-full min-h-[200px]">
+                    <div className="relative flex-grow w-full min-h-[150px]">
                         {obj.image ? (
                             <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
                                 <img src={obj.image} alt={obj.name} className="w-full h-full object-cover bg-brand-bg" />
@@ -201,14 +189,12 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
   isDirty,
   onSetDirty,
 }) => {
-  // Convert dict to array and sort
   const sortedObjects = useMemo(() => {
       return Object.values(globalObjects).sort((a: GameObject, b: GameObject) => a.name.localeCompare(b.name));
   }, [globalObjects]);
 
   const [localObjects, setLocalObjects] = useState<GameObject[]>(sortedObjects);
 
-  // Sync local objects whenever the global list changes (e.g., after a delete)
   useEffect(() => {
     setLocalObjects(sortedObjects);
   }, [sortedObjects]);
@@ -234,7 +220,6 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
           name: localObj.name,
           examineDescription: localObj.examineDescription,
           image: localObj.image,
-          isTakable: localObj.isTakable
         });
       }
     });
@@ -250,7 +235,6 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
           id: generateUniqueId('obj', allIds),
           name: 'Novo Objeto',
           examineDescription: 'Descrição do novo objeto.',
-          isTakable: false,
       };
       onCreateObject(newObject);
   };

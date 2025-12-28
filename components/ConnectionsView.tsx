@@ -28,7 +28,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
             {inputConnections.length}
           </span>
         </h4>
-        <p className="text-xs text-brand-text-dim -mt-2">Cenas que levam para esta cena.</p>
+        <p className="text-xs text-brand-text-dim -mt-2">Cenas que <b>trazem</b> o jogador para esta cena.</p>
         <div className="space-y-3">
           {inputConnections.length > 0 ? (
             inputConnections.map(({ scene, interactions }) => (
@@ -80,7 +80,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                 {outputConnections.length}
             </span>
         </h4>
-        <p className="text-xs text-brand-text-dim -mt-2">Cenas alcançáveis a partir desta cena.</p>
+        <p className="text-xs text-brand-text-dim -mt-2">Cenas que o usuário pode chegar <b>partindo</b> desta cena.</p>
         <div className="space-y-3">
           {outputConnections.length > 0 ? (
             outputConnections.map(({ scene, interactions }) => (

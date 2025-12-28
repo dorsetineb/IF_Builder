@@ -1,3 +1,4 @@
+
 import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
@@ -5,7 +6,6 @@ export const prepareGameDataForEngine = (data: GameData): object => {
     for (const sceneId in data.scenes) {
         if (Object.prototype.hasOwnProperty.call(data.scenes, sceneId)) {
             const scene = data.scenes[sceneId];
-            
             translatedCenas[sceneId] = {
                 id: scene.id,
                 name: scene.name,
@@ -21,7 +21,6 @@ export const prepareGameDataForEngine = (data: GameData): object => {
             };
         }
     }
-
     return {
         cena_inicial: data.startScene,
         cenas: translatedCenas,
@@ -34,25 +33,29 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameChanceIconColor: data.gameChanceIconColor,
         gameChanceReturnButtonText: data.gameChanceReturnButtonText,
         gameTheme: data.gameTheme,
-        gameTextColorLight: data.gameTextColorLight,
-        gameTitleColorLight: data.gameTitleColorLight,
-        gameFocusColorLight: data.gameFocusColorLight,
+        gameTextColorLight: data.textColorLight,
+        gameTitleColorLight: data.titleColorLight,
+        gameFocusColorLight: data.focusColorLight,
         gameBackgroundMusic: data.gameBackgroundMusic,
         positiveEndingImage: data.positiveEndingImage,
         positiveEndingContentAlignment: data.positiveEndingContentAlignment,
         positiveEndingDescription: data.positiveEndingDescription,
+        positiveEndingMusic: data.positiveEndingMusic,
         negativeEndingImage: data.negativeEndingImage,
         negativeEndingContentAlignment: data.negativeEndingContentAlignment,
         negativeEndingDescription: data.negativeEndingDescription,
+        negativeEndingMusic: data.negativeEndingMusic,
         gameRestartButtonText: data.gameRestartButtonText,
         gameContinueButtonText: data.gameContinueButtonText,
         gameSystemButtonText: data.gameSystemButtonText,
         gameSaveMenuTitle: data.gameSaveMenuTitle,
         gameLoadMenuTitle: data.gameLoadMenuTitle,
         gameMainMenuButtonText: data.gameMainMenuButtonText,
+        gameViewEndingButtonText: data.gameViewEndingButtonText,
         fixedVerbs: data.fixedVerbs || [],
         consequenceTrackers: data.consequenceTrackers || [],
         gameShowTrackersUI: data.gameShowTrackersUI,
+        gameShowSystemButton: data.gameShowSystemButton,
         gameTextAnimationType: data.gameTextAnimationType,
         gameTextSpeed: data.gameTextSpeed,
         gameImageTransitionType: data.gameImageTransitionType,
@@ -73,7 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const ICONS_OUTLINE = {
         heart: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
         circle: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
-        cross: '<svg stroke="%COLOR%" stroke-width="4" stroke-linecap="round" viewBox="0 0 24 24"><path d="M12 5 V19 M5 12 H19"/></svg>',
+        cross: '<svg stroke="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 5 V19 M5 12 H19"/></svg>',
         square: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>',
         diamond: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2l10 10-10 10L2 12z"/></svg>'
     };
@@ -86,21 +89,20 @@ document.addEventListener('DOMContentLoaded', () => {
     let chances = gameData.gameMaxChances || 3;
     let isGameEnded = false;
     let trackers = {};
-    let sceneObjectsState = {}; 
+    let removedObjectsFromScenes = {}; 
     let currentBgmSrc = "";
+    let isPrinting = false;
 
     const textSpeedVal = gameData.gameTextSpeed || 3; 
     const imgSpeedVal = gameData.gameImageSpeed || 3;
     const typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
     const textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
-    const imageAnimDuration = Math.max(0.3, 5.0 - (imgSpeedVal * 1.0)) + 's';
+    const imageAnimDuration = Math.max(0.3, 5.0 - (imgSpeedVal * 0.9)) + 's';
     
     document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
     document.documentElement.style.setProperty('--image-anim-speed', imageAnimDuration);
 
-    (gameData.consequenceTrackers || []).forEach(t => {
-        trackers[t.id] = t.initialValue;
-    });
+    (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
 
     const splashScreen = document.getElementById('splash-screen');
     const positiveEndingScreen = document.getElementById('positive-ending-screen');
@@ -109,6 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const continueButton = document.getElementById('continue-button');
     const endingRestartButtons = document.querySelectorAll('.ending-restart-button');
     
+    const gameContainer = document.getElementById('game-container');
     const imageContainer = document.getElementById('image-container');
     const sceneImage = document.getElementById('scene-image');
     const sceneImageBack = document.getElementById('scene-image-back');
@@ -124,6 +127,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const sceneNameOverlay = document.getElementById('scene-name-overlay');
     const soundEffectAudio = document.getElementById('scene-sound-effect');
     const bgmAudio = document.getElementById('bgm-audio');
+    
+    const standardActionBar = document.getElementById('standard-action-bar');
+    const endingActionBar = document.getElementById('ending-action-bar');
+    const viewEndingButton = document.getElementById('view-ending-button');
     
     const diaryModal = document.getElementById('diary-modal');
     const diaryLog = document.getElementById('diary-log');
@@ -147,738 +154,630 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const closeButtons = document.querySelectorAll('.modal-close-button');
 
-    const playSound = (src) => {
-        if (!src || !soundEffectAudio) return;
-        soundEffectAudio.src = src;
-        soundEffectAudio.play().catch(e => console.log('Audio play failed', e));
-    };
+    const playSound = (src) => { if (src && soundEffectAudio) { soundEffectAudio.src = src; soundEffectAudio.play().catch(e => {}); } };
 
+    let bgmFadeInterval = null;
     const playBgm = (src) => {
         if (!bgmAudio) return;
-        if (!src) {
-            bgmAudio.pause();
-            currentBgmSrc = "";
+        
+        // Se a fonte for a mesma e o áudio estiver pausado (bloqueio de autoplay), tenta dar play
+        if (src === currentBgmSrc) {
+            if (bgmAudio.paused && src) {
+                bgmAudio.play().catch(e => {});
+            }
             return;
         }
-        if (src === currentBgmSrc) return;
         
-        bgmAudio.src = src;
-        currentBgmSrc = src;
-        bgmAudio.play().catch(e => console.log('BGM play failed. Needs user interaction.', e));
+        const fadeOut = (callback) => {
+            if (bgmFadeInterval) clearInterval(bgmFadeInterval);
+            let vol = bgmAudio.volume;
+            bgmFadeInterval = setInterval(() => {
+                vol -= 0.1;
+                if (vol <= 0) {
+                    clearInterval(bgmFadeInterval);
+                    bgmAudio.pause();
+                    bgmAudio.volume = 0;
+                    callback();
+                } else {
+                    bgmAudio.volume = Math.max(0, vol);
+                }
+            }, 50);
+        };
+
+        const fadeIn = () => {
+            if (bgmFadeInterval) clearInterval(bgmFadeInterval);
+            bgmAudio.volume = 0;
+            bgmAudio.play().catch(e => {
+                console.log("Autoplay bloqueado ou erro de áudio.");
+            });
+            let vol = 0;
+            bgmFadeInterval = setInterval(() => {
+                vol += 0.1;
+                if (vol >= 1) {
+                    clearInterval(bgmFadeInterval);
+                    bgmAudio.volume = 1;
+                } else {
+                    bgmAudio.volume = Math.min(1, vol);
+                }
+            }, 50);
+        };
+
+        if (bgmAudio.src && !bgmAudio.paused) {
+            fadeOut(() => {
+                if (!src) { currentBgmSrc = ""; return; }
+                bgmAudio.src = src;
+                currentBgmSrc = src;
+                fadeIn();
+            });
+        } else {
+            if (!src) { currentBgmSrc = ""; return; }
+            bgmAudio.src = src;
+            currentBgmSrc = src;
+            fadeIn();
+        }
     };
 
     const init = () => {
-        const hasAutoSave = localStorage.getItem('if_builder_autosave_' + document.title);
-        if (hasAutoSave && !window.isPreview) {
-            continueButton.classList.remove('hidden');
+        if (gameData.gameBackgroundMusic) {
+            playBgm(gameData.gameBackgroundMusic);
         }
 
+        const startAudioOnInteraction = () => {
+            if (gameData.gameBackgroundMusic && bgmAudio.paused && !isGameEnded) {
+                playBgm(gameData.gameBackgroundMusic);
+            }
+            document.removeEventListener('mousedown', startAudioOnInteraction);
+            document.removeEventListener('keydown', startAudioOnInteraction);
+        };
+        document.addEventListener('mousedown', startAudioOnInteraction);
+        document.addEventListener('keydown', startAudioOnInteraction);
+
+        const hasAutoSave = localStorage.getItem('if_builder_autosave_' + document.title);
+        if (hasAutoSave && !window.isPreview) continueButton.classList.remove('hidden');
         splashStartButton.addEventListener('click', startGame);
         continueButton.addEventListener('click', () => loadGameFromData(hasAutoSave));
         endingRestartButtons.forEach(btn => btn.addEventListener('click', () => {
-             positiveEndingScreen.classList.add('hidden');
-             negativeEndingScreen.classList.add('hidden');
+             positiveEndingScreen.classList.add('hidden'); 
+             negativeEndingScreen.classList.add('hidden'); 
+             gameContainer.classList.remove('fade-out');
              startGame();
         }));
-
         submitVerb.addEventListener('click', handleInput);
-        verbInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') handleInput();
-        });
-
+        verbInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleInput(); });
         suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
         inventoryButton.addEventListener('click', () => togglePopup('inventory'));
         diaryButton.addEventListener('click', showDiary);
         if (trackersButton) trackersButton.addEventListener('click', showTrackers);
         if (systemButton) systemButton.addEventListener('click', toggleSystemMenu);
-        
-        closeButtons.forEach(btn => btn.addEventListener('click', (e) => {
-            e.target.closest('.modal-overlay').classList.add('hidden');
-        }));
-        
-        document.querySelectorAll('.modal-overlay').forEach(modal => {
-            modal.addEventListener('click', (e) => {
-                if(e.target === modal) modal.classList.add('hidden');
-            });
-        });
-
+        closeButtons.forEach(btn => btn.addEventListener('click', (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); }));
         btnSaveMenu.addEventListener('click', () => renderSlots('save'));
         btnLoadMenu.addEventListener('click', () => renderSlots('load'));
-        btnBackSystem.addEventListener('click', () => {
-            systemSlotsContainer.classList.add('hidden');
-            systemMenuMain.classList.remove('hidden');
-            systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema';
-        });
-        btnMainMenu.addEventListener('click', () => {
-            if (confirm("Voltar ao menu principal?")) {
-                systemModal.classList.add('hidden');
-                splashScreen.classList.remove('hidden');
+        btnBackSystem.addEventListener('click', () => { systemSlotsContainer.classList.add('hidden'); systemMenuMain.classList.remove('hidden'); systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema'; });
+        
+        viewEndingButton.addEventListener('click', () => {
+             const isWin = isGameEnded === 'win';
+             const endScreen = isWin ? positiveEndingScreen : negativeEndingScreen;
+             const endMusic = isWin ? gameData.positiveEndingMusic : gameData.negativeEndingMusic;
+             
+             if (endMusic) {
+                playBgm(endMusic);
+             } else {
                 playBgm(""); 
-            }
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                if (!itemModal.classList.contains('hidden')) {
-                    itemModal.classList.add('hidden');
-                } else if (!diaryModal.classList.contains('hidden')) {
-                    diaryModal.classList.add('hidden');
-                } else if (!trackersModal.classList.contains('hidden')) {
-                    trackersModal.classList.add('hidden');
-                } else if (!systemModal.classList.contains('hidden')) {
-                    systemModal.classList.add('hidden');
-                } else {
-                    toggleSystemMenu();
-                }
-            }
-        });
-
-        document.addEventListener('click', (e) => {
-             if (e.target && e.target.id === 'btn-return-chance') {
-                 loadScene(currentSceneId, false);
              }
-        });
 
-        if (window.isSceneTest) {
-            startGame();
-        }
+             endScreen.style.zIndex = '0';
+             endScreen.classList.remove('hidden');
+             gameContainer.classList.add('fade-out');
+             setTimeout(() => {
+                gameContainer.classList.add('hidden');
+                endScreen.style.zIndex = ''; 
+             }, 1000);
+        });
+        
+        btnMainMenu.onclick = (e) => {
+            systemModal.classList.add('hidden');
+            splashScreen.classList.remove('fade-out');
+            splashScreen.classList.remove('hidden');
+            isGameEnded = false; 
+            if (gameData.gameBackgroundMusic) playBgm(gameData.gameBackgroundMusic);
+            else playBgm("");
+        };
+
+        if (window.isSceneTest) startGame();
     };
 
     const startGame = () => {
-        if (!window.isPreview) {
-            localStorage.removeItem('if_builder_autosave_' + document.title);
-        }
-        currentSceneId = gameData.cena_inicial;
-        inventory = [];
-        visitedScenes = [];
-        actionLog = [];
-        chances = gameData.gameMaxChances || 3;
+        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + document.title);
+        currentSceneId = gameData.cena_inicial; 
+        inventory = []; 
+        visitedScenes = []; 
+        actionLog = []; 
+        chances = gameData.gameMaxChances || 3; 
+        trackers = {}; 
+        removedObjectsFromScenes = {};
         isGameEnded = false;
-        trackers = {};
-        sceneObjectsState = {}; 
-        (gameData.consequenceTrackers || []).forEach(t => {
-            trackers[t.id] = t.initialValue;
-        });
+        (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
         
-        splashScreen.classList.add('hidden');
-        
-        if (gameData.gameBackgroundMusic) {
-            playBgm(gameData.gameBackgroundMusic);
-        }
-
         loadScene(currentSceneId, false); 
+        standardActionBar.classList.remove('hidden');
+        endingActionBar.classList.add('hidden');
+
+        splashScreen.classList.add('fade-out');
+        setTimeout(() => {
+            splashScreen.classList.add('hidden');
+            splashScreen.classList.remove('fade-out');
+        }, 1000);
     };
 
     const loadGameFromData = (jsonString) => {
         try {
-            if (jsonString) {
-                const save = JSON.parse(jsonString);
-                if (save) {
-                    currentSceneId = save.currentSceneId;
-                    inventory = save.inventory;
-                    visitedScenes = save.visitedScenes || [];
-                    actionLog = save.actionLog || [];
-                    chances = save.chances;
-                    trackers = save.trackers || {};
-                    sceneObjectsState = save.sceneObjectsState || {};
+            const save = JSON.parse(jsonString);
+            if (save) {
+                currentSceneId = save.currentSceneId; 
+                inventory = save.inventory; 
+                visitedScenes = save.visitedScenes || []; 
+                actionLog = save.actionLog || []; 
+                chances = save.chances; 
+                trackers = save.trackers || {}; 
+                removedObjectsFromScenes = save.removedObjectsFromScenes || {};
+                isGameEnded = false;
+                
+                standardActionBar.classList.remove('hidden');
+                endingActionBar.classList.add('hidden');
+                systemModal.classList.add('hidden');
+                loadScene(currentSceneId, false);
 
+                splashScreen.classList.add('fade-out');
+                setTimeout(() => {
                     splashScreen.classList.add('hidden');
-                    systemModal.classList.add('hidden');
-                    
-                    const startScene = gameData.cenas[currentSceneId];
-                    if (startScene && startScene.backgroundMusic) {
-                        playBgm(startScene.backgroundMusic);
-                    } else if (gameData.gameBackgroundMusic) {
-                        playBgm(gameData.gameBackgroundMusic);
-                    }
-
-                    loadScene(currentSceneId, false);
-                } else {
-                    startGame();
-                }
+                    splashScreen.classList.remove('fade-out');
+                }, 1000);
             }
-        } catch (e) {
-            console.error("Failed to load save:", e);
-            startGame();
-        }
+        } catch (e) { startGame(); }
     };
 
     const autoSaveGame = () => {
         if (window.isPreview) return; 
-        const save = {
-            currentSceneId,
-            inventory,
-            visitedScenes,
-            actionLog,
-            chances,
-            trackers,
-            sceneObjectsState,
-            timestamp: new Date().toLocaleString()
-        };
+        if (isGameEnded) return;
+        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
         localStorage.setItem('if_builder_autosave_' + document.title, JSON.stringify(save));
     };
 
     const toggleSystemMenu = () => {
         if (systemModal.classList.contains('hidden')) {
-            systemModal.classList.remove('hidden');
-            systemMenuMain.classList.remove('hidden');
-            systemSlotsContainer.classList.add('hidden');
+            systemModal.classList.remove('hidden'); systemMenuMain.classList.remove('hidden'); systemSlotsContainer.classList.add('hidden');
             systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema';
-        } else {
-            systemModal.classList.add('hidden');
-        }
+        } else systemModal.classList.add('hidden');
     };
 
     const renderSlots = (mode) => {
-        systemMenuMain.classList.add('hidden');
-        systemSlotsContainer.classList.remove('hidden');
-        slotsList.innerHTML = '';
-        
-        systemModalTitle.textContent = mode === 'save' 
-            ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') 
-            : (gameData.gameLoadMenuTitle || 'Carregar Jogo');
-
+        systemMenuMain.classList.add('hidden'); systemSlotsContainer.classList.remove('hidden'); slotsList.innerHTML = '';
+        systemModalTitle.textContent = mode === 'save' ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') : (gameData.gameLoadMenuTitle || 'Carregar Jogo');
         for (let i = 1; i <= 3; i++) {
             const slotKey = 'if_builder_slot_' + i + '_' + document.title;
             const savedData = localStorage.getItem(slotKey);
-            const slotDiv = document.createElement('div');
-            slotDiv.className = 'slot-item';
-            
+            const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
             let contentHtml = '';
             if (savedData) {
-                const data = JSON.parse(savedData);
-                const sceneName = gameData.cenas[data.currentSceneId] ? gameData.cenas[data.currentSceneId].name : 'Desconhecido';
-                contentHtml = '<div class="slot-info">' +
-                    '<span class="slot-title">Slot ' + i + ' - ' + sceneName + '</span>' +
-                    '<span class="slot-meta">' + data.timestamp + '</span>' +
-                    '</div>';
-                if (mode === 'save') {
-                    contentHtml += '<div class="slot-actions"><span class="highlight-word">Sobrescrever</span></div>';
-                } else {
-                    contentHtml += '<div class="slot-actions">' +
-                        '<button class="slot-delete-btn" data-slot="' + i + '">×</button>' +
-                        '</div>';
-                }
+                const data = JSON.parse(savedData); const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Sobrescrever</span></div>';
+                else contentHtml += '<div class="slot-actions"><button class="slot-delete-btn" data-slot="' + i + '">×</button></div>';
             } else {
-                contentHtml = '<div class="slot-info">' +
-                    '<span class="slot-title">Slot ' + i + '</span>' +
-                    '<span class="slot-empty">Vazio</span>' +
-                    '</div>';
-                if (mode === 'save') {
-                    contentHtml += '<div class="slot-actions"><span class="highlight-word">Salvar</span></div>';
-                }
+                contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + '</span><span class="slot-empty">Vazio</span></div>';
+                if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Salvar</span></div>';
             }
-            
             slotDiv.innerHTML = contentHtml;
-            slotDiv.addEventListener('click', (e) => {
-                if (e.target.classList.contains('slot-delete-btn')) return;
-                if (mode === 'save') {
-                    performSave(i);
-                } else if (mode === 'load' && savedData) {
-                    loadGameFromData(savedData);
-                }
-            });
-
-            const deleteBtn = slotDiv.querySelector('.slot-delete-btn');
-            if (deleteBtn) {
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (confirm('Apagar este save?')) {
-                        localStorage.removeItem(slotKey);
-                        renderSlots(mode);
-                    }
-                });
-            }
+            slotDiv.addEventListener('click', (e) => { if (e.target.classList.contains('slot-delete-btn')) return; if (mode === 'save') performSave(i); else if (mode === 'load' && savedData) loadGameFromData(savedData); });
             slotsList.appendChild(slotDiv);
         }
     };
 
     const performSave = (slotIndex) => {
         const slotKey = 'if_builder_slot_' + slotIndex + '_' + document.title;
-        const save = {
-            currentSceneId,
-            inventory,
-            visitedScenes,
-            actionLog,
-            chances,
-            trackers,
-            sceneObjectsState,
-            timestamp: new Date().toLocaleString()
-        };
-        localStorage.setItem(slotKey, JSON.stringify(save));
-        alert('Jogo salvo no Slot ' + slotIndex);
-        renderSlots('save');
+        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
+        localStorage.setItem(slotKey, JSON.stringify(save)); renderSlots('save');
     };
 
     const getObjectsForScene = (sceneId) => {
-        if (sceneObjectsState[sceneId]) {
-            return sceneObjectsState[sceneId];
-        }
-        const scene = gameData.cenas[sceneId];
+        const scene = gameData.cenas[sceneId]; 
         if (!scene) return [];
-        const objects = (scene.objectIds || []).map(id => {
-            const globalObj = gameData.globalObjects[id];
-            return globalObj ? JSON.parse(JSON.stringify(globalObj)) : null;
-        }).filter(obj => obj !== null);
-        sceneObjectsState[sceneId] = objects;
+        let objects = (scene.objectIds || []).map(id => gameData.globalObjects[id]).filter(Boolean).map(o => JSON.parse(JSON.stringify(o)));
+        const removedIds = removedObjectsFromScenes[sceneId] || [];
+        objects = objects.filter(o => !removedIds.includes(o.id));
         return objects;
     };
     
-    const updateSceneObjects = (sceneId, newObjects) => {
-        sceneObjectsState[sceneId] = newObjects;
+    const flagObjectAsRemoved = (sceneId, objectId) => {
+        if (!removedObjectsFromScenes[sceneId]) removedObjectsFromScenes[sceneId] = [];
+        if (!removedObjectsFromScenes[sceneId].includes(objectId)) {
+            removedObjectsFromScenes[sceneId].push(objectId);
+        }
     };
 
     const updateTrackers = (effects) => {
         if (!effects) return;
-        let changed = false;
-        effects.forEach(effect => {
-            if (trackers.hasOwnProperty(effect.trackerId)) {
-                trackers[effect.trackerId] += effect.valueChange;
-                changed = true;
-            }
-        });
-        if (changed) checkTrackers();
+        effects.forEach(effect => { if (trackers.hasOwnProperty(effect.trackerId)) trackers[effect.trackerId] += effect.valueChange; });
+        checkTrackers();
     };
 
     const checkTrackers = () => {
         const definitions = gameData.consequenceTrackers || [];
-        for (const def of definitions) {
-            if (trackers[def.id] >= def.maxValue && def.consequenceSceneId) {
-                setTimeout(() => {
-                    loadScene(def.consequenceSceneId, true, 'fade');
-                }, 500);
-                return;
-            }
-        }
+        for (const def of definitions) { if (trackers[def.id] >= def.maxValue && def.consequenceSceneId) { setTimeout(() => { loadScene(def.consequenceSceneId, true, 'fade'); }, 500); return; } }
     };
 
-    const loadScene = (sceneId, transition = true, transitionType = 'none') => {
-        if (isGameEnded) return;
-        const scene = gameData.cenas[sceneId];
-        if (!scene) return;
+    const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
+        const scene = gameData.cenas[sceneId]; if (!scene) return;
         
         if (scene.backgroundMusic) {
             playBgm(scene.backgroundMusic);
         }
-
-        if (scene.removesChanceOnEntry) {
-            chances--;
-            if (chances <= 0) {
-                gameOver();
-                return;
-            }
+        
+        if (scene.removesChanceOnEntry) { 
+            chances--; 
         }
-        if (scene.restoresChanceOnEntry) {
-            if (gameData.gameSystemEnabled === 'chances') {
-                chances = Math.min(chances + 1, gameData.gameMaxChances);
-            }
-        }
+        
+        if (scene.restoresChanceOnEntry && gameData.gameSystemEnabled === 'chances') chances = Math.min(chances + 1, gameData.gameMaxChances);
         currentSceneId = sceneId;
         if (!visitedScenes.includes(sceneId)) visitedScenes.push(sceneId);
         actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
-        let effectiveTransition = transitionType === 'none' || !transitionType ? (gameData.gameImageTransitionType || 'fade') : transitionType;
+        
+        let effectiveTransition = !transitionType || transitionType === 'none' ? (gameData.gameImageTransitionType || 'fade') : transitionType;
         if (effectiveTransition === 'none') transition = false;
-        if (transition && sceneImage && sceneImageBack) {
-             sceneImageBack.src = scene.image || '';
-             sceneImageBack.classList.toggle('hidden', !scene.image);
-             if (sceneImage.src) {
-                 sceneImage.classList.remove('hidden');
-                 const animClass = 'trans-' + effectiveTransition + '-out';
-                 sceneImage.classList.add(animClass);
-                 const durationMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--image-anim-speed')) * 1000;
-                 setTimeout(() => {
-                     renderScene(scene);
-                     sceneImage.classList.remove(animClass);
-                     sceneImageBack.src = '';
-                     sceneImageBack.classList.add('hidden');
-                 }, durationMs + 50);
-             } else {
-                 renderScene(scene);
-             }
+        
+        if (transitionSpeed !== null) {
+            const dynamicDuration = Math.max(0.3, 5.0 - (transitionSpeed * 0.9)) + 's';
+            document.documentElement.style.setProperty('--image-anim-speed', dynamicDuration);
         } else {
-            if (sceneImageBack) {
-                sceneImageBack.src = ''; 
-                sceneImageBack.classList.add('hidden');
-            }
-            renderScene(scene);
+            const defaultDuration = Math.max(0.3, 5.0 - ((gameData.gameImageSpeed || 3) * 0.9)) + 's';
+            document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
         }
+
+        if (transition && sceneImage && sceneImageBack) {
+             sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
+             if (sceneImage.src) {
+                 sceneImage.classList.remove('hidden'); const animClass = 'trans-' + effectiveTransition + '-out'; sceneImage.classList.add(animClass);
+                 const durationMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--image-anim-speed')) * 1000;
+                 setTimeout(() => { renderScene(scene, successPrefix); sceneImage.classList.remove(animClass); sceneImageBack.src = ''; sceneImageBack.classList.add('hidden'); }, durationMs + 50);
+             } else renderScene(scene, successPrefix);
+        } else { renderScene(scene, successPrefix); }
         autoSaveGame();
     };
 
-    const renderScene = (scene) => {
-        if (scene.image) {
-            sceneImage.src = scene.image;
-            sceneImage.classList.remove('hidden');
-            imageContainer.classList.remove('no-image');
-        } else {
-            sceneImage.src = '';
-            sceneImage.classList.add('hidden');
-            imageContainer.classList.add('no-image');
-        }
-        if (sceneNameOverlay) {
-            sceneNameOverlay.textContent = scene.name;
-            sceneNameOverlay.style.opacity = '1';
-            setTimeout(() => { sceneNameOverlay.style.opacity = '0'; }, 3000);
-        }
-        sceneDescription.innerHTML = '';
-        const rawDesc = scene.description;
-        const paragraphs = rawDesc.split('\\n').filter(p => p.trim().length > 0);
-        let pIndex = 0;
-        const textAnimType = gameData.gameTextAnimationType || 'fade';
+    const formatText = (text) => text.replace(/<([^>]+)>/g, '<span class="highlight-word" data-word="$1">$1</span>');
 
-        const setupHighlights = (element) => {
-            element.querySelectorAll('.highlight-word').forEach(span => {
-                span.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    verbInput.value = span.dataset.word;
-                    verbInput.focus();
-                });
+    const setupHighlights = (element) => {
+        element.querySelectorAll('.highlight-word').forEach(span => {
+            span.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (isPrinting) return; 
+                const word = span.dataset.word;
+                const currentVal = verbInput.value.trim();
+                verbInput.value = currentVal ? (currentVal + ' ' + word) : word;
+                verbInput.focus();
             });
-        };
+        });
+    };
+
+    const renderScene = (scene, successPrefix = null) => {
+        if (scene.image) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
+        else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
+        if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
+        sceneDescription.innerHTML = '';
+        
+        let fullDescription = scene.description;
+        if (successPrefix) {
+            fullDescription = successPrefix + "\\n\\n" + fullDescription;
+        }
+
+        const paragraphs = fullDescription.split('\\n').filter(p => p.trim().length > 0);
+        let pIndex = 0; const textAnimType = gameData.gameTextAnimationType || 'fade';
+
+        isPrinting = true;
+        sceneDescription.classList.add('typewriting-active');
 
         const renderNextParagraph = () => {
-            if (pIndex >= paragraphs.length) {
-                if (scene.isEndingScene) setTimeout(gameWin, 2000);
-                return;
+            if (pIndex >= paragraphs.length) { 
+                isPrinting = false;
+                sceneDescription.classList.remove('typewriting-active');
+                
+                if (chances <= 0) {
+                    gameOver();
+                } else if (scene.isEndingScene) {
+                    activateEndingUI('win');
+                }
+                return; 
             }
-            const pText = paragraphs[pIndex];
-            const p = document.createElement('p');
-            const formatText = (text) => text.replace(/<([^>]+)>/g, '<span class="highlight-word" data-word="$1">$1</span>');
-            const formattedHTML = formatText(pText);
-            
+            const p = document.createElement('p'); const formattedHTML = formatText(paragraphs[pIndex]);
             if (textAnimType === 'typewriter') {
-                p.className = 'scene-paragraph typewriter-cursor';
-                p.style.opacity = '1'; 
-                p.innerHTML = formattedHTML;
-                sceneDescription.appendChild(p);
-
+                p.className = 'scene-paragraph typewriter-cursor'; p.style.opacity = '1'; p.innerHTML = formattedHTML; sceneDescription.appendChild(p);
                 const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
-                let node;
-                const textNodes = [];
-                while(node = walker.nextNode()) textNodes.push(node);
-                
-                const fullTexts = textNodes.map(n => n.nodeValue);
-                textNodes.forEach(n => n.nodeValue = '');
-                
-                let nodeIdx = 0;
-                let charIdx = 0;
-                
+                let node; const textNodes = []; while(node = walker.nextNode()) textNodes.push(node);
+                const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
+                let nodeIdx = 0; let charIdx = 0;
                 const type = () => {
-                    if (nodeIdx >= textNodes.length) {
-                        p.classList.remove('typewriter-cursor');
-                        setupHighlights(p);
-                        finishParagraph();
-                        return;
-                    }
-                    
-                    const currentNode = textNodes[nodeIdx];
-                    const fullText = fullTexts[nodeIdx];
-                    
-                    if (charIdx < fullText.length) {
-                        currentNode.nodeValue += fullText[charIdx];
-                        charIdx++;
-                        if (sceneDescription) sceneDescription.scrollTop = sceneDescription.scrollHeight;
-                        setTimeout(type, typeSpeedBase);
-                    } else {
-                        nodeIdx++;
-                        charIdx = 0;
-                        type();
-                    }
+                    if (nodeIdx >= textNodes.length) { p.classList.remove('typewriter-cursor'); setupHighlights(p); finishParagraph(); return; }
+                    const currentNode = textNodes[nodeIdx]; const fullText = fullTexts[nodeIdx];
+                    if (charIdx < fullText.length) { currentNode.nodeValue += fullText[charIdx]; charIdx++; if (sceneDescription) sceneDescription.scrollTop = sceneDescription.scrollHeight; setTimeout(type, typeSpeedBase); }
+                    else { nodeIdx++; charIdx = 0; type(); }
                 };
                 type();
-            } else {
-                p.innerHTML = formattedHTML;
-                p.className = 'scene-paragraph';
-                sceneDescription.appendChild(p);
-                setupHighlights(p);
-                finishParagraph();
-            }
+            } else { p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); finishParagraph(); }
         };
 
         const finishParagraph = () => {
             pIndex++;
             if (pIndex < paragraphs.length) {
-                const continueBtn = document.createElement('div');
-                continueBtn.className = 'continue-indicator';
-                continueBtn.innerHTML = '<span>▼</span>';
-                const continueHandler = (e) => {
-                    if(e) e.stopPropagation();
-                    continueBtn.remove();
-                    sceneDescription.removeEventListener('click', continueHandler);
-                    renderNextParagraph();
+                const continueBtn = document.createElement('div'); continueBtn.className = 'continue-indicator'; continueBtn.innerHTML = '<span>▼</span>';
+                
+                const continueHandler = (e) => { 
+                    if (e) {
+                        if (e.type === 'keydown' && e.key !== 'Enter') return;
+                        e.stopPropagation();
+                        if (e.type === 'keydown') e.preventDefault();
+                    }
+                    continueBtn.remove(); 
+                    sceneDescription.removeEventListener('click', continueHandler); 
+                    window.removeEventListener('keydown', continueHandler);
+                    renderNextParagraph(); 
                 };
-                continueBtn.addEventListener('click', continueHandler);
+                
+                continueBtn.addEventListener('click', continueHandler); 
                 sceneDescription.addEventListener('click', continueHandler);
-                sceneDescription.appendChild(continueBtn);
-                sceneDescription.scrollTop = sceneDescription.scrollHeight;
-            } else {
-                sceneDescription.scrollTop = sceneDescription.scrollHeight;
-                verbInput.focus();
-                if (scene.isEndingScene) setTimeout(gameWin, 2000);
+                window.addEventListener('keydown', continueHandler);
+                
+                sceneDescription.appendChild(continueBtn); sceneDescription.scrollTop = sceneDescription.scrollHeight;
+            } else { 
+                isPrinting = false;
+                sceneDescription.classList.remove('typewriting-active');
+                sceneDescription.scrollTop = sceneDescription.scrollHeight; 
+                
+                if (chances <= 0) {
+                    gameOver();
+                } else {
+                    verbInput.focus(); 
+                    if (scene.isEndingScene) activateEndingUI('win');
+                }
             }
         };
         renderNextParagraph();
+        
         const chancesContainer = document.getElementById('chances-container');
         if (chancesContainer && gameData.gameSystemEnabled === 'chances') {
             chancesContainer.innerHTML = '';
             const iconSvg = ICONS[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
             const iconOutlineSvg = ICONS_OUTLINE[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
             for (let i = 0; i < (gameData.gameMaxChances || 3); i++) {
-                const icon = document.createElement('div');
-                icon.className = 'chance-icon ' + (i < chances ? '' : 'lost');
-                icon.innerHTML = i < chances ? iconSvg : iconOutlineSvg;
-                chancesContainer.appendChild(icon);
+                const icon = document.createElement('div'); icon.className = 'chance-icon ' + (i < chances ? '' : 'lost');
+                icon.innerHTML = i < chances ? iconSvg : iconOutlineSvg; chancesContainer.appendChild(icon);
             }
         }
-        closeActionPopup();
-        verbInput.value = '';
+        actionPopup.classList.add('hidden'); verbInput.value = '';
     };
 
-    const gameOver = () => {
-        isGameEnded = true;
-        negativeEndingScreen.classList.remove('hidden');
-        if (!window.isPreview) {
-            localStorage.removeItem('if_builder_autosave_' + document.title);
+    const activateEndingUI = (type) => {
+        isGameEnded = type;
+        standardActionBar.classList.add('hidden');
+        endingActionBar.classList.remove('hidden');
+        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + document.title);
+    };
+
+    const gameOver = () => { activateEndingUI('lose'); };
+
+    const handleInput = () => { if (isPrinting) return; const input = verbInput.value.trim(); if (input) { processCommand(input); verbInput.value = ''; } };
+
+    const hasWord = (word, text) => {
+        if (!word || !text) return false;
+        const normalizedWord = word.toLowerCase().trim();
+        const normalizedText = text.toLowerCase();
+        
+        let index = normalizedText.indexOf(normalizedWord);
+        while (index !== -1) {
+            const charBefore = index > 0 ? normalizedText[index - 1] : ' ';
+            const charAfter = index + normalizedWord.length < normalizedText.length ? normalizedText[index + normalizedWord.length] : ' ';
+            
+            const isBoundary = (char) => /[^a-zA-Z0-9áéíóúàèìòùâêîôûãõç]/.test(char);
+            
+            if (isBoundary(charBefore) && isBoundary(charAfter)) return true;
+            
+            index = normalizedText.indexOf(normalizedWord, index + 1);
         }
-        playBgm(""); 
-    };
-
-    const gameWin = () => {
-        isGameEnded = true;
-        positiveEndingScreen.classList.remove('hidden');
-        if (!window.isPreview) {
-            localStorage.removeItem('if_builder_autosave_' + document.title);
-        }
-    };
-
-    const handleInput = () => {
-        const rawInput = verbInput.value.trim();
-        if (!rawInput) return;
-        processCommand(rawInput);
-        verbInput.value = '';
+        return false;
     };
 
     const processCommand = (input) => {
         const inputLower = input.toLowerCase().trim();
-        const echo = document.createElement('p');
-        echo.className = 'verb-echo';
-        echo.textContent = '> ' + input;
-        sceneDescription.appendChild(echo);
-        sceneDescription.scrollTop = sceneDescription.scrollHeight;
-        actionLog.push({ type: 'input', text: '> ' + input });
-        const scene = gameData.cenas[currentSceneId];
+        const echo = document.createElement('p'); echo.className = 'verb-echo'; echo.textContent = '> ' + input; sceneDescription.appendChild(echo);
+        sceneDescription.scrollTop = sceneDescription.scrollHeight; actionLog.push({ type: 'input', text: '> ' + input });
+        const scene = gameData.cenas[currentSceneId]; 
         const sceneObjects = getObjectsForScene(currentSceneId); 
-        const hasWord = (word, text) => {
-             const safe = word.replace(/[.*+?^$\{}()|[\\]\\\\]/g, '\\\\$&');
-             return new RegExp('\\\\b' + safe + '\\\\b', 'i').test(text);
-        };
-        for (const fv of (gameData.fixedVerbs || [])) {
-            if (fv.verbs.some(v => hasWord(v, inputLower))) {
-                printOutput(fv.description);
-                return;
-            }
-        }
-        const interaction = scene.interactions.find(i => {
-            const verbMatch = i.verbs.some(v => hasWord(v, inputLower));
-            if (!verbMatch) return false;
-            if (i.target) {
-                const targetObj = sceneObjects.find(o => o.id === i.target);
-                const invObj = findItemInInventoryById(i.target);
-                const obj = targetObj || invObj;
-                if (obj) {
-                    if (!hasWord(obj.name.toLowerCase(), inputLower)) return false;
-                } else return false;
-            }
+        
+        for (const fv of (gameData.fixedVerbs || [])) { if (fv.verbs.some(v => hasWord(v, inputLower))) { printOutput(fv.description); return; } }
+        
+        let foundInteraction = scene.interactions.find(i => {
+            if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
             if (i.requiresInInventory && !inventory.some(o => o.id === i.requiresInInventory)) return false;
-            return true;
+            
+            if (i.target) {
+                const obj = sceneObjects.find(o => i.target === o.id) || inventory.find(o => i.target === o.id);
+                if (!obj) return false;
+                return hasWord(obj.name.toLowerCase(), inputLower);
+            }
+            
+            const anyObjectMentioned = [...sceneObjects, ...inventory].some(o => hasWord(o.name.toLowerCase(), inputLower));
+            return !anyObjectMentioned;
         });
-        if (interaction) {
-            executeInteraction(interaction);
-            return;
+
+        if (!foundInteraction) {
+            foundInteraction = scene.interactions.find(i => {
+                if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
+                if (i.requiresInInventory && !inventory.some(o => o.id === i.requiresInInventory)) return false;
+                if (i.target) return false;
+                return true;
+            });
         }
-        if (hasWord('inventario', inputLower) || hasWord('i', inputLower) || hasWord('items', inputLower) || (hasWord('ver', inputLower) && hasWord('inventario', inputLower))) {
-            closeActionPopup();
-            togglePopup('inventory');
-            return;
-        }
-        const lookVerbs = ['olhar', 'examinar', 'l', 'x', 'ver', 'ler'];
+        
+        if (foundInteraction) { executeInteraction(foundInteraction); return; }
+        if (hasWord('inventario', inputLower) || hasWord('i', inputLower)) { actionPopup.classList.add('hidden'); togglePopup('inventory'); return; }
+        
+        const lookVerbs = ['olhar', 'examinar', 'ver', 'ler'];
         if (lookVerbs.some(v => hasWord(v, inputLower))) {
-             const sceneObj = sceneObjects.find(o => hasWord(o.name.toLowerCase(), inputLower));
-             if (sceneObj) { printOutput(sceneObj.examineDescription); return; }
-             const invObj = inventory.find(item => hasWord(item.name.toLowerCase(), inputLower));
-             if (invObj) { printOutput(invObj.examineDescription); return; }
-             printOutput(scene.description.replace(/<|>/g, ''));
-             return;
+             const obj = sceneObjects.find(o => hasWord(o.name.toLowerCase(), inputLower)) || inventory.find(o => hasWord(o.name.toLowerCase(), inputLower));
+             if (obj) { printOutput(obj.examineDescription); return; }
+             printOutput(scene.description); return;
         }
-        const takeVerbs = ['pegar', 'coletar', 'apanhar', 'levar'];
-        if (takeVerbs.some(v => hasWord(v, inputLower))) {
-             const sceneObj = sceneObjects.find(o => hasWord(o.name.toLowerCase(), inputLower));
-             if (sceneObj) {
-                 if (sceneObj.isTakable) {
-                     addToInventory(sceneObj);
-                     const newObjects = sceneObjects.filter(o => o.id !== sceneObj.id);
-                     updateSceneObjects(currentSceneId, newObjects);
-                     printOutput('Você pegou ' + sceneObj.name + '.');
-                     return;
-                 } else { printOutput("Você não pode pegar isso."); return; }
-             }
-        }
-        if (hasWord('ajuda', inputLower) || hasWord('help', inputLower) || inputLower === '?') {
-             printOutput("Descubra o que fazer interagindo com o cenário. Tente combinar ações e objetos, como 'examinar mesa', 'usar chave', 'empurrar porta'.");
-             return;
-        }
+        
         printOutput(gameData.mensagem_falha_padrao || "Não aconteceu nada.");
     };
 
     const executeInteraction = (interaction) => {
-        if (interaction.consumesItem && interaction.requiresInInventory) {
-            removeFromInventory(interaction.requiresInInventory);
-            printOutput("(Item perdido: " + findItemName(interaction.requiresInInventory) + ")");
-        }
+        if (interaction.consumesItem && interaction.requiresInInventory) { removeFromInventory(interaction.requiresInInventory); }
         if (interaction.trackerEffects) updateTrackers(interaction.trackerEffects);
-        if (interaction.removesTargetFromScene) {
-             const sceneObjects = getObjectsForScene(currentSceneId);
-             const newObjects = sceneObjects.filter(o => o.id !== interaction.target);
-             updateSceneObjects(currentSceneId, newObjects);
-        }
-        if (interaction.soundEffect) playSound(interaction.soundEffect);
-        if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType);
-        else {
-            if (interaction.newSceneDescription) {
-                 gameData.cenas[currentSceneId].description = interaction.newSceneDescription;
-                 renderScene(gameData.cenas[currentSceneId]);
+        
+        if (interaction.addsToInventory && interaction.target) {
+            const objInScene = getObjectsForScene(currentSceneId).find(o => o.id === interaction.target);
+            if (objInScene) { 
+                addToInventory(objInScene); 
+                flagObjectAsRemoved(currentSceneId, objInScene.id); 
             }
-            if (interaction.successMessage) printOutput(interaction.successMessage);
+        } else if (interaction.removesTargetFromScene && interaction.target) {
+             flagObjectAsRemoved(currentSceneId, interaction.target);
+        }
+        
+        if (interaction.soundEffect) playSound(interaction.soundEffect);
+        
+        if (interaction.goToScene) {
+             loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage);
+        }
+        else {
+            const scene = gameData.cenas[currentSceneId];
+            if (interaction.newSceneDescription) { 
+                if (interaction.successMessage) {
+                    scene.description = interaction.successMessage + "\\n\\n" + interaction.newSceneDescription;
+                } else {
+                    scene.description = interaction.newSceneDescription;
+                }
+                renderScene(scene); 
+            } else if (interaction.successMessage) {
+                printOutput(interaction.successMessage);
+            }
         }
     };
 
     const printOutput = (text) => {
-        const p = document.createElement('p');
-        p.textContent = text;
-        p.className = 'scene-paragraph';
-        sceneDescription.appendChild(p);
-        sceneDescription.scrollTop = sceneDescription.scrollHeight;
+        const textAnimType = gameData.gameTextAnimationType || 'fade';
+        const p = document.createElement('p'); 
+        const formattedHTML = formatText(text);
         actionLog.push({ type: 'output', text: text });
+
+        if (textAnimType === 'typewriter') {
+            isPrinting = true;
+            sceneDescription.classList.add('typewriting-active');
+            p.className = 'scene-paragraph typewriter-cursor'; 
+            p.style.opacity = '1'; 
+            p.innerHTML = formattedHTML; 
+            sceneDescription.appendChild(p);
+            
+            const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
+            let node; const textNodes = []; while(node = walker.nextNode()) textNodes.push(node);
+            const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
+            let nodeIdx = 0; let charIdx = 0;
+            
+            const type = () => {
+                if (nodeIdx >= textNodes.length) { 
+                    p.classList.remove('typewriter-cursor'); 
+                    setupHighlights(p); 
+                    isPrinting = false;
+                    sceneDescription.classList.remove('typewriting-active');
+                    sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                    verbInput.focus();
+                    return; 
+                }
+                const currentNode = textNodes[nodeIdx]; const fullText = fullTexts[nodeIdx];
+                if (charIdx < fullText.length) { 
+                    currentNode.nodeValue += fullText[charIdx]; 
+                    charIdx++; 
+                    if (sceneDescription) sceneDescription.scrollTop = sceneDescription.scrollHeight; 
+                    setTimeout(type, typeSpeedBase); 
+                }
+                else { nodeIdx++; charIdx = 0; type(); }
+            };
+            type();
+        } else {
+            p.innerHTML = formattedHTML; 
+            p.className = 'scene-paragraph'; 
+            sceneDescription.appendChild(p); 
+            setupHighlights(p);
+            sceneDescription.scrollTop = sceneDescription.scrollHeight;
+        }
     };
 
     const findItemInInventoryById = (id) => inventory.find(o => o.id === id) || null;
-    const findItemName = (id) => { const item = findItemInInventoryById(id) || gameData.globalObjects[id]; return item ? item.name : 'item'; };
+    const findItemName = (id) => (findItemInInventoryById(id) || gameData.globalObjects[id])?.name || 'item';
     const addToInventory = (obj) => { if (!inventory.some(o => o.id === obj.id)) inventory.push(obj); };
     const removeFromInventory = (id) => { inventory = inventory.filter(i => i.id !== id); };
-    const togglePopup = (type) => { if (!actionPopup.classList.contains('hidden') && activePopupSource === type) closeActionPopup(); else { if (type === 'suggestions') showSuggestions(); if (type === 'inventory') showInventory(); activePopupSource = type; } };
-    const closeActionPopup = () => { actionPopup.classList.add('hidden'); activePopupSource = null; };
+    const togglePopup = (type) => { if (!actionPopup.classList.contains('hidden')) actionPopup.classList.add('hidden'); else { if (type === 'suggestions') showSuggestions(); if (type === 'inventory') showInventory(); } };
+    
     const showSuggestions = () => {
-        actionPopup.classList.remove('hidden');
-        actionPopup.innerHTML = '';
-        const sceneObjects = getObjectsForScene(currentSceneId);
-        const container = document.createElement('div');
-        container.className = 'action-popup-container';
-        if (sceneObjects.length > 0) {
-            const row1 = document.createElement('div');
-            row1.className = 'action-popup-row';
-            sceneObjects.forEach(obj => {
-                const btn = document.createElement('button');
-                btn.textContent = obj.name;
-                btn.addEventListener('click', () => { verbInput.value = 'examinar ' + obj.name; closeActionPopup(); handleInput(); });
-                row1.appendChild(btn);
-            });
-            container.appendChild(row1);
-        }
-        const row2 = document.createElement('div');
-        row2.className = 'action-popup-row';
-        const verbs = ['Examinar', 'Empurrar', 'Puxar', 'Chutar', 'Falar'];
-        verbs.forEach(verb => {
-             const btn = document.createElement('button');
-             btn.textContent = verb;
-             btn.addEventListener('click', () => { verbInput.value = verb.toLowerCase() + ' '; verbInput.focus(); closeActionPopup(); });
-             row2.appendChild(btn);
-        });
-        ['Olhar ao redor', 'Ajuda'].forEach(action => {
-             const btn = document.createElement('button');
-             btn.textContent = action;
-             btn.addEventListener('click', () => { if (action === 'Olhar ao redor') verbInput.value = 'olhar'; if (action === 'Ajuda') verbInput.value = 'ajuda'; closeActionPopup(); handleInput(); });
-             row2.appendChild(btn);
-        });
-        container.appendChild(row2);
-        actionPopup.appendChild(container);
+        actionPopup.classList.remove('hidden'); actionPopup.innerHTML = '';
+        const sceneObjects = getObjectsForScene(currentSceneId); const container = document.createElement('div'); container.className = 'action-popup-container';
+        const row1 = document.createElement('div'); row1.className = 'action-popup-row';
+        sceneObjects.forEach(obj => { const btn = document.createElement('button'); btn.textContent = obj.name; btn.addEventListener('click', () => { verbInput.value = 'examinar ' + obj.name; actionPopup.classList.add('hidden'); handleInput(); }); row1.appendChild(btn); });
+        container.appendChild(row1);
+        const row2 = document.createElement('div'); row2.className = 'action-popup-row';
+        ['Examinar', 'Pegar', 'Usar', 'Falar', 'Abrir'].forEach(v => { const btn = document.createElement('button'); btn.textContent = v; btn.addEventListener('click', () => { verbInput.value = v.toLowerCase() + ' '; verbInput.focus(); actionPopup.classList.add('hidden'); }); row2.appendChild(btn); });
+        container.appendChild(row2); actionPopup.appendChild(container);
     };
     const showInventory = () => {
-        actionPopup.classList.remove('hidden');
-        actionPopup.innerHTML = '';
-        const list = document.createElement('div');
-        list.className = 'action-popup-list';
-        if (inventory.length === 0) {
-            const msg = document.createElement('div');
-            msg.className = 'empty-inventory-msg';
-            msg.textContent = 'Seu inventário está vazio.';
-            list.appendChild(msg);
-        } else {
-            inventory.forEach(item => {
-                if (item) {
-                    const btn = document.createElement('button');
-                    btn.textContent = item.name;
-                    btn.addEventListener('click', (e) => { e.stopPropagation(); openItemModal(item); closeActionPopup(); });
-                    list.appendChild(btn);
-                }
-            });
-        }
+        actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; const list = document.createElement('div'); list.className = 'action-popup-list';
+        if (inventory.length === 0) { const msg = document.createElement('p'); msg.textContent = 'Seu inventário está vazio.'; list.appendChild(msg); }
+        else { inventory.forEach(item => { const btn = document.createElement('button'); btn.textContent = item.name; btn.addEventListener('click', () => { openItemModal(item); actionPopup.classList.add('hidden'); }); list.appendChild(btn); }); }
         actionPopup.appendChild(list);
     };
     const openItemModal = (item) => {
-        itemModalName.textContent = item.name;
-        itemModalDescription.textContent = item.examineDescription;
+        itemModalName.textContent = item.name; 
+        itemModalDescription.innerHTML = formatText(item.examineDescription);
+        setupHighlights(itemModalDescription);
         if (item.image) { itemModalImage.src = item.image; itemModalImageContainer.classList.remove('hidden'); }
-        else { itemModalImage.src = ''; itemModalImageContainer.classList.add('hidden'); }
+        else itemModalImageContainer.classList.add('hidden');
         itemModal.classList.remove('hidden');
     };
+    
     const showDiary = () => {
         diaryLog.innerHTML = '';
+        let currentInterContainer = null;
+
         actionLog.forEach(entry => {
             if (entry.type === 'scene') {
-                const div = document.createElement('div');
+                const div = document.createElement('div'); 
                 div.className = 'diary-entry';
-                if (entry.image) { const imgContainer = document.createElement('div'); imgContainer.className = 'image-container'; const img = document.createElement('img'); img.src = entry.image; imgContainer.appendChild(img); div.appendChild(imgContainer); }
-                const textContainer = document.createElement('div'); textContainer.className = 'text-container'; const title = document.createElement('span'); title.className = 'scene-name'; title.textContent = entry.name; const desc = document.createElement('p'); desc.textContent = entry.description ? entry.description.replace(/<|>/g, '') : ''; textContainer.appendChild(title); textContainer.appendChild(desc); div.appendChild(textContainer); diaryLog.appendChild(div);
-            } else if (entry.type === 'input') {
-                const p = document.createElement('p'); p.className = 'diary-input'; p.textContent = entry.text; diaryLog.appendChild(p);
-            } else if (entry.type === 'output') {
-                const p = document.createElement('p'); p.className = 'diary-output'; p.textContent = entry.text; diaryLog.appendChild(p);
+                if (entry.image) { const img = document.createElement('img'); img.src = entry.image; div.appendChild(img); }
+                const txt = document.createElement('div'); 
+                txt.className = 'text-container'; 
+                txt.innerHTML = '<span class="scene-name">' + entry.name + '</span><p>' + formatText(entry.description) + '</p>';
+                div.appendChild(txt); 
+                diaryLog.appendChild(div);
+                
+                setupHighlights(txt);
+                
+                currentInterContainer = document.createElement('div');
+                currentInterContainer.className = 'diary-interactions-container';
+                txt.appendChild(currentInterContainer);
+            } else {
+                if (currentInterContainer) {
+                    const p = document.createElement('p'); 
+                    p.className = 'diary-' + entry.type; 
+                    if (entry.type === 'output') {
+                        p.innerHTML = formatText(entry.text);
+                        setupHighlights(p);
+                    } else {
+                        p.textContent = entry.text;
+                    }
+                    currentInterContainer.appendChild(p);
+                }
             }
         });
-        diaryModal.classList.remove('hidden');
-        setTimeout(() => { diaryLog.scrollTop = diaryLog.scrollHeight; }, 10);
-    };
-    const showTrackers = () => {
-        trackersContent.innerHTML = '';
-        const defs = gameData.consequenceTrackers || [];
-        if (defs.length === 0) trackersContent.textContent = 'Nenhum rastreador ativo.';
-        else {
-            defs.forEach(def => {
-                const val = trackers[def.id] || 0;
-                const percentage = Math.min(100, Math.max(0, (val / def.maxValue) * 100));
-                const item = document.createElement('div');
-                item.className = 'tracker-item';
-                const header = document.createElement('div');
-                header.className = 'tracker-item-header';
-                const nameSpan = document.createElement('span');
-                nameSpan.className = 'tracker-item-name';
-                nameSpan.textContent = def.name;
-                header.appendChild(nameSpan);
-                if (!def.hideValue) { const valSpan = document.createElement('span'); valSpan.className = 'tracker-item-values'; valSpan.textContent = val + ' / ' + def.maxValue; header.appendChild(valSpan); }
-                item.appendChild(header);
-                const barContainer = document.createElement('div');
-                barContainer.className = 'tracker-bar-container';
-                const bar = document.createElement('div');
-                bar.className = 'tracker-bar';
-                let width = def.invertBar ? (100 - percentage) : percentage;
-                bar.style.width = width + '%';
-                if (def.barColor) bar.style.backgroundColor = def.barColor;
-                barContainer.appendChild(bar);
-                item.appendChild(barContainer);
-                trackersContent.appendChild(item);
-            });
-        }
-        trackersModal.classList.remove('hidden');
+        diaryModal.classList.remove('hidden'); setTimeout(() => { diaryLog.scrollTop = diaryLog.scrollHeight; }, 10);
     };
     init();
 });
