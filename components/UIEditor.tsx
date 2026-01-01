@@ -1097,19 +1097,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                              {localGameSystemEnabled === 'trackers' && (
                                 <div className="flex flex-col gap-4">
-                                     <div className="flex items-center">
-                                          <input
-                                              type="checkbox"
-                                              id="showTrackersUI"
-                                              checked={!!localGameShowTrackersUI}
-                                              onChange={e => setLocalGameShowTrackersUI(e.target.checked)}
-                                              className="custom-checkbox"
-                                          />
-                                          <label htmlFor="showTrackersUI" className="ml-2 block text-sm text-brand-text-dim font-bold text-brand-primary">
-                                              Mostrar botão de visualização dos rastreadores no jogo
-                                          </label>
-                                      </div>
-                                      
                                       <div className="pt-2">
                                           <button
                                               onClick={onNavigateToTrackers}
@@ -1118,7 +1105,19 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                               <AdjustmentsHorizontalIcon className="w-4 h-4 mr-2" />
                                               Gerenciar Rastreadores
                                           </button>
-                                          <p className="text-xs text-brand-text-dim mt-2">Clique acima para configurar as variáveis do jogo (vida, dinheiro, etc.).</p>
+                                      </div>
+
+                                      <div className="flex items-center">
+                                          <input
+                                              type="checkbox"
+                                              id="showTrackersUI"
+                                              checked={!!localGameShowTrackersUI}
+                                              onChange={e => setLocalGameShowTrackersUI(e.target.checked)}
+                                              className="custom-checkbox"
+                                          />
+                                          <label htmlFor="showTrackersUI" className="ml-2 block text-sm text-brand-text-dim font-bold text-brand-primary cursor-pointer">
+                                              Habilitar visualização dos rastreadores no jogo
+                                          </label>
                                       </div>
                                 </div>
                              )}
