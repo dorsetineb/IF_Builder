@@ -13,6 +13,7 @@ interface UIEditorProps {
   layoutOrientation: 'vertical' | 'horizontal';
   layoutOrder: 'image-first' | 'image-last';
   imageFrame: GameData['gameImageFrame'];
+  gameMobileLayoutBehavior: GameData['gameMobileLayoutBehavior'];
   actionButtonText: string;
   verbInputPlaceholder: string;
   diaryPlayerName: string;
@@ -34,6 +35,9 @@ interface UIEditorProps {
   gameFontSize: string;
   chanceIcon: 'circle' | 'cross' | 'heart' | 'square' | 'diamond';
   chanceReturnButtonText: string;
+  // Added missing chance message props to fix ReferenceErrors
+  gameChanceLossMessage?: string;
+  gameChanceRestoreMessage?: string;
   gameTheme: 'dark' | 'light';
   textColorLight: string;
   titleColorLight: string;
@@ -239,13 +243,16 @@ const FixedVerbItem: React.FC<{
 
 export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const { 
-      layoutOrientation, layoutOrder, imageFrame, splashButtonText, continueButtonText,
+      layoutOrientation, layoutOrder, imageFrame, gameMobileLayoutBehavior, splashButtonText, continueButtonText,
       actionButtonText, verbInputPlaceholder, diaryPlayerName, restartButtonText, 
       gameSystemEnabled, maxChances, onUpdate, isDirty, onSetDirty,
       textColor, titleColor, splashButtonColor, splashButtonHoverColor,
       splashButtonTextColor, actionButtonColor, actionButtonTextColor,
       focusColor, chanceIconColor, gameFontFamily, gameFontSize, chanceIcon,
       chanceReturnButtonText,
+      // Fixed: Destructured missing chance message props to fix ReferenceErrors
+      gameChanceLossMessage: chanceLossMessage,
+      gameChanceRestoreMessage: chanceRestoreMessage,
       gameTheme, textColorLight, titleColorLight, focusColorLight,
       frameBookColor, frameTradingCardColor,
       frameRoundedTopColor,
@@ -273,6 +280,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localLayoutOrientation, setLocalLayoutOrientation] = useState(layoutOrientation);
   const [localLayoutOrder, setLocalLayoutOrder] = useState(layoutOrder);
   const [localImageFrame, setLocalImageFrame] = useState(imageFrame);
+  const [localMobileLayoutBehavior, setLocalMobileLayoutBehavior] = useState(gameMobileLayoutBehavior);
   const [localActionButtonText, setLocalActionButtonText] = useState(actionButtonText);
   const [localVerbInputPlaceholder, setLocalVerbInputPlaceholder] = useState(verbInputPlaceholder);
   const [localDiaryPlayerName, setLocalDiaryPlayerName] = useState(diaryPlayerName);
@@ -307,6 +315,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   const [localFontFamily, setLocalFontFamily] = useState(gameFontFamily);
   const [localGameFontSize, setLocalGameFontSize] = useState(gameFontSize);
   const [localChanceIcon, setLocalChanceIcon] = useState(chanceIcon);
+  // Fixed: Added missing local states for chance messages to fix ReferenceErrors
+  const [localChanceLossMessage, setLocalChanceLossMessage] = useState(chanceLossMessage || '');
+  const [localChanceRestoreMessage, setLocalChanceRestoreMessage] = useState(chanceRestoreMessage || '');
   const [localChanceReturnButtonText, setLocalChanceReturnButtonText] = useState(chanceReturnButtonText);
   const [localGameTheme, setLocalGameTheme] = useState(gameTheme);
   const [localTextColorLight, setLocalTextColorLight] = useState(textColorLight);
@@ -380,6 +391,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalLayoutOrientation(layoutOrientation);
     setLocalLayoutOrder(layoutOrder);
     setLocalImageFrame(imageFrame);
+    setLocalMobileLayoutBehavior(gameMobileLayoutBehavior || 'standard');
     setLocalSplashButtonText(splashButtonText);
     setLocalContinueButtonText(continueButtonText);
     setLocalRestartButtonText(restartButtonText);
@@ -411,6 +423,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalFontFamily(gameFontFamily);
     setLocalGameFontSize(gameFontSize);
     setLocalChanceIcon(chanceIcon);
+    // Fixed: Added missing sync for chance messages to fix ReferenceErrors
+    setLocalChanceLossMessage(chanceLossMessage || '');
+    setLocalChanceRestoreMessage(chanceRestoreMessage || '');
     setLocalChanceReturnButtonText(chanceReturnButtonText);
     setLocalGameTheme(gameTheme);
     setLocalTextColorLight(textColorLight);
@@ -445,9 +460,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalImageTransitionType(imageTransitionType);
     setLocalImageSpeed(imageSpeed);
   }, [
-    layoutOrientation, layoutOrder, imageFrame, actionButtonText, verbInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, gameSystemEnabled, maxChances,
+    layoutOrientation, layoutOrder, imageFrame, gameMobileLayoutBehavior, actionButtonText, verbInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, gameSystemEnabled, maxChances,
     textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
-    chanceIconColor, gameFontFamily, gameFontSize, chanceIcon, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight,
+    chanceIconColor, gameFontFamily, gameFontSize, chanceIcon, chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight,
     frameBookColor, frameTradingCardColor,
     frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, gameContinueIndicatorColor,
     gameShowTrackersUI, gameShowSystemButton, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText,
@@ -459,9 +474,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
   ]);
   
   useEffect(() => {
+    // Fixed: Chance messages are now defined, fixing ReferenceErrors in dirty check
     const dirty = localLayoutOrientation !== layoutOrientation ||
                   localLayoutOrder !== layoutOrder ||
                   localImageFrame !== imageFrame ||
+                  localMobileLayoutBehavior !== gameMobileLayoutBehavior ||
                   localSplashButtonText !== splashButtonText ||
                   localContinueButtonText !== continueButtonText ||
                   localRestartButtonText !== restartButtonText ||
@@ -493,6 +510,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localFontFamily !== gameFontFamily ||
                   localGameFontSize !== gameFontSize ||
                   localChanceIcon !== chanceIcon ||
+                  localChanceLossMessage !== chanceLossMessage ||
+                  localChanceRestoreMessage !== chanceRestoreMessage ||
                   localChanceReturnButtonText !== chanceReturnButtonText ||
                   localGameTheme !== gameTheme ||
                   localTextColorLight !== textColorLight ||
@@ -526,9 +545,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                   localImageSpeed !== imageSpeed;
     onSetDirty(dirty);
   }, [
-    localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI, localGameShowSystemButton, localSuggestionsButtonText, localInventoryButtonText, localDiaryButtonText, localTrackersButtonText,
+    localLayoutOrientation, localLayoutOrder, localImageFrame, localMobileLayoutBehavior, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI, localGameShowSystemButton, localSuggestionsButtonText, localInventoryButtonText, localDiaryButtonText, localTrackersButtonText,
     localSystemButtonText, localSaveMenuTitle, localLoadMenuTitle, localMainMenuButtonText, localViewEndingButtonText,
-    localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
+    localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
     localFrameBookColor, localFrameTradingCardColor,
     frameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor, localGameContinueIndicatorColor,
     localTitle, localLogo, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, localBackgroundMusic,
@@ -543,6 +562,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localLayoutOrientation !== layoutOrientation) onUpdate('gameLayoutOrientation', localLayoutOrientation);
     if (localLayoutOrder !== layoutOrder) onUpdate('gameLayoutOrder', localLayoutOrder);
     if (localImageFrame !== imageFrame) onUpdate('gameImageFrame', localImageFrame);
+    if (localMobileLayoutBehavior !== gameMobileLayoutBehavior) onUpdate('gameMobileLayoutBehavior', localMobileLayoutBehavior);
     if (localSplashButtonText !== splashButtonText) onUpdate('gameSplashButtonText', localSplashButtonText);
     if (localContinueButtonText !== continueButtonText) onUpdate('gameContinueButtonText', localContinueButtonText);
     if (localRestartButtonText !== restartButtonText) onUpdate('gameRestartButtonText', localRestartButtonText);
@@ -575,6 +595,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     if (localFontFamily !== gameFontFamily) onUpdate('gameFontFamily', localFontFamily);
     if (localGameFontSize !== gameFontSize) onUpdate('gameFontSize', localGameFontSize);
     if (localChanceIcon !== chanceIcon) onUpdate('gameChanceIcon', localChanceIcon);
+    // Fixed: Updated missing chance message props in handleSave to persist changes
+    if (localChanceLossMessage !== chanceLossMessage) onUpdate('gameChanceLossMessage', localChanceLossMessage);
+    if (localChanceRestoreMessage !== chanceRestoreMessage) onUpdate('gameChanceRestoreMessage', localChanceRestoreMessage);
     if (localChanceReturnButtonText !== chanceReturnButtonText) onUpdate('gameChanceReturnButtonText', localChanceReturnButtonText);
     if (localGameTheme !== gameTheme) onUpdate('gameTheme', localGameTheme);
     // Fix: Using correct property names from types.ts (removed 'game' prefix)
@@ -616,6 +639,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalLayoutOrientation(layoutOrientation);
     setLocalLayoutOrder(layoutOrder);
     setLocalImageFrame(imageFrame);
+    setLocalMobileLayoutBehavior(gameMobileLayoutBehavior);
     setLocalSplashButtonText(splashButtonText);
     setLocalContinueButtonText(continueButtonText);
     setLocalRestartButtonText(restartButtonText);
@@ -648,6 +672,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     setLocalFontFamily(gameFontFamily);
     setLocalGameFontSize(gameFontSize);
     setLocalChanceIcon(chanceIcon);
+    // Fixed: Undid missing chance message props in handleUndo
+    setLocalChanceLossMessage(chanceLossMessage || '');
+    setLocalChanceRestoreMessage(chanceRestoreMessage || '');
     setLocalChanceReturnButtonText(chanceReturnButtonText);
     setLocalGameTheme(gameTheme);
     setLocalTextColorLight(textColorLight);
@@ -974,6 +1001,20 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     )}
                                 </div>
                             </div>
+
+                            <div className="pt-4 border-t border-brand-border/30">
+                                <label htmlFor="mobile-behavior-select" className="block text-sm font-bold text-brand-primary mb-1">Comportamento em Dispositivos Móveis</label>
+                                <select
+                                    id="mobile-behavior-select"
+                                    value={localMobileLayoutBehavior}
+                                    onChange={(e) => setLocalMobileLayoutBehavior(e.target.value as any)}
+                                    className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                >
+                                    <option value="standard">Padrão (Empilhado)</option>
+                                    <option value="immersive">Imersivo (Sobreposição de Fundo)</option>
+                                </select>
+                                <p className="text-[10px] text-brand-text-dim mt-1">O modo <b>Imersivo</b> coloca a imagem como fundo de tela inteira (sem bordas) e o texto flutuando na metade inferior.</p>
+                            </div>
                           </div>
                           
                           <div className="flex flex-col">
@@ -1081,13 +1122,35 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         </div>
                                     </div>
                                     <ColorInput label="Cor do Ícone" id="chanceIconColor" value={chanceIconColor} onChange={(val) => onUpdate('gameChanceIconColor', val)} placeholder="#ff4d4d" />
+                                    {/* Fixed: Missing local state inputs for chance messages to fix ReferenceErrors */}
+                                    <div>
+                                        <label htmlFor="chanceLossMessage" className="block text-sm font-medium text-brand-text-dim mb-1">Mensagem de Perda de Chance</label>
+                                        <input
+                                            type="text"
+                                            id="chanceLossMessage"
+                                            value={localChanceLossMessage}
+                                            onChange={(e) => setLocalChanceLossMessage(e.target.value)}
+                                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                        />
+                                        <p className="text-xs text-brand-text-dim mt-1">Use {'{chances}'} para mostrar as chances restantes.</p>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="chanceRestoreMessage" className="block text-sm font-medium text-brand-text-dim mb-1">Mensagem de Recuperação de Chance</label>
+                                        <input
+                                            type="text"
+                                            id="chanceRestoreMessage"
+                                            value={localChanceRestoreMessage}
+                                            onChange={(e) => setLocalChanceRestoreMessage(e.target.value)}
+                                            className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
+                                        />
+                                    </div>
                                     <div>
                                         <label htmlFor="chanceReturnButton" className="block text-sm font-medium text-brand-text-dim mb-1">Texto do Botão de Retorno</label>
                                         <input
                                             type="text"
                                             id="chanceReturnButton"
-                                            value={chanceReturnButtonText}
-                                            onChange={(e) => onUpdate('gameChanceReturnButtonText', e.target.value)}
+                                            value={localChanceReturnButtonText}
+                                            onChange={(e) => setLocalChanceReturnButtonText(e.target.value)}
                                             className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm"
                                         />
                                         <p className="text-xs text-brand-text-dim mt-1">Aparece após perder uma chance.</p>
@@ -1504,9 +1567,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             <div>
                                 <label htmlFor="font-size-select" className="block text-sm font-medium text-brand-text-dim mb-1">Tamanho</label>
                                 <select id="font-size-select" value={localGameFontSize} onChange={(e) => setLocalGameFontSize(e.target.value)} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm">
-                                    <option value="0.85em">Pequeno (Padrão)</option>
-                                    <option value="1em">Médio</option>
-                                    <option value="1.1em">Grande</option>
+                                    <option value="0.75em">Pequeno (Padrão)</option>
+                                    <option value="0.85em">Médio</option>
+                                    <option value="1em">Grande</option>
                                 </select>
                             </div>
                         </div>

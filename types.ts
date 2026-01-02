@@ -108,6 +108,7 @@ export interface GameData {
   gameLayoutOrientation?: 'vertical' | 'horizontal';
   gameLayoutOrder?: 'image-first' | 'image-last';
   gameImageFrame?: 'none' | 'book-cover' | 'trading-card' | 'rounded-top';
+  gameMobileLayoutBehavior?: 'standard' | 'immersive';
   gameActionButtonColor?: string;
   gameActionButtonTextColor?: string;
   gameActionButtonText?: string;

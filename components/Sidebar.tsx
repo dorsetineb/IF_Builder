@@ -196,6 +196,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         .replace('__LAYOUT_ORIENTATION_CLASS__', exportData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : '')
         .replace('__LAYOUT_ORDER_CLASS__', exportData.gameLayoutOrder === 'image-last' ? 'layout-image-last' : '')
         .replace('__FRAME_CLASS__', getFrameClass(exportData.gameImageFrame))
+        .replace('__MOBILE_BEHAVIOR_CLASS__', `behavior-${exportData.gameMobileLayoutBehavior || 'standard'}`)
         .replace('__FONT_STYLESHEET__', fontStylesheet)
         .replace('__CHANCES_CONTAINER__', exportData.gameSystemEnabled === 'chances' ? '<div id="chances-container" class="chances-container"></div>' : '')
         .replace('__TRACKERS_BUTTON__', trackersButtonHTML)

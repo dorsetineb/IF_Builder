@@ -92,6 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let removedObjectsFromScenes = {}; 
     let currentBgmSrc = "";
     let isPrinting = false;
+    let activePopupType = null;
 
     const textSpeedVal = gameData.gameTextSpeed || 3; 
     const imgSpeedVal = gameData.gameImageSpeed || 3;
@@ -159,8 +160,6 @@ document.addEventListener('DOMContentLoaded', () => {
     let bgmFadeInterval = null;
     const playBgm = (src) => {
         if (!bgmAudio) return;
-        
-        // Se a fonte for a mesma e o áudio estiver pausado (bloqueio de autoplay), tenta dar play
         if (src === currentBgmSrc) {
             if (bgmAudio.paused && src) {
                 bgmAudio.play().catch(e => {});
@@ -187,9 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const fadeIn = () => {
             if (bgmFadeInterval) clearInterval(bgmFadeInterval);
             bgmAudio.volume = 0;
-            bgmAudio.play().catch(e => {
-                console.log("Autoplay bloqueado ou erro de áudio.");
-            });
+            bgmAudio.play().catch(e => {});
             let vol = 0;
             bgmFadeInterval = setInterval(() => {
                 vol += 0.1;
@@ -258,13 +255,7 @@ document.addEventListener('DOMContentLoaded', () => {
              const isWin = isGameEnded === 'win';
              const endScreen = isWin ? positiveEndingScreen : negativeEndingScreen;
              const endMusic = isWin ? gameData.positiveEndingMusic : gameData.negativeEndingMusic;
-             
-             if (endMusic) {
-                playBgm(endMusic);
-             } else {
-                playBgm(""); 
-             }
-
+             if (endMusic) playBgm(endMusic); else playBgm("");
              endScreen.style.zIndex = '0';
              endScreen.classList.remove('hidden');
              gameContainer.classList.add('fade-out');
@@ -282,7 +273,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (gameData.gameBackgroundMusic) playBgm(gameData.gameBackgroundMusic);
             else playBgm("");
         };
-
         if (window.isSceneTest) startGame();
     };
 
@@ -297,16 +287,12 @@ document.addEventListener('DOMContentLoaded', () => {
         removedObjectsFromScenes = {};
         isGameEnded = false;
         (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
-        
         loadScene(currentSceneId, false); 
         standardActionBar.classList.remove('hidden');
         endingActionBar.classList.add('hidden');
-
+        splashScreen.classList.remove('hidden');
         splashScreen.classList.add('fade-out');
-        setTimeout(() => {
-            splashScreen.classList.add('hidden');
-            splashScreen.classList.remove('fade-out');
-        }, 1000);
+        setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
     };
 
     const loadGameFromData = (jsonString) => {
@@ -321,17 +307,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 trackers = save.trackers || {}; 
                 removedObjectsFromScenes = save.removedObjectsFromScenes || {};
                 isGameEnded = false;
-                
                 standardActionBar.classList.remove('hidden');
                 endingActionBar.classList.add('hidden');
                 systemModal.classList.add('hidden');
                 loadScene(currentSceneId, false);
-
                 splashScreen.classList.add('fade-out');
-                setTimeout(() => {
-                    splashScreen.classList.add('hidden');
-                    splashScreen.classList.remove('fade-out');
-                }, 1000);
+                setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
             }
         } catch (e) { startGame(); }
     };
@@ -408,23 +389,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
         const scene = gameData.cenas[sceneId]; if (!scene) return;
-        
-        if (scene.backgroundMusic) {
-            playBgm(scene.backgroundMusic);
-        }
-        
-        if (scene.removesChanceOnEntry) { 
-            chances--; 
-        }
-        
+        if (scene.backgroundMusic) playBgm(scene.backgroundMusic);
+        if (scene.removesChanceOnEntry) chances--; 
         if (scene.restoresChanceOnEntry && gameData.gameSystemEnabled === 'chances') chances = Math.min(chances + 1, gameData.gameMaxChances);
         currentSceneId = sceneId;
         if (!visitedScenes.includes(sceneId)) visitedScenes.push(sceneId);
         actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
-        
         let effectiveTransition = !transitionType || transitionType === 'none' ? (gameData.gameImageTransitionType || 'fade') : transitionType;
         if (effectiveTransition === 'none') transition = false;
-        
         if (transitionSpeed !== null) {
             const dynamicDuration = Math.max(0.3, 5.0 - (transitionSpeed * 0.9)) + 's';
             document.documentElement.style.setProperty('--image-anim-speed', dynamicDuration);
@@ -432,7 +404,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const defaultDuration = Math.max(0.3, 5.0 - ((gameData.gameImageSpeed || 3) * 0.9)) + 's';
             document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
         }
-
         if (transition && sceneImage && sceneImageBack) {
              sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
              if (sceneImage.src) {
@@ -466,12 +437,11 @@ document.addEventListener('DOMContentLoaded', () => {
         sceneDescription.innerHTML = '';
         
         let fullDescription = scene.description;
-        if (successPrefix) {
-            fullDescription = successPrefix + "\\n\\n" + fullDescription;
-        }
+        if (successPrefix) fullDescription = successPrefix + "\\n\\n" + fullDescription;
 
         const paragraphs = fullDescription.split('\\n').filter(p => p.trim().length > 0);
         let pIndex = 0; const textAnimType = gameData.gameTextAnimationType || 'fade';
+        const isImmersive = document.body.classList.contains('behavior-immersive') && window.innerWidth <= 768;
 
         isPrinting = true;
         sceneDescription.classList.add('typewriting-active');
@@ -480,14 +450,10 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pIndex >= paragraphs.length) { 
                 isPrinting = false;
                 sceneDescription.classList.remove('typewriting-active');
-                
-                if (chances <= 0) {
-                    gameOver();
-                } else if (scene.isEndingScene) {
-                    activateEndingUI('win');
-                }
+                if (chances <= 0) gameOver(); else if (scene.isEndingScene) activateEndingUI('win');
                 return; 
             }
+
             const p = document.createElement('p'); const formattedHTML = formatText(paragraphs[pIndex]);
             if (textAnimType === 'typewriter') {
                 p.className = 'scene-paragraph typewriter-cursor'; p.style.opacity = '1'; p.innerHTML = formattedHTML; sceneDescription.appendChild(p);
@@ -509,35 +475,29 @@ document.addEventListener('DOMContentLoaded', () => {
             pIndex++;
             if (pIndex < paragraphs.length) {
                 const continueBtn = document.createElement('div'); continueBtn.className = 'continue-indicator'; continueBtn.innerHTML = '<span>▼</span>';
-                
                 const continueHandler = (e) => { 
-                    if (e) {
-                        if (e.type === 'keydown' && e.key !== 'Enter') return;
-                        e.stopPropagation();
-                        if (e.type === 'keydown') e.preventDefault();
+                    if (e) { if (e.type === 'keydown' && e.key !== 'Enter') return; e.stopPropagation(); if (e.type === 'keydown') e.preventDefault(); }
+                    
+                    // NO MODO IMERSIVO MOBILE: Limpa tudo ANTES de renderizar o próximo parágrafo
+                    if (isImmersive) {
+                        sceneDescription.innerHTML = '';
+                    } else {
+                        continueBtn.remove();
                     }
-                    continueBtn.remove(); 
+                    
                     sceneDescription.removeEventListener('click', continueHandler); 
                     window.removeEventListener('keydown', continueHandler);
                     renderNextParagraph(); 
                 };
-                
                 continueBtn.addEventListener('click', continueHandler); 
                 sceneDescription.addEventListener('click', continueHandler);
                 window.addEventListener('keydown', continueHandler);
-                
                 sceneDescription.appendChild(continueBtn); sceneDescription.scrollTop = sceneDescription.scrollHeight;
             } else { 
                 isPrinting = false;
                 sceneDescription.classList.remove('typewriting-active');
                 sceneDescription.scrollTop = sceneDescription.scrollHeight; 
-                
-                if (chances <= 0) {
-                    gameOver();
-                } else {
-                    verbInput.focus(); 
-                    if (scene.isEndingScene) activateEndingUI('win');
-                }
+                if (chances <= 0) gameOver(); else { verbInput.focus(); if (scene.isEndingScene) activateEndingUI('win'); }
             }
         };
         renderNextParagraph();
@@ -552,7 +512,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon.innerHTML = i < chances ? iconSvg : iconOutlineSvg; chancesContainer.appendChild(icon);
             }
         }
-        actionPopup.classList.add('hidden'); verbInput.value = '';
+        actionPopup.classList.add('hidden'); verbInput.value = ''; activePopupType = null;
     };
 
     const activateEndingUI = (type) => {
@@ -563,23 +523,17 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const gameOver = () => { activateEndingUI('lose'); };
-
     const handleInput = () => { if (isPrinting) return; const input = verbInput.value.trim(); if (input) { processCommand(input); verbInput.value = ''; } };
-
     const hasWord = (word, text) => {
         if (!word || !text) return false;
         const normalizedWord = word.toLowerCase().trim();
         const normalizedText = text.toLowerCase();
-        
         let index = normalizedText.indexOf(normalizedWord);
         while (index !== -1) {
             const charBefore = index > 0 ? normalizedText[index - 1] : ' ';
             const charAfter = index + normalizedWord.length < normalizedText.length ? normalizedText[index + normalizedWord.length] : ' ';
-            
             const isBoundary = (char) => /[^a-zA-Z0-9áéíóúàèìòùâêîôûãõç]/.test(char);
-            
             if (isBoundary(charBefore) && isBoundary(charAfter)) return true;
-            
             index = normalizedText.indexOf(normalizedWord, index + 1);
         }
         return false;
@@ -591,23 +545,18 @@ document.addEventListener('DOMContentLoaded', () => {
         sceneDescription.scrollTop = sceneDescription.scrollHeight; actionLog.push({ type: 'input', text: '> ' + input });
         const scene = gameData.cenas[currentSceneId]; 
         const sceneObjects = getObjectsForScene(currentSceneId); 
-        
         for (const fv of (gameData.fixedVerbs || [])) { if (fv.verbs.some(v => hasWord(v, inputLower))) { printOutput(fv.description); return; } }
-        
         let foundInteraction = scene.interactions.find(i => {
             if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
             if (i.requiresInInventory && !inventory.some(o => o.id === i.requiresInInventory)) return false;
-            
             if (i.target) {
                 const obj = sceneObjects.find(o => i.target === o.id) || inventory.find(o => i.target === o.id);
                 if (!obj) return false;
                 return hasWord(obj.name.toLowerCase(), inputLower);
             }
-            
             const anyObjectMentioned = [...sceneObjects, ...inventory].some(o => hasWord(o.name.toLowerCase(), inputLower));
             return !anyObjectMentioned;
         });
-
         if (!foundInteraction) {
             foundInteraction = scene.interactions.find(i => {
                 if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
@@ -616,51 +565,33 @@ document.addEventListener('DOMContentLoaded', () => {
                 return true;
             });
         }
-        
         if (foundInteraction) { executeInteraction(foundInteraction); return; }
-        if (hasWord('inventario', inputLower) || hasWord('i', inputLower)) { actionPopup.classList.add('hidden'); togglePopup('inventory'); return; }
-        
+        if (hasWord('inventario', inputLower) || hasWord('i', inputLower)) { actionPopup.classList.add('hidden'); activePopupType = null; togglePopup('inventory'); return; }
         const lookVerbs = ['olhar', 'examinar', 'ver', 'ler'];
         if (lookVerbs.some(v => hasWord(v, inputLower))) {
              const obj = sceneObjects.find(o => hasWord(o.name.toLowerCase(), inputLower)) || inventory.find(o => hasWord(o.name.toLowerCase(), inputLower));
              if (obj) { printOutput(obj.examineDescription); return; }
              printOutput(scene.description); return;
         }
-        
         printOutput(gameData.mensagem_falha_padrao || "Não aconteceu nada.");
     };
 
     const executeInteraction = (interaction) => {
         if (interaction.consumesItem && interaction.requiresInInventory) { removeFromInventory(interaction.requiresInInventory); }
         if (interaction.trackerEffects) updateTrackers(interaction.trackerEffects);
-        
         if (interaction.addsToInventory && interaction.target) {
             const objInScene = getObjectsForScene(currentSceneId).find(o => o.id === interaction.target);
-            if (objInScene) { 
-                addToInventory(objInScene); 
-                flagObjectAsRemoved(currentSceneId, objInScene.id); 
-            }
-        } else if (interaction.removesTargetFromScene && interaction.target) {
-             flagObjectAsRemoved(currentSceneId, interaction.target);
-        }
-        
+            if (objInScene) { addToInventory(objInScene); flagObjectAsRemoved(currentSceneId, objInScene.id); }
+        } else if (interaction.removesTargetFromScene && interaction.target) flagObjectAsRemoved(currentSceneId, interaction.target);
         if (interaction.soundEffect) playSound(interaction.soundEffect);
-        
-        if (interaction.goToScene) {
-             loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage);
-        }
+        if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage);
         else {
             const scene = gameData.cenas[currentSceneId];
             if (interaction.newSceneDescription) { 
-                if (interaction.successMessage) {
-                    scene.description = interaction.successMessage + "\\n\\n" + interaction.newSceneDescription;
-                } else {
-                    scene.description = interaction.newSceneDescription;
-                }
+                if (interaction.successMessage) scene.description = interaction.successMessage + "\\n\\n" + interaction.newSceneDescription;
+                else scene.description = interaction.newSceneDescription;
                 renderScene(scene); 
-            } else if (interaction.successMessage) {
-                printOutput(interaction.successMessage);
-            }
+            } else if (interaction.successMessage) printOutput(interaction.successMessage);
         }
     };
 
@@ -669,7 +600,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const p = document.createElement('p'); 
         const formattedHTML = formatText(text);
         actionLog.push({ type: 'output', text: text });
-
         if (textAnimType === 'typewriter') {
             isPrinting = true;
             sceneDescription.classList.add('typewriting-active');
@@ -677,38 +607,24 @@ document.addEventListener('DOMContentLoaded', () => {
             p.style.opacity = '1'; 
             p.innerHTML = formattedHTML; 
             sceneDescription.appendChild(p);
-            
             const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
             let node; const textNodes = []; while(node = walker.nextNode()) textNodes.push(node);
             const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
             let nodeIdx = 0; let charIdx = 0;
-            
             const type = () => {
                 if (nodeIdx >= textNodes.length) { 
-                    p.classList.remove('typewriter-cursor'); 
-                    setupHighlights(p); 
-                    isPrinting = false;
+                    p.classList.remove('typewriter-cursor'); setupHighlights(p); isPrinting = false;
                     sceneDescription.classList.remove('typewriting-active');
-                    sceneDescription.scrollTop = sceneDescription.scrollHeight;
-                    verbInput.focus();
+                    sceneDescription.scrollTop = sceneDescription.scrollHeight; verbInput.focus();
                     return; 
                 }
                 const currentNode = textNodes[nodeIdx]; const fullText = fullTexts[nodeIdx];
-                if (charIdx < fullText.length) { 
-                    currentNode.nodeValue += fullText[charIdx]; 
-                    charIdx++; 
-                    if (sceneDescription) sceneDescription.scrollTop = sceneDescription.scrollHeight; 
-                    setTimeout(type, typeSpeedBase); 
-                }
+                if (charIdx < fullText.length) { currentNode.nodeValue += fullText[charIdx]; charIdx++; if (sceneDescription) sceneDescription.scrollTop = sceneDescription.scrollHeight; setTimeout(type, typeSpeedBase); }
                 else { nodeIdx++; charIdx = 0; type(); }
             };
             type();
         } else {
-            p.innerHTML = formattedHTML; 
-            p.className = 'scene-paragraph'; 
-            sceneDescription.appendChild(p); 
-            setupHighlights(p);
-            sceneDescription.scrollTop = sceneDescription.scrollHeight;
+            p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
         }
     };
 
@@ -716,63 +632,70 @@ document.addEventListener('DOMContentLoaded', () => {
     const findItemName = (id) => (findItemInInventoryById(id) || gameData.globalObjects[id])?.name || 'item';
     const addToInventory = (obj) => { if (!inventory.some(o => o.id === obj.id)) inventory.push(obj); };
     const removeFromInventory = (id) => { inventory = inventory.filter(i => i.id !== id); };
-    const togglePopup = (type) => { if (!actionPopup.classList.contains('hidden')) actionPopup.classList.add('hidden'); else { if (type === 'suggestions') showSuggestions(); if (type === 'inventory') showInventory(); } };
     
+    const togglePopup = (type) => { 
+        if (!actionPopup.classList.contains('hidden') && activePopupType === type) { 
+            actionPopup.classList.add('hidden'); 
+            activePopupType = null;
+        } else { 
+            if (type === 'suggestions') showSuggestions(); 
+            if (type === 'inventory') showInventory(); 
+            activePopupType = type;
+        } 
+    };
+
     const showSuggestions = () => {
         actionPopup.classList.remove('hidden'); actionPopup.innerHTML = '';
         const sceneObjects = getObjectsForScene(currentSceneId); const container = document.createElement('div'); container.className = 'action-popup-container';
         const row1 = document.createElement('div'); row1.className = 'action-popup-row';
-        sceneObjects.forEach(obj => { const btn = document.createElement('button'); btn.textContent = obj.name; btn.addEventListener('click', () => { verbInput.value = 'examinar ' + obj.name; actionPopup.classList.add('hidden'); handleInput(); }); row1.appendChild(btn); });
+        sceneObjects.forEach(obj => { const btn = document.createElement('button'); btn.textContent = obj.name; btn.addEventListener('click', () => { 
+            verbInput.value = 'examinar ' + obj.name; 
+            actionPopup.classList.add('hidden'); 
+            activePopupType = null; 
+            handleInput(); 
+        }); row1.appendChild(btn); });
         container.appendChild(row1);
         const row2 = document.createElement('div'); row2.className = 'action-popup-row';
-        ['Examinar', 'Pegar', 'Usar', 'Falar', 'Abrir'].forEach(v => { const btn = document.createElement('button'); btn.textContent = v; btn.addEventListener('click', () => { verbInput.value = v.toLowerCase() + ' '; verbInput.focus(); actionPopup.classList.add('hidden'); }); row2.appendChild(btn); });
+        ['Examinar', 'Pegar', 'Usar', 'Falar', 'Abrir'].forEach(v => { const btn = document.createElement('button'); btn.textContent = v; btn.addEventListener('click', () => { 
+            verbInput.value = v.toLowerCase() + ' '; 
+            verbInput.focus(); 
+            actionPopup.classList.add('hidden'); 
+            activePopupType = null; 
+        }); row2.appendChild(btn); });
         container.appendChild(row2); actionPopup.appendChild(container);
     };
     const showInventory = () => {
         actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; const list = document.createElement('div'); list.className = 'action-popup-list';
         if (inventory.length === 0) { const msg = document.createElement('p'); msg.textContent = 'Seu inventário está vazio.'; list.appendChild(msg); }
-        else { inventory.forEach(item => { const btn = document.createElement('button'); btn.textContent = item.name; btn.addEventListener('click', () => { openItemModal(item); actionPopup.classList.add('hidden'); }); list.appendChild(btn); }); }
+        else { inventory.forEach(item => { const btn = document.createElement('button'); btn.textContent = item.name; btn.addEventListener('click', () => { 
+            openItemModal(item); 
+            actionPopup.classList.add('hidden'); 
+            activePopupType = null; 
+        }); list.appendChild(btn); }); }
         actionPopup.appendChild(list);
     };
     const openItemModal = (item) => {
-        itemModalName.textContent = item.name; 
-        itemModalDescription.innerHTML = formatText(item.examineDescription);
+        itemModalName.textContent = item.name; itemModalDescription.innerHTML = formatText(item.examineDescription);
         setupHighlights(itemModalDescription);
         if (item.image) { itemModalImage.src = item.image; itemModalImageContainer.classList.remove('hidden'); }
         else itemModalImageContainer.classList.add('hidden');
         itemModal.classList.remove('hidden');
     };
-    
     const showDiary = () => {
-        diaryLog.innerHTML = '';
-        let currentInterContainer = null;
-
+        diaryLog.innerHTML = ''; let currentInterContainer = null;
         actionLog.forEach(entry => {
             if (entry.type === 'scene') {
-                const div = document.createElement('div'); 
-                div.className = 'diary-entry';
+                const div = document.createElement('div'); div.className = 'diary-entry';
                 if (entry.image) { const img = document.createElement('img'); img.src = entry.image; div.appendChild(img); }
-                const txt = document.createElement('div'); 
-                txt.className = 'text-container'; 
+                const txt = document.createElement('div'); txt.className = 'text-container'; 
                 txt.innerHTML = '<span class="scene-name">' + entry.name + '</span><p>' + formatText(entry.description) + '</p>';
-                div.appendChild(txt); 
-                diaryLog.appendChild(div);
-                
+                div.appendChild(txt); diaryLog.appendChild(div);
                 setupHighlights(txt);
-                
-                currentInterContainer = document.createElement('div');
-                currentInterContainer.className = 'diary-interactions-container';
-                txt.appendChild(currentInterContainer);
+                currentInterContainer = document.createElement('div'); currentInterContainer.className = 'diary-interactions-container'; txt.appendChild(currentInterContainer);
             } else {
                 if (currentInterContainer) {
-                    const p = document.createElement('p'); 
-                    p.className = 'diary-' + entry.type; 
-                    if (entry.type === 'output') {
-                        p.innerHTML = formatText(entry.text);
-                        setupHighlights(p);
-                    } else {
-                        p.textContent = entry.text;
-                    }
+                    const p = document.createElement('p'); p.className = 'diary-' + entry.type; 
+                    if (entry.type === 'output') { p.innerHTML = formatText(entry.text); setupHighlights(p); } else p.textContent = entry.text;
                     currentInterContainer.appendChild(p);
                 }
             }
