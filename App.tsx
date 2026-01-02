@@ -70,9 +70,9 @@ const gameHTML = `
             </div>
             <div class="text-panel">
                 <div id="scene-description" class="scene-description"></div>
-                <div id="action-popup" class="action-popup hidden"></div>
                 __CHANCES_CONTAINER__
                 <div class="action-bar" id="standard-action-bar">
+                    <div id="action-popup" class="action-popup hidden"></div>
                     <div class="action-buttons">
                         <button id="suggestions-button">__SUGGESTIONS_BUTTON_TEXT__</button>
                         <button id="inventory-button">__INVENTORY_BUTTON_TEXT__</button>
@@ -156,8 +156,8 @@ const gameHTML = `
 const gameCSS = `
 body { padding: 0; }
 body.with-spacing { padding: 30px; }
-body.dark-theme { --bg-color: #0d1117; --panel-bg: #161b22; --border-color: #30363d; --text-color: __GAME_TEXT_COLOR__; --text-dim-color: #8b949e; --accent-color: __GAME_TITLE_COLOR__; --danger-color: #f85149; --danger-hover-bg: #da3633; --highlight-color: #eab308; --input-bg: #010409; --button-bg: #21262d; --button-hover-bg: #30363d; }
-body.light-theme { --bg-color: #ffffff; --panel-bg: #f6f8fa; --border-color: #d0d7de; --text-color: __GAME_TEXT_COLOR_LIGHT__; --text-dim-color: #57606a; --accent-color: __GAME_TITLE_COLOR_LIGHT__; --danger-color: #cf222e; --danger-hover-bg: #a40e26; --highlight-color: #9a6700; --input-bg: #ffffff; --button-bg: #f6f8fa; --button-hover-bg: #e5e7eb; }
+body.dark-theme { --bg-color: #0d1117; --panel-bg: #161b22; --border-color: #30363d; --text-color: __GAME_TEXT_COLOR__; --text-dim-color: #8b949e; --accent-color: __GAME_TITLE_COLOR__; --danger-color: #f85149; --danger-hover-bg: #da3633; --highlight-color: __GAME_FOCUS_COLOR__; --input-bg: #010409; --button-bg: #21262d; --button-hover-bg: #30363d; }
+body.light-theme { --bg-color: #ffffff; --panel-bg: #f6f8fa; --border-color: #d0d7de; --text-color: __GAME_TEXT_COLOR_LIGHT__; --text-dim-color: #57606a; --accent-color: __GAME_TITLE_COLOR_LIGHT__; --danger-color: #cf222e; --danger-hover-bg: #a40e26; --highlight-color: __GAME_FOCUS_COLOR_LIGHT__; --input-bg: #ffffff; --button-bg: #f6f8fa; --button-hover-bg: #e5e7eb; }
 :root { --font-family: __FONT_FAMILY__; --font-size: __GAME_FONT_SIZE__; --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: __CONTINUE_INDICATOR_COLOR__; --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
 * { box-sizing: border-box; }
 body { font-family: var(--font-family); font-size: var(--font-size); background-color: var(--bg-color); color: var(--text-color); margin: 0; height: 100vh; overflow: hidden; }
@@ -205,15 +205,18 @@ body.with-spacing .main-wrapper { height: 100%; }
 .highlight-item { font-weight: bold; color: var(--highlight-color); }
 .highlight-word { font-weight: bold; color: var(--accent-color); cursor: pointer; transition: color 0.2s; }
 .highlight-word:hover { filter: brightness(1.2); text-decoration: underline; }
-.action-bar { border-top: 2px solid var(--border-color); padding-top: 15px; margin-top: auto; flex-shrink: 0; }
-.action-popup { margin-bottom: 15px; background-color: var(--panel-bg); border: 1px solid var(--border-color); padding: 12px; }
-.action-popup.hidden { display: none; }
+
+/* Desktop Action Bar with Popup Inside - Removido fundo cinza do popup */
+.action-bar { border-top: 2px solid var(--border-color); padding-top: 15px; margin-top: auto; flex-shrink: 0; display: flex; flex-direction: column; }
+.action-popup { margin-bottom: 12px; background-color: transparent; border: none; padding: 0; }
+.action-popup.hidden { display: none !important; }
 .action-popup-container { display: flex; flex-direction: column; gap: 10px; }
 .action-popup-row { display: flex; flex-wrap: wrap; gap: 6px; }
-.action-popup-list button, .action-popup-row button, .action-popup-list p { display: inline-block; padding: 6px 10px; margin: 0; text-align: left; background-color: var(--button-bg); border: 1px solid var(--border-color); color: var(--text-color); font-family: var(--font-family); font-size: 0.85em; }
+.action-popup-list button, .action-popup-row button, .action-popup-list p { display: inline-block; padding: 6px 10px; margin: 0; text-align: left; background-color: var(--button-bg); border: 1px solid var(--border-color); color: var(--highlight-color); font-family: var(--font-family); font-size: 0.85em; font-weight: bold; }
 .action-popup-list button, .action-popup-row button { cursor: pointer; }
 .action-popup-list button:hover, .action-popup-row button:hover { background-color: var(--border-color); }
 .action-popup-list p { cursor: default; color: var(--text-dim-color); }
+
 .action-buttons { display: flex; gap: 8px; margin-bottom: 12px; }
 .action-buttons button { font-family: var(--font-family); padding: 8px 12px; border: 2px solid var(--border-color); background-color: var(--panel-bg); color: var(--text-color); cursor: pointer; transition: background-color 0.2s, border-color 0.2s; font-size: 0.85em; }
 .action-buttons button:hover { background-color: var(--border-color); border-color: var(--text-dim-color); }
@@ -228,10 +231,12 @@ body.with-spacing .main-wrapper { height: 100%; }
 .view-ending-button { width: 100%; padding: 12px; font-size: 1.1em; font-weight: bold; border: 2px solid var(--border-color); background-color: var(--action-button-bg); color: var(--action-button-text-color); font-family: var(--font-family); cursor: pointer; transition: all 0.2s; }
 .view-ending-button:hover { filter: brightness(0.9); transform: translateY(-2px); }
 .hidden { display: none !important; }
+
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); display: flex; justify-content: center; align-items: center; z-index: 1000; }
 .modal-content { background-color: var(--panel-bg); padding: 25px; border: 2px solid var(--border-color); position: relative; max-width: 600px; width: 90%; }
 .modal-content h2 { margin-top: 0; font-size: 1.3em; color: var(--accent-color); font-family: var(--font-family); }
 .modal-close-button { position: absolute; top: 10px; right: 15px; background: none; border: none; color: var(--text-dim-color); font-size: 2em; cursor: pointer; line-height: 1; }
+
 .trackers-modal-content { max-height: 80vh; display: flex; flex-direction: column; }
 #trackers-content { flex-grow: 1; overflow-y: auto; padding-right: 15px; margin-right: -15px; }
 .diary-modal-content { max-width: 80vw; height: 80vh; display: flex; flex-direction: column; }
@@ -245,6 +250,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .diary-interactions-container { margin-top: 18px; border-left: 3px solid var(--accent-color); padding-left: 22px; display: flex; flex-direction: column; gap: 14px; }
 .diary-input { color: var(--text-dim-color); font-style: italic; font-size: 0.9em; margin: 0; padding: 0; border: none; }
 .diary-output { color: var(--text-color); margin: 0; padding: 0; border: none; line-height: 1.6; font-size: 0.95em; }
+
 .item-modal-content { max-width: 80vw; width: 90%; }
 .item-modal-body { display: flex; flex-direction: row; gap: 30px; align-items: flex-start; }
 @media (max-width: 768px) { .item-modal-body { flex-direction: column; align-items: center; } }
@@ -273,7 +279,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .slot-delete-btn:hover { color: #fff; background-color: var(--danger-color); border-radius: 4px; }
 #btn-back-system { width: auto; padding: 10px 20px; align-self: center; margin-top: 10px; background-color: var(--button-bg); border: 1px solid var(--border-color); color: var(--text-color); cursor: pointer; font-family: var(--font-family); font-size: 0.9em; }
 
-/* Mobile Immersive Layout Definitivo - REMOÇÃO TOTAL DE MARGENS E ELEMENTOS FLUTUANTES */
+/* Mobile Immersive Layout Definitivo - CORREÇÃO DE FUNDOS E TRANSPARÊNCIAS */
 @media (max-width: 768px) {
     body.behavior-immersive {
         padding: 0 !important;
@@ -289,16 +295,9 @@ body.with-spacing .main-wrapper { height: 100%; }
         max-width: none !important;
     }
     body.behavior-immersive .splash-content {
-        padding: 40px 15px !important; /* Margem mobile de 15px na abertura */
+        padding: 40px 15px !important; 
         height: 100%;
         justify-content: flex-end;
-    }
-    body.behavior-immersive .splash-text p {
-        max-width: none !important;
-    }
-    body.behavior-immersive .splash-buttons {
-        max-width: none !important;
-        align-items: var(--splash-content-align-items);
     }
     body.behavior-immersive .game-container {
         display: block;
@@ -343,8 +342,8 @@ body.with-spacing .main-wrapper { height: 100%; }
         pointer-events: none;
     }
     body.behavior-immersive .scene-description {
-        background: linear-gradient(to top, rgba(0,0,0,0.98) 80%, transparent 100%) !important;
-        padding: 30px 15px 2px 15px !important; /* Reduzido o padding-bottom para aproximar do menu */
+        background: linear-gradient(to top, rgba(0,0,0,0.98) 95%, transparent 100%) !important;
+        padding: 30px 15px 2px 15px !important; 
         max-height: 40vh;
         min-height: 25vh;
         width: 100vw !important;
@@ -357,9 +356,9 @@ body.with-spacing .main-wrapper { height: 100%; }
         font-size: 0.85em !important;
     }
     body.behavior-immersive .action-bar {
-        background: none !important;
+        background: rgba(0,0,0,0.98) !important; 
         border-top: none !important;
-        padding: 2px 15px 15px 15px !important; /* Reduzido padding superior */
+        padding: 2px 15px 15px 15px !important; 
         margin-top: 0 !important;
         pointer-events: auto;
         width: 100vw !important;
@@ -367,6 +366,22 @@ body.with-spacing .main-wrapper { height: 100%; }
         left: 0 !important;
         margin: 0 !important;
     }
+    
+    body.behavior-immersive .action-popup:not(.hidden) {
+        background: rgba(0,0,0,0.98) !important; 
+        border: none !important;
+        margin: 0 !important; 
+        padding: 10px 15px !important; 
+        width: 100vw !important; 
+        box-sizing: border-box !important;
+        pointer-events: auto !important;
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: wrap !important;
+        gap: 6px !important; 
+        justify-content: flex-start !important;
+    }
+    
     body.behavior-immersive .action-buttons {
         display: flex;
         flex-wrap: wrap;
@@ -378,59 +393,42 @@ body.with-spacing .main-wrapper { height: 100%; }
         flex: 1 1 calc(33.33% - 6px);
         min-width: 0;
         padding: 10px 4px;
-        background: rgba(0,0,0,0.85); 
+        background: rgba(0,0,0,0.98) !important; 
         border: 1px solid rgba(255,255,255,0.25);
-        backdrop-filter: blur(4px);
+        backdrop-filter: none !important;
     }
     
-    /* FIX: Garantir que a popup oculta não apareça no modo imersivo */
-    body.behavior-immersive .action-popup {
-        display: none !important; /* Default escondido */
-    }
-    
-    body.behavior-immersive .action-popup:not(.hidden) {
-        background: none !important;
-        border: none !important;
-        margin: 0 15px 2px 15px !important; /* Aproximado dos botões */
-        width: calc(100vw - 30px) !important;
-        box-sizing: border-box !important;
-        pointer-events: auto !important;
-        display: flex !important; /* Só exibe se NÃO tiver .hidden */
-        flex-direction: row !important;
-        flex-wrap: wrap !important;
-        gap: 4px !important; /* Gap reduzido entre chips */
-        justify-content: flex-start !important;
-    }
     body.behavior-immersive .action-popup-container,
     body.behavior-immersive .action-popup-list,
     body.behavior-immersive .action-popup-row {
         display: flex !important;
         flex-direction: row !important;
         flex-wrap: wrap !important;
-        gap: 4px !important;
+        gap: 6px !important;
         width: 100% !important;
         background: none !important;
         border: none !important;
         padding: 0 !important;
     }
     body.behavior-immersive .action-popup button {
-        background: rgba(0,0,0,0.85) !important;
+        background: rgba(0,0,0,0.98) !important; 
         border: 1px solid rgba(255,255,255,0.3) !important;
-        backdrop-filter: blur(10px);
+        backdrop-filter: none !important;
         width: auto !important;
         flex: 0 1 auto !important;
         display: inline-block !important;
-        padding: 4px 10px !important; /* Padding reduzido para compacidade */
+        padding: 6px 12px !important; 
         border-radius: 6px;
         pointer-events: auto !important;
         font-size: 0.85em !important;
         margin-bottom: 2px !important;
         line-height: 1.2 !important;
+        color: var(--highlight-color) !important;
     }
     body.behavior-immersive .action-popup-list p {
-        background: rgba(0,0,0,0.85) !important;
+        background: rgba(0,0,0,0.98) !important; 
         color: var(--text-dim-color) !important;
-        padding: 8px 12px !important;
+        padding: 12px !important;
         border-radius: 6px;
         font-size: 0.85em !important;
         width: 100% !important;
@@ -441,9 +439,10 @@ body.with-spacing .main-wrapper { height: 100%; }
     }
     body.behavior-immersive #verb-input {
         padding: 12px;
-        background: rgba(0,0,0,0.85);
+        background: rgba(0,0,0,0.98) !important; 
         border: 1px solid rgba(255,255,255,0.35);
         box-sizing: border-box !important;
+        backdrop-filter: none !important;
     }
     body.behavior-immersive #submit-verb {
         padding: 8px 12px !important;
@@ -478,11 +477,11 @@ body.with-spacing .main-wrapper { height: 100%; }
 
     /* ADAPTAÇÃO DIÁRIO E INVENTÁRIO MOBILE */
     body.behavior-immersive .modal-content {
-        padding: 12px !important; /* Margem interna reduzida para o modal */
+        padding: 12px !important; 
     }
     body.behavior-immersive .diary-entry {
         flex-direction: column;
-        padding: 10px 0 !important; /* Margem entre entradas reduzida */
+        padding: 10px 0 !important; 
         gap: 12px !important;
     }
     body.behavior-immersive .diary-entry img {
@@ -726,12 +725,12 @@ const App: React.FC = () => {
     
     setGameData(prev => {
         const newScenes = { ...prev.scenes, [newId]: newScene };
-        const newOrder = [...prev.sceneOrder, newId];
-        const isFirst = newOrder.length === 1;
+        const updatedOrder = [...prev.sceneOrder, newId];
+        const isFirst = updatedOrder.length === 1;
         return { 
             ...prev, 
             scenes: newScenes, 
-            sceneOrder: newOrder,
+            sceneOrder: updatedOrder,
             startScene: isFirst ? newId : prev.startScene 
         };
     });
@@ -751,10 +750,10 @@ const App: React.FC = () => {
       setGameData(prev => {
           const newScenes = { ...prev.scenes };
           delete newScenes[id];
-          const newOrder = prev.sceneOrder.filter(sid => sid !== id);
+          const updatedOrder = prev.sceneOrder.filter(sid => sid !== id);
           let newStart = prev.startScene;
           if (newStart === id) {
-              newStart = newOrder.length > 0 ? newOrder[0] : '';
+              newStart = updatedOrder.length > 0 ? updatedOrder[0] : '';
           }
 
           Object.values(newScenes).forEach((scene: Scene) => {
@@ -769,7 +768,7 @@ const App: React.FC = () => {
               }
           });
 
-          return { ...prev, scenes: newScenes, sceneOrder: newOrder, startScene: newStart };
+          return { ...prev, scenes: newScenes, sceneOrder: updatedOrder, startScene: newStart };
       });
       
       if (selectedSceneId === id) setSelectedSceneId(null);
@@ -794,15 +793,15 @@ const App: React.FC = () => {
       
       setGameData(prev => {
           const newScenes = { ...prev.scenes, [newId]: newScene };
-          const newOrder = [...prev.sceneOrder, newId];
-          return { ...prev, scenes: newScenes, sceneOrder: newOrder };
+          const orderWithNew = [...prev.sceneOrder, newId];
+          return { ...prev, scenes: newScenes, sceneOrder: orderWithNew };
       });
       setSelectedSceneId(newId);
       setIsDirty(true);
   };
 
-  const handleReorderScenes = (newOrder: string[]) => {
-      setGameData(prev => ({ ...prev, sceneOrder: newOrder }));
+  const handleReorderScenes = (newSceneIds: string[]) => {
+      setGameData(prev => ({ ...prev, sceneOrder: newSceneIds }));
       setIsDirty(true);
   };
 
@@ -832,11 +831,11 @@ const App: React.FC = () => {
   const handleCreateGlobalObject = (obj: GameObject, linkToSceneId?: string) => {
       setGameData(prev => {
           const newObjects = { ...prev.globalObjects, [obj.id]: obj };
-          let newScenes = prev.scenes;
+          let updatedScenes = prev.scenes;
           
           if (linkToSceneId && prev.scenes[linkToSceneId]) {
               const scene = prev.scenes[linkToSceneId];
-              newScenes = {
+              updatedScenes = {
                   ...prev.scenes,
                   [linkToSceneId]: {
                       ...scene,
@@ -845,7 +844,7 @@ const App: React.FC = () => {
               };
           }
           
-          return { ...prev, globalObjects: newObjects, scenes: newScenes };
+          return { ...prev, globalObjects: newObjects, scenes: updatedScenes };
       });
       setIsDirty(true);
   };
@@ -856,7 +855,7 @@ const App: React.FC = () => {
           globalObjects: {
               ...prev.globalObjects,
               [objectId]: { ...prev.globalObjects[objectId], ...updatedData }
-          }
+            }
       }));
       setIsDirty(true);
   };
@@ -878,9 +877,9 @@ const App: React.FC = () => {
           const newObjects = { ...prev.globalObjects };
           delete newObjects[objectId];
           
-          const newScenes = { ...prev.scenes };
-          Object.keys(newScenes).forEach(id => {
-              const scene = newScenes[id];
+          const updatedScenes = { ...prev.scenes };
+          Object.keys(updatedScenes).forEach(id => {
+              const scene = updatedScenes[id];
               let sceneChanged = false;
               let newObjectIds = scene.objectIds || [];
               let newInteractions = scene.interactions || [];
@@ -905,11 +904,11 @@ const App: React.FC = () => {
               }
 
               if (sceneChanged) {
-                  newScenes[id] = { ...scene, objectIds: newObjectIds, interactions: newInteractions };
+                  updatedScenes[id] = { ...scene, objectIds: newObjectIds, interactions: newInteractions };
               }
           });
           
-          return { ...prev, globalObjects: newObjects, scenes: newScenes };
+          return { ...prev, globalObjects: newObjects, scenes: updatedScenes };
       });
       setIsDirty(true);
   };
