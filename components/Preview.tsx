@@ -42,11 +42,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('__LAYOUT_ORIENTATION_CLASS__', gameData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : '')
             .replace('__LAYOUT_ORDER_CLASS__', gameData.gameLayoutOrder === 'image-last' ? 'layout-image-last' : '')
             .replace('__FRAME_CLASS__', getFrameClass(gameData.gameImageFrame))
-<<<<<<< HEAD
             .replace('__MOBILE_BEHAVIOR_CLASS__', 'behavior-immersive') // FIXO: COMPORTAMENTO IMERSIVO
-=======
-            .replace('__MOBILE_BEHAVIOR_CLASS__', `behavior-${gameData.gameMobileLayoutBehavior || 'standard'}`)
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
             .replace('__FONT_STYLESHEET__', fontStylesheet)
             .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
             .replace('__TRACKERS_BUTTON__', trackersButtonHTML)

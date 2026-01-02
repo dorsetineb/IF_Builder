@@ -189,11 +189,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .scene-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
 #scene-image-back { z-index: 1; }
 #scene-image { z-index: 2; }
-<<<<<<< HEAD
 .scene-name-overlay { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 1em; font-weight: bold; z-index: 10; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: center; padding: 6px 12px; box-sizing: border-box; }
-=======
-.scene-name-overlay { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 0.85em; font-weight: bold; z-index: 10; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: center; padding: 6px 12px; box-sizing: border-box; }
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
 .text-panel { flex: 1; display: flex; flex-direction: column; padding: 30px; position: relative; }
 .game-container.layout-horizontal { flex-direction: column; }
 .game-container.layout-horizontal .image-panel { flex-basis: 45%; max-width: none; width: 100%; border-right: none; border-bottom: 2px solid var(--border-color); }
@@ -216,17 +212,12 @@ body.with-spacing .main-wrapper { height: 100%; }
 .action-popup.hidden { display: none !important; }
 .action-popup-container { display: flex; flex-direction: column; gap: 10px; }
 .action-popup-row { display: flex; flex-wrap: wrap; gap: 6px; }
-<<<<<<< HEAD
 .action-popup-list button, .action-popup-row button, .action-popup-list p { display: inline-block; padding: 6px 10px; margin: 0; text-align: left; background-color: var(--button-bg); border: 1px solid var(--border-color); color: var(--highlight-color); font-family: var(--font-family); font-size: 1em; font-weight: bold; }
-=======
-.action-popup-list button, .action-popup-row button, .action-popup-list p { display: inline-block; padding: 6px 10px; margin: 0; text-align: left; background-color: var(--button-bg); border: 1px solid var(--border-color); color: var(--highlight-color); font-family: var(--font-family); font-size: 0.85em; font-weight: bold; }
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
 .action-popup-list button, .action-popup-row button { cursor: pointer; }
 .action-popup-list button:hover, .action-popup-row button:hover { background-color: var(--border-color); }
 .action-popup-list p { cursor: default; color: var(--text-dim-color); }
 
 .action-buttons { display: flex; gap: 8px; margin-bottom: 12px; }
-<<<<<<< HEAD
 .action-buttons button { font-family: var(--font-family); padding: 8px 12px; border: 2px solid var(--border-color); background-color: var(--panel-bg); color: var(--text-color); cursor: pointer; transition: background-color 0.2s, border-color 0.2s; font-size: 1em; }
 .action-buttons button:hover { background-color: var(--border-color); border-color: var(--text-dim-color); }
 .input-area { display: flex; gap: 8px; }
@@ -234,15 +225,6 @@ body.with-spacing .main-wrapper { height: 100%; }
 #verb-input:focus { outline: none; border-color: var(--border-color); }
 #verb-input:disabled { background-color: var(--button-bg); cursor: not-allowed; }
 #submit-verb { padding: 8px 16px; border: 2px solid var(--border-color); background-color: var(--action-button-bg); color: var(--action-button-text-color); font-family: var(--font-family); cursor: pointer; font-weight: bold; transition: background-color 0.2s; font-size: 1em; }
-=======
-.action-buttons button { font-family: var(--font-family); padding: 8px 12px; border: 2px solid var(--border-color); background-color: var(--panel-bg); color: var(--text-color); cursor: pointer; transition: background-color 0.2s, border-color 0.2s; font-size: 0.85em; }
-.action-buttons button:hover { background-color: var(--border-color); border-color: var(--text-dim-color); }
-.input-area { display: flex; gap: 8px; }
-#verb-input { flex-grow: 1; padding: 12px 10px; border: 2px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); font-family: var(--font-family); font-size: 0.95em; }
-#verb-input:focus { outline: none; border-color: var(--border-color); }
-#verb-input:disabled { background-color: var(--button-bg); cursor: not-allowed; }
-#submit-verb { padding: 8px 16px; border: 2px solid var(--border-color); background-color: var(--action-button-bg); color: var(--action-button-text-color); font-family: var(--font-family); cursor: pointer; font-weight: bold; transition: background-color 0.2s; font-size: 0.95em; }
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
 #submit-verb:hover { filter: brightness(0.9); }
 #submit-verb:disabled { background-color: var(--button-hover-bg); color: var(--text-dim-color); cursor: not-allowed; }
 #submit-verb:disabled:hover { background-color: var(--button-hover-bg); }
@@ -360,17 +342,10 @@ body.with-spacing .main-wrapper { height: 100%; }
         pointer-events: none;
     }
     body.behavior-immersive .scene-description {
-<<<<<<< HEAD
         background: linear-gradient(to top, rgba(0,0,0,0.98) 60%, transparent 100%) !important;
         padding: 45px 15px 5px 15px !important; 
         max-height: 45vh !important; 
         min-height: 25vh !important; 
-=======
-        background: linear-gradient(to top, rgba(0,0,0,0.98) 95%, transparent 100%) !important;
-        padding: 30px 15px 2px 15px !important; 
-        max-height: 40vh;
-        min-height: 25vh;
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
         width: 100vw !important;
         flex-grow: 0;
         border-radius: 0;
@@ -571,11 +546,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 @keyframes blurOut { from { filter: blur(0); opacity: 1; } to { filter: blur(20px); opacity: 0; } }
 
 body.frame-none .image-panel { border: none; }
-<<<<<<< HEAD
 body.frame-rounded-top .game-container .image-panel { padding: 10px; background: __FRAME_ROUND_TOP_COLOR__; border: none; border-radius: 150px 150px 6px 6px; box-shadow: none; }
-=======
-body.frame-rounded-top .game-container .image-panel { padding: 10px; background: __FRAME_ROUNDED_TOP_COLOR__; border: none; border-radius: 150px 150px 6px 6px; box-shadow: none; }
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
 body.frame-rounded-top .game-container .image-container { border-radius: 140px 140px 0 0; }
 body.frame-book-cover .game-container .image-panel { padding: 10px; background: __FRAME_BOOK_COLOR__; border: none; }
 body.frame-book-cover .game-container .image-container { box-shadow: none; border-radius: 0 !important; }
@@ -627,11 +598,7 @@ const initialGameData: GameData = {
     gameMaxChances: 3,
     gameTheme: 'dark',
     gameImageFrame: 'none',
-<<<<<<< HEAD
     gameMobileLayoutBehavior: 'immersive',
-=======
-    gameMobileLayoutBehavior: 'standard',
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
     gameLayoutOrientation: 'vertical',
     gameLayoutOrder: 'image-first',
     gameTextColor: '#c9d1d9',
@@ -657,11 +624,7 @@ const initialGameData: GameData = {
     gameTextSpeed: 5,
     gameImageTransitionType: 'fade',
     gameImageSpeed: 5,
-<<<<<<< HEAD
     gameFontSize: '0.85em',
-=======
-    gameFontSize: '0.85em', 
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
     gameActionButtonText: 'Ação',
     gameSplashButtonText: 'INICIAR',
     gameContinueButtonText: 'Continuar Aventura',
@@ -678,13 +641,8 @@ const initialGameData: GameData = {
     gameMainMenuButtonText: 'Menu Principal',
     gameChanceReturnButtonText: 'Tentar Novamente',
     gameViewEndingButtonText: 'Ver Final',
-<<<<<<< HEAD
     gameShowTrackersUI: true,
     gameShowSystemButton: true,
-=======
-    gameShowTrackersUI: true, 
-    gameShowSystemButton: true, 
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
     fixedVerbs: [],
     consequenceTrackers: [],
     positiveEndingMusic: '',
@@ -692,7 +650,6 @@ const initialGameData: GameData = {
 };
 
 const App: React.FC = () => {
-<<<<<<< HEAD
     const [gameData, setGameData] = useState<GameData>(initialGameData);
     const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
     const [previewSceneId, setPreviewSceneId] = useState<string | null>(null);
@@ -1027,365 +984,10 @@ const App: React.FC = () => {
                     <Header
                         gameData={gameData}
                         isPreviewing={isPreviewing}
-=======
-  const [gameData, setGameData] = useState<GameData>(initialGameData);
-  const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
-  const [previewSceneId, setPreviewSceneId] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<View>('scenes');
-  const [isPreviewing, setIsPreviewing] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
-
-  const scenesList = useMemo(() => {
-    return gameData.sceneOrder.map(id => gameData.scenes[id]).filter(Boolean);
-  }, [gameData.scenes, gameData.sceneOrder]);
-
-  const selectedScene = selectedSceneId ? gameData.scenes[selectedSceneId] : null;
-
-  const fixedVerbs = useMemo(() => gameData.fixedVerbs || [], [gameData.fixedVerbs]);
-  const consequenceTrackers = useMemo(() => gameData.consequenceTrackers || [], [gameData.consequenceTrackers]);
-
-  const handleImportGame = useCallback((data: GameData) => {
-    const cleanedScenes = { ...data.scenes };
-    Object.keys(cleanedScenes).forEach(id => {
-        cleanedScenes[id] = {
-            ...cleanedScenes[id],
-            objectIds: cleanedScenes[id].objectIds || [],
-            interactions: cleanedScenes[id].interactions || []
-        };
-    });
-
-    setGameData(prev => ({
-        ...prev,
-        ...data,
-        scenes: cleanedScenes,
-        gameHTML: gameHTML, 
-        gameCSS: gameCSS,
-        fixedVerbs: data.fixedVerbs || [], 
-        consequenceTrackers: data.consequenceTrackers || [], 
-        gameTextAnimationType: data.gameTextAnimationType || 'fade',
-        gameTextSpeed: data.gameTextSpeed || 5,
-        gameImageTransitionType: data.gameImageTransitionType || 'fade',
-        gameImageSpeed: data.gameImageSpeed || 5,
-        gameShowTrackersUI: data.gameShowTrackersUI ?? true,
-        gameShowSystemButton: data.gameShowSystemButton ?? true,
-        gameViewEndingButtonText: data.gameViewEndingButtonText || 'Ver Final',
-        positiveEndingMusic: data.positiveEndingMusic || '',
-        negativeEndingMusic: data.negativeEndingMusic || '',
-    }));
-    if (data.startScene) {
-        setSelectedSceneId(data.startScene);
-    } else if (data.sceneOrder.length > 0) {
-        setSelectedSceneId(data.sceneOrder[0]);
-    }
-    setIsDirty(false);
-  }, []);
-
-  const handleUpdateGameData = (field: keyof GameData, value: any) => {
-    setGameData(prev => {
-        if (field === 'gameSystemEnabled' && value === 'trackers') {
-            return { ...prev, [field]: value, gameShowTrackersUI: true };
-        }
-        return { ...prev, [field]: value };
-    });
-    setIsDirty(true);
-  };
-
-  const handleAddScene = () => {
-    const newId = generateUniqueId('scn', Object.keys(gameData.scenes));
-    const newScene: Scene = {
-        id: newId,
-        name: 'Nova Cena',
-        image: '',
-        description: 'Descrição da nova cena.',
-        objectIds: [],
-        interactions: []
-    };
-    
-    setGameData(prev => {
-        const newScenes = { ...prev.scenes, [newId]: newScene };
-        const updatedOrder = [...prev.sceneOrder, newId];
-        const isFirst = updatedOrder.length === 1;
-        return { 
-            ...prev, 
-            scenes: newScenes, 
-            sceneOrder: updatedOrder,
-            startScene: isFirst ? newId : prev.startScene 
-        };
-    });
-    setSelectedSceneId(newId);
-    setIsDirty(true);
-  };
-
-  const handleDeleteScene = (id: string) => {
-      if (id === gameData.startScene && Object.keys(gameData.scenes).length > 1) {
-          alert("Você não pode deletar a cena inicial. Defina outra cena como inicial antes de excluir esta.");
-          return;
-      }
-      
-      const confirmDelete = window.confirm("Tem certeza que deseja deletar esta cena?");
-      if (!confirmDelete) return;
-
-      setGameData(prev => {
-          const newScenes = { ...prev.scenes };
-          delete newScenes[id];
-          const updatedOrder = prev.sceneOrder.filter(sid => sid !== id);
-          let newStart = prev.startScene;
-          if (newStart === id) {
-              newStart = updatedOrder.length > 0 ? updatedOrder[0] : '';
-          }
-
-          Object.values(newScenes).forEach((scene: Scene) => {
-              if (scene.interactions) {
-                  scene.interactions = scene.interactions.filter(i => i.goToScene !== id);
-              }
-              if (scene.exits) {
-                  const exits = scene.exits as any;
-                  Object.keys(exits).forEach(key => {
-                      if (exits[key] === id) delete exits[key];
-                  });
-              }
-          });
-
-          return { ...prev, scenes: newScenes, sceneOrder: updatedOrder, startScene: newStart };
-      });
-      
-      if (selectedSceneId === id) setSelectedSceneId(null);
-      setIsDirty(true);
-  };
-
-  const handleUpdateScene = (updatedScene: Scene) => {
-      setGameData(prev => ({
-          ...prev,
-          scenes: { ...prev.scenes, [updatedScene.id]: updatedScene }
-      }));
-      setIsDirty(true);
-  };
-  
-  const handleCopyScene = (sceneToCopy: Scene) => {
-      const newId = generateUniqueId('scn', Object.keys(gameData.scenes));
-      const newScene: Scene = {
-          ...JSON.parse(JSON.stringify(sceneToCopy)),
-          id: newId,
-          name: `${sceneToCopy.name} (Cópia)`,
-      };
-      
-      setGameData(prev => {
-          const newScenes = { ...prev.scenes, [newId]: newScene };
-          const orderWithNew = [...prev.sceneOrder, newId];
-          return { ...prev, scenes: newScenes, sceneOrder: orderWithNew };
-      });
-      setSelectedSceneId(newId);
-      setIsDirty(true);
-  };
-
-  const handleReorderScenes = (newSceneIds: string[]) => {
-      setGameData(prev => ({ ...prev, sceneOrder: newSceneIds }));
-      setIsDirty(true);
-  };
-
-  const handleSelectScene = (id: string) => {
-      setCurrentView('scenes');
-      setSelectedSceneId(id);
-  };
-
-  const handleSetView = (view: View) => {
-      setCurrentView(view);
-      if (view === 'scenes' && !selectedSceneId && scenesList.length > 0) {
-          setSelectedSceneId(scenesList[0].id);
-      }
-  };
-
-  const handleNewGame = () => {
-      if (isDirty) {
-          if (!window.confirm("Existem alterações não salvas. Deseja iniciar um novo jogo e perder as alterações atuais?")) {
-              return;
-          }
-      }
-      setGameData(initialGameData);
-      setSelectedSceneId(null);
-      setIsDirty(false);
-  };
-  
-  const handleCreateGlobalObject = (obj: GameObject, linkToSceneId?: string) => {
-      setGameData(prev => {
-          const newObjects = { ...prev.globalObjects, [obj.id]: obj };
-          let updatedScenes = prev.scenes;
-          
-          if (linkToSceneId && prev.scenes[linkToSceneId]) {
-              const scene = prev.scenes[linkToSceneId];
-              updatedScenes = {
-                  ...prev.scenes,
-                  [linkToSceneId]: {
-                      ...scene,
-                      objectIds: [...(scene.objectIds || []), obj.id]
-                  }
-              };
-          }
-          
-          return { ...prev, globalObjects: newObjects, scenes: updatedScenes };
-      });
-      setIsDirty(true);
-  };
-  
-  const handleUpdateGlobalObject = (objectId: string, updatedData: Partial<GameObject>) => {
-      setGameData(prev => ({
-          ...prev,
-          globalObjects: {
-              ...prev.globalObjects,
-              [objectId]: { ...prev.globalObjects[objectId], ...updatedData }
-            }
-      }));
-      setIsDirty(true);
-  };
-
-  const handleDeleteGlobalObject = (objectId: string) => {
-      const obj = gameData.globalObjects[objectId];
-      if (!obj) return;
-
-      const scenesUsingObject = Object.values(gameData.scenes).filter((s: Scene) => s.objectIds?.includes(objectId));
-      
-      if (scenesUsingObject.length > 0) {
-          const sceneNames = scenesUsingObject.map((s: Scene) => s.name).join(', ');
-          if (!window.confirm(`Este objeto está vinculado às seguintes cenas: ${sceneNames}. Tem certeza que deseja excluí-lo do jogo completamente?`)) {
-              return;
-          }
-      }
-
-      setGameData(prev => {
-          const newObjects = { ...prev.globalObjects };
-          delete newObjects[objectId];
-          
-          const updatedScenes = { ...prev.scenes };
-          Object.keys(updatedScenes).forEach(id => {
-              const scene = updatedScenes[id];
-              let sceneChanged = false;
-              let newObjectIds = scene.objectIds || [];
-              let newInteractions = scene.interactions || [];
-
-              if (newObjectIds.includes(objectId)) {
-                  newObjectIds = newObjectIds.filter(oid => oid !== objectId);
-                  sceneChanged = true;
-              }
-
-              if (newInteractions.some(inter => inter.target === objectId || inter.requiresInInventory === objectId)) {
-                  newInteractions = newInteractions.map(inter => {
-                      if (inter.target === objectId || inter.requiresInInventory === objectId) {
-                          return {
-                              ...inter,
-                              target: inter.target === objectId ? '' : inter.target,
-                              requiresInInventory: inter.requiresInInventory === objectId ? undefined : inter.requiresInInventory
-                          };
-                      }
-                      return inter;
-                  });
-                  sceneChanged = true;
-              }
-
-              if (sceneChanged) {
-                  updatedScenes[id] = { ...scene, objectIds: newObjectIds, interactions: newInteractions };
-              }
-          });
-          
-          return { ...prev, globalObjects: newObjects, scenes: updatedScenes };
-      });
-      setIsDirty(true);
-  };
-  
-  const handleLinkObjectToScene = (sceneId: string, objectId: string) => {
-      setGameData(prev => {
-          const scene = prev.scenes[sceneId];
-          if (scene.objectIds.includes(objectId)) return prev;
-          
-          return {
-              ...prev,
-              scenes: {
-                  ...prev.scenes,
-                  [sceneId]: {
-                      ...scene,
-                      objectIds: [...scene.objectIds, objectId]
-                  }
-              }
-          };
-      });
-      setIsDirty(true);
-  };
-  
-  const handleUnlinkObjectFromScene = (sceneId: string, objectId: string) => {
-       setGameData(prev => {
-          const scene = prev.scenes[sceneId];
-          return {
-              ...prev,
-              scenes: {
-                  ...prev.scenes,
-                  [sceneId]: {
-                      ...scene,
-                      objectIds: scene.objectIds.filter(id => id !== objectId)
-                  }
-              }
-          };
-      });
-      setIsDirty(true);
-  };
-
-  const handleUpdateTrackers = (trackers: ConsequenceTracker[]) => {
-      setGameData(prev => ({ ...prev, consequenceTrackers: trackers }));
-      setIsDirty(true);
-  };
-  
-  const handleUpdateScenePosition = (sceneId: string, x: number, y: number) => {
-    setGameData(prev => ({
-        ...prev,
-        scenes: {
-            ...prev.scenes,
-            [sceneId]: { ...prev.scenes[sceneId], mapX: x, mapY: y }
-        }
-    }));
-    setIsDirty(true);
-  };
-
-
-  return (
-    <div className="flex flex-col h-screen w-screen overflow-hidden bg-brand-bg text-brand-text">
-        {isPreviewing ? (
-             <div className="flex flex-col w-full h-full">
-                <Header 
-                    gameData={gameData} 
-                    isPreviewing={isPreviewing} 
-                    onTogglePreview={() => setIsPreviewing(false)} 
-                    onNewGame={handleNewGame}
-                />
-                <Preview gameData={gameData} testSceneId={previewSceneId} />
-             </div>
-        ) : (
-            <>
-                <Header 
-                    gameData={gameData} 
-                    isPreviewing={isPreviewing} 
-                    onTogglePreview={() => {
-                        setPreviewSceneId(null); 
-                        setIsPreviewing(true);
-                    }} 
-                    onNewGame={handleNewGame}
-                />
-                <div className="flex flex-1 overflow-hidden">
-                    <Sidebar 
-                        scenes={scenesList}
-                        startSceneId={gameData.startScene}
-                        selectedSceneId={selectedSceneId}
-                        currentView={currentView}
-                        gameData={gameData}
-                        onSelectScene={handleSelectScene}
-                        onAddScene={handleAddScene}
-                        onDeleteScene={handleDeleteScene}
-                        onReorderScenes={handleReorderScenes}
-                        onSetView={handleSetView}
-                        onImportGame={handleImportGame}
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                         onTogglePreview={() => {
                             setPreviewSceneId(null);
                             setIsPreviewing(true);
                         }}
-<<<<<<< HEAD
                         onNewGame={handleNewGame}
                     />
                     <div className="flex flex-1 overflow-hidden">
@@ -1550,154 +1152,6 @@ const App: React.FC = () => {
             )}
         </div>
     );
-=======
-                    />
-                    <main className="flex-1 overflow-y-auto p-6 relative bg-brand-bg">
-                        {currentView === 'interface' && (
-                            <UIEditor
-                                {...gameData}
-                                html={gameData.gameHTML}
-                                css={gameData.gameCSS}
-                                onUpdate={handleUpdateGameData}
-                                isDirty={isDirty}
-                                onSetDirty={setIsDirty}
-                                title={gameData.gameTitle || ''}
-                                logo={gameData.gameLogo || ''}
-                                omitSplashTitle={!!gameData.gameOmitSplashTitle}
-                                splashImage={gameData.gameSplashImage || ''}
-                                splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
-                                splashDescription={gameData.gameSplashDescription || ''}
-                                backgroundMusic={gameData.gameBackgroundMusic || ''}
-                                positiveEndingImage={gameData.positiveEndingImage || ''}
-                                positiveEndingContentAlignment={gameData.positiveEndingContentAlignment || 'right'}
-                                positiveEndingDescription={gameData.positiveEndingDescription || ''}
-                                positiveEndingMusic={gameData.positiveEndingMusic || ''}
-                                negativeEndingImage={gameData.negativeEndingImage || ''}
-                                negativeEndingContentAlignment={gameData.negativeEndingContentAlignment || 'right'}
-                                negativeEndingDescription={gameData.negativeEndingDescription || ''}
-                                negativeEndingMusic={gameData.negativeEndingMusic || ''}
-                                fixedVerbs={fixedVerbs}
-                                actionButtonText={gameData.gameActionButtonText || 'Ação'}
-                                verbInputPlaceholder={gameData.gameVerbInputPlaceholder || 'O que você faz?'}
-                                diaryPlayerName={gameData.gameDiaryPlayerName || 'Jogador'}
-                                splashButtonText={gameData.gameSplashButtonText || 'INICIAR'}
-                                continueButtonText={gameData.gameContinueButtonText || 'Continuar'}
-                                restartButtonText={gameData.gameRestartButtonText || 'Reiniciar'}
-                                gameSystemEnabled={gameData.gameSystemEnabled || 'none'}
-                                maxChances={gameData.gameMaxChances || 3}
-                                textColor={gameData.gameTextColor || '#c9d1d9'}
-                                titleColor={gameData.gameTitleColor || '#58a6ff'}
-                                splashButtonColor={gameData.gameSplashButtonColor || '#2ea043'}
-                                splashButtonHoverColor={gameData.gameSplashButtonHoverColor || '#238636'}
-                                splashButtonTextColor={gameData.gameSplashButtonTextColor || '#ffffff'}
-                                actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
-                                actionButtonTextColor={gameData.gameActionButtonTextColor || '#0d1117'}
-                                focusColor={gameData.gameFocusColor || '#58a6ff'}
-                                chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
-                                gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
-                                gameFontSize={gameData.gameFontSize || '0.75em'}
-                                chanceIcon={gameData.gameChanceIcon || 'heart'}
-                                chanceReturnButtonText={gameData.gameChanceReturnButtonText || 'Tentar Novamente'}
-                                gameTheme={gameData.gameTheme || 'dark'}
-                                textColorLight={gameData.textColorLight || '#24292f'}
-                                titleColorLight={gameData.titleColorLight || '#0969da'}
-                                focusColorLight={gameData.focusColorLight || '#0969da'}
-                                frameBookColor={gameData.frameBookColor || '#FFFFFF'}
-                                frameTradingCardColor={gameData.frameTradingCardColor || '#1c1917'}
-                                frameRoundedTopColor={gameData.frameRoundedTopColor || '#facc15'}
-                                gameSceneNameOverlayBg={gameData.gameSceneNameOverlayBg || '#0d1117'}
-                                gameSceneNameOverlayTextColor={gameData.gameSceneNameOverlayTextColor || '#c9d1d9'}
-                                gameShowTrackersUI={gameData.gameShowTrackersUI ?? true}
-                                gameShowSystemButton={gameData.gameShowSystemButton ?? true}
-                                imageFrame={gameData.gameImageFrame || 'none'}
-                                layoutOrder={gameData.gameLayoutOrder || 'image-first'}
-                                layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
-                                gameMobileLayoutBehavior={gameData.gameMobileLayoutBehavior || 'standard'}
-                                suggestionsButtonText={gameData.gameSuggestionsButtonText}
-                                inventoryButtonText={gameData.gameInventoryButtonText}
-                                diaryButtonText={gameData.gameDiaryButtonText}
-                                trackersButtonText={gameData.gameTrackersButtonText}
-                                gameSystemButtonText={gameData.gameSystemButtonText}
-                                gameSaveMenuTitle={gameData.gameSaveMenuTitle}
-                                gameLoadMenuTitle={gameData.gameLoadMenuTitle}
-                                gameMainMenuButtonText={gameData.gameMainMenuButtonText}
-                                gameContinueIndicatorColor={gameData.gameContinueIndicatorColor || '#58a6ff'}
-                                gameViewEndingButtonText={gameData.gameViewEndingButtonText || 'Ver Final'}
-                                textAnimationType={gameData.gameTextAnimationType || 'fade'}
-                                textSpeed={gameData.gameTextSpeed || 5}
-                                imageTransitionType={gameData.gameImageTransitionType || 'fade'}
-                                imageSpeed={gameData.gameImageSpeed || 5}
-                                onNavigateToTrackers={() => handleSetView('trackers')}
-                            />
-                        )}
-                        {currentView === 'scenes' && selectedScene ? (
-                            <SceneEditor 
-                                scene={selectedScene}
-                                allScenes={scenesList}
-                                globalObjects={gameData.globalObjects}
-                                onUpdateScene={handleUpdateScene}
-                                onCopyScene={handleCopyScene}
-                                onCreateGlobalObject={handleCreateGlobalObject}
-                                onLinkObjectToScene={handleLinkObjectToScene}
-                                onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
-                                onUpdateGlobalObject={handleUpdateGlobalObject}
-                                onPreviewScene={(scene) => {
-                                    setPreviewSceneId(scene.id);
-                                    setIsPreviewing(true);
-                                }}
-                                onSelectScene={handleSelectScene}
-                                isDirty={isDirty}
-                                onSetDirty={setIsDirty}
-                                layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
-                                consequenceTrackers={consequenceTrackers}
-                                isStartScene={selectedScene.id === gameData.startScene}
-                            />
-                        ) : currentView === 'scenes' ? (
-                            <WelcomePlaceholder />
-                        ) : null}
-                        
-                        {currentView === 'map' && (
-                            <SceneMap 
-                                allScenesMap={gameData.scenes}
-                                globalObjects={gameData.globalObjects}
-                                startSceneId={gameData.startScene}
-                                onSelectScene={handleSelectScene}
-                                onUpdateScenePosition={handleUpdateScenePosition}
-                                onAddScene={handleAddScene}
-                            />
-                        )}
-                        
-                        {currentView === 'global_objects' && (
-                            <GlobalObjectsEditor
-                                scenes={gameData.scenes}
-                                globalObjects={gameData.globalObjects}
-                                onUpdateObject={handleUpdateGlobalObject}
-                                onDeleteObject={handleDeleteGlobalObject}
-                                onCreateObject={handleCreateGlobalObject}
-                                onSelectScene={handleSelectScene}
-                                isDirty={isDirty}
-                                onSetDirty={setIsDirty}
-                            />
-                        )}
-                        
-                        {currentView === 'trackers' && (
-                            <TrackersEditor
-                                trackers={consequenceTrackers}
-                                onUpdateTrackers={handleUpdateTrackers}
-                                allScenes={scenesList}
-                                allTrackerIds={(gameData.consequenceTrackers || []).map(t => t.id)}
-                                isDirty={isDirty}
-                                onSetDirty={setIsDirty}
-                                onSelectScene={handleSelectScene}
-                            />
-                        )}
-                    </main>
-                </div>
-            </>
-        )}
-    </div>
-  );
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
 };
 
 export default App;

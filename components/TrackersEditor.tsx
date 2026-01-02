@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { ConsequenceTracker, Scene, Interaction, TrackerEffect } from '../types';
-<<<<<<< HEAD
 import { Plus, Trash2, ChevronDown } from 'lucide-react';
 
 interface TrackersEditorProps {
@@ -12,20 +11,6 @@ interface TrackersEditorProps {
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
     onSelectScene: (sceneId: string) => void;
-=======
-import { PlusIcon } from './icons/PlusIcon';
-import { TrashIcon } from './icons/TrashIcon';
-import { ChevronDownIcon } from './icons/ChevronDownIcon';
-
-interface TrackersEditorProps {
-  trackers: ConsequenceTracker[];
-  onUpdateTrackers: (trackers: ConsequenceTracker[]) => void;
-  allScenes: Scene[];
-  allTrackerIds: string[];
-  isDirty: boolean;
-  onSetDirty: (isDirty: boolean) => void;
-  onSelectScene: (sceneId: string) => void;
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
 }
 
 const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
@@ -60,16 +45,11 @@ const TrackerItem: React.FC<{
     return (
         <div className={`bg-brand-bg rounded-md border ${isOpen ? 'border-brand-primary' : 'border-brand-border/50'} overflow-hidden transition-all duration-300 relative`}>
             {/* Header - Always visible summary */}
-<<<<<<< HEAD
             <div
-=======
-            <div 
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                 onClick={() => setIsOpen(!isOpen)}
                 className={`relative flex items-center p-4 cursor-pointer hover:bg-brand-surface/30 transition-colors overflow-hidden group ${isOpen ? 'bg-brand-primary/5 border-b border-brand-primary/20' : ''}`}
             >
                 {/* Sliding Trash Button */}
-<<<<<<< HEAD
                 <button
                     onClick={(e) => { e.stopPropagation(); onRemove(tracker.id); }}
                     className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20"
@@ -81,19 +61,6 @@ const TrackerItem: React.FC<{
                 {/* Expansion Arrow */}
                 <ChevronDown
                     className={`w-5 h-5 text-brand-text-dim transition-transform duration-300 mr-4 shrink-0 ${isOpen ? '-rotate-90' : 'rotate-0'}`}
-=======
-                <button 
-                    onClick={(e) => { e.stopPropagation(); onRemove(tracker.id); }} 
-                    className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20"
-                    title="Excluir rastreador"
-                >
-                    <TrashIcon className="w-5 h-5" />
-                </button>
-
-                {/* Expansion Arrow */}
-                <ChevronDownIcon 
-                    className={`w-5 h-5 text-brand-text-dim transition-transform duration-300 mr-4 shrink-0 ${isOpen ? '-rotate-90' : 'rotate-0'}`} 
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                 />
 
                 <div className="flex flex-1 items-center overflow-hidden h-6">
@@ -105,11 +72,7 @@ const TrackerItem: React.FC<{
                             <span className="ml-2 text-[10px] text-brand-text-dim font-mono opacity-50 shrink-0">({tracker.id})</span>
                         </div>
                     </div>
-<<<<<<< HEAD
 
-=======
-                    
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                     {/* Alcance */}
                     <div className="flex items-center gap-2 min-w-0 px-6 border-r border-brand-border/30 h-full">
                         <span className="text-[10px] uppercase font-bold text-brand-text-dim shrink-0">Início / Max:</span>
@@ -246,17 +209,10 @@ const TrackerItem: React.FC<{
                             <ul className="space-y-2">
                                 {usages.map(({ scene, interaction, effect }, index) => {
                                     const interactionDesc = `${interaction.verbs[0] || 'Ação'}${interaction.target ? ' em ' + interaction.target : ''}`;
-<<<<<<< HEAD
 
                                     return (
                                         <li key={`${interaction.id}-${index}`}>
                                             <button
-=======
-                                    
-                                    return (
-                                        <li key={`${interaction.id}-${index}`}>
-                                            <button 
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                                                 onClick={() => onSelectScene(scene.id)}
                                                 className="w-full flex justify-between items-center text-left p-3 bg-brand-surface rounded-md border border-brand-border/50 hover:bg-brand-border/30 transition-colors"
                                                 title={`Ir para a cena: ${scene.name}`}
@@ -288,7 +244,6 @@ const TrackerItem: React.FC<{
 };
 
 const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrackers, allScenes, allTrackerIds, isDirty, onSetDirty, onSelectScene }) => {
-<<<<<<< HEAD
     const [localTrackers, setLocalTrackers] = useState(trackers);
 
     const allTrackerUsages = useMemo(() => {
@@ -418,137 +373,6 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
             </div>
         </div>
     );
-=======
-  const [localTrackers, setLocalTrackers] = useState(trackers);
-
-  const allTrackerUsages = useMemo(() => {
-    const usageMap = new Map<string, { scene: Scene; interaction: Interaction; effect: TrackerEffect }[]>();
-    trackers.forEach(tracker => usageMap.set(tracker.id, []));
-    allScenes.forEach(scene => {
-        scene.interactions?.forEach(interaction => {
-            interaction.trackerEffects?.forEach(effect => {
-                if (usageMap.has(effect.trackerId)) {
-                    usageMap.get(effect.trackerId)!.push({ scene, interaction, effect });
-                }
-            });
-        });
-    });
-    return usageMap;
-  }, [allScenes, trackers]);
-
-
-  useEffect(() => {
-    setLocalTrackers(trackers);
-  }, [trackers]);
-
-  useEffect(() => {
-    onSetDirty(JSON.stringify(localTrackers) !== JSON.stringify(trackers));
-  }, [localTrackers, trackers, onSetDirty]);
-
-  const handleAddTracker = () => {
-    const newTracker: ConsequenceTracker = {
-      id: generateUniqueId('trk', allTrackerIds),
-      name: 'Novo Rastreador',
-      initialValue: 0,
-      maxValue: 100,
-      consequenceSceneId: '',
-    };
-    setLocalTrackers([...localTrackers, newTracker]);
-  };
-
-  const handleRemoveTracker = (id: string) => {
-    setLocalTrackers(localTrackers.filter(t => t.id !== id));
-  };
-
-  const handleTrackerChange = (id: string, field: keyof ConsequenceTracker, value: any) => {
-    setLocalTrackers(prev => prev.map(t => {
-        if (t.id === id) {
-            if (field === 'barColor' && value === '') {
-                const newTracker = { ...t };
-                delete newTracker.barColor;
-                return newTracker;
-            }
-            return { ...t, [field]: value };
-        }
-        return t;
-    }));
-  };
-  
-  const handleSave = () => {
-    onUpdateTrackers(localTrackers);
-  };
-
-  const handleUndo = () => {
-    setLocalTrackers(trackers);
-  };
-
-  return (
-    <div className="space-y-6 pb-24">
-      <div className="flex justify-between items-start">
-        <div>
-            <p className="text-brand-text-dim mt-1 text-sm">
-              Crie e gerencie variáveis que mudam com as ações do jogador (ex: Vida, Dinheiro, Sanidade).
-            </p>
-        </div>
-        <div className="flex items-center gap-4 flex-shrink-0 mt-1">
-            {isDirty && (
-                <div className="flex items-center gap-2 text-yellow-400 text-xs font-medium animate-pulse">
-                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                    <span>Alterações não salvas</span>
-                </div>
-            )}
-        </div>
-      </div>
-
-      <div className="space-y-4">
-        {localTrackers.length > 0 ? (
-            localTrackers.map((tracker) => (
-                <TrackerItem 
-                    key={tracker.id} 
-                    tracker={tracker} 
-                    onUpdate={handleTrackerChange} 
-                    onRemove={handleRemoveTracker} 
-                    onSelectScene={onSelectScene} 
-                    allScenes={allScenes} 
-                    usages={allTrackerUsages.get(tracker.id) || []} 
-                />
-            ))
-        ) : (
-            <p className="text-center text-brand-text-dim py-8 border-2 border-dashed border-brand-border/50 rounded-md bg-brand-surface/30">Nenhum rastreador criado.</p>
-        )}
-      </div>
-
-       {/* Floating Add Button - Adjusted to match sidebar constraints */}
-       <div className="fixed bottom-6 left-[calc(25%+2.5rem)] xl:left-[calc(20%+2.5rem)] z-10 flex gap-2">
-            <button
-                onClick={handleAddTracker}
-                className="flex items-center px-6 py-3 bg-brand-primary text-brand-bg font-bold rounded-md hover:bg-brand-primary-hover transition-colors shadow-lg"
-            >
-                <PlusIcon className="w-5 h-5 mr-2" />
-                Novo Rastreador
-            </button>
-        </div>
-
-       <div className="fixed bottom-6 right-10 z-10 flex gap-2">
-            <button
-              onClick={handleUndo}
-              disabled={!isDirty}
-              className="px-6 py-2 bg-brand-surface border border-brand-border text-brand-text-dim font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Desfazer
-            </button>
-            <button
-                onClick={handleSave}
-                disabled={!isDirty}
-                className="px-6 py-2 bg-yellow-400 text-black font-semibold rounded-md hover:bg-yellow-500 transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
-                title="Salvar"
-            >
-                Salvar Alterações
-            </button>
-        </div>
-    </div>
-  );
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
 };
 
 export default TrackersEditor;

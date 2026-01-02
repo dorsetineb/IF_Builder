@@ -1,7 +1,6 @@
 
 import React, { useState, DragEvent } from 'react';
 import { GameObject } from '../types';
-<<<<<<< HEAD
 import { Plus, Trash2, Upload } from 'lucide-react';
 
 interface ObjectEditorProps {
@@ -12,20 +11,6 @@ interface ObjectEditorProps {
     onLinkObject: (sceneId: string, objectId: string) => void;
     onUnlinkObject: (sceneId: string, objectId: string) => void;
     onUpdateGlobalObject: (objectId: string, updatedData: Partial<GameObject>) => void;
-=======
-import { PlusIcon } from './icons/PlusIcon';
-import { TrashIcon } from './icons/TrashIcon';
-import { UploadIcon } from './icons/UploadIcon';
-
-interface ObjectEditorProps {
-  sceneId: string;
-  objects: GameObject[]; // The objects currently linked to this scene
-  allGlobalObjects: GameObject[]; // All available objects
-  onCreateGlobalObject: (obj: GameObject, linkToSceneId: string) => void;
-  onLinkObject: (sceneId: string, objectId: string) => void;
-  onUnlinkObject: (sceneId: string, objectId: string) => void;
-  onUpdateGlobalObject: (objectId: string, updatedData: Partial<GameObject>) => void;
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
 }
 
 const generateUniqueId = (prefix: 'obj', existingIds: string[]): string => {
@@ -77,39 +62,23 @@ const SceneObjectItem: React.FC<{
                 className="absolute top-0 right-0 p-2 bg-brand-border text-brand-text-dim rounded-bl-lg hover:bg-red-500 hover:text-white transition-colors"
                 title="Desvincular objeto desta cena (não apaga do jogo)"
             >
-<<<<<<< HEAD
                 <Trash2 className="w-5 h-5" />
-=======
-                <TrashIcon className="w-5 h-5" />
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
             </button>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                 {/* Editable fields */}
                 <div className="space-y-4">
                     <div>
                         <label className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Objeto</label>
-<<<<<<< HEAD
                         <input
                             type="text"
                             value={obj.name}
                             onChange={(e) => onUpdateGlobalObject(obj.id, { name: e.target.value })}
                             className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
-=======
-                        <input 
-                            type="text" 
-                            value={obj.name} 
-                            onChange={(e) => onUpdateGlobalObject(obj.id, { name: e.target.value })}
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                         />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
-<<<<<<< HEAD
                         <p
-=======
-                        <p 
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                             className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
                             title="Use este ID para referência interna."
                         >
@@ -118,19 +87,11 @@ const SceneObjectItem: React.FC<{
                     </div>
                     <div className="flex flex-col">
                         <label className="block text-sm font-medium text-brand-text-dim mb-1">Descrição ao olhar/examinar</label>
-<<<<<<< HEAD
                         <textarea
                             value={obj.examineDescription}
                             onChange={(e) => onUpdateGlobalObject(obj.id, { examineDescription: e.target.value })}
                             rows={4}
                             className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
-=======
-                        <textarea 
-                            value={obj.examineDescription} 
-                            onChange={(e) => onUpdateGlobalObject(obj.id, { examineDescription: e.target.value })}
-                            rows={4} 
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0" 
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                         />
                     </div>
                 </div>
@@ -143,11 +104,7 @@ const SceneObjectItem: React.FC<{
                                 <img src={obj.image} alt={obj.name} className="w-full h-full object-cover bg-brand-bg" />
                                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
                                     <label htmlFor={`image-upload-${obj.id}`} className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover flex items-center gap-2 font-semibold text-sm">
-<<<<<<< HEAD
                                         <Upload className="w-5 h-5" />
-=======
-                                        <UploadIcon className="w-5 h-5" />
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                                         <span className="hidden sm:inline">Alterar</span>
                                         <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                     </label>
@@ -156,33 +113,20 @@ const SceneObjectItem: React.FC<{
                                         className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
                                         title="Remover Imagem"
                                     >
-<<<<<<< HEAD
                                         <Trash2 className="w-5 h-5" />
-=======
-                                        <TrashIcon className="w-5 h-5" />
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                                     </button>
                                 </div>
                             </div>
                         ) : (
-<<<<<<< HEAD
                             <label
                                 htmlFor={`image-upload-${obj.id}`}
-=======
-                            <label 
-                                htmlFor={`image-upload-${obj.id}`} 
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                                 className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
                                 onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                 onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                 onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
                                 onDrop={handleDrop}
                             >
-<<<<<<< HEAD
                                 <Upload className="w-8 h-8 text-brand-text-dim mb-2" />
-=======
-                                <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                                 <span className="text-xs text-brand-text-dim">Carregar Imagem</span>
                                 <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                             </label>
@@ -194,7 +138,6 @@ const SceneObjectItem: React.FC<{
     );
 };
 
-<<<<<<< HEAD
 const ObjectEditor: React.FC<ObjectEditorProps> = ({
     sceneId,
     objects,
@@ -282,95 +225,6 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
             </div>
         </>
     );
-=======
-const ObjectEditor: React.FC<ObjectEditorProps> = ({ 
-    sceneId, 
-    objects, 
-    allGlobalObjects, 
-    onCreateGlobalObject, 
-    onLinkObject, 
-    onUnlinkObject,
-    onUpdateGlobalObject
-}) => {
-  const [selectedGlobalObjectId, setSelectedGlobalObjectId] = useState<string>('');
-  
-  const handleCreateNewObject = () => {
-    const allIds = allGlobalObjects.map(o => o.id);
-    const newObject: GameObject = {
-      id: generateUniqueId('obj', allIds),
-      name: 'Novo Objeto',
-      examineDescription: 'Descrição do novo objeto.',
-    };
-    onCreateGlobalObject(newObject, sceneId);
-  };
-
-  const handleLinkExistingObject = () => {
-      if (selectedGlobalObjectId) {
-          onLinkObject(sceneId, selectedGlobalObjectId);
-          setSelectedGlobalObjectId('');
-      }
-  };
-  
-  const availableObjects = allGlobalObjects.filter(gObj => !objects.some(linked => linked.id === gObj.id));
-
-  return (
-    <>
-      <div className="space-y-4">
-        {objects.length > 0 ? (
-            objects.map((obj) => (
-                <SceneObjectItem
-                    key={obj.id}
-                    obj={obj}
-                    sceneId={sceneId}
-                    onUnlinkObject={onUnlinkObject}
-                    onUpdateGlobalObject={onUpdateGlobalObject}
-                />
-            ))
-        ) : (
-             <p className="text-center text-brand-text-dim">Nenhum objeto vinculado a esta cena.</p>
-        )}
-      </div>
-
-      <div className="mt-8 pt-6 border-t border-brand-border bg-brand-surface rounded-md p-4">
-        <h4 className="text-sm font-bold text-brand-text mb-4">Adicionar Objeto à Cena</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-                 <p className="text-sm text-brand-text-dim">Crie um novo objeto:</p>
-                 <button 
-                    onClick={handleCreateNewObject} 
-                    className="w-full flex items-center justify-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
-                >
-                    <PlusIcon className="w-5 h-5 mr-2" />
-                    Criar Novo Objeto
-                </button>
-            </div>
-            <div className="space-y-2 md:border-l md:border-brand-border/30 md:pl-6">
-                <p className="text-sm text-brand-text-dim">Ou vincule um existente:</p>
-                <div className="flex gap-2">
-                    <select
-                        value={selectedGlobalObjectId}
-                        onChange={(e) => setSelectedGlobalObjectId(e.target.value)}
-                        className="flex-grow bg-brand-bg border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0 [&>option]:bg-brand-sidebar"
-                    >
-                        <option value="">Selecione um objeto...</option>
-                        {availableObjects.map(obj => (
-                            <option key={obj.id} value={obj.id}>{obj.name} ({obj.id})</option>
-                        ))}
-                    </select>
-                    <button 
-                        onClick={handleLinkExistingObject}
-                        disabled={!selectedGlobalObjectId}
-                        className="px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        Vincular
-                    </button>
-                </div>
-            </div>
-        </div>
-      </div>
-    </>
-  );
->>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
 };
 
 export default ObjectEditor;
