@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect, useMemo, DragEvent } from 'react';
 import { GameData, GameObject, Scene } from '../types';
+<<<<<<< HEAD
 import { Plus, Trash2, Upload, ChevronDown } from 'lucide-react';
 
 interface GlobalObjectsEditorProps {
@@ -12,6 +13,22 @@ interface GlobalObjectsEditorProps {
     onSelectScene: (sceneId: string) => void;
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
+=======
+import { TrashIcon } from './icons/TrashIcon';
+import { UploadIcon } from './icons/UploadIcon';
+import { PlusIcon } from './icons/PlusIcon';
+import { ChevronDownIcon } from './icons/ChevronDownIcon';
+
+interface GlobalObjectsEditorProps {
+  scenes: GameData['scenes'];
+  globalObjects: { [id: string]: GameObject };
+  onUpdateObject: (objectId: string, updatedData: Partial<GameObject>) => void;
+  onDeleteObject: (objectId: string) => void;
+  onCreateObject: (obj: GameObject) => void;
+  onSelectScene: (sceneId: string) => void;
+  isDirty: boolean;
+  onSetDirty: (isDirty: boolean) => void;
+>>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
 }
 
 const generateUniqueId = (prefix: 'obj', existingIds: string[]): string => {
@@ -58,7 +75,11 @@ const GlobalObjectItem: React.FC<{
     };
 
     const usages = useMemo(() => {
+<<<<<<< HEAD
         const result: { id: string, name: string }[] = [];
+=======
+        const result: {id: string, name: string}[] = [];
+>>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
         Object.values(scenes).forEach((scene: Scene) => {
             if (scene.objectIds && scene.objectIds.includes(obj.id)) {
                 result.push({ id: scene.id, name: scene.name });
@@ -70,23 +91,41 @@ const GlobalObjectItem: React.FC<{
     return (
         <div className={`bg-brand-bg rounded-md border ${isOpen ? 'border-brand-primary' : 'border-brand-border/50'} overflow-hidden transition-all duration-300 relative`}>
             {/* Header - Fixed height to allow full-height image */}
+<<<<<<< HEAD
             <div
+=======
+            <div 
+>>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                 onClick={() => setIsOpen(!isOpen)}
                 className={`relative flex items-center h-16 cursor-pointer hover:bg-brand-surface/30 transition-colors overflow-hidden group ${isOpen ? 'bg-brand-primary/5 border-b border-brand-primary/20' : ''}`}
             >
                 {/* Sliding Trash Button */}
+<<<<<<< HEAD
                 <button
                     onClick={(e) => { e.stopPropagation(); onDelete(obj.id); }}
                     className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20"
                     title="Excluir objeto do jogo"
                 >
                     <Trash2 className="w-5 h-5" />
+=======
+                <button 
+                    onClick={(e) => { e.stopPropagation(); onDelete(obj.id); }} 
+                    className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20"
+                    title="Excluir objeto do jogo"
+                >
+                    <TrashIcon className="w-5 h-5" />
+>>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                 </button>
 
                 {/* Expansion Arrow */}
                 <div className="px-4 shrink-0">
+<<<<<<< HEAD
                     <ChevronDown
                         className={`w-5 h-5 text-brand-text-dim transition-transform duration-300 ${isOpen ? '-rotate-90' : 'rotate-0'}`}
+=======
+                    <ChevronDownIcon 
+                        className={`w-5 h-5 text-brand-text-dim transition-transform duration-300 ${isOpen ? '-rotate-90' : 'rotate-0'}`} 
+>>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                     />
                 </div>
 
@@ -138,7 +177,11 @@ const GlobalObjectItem: React.FC<{
                             </div>
                             <div>
                                 <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
+<<<<<<< HEAD
                                 <p
+=======
+                                <p 
+>>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                                     className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
                                     title="Use este ID para referência interna."
                                 >
@@ -183,7 +226,11 @@ const GlobalObjectItem: React.FC<{
                                         <img src={obj.image} alt={obj.name} className="w-full h-full object-cover bg-brand-bg" />
                                         <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity gap-2">
                                             <label htmlFor={`image-upload-${obj.id}`} className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover flex items-center gap-2 font-semibold text-sm">
+<<<<<<< HEAD
                                                 <Upload className="w-5 h-5" />
+=======
+                                                <UploadIcon className="w-5 h-5" />
+>>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                                                 <span className="hidden sm:inline">Alterar</span>
                                                 <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                             </label>
@@ -192,7 +239,11 @@ const GlobalObjectItem: React.FC<{
                                                 className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
                                                 title="Remover Imagem"
                                             >
+<<<<<<< HEAD
                                                 <Trash2 className="w-5 h-5" />
+=======
+                                                <TrashIcon className="w-5 h-5" />
+>>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                                             </button>
                                         </div>
                                     </div>
@@ -205,14 +256,22 @@ const GlobalObjectItem: React.FC<{
                                         onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
                                         onDrop={handleDrop}
                                     >
+<<<<<<< HEAD
                                         <Upload className="w-8 h-8 text-brand-text-dim mb-2" />
+=======
+                                        <UploadIcon className="w-8 h-8 text-brand-text-dim mb-2" />
+>>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                                         <span className="text-sm font-semibold text-brand-text">Clique para Enviar</span>
                                         <span className="text-xs text-brand-text-dim mt-1">ou arraste e solte</span>
                                         <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                     </label>
                                 )}
                             </div>
+<<<<<<< HEAD
                             <p className="text-xs text-brand-text-dim text-center">Imagem que aparece ao inspecionar o item.<br />Recomendado: 1:1 (quadrado), ex: 512x512 pixels.</p>
+=======
+                            <p className="text-xs text-brand-text-dim text-center">Imagem que aparece ao inspecionar o item.<br/>Recomendado: 1:1 (quadrado), ex: 512x512 pixels.</p>
+>>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
                         </div>
                     </div>
                 </div>
@@ -222,6 +281,7 @@ const GlobalObjectItem: React.FC<{
 }
 
 const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
+<<<<<<< HEAD
     scenes,
     globalObjects,
     onUpdateObject,
@@ -345,6 +405,131 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
             </div>
         </div>
     );
+=======
+  scenes,
+  globalObjects,
+  onUpdateObject,
+  onDeleteObject,
+  onCreateObject,
+  onSelectScene,
+  isDirty,
+  onSetDirty,
+}) => {
+  const sortedObjects = useMemo(() => {
+      return Object.values(globalObjects).sort((a: GameObject, b: GameObject) => a.name.localeCompare(b.name));
+  }, [globalObjects]);
+
+  const [localObjects, setLocalObjects] = useState<GameObject[]>(sortedObjects);
+
+  useEffect(() => {
+    setLocalObjects(sortedObjects);
+  }, [sortedObjects]);
+
+  useEffect(() => {
+    const isDifferent = JSON.stringify(localObjects) !== JSON.stringify(sortedObjects);
+    onSetDirty(isDifferent);
+  }, [localObjects, sortedObjects, onSetDirty]);
+
+  const handleObjectChange = (objectId: string, field: keyof GameObject, value: any) => {
+    setLocalObjects(prev =>
+      prev.map(obj =>
+        obj.id === objectId ? { ...obj, [field]: value } : obj
+      )
+    );
+  };
+
+  const handleSave = () => {
+    localObjects.forEach(localObj => {
+      const originalObj = globalObjects[localObj.id];
+      if (originalObj && JSON.stringify(localObj) !== JSON.stringify(originalObj)) {
+        onUpdateObject(localObj.id, {
+          name: localObj.name,
+          examineDescription: localObj.examineDescription,
+          image: localObj.image,
+        });
+      }
+    });
+  };
+
+  const handleUndo = () => {
+    setLocalObjects(sortedObjects);
+  };
+  
+  const handleCreate = () => {
+      const allIds = Object.keys(globalObjects);
+      const newObject: GameObject = {
+          id: generateUniqueId('obj', allIds),
+          name: 'Novo Objeto',
+          examineDescription: 'Descrição do novo objeto.',
+      };
+      onCreateObject(newObject);
+  };
+  
+  return (
+    <div className="space-y-6 pb-24">
+      <div className="flex justify-between items-start">
+        <div>
+            <p className="text-brand-text-dim mt-1 text-sm">
+                Aqui você gerencia todos os objetos do jogo. Vincule-os às cenas através do Editor de Cenas.
+            </p>
+        </div>
+        <div className="flex items-center gap-4 flex-shrink-0 mt-1">
+            {isDirty && (
+                <div className="flex items-center gap-2 text-yellow-400 text-xs font-medium animate-pulse">
+                    <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                    <span>Alterações não salvas</span>
+                </div>
+            )}
+        </div>
+      </div>
+      
+      <div className="space-y-4">
+        {localObjects.length > 0 ? (
+          localObjects.map(obj => (
+            <GlobalObjectItem 
+                key={obj.id} 
+                obj={obj} 
+                onUpdate={handleObjectChange} 
+                onDelete={onDeleteObject} 
+                scenes={scenes}
+                onSelectScene={onSelectScene}
+            />
+          ))
+        ) : (
+          <p className="text-center text-brand-text-dim py-8 border-2 border-dashed border-brand-border/50 rounded-md bg-brand-surface/30">Nenhum objeto na biblioteca.</p>
+        )}
+      </div>
+
+      {/* Floating Add Button - Adjusted to match sidebar constraints */}
+      <div className="fixed bottom-6 left-[calc(25%+2.5rem)] xl:left-[calc(20%+2.5rem)] z-10 flex gap-2">
+        <button
+            onClick={handleCreate}
+            className="flex items-center px-6 py-3 bg-brand-primary text-brand-bg font-bold rounded-md hover:bg-brand-primary-hover transition-colors shadow-lg"
+        >
+            <PlusIcon className="w-5 h-5 mr-2" />
+            Novo Objeto
+        </button>
+      </div>
+
+      <div className="fixed bottom-6 right-10 z-10 flex gap-2">
+          <button
+            onClick={handleUndo}
+            disabled={!isDirty}
+            className="px-6 py-2 bg-brand-surface border border-brand-border text-brand-text-dim font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Desfazer
+          </button>
+          <button
+              onClick={handleSave}
+              disabled={!isDirty}
+              className="px-6 py-2 bg-yellow-400 text-black font-semibold rounded-md hover:bg-yellow-500 transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
+          >
+              Salvar Alterações
+          </button>
+      </div>
+    </div>
+  );
+>>>>>>> 3773e8d5433b183fb55694c9010f416f8ebcafd7
 };
 
 export default GlobalObjectsEditor;
