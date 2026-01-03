@@ -142,10 +142,9 @@ class RetroEffectImpl extends Effect {
         const uniforms = new Map<string, THREE.Uniform>([
             ['colorNum', new THREE.Uniform(4.0)],
             ['pixelSize', new THREE.Uniform(2.0)],
-            ['resolution', new THREE.Uniform(new THREE.Vector2(window.innerWidth, window.innerHeight))]
+            ['resolution', new THREE.Uniform(new THREE.Vector2(1, 1))]
         ]);
         super('RetroEffect', ditherFragmentShader, { uniforms });
-        this.uniforms = uniforms;
     }
     update(renderer: THREE.WebGLRenderer, inputBuffer: THREE.WebGLRenderTarget, deltaTime: number) {
         const resolution = this.uniforms.get('resolution');
@@ -285,23 +284,24 @@ export default function Dither({
     mouseRadius = 1
 }: any) {
     return (
-        <Canvas
-            className="dither-container"
-            camera={{ position: [0, 0, 6] }}
-            dpr={1}
-            gl={{ antialias: true, preserveDrawingBuffer: true }}
-        >
-            <DitheredWaves
-                waveSpeed={waveSpeed}
-                waveFrequency={waveFrequency}
-                waveAmplitude={waveAmplitude}
-                waveColor={waveColor}
-                colorNum={colorNum}
-                pixelSize={pixelSize}
-                disableAnimation={disableAnimation}
-                enableMouseInteraction={enableMouseInteraction}
-                mouseRadius={mouseRadius}
-            />
-        </Canvas>
+        <div className="dither-container">
+            <Canvas
+                camera={{ position: [0, 0, 6] }}
+                dpr={1}
+                gl={{ antialias: true, preserveDrawingBuffer: true }}
+            >
+                <DitheredWaves
+                    waveSpeed={waveSpeed}
+                    waveFrequency={waveFrequency}
+                    waveAmplitude={waveAmplitude}
+                    waveColor={waveColor}
+                    colorNum={colorNum}
+                    pixelSize={pixelSize}
+                    disableAnimation={disableAnimation}
+                    enableMouseInteraction={enableMouseInteraction}
+                    mouseRadius={mouseRadius}
+                />
+            </Canvas>
+        </div>
     );
 }
