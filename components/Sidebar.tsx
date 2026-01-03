@@ -327,7 +327,6 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   };
 
   return (
-  return (
     <aside className={`${isCollapsed ? 'w-16' : 'w-1/4 xl:w-1/5'} bg-zinc-950 p-4 border-r border-zinc-900 flex flex-col transition-all duration-300 relative`}>
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
