@@ -1,9 +1,11 @@
-
-import { useRef, useEffect, forwardRef, useMemo } from 'react';
+/* eslint-disable react/no-unknown-property */
+import { useRef, useEffect, forwardRef } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { EffectComposer, wrapEffect } from '@react-three/postprocessing';
 import { Effect } from 'postprocessing';
 import * as THREE from 'three';
+
+import './Dither.css';
 
 const waveVertexShader = `
 precision highp float;
@@ -101,7 +103,7 @@ precision highp float;
 uniform float colorNum;
 uniform float pixelSize;
 uniform vec2 resolution;
-uniform sampler2D inputBuffer; // Add this line
+uniform sampler2D inputBuffer;
 
 const float bayerMatrix8x8[64] = float[64](
   0.0/64.0, 48.0/64.0, 12.0/64.0, 60.0/64.0,  3.0/64.0, 51.0/64.0, 15.0/64.0, 63.0/64.0,
@@ -145,22 +147,19 @@ class RetroEffectImpl extends Effect {
         super('RetroEffect', ditherFragmentShader, { uniforms });
         this.uniforms = uniforms;
     }
-
-    // Add update method to handle resizing
     update(renderer: THREE.WebGLRenderer, inputBuffer: THREE.WebGLRenderTarget, deltaTime: number) {
         const resolution = this.uniforms.get('resolution');
         if (resolution) {
             resolution.value.set(inputBuffer.width, inputBuffer.height);
         }
     }
-
-    set colorNum(v: number) {
+    set colorNum(v: any) {
         this.uniforms.get('colorNum')!.value = v;
     }
     get colorNum() {
         return this.uniforms.get('colorNum')!.value;
     }
-    set pixelSize(v: number) {
+    set pixelSize(v: any) {
         this.uniforms.get('pixelSize')!.value = v;
     }
     get pixelSize() {
@@ -168,29 +167,16 @@ class RetroEffectImpl extends Effect {
     }
 }
 
-// Wrap the effect
 // @ts-ignore
 const WrappedRetro = wrapEffect(RetroEffectImpl);
 
-const RetroEffect = forwardRef<{ colorNum: number; pixelSize: number }, any>((props, ref) => {
+const RetroEffect = forwardRef((props: any, ref) => {
     const { colorNum, pixelSize } = props;
     return <WrappedRetro ref={ref} colorNum={colorNum} pixelSize={pixelSize} />;
 });
 RetroEffect.displayName = 'RetroEffect';
 
-interface DitherProps {
-    waveSpeed?: number;
-    waveFrequency?: number;
-    waveAmplitude?: number;
-    waveColor?: number[];
-    colorNum?: number;
-    pixelSize?: number;
-    disableAnimation?: boolean;
-    enableMouseInteraction?: boolean;
-    mouseRadius?: number;
-}
-
-const DitheredWaves: React.FC<DitherProps> = ({
+function DitheredWaves({
     waveSpeed,
     waveFrequency,
     waveAmplitude,
@@ -200,7 +186,7 @@ const DitheredWaves: React.FC<DitherProps> = ({
     disableAnimation,
     enableMouseInteraction,
     mouseRadius
-}) => {
+}: any) {
     const mesh = useRef<THREE.Mesh>(null);
     const mouseRef = useRef(new THREE.Vector2());
     const { viewport, size, gl } = useThree();
@@ -211,7 +197,7 @@ const DitheredWaves: React.FC<DitherProps> = ({
         waveSpeed: new THREE.Uniform(waveSpeed),
         waveFrequency: new THREE.Uniform(waveFrequency),
         waveAmplitude: new THREE.Uniform(waveAmplitude),
-        waveColor: new THREE.Uniform(new THREE.Color(...(waveColor || [0.5, 0.5, 0.5]))),
+        waveColor: new THREE.Uniform(new THREE.Color(...waveColor)),
         mousePos: new THREE.Uniform(new THREE.Vector2(0, 0)),
         enableMouseInteraction: new THREE.Uniform(enableMouseInteraction ? 1 : 0),
         mouseRadius: new THREE.Uniform(mouseRadius)
@@ -219,22 +205,15 @@ const DitheredWaves: React.FC<DitherProps> = ({
 
     useEffect(() => {
         const dpr = gl.getPixelRatio();
-        const w = Math.floor(size.width * dpr);
-        const h = Math.floor(size.height * dpr);
+        const w = Math.floor(size.width * dpr),
+            h = Math.floor(size.height * dpr);
         const res = waveUniformsRef.current.resolution.value;
         if (res.x !== w || res.y !== h) {
             res.set(w, h);
         }
     }, [size, gl]);
 
-    // Update color if prop changes
-    useEffect(() => {
-        if (waveColor) {
-            waveUniformsRef.current.waveColor.value.set(...waveColor);
-        }
-    }, [waveColor]);
-
-
+    const prevColor = useRef([...waveColor]);
     useFrame(({ clock }) => {
         const u = waveUniformsRef.current;
 
@@ -242,13 +221,17 @@ const DitheredWaves: React.FC<DitherProps> = ({
             u.time.value = clock.getElapsedTime();
         }
 
-        if (waveSpeed !== undefined && u.waveSpeed.value !== waveSpeed) u.waveSpeed.value = waveSpeed;
-        if (waveFrequency !== undefined && u.waveFrequency.value !== waveFrequency) u.waveFrequency.value = waveFrequency;
-        if (waveAmplitude !== undefined && u.waveAmplitude.value !== waveAmplitude) u.waveAmplitude.value = waveAmplitude;
+        if (u.waveSpeed.value !== waveSpeed) u.waveSpeed.value = waveSpeed;
+        if (u.waveFrequency.value !== waveFrequency) u.waveFrequency.value = waveFrequency;
+        if (u.waveAmplitude.value !== waveAmplitude) u.waveAmplitude.value = waveAmplitude;
 
+        if (!prevColor.current.every((v: any, i: number) => v === waveColor[i])) {
+            u.waveColor.value.set(...waveColor);
+            prevColor.current = [...waveColor];
+        }
 
-        if (enableMouseInteraction !== undefined) u.enableMouseInteraction.value = enableMouseInteraction ? 1 : 0;
-        if (mouseRadius !== undefined) u.mouseRadius.value = mouseRadius;
+        u.enableMouseInteraction.value = enableMouseInteraction ? 1 : 0;
+        u.mouseRadius.value = mouseRadius;
 
         if (enableMouseInteraction) {
             u.mousePos.value.copy(mouseRef.current);
@@ -259,12 +242,7 @@ const DitheredWaves: React.FC<DitherProps> = ({
         if (!enableMouseInteraction) return;
         const rect = gl.domElement.getBoundingClientRect();
         const dpr = gl.getPixelRatio();
-        const x = (e.clientX - rect.left) * dpr;
-        const y = (e.clientY - rect.top) * dpr;
-        // Invert Y coordinate for shader interaction if needed, or pass correctly
-        // The original code used (e.clientY - rect.top), which means 0 is top.
-        // In shaders usually (0,0) is bottom-left. Let's stick to the original logic first.
-        mouseRef.current.set(x, size.height * dpr - y); // Flip Y for shader standard
+        mouseRef.current.set((e.clientX - rect.left) * dpr, (e.clientY - rect.top) * dpr);
     };
 
     return (
@@ -288,13 +266,12 @@ const DitheredWaves: React.FC<DitherProps> = ({
                 scale={[viewport.width, viewport.height, 1]}
                 visible={false}
             >
-                {/* @ts-ignore */}
                 <planeGeometry args={[1, 1]} />
                 <meshBasicMaterial transparent opacity={0} />
             </mesh>
         </>
     );
-};
+}
 
 export default function Dither({
     waveSpeed = 0.05,
@@ -306,26 +283,25 @@ export default function Dither({
     disableAnimation = false,
     enableMouseInteraction = true,
     mouseRadius = 1
-}: DitherProps) {
+}: any) {
     return (
-        <div style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0, zIndex: 0 }}>
-            <Canvas
-                camera={{ position: [0, 0, 6] }}
-                dpr={1}
-                gl={{ antialias: true, preserveDrawingBuffer: true }}
-            >
-                <DitheredWaves
-                    waveSpeed={waveSpeed}
-                    waveFrequency={waveFrequency}
-                    waveAmplitude={waveAmplitude}
-                    waveColor={waveColor}
-                    colorNum={colorNum}
-                    pixelSize={pixelSize}
-                    disableAnimation={disableAnimation}
-                    enableMouseInteraction={enableMouseInteraction}
-                    mouseRadius={mouseRadius}
-                />
-            </Canvas>
-        </div>
+        <Canvas
+            className="dither-container"
+            camera={{ position: [0, 0, 6] }}
+            dpr={1}
+            gl={{ antialias: true, preserveDrawingBuffer: true }}
+        >
+            <DitheredWaves
+                waveSpeed={waveSpeed}
+                waveFrequency={waveFrequency}
+                waveAmplitude={waveAmplitude}
+                waveColor={waveColor}
+                colorNum={colorNum}
+                pixelSize={pixelSize}
+                disableAnimation={disableAnimation}
+                enableMouseInteraction={enableMouseInteraction}
+                mouseRadius={mouseRadius}
+            />
+        </Canvas>
     );
 }
