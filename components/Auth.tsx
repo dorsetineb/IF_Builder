@@ -32,7 +32,12 @@ export function Auth() {
                 if (error) throw error;
             }
         } catch (err: any) {
-            setError(err.message || 'Ocorreu um erro na autenticação.');
+            console.error('Auth error:', err);
+            if (err.message === 'Failed to fetch') {
+                setError('Erro de conexão. Verifique se as Variáveis de Ambiente do Supabase (URL e ANON_KEY) foram configuradas no Vercel.');
+            } else {
+                setError(err.message || 'Ocorreu um erro na autenticação.');
+            }
         } finally {
             setLoading(false);
         }
