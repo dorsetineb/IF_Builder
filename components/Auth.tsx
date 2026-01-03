@@ -46,7 +46,7 @@ export function Auth() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-4 font-sans relative">
-            {/* <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-0">
                 <Dither
                     waveSpeed={0.05}
                     waveFrequency={3}
@@ -58,7 +58,7 @@ export function Auth() {
                     enableMouseInteraction={true}
                     mouseRadius={0.5}
                 />
-            </div> */}
+            </div>
 
             <div className="w-full max-w-md bg-zinc-900/50 border border-zinc-800 backdrop-blur-xl relative z-10 overflow-hidden rounded-2xl shadow-2xl">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-50" />
