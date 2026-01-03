@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import Dither from './Dither';
 
 export function Auth() {
     const [loading, setLoading] = useState(false);
@@ -44,10 +45,20 @@ export function Auth() {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-4 font-sans">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(39,39,42,0.4)_0,rgba(9,9,11,1)_70%)] pointer-events-none" />
+        <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-4 font-sans relative">
+            <Dither
+                waveSpeed={0.05}
+                waveFrequency={3}
+                waveAmplitude={0.3}
+                waveColor={[0.5, 0.3, 0.9]}
+                colorNum={4}
+                pixelSize={3}
+                disableAnimation={false}
+                enableMouseInteraction={true}
+                mouseRadius={0.5}
+            />
 
-            <div className="w-full max-w-md bg-zinc-900/50 border border-zinc-800 backdrop-blur-xl relative overflow-hidden rounded-2xl shadow-2xl">
+            <div className="w-full max-w-md bg-zinc-900/50 border border-zinc-800 backdrop-blur-xl relative z-10 overflow-hidden rounded-2xl shadow-2xl">
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-50" />
 
                 <div className="p-8 space-y-6">
