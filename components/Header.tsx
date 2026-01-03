@@ -41,9 +41,9 @@ const Header: React.FC<{
             </button>
             <button
               onClick={onNewGame}
-              className="flex items-center justify-center px-4 py-2 bg-zinc-950 border border-zinc-800 text-white font-semibold rounded-lg hover:bg-zinc-900 transition-all text-sm"
+              className="flex items-center justify-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-all text-sm"
             >
-              <Plus className="w-4 h-4 mr-2 text-purple-400" /> Novo Jogo
+              <Plus className="w-4 h-4 mr-2" /> Novo Jogo
             </button>
             <button
               onClick={onLogout}

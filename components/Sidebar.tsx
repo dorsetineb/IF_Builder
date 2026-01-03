@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import SceneList from './SceneList';
 import { Scene, View, GameData } from '../types';
-import { Code, BookOpen, Map, Box, SlidersHorizontal, Download, Eye, FileUp } from 'lucide-react';
+import { Code, BookOpen, Map, Box, SlidersHorizontal, Download, Eye, FileUp, ChevronLeft, ChevronRight } from 'lucide-react';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 
 declare var JSZip: any;
@@ -59,12 +59,13 @@ const getMimeTypeFromFileName = (name: string): string => {
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
   const { currentView, onSetView, scenes, gameData, onImportGame, onTogglePreview, ...sceneListProps } = props;
-  const [isExpanded, setIsExpanded] = useState(currentView === 'scenes');
+  const [isScenesExpanded, setIsScenesExpanded] = useState(currentView === 'scenes');
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const importInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (currentView === 'scenes') {
-      setIsExpanded(true);
+      setIsScenesExpanded(true);
     }
   }, [currentView]);
 
@@ -77,9 +78,10 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   const handleToggleScenes = () => {
     if (currentView !== 'scenes') {
       onSetView('scenes');
-      setIsExpanded(true);
+      setIsScenesExpanded(true);
+      if (isCollapsed) setIsCollapsed(false); // Auto-expand sidebar when opening scenes
     } else {
-      setIsExpanded(!isExpanded);
+      setIsScenesExpanded(!isScenesExpanded);
     }
   };
 
@@ -325,44 +327,76 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   };
 
   return (
-    <aside className="w-1/4 xl:w-1/5 bg-zinc-950 p-4 border-r border-zinc-900 flex flex-col">
-      <nav className="flex flex-col gap-2 flex-grow overflow-y-auto">
-        <button className={getButtonClass('interface')} onClick={() => onSetView('interface')}>
-          <Code className="w-4 h-4 mr-3" />
-          <span className="font-semibold text-xs">Informações e Interface</span>
+  return (
+    <aside className={`${isCollapsed ? 'w-16' : 'w-1/4 xl:w-1/5'} bg-zinc-950 p-4 border-r border-zinc-900 flex flex-col transition-all duration-300 relative`}>
+      <button
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        className="absolute -right-3 top-6 bg-zinc-900 border border-zinc-800 rounded-full p-1 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors z-10"
+      >
+        {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+      </button>
+
+      <nav className="flex flex-col gap-2 flex-grow overflow-y-auto overflow-x-hidden">
+        <button
+          className={getButtonClass('interface')}
+          onClick={() => onSetView('interface')}
+          title={isCollapsed ? "Informações e Interface" : undefined}
+        >
+          <Code className="w-4 h-4 flex-shrink-0" />
+          {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Informações e Interface</span>}
         </button>
 
         <div>
-          <button className={getButtonClass('scenes')} onClick={handleToggleScenes}>
-            <BookOpen className="w-4 h-4 mr-3" />
-            <span className="font-semibold text-xs">Editor de Cenas</span>
-            <span className="ml-auto bg-zinc-800 text-zinc-300 text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-zinc-700">
-              {scenes.length}
-            </span>
+          <button
+            className={getButtonClass('scenes')}
+            onClick={handleToggleScenes}
+            title={isCollapsed ? "Editor de Cenas" : undefined}
+          >
+            <BookOpen className="w-4 h-4 flex-shrink-0" />
+            {!isCollapsed && (
+              <>
+                <span className="font-semibold text-xs ml-3 truncate">Editor de Cenas</span>
+                <span className="ml-auto bg-zinc-800 text-zinc-300 text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-zinc-700">
+                  {scenes.length}
+                </span>
+              </>
+            )}
           </button>
-          {isExpanded && (
-            <div className="pl-4 mt-2 ml-2">
+          {!isCollapsed && isScenesExpanded && (
+            <div className="pl-4 mt-2 ml-2 border-l border-zinc-800">
               <SceneList scenes={scenes} {...sceneListProps} />
             </div>
           )}
         </div>
 
-        <button className={getButtonClass('map')} onClick={() => onSetView('map')}>
-          <Map className="w-4 h-4 mr-3" />
-          <span className="font-semibold text-xs">Mapa de Cenas</span>
+        <button
+          className={getButtonClass('map')}
+          onClick={() => onSetView('map')}
+          title={isCollapsed ? "Mapa de Cenas" : undefined}
+        >
+          <Map className="w-4 h-4 flex-shrink-0" />
+          {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Mapa de Cenas</span>}
         </button>
 
-        <button className={getButtonClass('global_objects')} onClick={() => onSetView('global_objects')}>
-          <Box className="w-4 h-4 mr-3" />
-          <span className="font-semibold text-xs">Objetos</span>
+        <button
+          className={getButtonClass('global_objects')}
+          onClick={() => onSetView('global_objects')}
+          title={isCollapsed ? "Objetos" : undefined}
+        >
+          <Box className="w-4 h-4 flex-shrink-0" />
+          {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Objetos</span>}
         </button>
-        <button className={getButtonClass('trackers')} onClick={() => onSetView('trackers')}>
-          <SlidersHorizontal className="w-4 h-4 mr-3" />
-          <span className="font-semibold text-xs">Rastreadores</span>
+        <button
+          className={getButtonClass('trackers')}
+          onClick={() => onSetView('trackers')}
+          title={isCollapsed ? "Rastreadores" : undefined}
+        >
+          <SlidersHorizontal className="w-4 h-4 flex-shrink-0" />
+          {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Rastreadores</span>}
         </button>
       </nav>
 
-      <div className="flex-shrink-0 mt-4 pt-4 border-t border-zinc-900 flex flex-col gap-2">
+      <div className={`flex-shrink-0 mt-4 pt-4 border-t border-zinc-900 flex flex-col gap-2 ${isCollapsed ? 'items-center' : ''}`}>
         <input
           type="file"
           ref={importInputRef}
@@ -374,14 +408,29 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             e.target.value = '';
           }}
         />
-        <button onClick={() => importInputRef.current?.click()} className="flex items-center w-full px-4 py-2 bg-zinc-900/50 border border-zinc-800 text-zinc-300 font-semibold rounded-lg hover:bg-zinc-800 transition-all text-xs">
-          <FileUp className="w-4 h-4 mr-2" /> Importar Jogo
+        <button
+          onClick={() => importInputRef.current?.click()}
+          className={`flex items-center ${isCollapsed ? 'justify-center p-2' : 'w-full px-4 py-2'} bg-zinc-900/50 border border-zinc-800 text-zinc-300 font-semibold rounded-lg hover:bg-zinc-800 transition-all text-xs`}
+          title={isCollapsed ? "Importar Jogo" : undefined}
+        >
+          <FileUp className="w-4 h-4 flex-shrink-0" />
+          {!isCollapsed && <span className="ml-2 truncate">Importar Jogo</span>}
         </button>
-        <button onClick={handleExport} className="flex items-center w-full px-4 py-2 bg-zinc-900/50 border border-zinc-800 text-zinc-300 font-semibold rounded-lg hover:bg-zinc-800 transition-all text-xs">
-          <Download className="w-4 h-4 mr-2" /> Exportar Jogo
+        <button
+          onClick={handleExport}
+          className={`flex items-center ${isCollapsed ? 'justify-center p-2' : 'w-full px-4 py-2'} bg-zinc-900/50 border border-zinc-800 text-zinc-300 font-semibold rounded-lg hover:bg-zinc-800 transition-all text-xs`}
+          title={isCollapsed ? "Exportar Jogo" : undefined}
+        >
+          <Download className="w-4 h-4 flex-shrink-0" />
+          {!isCollapsed && <span className="ml-2 truncate">Exportar Jogo</span>}
         </button>
-        <button onClick={onTogglePreview} className="flex items-center w-full px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs">
-          <Eye className="w-4 h-4 mr-2" /> Pré-visualizar Jogo
+        <button
+          onClick={onTogglePreview}
+          className={`flex items-center ${isCollapsed ? 'justify-center p-2' : 'w-full px-4 py-2'} bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs`}
+          title={isCollapsed ? "Pré-visualizar Jogo" : undefined}
+        >
+          <Eye className="w-4 h-4 flex-shrink-0" />
+          {!isCollapsed && <span className="ml-2 truncate">Pré-visualizar</span>}
         </button>
       </div>
     </aside>
