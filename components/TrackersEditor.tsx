@@ -22,10 +22,10 @@ const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
 };
 
 const whiteChevron = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20' stroke-width='1.5' stroke='white'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='m5.25 7.5 4.5 4.5 4.5-4.5' /%3e%3c/svg%3e";
-const selectBaseClasses = "w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text appearance-none bg-no-repeat pr-8 focus:ring-0 [&>option]:bg-brand-sidebar";
+const selectBaseClasses = "w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 appearance-none bg-no-repeat pr-8 focus:ring-0 [&>option]:bg-zinc-950";
 const selectStyle = { backgroundImage: `url("${whiteChevron}")`, backgroundPosition: 'right 0.5rem center', backgroundSize: '1.25em' };
-const optionBaseClasses = "bg-brand-surface text-brand-text";
-const optionDimClasses = "bg-brand-surface text-brand-text-dim";
+const optionBaseClasses = "bg-zinc-950 text-zinc-300";
+const optionDimClasses = "bg-zinc-950 text-zinc-500";
 
 const TrackerItem: React.FC<{
     tracker: ConsequenceTracker;
@@ -43,11 +43,11 @@ const TrackerItem: React.FC<{
     }, [tracker.consequenceSceneId, allScenes]);
 
     return (
-        <div className={`bg-brand-bg rounded-md border ${isOpen ? 'border-brand-primary' : 'border-brand-border/50'} overflow-hidden transition-all duration-300 relative`}>
+        <div className={`bg-zinc-900/30 rounded-lg border ${isOpen ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.05)]' : 'border-zinc-800/80'} overflow-hidden transition-all duration-300 relative`}>
             {/* Header - Always visible summary */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className={`relative flex items-center p-4 cursor-pointer hover:bg-brand-surface/30 transition-colors overflow-hidden group ${isOpen ? 'bg-brand-primary/5 border-b border-brand-primary/20' : ''}`}
+                className={`relative flex items-center p-4 cursor-pointer hover:bg-zinc-800/50 transition-all overflow-hidden group ${isOpen ? 'bg-purple-500/5 border-b border-purple-500/10' : ''}`}
             >
                 {/* Sliding Trash Button */}
                 <button
@@ -60,35 +60,35 @@ const TrackerItem: React.FC<{
 
                 {/* Expansion Arrow */}
                 <ChevronDown
-                    className={`w-5 h-5 text-brand-text-dim transition-transform duration-300 mr-4 shrink-0 ${isOpen ? '-rotate-90' : 'rotate-0'}`}
+                    className={`w-4 h-4 text-zinc-600 transition-transform duration-300 mr-4 shrink-0 ${isOpen ? '-rotate-90' : 'rotate-0'}`}
                 />
 
                 <div className="flex flex-1 items-center overflow-hidden h-6">
                     {/* Nome & ID */}
-                    <div className="flex items-center gap-2 min-w-0 pr-6 border-r border-brand-border/30 h-full">
-                        <span className="text-[10px] uppercase font-bold text-brand-text-dim shrink-0">Nome:</span>
+                    <div className="flex items-center gap-2 min-w-0 pr-6 border-r border-zinc-800 h-full">
+                        <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Nome:</span>
                         <div className="flex items-center truncate">
-                            <span className="text-sm font-normal text-brand-primary truncate">{tracker.name || '(Sem nome)'}</span>
-                            <span className="ml-2 text-[10px] text-brand-text-dim font-mono opacity-50 shrink-0">({tracker.id})</span>
+                            <span className="text-xs font-bold text-white truncate">{tracker.name || '(Sem nome)'}</span>
+                            <span className="ml-2 text-[10px] text-zinc-600 font-mono opacity-50 shrink-0">({tracker.id})</span>
                         </div>
                     </div>
 
                     {/* Alcance */}
-                    <div className="flex items-center gap-2 min-w-0 px-6 border-r border-brand-border/30 h-full">
-                        <span className="text-[10px] uppercase font-bold text-brand-text-dim shrink-0">Início / Max:</span>
-                        <span className="text-sm font-normal text-brand-primary truncate">{tracker.initialValue} / {tracker.maxValue}</span>
+                    <div className="flex items-center gap-2 min-w-0 px-6 border-r border-zinc-800 h-full">
+                        <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Início / Max:</span>
+                        <span className="text-xs font-bold text-purple-400 truncate">{tracker.initialValue} / {tracker.maxValue}</span>
                     </div>
 
                     {/* Cena */}
                     <div className="flex items-center gap-2 min-w-0 px-6 h-full">
-                        <span className="text-[10px] uppercase font-bold text-brand-text-dim shrink-0">Consequência.:</span>
-                        <span className="text-sm font-normal text-brand-primary truncate">{consequenceSceneName}</span>
+                        <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Cena:</span>
+                        <span className="text-xs font-bold text-purple-400 truncate">{consequenceSceneName}</span>
                     </div>
 
                     {/* Color Indicator */}
                     {tracker.barColor && (
                         <div className="ml-auto flex items-center gap-2 shrink-0">
-                            <div className="w-3 h-3 rounded-full border border-brand-border/50" style={{ backgroundColor: tracker.barColor }}></div>
+                            <div className="w-2.5 h-2.5 rounded-full border border-white/20 shadow-[0_0_8px_rgba(255,255,255,0.1)]" style={{ backgroundColor: tracker.barColor }}></div>
                         </div>
                     )}
                 </div>
@@ -100,45 +100,45 @@ const TrackerItem: React.FC<{
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Rastreador</label>
+                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Nome do Rastreador</label>
                                 <input
                                     type="text"
                                     value={tracker.name}
                                     onChange={e => onUpdate(tracker.id, 'name', e.target.value)}
-                                    className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text focus:ring-0"
+                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                     placeholder="Nome do Rastreador"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Rastreador</label>
-                                <p className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all">
+                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">ID do Rastreador</label>
+                                <p className="w-full bg-zinc-950/50 border border-zinc-900 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all">
                                     {tracker.id}
                                 </p>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-sm font-medium text-brand-text-dim mb-1">Valor Inicial</label>
+                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Valor Inicial</label>
                                     <input
                                         type="number"
                                         value={tracker.initialValue}
                                         onChange={e => onUpdate(tracker.id, 'initialValue', parseInt(e.target.value, 10) || 0)}
-                                        className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-sm font-medium text-brand-text-dim mb-1">Valor Máximo</label>
+                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Valor Máximo</label>
                                     <input
                                         type="number"
                                         value={tracker.maxValue}
                                         onChange={e => onUpdate(tracker.id, 'maxValue', parseInt(e.target.value, 10) || 0)}
-                                        className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                     />
                                 </div>
                             </div>
                         </div>
                         <div className="space-y-4">
                             <div>
-                                <label className="block text-sm font-medium text-brand-text-dim mb-1">Consequência</label>
+                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Consequência</label>
                                 <select
                                     value={tracker.consequenceSceneId}
                                     onChange={e => onUpdate(tracker.id, 'consequenceSceneId', e.target.value)}
@@ -152,29 +152,29 @@ const TrackerItem: React.FC<{
                                         </option>
                                     ))}
                                 </select>
-                                <p className="text-xs text-brand-text-dim mt-1">
+                                <p className="text-[10px] text-zinc-600 mt-2 italic">
                                     O jogador irá para esta cena quando o valor máximo for atingido.
                                 </p>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-brand-text-dim mb-1">Cor da Barra (Opcional)</label>
+                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Cor da Barra (Opcional)</label>
                                 <div className="flex items-center gap-2">
                                     <input
                                         type="text"
                                         value={tracker.barColor || ''}
                                         onChange={e => onUpdate(tracker.id, 'barColor', e.target.value)}
-                                        placeholder="Use cor global"
-                                        className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                                        placeholder="Hex: #ffffff"
+                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                     />
                                     <input
                                         type="color"
-                                        value={tracker.barColor || '#58a6ff'}
+                                        value={tracker.barColor || '#a855f7'}
                                         onChange={e => onUpdate(tracker.id, 'barColor', e.target.value)}
-                                        className="w-10 h-10 p-1 bg-transparent border-none rounded-md cursor-pointer"
+                                        className="w-8 h-8 p-1 bg-transparent border-none rounded-lg cursor-pointer"
                                     />
                                 </div>
                             </div>
-                            <div className="flex flex-col space-y-2 pt-2">
+                            <div className="flex flex-col space-y-3 pt-2">
                                 <div className="flex items-center">
                                     <input
                                         type="checkbox"
@@ -183,7 +183,7 @@ const TrackerItem: React.FC<{
                                         onChange={e => onUpdate(tracker.id, 'invertBar', e.target.checked)}
                                         className="custom-checkbox"
                                     />
-                                    <label htmlFor={`invertBar-${tracker.id}`} className="ml-2 block text-sm text-brand-text-dim">
+                                    <label htmlFor={`invertBar-${tracker.id}`} className="ml-2 block text-xs text-zinc-500 font-medium">
                                         Inverter preenchimento da barra
                                     </label>
                                 </div>
@@ -195,7 +195,7 @@ const TrackerItem: React.FC<{
                                         onChange={e => onUpdate(tracker.id, 'hideValue', e.target.checked)}
                                         className="custom-checkbox"
                                     />
-                                    <label htmlFor={`hideValue-${tracker.id}`} className="ml-2 block text-sm text-brand-text-dim">
+                                    <label htmlFor={`hideValue-${tracker.id}`} className="ml-2 block text-xs text-zinc-500 font-medium">
                                         Ocultar valores numéricos no jogo
                                     </label>
                                 </div>
@@ -203,8 +203,8 @@ const TrackerItem: React.FC<{
                         </div>
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-brand-border/50">
-                        <h4 className="text-sm font-semibold text-brand-text mb-3">Onde este Rastreador é Usado?</h4>
+                    <div className="mt-8 pt-6 border-t border-zinc-900">
+                        <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Uso do Rastreador</h4>
                         {usages.length > 0 ? (
                             <ul className="space-y-2">
                                 {usages.map(({ scene, interaction, effect }, index) => {
@@ -214,15 +214,15 @@ const TrackerItem: React.FC<{
                                         <li key={`${interaction.id}-${index}`}>
                                             <button
                                                 onClick={() => onSelectScene(scene.id)}
-                                                className="w-full flex justify-between items-center text-left p-3 bg-brand-surface rounded-md border border-brand-border/50 hover:bg-brand-border/30 transition-colors"
+                                                className="w-full flex justify-between items-center text-left p-3 bg-zinc-950/50 rounded-lg border border-zinc-900 hover:border-zinc-800 transition-all shadow-sm"
                                                 title={`Ir para a cena: ${scene.name}`}
                                             >
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-semibold text-brand-text truncate" title={scene.name}>{scene.name}</p>
-                                                    <p className="text-xs text-brand-text-dim truncate" title={interactionDesc}>{interactionDesc}</p>
+                                                    <p className="text-xs font-bold text-zinc-200 truncate" title={scene.name}>{scene.name}</p>
+                                                    <p className="text-xs text-zinc-600 truncate italic" title={interactionDesc}>{interactionDesc}</p>
                                                 </div>
                                                 <div className="flex-shrink-0 ml-4 text-center">
-                                                    <span className={`font-bold text-lg ${effect.valueChange >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                    <span className={`font-mono font-bold text-xs px-2 py-1 rounded-md ${effect.valueChange >= 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
                                                         {effect.valueChange >= 0 ? '+' : ''}{effect.valueChange}
                                                     </span>
                                                 </div>
@@ -232,8 +232,8 @@ const TrackerItem: React.FC<{
                                 })}
                             </ul>
                         ) : (
-                            <div className="text-center p-4 bg-brand-surface border-2 border-dashed border-brand-border rounded-md">
-                                <p className="text-brand-text-dim text-sm">Este rastreador ainda não é modificado por nenhuma interação.</p>
+                            <div className="text-center p-8 bg-zinc-950/20 border-2 border-dashed border-zinc-900/50 rounded-xl">
+                                <p className="text-zinc-600 text-xs italic">Este rastreador ainda não é modificado por nenhuma interação.</p>
                             </div>
                         )}
                     </div>
@@ -311,14 +311,14 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
         <div className="space-y-6 pb-24">
             <div className="flex justify-between items-start">
                 <div>
-                    <p className="text-brand-text-dim mt-1 text-sm">
+                    <p className="text-zinc-500 mt-1 text-xs font-medium">
                         Crie e gerencie variáveis que mudam com as ações do jogador (ex: Vida, Dinheiro, Sanidade).
                     </p>
                 </div>
                 <div className="flex items-center gap-4 flex-shrink-0 mt-1">
                     {isDirty && (
-                        <div className="flex items-center gap-2 text-yellow-400 text-xs font-medium animate-pulse">
-                            <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                        <div className="flex items-center gap-2 text-purple-400 text-xs font-bold uppercase tracking-widest animate-pulse">
+                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
                             <span>Alterações não salvas</span>
                         </div>
                     )}
@@ -339,7 +339,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                         />
                     ))
                 ) : (
-                    <p className="text-center text-brand-text-dim py-8 border-2 border-dashed border-brand-border/50 rounded-md bg-brand-surface/30">Nenhum rastreador criado.</p>
+                    <p className="text-center text-zinc-500 py-16 border-2 border-dashed border-zinc-800/50 rounded-xl bg-zinc-950/20 italic text-xs">Nenhum rastreador criado.</p>
                 )}
             </div>
 
@@ -347,9 +347,9 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
             <div className="fixed bottom-6 left-[calc(25%+2.5rem)] xl:left-[calc(20%+2.5rem)] z-10 flex gap-2">
                 <button
                     onClick={handleAddTracker}
-                    className="flex items-center px-6 py-3 bg-brand-primary text-brand-bg font-bold rounded-md hover:bg-brand-primary-hover transition-colors shadow-lg"
+                    className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
                 >
-                    <Plus className="w-5 h-5 mr-2" />
+                    <Plus className="w-4 h-4 mr-2" />
                     Novo Rastreador
                 </button>
             </div>
@@ -358,14 +358,14 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                 <button
                     onClick={handleUndo}
                     disabled={!isDirty}
-                    className="px-6 py-2 bg-brand-surface border border-brand-border text-brand-text-dim font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 font-bold rounded-lg hover:bg-zinc-800 transition-all text-xs disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                     Desfazer
                 </button>
                 <button
                     onClick={handleSave}
                     disabled={!isDirty}
-                    className="px-6 py-2 bg-yellow-400 text-black font-semibold rounded-md hover:bg-yellow-500 transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-xl"
                     title="Salvar"
                 >
                     Salvar Alterações

@@ -309,20 +309,20 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         <div className="space-y-6 pb-24">
             <div className="flex justify-between items-start">
                 <div>
-                    <p className="text-brand-text-dim mt-1 text-sm">
+                    <p className="text-zinc-500 mt-1 text-[10px]">
                         Defina a imagem, descrição, objetos e interações para esta cena.
                     </p>
                 </div>
                 <div className="flex items-center gap-4 flex-shrink-0 mt-1">
                     {isDirty && (
-                        <div className="flex items-center gap-2 text-yellow-400 text-xs font-medium animate-pulse">
-                            <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
-                            <span>Alterações não salvas</span>
+                        <div className="flex items-center gap-2 text-purple-400 text-[10px] font-bold animate-pulse bg-purple-500/5 px-2 py-1 rounded-md border border-purple-500/10">
+                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                            <span>ALTERAÇÕES NÃO SALVAS</span>
                         </div>
                     )}
                     <button
                         onClick={() => onCopyScene(localScene)}
-                        className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors"
+                        className="flex items-center px-3 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold rounded-md hover:bg-zinc-800 transition-colors text-xs"
                         title="Copiar Cena"
                     >
                         Copiar Cena
@@ -331,8 +331,8 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
             </div>
 
             <div>
-                <div className="border-b border-brand-border flex justify-between items-end">
-                    <div className="flex space-x-1">
+                <div className="border-b border-zinc-800 flex justify-between items-end">
+                    <div className="flex space-x-6">
                         {Object.entries(TABS).map(([key, name]) => {
                             const isTabDisabled = localScene.isEndingScene && (key === 'objects' || key === 'interactions');
                             return (
@@ -340,10 +340,10 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                     key={key}
                                     onClick={() => !isTabDisabled && setActiveTab(key as any)}
                                     disabled={isTabDisabled}
-                                    className={`px-4 py-2 font-semibold text-sm rounded-t-md transition-colors ${activeTab === key
-                                        ? 'bg-brand-surface text-brand-primary'
-                                        : 'text-brand-text-dim hover:text-brand-text'
-                                        } ${isTabDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === key
+                                        ? 'text-purple-400 border-b-2 border-purple-500'
+                                        : 'text-zinc-500 hover:text-zinc-300'
+                                        } ${isTabDisabled ? 'opacity-30 cursor-not-allowed' : ''}`}
                                 >
                                     {name}
                                 </button>
@@ -357,21 +357,21 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                     )}
                 </div>
 
-                <div className="bg-brand-surface -mt-px p-6">
+                <div className="bg-zinc-950 pt-6">
                     {activeTab === 'properties' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                             <div className="space-y-4 flex flex-col order-2 md:order-1">
                                 {/* Name and ID Column */}
                                 <div className="space-y-4">
                                     <div>
-                                        <label htmlFor="sceneName" className="block text-sm font-medium text-brand-text-dim mb-1">Nome da Cena</label>
-                                        <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-brand-bg border border-brand-border rounded-md px-3 py-2 focus:ring-0 text-sm" />
+                                        <label htmlFor="sceneName" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Nome da Cena</label>
+                                        <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                     </div>
                                     <div>
-                                        <label htmlFor="sceneId" className="block text-sm font-medium text-brand-text-dim mb-1">ID da Cena</label>
+                                        <label htmlFor="sceneId" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">ID da Cena</label>
                                         <p
                                             id="sceneId"
-                                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
+                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all"
                                             title="O ID da cena é único e não pode ser alterado."
                                         >
                                             {localScene.id}
@@ -380,25 +380,25 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                 </div>
 
                                 <div className="flex flex-col flex-1 min-h-0 pt-2">
-                                    <label htmlFor="sceneDescription" className="block text-sm font-medium text-brand-text-dim mb-1">
+                                    <label htmlFor="sceneDescription" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">
                                         {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição'}
                                     </label>
-                                    <p className="text-xs text-brand-text-dim -mt-1 mb-2">Use <code>&lt;palavra&gt;</code> para destacar texto clicável.</p>
+                                    <p className="text-[10px] text-zinc-500 -mt-2 mb-2">Use <code>&lt;palavra&gt;</code> para destacar texto clicável.</p>
                                     <div className="relative flex-1">
-                                        <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-brand-bg border border-brand-border rounded-md px-3 py-2 resize-y focus:ring-0 text-sm" />
+                                        <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 resize-y focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                     </div>
                                 </div>
                             </div>
 
                             <div className="flex flex-col space-y-4 order-1 md:order-2">
                                 <div className="flex flex-col flex-grow min-h-[300px]">
-                                    <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem da Cena</label>
+                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Imagem da Cena</label>
                                     <div className="relative flex-grow w-full">
                                         {localScene.image ? (
-                                            <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
+                                            <div className="absolute inset-0 w-full h-full border border-zinc-800 rounded-lg overflow-hidden bg-zinc-950 group">
                                                 <img src={localScene.image} alt={localScene.name} className="w-full h-full object-cover" />
                                                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
-                                                    <label htmlFor="image-upload-input" className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover flex items-center gap-2 font-semibold text-sm">
+                                                    <label htmlFor="image-upload-input" className="p-2 bg-white text-zinc-950 rounded-lg cursor-pointer hover:bg-zinc-200 flex items-center gap-2 font-bold text-[10px] uppercase tracking-widest shadow-lg">
                                                         <Upload className="w-5 h-5" />
                                                         <span className="hidden sm:inline">Alterar</span>
                                                         <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
@@ -415,32 +415,32 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                         ) : (
                                             <label
                                                 htmlFor="image-upload-input"
-                                                className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
+                                                className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-zinc-900/30 rounded-xl cursor-pointer hover:bg-zinc-800/50 hover:border-purple-500/50 transition-all ${isDraggingOver ? 'border-purple-500 bg-purple-500/10' : 'border-zinc-800'}`}
                                                 onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                                 onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                                 onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
                                                 onDrop={handleDrop}
                                             >
-                                                <Upload className="w-8 h-8 text-brand-text-dim mb-2" />
-                                                <span className="text-sm font-semibold text-brand-text">Clique para Enviar</span>
-                                                <span className="text-xs text-brand-text-dim mt-1">ou arraste e solte</span>
+                                                <Upload className="w-8 h-8 text-zinc-700 mb-2 transition-colors group-hover:text-purple-400" />
+                                                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest group-hover:text-zinc-300">Clique para Enviar</span>
+                                                <span className="text-[10px] text-zinc-600 mt-1">ou arraste e solte</span>
                                                 <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                             </label>
                                         )}
                                     </div>
                                     {/* MODIFICADO: Recomendação contextual incluindo tamanho em pixels */}
-                                    <p className="text-xs text-brand-text-dim text-center mt-3">
+                                    <p className="text-[10px] text-zinc-600 text-center mt-3 font-medium italic">
                                         {layoutOrientation === 'vertical'
                                             ? "Recomendado imagens em pé (ex: 9:16). Sugestão: 720x1280 pixels."
                                             : "Recomendado imagens deitadas (ex: 16:9). Sugestão: 1280x720 pixels."}
                                     </p>
                                 </div>
 
-                                <div className="pt-4 border-t border-brand-border/30">
-                                    <label className="block text-sm font-medium text-brand-text-dim mb-2">Trilha sonora da cena</label>
+                                <div className="pt-4 border-t border-zinc-800">
+                                    <label className="block text-sm font-medium text-zinc-400 mb-2">Trilha sonora da cena</label>
                                     <div className="flex items-center gap-2">
-                                        <label className="flex-grow flex items-center justify-center px-3 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors cursor-pointer text-xs">
-                                            <Upload className="w-4 h-4 mr-2" /> {localScene.backgroundMusic ? 'Alterar Trilha' : 'Carregar Trilha (.mp3)'}
+                                        <label className="flex-grow flex items-center justify-center px-3 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold rounded-lg hover:bg-zinc-800 transition-all cursor-pointer text-xs">
+                                            <Upload className="w-4 h-4 mr-2 text-purple-400" /> {localScene.backgroundMusic ? 'Alterar Trilha' : 'Carregar Trilha (.mp3)'}
                                             <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={handleMusicUpload} className="hidden" />
                                         </label>
                                         {localScene.backgroundMusic && (
@@ -453,11 +453,11 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                             </button>
                                         )}
                                     </div>
-                                    <p className="text-[10px] text-brand-text-dim mt-1 italic">Deixe vazio para continuar tocando a música da cena anterior.</p>
+                                    <p className="text-[10px] text-zinc-600 mt-1 italic">Deixe vazio para continuar tocando a música da cena anterior.</p>
                                 </div>
 
                                 {!isStartScene && (
-                                    <div className="space-y-4 pt-4 border-t border-brand-border/30">
+                                    <div className="space-y-4 pt-4 border-t border-zinc-800/50">
                                         <div className="flex items-center">
                                             <input
                                                 type="checkbox"
@@ -467,7 +467,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                 className="custom-checkbox"
                                                 disabled={isAnyCheckboxChecked && !localScene.isEndingScene}
                                             />
-                                            <label htmlFor="isEndingScene" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
+                                            <label htmlFor="isEndingScene" className={`ml-2 block text-xs font-bold text-zinc-500 uppercase tracking-widest ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
                                                 Esta cena vence o jogo.
                                             </label>
                                         </div>
@@ -480,7 +480,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                 className="custom-checkbox"
                                                 disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
                                             />
-                                            <label htmlFor="removesChance" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
+                                            <label htmlFor="removesChance" className={`ml-2 block text-xs font-bold text-zinc-500 uppercase tracking-widest ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
                                                 Esta cena remove uma chance.
                                             </label>
                                         </div>
@@ -493,7 +493,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                 className="custom-checkbox"
                                                 disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
                                             />
-                                            <label htmlFor="restoresChance" className={`ml-2 block text-sm text-brand-text-dim ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
+                                            <label htmlFor="restoresChance" className={`ml-2 block text-xs font-bold text-zinc-500 uppercase tracking-widest ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
                                                 Esta cena restaura uma chance.
                                             </label>
                                         </div>
@@ -541,22 +541,22 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
             <div className="fixed bottom-6 right-10 z-10 flex gap-2">
                 <button
                     onClick={handlePreview}
-                    className="px-6 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200"
+                    className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold rounded-lg hover:bg-zinc-800 transition-all text-xs"
                 >
-                    <Eye className="w-5 h-5 inline-block mr-2" />
+                    <Eye className="w-4 h-4 inline-block mr-2" />
                     Testar Cena
                 </button>
                 <button
                     onClick={handleUndo}
                     disabled={!isDirty}
-                    className="px-6 py-2 bg-brand-surface border border-brand-border text-brand-text-dim font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-500 font-semibold rounded-lg hover:bg-zinc-800 transition-all text-xs disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                     Desfazer
                 </button>
                 <button
                     onClick={handleSave}
                     disabled={!isDirty}
-                    className="px-6 py-2 bg-yellow-400 text-black font-semibold rounded-md hover:bg-yellow-500 transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed"
                 >
                     Salvar
                 </button>

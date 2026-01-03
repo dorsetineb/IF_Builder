@@ -55,9 +55,9 @@ const SceneList: React.FC<SceneListProps> = ({
         {scenes.map((scene, index) => (
           <li
             key={scene.id}
-            className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-md transition-colors overflow-hidden ${selectedSceneId === scene.id
-              ? 'bg-yellow-400 text-black'
-              : 'hover:bg-brand-border/50'
+            className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-lg transition-all overflow-hidden ${selectedSceneId === scene.id
+              ? 'bg-purple-500/20 text-purple-100 border border-purple-500/30'
+              : 'hover:bg-zinc-800/50'
               } ${scene.id === startSceneId ? 'cursor-default' : ''}`}
             onDragStart={(e) => scene.id !== startSceneId && handleDragStart(e, index)}
             onDragEnter={(e) => scene.id !== startSceneId && handleDragEnter(e, index)}
@@ -67,16 +67,16 @@ const SceneList: React.FC<SceneListProps> = ({
           >
             <div className={`flex items-center flex-grow p-2`}>
               {scene.id !== startSceneId ? (
-                <Menu className={`w-5 h-5 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? 'text-black' : 'text-brand-text-dim'}`} />
+                <Menu className={`w-4 h-4 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? 'text-purple-400' : 'text-zinc-600'}`} />
               ) : null}
 
               <div
                 className={`flex-1 min-w-0 flex items-center justify-between ${scene.id !== startSceneId ? 'cursor-pointer' : ''}`}
                 onClick={() => onSelectScene(scene.id)}
               >
-                <span className="truncate font-medium">{scene.name}</span>
+                <span className="truncate font-medium text-xs">{scene.name}</span>
                 {startSceneId === scene.id && (
-                  <span className={`ml-2 text-xs font-bold px-2 py-0.5 rounded-full ${selectedSceneId === scene.id ? 'bg-black/20 text-black' : 'bg-yellow-400/20 text-yellow-300'
+                  <span className={`ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${selectedSceneId === scene.id ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' : 'bg-zinc-800 text-zinc-400 border-zinc-700'
                     }`}>
                     Início
                   </span>
@@ -98,9 +98,9 @@ const SceneList: React.FC<SceneListProps> = ({
       </ul>
       <button
         onClick={onAddScene}
-        className="w-full flex items-center justify-start px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
+        className="w-full flex items-center justify-center px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold rounded-lg hover:bg-zinc-800 transition-all text-xs"
       >
-        <Plus className="w-5 h-5 mr-2" />
+        <Plus className="w-4 h-4 mr-2 text-purple-400" />
         Adicionar Cena
       </button>
     </div>

@@ -56,78 +56,78 @@ const SceneObjectItem: React.FC<{
     };
 
     return (
-        <div className="relative pt-6 p-4 bg-brand-bg rounded-md border border-brand-border/50">
+        <div className="relative pt-6 p-4 bg-zinc-950/50 rounded-lg border border-zinc-800">
             <button
                 onClick={() => onUnlinkObject(sceneId, obj.id)}
-                className="absolute top-0 right-0 p-2 bg-brand-border text-brand-text-dim rounded-bl-lg hover:bg-red-500 hover:text-white transition-colors"
+                className="absolute top-0 right-0 p-2 bg-zinc-800 text-zinc-500 rounded-bl-lg hover:bg-red-500/80 hover:text-white transition-all"
                 title="Desvincular objeto desta cena (não apaga do jogo)"
             >
-                <Trash2 className="w-5 h-5" />
+                <Trash2 className="w-4 h-4" />
             </button>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                 {/* Editable fields */}
                 <div className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Objeto</label>
+                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 px-1">Nome do Objeto</label>
                         <input
                             type="text"
                             value={obj.name}
                             onChange={(e) => onUpdateGlobalObject(obj.id, { name: e.target.value })}
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                            className="w-full bg-zinc-950/50 border border-zinc-800 rounded-md px-3 py-2 text-xs focus:ring-0"
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
+                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 px-1">ID do Objeto</label>
                         <p
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
+                            className="w-full bg-zinc-900/30 border border-zinc-800 rounded-md px-3 py-2 text-xs text-zinc-500 font-mono select-all"
                             title="Use este ID para referência interna."
                         >
                             {obj.id}
                         </p>
                     </div>
                     <div className="flex flex-col">
-                        <label className="block text-sm font-medium text-brand-text-dim mb-1">Descrição ao olhar/examinar</label>
+                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-1 px-1">Descrição ao olhar/examinar</label>
                         <textarea
                             value={obj.examineDescription}
                             onChange={(e) => onUpdateGlobalObject(obj.id, { examineDescription: e.target.value })}
                             rows={4}
-                            className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0"
+                            className="w-full bg-zinc-950/50 border border-zinc-800 rounded-md px-3 py-2 text-xs focus:ring-0"
                         />
                     </div>
                 </div>
                 {/* Image Upload Column */}
                 <div className="flex flex-col space-y-3 h-full">
-                    <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem do Objeto</label>
+                    <label className="block text-[10px] font-bold text-brand-text-dim mb-1">Imagem do Objeto</label>
                     <div className="relative flex-grow w-full min-h-[150px]">
                         {obj.image ? (
                             <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group">
                                 <img src={obj.image} alt={obj.name} className="w-full h-full object-cover bg-brand-bg" />
                                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
-                                    <label htmlFor={`image-upload-${obj.id}`} className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover flex items-center gap-2 font-semibold text-sm">
-                                        <Upload className="w-5 h-5" />
+                                    <label htmlFor={`image-upload-${obj.id}`} className="p-2 bg-white text-zinc-950 rounded-lg cursor-pointer hover:bg-zinc-200 flex items-center gap-2 font-bold text-xs transition-all">
+                                        <Upload className="w-4 h-4" />
                                         <span className="hidden sm:inline">Alterar</span>
                                         <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                     </label>
                                     <button
                                         onClick={() => onUpdateGlobalObject(obj.id, { image: '' })}
-                                        className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
+                                        className="p-2 bg-red-500/80 text-white rounded-lg hover:bg-red-600 transition-all"
                                         title="Remover Imagem"
                                     >
-                                        <Trash2 className="w-5 h-5" />
+                                        <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
                         ) : (
                             <label
                                 htmlFor={`image-upload-${obj.id}`}
-                                className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
+                                className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-zinc-950/50 rounded-lg cursor-pointer hover:bg-zinc-800 transition-all ${isDraggingOver ? 'border-purple-500 bg-purple-500/5' : 'border-zinc-800'}`}
                                 onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                 onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                 onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
                                 onDrop={handleDrop}
                             >
-                                <Upload className="w-8 h-8 text-brand-text-dim mb-2" />
-                                <span className="text-xs text-brand-text-dim">Carregar Imagem</span>
+                                <Upload className="w-6 h-6 text-zinc-600 mb-2" />
+                                <span className="text-xs text-zinc-500 font-medium">Carregar Imagem</span>
                                 <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                             </label>
                         )}
@@ -182,30 +182,30 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                         />
                     ))
                 ) : (
-                    <p className="text-center text-brand-text-dim">Nenhum objeto vinculado a esta cena.</p>
+                    <p className="text-center text-zinc-500 py-12 text-xs italic">Nenhum objeto vinculado a esta cena.</p>
                 )}
             </div>
 
             <div className="mt-8 pt-6 border-t border-brand-border bg-brand-surface rounded-md p-4">
-                <h4 className="text-sm font-bold text-brand-text mb-4">Adicionar Objeto à Cena</h4>
+                <h4 className="text-[10px] font-bold text-white uppercase tracking-widest mb-4">Adicionar Objeto à Cena</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                        <p className="text-sm text-brand-text-dim">Crie um novo objeto:</p>
+                    <div className="space-y-4">
+                        <p className="text-xs text-zinc-500">Crie um novo objeto:</p>
                         <button
                             onClick={handleCreateNewObject}
-                            className="w-full flex items-center justify-center px-4 py-2 bg-brand-primary/20 text-brand-primary font-semibold rounded-md hover:bg-brand-primary/30 transition-colors duration-200"
+                            className="w-full flex items-center justify-center px-4 py-2 bg-zinc-950 border border-zinc-800 text-white font-bold rounded-lg hover:bg-zinc-900 transition-all text-xs"
                         >
-                            <Plus className="w-5 h-5 mr-2" />
+                            <Plus className="w-4 h-4 mr-2 text-purple-400" />
                             Criar Novo Objeto
                         </button>
                     </div>
-                    <div className="space-y-2 md:border-l md:border-brand-border/30 md:pl-6">
-                        <p className="text-sm text-brand-text-dim">Ou vincule um existente:</p>
+                    <div className="space-y-4 md:border-l md:border-zinc-800 md:pl-6">
+                        <p className="text-xs text-zinc-500">Ou vincule um existente:</p>
                         <div className="flex gap-2">
                             <select
                                 value={selectedGlobalObjectId}
                                 onChange={(e) => setSelectedGlobalObjectId(e.target.value)}
-                                className="flex-grow bg-brand-bg border border-brand-border rounded-md px-3 py-2 text-sm focus:ring-0 [&>option]:bg-brand-sidebar"
+                                className="flex-grow bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs focus:ring-0 [&>option]:bg-zinc-950"
                             >
                                 <option value="">Selecione um objeto...</option>
                                 {availableObjects.map(obj => (
@@ -215,7 +215,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                             <button
                                 onClick={handleLinkExistingObject}
                                 disabled={!selectedGlobalObjectId}
-                                className="px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold rounded-lg hover:bg-zinc-800 transition-all text-xs disabled:opacity-30 disabled:cursor-not-allowed"
                             >
                                 Vincular
                             </button>

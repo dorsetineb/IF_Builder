@@ -21,28 +21,28 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {/* Input Scenes Column */}
-      <div className="space-y-3">
-        <h4 className="flex items-center gap-2 text-md font-semibold text-brand-text-dim border-b border-brand-border pb-2">
+      <div className="space-y-4">
+        <h4 className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-3">
           Entradas
-          <span className="bg-white text-brand-bg text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+          <span className="bg-purple-500/20 text-purple-400 text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-purple-500/20">
             {inputConnections.length}
           </span>
         </h4>
-        <p className="text-xs text-brand-text-dim -mt-2">Cenas que <b>trazem</b> o jogador para esta cena.</p>
+        <p className="text-[10px] text-zinc-600 -mt-2 italic">Cenas que <b>trazem</b> o jogador para esta cena.</p>
         <div className="space-y-3">
           {inputConnections.length > 0 ? (
             inputConnections.map(({ scene, interactions }) => (
               <div
                 key={scene.id}
-                className="w-full text-left p-3 bg-brand-bg border border-brand-border rounded-md"
+                className="w-full text-left p-4 bg-zinc-950/50 border border-zinc-800 rounded-lg group hover:border-zinc-700 transition-all shadow-sm"
               >
-                <button onClick={() => onSelectScene(scene.id)} className="w-full text-left rounded-md -m-1 p-1 hover:bg-brand-border/30 transition-colors">
-                  <p className="font-semibold text-brand-text">{scene.name}</p>
-                  <p className="text-xs font-mono text-brand-text-dim">{scene.id}</p>
+                <button onClick={() => onSelectScene(scene.id)} className="w-full text-left rounded-md -m-1 p-1 hover:bg-zinc-800/50 transition-all">
+                  <p className="font-bold text-zinc-200 text-xs">{scene.name}</p>
+                  <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-tighter">{scene.id}</p>
                 </button>
-                <div className="mt-2 pt-2 border-t border-brand-border/50 text-xs space-y-1">
+                <div className="mt-3 pt-3 border-t border-zinc-800/50 text-xs space-y-2">
                   {interactions.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2 font-semibold text-brand-text-dim px-2 mb-1">
+                    <div className="grid grid-cols-3 gap-2 text-[9px] font-bold text-zinc-600 uppercase tracking-widest px-2 mb-1">
                       <span>Verbos</span>
                       <span>Alvo</span>
                       <span>Requer</span>
@@ -52,10 +52,10 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                     const targetObject = allObjectsMap.get(inter.target);
                     const targetName = targetObject ? targetObject.name : (inter.target || '-');
                     return (
-                      <div key={inter.id} className="grid grid-cols-3 gap-2 text-brand-text bg-brand-surface p-2 rounded items-center">
-                        <span className="truncate" title={inter.verbs.join(', ')}>{inter.verbs.join(', ')}</span>
+                      <div key={inter.id} className="grid grid-cols-3 gap-2 text-zinc-400 bg-zinc-950/80 p-2 rounded-md border border-zinc-800/50 items-center text-[11px]">
+                        <span className="truncate font-medium" title={inter.verbs.join(', ')}>{inter.verbs.join(', ')}</span>
                         <span className="truncate" title={targetName}>{targetName}</span>
-                        <span className="truncate" title={inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory) ? allObjectsMap.get(inter.requiresInInventory)!.name : '-'}>
+                        <span className="truncate italic text-zinc-500" title={inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory) ? allObjectsMap.get(inter.requiresInInventory)!.name : '-'}>
                           {inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory)
                             ? allObjectsMap.get(inter.requiresInInventory)!.name
                             : '-'}
@@ -67,34 +67,34 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
               </div>
             ))
           ) : (
-            <p className="text-brand-text-dim text-sm text-center py-4 bg-brand-bg rounded-md">Nenhuma cena leva diretamente para aqui.</p>
+            <p className="text-zinc-500 text-xs text-center py-8 bg-zinc-950/20 border-2 border-dashed border-zinc-900/50 rounded-xl italic">Nenhuma cena leva diretamente para aqui.</p>
           )}
         </div>
       </div>
 
       {/* Output Scenes Column */}
-      <div className="space-y-3">
-        <h4 className="flex items-center gap-2 text-md font-semibold text-brand-text-dim border-b border-brand-border pb-2">
-            Saídas
-            <span className="bg-white text-brand-bg text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                {outputConnections.length}
-            </span>
+      <div className="space-y-4">
+        <h4 className="flex items-center gap-2 text-xs font-bold text-zinc-500 uppercase tracking-widest border-b border-zinc-800 pb-3">
+          Saídas
+          <span className="bg-purple-500/20 text-purple-400 text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-purple-500/20">
+            {outputConnections.length}
+          </span>
         </h4>
-        <p className="text-xs text-brand-text-dim -mt-2">Cenas que o usuário pode chegar <b>partindo</b> desta cena.</p>
+        <p className="text-[10px] text-zinc-600 -mt-2 italic">Cenas que o usuário pode chegar <b>partindo</b> desta cena.</p>
         <div className="space-y-3">
           {outputConnections.length > 0 ? (
             outputConnections.map(({ scene, interactions }) => (
               <div
                 key={scene.id}
-                className="w-full text-left p-3 bg-brand-bg border border-brand-border rounded-md"
+                className="w-full text-left p-4 bg-zinc-950/50 border border-zinc-800 rounded-lg group hover:border-zinc-700 transition-all shadow-sm"
               >
-                <button onClick={() => onSelectScene(scene.id)} className="w-full text-left rounded-md -m-1 p-1 hover:bg-brand-border/30 transition-colors">
-                  <p className="font-semibold text-brand-text">{scene.name}</p>
-                  <p className="text-xs font-mono text-brand-text-dim">{scene.id}</p>
+                <button onClick={() => onSelectScene(scene.id)} className="w-full text-left rounded-md -m-1 p-1 hover:bg-zinc-800/50 transition-all">
+                  <p className="font-bold text-zinc-200 text-xs">{scene.name}</p>
+                  <p className="text-[10px] font-mono text-zinc-600 uppercase tracking-tighter">{scene.id}</p>
                 </button>
-                 <div className="mt-2 pt-2 border-t border-brand-border/50 text-xs space-y-1">
+                <div className="mt-3 pt-3 border-t border-zinc-800/50 text-xs space-y-2">
                   {interactions.length > 0 && (
-                    <div className="grid grid-cols-3 gap-2 font-semibold text-brand-text-dim px-2 mb-1">
+                    <div className="grid grid-cols-3 gap-2 text-[9px] font-bold text-zinc-600 uppercase tracking-widest px-2 mb-1">
                       <span>Verbos</span>
                       <span>Alvo</span>
                       <span>Requer</span>
@@ -104,10 +104,10 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                     const targetObject = allObjectsMap.get(inter.target);
                     const targetName = targetObject ? targetObject.name : (inter.target || '-');
                     return (
-                      <div key={inter.id} className="grid grid-cols-3 gap-2 text-brand-text bg-brand-surface p-2 rounded items-center">
-                        <span className="truncate" title={inter.verbs.join(', ')}>{inter.verbs.join(', ')}</span>
+                      <div key={inter.id} className="grid grid-cols-3 gap-2 text-zinc-400 bg-zinc-950/80 p-2 rounded-md border border-zinc-800/50 items-center text-[11px]">
+                        <span className="truncate font-medium" title={inter.verbs.join(', ')}>{inter.verbs.join(', ')}</span>
                         <span className="truncate" title={targetName}>{targetName}</span>
-                        <span className="truncate" title={inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory) ? allObjectsMap.get(inter.requiresInInventory)!.name : '-'}>
+                        <span className="truncate italic text-zinc-500" title={inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory) ? allObjectsMap.get(inter.requiresInInventory)!.name : '-'}>
                           {inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory)
                             ? allObjectsMap.get(inter.requiresInInventory)!.name
                             : '-'}
@@ -119,7 +119,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
               </div>
             ))
           ) : (
-            <p className="text-brand-text-dim text-sm text-center py-4 bg-brand-bg rounded-md">Esta cena não leva diretamente a nenhuma outra.</p>
+            <p className="text-zinc-500 text-xs text-center py-8 bg-zinc-950/20 border-2 border-dashed border-zinc-900/50 rounded-xl italic">Esta cena não leva diretamente a nenhuma outra.</p>
           )}
         </div>
       </div>

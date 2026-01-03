@@ -68,11 +68,11 @@ const GlobalObjectItem: React.FC<{
     }, [scenes, obj.id]);
 
     return (
-        <div className={`bg-brand-bg rounded-md border ${isOpen ? 'border-brand-primary' : 'border-brand-border/50'} overflow-hidden transition-all duration-300 relative`}>
+        <div className={`bg-zinc-900/30 rounded-lg border ${isOpen ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.05)]' : 'border-zinc-800/80'} overflow-hidden transition-all duration-300 relative`}>
             {/* Header - Fixed height to allow full-height image */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className={`relative flex items-center h-16 cursor-pointer hover:bg-brand-surface/30 transition-colors overflow-hidden group ${isOpen ? 'bg-brand-primary/5 border-b border-brand-primary/20' : ''}`}
+                className={`relative flex items-center h-14 cursor-pointer hover:bg-zinc-800/50 transition-all overflow-hidden group ${isOpen ? 'bg-purple-500/5 border-b border-purple-500/10' : ''}`}
             >
                 {/* Sliding Trash Button */}
                 <button
@@ -86,31 +86,31 @@ const GlobalObjectItem: React.FC<{
                 {/* Expansion Arrow */}
                 <div className="px-4 shrink-0">
                     <ChevronDown
-                        className={`w-5 h-5 text-brand-text-dim transition-transform duration-300 ${isOpen ? '-rotate-90' : 'rotate-0'}`}
+                        className={`w-4 h-4 text-zinc-600 transition-transform duration-300 ${isOpen ? '-rotate-90' : 'rotate-0'}`}
                     />
                 </div>
 
                 {/* Larger Thumbnail - Only rendered if image exists, otherwise no space occupied */}
                 {obj.image && (
-                    <div className="w-16 h-16 shrink-0 bg-brand-surface border-r border-brand-border/30 overflow-hidden flex items-center justify-center">
+                    <div className="w-14 h-14 shrink-0 bg-zinc-950 border-r border-zinc-800/50 overflow-hidden flex items-center justify-center">
                         <img src={obj.image} alt="" className="w-full h-full object-cover" />
                     </div>
                 )}
 
                 <div className="flex flex-1 items-center px-6 overflow-hidden">
                     <div className="flex items-center min-w-0">
-                        <span className="text-sm font-semibold text-brand-primary truncate">{obj.name || '(Sem nome)'}</span>
-                        <span className="ml-2 text-[10px] text-brand-text-dim font-mono opacity-50 shrink-0">({obj.id})</span>
+                        <span className="text-xs font-bold text-zinc-200 truncate">{obj.name || '(Sem nome)'}</span>
+                        <span className="ml-2 text-[9px] text-zinc-600 font-mono opacity-50 shrink-0 uppercase tracking-tighter">({obj.id})</span>
                     </div>
 
                     {usages.length > 0 && (
                         <>
-                            <div className="mx-6 h-4 border-r border-brand-border/40 shrink-0"></div>
-                            <div className="flex items-center gap-2 overflow-hidden">
-                                <span className="text-[10px] uppercase font-bold text-brand-text-dim shrink-0">Cenas:</span>
+                            <div className="mx-6 h-4 border-r border-zinc-800 shrink-0"></div>
+                            <div className="flex items-center gap-2 overflow-hidden text-[9px]">
+                                <span className="uppercase font-bold text-zinc-600 tracking-wider shrink-0">Cenas:</span>
                                 <div className="flex gap-1 overflow-hidden truncate">
                                     {usages.map((u, i) => (
-                                        <span key={u.id} className="text-xs text-brand-text-dim whitespace-nowrap">
+                                        <span key={u.id} className="text-purple-400 font-bold whitespace-nowrap">
                                             {u.name}{i < usages.length - 1 ? ',' : ''}
                                         </span>
                                     ))}
@@ -127,43 +127,43 @@ const GlobalObjectItem: React.FC<{
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                         <div className="space-y-4">
                             <div>
-                                <label htmlFor={`obj-name-${obj.id}`} className="block text-sm font-medium text-brand-text-dim mb-1">Nome do Objeto</label>
+                                <label htmlFor={`obj-name-${obj.id}`} className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Nome do Objeto</label>
                                 <input
                                     id={`obj-name-${obj.id}`}
                                     type="text"
                                     value={obj.name}
                                     onChange={e => onUpdate(obj.id, 'name', e.target.value)}
-                                    className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text focus:ring-0"
+                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-brand-text-dim mb-1">ID do Objeto</label>
+                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">ID do Objeto</label>
                                 <p
-                                    className="w-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text-dim font-mono select-all"
+                                    className="w-full bg-zinc-950/50 border border-zinc-900 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all"
                                     title="Use este ID para referência interna."
                                 >
                                     {obj.id}
                                 </p>
                             </div>
                             <div className="flex flex-col flex-grow">
-                                <label htmlFor={`obj-desc-${obj.id}`} className="block text-sm font-medium text-brand-text-dim mb-1">Descrição ao olhar/examinar</label>
+                                <label htmlFor={`obj-desc-${obj.id}`} className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Descrição ao examinar</label>
                                 <textarea
                                     id={`obj-desc-${obj.id}`}
                                     value={obj.examineDescription}
                                     onChange={e => onUpdate(obj.id, 'examineDescription', e.target.value)}
                                     rows={4}
-                                    className="w-full h-full bg-brand-border/30 border border-brand-border rounded-md px-3 py-2 text-sm text-brand-text focus:ring-0"
+                                    className="w-full h-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                 />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-brand-text-dim mb-1">Cenas vinculadas:</label>
+                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Cenas vinculadas</label>
                                 {usages.length > 0 ? (
                                     <div className="flex flex-wrap gap-2">
                                         {usages.map(usage => (
                                             <button
                                                 key={usage.id}
                                                 onClick={() => onSelectScene(usage.id)}
-                                                className="px-2 py-1 bg-brand-border/30 border border-brand-border rounded text-xs hover:bg-brand-border/50 transition-colors"
+                                                className="px-2 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 font-bold rounded text-[10px] uppercase tracking-tighter hover:bg-purple-500/20 transition-all"
                                                 title={`Ir para cena ${usage.name}`}
                                             >
                                                 {usage.name}
@@ -171,19 +171,19 @@ const GlobalObjectItem: React.FC<{
                                         ))}
                                     </div>
                                 ) : (
-                                    <p className="text-xs text-brand-text-dim italic">Não vinculado a nenhuma cena.</p>
+                                    <p className="text-[10px] text-zinc-600 italic">Não vinculado a nenhuma cena.</p>
                                 )}
                             </div>
                         </div>
                         <div className="flex flex-col space-y-3 h-full">
-                            <label className="block text-sm font-medium text-brand-text-dim mb-1">Imagem do Objeto</label>
+                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Imagem do Objeto</label>
                             <div className="relative flex-grow w-full min-h-[150px]">
                                 {obj.image ? (
-                                    <div className="absolute inset-0 w-full h-full border border-brand-border rounded-md overflow-hidden bg-brand-bg group/img">
-                                        <img src={obj.image} alt={obj.name} className="w-full h-full object-cover bg-brand-bg" />
+                                    <div className="absolute inset-0 w-full h-full border border-zinc-800 rounded-lg overflow-hidden bg-zinc-950 group/img">
+                                        <img src={obj.image} alt={obj.name} className="w-full h-full object-cover bg-zinc-950" />
                                         <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity gap-2">
-                                            <label htmlFor={`image-upload-${obj.id}`} className="p-2 bg-brand-primary text-brand-bg rounded-md cursor-pointer hover:bg-brand-primary-hover flex items-center gap-2 font-semibold text-sm">
-                                                <Upload className="w-5 h-5" />
+                                            <label htmlFor={`image-upload-${obj.id}`} className="px-4 py-2 bg-white text-black rounded-lg cursor-pointer hover:bg-zinc-200 transition-all flex items-center gap-2 font-bold text-xs uppercase tracking-widest">
+                                                <Upload className="w-4 h-4" />
                                                 <span className="hidden sm:inline">Alterar</span>
                                                 <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                             </label>
@@ -199,20 +199,20 @@ const GlobalObjectItem: React.FC<{
                                 ) : (
                                     <label
                                         htmlFor={`image-upload-${obj.id}`}
-                                        className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-brand-bg/50 rounded-md cursor-pointer hover:bg-brand-border/30 transition-colors ${isDraggingOver ? 'border-brand-primary bg-brand-primary/10' : 'border-brand-border'}`}
+                                        className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-zinc-950 rounded-lg cursor-pointer hover:bg-zinc-900 transition-all ${isDraggingOver ? 'border-purple-500 bg-purple-500/5' : 'border-zinc-800'}`}
                                         onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                         onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                         onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
                                         onDrop={handleDrop}
                                     >
-                                        <Upload className="w-8 h-8 text-brand-text-dim mb-2" />
-                                        <span className="text-sm font-semibold text-brand-text">Clique para Enviar</span>
-                                        <span className="text-xs text-brand-text-dim mt-1">ou arraste e solte</span>
+                                        <Upload className="w-6 h-6 text-zinc-700 mb-2" />
+                                        <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Clique para Enviar</span>
+                                        <span className="text-[10px] text-zinc-700 mt-1">ou arraste para aqui</span>
                                         <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                     </label>
                                 )}
                             </div>
-                            <p className="text-xs text-brand-text-dim text-center">Imagem que aparece ao inspecionar o item.<br />Recomendado: 1:1 (quadrado), ex: 512x512 pixels.</p>
+                            <p className="text-[10px] text-zinc-600 text-center uppercase tracking-tight">Imagem que aparece ao inspecionar o item.<br />Recomendado: 1:1 (quadrado), ex: 512x512 pixels.</p>
                         </div>
                     </div>
                 </div>
@@ -285,14 +285,14 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         <div className="space-y-6 pb-24">
             <div className="flex justify-between items-start">
                 <div>
-                    <p className="text-brand-text-dim mt-1 text-sm">
+                    <p className="text-zinc-500 mt-1 text-xs font-medium">
                         Aqui você gerencia todos os objetos do jogo. Vincule-os às cenas através do Editor de Cenas.
                     </p>
                 </div>
                 <div className="flex items-center gap-4 flex-shrink-0 mt-1">
                     {isDirty && (
-                        <div className="flex items-center gap-2 text-yellow-400 text-xs font-medium animate-pulse">
-                            <div className="w-2 h-2 bg-yellow-400 rounded-full"></div>
+                        <div className="flex items-center gap-2 text-purple-400 text-xs font-bold uppercase tracking-widest animate-pulse">
+                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
                             <span>Alterações não salvas</span>
                         </div>
                     )}
@@ -312,7 +312,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                         />
                     ))
                 ) : (
-                    <p className="text-center text-brand-text-dim py-8 border-2 border-dashed border-brand-border/50 rounded-md bg-brand-surface/30">Nenhum objeto na biblioteca.</p>
+                    <p className="text-center text-zinc-500 py-16 border-2 border-dashed border-zinc-800/50 rounded-xl bg-zinc-950/20 italic text-xs">Nenhum objeto na biblioteca.</p>
                 )}
             </div>
 
@@ -320,9 +320,9 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
             <div className="fixed bottom-6 left-[calc(25%+2.5rem)] xl:left-[calc(20%+2.5rem)] z-10 flex gap-2">
                 <button
                     onClick={handleCreate}
-                    className="flex items-center px-6 py-3 bg-brand-primary text-brand-bg font-bold rounded-md hover:bg-brand-primary-hover transition-colors shadow-lg"
+                    className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
                 >
-                    <Plus className="w-5 h-5 mr-2" />
+                    <Plus className="w-4 h-4 mr-2" />
                     Novo Objeto
                 </button>
             </div>
@@ -331,14 +331,14 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                 <button
                     onClick={handleUndo}
                     disabled={!isDirty}
-                    className="px-6 py-2 bg-brand-surface border border-brand-border text-brand-text-dim font-semibold rounded-md hover:bg-brand-border/30 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 font-bold rounded-lg hover:bg-zinc-800 transition-all text-xs disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                     Desfazer
                 </button>
                 <button
                     onClick={handleSave}
                     disabled={!isDirty}
-                    className="px-6 py-2 bg-yellow-400 text-black font-semibold rounded-md hover:bg-yellow-500 transition-colors duration-200 disabled:bg-gray-600 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-xl"
                 >
                     Salvar Alterações
                 </button>

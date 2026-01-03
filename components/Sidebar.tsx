@@ -69,9 +69,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   }, [currentView]);
 
   const getButtonClass = (view: View) =>
-    `w-full flex items-center p-2 rounded-md transition-colors text-left ${currentView === view
-      ? 'bg-brand-primary/20 text-brand-primary'
-      : 'hover:bg-brand-border/50'
+    `w-full flex items-center p-2 rounded-lg transition-all text-left ${currentView === view
+      ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]'
+      : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-100'
     }`;
 
   const handleToggleScenes = () => {
@@ -325,18 +325,18 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   };
 
   return (
-    <aside className="w-1/4 xl:w-1/5 bg-brand-sidebar p-4 border-r border-brand-border flex flex-col">
+    <aside className="w-1/4 xl:w-1/5 bg-zinc-950 p-4 border-r border-zinc-900 flex flex-col">
       <nav className="flex flex-col gap-2 flex-grow overflow-y-auto">
         <button className={getButtonClass('interface')} onClick={() => onSetView('interface')}>
-          <Code className="w-5 h-5 mr-3" />
-          <span className="font-semibold">Informações e Interface</span>
+          <Code className="w-4 h-4 mr-3" />
+          <span className="font-semibold text-xs">Informações e Interface</span>
         </button>
 
         <div>
           <button className={getButtonClass('scenes')} onClick={handleToggleScenes}>
-            <BookOpen className="w-5 h-5 mr-3" />
-            <span className="font-semibold">Editor de Cenas</span>
-            <span className="ml-auto bg-white text-brand-bg text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            <BookOpen className="w-4 h-4 mr-3" />
+            <span className="font-semibold text-xs">Editor de Cenas</span>
+            <span className="ml-auto bg-zinc-800 text-zinc-300 text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-zinc-700">
               {scenes.length}
             </span>
           </button>
@@ -348,21 +348,21 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         </div>
 
         <button className={getButtonClass('map')} onClick={() => onSetView('map')}>
-          <Map className="w-5 h-5 mr-3" />
-          <span className="font-semibold">Mapa de Cenas</span>
+          <Map className="w-4 h-4 mr-3" />
+          <span className="font-semibold text-xs">Mapa de Cenas</span>
         </button>
 
         <button className={getButtonClass('global_objects')} onClick={() => onSetView('global_objects')}>
-          <Box className="w-5 h-5 mr-3" />
-          <span className="font-semibold">Objetos</span>
+          <Box className="w-4 h-4 mr-3" />
+          <span className="font-semibold text-xs">Objetos</span>
         </button>
         <button className={getButtonClass('trackers')} onClick={() => onSetView('trackers')}>
-          <SlidersHorizontal className="w-5 h-5 mr-3" />
-          <span className="font-semibold">Rastreadores</span>
+          <SlidersHorizontal className="w-4 h-4 mr-3" />
+          <span className="font-semibold text-xs">Rastreadores</span>
         </button>
       </nav>
 
-      <div className="flex-shrink-0 mt-4 pt-4 border-t border-brand-border flex flex-col gap-3">
+      <div className="flex-shrink-0 mt-4 pt-4 border-t border-zinc-900 flex flex-col gap-2">
         <input
           type="file"
           ref={importInputRef}
@@ -374,14 +374,14 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             e.target.value = '';
           }}
         />
-        <button onClick={() => importInputRef.current?.click()} className="flex items-center w-full px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors">
-          <FileUp className="w-5 h-5 mr-2" /> Importar Jogo
+        <button onClick={() => importInputRef.current?.click()} className="flex items-center w-full px-4 py-2 bg-zinc-900/50 border border-zinc-800 text-zinc-300 font-semibold rounded-lg hover:bg-zinc-800 transition-all text-xs">
+          <FileUp className="w-4 h-4 mr-2" /> Importar Jogo
         </button>
-        <button onClick={handleExport} className="flex items-center w-full px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors">
-          <Download className="w-5 h-5 mr-2" /> Exportar Jogo
+        <button onClick={handleExport} className="flex items-center w-full px-4 py-2 bg-zinc-900/50 border border-zinc-800 text-zinc-300 font-semibold rounded-lg hover:bg-zinc-800 transition-all text-xs">
+          <Download className="w-4 h-4 mr-2" /> Exportar Jogo
         </button>
-        <button onClick={onTogglePreview} className="flex items-center w-full px-4 py-2 bg-brand-primary text-brand-bg font-semibold rounded-md hover:bg-brand-primary-hover transition-colors">
-          <Eye className="w-5 h-5 mr-2" /> Pré-visualizar Jogo
+        <button onClick={onTogglePreview} className="flex items-center w-full px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs">
+          <Eye className="w-4 h-4 mr-2" /> Pré-visualizar Jogo
         </button>
       </div>
     </aside>

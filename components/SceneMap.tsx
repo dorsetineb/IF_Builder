@@ -228,14 +228,14 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
   return (
     <div className="h-full flex flex-col relative">
       <div className="mb-4 flex-shrink-0">
-        <p className="text-brand-text-dim mt-1 text-sm">
+        <p className="text-zinc-500 mt-1 text-sm font-medium">
           Visualize e organize a estrutura do seu jogo. Arraste as cenas para reposicioná-las e clique para editá-las.
         </p>
       </div>
       <div
         ref={containerRef}
-        className={`w-full h-full bg-brand-bg rounded-lg border border-brand-border overflow-hidden ${isPanning || dragInfo ? 'cursor-grabbing' : 'cursor-grab'}`}
-        style={{ backgroundImage: 'radial-gradient(#4a5568 1px, transparent 1px)', backgroundSize: '20px 20px' }}
+        className={`w-full h-full bg-zinc-950 rounded-2xl border border-zinc-800/50 overflow-hidden ${isPanning || dragInfo ? 'cursor-grabbing' : 'cursor-grab'} shadow-inner`}
+        style={{ backgroundImage: 'radial-gradient(rgba(168,85,247,0.15) 1px, transparent 1px)', backgroundSize: '30px 30px' }}
         onWheel={handleWheel}
         onMouseDown={handleCanvasMouseDown}
         onMouseMove={handleMouseMove}
@@ -249,7 +249,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
           <svg className="absolute" width={bounds.maxX - bounds.minX + NODE_WIDTH + X_GAP * 4} height={bounds.maxY - bounds.minY + Y_GAP * 4} style={{ transform: `translate(${bounds.minX}px, ${bounds.minY}px)`, zIndex: 0 }}>
             <defs>
               <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#4fd1c5" />
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#a855f7" fillOpacity="0.8" />
               </marker>
             </defs>
             {edges.map((edge, i) => {
@@ -280,8 +280,9 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
                 <path
                   key={`${edge.source}-${edge.target}-${i}`}
                   d={`M ${x1} ${y1} C ${cx1} ${y1}, ${cx2} ${y2}, ${x2} ${y2}`}
-                  stroke="#4fd1c5"
+                  stroke="#a855f7"
                   strokeWidth="2"
+                  strokeOpacity="0.4"
                   fill="none"
                   markerEnd="url(#arrow)"
                 />
@@ -291,7 +292,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
 
           {nodes.map(node => {
             const linkingInteractions = node.interactions.filter(inter => inter.goToScene && allScenesMap[inter.goToScene]);
-            const borderColorClass = node.id === startSceneId ? 'border-yellow-400' : node.isEndingScene ? 'border-brand-primary' : node.removesChanceOnEntry ? 'border-red-500' : node.restoresChanceOnEntry ? 'border-white' : 'border-brand-border';
+            const borderColorClass = node.id === startSceneId ? 'border-purple-500' : node.isEndingScene ? 'border-zinc-100' : node.removesChanceOnEntry ? 'border-red-500' : node.restoresChanceOnEntry ? 'border-green-500' : 'border-zinc-800/80';
 
             return (
               <div
@@ -306,19 +307,19 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
                 onClick={(e) => {
                   if (Math.sqrt(Math.pow(e.clientX - dragStartPos.current.x, 2) + Math.pow(e.clientY - dragStartPos.current.y, 2)) < 5) onSelectScene(node.id);
                 }}
-                className={`absolute bg-brand-surface rounded-xl shadow-lg flex flex-col transition-all duration-300 border-2 ${borderColorClass} cursor-pointer hover:border-yellow-400 hover:shadow-xl overflow-hidden`}
+                className={`absolute bg-zinc-900 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex flex-col transition-all duration-300 border-2 ${borderColorClass} cursor-pointer hover:border-purple-400 hover:shadow-purple-500/10 overflow-hidden group`}
                 style={{ width: NODE_WIDTH, transform: `translate(${node.x}px, ${node.y}px)`, height: node.height, userSelect: 'none' }}
               >
-                <div className="p-3 relative flex-shrink-0 text-center" style={{ height: NODE_HEADER_HEIGHT }}>
+                <div className="p-3 relative flex-shrink-0 text-center bg-zinc-900/50" style={{ height: NODE_HEADER_HEIGHT }}>
                   {/* Removido o node no canto superior esquerdo da cena inicial conforme solicitado */}
                   {node.id !== startSceneId && (
-                    <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${activeAnchors.has(`${node.id}-L`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
+                    <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${node.id}-L`) ? 'bg-purple-500 border-purple-400' : 'bg-zinc-950 border-zinc-700'}`} />
                   )}
-                  <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${activeAnchors.has(`${node.id}-R`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
-                  <h3 className="font-bold text-brand-text truncate">{node.name}</h3>
-                  <p className="text-xs text-brand-text-dim">(ID: {node.id})</p>
-                  {node.id === startSceneId && <p className="text-xs font-bold text-yellow-400 mt-1">(Início)</p>}
-                  {node.isEndingScene && <p className="text-xs font-bold text-brand-primary mt-1">(Fim de Jogo)</p>}
+                  <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${node.id}-R`) ? 'bg-purple-500 border-purple-400' : 'bg-zinc-950 border-zinc-700'}`} />
+                  <h3 className="font-bold text-zinc-100 truncate text-sm">{node.name}</h3>
+                  <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">(ID: {node.id})</p>
+                  {node.id === startSceneId && <p className="text-[10px] font-bold text-purple-400 mt-1 uppercase tracking-widest">Início</p>}
+                  {node.isEndingScene && <p className="text-[10px] font-bold text-zinc-400 mt-1 uppercase tracking-widest">Fim de Jogo</p>}
                 </div>
 
                 {node.image && (
@@ -336,7 +337,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
                 )}
 
                 {linkingInteractions.length > 0 && (
-                  <div className="flex flex-col gap-1 pt-1 pb-2 border-t border-brand-border/30">
+                  <div className="flex flex-col gap-1 pt-1 pb-2 border-t border-zinc-800/50">
                     {linkingInteractions.map(inter => {
                       const actionText = inter.verbs?.[0] || 'Ação';
                       const reqObj = inter.requiresInInventory ? globalObjects[inter.requiresInInventory] : null;
@@ -345,10 +346,10 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
                       const displayLabel = `${actionText}${reqObj ? ' ' + reqObj.name : ''}${targetObj ? ' ' + targetObj.name : ''}`;
 
                       return (
-                        <div key={inter.id} className="relative bg-brand-primary/10 text-brand-primary-hover font-bold py-1 flex items-center w-full" style={{ height: INTERACTION_ITEM_HEIGHT }}>
-                          <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${activeAnchors.has(`${inter.id}-L`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
-                          <span className="truncate px-4 text-center w-full text-xs" title={displayLabel}>{displayLabel}</span>
-                          <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors ${activeAnchors.has(`${inter.id}-R`) ? 'bg-brand-primary' : 'bg-transparent border-2 border-slate-400'}`} />
+                        <div key={inter.id} className="relative bg-purple-500/5 text-purple-400 font-bold py-1 flex items-center w-full" style={{ height: INTERACTION_ITEM_HEIGHT }}>
+                          <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${inter.id}-L`) ? 'bg-purple-500 border-purple-400' : 'bg-zinc-950 border-zinc-700'}`} />
+                          <span className="truncate px-4 text-center w-full text-[10px] uppercase tracking-wider" title={displayLabel}>{displayLabel}</span>
+                          <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${inter.id}-R`) ? 'bg-purple-500 border-purple-400' : 'bg-zinc-950 border-zinc-700'}`} />
                         </div>
                       );
                     })}
@@ -359,20 +360,22 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
           })}
         </div>
       </div>
-      <div className="absolute bottom-4 left-4 z-10 bg-brand-surface/80 backdrop-blur-sm p-3 rounded-lg border border-brand-border text-xs text-brand-text-dim">
-        <h4 className="font-bold text-sm text-brand-text mb-2">Legenda</h4>
-        <ul className="space-y-1.5">
-          <li className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border-2 border-yellow-400"></div><span>Cena Inicial</span></li>
-          <li className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border-2 border-brand-primary"></div><span>Fim de Jogo</span></li>
-          <li className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border-2 border-red-500"></div><span>Remove Chance</span></li>
-          <li className="flex items-center gap-2"><div className="w-3 h-3 rounded-sm border-2 border-white"></div><span>Restaura Chance</span></li>
-        </ul>
+      <div className="absolute bottom-6 left-6 z-10 flex items-center gap-3">
+        <button onClick={onAddScene} className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs uppercase tracking-widest"><Plus className="w-4 h-4 mr-2" />Nova Cena</button>
       </div>
-      <div className="absolute bottom-4 right-4 z-10 flex items-end gap-2">
-        <button onClick={onAddScene} className="flex items-center px-4 py-2 bg-brand-surface border border-brand-border text-brand-text font-semibold rounded-md hover:bg-brand-border/30 transition-colors"><Plus className="w-5 h-5 mr-2" />Adicionar Cena</button>
-        <div className="flex flex-col gap-2">
-          <button onClick={() => handleZoom('in')} className="w-10 h-10 flex items-center justify-center bg-brand-surface border border-brand-border rounded-md hover:bg-brand-border/50"><Plus className="w-6 h-6" /></button>
-          <button onClick={() => handleZoom('out')} className="w-10 h-10 flex items-center justify-center bg-brand-surface border border-brand-border rounded-md hover:bg-brand-border/50"><Minus className="w-6 h-6" /></button>
+      <div className="absolute bottom-6 right-6 z-10 flex flex-col items-end gap-4 pointer-events-none">
+        <div className="bg-zinc-950/80 backdrop-blur-md p-4 rounded-xl border border-zinc-800 shadow-xl pointer-events-auto">
+          <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Legenda</h4>
+          <ul className="space-y-2">
+            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-purple-500 bg-purple-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Cena Inicial</span></li>
+            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-zinc-100 bg-zinc-100/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Fim de Jogo</span></li>
+            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-red-500 bg-red-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Remove Chance</span></li>
+            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-green-500 bg-green-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Restaura Chance</span></li>
+          </ul>
+        </div>
+        <div className="flex bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden shadow-xl pointer-events-auto">
+          <button onClick={() => handleZoom('in')} className="w-10 h-10 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all border-r border-zinc-800"><Plus className="w-4 h-4" /></button>
+          <button onClick={() => handleZoom('out')} className="w-10 h-10 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all"><Minus className="w-4 h-4" /></button>
         </div>
       </div>
     </div>

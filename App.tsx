@@ -1,5 +1,7 @@
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { supabase } from './lib/supabase';
+import { Auth } from './components/Auth';
 import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker, FixedVerb } from './types';
 import Sidebar from './components/Sidebar';
 import SceneEditor from './components/SceneEditor';
@@ -650,6 +652,26 @@ const initialGameData: GameData = {
 };
 
 const App: React.FC = () => {
+    const [session, setSession] = useState<any>(null);
+
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setSession(session);
+        });
+
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            setSession(session);
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+    };
+
     const [gameData, setGameData] = useState<GameData>(initialGameData);
     const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
     const [previewSceneId, setPreviewSceneId] = useState<string | null>(null);
@@ -967,8 +989,13 @@ const App: React.FC = () => {
     };
 
 
+
+    if (!session) {
+        return <Auth />;
+    }
+
     return (
-        <div className="flex flex-col h-screen w-screen overflow-hidden bg-brand-bg text-brand-text">
+        <div className="flex h-screen bg-zinc-950 text-zinc-100 overflow-hidden font-sans selection:bg-blue-500/30">
             {isPreviewing ? (
                 <div className="flex flex-col w-full h-full">
                     <Header
@@ -976,11 +1003,12 @@ const App: React.FC = () => {
                         isPreviewing={isPreviewing}
                         onTogglePreview={() => setIsPreviewing(false)}
                         onNewGame={handleNewGame}
+                        onLogout={handleLogout}
                     />
                     <Preview gameData={gameData} testSceneId={previewSceneId} />
                 </div>
             ) : (
-                <>
+                <div className="flex flex-col h-full w-full">
                     <Header
                         gameData={gameData}
                         isPreviewing={isPreviewing}
@@ -989,6 +1017,7 @@ const App: React.FC = () => {
                             setIsPreviewing(true);
                         }}
                         onNewGame={handleNewGame}
+                        onLogout={handleLogout}
                     />
                     <div className="flex flex-1 overflow-hidden">
                         <Sidebar
@@ -1008,7 +1037,7 @@ const App: React.FC = () => {
                                 setIsPreviewing(true);
                             }}
                         />
-                        <main className="flex-1 overflow-y-auto p-6 relative bg-brand-bg">
+                        <main className="flex-1 overflow-y-auto p-6 relative bg-zinc-950">
                             {currentView === 'interface' && (
                                 <UIEditor
                                     {...gameData}
@@ -1148,7 +1177,7 @@ const App: React.FC = () => {
                             )}
                         </main>
                     </div>
-                </>
+                </div>
             )}
         </div>
     );
