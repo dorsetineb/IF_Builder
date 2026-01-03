@@ -129,3 +129,32 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #09090b;
+  /* zinc-950 */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #9333ea;
+  /* purple-600 */
+  border-radius: 5px;
+  border: 2px solid #09090b;
+  /* zinc-950 (border matches bg to create padded look) */
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #7e22ce;
+  /* purple-700 */
+}
+
+::-webkit-scrollbar-corner {
+  background: #09090b;
+  /* zinc-950 */
+}
