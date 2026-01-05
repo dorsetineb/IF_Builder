@@ -59,7 +59,6 @@ export function Auth() {
                     animationSpeed={0.005}
                     className="w-full h-full"
                     objectFit="cover"
-                    objectFit="cover"
                     enableHover={true}
                     hoverRadius={433} // Increased by another 70% (255 * 1.7)
                 />
