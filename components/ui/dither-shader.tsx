@@ -326,7 +326,11 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
                 const dx = (internalWidth - dw) / 2;
                 const dy = (internalHeight - dh) / 2;
                 offCtx.drawImage(img, dx, dy, dw, dh);
-                sourceDataRef.current = offCtx.getImageData(0, 0, internalWidth, internalHeight);
+                try {
+                    sourceDataRef.current = offCtx.getImageData(0, 0, internalWidth, internalHeight);
+                } catch (e) {
+                    console.error("Canvas taint error:", e);
+                }
             }
         };
 
@@ -342,25 +346,43 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             };
             prepareSource();
             loop();
-            return () => { cancel = true; if (animationRef.current) cancelAnimationFrame(animationRef.current); };
+            return () => {
+                cancel = true;
+                if (animationRef.current) cancelAnimationFrame(animationRef.current);
+            };
         };
 
-        if (imageRef.current && imageRef.current.complete) {
-            return startLoop();
-        } else {
-            const img = new Image();
-            // Only set crossOrigin for external URLs
-            if (src.startsWith("http") || src.startsWith("//")) {
-                img.crossOrigin = "anonymous";
+        // Robust loading strategy: Fetch blob to avoid CORS tainting
+        let activeUrl = "";
+        const loadAndStart = async () => {
+            try {
+                const response = await fetch(src);
+                const blob = await response.blob();
+                activeUrl = URL.createObjectURL(blob);
+
+                const img = new Image();
+                img.src = activeUrl;
+                img.onload = () => {
+                    imageRef.current = img;
+                    startLoop();
+                };
+            } catch (err) {
+                console.error("Failed to fetch image blob:", err);
+                // Fallback
+                const img = new Image();
+                img.src = src;
+                img.onload = () => {
+                    imageRef.current = img;
+                    startLoop();
+                };
             }
-            img.src = src;
-            img.onload = () => {
-                imageRef.current = img;
-                prepareSource();
-            };
-            imageRef.current = img;
-            return startLoop();
-        }
+        };
+
+        loadAndStart();
+
+        return () => {
+            if (activeUrl) URL.revokeObjectURL(activeUrl);
+        };
 
     }, [src, dimensions, gridSize, renderLoop, animated, animationSpeed, enableHover, objectFit]);
 
