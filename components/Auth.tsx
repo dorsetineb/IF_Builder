@@ -49,16 +49,18 @@ export function Auth() {
             <div className="absolute inset-0 z-0 bg-neutral-950">
                 <DitherShader
                     src="/background.png"
-                    gridSize={4}
+                    gridSize={2} // Increased resolution (smaller grid)
                     ditherMode="bayer"
                     colorMode="duotone"
-                    primaryColor="#2E0249" // deep purple
-                    secondaryColor="#000000" // black
+                    primaryColor="#000000" // Black (Dark areas)
+                    secondaryColor="#581c87" // Purple-900 (Light areas) - Adjusted for better contrast
                     invert={false}
                     animated={true}
                     animationSpeed={0.005}
                     className="w-full h-full"
                     objectFit="cover"
+                    enableHover={true}
+                    hoverRadius={150}
                 />
             </div>
 
