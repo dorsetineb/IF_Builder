@@ -48,15 +48,14 @@ export function Auth() {
         <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-4 font-sans relative">
             <div className="absolute inset-0 z-0">
                 <Dither
-                    waveSpeed={0.05}
-                    waveFrequency={3}
-                    waveAmplitude={0.3}
-                    waveColor={[0.5, 0.3, 0.9]}
-                    colorNum={4}
-                    pixelSize={3}
+                    waveColor={[0.5, 0.5, 0.5]}
                     disableAnimation={false}
                     enableMouseInteraction={true}
-                    mouseRadius={0.5}
+                    mouseRadius={0.3}
+                    colorNum={4}
+                    waveAmplitude={0.3}
+                    waveFrequency={3}
+                    waveSpeed={0.05}
                 />
             </div>
 
