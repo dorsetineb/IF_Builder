@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { MessageSquare, CircleHelp, Gamepad2, BookOpen, Coffee } from 'lucide-react';
