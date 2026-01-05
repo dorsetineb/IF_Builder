@@ -48,16 +48,17 @@ export function Auth() {
         <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-4 font-sans relative">
             <div className="absolute inset-0 z-0 bg-neutral-950">
                 <DitherShader
-                    src="https://images.unsplash.com/photo-1518531933037-9a847dd20d94?q=80&w=2670&auto=format&fit=crop"
+                    src="/background.png"
                     gridSize={4}
                     ditherMode="bayer"
                     colorMode="duotone"
-                    primaryColor="#2e1065" // purple-950
+                    primaryColor="#2E0249" // deep purple
                     secondaryColor="#000000" // black
                     invert={false}
                     animated={true}
-                    animationSpeed={0.01}
-                    className="w-full h-full opacity-50"
+                    animationSpeed={0.005}
+                    className="w-full h-full"
+                    objectFit="cover"
                 />
             </div>
 
