@@ -67,9 +67,9 @@ const Community: React.FC = () => {
                     <h1 className="text-3xl font-bold text-white mb-2">Comunidade</h1>
                     <p className="text-zinc-400">Discuta, aprenda e compartilhe seus jogos com outros criadores.</p>
                 </div>
-                <button className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-lg transition-colors shadow-lg shadow-purple-900/20">
+                <Link to="/community/create" className="bg-purple-600 hover:bg-purple-500 text-white font-semibold py-2 px-6 rounded-lg transition-colors shadow-lg shadow-purple-900/20">
                     Novo Tópico
-                </button>
+                </Link>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
