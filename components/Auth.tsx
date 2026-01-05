@@ -60,7 +60,7 @@ export function Auth() {
                     className="w-full h-full"
                     objectFit="cover"
                     enableHover={true}
-                    hoverRadius={150}
+                    hoverRadius={433} // Increased by another 70% (255 * 1.7)
                 />
             </div>
 

@@ -349,7 +349,10 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             return startLoop();
         } else {
             const img = new Image();
-            img.crossOrigin = "anonymous";
+            // Only set crossOrigin for external URLs
+            if (src.startsWith("http") || src.startsWith("//")) {
+                img.crossOrigin = "anonymous";
+            }
             img.src = src;
             img.onload = () => {
                 imageRef.current = img;
