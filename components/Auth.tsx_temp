@@ -1,0 +1,15 @@
+"use client";
+import React, { useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { DitherShader } from '@/components/ui/dither-shader';
+
+// Import the locally generated image (assuming it's placed in public or imported)
+// For now, we'll try a different reliable URL as a fallback While I generate the local one if needed, 
+// but best practice is local.
+// Actually, since I am generating it, I will use the path relative to public if I can put it there.
+// If not, I'll import it.
+
+export function Auth() {
+    const [loading, setLoading] = useState(false);
+    // ... rest of component
