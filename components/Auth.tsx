@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
-import Dither from './Dither';
+import { DitherShader } from '@/components/ui/dither-shader';
 
 export function Auth() {
     const [loading, setLoading] = useState(false);
@@ -46,17 +46,18 @@ export function Auth() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-4 font-sans relative">
-            <div className="absolute inset-0 z-0">
-                <Dither
-                    waveSpeed={0.05}
-                    waveFrequency={3}
-                    waveAmplitude={0.3}
-                    waveColor={[0.5, 0.3, 0.9]}
-                    colorNum={4}
-                    pixelSize={3}
-                    disableAnimation={false}
-                    enableMouseInteraction={true}
-                    mouseRadius={0.5}
+            <div className="absolute inset-0 z-0 bg-neutral-950">
+                <DitherShader
+                    src="https://images.unsplash.com/photo-1518531933037-9a847dd20d94?q=80&w=2670&auto=format&fit=crop"
+                    gridSize={4}
+                    ditherMode="bayer"
+                    colorMode="duotone"
+                    primaryColor="#2e1065" // purple-950
+                    secondaryColor="#000000" // black
+                    invert={false}
+                    animated={true}
+                    animationSpeed={0.01}
+                    className="w-full h-full opacity-50"
                 />
             </div>
 
