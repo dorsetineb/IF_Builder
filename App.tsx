@@ -7,6 +7,7 @@ import PlatformLayout from './components/layouts/PlatformLayout';
 import Dashboard from './pages/Dashboard';
 import Community from './pages/Community';
 import Profile from './pages/Profile';
+import PostDetail from './pages/PostDetail';
 import Editor from './components/Editor';
 
 const App: React.FC = () => {
@@ -45,6 +46,7 @@ const App: React.FC = () => {
                     <Route path="/" element={<Navigate to="/dashboard" replace />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/community" element={<Community />} />
+                    <Route path="/community/post/:id" element={<PostDetail />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/projects" element={<div className="p-8 text-white">Página de Projetos (Em construção)</div>} />
                     <Route path="/settings" element={<div className="p-8 text-white">Configurações (Em construção)</div>} />
