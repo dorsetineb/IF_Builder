@@ -17,9 +17,7 @@ const Dashboard: React.FC = () => {
                         Você tem 3 rascunhos pendentes e sua última história "Fuja da Masmorra" recebeu 12 novos comentários.
                     </p>
                     <div className="flex gap-3 relative z-10">
-                        <Link to="/editor" className="bg-zinc-100 hover:bg-white text-zinc-900 font-semibold py-2 px-4 rounded-md transition-colors text-xs">
-                            Continuar Editando
-                        </Link>
+                        {/* Button removed as requested */}
                     </div>
                     <BookOpen className="absolute bottom-4 right-8 text-zinc-800 w-24 h-24 opacity-30 rotate-12" />
                 </div>
@@ -30,7 +28,7 @@ const Dashboard: React.FC = () => {
                         <Plus size={24} />
                     </div>
                     <h2 className="text-white font-bold text-lg">Criar Jogo</h2>
-                    <p className="text-purple-200 text-xs mt-1">Inicie uma nova jornada interativa</p>
+                    <p className="text-purple-200 text-xs mt-1">Inicie uma nova ficção interativa</p>
                 </Link>
             </div>
 
