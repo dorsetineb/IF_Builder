@@ -1,5 +1,6 @@
 
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Auth } from './Auth';
 import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker, FixedVerb } from '../types';
@@ -668,8 +669,15 @@ const Editor: React.FC = () => {
         return () => subscription.unsubscribe();
     }, []);
 
+    const navigate = useNavigate();
+
     const handleLogout = async () => {
-        await supabase.auth.signOut();
+        if (isDirty) {
+            if (!window.confirm("Existem alterações não salvas. Deseja realmente sair?")) {
+                return;
+            }
+        }
+        navigate('/dashboard');
     };
 
     const [gameData, setGameData] = useState<GameData>(initialGameData);
