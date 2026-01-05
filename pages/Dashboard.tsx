@@ -25,12 +25,12 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 {/* Create Game Button (Replaces Stats) */}
-                <Link to="/editor" className="bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 p-6 rounded-xl flex flex-col items-center justify-center text-center transition-all group cursor-pointer lg:col-span-1 h-full min-h-[160px]">
-                    <div className="w-12 h-12 rounded-full bg-purple-600/10 text-purple-500 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all">
+                <Link to="/editor" className="bg-purple-600 hover:bg-purple-500 border border-purple-500 p-6 rounded-xl flex flex-col items-center justify-center text-center transition-all group cursor-pointer lg:col-span-1 h-full min-h-[160px] shadow-lg shadow-purple-900/20">
+                    <div className="w-12 h-12 rounded-full bg-white/10 text-white flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-white group-hover:text-purple-600 transition-all">
                         <Plus size={24} />
                     </div>
                     <h2 className="text-white font-bold text-lg">Criar Jogo</h2>
-                    <p className="text-zinc-500 text-xs mt-1">Inicie uma nova jornada interativa</p>
+                    <p className="text-purple-200 text-xs mt-1">Inicie uma nova jornada interativa</p>
                 </Link>
             </div>
 
@@ -46,7 +46,7 @@ const Dashboard: React.FC = () => {
 
                     <div className="flex flex-col gap-3">
                         {/* Post Item 1 */}
-                        <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-lg hover:border-zinc-700 transition-colors cursor-pointer group flex gap-4 items-center">
+                        <Link to="/community/post/1" className="bg-zinc-900 border border-zinc-800 p-4 rounded-lg hover:border-zinc-700 transition-colors cursor-pointer group flex gap-4 items-center">
                             <div className="w-10 h-10 bg-zinc-800 rounded flex items-center justify-center text-zinc-500 flex-shrink-0">
                                 <MessageSquare size={18} />
                             </div>
@@ -57,10 +57,10 @@ const Dashboard: React.FC = () => {
                             <div className="flex gap-4 text-xs text-zinc-500">
                                 <span className="flex items-center gap-1"><i className="w-1.5 h-1.5 rounded-full bg-green-500"></i> 3 respostas</span>
                             </div>
-                        </div>
+                        </Link>
 
                         {/* Post Item 2 */}
-                        <div className="bg-zinc-900 border border-zinc-800 p-4 rounded-lg hover:border-zinc-700 transition-colors cursor-pointer group flex gap-4 items-center">
+                        <Link to="/community/post/2" className="bg-zinc-900 border border-zinc-800 p-4 rounded-lg hover:border-zinc-700 transition-colors cursor-pointer group flex gap-4 items-center">
                             <div className="w-10 h-10 bg-zinc-800 rounded flex items-center justify-center text-zinc-500 flex-shrink-0">
                                 <MessageSquare size={18} />
                             </div>
@@ -72,7 +72,7 @@ const Dashboard: React.FC = () => {
                                 <span className="flex items-center gap-1">12 likes</span>
                                 <span className="flex items-center gap-1">5 coments</span>
                             </div>
-                        </div>
+                        </Link>
                     </div>
                 </div>
 
