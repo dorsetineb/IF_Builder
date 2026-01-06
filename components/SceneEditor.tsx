@@ -309,7 +309,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         <div className="space-y-6 pb-24">
             <div className="flex justify-between items-start">
                 <div>
-                    <p className="text-zinc-500 mt-1 text-[10px]">
+                    <p className="text-muted-foreground mt-1 text-[10px]">
                         Defina a imagem, descrição, objetos e interações para esta cena.
                     </p>
                 </div>
@@ -322,7 +322,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                     )}
                     <button
                         onClick={() => onCopyScene(localScene)}
-                        className="flex items-center px-3 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold rounded-md hover:bg-zinc-800 transition-colors text-xs"
+                        className="flex items-center px-3 py-2 bg-muted border border-border text-foreground font-semibold rounded-md hover:bg-muted/80 transition-colors text-xs"
                         title="Copiar Cena"
                     >
                         Copiar Cena
@@ -331,7 +331,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
             </div>
 
             <div>
-                <div className="border-b border-zinc-800 flex justify-between items-end">
+                <div className="border-b border-border flex justify-between items-end">
                     <div className="flex space-x-6">
                         {Object.entries(TABS).map(([key, name]) => {
                             const isTabDisabled = localScene.isEndingScene && (key === 'objects' || key === 'interactions');
@@ -342,7 +342,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                     disabled={isTabDisabled}
                                     className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === key
                                         ? 'text-purple-400 border-b-2 border-purple-500'
-                                        : 'text-zinc-500 hover:text-zinc-300'
+                                        : 'text-muted-foreground hover:text-foreground'
                                         } ${isTabDisabled ? 'opacity-30 cursor-not-allowed' : ''}`}
                                 >
                                     {name}
@@ -357,21 +357,21 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                     )}
                 </div>
 
-                <div className="bg-zinc-950 pt-6">
+                <div className="bg-background pt-6">
                     {activeTab === 'properties' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                             <div className="space-y-4 flex flex-col order-2 md:order-1">
                                 {/* Name and ID Column */}
                                 <div className="space-y-4">
                                     <div>
-                                        <label htmlFor="sceneName" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Nome da Cena</label>
-                                        <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                        <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Nome da Cena</label>
+                                        <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all shadow-lg" />
                                     </div>
                                     <div>
-                                        <label htmlFor="sceneId" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">ID da Cena</label>
+                                        <label htmlFor="sceneId" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">ID da Cena</label>
                                         <p
                                             id="sceneId"
-                                            className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all"
+                                            className="w-full bg-muted border border-border rounded-lg px-3 py-2 text-xs text-muted-foreground font-mono select-all"
                                             title="O ID da cena é único e não pode ser alterado."
                                         >
                                             {localScene.id}
@@ -380,25 +380,25 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                 </div>
 
                                 <div className="flex flex-col flex-1 min-h-0 pt-2">
-                                    <label htmlFor="sceneDescription" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">
+                                    <label htmlFor="sceneDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
                                         {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição'}
                                     </label>
-                                    <p className="text-[10px] text-zinc-500 -mt-2 mb-2">Use <code>&lt;palavra&gt;</code> para destacar texto clicável.</p>
+                                    <p className="text-[10px] text-muted-foreground -mt-2 mb-2">Use <code>&lt;palavra&gt;</code> para destacar texto clicável.</p>
                                     <div className="relative flex-1">
-                                        <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 resize-y focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                        <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground resize-y focus:ring-1 focus:ring-primary/30 transition-all shadow-lg" />
                                     </div>
                                 </div>
                             </div>
 
                             <div className="flex flex-col space-y-4 order-1 md:order-2">
                                 <div className="flex flex-col flex-grow min-h-[300px]">
-                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Imagem da Cena</label>
+                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Imagem da Cena</label>
                                     <div className="relative flex-grow w-full">
                                         {localScene.image ? (
-                                            <div className="absolute inset-0 w-full h-full border border-zinc-800 rounded-lg overflow-hidden bg-zinc-950 group">
+                                            <div className="absolute inset-0 w-full h-full border border-border rounded-lg overflow-hidden bg-background group">
                                                 <img src={localScene.image} alt={localScene.name} className="w-full h-full object-cover" />
                                                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
-                                                    <label htmlFor="image-upload-input" className="p-2 bg-white text-zinc-950 rounded-lg cursor-pointer hover:bg-zinc-200 flex items-center gap-2 font-bold text-[10px] uppercase tracking-widest shadow-lg">
+                                                    <label htmlFor="image-upload-input" className="p-2 bg-secondary text-secondary-foreground rounded-lg cursor-pointer hover:bg-secondary/80 flex items-center gap-2 font-bold text-[10px] uppercase tracking-widest shadow-lg">
                                                         <Upload className="w-5 h-5" />
                                                         <span className="hidden sm:inline">Alterar</span>
                                                         <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
@@ -415,21 +415,21 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                         ) : (
                                             <label
                                                 htmlFor="image-upload-input"
-                                                className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-zinc-900/30 rounded-xl cursor-pointer hover:bg-zinc-800/50 hover:border-purple-500/50 transition-all ${isDraggingOver ? 'border-purple-500 bg-purple-500/10' : 'border-zinc-800'}`}
+                                                className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-muted/30 rounded-xl cursor-pointer hover:bg-muted/50 hover:border-primary/50 transition-all ${isDraggingOver ? 'border-primary bg-primary/10' : 'border-border'}`}
                                                 onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                                 onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                                 onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
                                                 onDrop={handleDrop}
                                             >
                                                 <Upload className="w-8 h-8 text-zinc-700 mb-2 transition-colors group-hover:text-purple-400" />
-                                                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest group-hover:text-zinc-300">Clique para Enviar</span>
-                                                <span className="text-[10px] text-zinc-600 mt-1">ou arraste e solte</span>
+                                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground">Clique para Enviar</span>
+                                                <span className="text-[10px] text-muted-foreground mt-1">ou arraste e solte</span>
                                                 <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                             </label>
                                         )}
                                     </div>
                                     {/* MODIFICADO: Recomendação contextual incluindo tamanho em pixels */}
-                                    <p className="text-[10px] text-zinc-600 text-center mt-3 font-medium italic">
+                                    <p className="text-[10px] text-muted-foreground text-center mt-3 font-medium italic">
                                         {layoutOrientation === 'vertical'
                                             ? "Recomendado imagens em pé (ex: 9:16). Sugestão: 720x1280 pixels."
                                             : "Recomendado imagens deitadas (ex: 16:9). Sugestão: 1280x720 pixels."}
@@ -437,10 +437,10 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                 </div>
 
                                 <div className="pt-4 border-t border-zinc-800">
-                                    <label className="block text-sm font-medium text-zinc-400 mb-2">Trilha sonora da cena</label>
+                                    <label className="block text-sm font-medium text-muted-foreground mb-2">Trilha sonora da cena</label>
                                     <div className="flex items-center gap-2">
-                                        <label className="flex-grow flex items-center justify-center px-3 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold rounded-lg hover:bg-zinc-800 transition-all cursor-pointer text-xs">
-                                            <Upload className="w-4 h-4 mr-2 text-purple-400" /> {localScene.backgroundMusic ? 'Alterar Trilha' : 'Carregar Trilha (.mp3)'}
+                                        <label className="flex-grow flex items-center justify-center px-3 py-2 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 transition-all cursor-pointer text-xs">
+                                            <Upload className="w-4 h-4 mr-2 text-primary" /> {localScene.backgroundMusic ? 'Alterar Trilha' : 'Carregar Trilha (.mp3)'}
                                             <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={handleMusicUpload} className="hidden" />
                                         </label>
                                         {localScene.backgroundMusic && (
@@ -453,11 +453,11 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                             </button>
                                         )}
                                     </div>
-                                    <p className="text-[10px] text-zinc-600 mt-1 italic">Deixe vazio para continuar tocando a música da cena anterior.</p>
+                                    <p className="text-[10px] text-muted-foreground mt-1 italic">Deixe vazio para continuar tocando a música da cena anterior.</p>
                                 </div>
 
                                 {!isStartScene && (
-                                    <div className="space-y-4 pt-4 border-t border-zinc-800/50">
+                                    <div className="space-y-4 pt-4 border-t border-border/50">
                                         <div className="flex items-center">
                                             <input
                                                 type="checkbox"
@@ -467,7 +467,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                 className="custom-checkbox"
                                                 disabled={isAnyCheckboxChecked && !localScene.isEndingScene}
                                             />
-                                            <label htmlFor="isEndingScene" className={`ml-2 block text-xs font-bold text-zinc-500 uppercase tracking-widest ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
+                                            <label htmlFor="isEndingScene" className={`ml-2 block text-xs font-bold text-muted-foreground uppercase tracking-widest ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
                                                 Esta cena vence o jogo.
                                             </label>
                                         </div>
@@ -480,7 +480,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                 className="custom-checkbox"
                                                 disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
                                             />
-                                            <label htmlFor="removesChance" className={`ml-2 block text-xs font-bold text-zinc-500 uppercase tracking-widest ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
+                                            <label htmlFor="removesChance" className={`ml-2 block text-xs font-bold text-muted-foreground uppercase tracking-widest ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
                                                 Esta cena remove uma chance.
                                             </label>
                                         </div>
@@ -493,7 +493,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                 className="custom-checkbox"
                                                 disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
                                             />
-                                            <label htmlFor="restoresChance" className={`ml-2 block text-xs font-bold text-zinc-500 uppercase tracking-widest ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
+                                            <label htmlFor="restoresChance" className={`ml-2 block text-xs font-bold text-muted-foreground uppercase tracking-widest ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
                                                 Esta cena restaura uma chance.
                                             </label>
                                         </div>
@@ -541,7 +541,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
             <div className="fixed bottom-6 right-10 z-10 flex gap-2">
                 <button
                     onClick={handlePreview}
-                    className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-semibold rounded-lg hover:bg-zinc-800 transition-all text-xs"
+                    className="px-4 py-2 bg-muted border border-border text-foreground font-semibold rounded-lg hover:bg-muted/80 transition-all text-xs"
                 >
                     <Eye className="w-4 h-4 inline-block mr-2" />
                     Testar Cena
@@ -549,14 +549,14 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                 <button
                     onClick={handleUndo}
                     disabled={!isDirty}
-                    className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-500 font-semibold rounded-lg hover:bg-zinc-800 transition-all text-xs disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-muted border border-border text-muted-foreground font-semibold rounded-lg hover:bg-muted/80 transition-all text-xs disabled:opacity-30 disabled:cursor-not-allowed"
                 >
                     Desfazer
                 </button>
                 <button
                     onClick={handleSave}
                     disabled={!isDirty}
-                    className="px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
                 >
                     Salvar
                 </button>

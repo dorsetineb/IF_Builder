@@ -57,7 +57,7 @@ const SceneList: React.FC<SceneListProps> = ({
             key={scene.id}
             className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-lg transition-all overflow-hidden ${selectedSceneId === scene.id
               ? 'bg-purple-500/20 text-purple-100 border border-purple-500/30'
-              : 'hover:bg-zinc-800/50'
+              : 'hover:bg-muted/50'
               } ${scene.id === startSceneId ? 'cursor-default' : ''}`}
             onDragStart={(e) => scene.id !== startSceneId && handleDragStart(e, index)}
             onDragEnter={(e) => scene.id !== startSceneId && handleDragEnter(e, index)}
@@ -67,7 +67,7 @@ const SceneList: React.FC<SceneListProps> = ({
           >
             <div className={`flex items-center flex-grow p-2`}>
               {scene.id !== startSceneId ? (
-                <Menu className={`w-4 h-4 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? 'text-purple-400' : 'text-zinc-600'}`} />
+                <Menu className={`w-4 h-4 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? 'text-purple-400' : 'text-muted-foreground'}`} />
               ) : null}
 
               <div
@@ -76,7 +76,7 @@ const SceneList: React.FC<SceneListProps> = ({
               >
                 <span className="truncate font-medium text-xs">{scene.name}</span>
                 {startSceneId === scene.id && (
-                  <span className={`ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${selectedSceneId === scene.id ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' : 'bg-zinc-800 text-zinc-400 border-zinc-700'
+                  <span className={`ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${selectedSceneId === scene.id ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' : 'bg-muted text-muted-foreground border-border'
                     }`}>
                     Início
                   </span>
@@ -98,7 +98,7 @@ const SceneList: React.FC<SceneListProps> = ({
       </ul>
       <button
         onClick={onAddScene}
-        className="w-full flex items-center justify-center px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold rounded-lg hover:bg-zinc-800 transition-all text-xs"
+        className="w-full flex items-center justify-center px-4 py-2 bg-muted/50 border border-border text-foreground font-bold rounded-lg hover:bg-muted transition-all text-xs"
       >
         <Plus className="w-4 h-4 mr-2 text-purple-400" />
         Adicionar Cena

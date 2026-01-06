@@ -327,10 +327,10 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   };
 
   return (
-    <aside className={`${isCollapsed ? 'w-16' : 'w-1/4 xl:w-1/5'} bg-zinc-950 p-4 border-r border-zinc-900 flex flex-col transition-all duration-300 relative`}>
+    <aside className={`${isCollapsed ? 'w-16' : 'w-1/4 xl:w-1/5'} bg-card p-4 border-r border-border flex flex-col transition-all duration-300 relative`}>
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-6 bg-zinc-900 border border-zinc-800 rounded-full p-1 text-zinc-400 hover:text-white hover:border-zinc-700 transition-colors z-10"
+        className="absolute -right-3 top-6 bg-card border border-border rounded-full p-1 text-muted-foreground hover:text-foreground hover:border-primary transition-colors z-10"
       >
         {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>
@@ -355,14 +355,14 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             {!isCollapsed && (
               <>
                 <span className="font-semibold text-xs ml-3 truncate">Editor de Cenas</span>
-                <span className="ml-auto bg-zinc-800 text-zinc-300 text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-zinc-700">
+                <span className="ml-auto bg-muted text-muted-foreground text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-border">
                   {scenes.length}
                 </span>
               </>
             )}
           </button>
           {!isCollapsed && isScenesExpanded && (
-            <div className="pl-4 mt-2 ml-2 border-l border-zinc-800">
+            <div className="pl-4 mt-2 ml-2 border-l border-border">
               <SceneList scenes={scenes} {...sceneListProps} />
             </div>
           )}
@@ -395,7 +395,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         </button>
       </nav>
 
-      <div className={`flex-shrink-0 mt-4 pt-4 border-t border-zinc-900 flex flex-col gap-2 ${isCollapsed ? 'items-center' : ''}`}>
+      <div className={`flex-shrink-0 mt-4 pt-4 border-t border-border flex flex-col gap-2 ${isCollapsed ? 'items-center' : ''}`}>
         <input
           type="file"
           ref={importInputRef}
@@ -409,7 +409,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         />
         <button
           onClick={() => importInputRef.current?.click()}
-          className={`flex items-center ${isCollapsed ? 'justify-center p-2' : 'w-full px-4 py-2'} bg-zinc-900/50 border border-zinc-800 text-zinc-300 font-semibold rounded-lg hover:bg-zinc-800 transition-all text-xs`}
+          className={`flex items-center ${isCollapsed ? 'justify-center p-2' : 'w-full px-4 py-2'} bg-muted/50 border border-border text-foreground font-semibold rounded-lg hover:bg-muted transition-all text-xs`}
           title={isCollapsed ? "Importar Jogo" : undefined}
         >
           <FileUp className="w-4 h-4 flex-shrink-0" />
@@ -417,7 +417,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         </button>
         <button
           onClick={handleExport}
-          className={`flex items-center ${isCollapsed ? 'justify-center p-2' : 'w-full px-4 py-2'} bg-zinc-900/50 border border-zinc-800 text-zinc-300 font-semibold rounded-lg hover:bg-zinc-800 transition-all text-xs`}
+          className={`flex items-center ${isCollapsed ? 'justify-center p-2' : 'w-full px-4 py-2'} bg-muted/50 border border-border text-foreground font-semibold rounded-lg hover:bg-muted transition-all text-xs`}
           title={isCollapsed ? "Exportar Jogo" : undefined}
         >
           <Download className="w-4 h-4 flex-shrink-0" />

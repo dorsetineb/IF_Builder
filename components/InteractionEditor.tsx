@@ -123,7 +123,7 @@ const InteractionItem: React.FC<{
     };
 
     const otherScenes = allScenes.filter(s => s.id !== currentSceneId);
-    const selectBaseClasses = "w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 [&>option]:bg-zinc-950 [&>option]:text-zinc-300";
+    const selectBaseClasses = "w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 [&>option]:bg-background [&>option]:text-foreground";
     const outcomeType = getOutcomeType(interaction);
 
     const requiredItemName = useMemo(() => {
@@ -137,11 +137,11 @@ const InteractionItem: React.FC<{
     }, [interaction.target, sceneObjects]);
 
     return (
-        <div className={`bg-zinc-900/30 rounded-lg border ${isOpen ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.05)]' : 'border-zinc-800/80'} overflow-hidden transition-all duration-300 relative`}>
+        <div className={`bg-card rounded-lg border ${isOpen ? 'border-primary/50 shadow-[0_0_20px_rgba(var(--primary),0.05)]' : 'border-border'} overflow-hidden transition-all duration-300 relative`}>
             {/* Header - Always visible summary */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className={`relative flex items-center p-4 cursor-pointer hover:bg-zinc-800/50 transition-all overflow-hidden group ${isOpen ? 'bg-purple-500/5 border-b border-purple-500/10' : ''}`}
+                className={`relative flex items-center p-4 cursor-pointer hover:bg-muted/50 transition-all overflow-hidden group ${isOpen ? 'bg-primary/5 border-b border-primary/10' : ''}`}
             >
                 {/* Sliding Trash Button */}
                 <button
@@ -154,25 +154,25 @@ const InteractionItem: React.FC<{
 
                 {/* Expansion Arrow on the Left */}
                 <ChevronDown
-                    className={`w-4 h-4 text-zinc-600 transition-transform duration-300 mr-4 shrink-0 ${isOpen ? '-rotate-90' : 'rotate-0'}`}
+                    className={`w-4 h-4 text-muted-foreground transition-transform duration-300 mr-4 shrink-0 ${isOpen ? '-rotate-90' : 'rotate-0'}`}
                 />
 
                 <div className="flex flex-1 items-center overflow-hidden h-6">
                     {/* Verbos */}
-                    <div className="flex items-center gap-2 min-w-0 pr-6 border-r border-zinc-800 h-full">
-                        <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Verbos:</span>
+                    <div className="flex items-center gap-2 min-w-0 pr-6 border-r border-border h-full">
+                        <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider shrink-0">Verbos:</span>
                         <span className="text-xs font-bold text-purple-400 truncate">{localVerbs || '(Vazio)'}</span>
                     </div>
 
                     {/* Item */}
-                    <div className="flex items-center gap-2 min-w-0 px-6 border-r border-zinc-800 h-full">
-                        <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Item:</span>
+                    <div className="flex items-center gap-2 min-w-0 px-6 border-r border-border h-full">
+                        <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider shrink-0">Item:</span>
                         <span className="text-xs font-bold text-purple-400 truncate">{requiredItemName || '(Não requer item)'}</span>
                     </div>
 
                     {/* Alvo */}
                     <div className="flex items-center gap-2 min-w-0 px-6 h-full">
-                        <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Alvo:</span>
+                        <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider shrink-0">Alvo:</span>
                         <span className="text-xs font-bold text-purple-400 truncate">{targetName || '(Nenhum)'}</span>
                     </div>
                 </div>
@@ -184,24 +184,24 @@ const InteractionItem: React.FC<{
                     {/* Top Row: 3 Columns */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
                         <div>
-                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Verbos (separados por vírgula)</label>
-                            <input id={verbInputId} type="text" value={localVerbs} onChange={e => setLocalVerbs(e.target.value)} onBlur={handleVerbsBlur} placeholder="ex: usar, mover, abrir" className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs focus:ring-0 text-zinc-300" />
+                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Verbos (separados por vírgula)</label>
+                            <input id={verbInputId} type="text" value={localVerbs} onChange={e => setLocalVerbs(e.target.value)} onBlur={handleVerbsBlur} placeholder="ex: usar, mover, abrir" className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs focus:ring-0 text-foreground" />
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Requer Item (opcional)</label>
+                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Requer Item (opcional)</label>
                             <select value={interaction.requiresInInventory || ''} onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)} className={selectBaseClasses}>
                                 <option value="">Não requer item</option>
                                 {allTakableObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name} ({obj.id})</option>)}
                             </select>
                             <div className="flex items-center mt-3">
                                 <input type="checkbox" id={`consumesItem-${index}`} checked={!!interaction.consumesItem} onChange={e => handleInteractionChange('consumesItem', e.target.checked)} disabled={!interaction.requiresInInventory} className="custom-checkbox" />
-                                <label htmlFor={`consumesItem-${index}`} className={`ml-2 block text-[10px] text-zinc-500 font-medium ${!interaction.requiresInInventory ? 'opacity-30' : ''}`}>Consome item após uso</label>
+                                <label htmlFor={`consumesItem-${index}`} className={`ml-2 block text-[10px] text-muted-foreground font-medium ${!interaction.requiresInInventory ? 'opacity-30' : ''}`}>Consome item após uso</label>
                             </div>
                         </div>
 
                         <div>
-                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Alvo da Interação</label>
+                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Alvo da Interação</label>
                             <select value={interaction.target} onChange={e => handleInteractionChange('target', e.target.value)} className={selectBaseClasses}>
                                 <option value="">Nenhum / Ação Geral</option>
                                 {sceneObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
@@ -210,7 +210,7 @@ const InteractionItem: React.FC<{
                                 <div className="space-y-3 mt-3">
                                     <div className="flex items-center">
                                         <input type="checkbox" id={`removesTarget-${index}`} checked={!!interaction.removesTargetFromScene} onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)} className="custom-checkbox" />
-                                        <label htmlFor={`removesTarget-${index}`} className="ml-2 block text-[10px] text-zinc-500 font-medium">Remove objeto da cena</label>
+                                        <label htmlFor={`removesTarget-${index}`} className="ml-2 block text-[10px] text-muted-foreground font-medium">Remove objeto da cena</label>
                                     </div>
                                     <div className="flex items-center">
                                         <input type="checkbox" id={`addsToInventory-${index}`} checked={!!interaction.addsToInventory} onChange={e => handleInteractionChange('addsToInventory', e.target.checked)} className="custom-checkbox" />
@@ -226,10 +226,10 @@ const InteractionItem: React.FC<{
                         {/* Left Column: Outcome, Transition, Success Message */}
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Resultado da Ação</label>
-                                <div className="flex gap-2 mb-3 p-1 bg-zinc-950 border border-zinc-800 rounded-lg">
-                                    <button onClick={() => handleOutcomeChange('goToScene')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'goToScene' ? 'bg-white text-zinc-950 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}>Mudar de Cena</button>
-                                    <button onClick={() => handleOutcomeChange('newSceneDescription')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'newSceneDescription' ? 'bg-white text-zinc-950 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}>Atualizar Texto</button>
+                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Resultado da Ação</label>
+                                <div className="flex gap-2 mb-3 p-1 bg-muted border border-border rounded-lg">
+                                    <button onClick={() => handleOutcomeChange('goToScene')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'goToScene' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Mudar de Cena</button>
+                                    <button onClick={() => handleOutcomeChange('newSceneDescription')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'newSceneDescription' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Atualizar Texto</button>
                                 </div>
                                 {outcomeType === 'goToScene' ? (
                                     <select value={interaction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className={selectBaseClasses}>
@@ -237,7 +237,7 @@ const InteractionItem: React.FC<{
                                         {otherScenes.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                                     </select>
                                 ) : (
-                                    <textarea value={interaction.newSceneDescription || ''} onChange={e => handleInteractionChange('newSceneDescription', e.target.value)} rows={3} placeholder="Nova descrição para esta cena..." className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs focus:ring-0 text-zinc-300" />
+                                    <textarea value={interaction.newSceneDescription || ''} onChange={e => handleInteractionChange('newSceneDescription', e.target.value)} rows={3} placeholder="Nova descrição para esta cena..." className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs focus:ring-0 text-foreground" />
                                 )}
                             </div>
 
@@ -245,7 +245,7 @@ const InteractionItem: React.FC<{
                             {outcomeType === 'goToScene' && (
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Transição</label>
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Transição</label>
                                         <select
                                             value={interaction.transitionType || 'fade'}
                                             onChange={e => handleInteractionChange('transitionType', e.target.value)}
@@ -262,13 +262,13 @@ const InteractionItem: React.FC<{
                                         </select>
                                     </div>
                                     <div>
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Velocidade</label>
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Velocidade</label>
                                         <div className="flex items-center gap-3 h-[34px]">
                                             <input
                                                 type="range" min="1" max="5"
                                                 value={interaction.transitionSpeed || 3}
                                                 onChange={e => handleInteractionChange('transitionSpeed', parseInt(e.target.value, 10))}
-                                                className="flex-grow h-1 bg-zinc-950 rounded-lg appearance-none cursor-pointer border border-zinc-800 accent-purple-500"
+                                                className="flex-grow h-1 bg-input rounded-lg appearance-none cursor-pointer border border-input accent-primary"
                                             />
                                             <span className="font-mono font-bold text-purple-400 w-6 text-center text-xs shrink-0">
                                                 {interaction.transitionSpeed || 3}
@@ -279,18 +279,18 @@ const InteractionItem: React.FC<{
                             )}
 
                             <div>
-                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Mensagem de Sucesso (Opcional)</label>
-                                <input type="text" value={interaction.successMessage || ''} onChange={e => handleInteractionChange('successMessage', e.target.value)} placeholder="Ex: Você abriu a porta." className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs focus:ring-0 text-zinc-300" />
+                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Mensagem de Sucesso (Opcional)</label>
+                                <input type="text" value={interaction.successMessage || ''} onChange={e => handleInteractionChange('successMessage', e.target.value)} placeholder="Ex: Você abriu a porta." className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs focus:ring-0 text-foreground" />
                             </div>
                         </div>
 
                         {/* Right Column: Sound Effect, Trackers */}
                         <div className="space-y-6">
                             <div className="flex flex-col space-y-2">
-                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Efeito Sonoro (Opcional)</label>
+                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Efeito Sonoro (Opcional)</label>
                                 <div className="flex items-center gap-2">
-                                    <label className="flex-grow flex items-center justify-center px-3 py-2 bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold rounded-lg hover:bg-zinc-800 transition-all cursor-pointer text-xs">
-                                        <Upload className="w-4 h-4 mr-2 text-purple-400" /> {interaction.soundEffect ? 'Alterar Som' : 'Carregar Som'}
+                                    <label className="flex-grow flex items-center justify-center px-3 py-2 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 transition-all cursor-pointer text-xs">
+                                        <Upload className="w-4 h-4 mr-2 text-primary" /> {interaction.soundEffect ? 'Alterar Som' : 'Carregar Som'}
                                         <input type="file" accept="audio/*" onChange={handleSoundUpload} className="hidden" />
                                     </label>
                                     {interaction.soundEffect && <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Remover Som"><Trash2 className="w-3 h-3" /></button>}
@@ -299,20 +299,20 @@ const InteractionItem: React.FC<{
 
                             <div>
                                 <div className="flex justify-between items-center mb-3">
-                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider">Rastreadores</label>
+                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Rastreadores</label>
                                     <button onClick={handleAddTrackerEffect} className="text-[10px] text-purple-400 font-bold uppercase tracking-widest hover:text-purple-300 transition-all flex items-center"><Plus className="w-3 h-3 mr-1" /> Adicionar</button>
                                 </div>
                                 <div className="space-y-2">
                                     {interaction.trackerEffects && interaction.trackerEffects.length > 0 ? interaction.trackerEffects.map((effect, i) => (
                                         <div key={i} className="flex gap-2 items-center">
-                                            <select value={effect.trackerId} onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)} className="flex-grow bg-zinc-950 border border-zinc-800 rounded-lg px-2 py-1.5 text-xs text-zinc-300 focus:ring-0">
+                                            <select value={effect.trackerId} onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)} className="flex-grow bg-input border border-input rounded-lg px-2 py-1.5 text-xs text-foreground focus:ring-0">
                                                 <option value="">Selecione...</option>
                                                 {consequenceTrackers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                                             </select>
-                                            <input type="number" value={localTrackerValues[i]} onChange={e => handleLocalTrackerValueChange(i, e.target.value)} onBlur={() => handleLocalTrackerValueBlur(i)} className="w-20 bg-zinc-900 border border-zinc-800 rounded-lg px-2 py-1.5 text-xs focus:ring-0 text-zinc-300 font-mono" />
-                                            <button onClick={() => handleRemoveTrackerEffect(i)} className="text-zinc-600 hover:text-red-500 transition-all"><Trash2 className="w-4 h-4" /></button>
+                                            <input type="number" value={localTrackerValues[i]} onChange={e => handleLocalTrackerValueChange(i, e.target.value)} onBlur={() => handleLocalTrackerValueBlur(i)} className="w-20 bg-input border border-input rounded-lg px-2 py-1.5 text-xs focus:ring-0 text-foreground font-mono" />
+                                            <button onClick={() => handleRemoveTrackerEffect(i)} className="text-muted-foreground hover:text-destructive transition-all"><Trash2 className="w-4 h-4" /></button>
                                         </div>
-                                    )) : <p className="text-[10px] text-zinc-600 italic py-2">Nenhum efeito definido.</p>}
+                                    )) : <p className="text-[10px] text-muted-foreground italic py-2">Nenhum efeito definido.</p>}
                                 </div>
                             </div>
                         </div>
@@ -344,13 +344,13 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions, onU
         <div className="space-y-3">
             {interactions.length > 0 ? interactions.map((interaction, index) => (
                 <InteractionItem key={interaction.id} index={index} interaction={interaction} onUpdate={handleUpdate} onRemove={handleRemove} allScenes={allScenes} currentSceneId={currentSceneId} sceneObjects={sceneObjects} allTakableObjects={allTakableObjects} consequenceTrackers={consequenceTrackers} />
-            )) : <p className="text-center text-zinc-500 py-16 border-2 border-dashed border-zinc-800/50 rounded-xl text-xs italic bg-zinc-950/20">Nenhuma interação definida para esta cena.</p>}
+            )) : <p className="text-center text-muted-foreground py-16 border-2 border-dashed border-border/50 rounded-xl text-xs italic bg-muted/20">Nenhuma interação definida para esta cena.</p>}
 
             {/* Floating Add Button - Adjusted to match sidebar constraints */}
             <div className="fixed bottom-6 left-[calc(25%+2.5rem)] xl:left-[calc(20%+2.5rem)] z-10 flex gap-2">
                 <button
                     onClick={handleAdd}
-                    className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
+                    className="flex items-center px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all shadow-xl active:scale-95 text-xs"
                 >
                     <Plus className="w-4 h-4 mr-2" />
                     Nova Interação

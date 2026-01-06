@@ -1,22 +1,124 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Bold, Italic, Underline, List, ListOrdered, Link as LinkIcon, Image, Quote, ChevronLeft, Save, Send, Maximize2 } from 'lucide-react';
+import { ChevronLeft, Save, Send, AlertCircle } from 'lucide-react';
 import { Database } from '../types/supabase';
+import { useToast } from '../components/ToastContext';
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
 
 type Category = Database['public']['Tables']['categories']['Row'];
 
+// Confirmation Modal Component
+const ConfirmationModal = ({
+    isOpen,
+    onClose,
+    onConfirm,
+    title,
+    message,
+    confirmText = "Confirmar",
+    confirmColor = "bg-green-600 hover:bg-green-500"
+}: {
+    isOpen: boolean;
+    onClose: () => void;
+    onConfirm: () => void;
+    title: string;
+    message: string;
+    confirmText?: string;
+    confirmColor?: string;
+}) => {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+            <div className="bg-card border border-border rounded-xl shadow-2xl max-w-md w-full overflow-hidden animate-in zoom-in-95 duration-200">
+                <div className="p-6">
+                    <div className="flex items-center gap-3 mb-4 text-foreground">
+                        <div className="bg-primary/10 p-2 rounded-full text-primary">
+                            <AlertCircle size={24} />
+                        </div>
+                        <h3 className="text-lg font-bold">{title}</h3>
+                    </div>
+                    <p className="text-muted-foreground mb-6 leading-relaxed text-sm">{message}</p>
+                    <div className="flex justify-end gap-3">
+                        <button
+                            onClick={onClose}
+                            className="px-4 py-2 rounded-lg text-sm font-medium text-muted-foreground hover:bg-muted transition-colors"
+                        >
+                            Cancelar
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            className={`px-4 py-2 rounded-lg text-sm font-bold text-white shadow-sm transition-colors ${confirmColor}`}
+                        >
+                            {confirmText}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 const CreatePost: React.FC = () => {
     const navigate = useNavigate();
+    const { id } = useParams();
+    const { toast } = useToast();
+
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
-    const [categoryId, setCategoryId] = useState<string>(''); // Default to be selected
+    const [categoryId, setCategoryId] = useState<string>('');
     const [categories, setCategories] = useState<Category[]>([]);
     const [loading, setLoading] = useState(false);
     const [savingDraft, setSavingDraft] = useState(false);
+    const [initError, setInitError] = useState<string | null>(null);
 
-    React.useEffect(() => {
+    const [showPublishModal, setShowPublishModal] = useState(false);
+
+    const editorRef = useRef<HTMLDivElement>(null);
+    const quillRef = useRef<Quill | null>(null);
+
+    useEffect(() => {
         fetchCategories();
+        if (id) {
+            fetchPostData(id);
+        }
+    }, [id]);
+
+    // Initialize Quill
+    useEffect(() => {
+        if (editorRef.current && !quillRef.current) {
+            try {
+                const quill = new Quill(editorRef.current, {
+                    theme: 'snow',
+                    placeholder: 'Comece a escrever seu tópico aqui...',
+                    modules: {
+                        toolbar: [
+                            [{ 'header': [1, 2, false] }],
+                            ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                            ['link', 'image', 'code-block'],
+                            ['clean']
+                        ]
+                    }
+                });
+
+                quill.on('text-change', () => {
+                    // Get HTML content
+                    const html = quill.root.innerHTML || '';
+                    // If editor is empty (just <p><br></p>), set content to empty string
+                    if (html === '<p><br></p>') {
+                        setContent('');
+                    } else {
+                        setContent(html);
+                    }
+                });
+
+                quillRef.current = quill;
+            } catch (err: any) {
+                console.error("Quill initialization error:", err);
+                setInitError(err.message || 'Erro ao carregar editor');
+            }
+        }
     }, []);
 
     const fetchCategories = async () => {
@@ -24,166 +126,306 @@ const CreatePost: React.FC = () => {
         if (data) setCategories(data);
     };
 
-    const handleSave = async (status: 'draft' | 'published') => {
-        if (!title.trim() || !content.trim()) {
-            alert('Por favor, preencha o título e o conteúdo.');
+    const fetchPostData = async (postId: string) => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const { data, error } = await supabase
+            .from('posts')
+            .select('*')
+            .eq('id', postId)
+            .single();
+
+        if (error) {
+            toast('Erro', 'Não foi possível carregar o rascunho.', 'error');
+            navigate('/community');
             return;
         }
 
-        if (status === 'published' && !categoryId) {
-            // If publishing, maybe require a category? For now let's be flexible or pick the first one default
+        if (data.author_id !== user.id) {
+            toast('Acesso negado', 'Você não tem permissão para editar este post.', 'error');
+            navigate('/community');
+            return;
+        }
+
+        setTitle(data.title);
+        setContent(data.content);
+        setCategoryId(data.category_id);
+
+        // Update Quill content safely
+        if (quillRef.current && data.content) {
+            // Direct innerHTML assignment is safe and supported for initial load
+            quillRef.current.root.innerHTML = data.content;
+        }
+    };
+
+    const confirmPublish = () => {
+        const strippedContent = content.replace(/<[^>]*>/g, '').trim();
+        if (!title.trim() || !strippedContent) {
+            toast('Campos obrigatórios', 'Por favor, preencha o título e o conteúdo.', 'error');
+            return;
+        }
+
+        let validCategory = categoryId;
+        if (!validCategory) {
             const defaultCat = categories.find(c => c.slug === 'general')?.id || categories[0]?.id;
-            if (defaultCat) setCategoryId(defaultCat);
-            else {
-                alert("Selecione uma categoria para publicar.");
+            if (defaultCat) {
+                validCategory = defaultCat;
+                setCategoryId(defaultCat);
+            } else {
+                toast('Categoria necessária', 'Selecione uma categoria para publicar.', 'error');
                 return;
             }
+        }
+        setShowPublishModal(true);
+    };
+
+    const handleSave = async (status: 'draft' | 'published') => {
+        const strippedContent = content.replace(/<[^>]*>/g, '').trim();
+        if (!title.trim() || (!strippedContent && status === 'published')) {
+            toast('Campos obrigatórios', 'Por favor, preencha o título e o conteúdo.', 'error');
+            return;
+        }
+
+        const { data: { user } } = await supabase.auth.getUser();
+
+        if (!user) {
+            toast('Erro de autenticação', 'Você precisa estar logado.', 'error');
+            return;
+        }
+
+        let validCategoryId = categoryId;
+        if (!validCategoryId) {
+            const defaultCat = categories.find(c => c.slug === 'general')?.id || categories[0]?.id;
+            validCategoryId = defaultCat || '';
+        }
+
+        if (status === 'published' && !validCategoryId) {
+            toast('Erro de configuração', 'Nenhuma categoria disponível.', 'error');
+            return;
         }
 
         if (status === 'draft') setSavingDraft(true);
         else setLoading(true);
 
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            alert('Você precisa estar logado.');
-            setLoading(false);
-            setSavingDraft(false);
-            return;
-        }
-
-        const validCategoryId = categoryId || categories[0]?.id;
-
-        if (!validCategoryId) {
-            alert("Erro: Nenhuma categoria disponível. Entre em contato com o suporte.");
-            setLoading(false);
-            setSavingDraft(false);
-            return;
-        }
-
         const postData = {
             title,
-            content,
+            content, // HTML content from Quill
             author_id: user.id,
             category_id: validCategoryId,
-            status: status
+            status: status,
+            updated_at: new Date().toISOString()
         };
 
-        const { error } = await supabase.from('posts').insert(postData);
+        let error;
+
+        if (id) {
+            const { error: updateError } = await supabase
+                .from('posts')
+                .update(postData)
+                .eq('id', id);
+            error = updateError;
+        } else {
+            const { error: insertError } = await supabase
+                .from('posts')
+                .insert(postData);
+            error = insertError;
+        }
 
         if (error) {
-            console.error('Error creating post:', error);
-            console.error('Error creating post:', error);
-            alert(`Erro ao salvar: ${error.message || error.details || JSON.stringify(error)}`);
+            console.error('Error saving post:', error);
+            toast('Erro ao salvar', error.message || 'Ocorreu um erro inesperado.', 'error');
         } else {
             if (status === 'published') {
+                toast('Sucesso!', 'Tópico publicado com sucesso.', 'success');
                 navigate('/community');
             } else {
-                alert('Rascunho salvo com sucesso!');
+                toast('Rascunho salvo', 'Seu trabalho foi salvo com sucesso.', 'success');
+                if (!id) navigate('/community/my-posts');
             }
         }
 
+        setShowPublishModal(false);
         setLoading(false);
         setSavingDraft(false);
     };
 
+    if (initError) {
+        return (
+            <div className="p-8 text-center">
+                <div className="text-red-500 mb-2 font-bold">Erro ao carregar editor</div>
+                <div className="text-muted-foreground">{initError}</div>
+                <button onClick={() => window.location.reload()} className="mt-4 px-4 py-2 bg-primary text-white rounded">Tentar novamente</button>
+            </div>
+        );
+    }
+
     return (
-        <div className="flex flex-col h-full max-w-5xl mx-auto p-6 font-sans">
-            {/* Header */}
-            <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-4">
-                    <button onClick={() => navigate('/community')} className="text-zinc-400 hover:text-white transition-colors">
-                        <ChevronLeft size={24} />
+        <div className="flex flex-col h-full max-w-5xl mx-auto p-4 font-sans">
+            <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-3">
+                    <button onClick={() => navigate('/community')} className="text-muted-foreground hover:text-foreground transition-colors">
+                        <ChevronLeft size={20} />
                     </button>
                     <div>
-                        <div className="flex items-center gap-2 text-zinc-400 text-xs mb-1">
-                            <span>Minhas Histórias</span>
-                            <span>›</span>
-                            <span>Nova Postagem</span>
+                        <div>
+                            <h1 className="text-xl font-bold text-foreground">{id ? 'Editar Tópico' : 'Novo Tópico'}</h1>
+                            <p className="text-muted-foreground text-xs">{id ? 'Continue escrevendo sua discussão.' : 'Crie e compartilhe sua discussão com a comunidade.'}</p>
                         </div>
-                        <h1 className="text-2xl font-bold text-white">Nova História</h1>
-                        <p className="text-zinc-500 text-sm">Crie e compartilhe sua próxima aventura interativa.</p>
                     </div>
                 </div>
             </div>
 
-            {/* Inputs */}
-            <div className="space-y-6 flex-1 flex flex-col">
-                <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-300 ml-1">Título da Aventura</label>
+            <div className="space-y-4 flex-1 flex flex-col">
+                <div className="space-y-1">
+                    <label className="text-xs font-medium text-muted-foreground ml-1">Título do Tópico</label>
                     <input
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         placeholder="Digite um título cativante..."
-                        className="w-full bg-zinc-900/50 border border-zinc-700 rounded-xl px-5 py-4 text-white text-lg placeholder-zinc-600 focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all font-medium"
+                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-foreground text-sm placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
                     />
                 </div>
 
-                <div className="bg-zinc-900/50 border border-zinc-700 rounded-xl flex flex-col flex-1 overflow-hidden focus-within:border-purple-500/50 focus-within:ring-1 focus-within:ring-purple-500/20 transition-all">
-                    {/* Toolbar */}
-                    <div className="flex items-center gap-1 p-3 border-b border-zinc-800 bg-zinc-900/30">
-                        <button className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors"><Bold size={18} /></button>
-                        <button className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors"><Italic size={18} /></button>
-                        <button className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors"><Underline size={18} /></button>
-                        <div className="w-px h-6 bg-zinc-800 mx-2"></div>
-                        <button className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors"><List size={18} /></button>
-                        <button className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors"><ListOrdered size={18} /></button>
-                        <div className="w-px h-6 bg-zinc-800 mx-2"></div>
-                        <button className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors"><LinkIcon size={18} /></button>
-                        <button className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors"><Image size={18} /></button>
-                        <button className="p-2 text-zinc-400 hover:text-white hover:bg-zinc-800 rounded transition-colors"><Quote size={18} /></button>
-                        <div className="flex-1"></div>
-                        <button className="p-2 text-zinc-400 hover:text-purple-400 hover:bg-zinc-800 rounded transition-colors flex items-center gap-2 text-xs font-medium">
-                            <Maximize2 size={16} /> Modo Foco
-                        </button>
-                    </div>
+                <div className="bg-card border border-border rounded-lg flex flex-col flex-1 overflow-hidden">
+                    {/* Quill Editor Container */}
+                    <div ref={editorRef} className="quill-editor h-full text-foreground bg-background"></div>
 
-                    {/* Editor Area */}
-                    <textarea
-                        value={content}
-                        onChange={(e) => setContent(e.target.value)}
-                        placeholder="Comece a escrever sua história aqui...&#10;&#10;O vento uivava através das árvores antigas..."
-                        className="flex-1 w-full bg-transparent border-none p-6 text-zinc-300 placeholder-zinc-600 resize-none focus:ring-0 leading-relaxed text-base"
-                    ></textarea>
+                    {/* Styles override for dark mode adaptation */}
+                    <style>{`
+                        /* Base Toolbar & Container */
+                        .ql-toolbar.ql-snow {
+                            background-color: var(--muted) !important;
+                            border-color: var(--border) !important;
+                            border-top-left-radius: 0.5rem;
+                            border-top-right-radius: 0.5rem;
+                        }
+                        .ql-container.ql-snow {
+                            border-color: var(--border) !important;
+                            border-bottom-left-radius: 0.5rem;
+                            border-bottom-right-radius: 0.5rem;
+                            background-color: var(--card) !important;
+                            color: var(--foreground) !important;
+                            font-family: inherit;
+                            font-size: 0.875rem; 
+                        }
+                        
+                        /* Editor Area */
+                        .ql-editor {
+                            min-height: 200px;
+                        }
+                        
+                        /* --- ICONS VISIBILITY FIX --- */
+                        /* Force all strokes to be white (or foreground variable) */
+                        .ql-snow .ql-stroke,
+                        .ql-toolbar .ql-stroke {
+                            stroke: var(--foreground) !important;
+                        }
+                        
+                        /* Force all fills to be white */
+                        .ql-snow .ql-fill,
+                        .ql-toolbar .ql-fill {
+                            fill: var(--foreground) !important;
+                        }
+                        
+                        /* Dropdown Pickers (Header, etc) */
+                        .ql-snow .ql-picker {
+                            color: var(--foreground) !important;
+                        }
+                        .ql-snow .ql-picker-label {
+                            color: var(--foreground) !important;
+                        }
+                        .ql-snow .ql-picker-label::before {
+                            color: var(--foreground) !important;
+                        }
+                        .ql-snow .ql-picker .ql-picker-label .ql-stroke {
+                            stroke: var(--foreground) !important;
+                        }
+
+                        /* Hover States - Primary Color */
+                        .ql-snow.ql-toolbar button:hover .ql-stroke,
+                        .ql-snow.ql-toolbar button.ql-active .ql-stroke,
+                        .ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,
+                        .ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke {
+                            stroke: var(--primary) !important;
+                        }
+                        
+                        .ql-snow.ql-toolbar button:hover .ql-fill,
+                        .ql-snow.ql-toolbar button.ql-active .ql-fill,
+                        .ql-snow.ql-toolbar .ql-picker-label:hover .ql-fill,
+                        .ql-snow.ql-toolbar .ql-picker-item:hover .ql-fill {
+                            fill: var(--primary) !important;
+                        }
+                        
+                        .ql-snow.ql-toolbar button:hover,
+                        .ql-snow.ql-toolbar button.ql-active,
+                        .ql-snow.ql-toolbar .ql-picker-label:hover,
+                        .ql-snow.ql-toolbar .ql-picker-item:hover {
+                            color: var(--primary) !important;
+                        }
+
+                        /* Dropdown Options Background */
+                        .ql-snow .ql-picker-options {
+                            background-color: var(--card) !important;
+                            border-color: var(--border) !important;
+                        }
+                        .ql-snow .ql-picker-item {
+                            color: var(--foreground) !important;
+                        }
+                        
+                        /* Placeholder */
+                        .ql-editor.ql-blank::before {
+                            color: var(--muted-foreground) !important;
+                            font-style: normal;
+                        }
+                    `}</style>
                 </div>
             </div>
 
-            {/* Footer Actions */}
-            <div className="flex items-center justify-between mt-6 pt-6 border-t border-zinc-800/50">
-                <div className="flex items-center gap-2 text-zinc-500 text-sm">
-                    {/* Optional: Add category selector here if needed, or simple Draft status */}
+            <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/50">
+                <div className="flex items-center gap-2 text-muted-foreground text-xs">
                     <select
                         value={categoryId}
                         onChange={(e) => setCategoryId(e.target.value)}
-                        className="bg-zinc-900 border border-zinc-700 text-zinc-300 text-xs rounded px-2 py-1 focus:outline-none focus:border-purple-500"
+                        className="bg-card border border-border text-foreground text-[10px] rounded px-2 py-1 focus:outline-none focus:border-primary"
                     >
                         <option value="">Selecionar Categoria</option>
                         {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
-                    <span className="text-zinc-600">|</span>
-                    <span>Salvo como rascunho às 14:05</span>
+                    <span className="text-muted-foreground/50">|</span>
+                    <span className="text-[10px]">{id ? 'Edição de rascunho' : 'Novo rascunho'}</span>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex gap-3">
                     <button
                         onClick={() => handleSave('draft')}
                         disabled={savingDraft || loading}
-                        className="px-6 py-2.5 rounded-lg border border-zinc-700 text-zinc-300 font-medium hover:bg-zinc-800 hover:text-white transition-all disabled:opacity-50 text-sm flex items-center gap-2"
+                        className="px-4 py-2 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-all disabled:opacity-50 text-xs flex items-center gap-1.5"
                     >
-                        <Save size={16} />
+                        <Save size={14} />
                         {savingDraft ? 'Salvando...' : 'Salvar Rascunho'}
                     </button>
                     <button
-                        onClick={() => handleSave('published')}
+                        onClick={confirmPublish}
                         disabled={loading || savingDraft}
-                        className="px-6 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold hover:shadow-lg hover:shadow-blue-600/20 transition-all disabled:opacity-50 text-sm flex items-center gap-2"
+                        className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold hover:shadow-lg hover:shadow-blue-600/20 transition-all disabled:opacity-50 text-xs flex items-center gap-1.5"
                     >
-                        {loading ? 'Publicando...' : 'Publicar História'}
-                        <Send size={16} />
+                        {loading ? 'Publicando...' : 'Publicar Tópico'}
+                        <Send size={14} />
                     </button>
                 </div>
             </div>
+
+            <ConfirmationModal
+                isOpen={showPublishModal}
+                onClose={() => setShowPublishModal(false)}
+                onConfirm={() => handleSave('published')}
+                title="Publicar Tópico"
+                message="Tem certeza que deseja publicar este tópico? Ele ficará visível para toda a comunidade imediatamente."
+                confirmText="Publicar Agora"
+                confirmColor="bg-blue-600 hover:bg-blue-500"
+            />
         </div>
     );
 };

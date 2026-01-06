@@ -228,7 +228,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
   return (
     <div className="h-full flex flex-col relative">
       <div className="mb-4 flex-shrink-0">
-        <p className="text-zinc-500 mt-1 text-sm font-medium">
+        <p className="text-zinc-500 mt-1 text-xs font-medium">
           Visualize e organize a estrutura do seu jogo. Arraste as cenas para reposicioná-las e clique para editá-las.
         </p>
       </div>
@@ -361,7 +361,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
         </div>
       </div>
       <div className="absolute bottom-6 left-6 z-10 flex items-center gap-3">
-        <button onClick={onAddScene} className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs uppercase tracking-widest"><Plus className="w-4 h-4 mr-2" />Nova Cena</button>
+        <button onClick={onAddScene} className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"><Plus className="w-4 h-4 mr-2" />Nova Cena</button>
       </div>
       <div className="absolute bottom-6 right-6 z-10 flex flex-col items-end gap-4 pointer-events-none">
         <div className="bg-zinc-950/80 backdrop-blur-md p-4 rounded-xl border border-zinc-800 shadow-xl pointer-events-auto">

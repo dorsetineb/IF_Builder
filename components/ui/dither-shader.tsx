@@ -124,18 +124,27 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
     const parsedSecondaryColor = parseColor(secondaryColor);
     const parsedCustomPalette = customPalette.map(parseColor);
 
-    const handleMouseMove = useCallback((e: React.MouseEvent) => {
-        if (!containerRef.current) return;
-        const rect = containerRef.current.getBoundingClientRect();
-        mouseRef.current = {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top,
+    useEffect(() => {
+        const handleGlobalMouseMove = (e: MouseEvent) => {
+            if (!containerRef.current || !enableHover) return;
+            const rect = containerRef.current.getBoundingClientRect();
+            mouseRef.current = {
+                x: e.clientX - rect.left,
+                y: e.clientY - rect.top,
+            };
         };
-    }, []);
+
+        window.addEventListener("mousemove", handleGlobalMouseMove);
+        return () => {
+            window.removeEventListener("mousemove", handleGlobalMouseMove);
+        };
+    }, [enableHover]);
 
     const handleMouseLeave = useCallback(() => {
         mouseRef.current = null;
     }, []);
+
+    // Remove old event handlers from local variables if they exist in previous renders (not needed, just cleaning up)
 
     const renderLoop = useCallback(
         (
@@ -365,8 +374,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
         <div
             ref={containerRef}
             className={cn("relative h-full w-full overflow-hidden", className)}
-            onMouseMove={handleMouseMove}
-            onMouseLeave={handleMouseLeave}
+        // onMouseLeave={handleMouseLeave} // Optional: keep if we want to reset on window leave, but for now user wants persistence
         >
             <canvas
                 ref={canvasRef}

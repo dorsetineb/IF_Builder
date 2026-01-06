@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { User, Lock, Save, Camera, Link as LinkIcon, Mail } from 'lucide-react';
+import { User, Lock, Save, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee } from 'lucide-react';
+import { useTheme } from '../components/ThemeProvider';
+import { useToast } from '../components/ToastContext';
+import { useNavigate } from 'react-router-dom';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const Settings: React.FC = () => {
+    const { theme, setTheme } = useTheme();
+    const { toast } = useToast();
+    const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
-    const [profile, setProfile] = useState<Profile | null>(null);
     const [email, setEmail] = useState('');
 
     // Form States
@@ -27,12 +32,18 @@ const Settings: React.FC = () => {
             setEmail(user.email || '');
             const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
             if (data) {
-                setProfile(data);
                 setDisplayName(data.full_name || '');
                 setUsername(data.username || '');
                 setWebsite(data.website || '');
                 setBio(data.bio || '');
                 setAvatarUrl(data.avatar_url || '');
+            } else {
+                // Pre-fill from auth metadata if profile doesn't exist
+                const meta = user.user_metadata;
+                console.log('No profile found, using metadata:', meta);
+                setDisplayName(meta.full_name || '');
+                setUsername(meta.username || '');
+                setAvatarUrl(meta.avatar_url || '');
             }
         }
     };
@@ -55,44 +66,91 @@ const Settings: React.FC = () => {
         const { error } = await supabase.from('profiles').upsert(updates);
 
         if (error) {
-            alert(error.message);
+            toast("Erro ao salvar perfil", error.message, "error");
         } else {
-            alert('Perfil atualizado com sucesso!');
+            toast("Sucesso!", "Perfil atualizado com sucesso.", "success");
         }
         setLoading(false);
     };
 
+    const handleLogout = async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) {
+            console.error('Error logging out:', error);
+            toast("Erro ao sair", "Não foi possível encerrar a sessão.", "error");
+        } else {
+            navigate('/');
+        }
+    };
+
     return (
-        <div className="p-8 max-w-4xl mx-auto font-sans text-zinc-200">
-            <div className="flex justify-between items-center mb-8">
+        <div className="p-6 max-w-4xl mx-auto font-sans text-foreground bg-background min-h-screen text-xs">
+            <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h1 className="text-3xl font-bold text-white mb-2">Configurações de Perfil</h1>
-                    <p className="text-zinc-400">Gerencie suas informações pessoais e preferências de conta.</p>
+                    <h1 className="text-xl font-bold text-foreground mb-1">Configurações</h1>
+                    <p className="text-muted-foreground text-xs">Gerencie suas preferências e perfil.</p>
                 </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-zinc-800 text-zinc-400 rounded-lg hover:bg-zinc-700 text-sm font-medium transition-colors">
-                    <User size={16} /> Manual de Uso
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-destructive/10 text-destructive rounded-lg hover:bg-destructive/20 border border-destructive/20 text-xs font-medium transition-colors"
+                >
+                    <LogOut size={14} /> Sair da Conta
                 </button>
             </div>
 
-            {/* Public Info Section */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 mb-8">
-                <div className="flex items-center gap-3 mb-6 text-purple-400">
-                    <User size={20} />
-                    <h2 className="text-lg font-bold text-white">Informações Públicas</h2>
+            {/* Theme Section */}
+            <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
+                <div className="flex items-center gap-2 mb-3 text-primary">
+                    <Sun size={16} />
+                    <h2 className="text-sm font-bold text-card-foreground">Aparência</h2>
                 </div>
 
-                <div className="flex gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <button
+                        onClick={() => setTheme('dark')}
+                        className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted'}`}
+                    >
+                        <Moon size={16} className={theme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
+                        <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>Dark</span>
+                    </button>
+
+                    <button
+                        onClick={() => setTheme('light')}
+                        className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted'}`}
+                    >
+                        <Sun size={16} className={theme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
+                        <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>Light</span>
+                    </button>
+
+                    <button
+                        onClick={() => setTheme('cream')}
+                        className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted'}`}
+                    >
+                        <Coffee size={16} className={theme === 'cream' ? 'text-primary' : 'text-muted-foreground'} />
+                        <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>Cream</span>
+                    </button>
+                </div>
+            </div>
+
+            {/* Public Info Section */}
+            <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
+                <div className="flex items-center gap-2 mb-4 text-primary">
+                    <User size={16} />
+                    <h2 className="text-sm font-bold text-card-foreground">Informações Públicas</h2>
+                </div>
+
+                <div className="flex flex-col md:flex-row gap-6">
                     {/* Avatar Actions */}
-                    <div className="flex flex-col items-center gap-3">
-                        <div className="w-32 h-32 rounded-full bg-zinc-800 border-4 border-zinc-900 shadow-xl overflow-hidden flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-2">
+                        <div className="w-24 h-24 rounded-full bg-muted border-2 border-card shadow-lg overflow-hidden flex items-center justify-center">
                             {avatarUrl ? (
                                 <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                             ) : (
-                                <User size={48} className="text-zinc-600" />
+                                <User size={32} className="text-muted-foreground" />
                             )}
                         </div>
                         <button
-                            className="text-purple-400 hover:text-purple-300 text-sm font-medium flex items-center gap-1.5"
+                            className="text-primary hover:text-primary/80 text-xs font-medium flex items-center gap-1"
                             onClick={() => {
                                 const url = prompt("Insira a URL da imagem:");
                                 if (url) setAvatarUrl(url);
@@ -103,97 +161,93 @@ const Settings: React.FC = () => {
                     </div>
 
                     {/* Form Fields */}
-                    <div className="flex-1 space-y-5">
-                        <div className="space-y-1.5 text-left">
-                            <label className="text-sm font-medium text-zinc-400">Nome de Exibição</label>
+                    <div className="flex-1 space-y-3">
+                        <div className="space-y-1 text-left">
+                            <label className="text-xs font-medium text-muted-foreground">Nome de Exibição</label>
                             <input
                                 type="text"
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
-                                className="w-full bg-black/50 border border-zinc-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all font-medium"
+                                className="w-full bg-input border border-input rounded px-3 py-1.5 text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
                                 placeholder="Como você quer ser chamado"
                             />
                         </div>
 
-                        <div className="grid grid-cols-2 gap-5">
-                            <div className="space-y-1.5 text-left">
-                                <label className="text-sm font-medium text-zinc-400">Nome de Usuário</label>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="space-y-1 text-left">
+                                <label className="text-xs font-medium text-muted-foreground">Nome de Usuário</label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-2.5 text-zinc-500">@</span>
+                                    <span className="absolute left-2.5 top-1.5 text-muted-foreground">@</span>
                                     <input
                                         type="text"
                                         value={username}
                                         onChange={(e) => setUsername(e.target.value)}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-lg pl-8 pr-4 py-2.5 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all font-medium"
+                                        className="w-full bg-input border border-input rounded pl-7 pr-3 py-1.5 text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
                                     />
                                 </div>
                             </div>
-                            <div className="space-y-1.5 text-left">
-                                <label className="text-sm font-medium text-zinc-400">Website (Opcional)</label>
+                            <div className="space-y-1 text-left">
+                                <label className="text-xs font-medium text-muted-foreground">Website (Opcional)</label>
                                 <div className="relative">
-                                    <span className="absolute left-3 top-2.5 text-zinc-500"><LinkIcon size={14} /></span>
+                                    <span className="absolute left-2.5 top-1.5 text-muted-foreground"><LinkIcon size={12} /></span>
                                     <input
                                         type="text"
                                         value={website}
                                         onChange={(e) => setWebsite(e.target.value)}
-                                        className="w-full bg-black/50 border border-zinc-700 rounded-lg pl-9 pr-4 py-2.5 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all font-medium"
+                                        className="w-full bg-input border border-input rounded pl-7 pr-3 py-1.5 text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
                                         placeholder="https://"
                                     />
                                 </div>
                             </div>
                         </div>
 
-                        <div className="space-y-1.5 text-left">
-                            <label className="text-sm font-medium text-zinc-400">Bio</label>
+                        <div className="space-y-1 text-left">
+                            <label className="text-xs font-medium text-muted-foreground">Bio</label>
                             <textarea
                                 value={bio}
                                 onChange={(e) => setBio(e.target.value)}
-                                className="w-full bg-black/50 border border-zinc-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-purple-500 focus:ring-1 focus:ring-purple-500 transition-all resize-none h-24"
+                                className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none h-20"
                                 placeholder="Conte um pouco sobre você..."
                             ></textarea>
-                            <p className="text-right text-xs text-zinc-600">{bio.length}/160 caracteres</p>
+                            <p className="text-right text-[10px] text-muted-foreground">{bio.length}/160 caracteres</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Security Section (Visual Only for now) */}
-            <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-8 mb-8">
-                <div className="flex items-center gap-3 mb-6 text-purple-400">
-                    <Lock size={20} />
-                    <h2 className="text-lg font-bold text-white">Segurança e Contato</h2>
+            <div className="bg-card border border-border rounded-lg p-4 mb-6 shadow-sm">
+                <div className="flex items-center gap-2 mb-4 text-primary">
+                    <Lock size={16} />
+                    <h2 className="text-sm font-bold text-card-foreground">Segurança</h2>
                 </div>
 
-                <div className="grid grid-cols-2 gap-6 mb-6">
-                    <div className="space-y-1.5 text-left">
-                        <label className="text-sm font-medium text-zinc-400">Endereço de E-mail</label>
-                        <div className="bg-black/30 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-500">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="space-y-1 text-left">
+                        <label className="text-xs font-medium text-muted-foreground">Endereço de E-mail</label>
+                        <div className="bg-muted border border-border rounded px-3 py-1.5 text-muted-foreground text-sm">
                             {email}
                         </div>
                     </div>
-                    <div className="space-y-1.5 text-left">
-                        <label className="text-sm font-medium text-zinc-400">Telefone (Opcional)</label>
-                        <div className="bg-black/30 border border-zinc-800 rounded-lg px-4 py-2.5 text-zinc-500">
-                            +55 (XX) XXXXX-XXXX
-                        </div>
-                    </div>
                 </div>
 
-                <h3 className="text-sm font-bold text-white mb-4">Alterar Senha</h3>
-                <div className="grid grid-cols-3 gap-4">
-                    <input type="password" placeholder="Senha Atual" className="bg-black/50 border border-zinc-700 rounded-lg px-4 py-2.5 text-white" disabled />
-                    <input type="password" placeholder="Nova Senha" className="bg-black/50 border border-zinc-700 rounded-lg px-4 py-2.5 text-white" disabled />
-                    <input type="password" placeholder="Confirmar Senha" className="bg-black/50 border border-zinc-700 rounded-lg px-4 py-2.5 text-white" disabled />
+                <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 flex items-start gap-2">
+                    <AlertCircle className="text-accent flex-shrink-0 mt-0.5" size={16} />
+                    <div>
+                        <h4 className="font-medium text-foreground text-xs">Alteração de Senha</h4>
+                        <p className="text-muted-foreground text-[10px] mt-0.5">Para alterar sua senha, enviaremos um link para seu email.</p>
+                        <button className="mt-1 text-xs font-medium text-primary hover:underline">Enviar link de redefinição</button>
+                    </div>
                 </div>
             </div>
 
-            <div className="flex justify-end pt-4">
+            <div className="flex justify-end pt-2">
                 <button
                     onClick={handleSave}
                     disabled={loading}
-                    className="bg-purple-600 hover:bg-purple-500 text-white font-bold py-2.5 px-8 rounded-lg shadow-lg shadow-purple-900/20 flex items-center gap-2 transition-all disabled:opacity-50"
+                    className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-all disabled:opacity-50 text-xs"
                 >
-                    <Save size={18} />
+                    <Save size={14} />
                     Salvar Alterações
                 </button>
             </div>

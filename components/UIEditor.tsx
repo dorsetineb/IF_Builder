@@ -152,8 +152,8 @@ const ColorInput: React.FC<{
     placeholder: string;
 }> = ({ label, id, value, onChange, placeholder }) => (
     <div>
-        <label htmlFor={id} className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{label}</label>
-        <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-zinc-800 rounded-lg focus-within:border-purple-500/50 transition-all">
+        <label htmlFor={id} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{label}</label>
+        <div className="flex items-center gap-2 p-1 bg-input border border-input rounded-lg focus-within:border-purple-500/50 transition-all">
             <input
                 type="color"
                 id={`${id}-picker`}
@@ -167,7 +167,7 @@ const ColorInput: React.FC<{
                 id={id}
                 value={value}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full bg-transparent font-mono text-xs text-zinc-300 focus:outline-none focus:ring-0 uppercase"
+                className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase"
                 placeholder={placeholder}
             />
         </div>
@@ -196,17 +196,17 @@ const FixedVerbItem: React.FC<{
     };
 
     return (
-        <div className="relative p-6 bg-zinc-900/30 rounded-xl border border-zinc-800/80 hover:border-purple-500/30 transition-all group">
+        <div className="relative p-6 bg-muted/30 rounded-xl border border-border hover:border-purple-500/30 transition-all group">
             <button
                 onClick={() => onRemove(verb.id)}
-                className="absolute top-4 right-4 p-2 text-zinc-500 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
                 title="Remover verbo"
             >
                 <Trash2 className="w-5 h-5" />
             </button>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div>
-                    <label htmlFor={inputId} className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Verbos (separados por vírgula)</label>
+                    <label htmlFor={inputId} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Verbos (separados por vírgula)</label>
                     <input
                         id={inputId}
                         type="text"
@@ -214,18 +214,18 @@ const FixedVerbItem: React.FC<{
                         onChange={e => setLocalVerbs(e.target.value)}
                         onBlur={handleVerbsBlur}
                         placeholder="ex: ajuda, help, ?"
-                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all"
+                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 transition-all"
                     />
                 </div>
                 <div className="flex flex-col h-full">
-                    <label htmlFor={`verb-desc-${verb.id}`} className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Descrição / Resposta</label>
+                    <label htmlFor={`verb-desc-${verb.id}`} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Descrição / Resposta</label>
                     <textarea
                         id={`verb-desc-${verb.id}`}
                         value={verb.description}
                         onChange={e => onUpdate(verb.id, 'description', e.target.value)}
                         placeholder="Texto que será exibido para o jogador."
                         rows={3}
-                        className="w-full flex-grow bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all resize-none"
+                        className="w-full flex-grow bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 transition-all resize-none"
                     />
                 </div>
             </div>
@@ -786,28 +786,28 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         <div className="space-y-6 pb-24">
             <div className="flex justify-between items-start">
                 <div>
-                    <p className="text-zinc-500 mt-1 text-sm font-medium">
+                    <p className="text-zinc-500 mt-1 text-xs font-medium">
                         Configure o título, a interface, as cores e as telas de vitória/derrota do seu jogo.
                     </p>
                 </div>
                 {isDirty && (
-                    <div className="flex items-center gap-2 text-purple-400 text-xs font-bold uppercase tracking-widest animate-pulse bg-purple-500/10 px-3 py-1 rounded-full border border-purple-500/20">
-                        <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
+                    <div className="flex items-center gap-2 text-purple-400 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
+                        <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
                         <span>Alterações não salvas</span>
                     </div>
                 )}
             </div>
 
             <div>
-                <div className="border-b border-zinc-800 flex space-x-1 overflow-x-auto">
+                <div className="border-b border-border flex space-x-1 overflow-x-auto">
                     {Object.entries(TABS).map(([key, name]) => {
                         return (
                             <button
                                 key={key}
                                 onClick={() => setActiveTab(key as any)}
                                 className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-2 ${activeTab === key
-                                    ? 'border-purple-500 text-zinc-100 bg-purple-500/5'
-                                    : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/30'
+                                    ? 'border-purple-500 text-foreground bg-purple-500/5'
+                                    : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
                                     }`}
                             >
                                 {name}
@@ -816,47 +816,47 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     })}
                 </div>
 
-                <div className="bg-zinc-900/10 -mt-px py-8 grid grid-cols-1 xl:grid-cols-[1fr_450px] gap-8 items-start px-6">
+                <div className="bg-muted/10 -mt-px py-8 grid grid-cols-1 xl:grid-cols-[1fr_450px] gap-8 items-start px-6">
                     {activeTab === 'layout' && (
-                        <div className="space-y-12">
+                        <div className="space-y-6">
                             <div>
-                                <h3 className="text-xs font-bold text-zinc-100 mb-8 uppercase tracking-widest">Tela de Abertura</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-10">
+                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Tela de Abertura</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
                                     <div className="space-y-8 col-span-1">
                                         <div className="space-y-8">
                                             <div>
-                                                <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Posicionamento do Conteúdo</label>
+                                                <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
                                                 <select
                                                     id="splashContentAlignment"
                                                     value={localSplashContentAlignment}
                                                     onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-zinc-950 shadow-lg"
+                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input shadow-lg"
                                                 >
                                                     <option value="right">Direita</option>
                                                     <option value="left">Esquerda</option>
                                                 </select>
                                             </div>
                                             <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}>
-                                                <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${localOmitSplashTitle ? 'bg-purple-500 border-purple-500' : 'bg-zinc-950 border-zinc-800 group-hover:border-zinc-700'}`}>
+                                                <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${localOmitSplashTitle ? 'bg-purple-500 border-purple-500' : 'bg-input border-input group-hover:border-primary/50'}`}>
                                                     {localOmitSplashTitle && <Circle className="w-2 h-2 fill-white stroke-none" />}
                                                 </div>
-                                                <label htmlFor="omitSplashTitle" className="ml-3 text-xs font-bold text-zinc-500 uppercase tracking-widest group-hover:text-zinc-400 cursor-pointer select-none transition-colors">Ocultar título e descrição</label>
+                                                <label htmlFor="omitSplashTitle" className="ml-3 text-xs font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground cursor-pointer select-none transition-colors">Ocultar título e descrição</label>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="space-y-4 col-span-2">
-                                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-center mb-1">Pré-visualização</p>
-                                        <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex items-center justify-center shadow-inner h-full min-h-[300px]">
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-1">Pré-visualização</p>
+                                        <div className="bg-card border border-border rounded-2xl p-6 flex items-center justify-center shadow-inner h-full min-h-[300px]">
                                             <div
-                                                className="relative w-full max-w-full aspect-video bg-zinc-900 border border-zinc-800/50 rounded-xl flex shadow-2xl overflow-hidden"
+                                                className="relative w-full max-w-full aspect-video bg-muted border border-border/50 rounded-xl flex shadow-2xl overflow-hidden"
                                                 style={{
                                                     justifyContent: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
                                                     alignItems: 'flex-end'
                                                 }}
                                             >
                                                 <div className="absolute inset-0 flex items-center justify-center -translate-y-4">
-                                                    <div className="text-zinc-800 font-black text-[8px] uppercase tracking-[0.2em] border-2 border-zinc-800/20 px-3 py-1 rounded">Imagem de Fundo</div>
+                                                    <div className="text-secondary-foreground font-black text-[8px] uppercase tracking-[0.2em] border-2 border-secondary-foreground/20 px-3 py-1 rounded">Imagem de Fundo</div>
                                                 </div>
                                                 {!localOmitSplashTitle && (
                                                     <div
@@ -871,42 +871,42 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
                             </div>
 
-                            <div className="pt-12 border-t border-zinc-800/50">
-                                <h3 className="text-xs font-bold text-zinc-100 mb-8 uppercase tracking-widest">Layout do Jogo</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-10">
+                            <div className="pt-6 border-t border-zinc-800/50">
+                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Layout do Jogo</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
                                     <div className="space-y-8 col-span-1">
                                         <div className="space-y-4">
                                             <div>
-                                                <label htmlFor="orientation-select" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Orientação</label>
+                                                <label htmlFor="orientation-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Orientação</label>
                                                 <select
                                                     id="orientation-select"
                                                     value={localLayoutOrientation}
                                                     onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
-                                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-zinc-950"
+                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input"
                                                 >
                                                     <option value="vertical">Vertical</option>
                                                     <option value="horizontal">Horizontal</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label htmlFor="order-select" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Posição da Imagem</label>
+                                                <label htmlFor="order-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posição da Imagem</label>
                                                 <select
                                                     id="order-select"
                                                     value={localLayoutOrder}
                                                     onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
-                                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-zinc-950"
+                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input"
                                                 >
                                                     <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
                                                     <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label htmlFor="frame-select" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Tipo de Moldura</label>
+                                                <label htmlFor="frame-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Tipo de Moldura</label>
                                                 <select
                                                     id="frame-select"
                                                     value={localImageFrame}
                                                     onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
-                                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-zinc-950"
+                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input"
                                                 >
                                                     <option value="none">Sem moldura</option>
                                                     <option value="rounded-top">Portal</option>
@@ -929,10 +929,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     </div>
 
                                     <div className="flex flex-col col-span-2">
-                                        <p className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest text-center mb-4">Pré-visualização do Layout</p>
-                                        <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-6 flex items-center justify-center h-full min-h-[300px] shadow-inner">
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">Pré-visualização do Layout</p>
+                                        <div className="bg-card border border-border rounded-2xl p-6 flex items-center justify-center h-full min-h-[300px] shadow-inner">
                                             <div
-                                                className="w-full max-w-[400px] aspect-video border border-zinc-800/30 bg-zinc-900 rounded-xl flex p-3 gap-3 transition-all shadow-2xl overflow-hidden"
+                                                className="w-full max-w-[400px] aspect-video border border-border/30 bg-muted rounded-xl flex p-3 gap-3 transition-all shadow-2xl overflow-hidden"
                                                 style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
                                             >
                                                 <div
@@ -940,7 +940,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     style={getFramePreviewStyles(localImageFrame).panelStyles}
                                                 >
                                                     <div
-                                                        className={`flex-1 w-full h-full rounded-lg flex items-center justify-center text-center text-[7px] p-2 font-black uppercase tracking-[0.2em] text-zinc-700 border border-zinc-800/30 bg-zinc-950 shadow-inner`}
+                                                        className={`flex-1 w-full h-full rounded-lg flex items-center justify-center text-center text-[7px] p-2 font-black uppercase tracking-[0.2em] text-muted-foreground border border-border/30 bg-card shadow-inner`}
                                                         style={{
                                                             ...getFramePreviewStyles(localImageFrame).containerStyles,
                                                             backgroundColor: undefined
@@ -961,18 +961,18 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     )}
 
                     {activeTab === 'sistemas' && (
-                        <div className="space-y-12">
+                        <div className="space-y-6">
                             <div>
-                                <h3 className="text-xs font-bold text-zinc-100 mb-8 uppercase tracking-widest">Configuração de Sistemas</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Configuração de Sistemas</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                     <div className="space-y-6">
                                         <div>
-                                            <label htmlFor="system-select" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Habilitar sistemas</label>
+                                            <label htmlFor="system-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Habilitar sistemas</label>
                                             <select
                                                 id="system-select"
                                                 value={localGameSystemEnabled}
                                                 onChange={(e) => setLocalGameSystemEnabled(e.target.value as 'none' | 'chances' | 'trackers')}
-                                                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-zinc-950 shadow-lg"
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input shadow-lg"
                                             >
                                                 <option value="none">Nenhum</option>
                                                 <option value="chances">Chances (Vidas)</option>
@@ -980,7 +980,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             </select>
                                         </div>
 
-                                        <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 text-xs text-zinc-400 leading-relaxed">
+                                        <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 text-xs text-muted-foreground leading-relaxed">
                                             {localGameSystemEnabled === 'none' && "Nenhum sistema de jogo adicional habilitado. O jogo será puramente baseado em navegação e interações simples."}
                                             {localGameSystemEnabled === 'chances' && (
                                                 <div className="flex gap-3">
@@ -1002,7 +1002,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
                                                 <div className="grid grid-cols-2 gap-6">
                                                     <div>
-                                                        <label htmlFor="maxChances" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Máximo de Chances</label>
+                                                        <label htmlFor="maxChances" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Máximo de Chances</label>
                                                         <input
                                                             type="number"
                                                             id="maxChances"
@@ -1010,24 +1010,24 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
                                                             min="1"
                                                             max="10"
-                                                            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-100 focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all shadow-lg"
+                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all shadow-lg"
                                                         />
                                                     </div>
                                                     <div>
-                                                        <label htmlFor="chanceIcon" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Ícone</label>
+                                                        <label htmlFor="chanceIcon" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Ícone</label>
                                                         <div className="flex gap-2">
                                                             <select
                                                                 id="chanceIcon"
                                                                 value={localChanceIcon}
                                                                 onChange={(e) => setLocalChanceIcon(e.target.value as any)}
-                                                                className="flex-grow bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg"
+                                                                className="flex-grow bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg"
                                                             >
                                                                 <option value="heart">Corações</option>
                                                                 <option value="circle">Círculos</option>
                                                                 <option value="square">Quadrados</option>
                                                                 <option value="diamond">Losangos</option>
                                                             </select>
-                                                            <div className="flex-shrink-0 flex items-center justify-center w-12 bg-zinc-950 border border-zinc-800 rounded-lg shadow-lg">
+                                                            <div className="flex-shrink-0 flex items-center justify-center w-12 bg-input border border-input rounded-lg shadow-lg">
                                                                 <ChanceIcon type={localChanceIcon} color={localChanceIconColor} className="w-5 h-5 shadow-[0_0_10px_rgba(168,85,247,0.2)]" />
                                                             </div>
                                                         </div>
@@ -1038,24 +1038,24 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                                 <div className="space-y-4 pt-4 border-t border-zinc-800/50">
                                                     <div>
-                                                        <label htmlFor="chanceLossMessage" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Mensagem de Perda</label>
+                                                        <label htmlFor="chanceLossMessage" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Mensagem de Perda</label>
                                                         <input
                                                             type="text"
                                                             id="chanceLossMessage"
                                                             value={localChanceLossMessage}
                                                             onChange={(e) => setLocalChanceLossMessage(e.target.value)}
-                                                            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:ring-0 focus:border-purple-500/50 transition-all shadow-lg"
+                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all shadow-lg"
                                                             placeholder="Suas chances acabaram."
                                                         />
                                                     </div>
                                                     <div>
-                                                        <label htmlFor="chanceRestoreMessage" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Mensagem de Recuperação</label>
+                                                        <label htmlFor="chanceRestoreMessage" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Mensagem de Recuperação</label>
                                                         <input
                                                             type="text"
                                                             id="chanceRestoreMessage"
                                                             value={localChanceRestoreMessage}
                                                             onChange={(e) => setLocalChanceRestoreMessage(e.target.value)}
-                                                            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:ring-0 focus:border-purple-500/50 transition-all shadow-lg"
+                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all shadow-lg"
                                                             placeholder="Suas chances foram restauradas."
                                                         />
                                                     </div>
@@ -1064,11 +1064,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         )}
 
                                         {localGameSystemEnabled === 'trackers' && (
-                                            <div className="flex flex-col items-center justify-center h-full p-8 bg-zinc-950 border border-zinc-800 border-dashed rounded-2xl text-center space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
-                                                <SlidersHorizontal className="w-12 h-12 text-zinc-800 mb-2" />
+                                            <div className="flex flex-col items-center justify-center h-full p-8 bg-card border border-border border-dashed rounded-2xl text-center space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
+                                                <SlidersHorizontal className="w-10 h-10 text-muted-foreground/50 mb-2" />
                                                 <div>
-                                                    <p className="text-sm font-bold text-zinc-300">Rastreadores Habilitados</p>
-                                                    <p className="text-xs text-zinc-500 mt-2 max-w-[240px]">Para criar e editar as variáveis específicas do jogo, utilize a guia "Rastreadores" no menu superior.</p>
+                                                    <p className="text-sm font-bold text-foreground">Rastreadores Habilitados</p>
+                                                    <p className="text-xs text-muted-foreground mt-2 max-w-[240px]">Para criar e editar as variáveis específicas do jogo, utilize a guia "Rastreadores" no menu superior.</p>
                                                 </div>
                                                 <button
                                                     onClick={() => props.onNavigateToTrackers?.()}
@@ -1080,7 +1080,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         )}
 
                                         {localGameSystemEnabled === 'none' && (
-                                            <div className="h-full border border-zinc-800/30 rounded-2xl bg-zinc-950/20 flex items-center justify-center p-12 text-center text-zinc-700 font-bold uppercase tracking-[0.2em] text-[10px]">
+                                            <div className="h-full border border-border/30 rounded-2xl bg-muted/20 flex items-center justify-center p-12 text-center text-muted-foreground font-bold uppercase tracking-[0.2em] text-[10px]">
                                                 Nenhum sistema selecionado
                                             </div>
                                         )}
@@ -1091,26 +1091,26 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     )}
 
                     {activeTab === 'abertura' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-8 flex flex-col h-full">
                                 <div className="space-y-2">
-                                    <label htmlFor="gameTitle" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Título do Jogo</label>
+                                    <label htmlFor="gameTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Título do Jogo</label>
                                     <input
                                         type="text"
                                         id="gameTitle"
                                         value={localTitle}
                                         onChange={(e) => setLocalTitle(e.target.value)}
-                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-100 focus:ring-0 focus:border-purple-500/50 transition-all font-bold placeholder:text-zinc-800"
+                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all font-bold placeholder:text-muted-foreground"
                                         placeholder="Ex: A Masmorra Esquecida"
                                     />
                                 </div>
                                 <div className="space-y-2 flex flex-col flex-grow">
-                                    <label htmlFor="splashDescription" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Descrição do Jogo</label>
+                                    <label htmlFor="splashDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Descrição do Jogo</label>
                                     <textarea
                                         id="splashDescription"
                                         value={localSplashDescription}
                                         onChange={(e) => setLocalSplashDescription(e.target.value)}
-                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 focus:border-purple-500/50 transition-all flex-grow min-h-[200px] resize-none leading-relaxed placeholder:text-zinc-800"
+                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all flex-grow min-h-[200px] resize-none leading-relaxed placeholder:text-muted-foreground"
                                         placeholder="Uma breve descrição da sua aventura..."
                                     />
                                 </div>
@@ -1118,13 +1118,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                             <div className="space-y-8 flex flex-col h-full">
                                 <div className="space-y-4">
-                                    <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Imagem de Fundo</h4>
+                                    <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem de Fundo</h4>
                                     <div className="relative w-full h-[250px]">
                                         {localSplashImage ? (
-                                            <div className="absolute inset-0 w-full h-full border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 group shadow-2xl">
+                                            <div className="absolute inset-0 w-full h-full border border-border rounded-xl overflow-hidden bg-card group shadow-2xl">
                                                 <img src={localSplashImage} alt="Fundo" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-40" />
-                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-3 bg-zinc-950/40 backdrop-blur-sm">
-                                                    <label className="p-3 bg-white text-zinc-950 rounded-lg cursor-pointer hover:bg-zinc-200 transition-all shadow-xl active:scale-95">
+                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-3 bg-black/40 backdrop-blur-sm">
+                                                    <label className="p-3 bg-secondary text-secondary-foreground rounded-lg cursor-pointer hover:bg-secondary/80 transition-all shadow-xl active:scale-95">
                                                         <Upload className="w-5 h-5" />
                                                         <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
                                                     </label>
@@ -1134,78 +1134,78 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 </div>
                                             </div>
                                         ) : (
-                                            <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 bg-zinc-900/30 rounded-xl cursor-pointer hover:bg-zinc-800/50 hover:border-purple-500/50 transition-all group overflow-hidden">
+                                            <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-border bg-muted/30 rounded-xl cursor-pointer hover:bg-muted/50 hover:border-purple-500/50 transition-all group overflow-hidden">
                                                 <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                <Upload className="w-10 h-10 text-zinc-700 mb-4 transition-colors group-hover:text-purple-400" />
-                                                <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest group-hover:text-zinc-300">Carregar Imagem de Fundo</span>
+                                                <Upload className="w-10 h-10 text-muted-foreground mb-4 transition-colors group-hover:text-purple-400" />
+                                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground">Carregar Imagem de Fundo</span>
                                                 <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
                                             </label>
                                         )}
                                     </div>
-                                    <p className="text-[10px] text-zinc-600 font-medium text-center italic">Recomendado: Full HD (1920x1080), proporção 16:9.</p>
+                                    <p className="text-[10px] text-muted-foreground font-medium text-center italic">Recomendado: Full HD (1920x1080), proporção 16:9.</p>
                                 </div>
 
                                 <div className="space-y-4 pt-8 border-t border-zinc-800/50">
-                                    <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Trilha Sonora Inicial</h4>
+                                    <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha Sonora Inicial</h4>
                                     <div className="flex items-center gap-3">
-                                        <label className="flex-grow flex items-center justify-center px-4 py-3 bg-zinc-900 border border-zinc-800 text-zinc-300 font-bold rounded-lg hover:bg-zinc-800 hover:text-white transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
+                                        <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
                                             <Upload className="w-4 h-4 mr-2 text-purple-400" /> {localBackgroundMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
                                             <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalBackgroundMusic)} className="hidden" />
                                         </label>
                                         {localBackgroundMusic && (
                                             <button
                                                 onClick={() => setLocalBackgroundMusic('')}
-                                                className="p-3 bg-red-500/5 text-zinc-600 rounded-lg border border-zinc-800 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-lg"
+                                                className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-border hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-lg"
                                                 title="Remover Música"
                                             >
                                                 <Trash2 className="w-5 h-5" />
                                             </button>
                                         )}
                                     </div>
-                                    <p className="text-[10px] text-zinc-600 font-medium italic">Esta trilha começará a tocar assim que a tela de início for carregada.</p>
+                                    <p className="text-[10px] text-muted-foreground font-medium italic">Esta trilha começará a tocar assim que a tela de início for carregada.</p>
                                 </div>
                             </div>
                         </div>
                     )}
 
                     {activeTab === 'fim_de_jogo' && (
-                        <div className="space-y-12">
+                        <div className="space-y-6">
                             <div>
-                                <h3 className="text-xs font-bold text-zinc-100 mb-8 uppercase tracking-widest">Final Positivo</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-10">
+                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Final Positivo</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
                                     <div className="space-y-8 flex flex-col h-full col-span-1">
                                         <div className="space-y-2">
-                                            <label htmlFor="posEndingContent" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Posicionamento do Conteúdo</label>
+                                            <label htmlFor="posEndingContent" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
                                             <select
                                                 id="posEndingContent"
                                                 value={localPositiveEndingContentAlignment}
                                                 onChange={(e) => setLocalPositiveEndingContentAlignment(e.target.value as 'left' | 'right')}
-                                                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all [&>option]:bg-zinc-950 shadow-lg"
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all [&>option]:bg-input shadow-lg"
                                             >
                                                 <option value="right">Direita</option>
                                                 <option value="left">Esquerda</option>
                                             </select>
                                         </div>
                                         <div className="space-y-2 flex flex-col flex-grow">
-                                            <label htmlFor="positiveEndingDescription" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Mensagem de Vitória</label>
+                                            <label htmlFor="positiveEndingDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Mensagem de Vitória</label>
                                             <textarea
                                                 id="positiveEndingDescription"
                                                 value={localPositiveEndingDescription}
                                                 onChange={(e) => setLocalPositiveEndingDescription(e.target.value)}
-                                                className="w-full flex-grow bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-xs text-zinc-300 focus:ring-0 focus:border-purple-500/50 transition-all min-h-[160px] resize-none leading-relaxed placeholder:text-zinc-800"
+                                                className="w-full flex-grow bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all min-h-[160px] resize-none leading-relaxed placeholder:text-muted-foreground"
                                                 placeholder="Parabéns! Você venceu."
                                             />
                                         </div>
                                     </div>
                                     <div className="space-y-8 col-span-2">
                                         <div className="space-y-4">
-                                            <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Imagem de Vitória</h4>
+                                            <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem de Vitória</h4>
                                             <div className="relative w-full h-[225px]">
                                                 {localPositiveEndingImage ? (
-                                                    <div className="absolute inset-0 w-full h-full border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 group shadow-2xl">
+                                                    <div className="absolute inset-0 w-full h-full border border-border rounded-xl overflow-hidden bg-card group shadow-2xl">
                                                         <img src={localPositiveEndingImage} alt="Final Positivo" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-40" />
-                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-3 bg-zinc-950/40 backdrop-blur-sm">
-                                                            <label className="p-3 bg-white text-zinc-950 rounded-lg cursor-pointer hover:bg-zinc-200 transition-all shadow-xl">
+                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-3 bg-black/40 backdrop-blur-sm">
+                                                            <label className="p-3 bg-secondary text-secondary-foreground rounded-lg cursor-pointer hover:bg-secondary/80 transition-all shadow-xl">
                                                                 <Upload className="w-5 h-5" />
                                                                 <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
                                                             </label>
@@ -1215,23 +1215,23 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         </div>
                                                     </div>
                                                 ) : (
-                                                    <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 bg-zinc-900/30 rounded-xl cursor-pointer hover:bg-zinc-800/50 transition-all group overflow-hidden">
-                                                        <Upload className="w-10 h-10 text-zinc-700 mb-4 transition-colors group-hover:text-purple-400" />
-                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest group-hover:text-zinc-300">Carregar Imagem</span>
+                                                    <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-border bg-muted/30 rounded-xl cursor-pointer hover:bg-muted/50 transition-all group overflow-hidden">
+                                                        <Upload className="w-10 h-10 text-muted-foreground mb-4 transition-colors group-hover:text-purple-400" />
+                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground">Carregar Imagem</span>
                                                         <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
                                                     </label>
                                                 )}
                                             </div>
                                         </div>
                                         <div className="space-y-4 pt-6 border-t border-zinc-800/50">
-                                            <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Trilha de Vitória</h4>
+                                            <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha de Vitória</h4>
                                             <div className="flex items-center gap-3">
-                                                <label className="flex-grow flex items-center justify-center px-4 py-3 bg-zinc-900 border border-zinc-800 text-zinc-400 font-bold rounded-lg hover:bg-zinc-800 hover:text-white transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
+                                                <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
                                                     <Upload className="w-4 h-4 mr-2 text-purple-400" /> {localPositiveEndingMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
                                                     <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalPositiveEndingMusic)} className="hidden" />
                                                 </label>
                                                 {localPositiveEndingMusic && (
-                                                    <button onClick={() => setLocalPositiveEndingMusic('')} className="p-3 bg-red-500/5 text-zinc-600 rounded-lg border border-zinc-800 hover:bg-red-500 hover:text-white transition-all shadow-lg">
+                                                    <button onClick={() => setLocalPositiveEndingMusic('')} className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-border hover:bg-red-500 hover:text-white transition-all shadow-lg">
                                                         <Trash2 className="w-5 h-5" />
                                                     </button>
                                                 )}
@@ -1241,24 +1241,24 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
                             </div>
 
-                            <div className="pt-12 border-t border-zinc-800/50">
-                                <h3 className="text-xs font-bold text-zinc-100 mb-8 uppercase tracking-widest">Final Negativo</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-10">
+                            <div className="pt-6 border-t border-zinc-800/50">
+                                <h3 className="text-xs font-bold text-zinc-100 mb-4 uppercase tracking-widest">Final Negativo</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
                                     <div className="space-y-8 flex flex-col h-full col-span-1">
                                         <div className="space-y-2">
-                                            <label htmlFor="negEndingContent" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Posicionamento do Conteúdo</label>
+                                            <label htmlFor="negEndingContent" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
                                             <select
                                                 id="negEndingContent"
                                                 value={localNegativeEndingContentAlignment}
                                                 onChange={(e) => setLocalNegativeEndingContentAlignment(e.target.value as 'left' | 'right')}
-                                                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all [&>option]:bg-zinc-950 shadow-lg"
+                                                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all [&>option]:bg-zinc-950 shadow-lg"
                                             >
                                                 <option value="right">Direita</option>
                                                 <option value="left">Esquerda</option>
                                             </select>
                                         </div>
                                         <div className="space-y-2 flex flex-col flex-grow">
-                                            <label htmlFor="negativeEndingDescription" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Mensagem de Derrota</label>
+                                            <label htmlFor="negativeEndingDescription" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Mensagem de Derrota</label>
                                             <textarea
                                                 id="negativeEndingDescription"
                                                 value={localNegativeEndingDescription}
@@ -1287,8 +1287,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     </div>
                                                 ) : (
                                                     <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 bg-zinc-900/30 rounded-xl cursor-pointer hover:bg-zinc-800/50 transition-all group overflow-hidden">
-                                                        <Upload className="w-10 h-10 text-zinc-700 mb-4 transition-colors group-hover:text-purple-400" />
-                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest group-hover:text-zinc-300">Carregar Imagem</span>
+                                                        <Upload className="w-10 h-10 text-muted-foreground mb-4 transition-colors group-hover:text-purple-400" />
+                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground">Carregar Imagem</span>
                                                         <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
                                                     </label>
                                                 )}
@@ -1297,12 +1297,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="space-y-4 pt-6 border-t border-zinc-800/50">
                                             <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Trilha de Derrota</h4>
                                             <div className="flex items-center gap-3">
-                                                <label className="flex-grow flex items-center justify-center px-4 py-3 bg-zinc-900 border border-zinc-800 text-zinc-400 font-bold rounded-lg hover:bg-zinc-800 hover:text-white transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
+                                                <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
                                                     <Upload className="w-4 h-4 mr-2 text-purple-400" /> {localNegativeEndingMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
                                                     <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalNegativeEndingMusic)} className="hidden" />
                                                 </label>
                                                 {localNegativeEndingMusic && (
-                                                    <button onClick={() => setLocalNegativeEndingMusic('')} className="p-3 bg-red-500/5 text-zinc-600 rounded-lg border border-zinc-800 hover:bg-red-500 hover:text-white transition-all shadow-lg">
+                                                    <button onClick={() => setLocalNegativeEndingMusic('')} className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-border hover:bg-red-500 hover:text-white transition-all shadow-lg">
                                                         <Trash2 className="w-5 h-5" />
                                                     </button>
                                                 )}
@@ -1314,129 +1314,137 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         </div>
                     )}
                     {activeTab === 'textos' && (
-                        <div className="space-y-12">
+                        <div className="space-y-6">
                             <div>
-                                <h3 className="text-xs font-bold text-zinc-100 mb-8 uppercase tracking-widest">Textos da Interface</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Textos da Interface</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                     <div className="space-y-2">
-                                        <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Texto do Botão de Ação</label>
-                                        <input type="text" id="actionButtonText" value={localActionButtonText} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                        <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Ação</label>
+                                        <input type="text" id="actionButtonText" value={localActionButtonText} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Texto do Campo de Comando</label>
-                                        <input type="text" id="verbInputPlaceholder" value={localVerbInputPlaceholder} onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                        <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Campo de Comando</label>
+                                        <input type="text" id="verbInputPlaceholder" value={localVerbInputPlaceholder} onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label htmlFor="viewEndingButtonText" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Texto do Botão "Ver Final"</label>
-                                        <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText} onChange={(e) => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg placeholder:text-zinc-800" placeholder="Ver Final" />
-                                        <p className="text-[10px] text-zinc-600 mt-2 italic">Aparece quando o jogo termina, para levar às telas de final.</p>
+                                        <label htmlFor="viewEndingButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão "Ver Final"</label>
+                                        <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText} onChange={(e) => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg placeholder:text-muted-foreground" placeholder="Ver Final" />
+                                        <p className="text-[10px] text-muted-foreground mt-2 italic">Aparece quando o jogo termina, para levar às telas de final.</p>
                                     </div>
                                     <div className="space-y-2">
-                                        <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Nome do Jogador no Diário</label>
-                                        <input type="text" id="diaryPlayerName" value={localDiaryPlayerName} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                        <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Nome do Jogador no Diário</label>
+                                        <input type="text" id="diaryPlayerName" value={localDiaryPlayerName} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label htmlFor="splashButtonText" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Texto do Botão de Início</label>
-                                        <input type="text" id="splashButtonText" value={localSplashButtonText} onChange={(e) => setLocalSplashButtonText(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="INICIAR" />
+                                        <label htmlFor="splashButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Início</label>
+                                        <input type="text" id="splashButtonText" value={localSplashButtonText} onChange={(e) => setLocalSplashButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="INICIAR" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label htmlFor="continueButtonText" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Texto do Botão de Continuar</label>
-                                        <input type="text" id="continueButtonText" value={localContinueButtonText} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Continuar Aventura" />
+                                        <label htmlFor="continueButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Continuar</label>
+                                        <input type="text" id="continueButtonText" value={localContinueButtonText} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Continuar Aventura" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Texto do Botão de Reiniciar</label>
-                                        <input type="text" id="restartButtonText" value={localRestartButtonText} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Reiniciar Aventura" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="pt-12 border-t border-zinc-800/50">
-                                <h3 className="text-xs font-bold text-zinc-100 mb-8 uppercase tracking-widest">Botões de Navegação</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                                    <div className="space-y-2">
-                                        <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Botão Sugestões</label>
-                                        <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Botão Inventário</label>
-                                        <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Botão Diário</label>
-                                        <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="trackersButtonText" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Botão Rastreadores</label>
-                                        <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed" placeholder="Rastreadores" disabled={localGameSystemEnabled !== 'trackers'} />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="systemButtonText" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Botão Menu Sistema</label>
-                                        <input type="text" id="systemButtonText" value={localSystemButtonText} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Sistema" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Botão Menu Principal</label>
-                                        <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Menu Principal" />
+                                        <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Reiniciar</label>
+                                        <input type="text" id="restartButtonText" value={localRestartButtonText} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Reiniciar Aventura" />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="pt-12 border-t border-zinc-800/50">
-                                <div className="flex justify-between items-center mb-8">
-                                    <h3 className="text-sm font-bold text-zinc-100 uppercase tracking-widest">Menu de Sistema</h3>
-                                    <div className="flex items-center gap-3 px-4 py-2 bg-zinc-950 border border-zinc-800 rounded-xl group cursor-pointer" onClick={() => setLocalGameShowSystemButton(!localGameShowSystemButton)}>
-                                        <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${localGameShowSystemButton ? 'bg-purple-500 border-purple-500' : 'bg-zinc-900 border-zinc-800 group-hover:border-zinc-700'}`}>
+                            <div className="pt-6 border-t border-border/50">
+                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Botões de Navegação</h3>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                    <div className="space-y-2">
+                                        <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Sugestões</label>
+                                        <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Inventário</label>
+                                        <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Diário</label>
+                                        <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="trackersButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Rastreadores</label>
+                                        <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed" placeholder="Rastreadores" disabled={localGameSystemEnabled !== 'trackers'} />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="systemButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Sistema</label>
+                                        <input type="text" id="systemButtonText" value={localSystemButtonText} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Sistema" />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Principal</label>
+                                        <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Menu Principal" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="pt-6 border-t border-border/50">
+                                <div className="flex justify-between items-center mb-4">
+                                    <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Menu de Sistema</h3>
+                                    <div className="flex items-center gap-3 px-4 py-2 bg-card border border-border rounded-xl group cursor-pointer" onClick={() => setLocalGameShowSystemButton(!localGameShowSystemButton)}>
+                                        <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${localGameShowSystemButton ? 'bg-purple-500 border-purple-500' : 'bg-input border-input group-hover:border-primary/50'}`}>
                                             {localGameShowSystemButton && <Check className="w-3 h-3 text-white" />}
                                         </div>
-                                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest group-hover:text-zinc-300 select-none">Mostrar Menu de Sistema</span>
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground select-none">Mostrar Menu de Sistema</span>
                                     </div>
                                 </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                     <div className="space-y-2">
-                                        <label htmlFor="saveMenuTitle" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Título Tela Salvar</label>
-                                        <input type="text" id="saveMenuTitle" value={localSaveMenuTitle} onChange={e => setLocalSaveMenuTitle(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Salvar Jogo" />
+                                        <label htmlFor="saveMenuTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Título Tela Salvar</label>
+                                        <input type="text" id="saveMenuTitle" value={localSaveMenuTitle} onChange={e => setLocalSaveMenuTitle(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Salvar Jogo" />
                                     </div>
                                     <div className="space-y-2">
-                                        <label htmlFor="loadMenuTitle" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Título Tela Carregar</label>
-                                        <input type="text" id="loadMenuTitle" value={localLoadMenuTitle} onChange={e => setLocalLoadMenuTitle(e.target.value)} className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Carregar Jogo" />
+                                        <label htmlFor="loadMenuTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Título Tela Carregar</label>
+                                        <input type="text" id="loadMenuTitle" value={localLoadMenuTitle} onChange={e => setLocalLoadMenuTitle(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Carregar Jogo" />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="pt-12 border-t border-zinc-800/50">
-                                <h3 className="text-xs font-bold text-zinc-100 mb-8 uppercase tracking-widest">Efeitos de Texto</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
-                                    <div className="space-y-2">
-                                        <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Estilo de Animação</label>
-                                        <select
-                                            id="textAnimationType"
-                                            value={localTextAnimationType}
-                                            onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
-                                            className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg"
-                                        >
-                                            <option value="fade">Esmaecer (Fade In)</option>
-                                            <option value="typewriter">Máquina de Escrever (Letra a letra)</option>
-                                        </select>
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-[10px] font-bold text-foreground mb-4 uppercase tracking-widest">Efeitos de Texto</h3>
+                                {/* Unsaved Changes Notification - Matching SceneEditor */}
+                                {isDirty && (
+                                    <div className="flex items-center gap-2 text-purple-400 text-[10px] font-bold animate-pulse bg-purple-500/5 px-2 py-1 rounded-md border border-purple-500/10">
+                                        <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                        <span>ALTERAÇÕES NÃO SALVAS</span>
                                     </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="textSpeed" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Velocidade da Animação</label>
-                                        <div className="flex items-center gap-6 px-2">
-                                            <input
-                                                type="range"
-                                                id="textSpeed"
-                                                min="1"
-                                                max="5"
-                                                value={localTextSpeed}
-                                                onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
-                                                className="flex-grow h-1.5 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-purple-500"
-                                            />
-                                            <div className="w-10 h-10 rounded-lg bg-zinc-900 border border-zinc-800 flex items-center justify-center font-mono text-xs font-bold text-purple-400 shadow-inner">
-                                                {localTextSpeed}
-                                            </div>
+                                )}
+                            </div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                <div className="space-y-2">
+                                    <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Estilo de Animação</label>
+                                    <select
+                                        id="textAnimationType"
+                                        value={localTextAnimationType}
+                                        onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
+                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg"
+                                    >
+                                        <option value="fade">Esmaecer (Fade In)</option>
+                                        <option value="typewriter">Máquina de Escrever (Letra a letra)</option>
+                                    </select>
+                                </div>
+                                <div className="space-y-2">
+                                    <label htmlFor="textSpeed" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Velocidade da Animação</label>
+                                    <div className="flex items-center gap-6 px-2">
+                                        <input
+                                            type="range"
+                                            id="textSpeed"
+                                            min="1"
+                                            max="5"
+                                            value={localTextSpeed}
+                                            onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
+                                            className="flex-grow h-1.5 bg-input rounded-lg appearance-none cursor-pointer accent-purple-500"
+                                        />
+                                        <div className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center font-mono text-xs font-bold text-purple-400 shadow-inner">
+                                            {localTextSpeed}
                                         </div>
-                                        <div className="flex justify-between text-[9px] text-zinc-600 font-bold uppercase tracking-tighter px-2">
-                                            <span>Lento</span>
-                                            <span>Rápido</span>
-                                        </div>
+                                    </div>
+                                    <div className="flex justify-between text-[9px] text-muted-foreground font-bold uppercase tracking-tighter px-2">
+                                        <span>Lento</span>
+                                        <span>Rápido</span>
                                     </div>
                                 </div>
                             </div>
@@ -1444,9 +1452,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     )}
 
                     {activeTab === 'cores' && (
-                        <div className="space-y-12">
+                        <div className="space-y-6">
                             <div>
-                                <h3 className="text-xs font-bold text-zinc-100 mb-8 uppercase tracking-widest">Temas Predefinidos</h3>
+                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Temas Predefinidos</h3>
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                     {[
                                         { id: 'dark', name: 'GitHub Dark', primary: '#30363d', accent: '#58a6ff' },
@@ -1457,14 +1465,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <button
                                             key={theme.id}
                                             onClick={() => setLocalGameTheme(theme.id as 'dark' | 'light')}
-                                            className={`group relative p-4 rounded-xl border-2 transition-all ${localGameTheme === theme.id ? 'border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.2)]' : 'border-zinc-800 hover:border-zinc-700'}`}
+                                            className={`group relative p-4 rounded-xl border-2 transition-all ${localGameTheme === theme.id ? 'border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.2)]' : 'border-border hover:border-primary/50'}`}
                                         >
                                             <div className="flex flex-col gap-2">
                                                 <div className="flex gap-1">
                                                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.primary }} />
                                                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.accent }} />
                                                 </div>
-                                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-tighter group-hover:text-zinc-200">{theme.name}</span>
+                                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter group-hover:text-foreground">{theme.name}</span>
                                             </div>
                                             {localGameTheme === theme.id && (
                                                 <div className="absolute -top-2 -right-2 bg-purple-500 text-white p-1 rounded-full shadow-lg">
@@ -1476,9 +1484,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
                             </div>
 
-                            <div className="pt-12 border-t border-zinc-800/50">
-                                <h3 className="text-xs font-bold text-zinc-100 mb-8 uppercase tracking-widest">Cores do Sistema</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-8">
+                            <div className="pt-6 border-t border-border/50">
+                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Cores do Sistema</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                                     <ColorInput label="Título do Jogo" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#FFFFFF" />
                                     <ColorInput label="Texto Geral" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
                                     <ColorInput label="Destaque / Foco" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#FFFFFF" />
@@ -1486,9 +1494,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
                             </div>
 
-                            <div className="pt-12 border-t border-zinc-800/50">
-                                <h3 className="text-xs font-bold text-zinc-100 mb-8 uppercase tracking-widest">Cores dos Botões</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-12 gap-y-8">
+                            <div className="pt-6 border-t border-border/50">
+                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Cores dos Botões</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
                                     <ColorInput label="Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
                                     <ColorInput label="Texto do Botão Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
                                     <ColorInput label="Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
@@ -1503,9 +1511,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             <div className="bg-purple-500/5 border border-purple-500/10 p-6 rounded-2xl flex items-start gap-4">
                                 <TriangleAlert className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" />
                                 <div className="space-y-2">
-                                    <h4 className="text-sm font-bold text-zinc-100 uppercase tracking-widest">Informação de Verbos</h4>
-                                    <p className="text-xs text-zinc-400 leading-relaxed">
-                                        Os verbos <strong className="text-zinc-200">olhar</strong> e <strong className="text-zinc-200">examinar</strong> são ações fundamentais e já estão integradas por padrão. Adicione aqui apenas verbos específicos que devem estar disponíveis globalmente em toda a aventura.
+                                    <h4 className="text-sm font-bold text-foreground uppercase tracking-widest">Informação de Verbos</h4>
+                                    <p className="text-xs text-muted-foreground leading-relaxed">
+                                        Os verbos <strong className="text-foreground">olhar</strong> e <strong className="text-foreground">examinar</strong> são ações fundamentais e já estão integradas por padrão. Adicione aqui apenas verbos específicos que devem estar disponíveis globalmente em toda a aventura.
                                     </p>
                                 </div>
                             </div>
@@ -1521,15 +1529,15 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 ))}
 
                                 {localFixedVerbs.length === 0 && (
-                                    <div className="text-center py-12 border-2 border-dashed border-zinc-900 rounded-2xl bg-zinc-950/30">
-                                        <p className="text-xs font-bold text-zinc-600 uppercase tracking-widest">Nenhum verbo global definido</p>
+                                    <div className="text-center py-12 border-2 border-dashed border-border rounded-2xl bg-muted/30">
+                                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Nenhum verbo global definido</p>
                                     </div>
                                 )}
 
                                 <div className="flex justify-center mt-8">
                                     <button
                                         onClick={handleAddFixedVerb}
-                                        className="flex items-center px-6 py-3 bg-zinc-100 text-zinc-950 font-bold rounded-xl hover:bg-white transition-all active:scale-95 shadow-xl text-xs uppercase tracking-widest"
+                                        className="flex items-center px-6 py-3 bg-muted text-foreground font-bold rounded-xl hover:bg-muted/80 transition-all active:scale-95 shadow-xl text-xs uppercase tracking-widest"
                                     >
                                         <Plus className="w-4 h-4 mr-2" /> Adicionar Novo Verbo Global
                                     </button>
@@ -1543,7 +1551,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     <div className="hidden xl:block h-fit sticky top-8">
                         <div className="space-y-6">
                             <div className="flex items-center justify-between px-2">
-                                <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Prévia em Tempo Real</h3>
+                                <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Prévia em Tempo Real</h3>
                                 <div className="flex gap-1.5">
                                     <div className="w-2 h-2 rounded-full bg-red-500/50" />
                                     <div className="w-2 h-2 rounded-full bg-yellow-500/50" />
@@ -1552,37 +1560,37 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             </div>
 
                             <div
-                                className={`w-full aspect-video rounded-2xl overflow-hidden border-4 shadow-2xl transition-all ${localGameTheme === 'dark' ? 'bg-zinc-950 border-zinc-900' : 'bg-white border-zinc-100'}`}
+                                className={`w-full aspect-video rounded-2xl overflow-hidden border-4 shadow-2xl transition-all ${localGameTheme === 'dark' ? 'bg-background border-border' : 'bg-white border-zinc-100'}`}
                                 style={{ fontFamily: localFontFamily, fontSize: `${localGameFontSize}px` }}
                             >
                                 <div className="h-full flex flex-col p-6 space-y-4">
                                     <div className="flex-grow flex gap-6">
                                         {/* Image Placeholder */}
                                         <div
-                                            className="w-1/3 rounded-xl border-zinc-800 border flex items-center justify-center relative overflow-hidden bg-zinc-900/50"
+                                            className="w-1/3 rounded-xl border-border border flex items-center justify-center relative overflow-hidden bg-muted/50"
                                             style={getFramePreviewStyles(localImageFrame).containerStyles}
                                         >
                                             <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                                                <ImageIcon className="w-12 h-12" />
+                                                <ImageIcon className="w-10 h-10" />
                                             </div>
-                                            <div className="relative text-[10px] font-bold text-zinc-600 uppercase tracking-widest">Imagem</div>
+                                            <div className="relative text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem</div>
                                         </div>
 
                                         {/* Text Preview */}
                                         <div className="flex-1 space-y-3">
-                                            <div className="h-4 w-2/3 bg-zinc-800/50 rounded-full animate-pulse" style={{ backgroundColor: localTitleColor }} />
+                                            <div className="h-4 w-2/3 bg-muted/50 rounded-full animate-pulse" style={{ backgroundColor: localTitleColor }} />
                                             <div className="space-y-2">
-                                                <div className="h-2 w-full bg-zinc-800/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
-                                                <div className="h-2 w-full bg-zinc-800/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
-                                                <div className="h-2 w-4/5 bg-zinc-800/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
+                                                <div className="h-2 w-full bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
+                                                <div className="h-2 w-full bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
+                                                <div className="h-2 w-4/5 bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
                                             </div>
                                         </div>
                                     </div>
 
                                     {/* Input Preview */}
-                                    <div className="pt-4 border-t border-zinc-900 flex gap-3">
-                                        <div className="flex-1 h-10 rounded-lg border-2 border-zinc-900 bg-zinc-950/50 flex items-center px-4">
-                                            <span className="text-[10px] text-zinc-700 font-bold uppercase tracking-widest">{localVerbInputPlaceholder || 'Comando...'}</span>
+                                    <div className="pt-4 border-t border-border flex gap-3">
+                                        <div className="flex-1 h-10 rounded-lg border-2 border-border bg-muted/50 flex items-center px-4">
+                                            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{localVerbInputPlaceholder || 'Comando...'}</span>
                                         </div>
                                         <div className="px-6 rounded-lg font-bold text-[10px] uppercase tracking-widest flex items-center shadow-lg" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor }}>
                                             {localActionButtonText || 'Ação'}
@@ -1590,34 +1598,30 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     </div>
                                 </div>
                             </div>
-                            <p className="text-[10px] text-zinc-600 italic text-center font-bold uppercase tracking-tighter">Esquema visual básico do estilo selecionado</p>
+                            <p className="text-[10px] text-muted-foreground italic text-center font-bold uppercase tracking-tighter">Esquema visual básico do estilo selecionado</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Sticky Action Footer */}
-            <div className="sticky bottom-0 p-6 pointer-events-none z-50 mt-auto border-t border-zinc-800/50 bg-zinc-950/80 backdrop-blur-sm -mx-6 -mb-6">
-                <div className="max-w-7xl mx-auto flex justify-end gap-3 pointer-events-auto">
-                    <button
-                        onClick={handleUndo}
-                        disabled={!isDirty}
-                        className="group flex items-center px-6 py-3 bg-zinc-900/80 backdrop-blur-md border border-zinc-800 text-zinc-400 font-bold rounded-xl hover:bg-zinc-800 hover:text-zinc-100 transition-all disabled:opacity-0 disabled:translate-y-4 shadow-2xl overflow-hidden relative"
-                    >
-                        <RotateCcw className="w-4 h-4 mr-2" />
-                        <span className="text-xs uppercase tracking-widest">Desfazer</span>
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={!isDirty}
-                        className="flex items-center px-8 py-3 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-500 transition-all active:scale-95 disabled:opacity-0 disabled:translate-y-4 shadow-[0_10px_30px_rgba(147,51,234,0.3)]"
-                    >
-                        <Save className="w-4 h-4 mr-2" />
-                        <span className="text-xs uppercase tracking-widest">Salvar Alterações</span>
-                    </button>
-                </div>
+            {/* Fixed Action Footer to match SceneEditor */}
+            <div className="fixed bottom-6 right-10 z-50 flex gap-2">
+                <button
+                    onClick={handleUndo}
+                    disabled={!isDirty}
+                    className="px-4 py-2 bg-muted border border-border text-muted-foreground font-semibold rounded-lg hover:bg-muted/80 transition-all text-xs disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                    Desfazer
+                </button>
+                <button
+                    onClick={handleSave}
+                    disabled={!isDirty}
+                    className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
+                >
+                    Salvar
+                </button>
             </div>
-        </div>
+        </div >
     );
 };
 

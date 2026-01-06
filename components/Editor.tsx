@@ -3,6 +3,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Auth } from './Auth';
+import { useToast } from './ToastContext';
 import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker, FixedVerb } from '../types';
 import Sidebar from './Sidebar';
 import SceneEditor from './SceneEditor';
@@ -13,6 +14,8 @@ import Preview from './Preview';
 import SceneMap from './SceneMap';
 import GlobalObjectsEditor from './GlobalObjectsEditor';
 import TrackersEditor from './TrackersEditor';
+import { ConfirmationModal } from './ConfirmationModal';
+import { TransitionScreen } from './TransitionScreen';
 
 const gameHTML = `
 <!DOCTYPE html>
@@ -653,31 +656,61 @@ const initialGameData: GameData = {
 };
 
 const Editor: React.FC = () => {
+    const { toast } = useToast();
     const [session, setSession] = useState<any>(null);
+    const [loadingSession, setLoadingSession] = useState(true);
+    const [isTransitioning, setIsTransitioning] = useState(true);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setIsTransitioning(false);
+        }, 2000); // 2s duration
+        return () => clearTimeout(timer);
+    }, []);
+
+    const handleExit = () => {
+        setIsTransitioning(true);
+        setTimeout(() => {
+            navigate('/dashboard');
+        }, 2000); // 2s duration
+    };
 
     useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
             setSession(session);
+            setLoadingSession(false);
         });
 
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange((_event, session) => {
             setSession(session);
+            setLoadingSession(false);
         });
 
         return () => subscription.unsubscribe();
     }, []);
 
+
+
     const navigate = useNavigate();
 
     const handleLogout = async () => {
         if (isDirty) {
-            if (!window.confirm("Existem alterações não salvas. Deseja realmente sair?")) {
-                return;
-            }
+            setConfirmationModal({
+                isOpen: true,
+                title: "Alterações não salvas",
+                message: "Existem alterações não salvas. Deseja realmente sair? Todo o progresso não salvo será perdido.",
+                isDanger: true,
+                onConfirm: () => {
+                    closeConfirmationModal();
+                    handleExit();
+                },
+                onCancel: closeConfirmationModal
+            });
+            return;
         }
-        navigate('/dashboard');
+        handleExit();
     };
 
     const [gameData, setGameData] = useState<GameData>(initialGameData);
@@ -686,6 +719,18 @@ const Editor: React.FC = () => {
     const [currentView, setCurrentView] = useState<View>('scenes');
     const [isPreviewing, setIsPreviewing] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
+    const [confirmationModal, setConfirmationModal] = useState({
+        isOpen: false,
+        title: '',
+        message: '',
+        onConfirm: () => { },
+        onCancel: () => { },
+        isDanger: false
+    });
+
+    const closeConfirmationModal = () => {
+        setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+    };
 
     const scenesList = useMemo(() => {
         return gameData.sceneOrder.map(id => gameData.scenes[id]).filter(Boolean);
@@ -771,39 +816,60 @@ const Editor: React.FC = () => {
 
     const handleDeleteScene = (id: string) => {
         if (id === gameData.startScene && Object.keys(gameData.scenes).length > 1) {
-            alert("Você não pode deletar a cena inicial. Defina outra cena como inicial antes de excluir esta.");
+            toast("Ação não permitida", "Você não pode deletar a cena inicial. Defina outra cena como inicial antes de excluir esta.", "error");
             return;
         }
 
-        const confirmDelete = window.confirm("Tem certeza que deseja deletar esta cena?");
-        if (!confirmDelete) return;
-
-        setGameData(prev => {
-            const newScenes = { ...prev.scenes };
-            delete newScenes[id];
-            const updatedOrder = prev.sceneOrder.filter(sid => sid !== id);
-            let newStart = prev.startScene;
-            if (newStart === id) {
-                newStart = updatedOrder.length > 0 ? updatedOrder[0] : '';
-            }
-
-            Object.values(newScenes).forEach((scene: Scene) => {
-                if (scene.interactions) {
-                    scene.interactions = scene.interactions.filter(i => i.goToScene !== id);
+        const proceedWithDelete = () => {
+            setGameData(prev => {
+                const newScenes = { ...prev.scenes };
+                delete newScenes[id];
+                const updatedOrder = prev.sceneOrder.filter(sid => sid !== id);
+                let newStart = prev.startScene;
+                if (newStart === id) {
+                    newStart = updatedOrder.length > 0 ? updatedOrder[0] : '';
                 }
-                if (scene.exits) {
-                    const exits = scene.exits as any;
-                    Object.keys(exits).forEach(key => {
-                        if (exits[key] === id) delete exits[key];
-                    });
-                }
+
+                Object.values(newScenes).forEach((scene: Scene) => {
+                    if (scene.interactions) {
+                        scene.interactions = scene.interactions.filter(i => i.goToScene !== id);
+                    }
+                    if (scene.exits) {
+                        const exits = scene.exits as any;
+                        Object.keys(exits).forEach(key => {
+                            if (exits[key] === id) delete exits[key];
+                        });
+                    }
+                });
+
+                return {
+                    ...prev,
+                    scenes: newScenes,
+                    sceneOrder: updatedOrder,
+                    startScene: newStart
+                };
             });
 
-            return { ...prev, scenes: newScenes, sceneOrder: updatedOrder, startScene: newStart };
+            if (id === selectedSceneId) {
+                const newSceneId = gameData.sceneOrder.find(sid => sid !== id) || '';
+                setSelectedSceneId(newSceneId);
+            }
+            setIsDirty(true);
+            toast("Cena deletada", "A cena foi removida com sucesso.", "success");
+            closeConfirmationModal();
+        };
+
+        setConfirmationModal({
+            isOpen: true,
+            title: "Deletar Cena",
+            message: "Tem certeza que deseja deletar esta cena? Esta ação não pode ser desfeita e removerá todas as referências a ela.",
+            isDanger: true,
+            onConfirm: proceedWithDelete,
+            onCancel: closeConfirmationModal
         });
 
-        if (selectedSceneId === id) setSelectedSceneId(null);
-        setIsDirty(true);
+
+
     };
 
     const handleUpdateScene = (updatedScene: Scene) => {
@@ -850,9 +916,20 @@ const Editor: React.FC = () => {
 
     const handleNewGame = () => {
         if (isDirty) {
-            if (!window.confirm("Existem alterações não salvas. Deseja iniciar um novo jogo e perder as alterações atuais?")) {
-                return;
-            }
+            setConfirmationModal({
+                isOpen: true,
+                title: "Novo Jogo",
+                message: "Existem alterações não salvas. Deseja iniciar um novo jogo e perder as alterações atuais?",
+                isDanger: true,
+                onConfirm: () => {
+                    closeConfirmationModal();
+                    setGameData(initialGameData);
+                    setSelectedSceneId(null);
+                    setIsDirty(false);
+                },
+                onCancel: closeConfirmationModal
+            });
+            return;
         }
         setGameData(initialGameData);
         setSelectedSceneId(null);
@@ -998,12 +1075,18 @@ const Editor: React.FC = () => {
 
 
 
+    if (loadingSession) {
+        return <TransitionScreen isVisible={true} />;
+    }
+
     if (!session) {
         return <Auth />;
     }
 
     return (
-        <div className="flex h-screen bg-zinc-950 text-zinc-100 overflow-hidden font-sans selection:bg-blue-500/30">
+        <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans selection:bg-primary/30">
+            <TransitionScreen isVisible={isTransitioning} />
+            <TransitionScreen isVisible={isTransitioning} />
             {isPreviewing ? (
                 <div className="flex flex-col w-full h-full">
                     <Header
@@ -1045,7 +1128,7 @@ const Editor: React.FC = () => {
                                 setIsPreviewing(true);
                             }}
                         />
-                        <main className="flex-1 overflow-y-auto p-6 relative bg-zinc-950">
+                        <main className="flex-1 overflow-y-auto p-6 relative bg-background">
                             {currentView === 'interface' && (
                                 <UIEditor
                                     {...gameData}

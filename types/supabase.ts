@@ -102,6 +102,7 @@ export interface Database {
                     content: string
                     post_id: string
                     author_id: string
+                    parent_id: string | null
                     created_at: string
                 }
                 Insert: {
@@ -109,6 +110,7 @@ export interface Database {
                     content: string
                     post_id: string
                     author_id: string
+                    parent_id?: string | null
                     created_at?: string
                 }
                 Update: {
@@ -116,6 +118,50 @@ export interface Database {
                     content?: string
                     post_id?: string
                     author_id?: string
+                    parent_id?: string | null
+                    created_at?: string
+                }
+            }
+            post_reactions: {
+                Row: {
+                    id: string
+                    post_id: string
+                    user_id: string
+                    type: 'like' | 'super_like' | 'dislike'
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    post_id: string
+                    user_id: string
+                    type: 'like' | 'super_like' | 'dislike'
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    post_id?: string
+                    user_id?: string
+                    type?: 'like' | 'super_like' | 'dislike'
+                    created_at?: string
+                }
+            }
+            post_favorites: {
+                Row: {
+                    id: string
+                    post_id: string
+                    user_id: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    post_id: string
+                    user_id: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    post_id?: string
+                    user_id?: string
                     created_at?: string
                 }
             }
