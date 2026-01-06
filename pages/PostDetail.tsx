@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, ThumbsUp, Share2, Send, ThumbsDown, CornerDownRight, User, Star, Trash2, AlertCircle, List } from 'lucide-react';
+import { ChevronLeft, ThumbsUp, Share2, Send, ThumbsDown, CornerDownRight, User, Star, Trash2, AlertCircle, List, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { useToast } from '../components/ToastContext';
+import ImageModal from '../components/ImageModal';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 
@@ -96,7 +97,7 @@ const RichEditor = ({
                     toolbar: [
                         ['bold', 'italic', 'underline', 'code-block'],
                         [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                        ['link']
+                        ['link', 'image']
                     ]
                 }
             });
@@ -163,6 +164,14 @@ const PostDetail: React.FC = () => {
     // Modal State
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<{ type: 'post' | 'comment', id: string } | null>(null);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+    const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        const target = e.target as HTMLElement;
+        if (target.tagName === 'IMG') {
+            setSelectedImage((target as HTMLImageElement).src);
+        }
+    };
 
     useEffect(() => {
         if (id) {
@@ -320,8 +329,8 @@ const PostDetail: React.FC = () => {
         }
     };
 
-    const handleSubmitComment = async () => {
-        if (!newComment.trim() || !id) return;
+    const handleSubmitComment = async (content: string = newComment, parentId: string | null = replyingTo) => {
+        if (!content.trim() || !id) return;
         setSubmitting(true);
         if (!currentUser) {
             toast('Login necessário', "Você precisa estar logado para responder.", 'error');
@@ -330,10 +339,10 @@ const PostDetail: React.FC = () => {
         }
 
         const { error } = await supabase.from('comments').insert({
-            content: newComment,
+            content: content,
             post_id: id,
             author_id: currentUser.id,
-            parent_id: replyingTo
+            parent_id: parentId
         });
 
         if (error) {
@@ -394,77 +403,130 @@ const PostDetail: React.FC = () => {
         }
     };
 
-    const CommentItem: React.FC<{ comment: CommentWithAuthor, depth?: number }> = ({ comment, depth = 0 }) => (
-        <div className={`group relative ${depth > 0 ? 'ml-0 mt-2 pl-4 border-l border-border/40 hover:border-purple-500/50 transition-colors' : 'bg-card/30 border border-border/50 p-3 rounded-lg hover:border-purple-500/50 transition-colors'}`}>
-            <div className="flex justify-between items-start mb-1.5">
-                <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-muted border border-border overflow-hidden flex-shrink-0">
-                        {comment.profiles?.avatar_url ? (
-                            <img src={comment.profiles.avatar_url} alt={comment.profiles.username || ''} className="w-full h-full object-cover" />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                                <User size={12} />
-                            </div>
-                        )}
+    // Extracted CommentItem to prevent re-renders losing focus
+    interface CommentItemProps {
+        comment: CommentWithAuthor;
+        depth?: number;
+        currentUser: any;
+        replyingTo: string | null;
+        setReplyingTo: (id: string | null) => void;
+        submitting: boolean;
+        handleSubmitComment: (content?: string, parentId?: string | null) => void;
+        confirmDelete: (type: 'post' | 'comment', id: string) => void;
+        postStatus?: string;
+        onImageClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+    }
+
+    const CommentItem: React.FC<CommentItemProps> = ({
+        comment,
+        depth = 0,
+        currentUser,
+        replyingTo,
+        setReplyingTo,
+        submitting,
+        handleSubmitComment,
+        confirmDelete,
+        postStatus,
+        onImageClick
+    }) => {
+        const [localComment, setLocalComment] = useState('');
+
+        // Reset local comment when closing/opening
+        useEffect(() => {
+            if (replyingTo !== comment.id) setLocalComment('');
+        }, [replyingTo, comment.id]);
+
+        return (
+            <div className={`group relative ${depth > 0 ? 'ml-0 mt-2 pl-4 border-l border-border/40 hover:border-purple-500/50 transition-colors' : 'bg-card/30 border border-border/50 p-3 rounded-lg hover:border-purple-500/50 transition-colors'}`}>
+                <div className="flex justify-between items-start mb-1.5">
+                    <div className="flex items-center gap-2">
+                        <div className="w-6 h-6 rounded-full bg-muted border border-border overflow-hidden flex-shrink-0">
+                            {comment.profiles?.avatar_url ? (
+                                <img src={comment.profiles.avatar_url} alt={comment.profiles.username || ''} className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                                    <User size={12} />
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <span className="font-bold text-card-foreground text-[11px] block">{comment.profiles?.username}</span>
+                            <span className="text-muted-foreground text-[9px]">{new Date(comment.created_at).toLocaleDateString()} às {new Date(comment.created_at).toLocaleTimeString().slice(0, 5)}</span>
+                        </div>
                     </div>
-                    <div>
-                        <span className="font-bold text-card-foreground text-[11px] block">{comment.profiles?.username}</span>
-                        <span className="text-muted-foreground text-[9px]">{new Date(comment.created_at).toLocaleDateString()} às {new Date(comment.created_at).toLocaleTimeString().slice(0, 5)}</span>
-                    </div>
+                    {currentUser && currentUser.id === comment.author_id && (
+                        <button
+                            onClick={() => confirmDelete('comment', comment.id)}
+                            className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:bg-red-500 hover:text-white transition-all p-1 rounded"
+                            title="Excluir resposta"
+                        >
+                            <Trash2 size={12} />
+                        </button>
+                    )}
                 </div>
-                {currentUser && currentUser.id === comment.author_id && (
-                    <button
-                        onClick={() => confirmDelete('comment', comment.id)}
-                        className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:bg-red-500 hover:text-white transition-all p-1 rounded"
-                        title="Excluir resposta"
-                    >
-                        <Trash2 size={12} />
-                    </button>
+
+                <div
+                    className="text-muted-foreground text-xs mb-2 pl-1 leading-relaxed prose prose-invert max-w-none [&_img]:max-w-full [&_img]:rounded-lg [&_img]:mt-2 [&_img]:cursor-pointer [&_img]:hover:opacity-90 transition-opacity"
+                    dangerouslySetInnerHTML={{ __html: comment.content }}
+                    onClick={onImageClick}
+                />
+
+                <div className="flex items-center gap-3 pl-1">
+                    {postStatus === 'published' ? (
+                        <button
+                            onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
+                            className={`font-medium flex items-center gap-1 transition-all text-xs ${replyingTo === comment.id
+                                ? 'text-muted-foreground hover:text-red-500 opacity-100'
+                                : 'text-muted-foreground hover:text-purple-400 opacity-0 group-hover:opacity-100'
+                                }`}
+                        >
+                            {replyingTo === comment.id ? <X size={14} /> : <CornerDownRight size={14} />}
+                            {replyingTo === comment.id ? 'Cancelar' : 'Responder'}
+                        </button>
+                    ) : (
+                        <span className="text-[10px] text-muted-foreground/50 cursor-not-allowed" title="Tópico não publicado">Responder</span>
+                    )}
+                </div>
+
+                {/* Inline Editor for Replies */}
+                {replyingTo === comment.id && (
+                    <div className="mt-3 ml-1 animate-in slide-in-from-top-2 duration-200">
+                        <RichEditor
+                            value={localComment}
+                            onChange={setLocalComment}
+                            placeholder={`Respondendo a ${comment.profiles?.username || 'usuário'}...`}
+                            minHeight="80px"
+                            autoFocus
+                            onSubmit={() => handleSubmitComment(localComment, comment.id)}
+                            submitting={submitting}
+                        />
+
+                    </div>
+                )}
+
+                {/* Nested Comments */}
+                {comment.children && comment.children.length > 0 && (
+                    <div className="mt-1 space-y-1">
+                        {comment.children.map(child => (
+                            <CommentItem
+                                key={child.id}
+                                comment={child}
+                                depth={depth + 1}
+                                currentUser={currentUser}
+                                replyingTo={replyingTo}
+                                setReplyingTo={setReplyingTo}
+                                submitting={submitting}
+                                handleSubmitComment={handleSubmitComment}
+                                confirmDelete={confirmDelete}
+                                postStatus={postStatus}
+                                onImageClick={onImageClick}
+                            />
+                        ))}
+                    </div>
                 )}
             </div>
-
-            <p className="text-muted-foreground text-xs mb-2 pl-1 leading-relaxed">{comment.content}</p>
-
-            <div className="flex items-center gap-3 pl-1">
-                {post?.status === 'published' ? (
-                    <button
-                        onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                        className={`text-muted-foreground hover:text-purple-400 text-[10px] font-medium flex items-center gap-1 transition-all ${replyingTo === comment.id ? 'text-purple-400 opacity-100' : 'opacity-0 group-hover:opacity-100'
-                            }`}
-                    >
-                        <CornerDownRight size={10} /> {replyingTo === comment.id ? 'Cancel' : 'Responder'}
-                    </button>
-                ) : (
-                    <span className="text-[10px] text-muted-foreground/50 cursor-not-allowed" title="Tópico não publicado">Responder</span>
-                )}
-            </div>
-
-            {/* Inline Editor for Replies */}
-            {replyingTo === comment.id && (
-                <div className="mt-3 ml-1 animate-in slide-in-from-top-2 duration-200">
-                    <RichEditor
-                        value={newComment}
-                        onChange={setNewComment}
-                        placeholder={`Respondendo a ${comment.profiles?.username || 'usuário'}...`}
-                        minHeight="80px"
-                        autoFocus
-                        onSubmit={handleSubmitComment}
-                        submitting={submitting}
-                    />
-                    <div className="flex justify-start mt-2">
-                        <button onClick={() => setReplyingTo(null)} className="text-[10px] text-muted-foreground hover:text-foreground underline">Cancelar</button>
-                    </div>
-                </div>
-            )}
-
-            {/* Nested Comments */}
-            {comment.children && comment.children.length > 0 && (
-                <div className="mt-1 space-y-1">
-                    {comment.children.map(child => <CommentItem key={child.id} comment={child} depth={depth + 1} />)}
-                </div>
-            )}
-        </div>
-    );
+        );
+    };
 
     if (loading) return <div className="p-8 text-center text-zinc-500 text-xs">Carregando discussão...</div>;
     if (!post) return <div className="p-8 text-center text-zinc-500 text-xs">Post não encontrado.</div>;
@@ -572,9 +634,11 @@ const PostDetail: React.FC = () => {
                                 </div>
 
                                 {/* Post Content */}
-                                <div className="prose prose-invert prose-purple max-w-none text-sm text-foreground/90 leading-relaxed font-normal">
-                                    <div dangerouslySetInnerHTML={{ __html: post.content.replace(/<img[^>]*>/g, '') }} />
-                                </div>
+                                <div
+                                    className="prose prose-invert prose-purple max-w-none text-sm text-foreground/90 leading-relaxed font-normal [&_img]:max-w-full [&_img]:rounded-lg [&_img]:mt-2 [&_img]:cursor-pointer [&_img]:hover:opacity-90 transition-opacity"
+                                    dangerouslySetInnerHTML={{ __html: post.content.replace(/<img[^>]*>/g, '') }}
+                                    onClick={handleImageClick}
+                                />
 
                                 {/* Reactions Footer */}
                                 <div className="flex items-center gap-4 pt-8 mt-8 border-t border-border">
@@ -626,7 +690,18 @@ const PostDetail: React.FC = () => {
 
                             <div className="space-y-4">
                                 {comments.map(comment => (
-                                    <CommentItem key={comment.id} comment={comment} />
+                                    <CommentItem
+                                        key={comment.id}
+                                        comment={comment}
+                                        currentUser={currentUser}
+                                        replyingTo={replyingTo}
+                                        setReplyingTo={setReplyingTo}
+                                        submitting={submitting}
+                                        handleSubmitComment={handleSubmitComment}
+                                        confirmDelete={confirmDelete}
+                                        postStatus={post?.status}
+                                        onImageClick={handleImageClick}
+                                    />
                                 ))}
                             </div>
 
@@ -706,6 +781,11 @@ const PostDetail: React.FC = () => {
                 message={itemToDelete?.type === 'post'
                     ? 'Tem certeza que deseja excluir este tópico? Esta ação não pode ser desfeita.'
                     : 'Tem certeza que deseja excluir esta resposta? Esta ação não pode ser desfeita.'}
+            />
+
+            <ImageModal
+                imageUrl={selectedImage}
+                onClose={() => setSelectedImage(null)}
             />
         </div>
     );
