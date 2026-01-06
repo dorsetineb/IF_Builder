@@ -309,14 +309,14 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         <div className="space-y-6 pb-24">
             <div className="flex justify-between items-start">
                 <div>
-                    <p className="text-muted-foreground mt-1 text-[10px]">
+                    <p className="text-zinc-500 mt-1 text-xs font-medium">
                         Defina a imagem, descrição, objetos e interações para esta cena.
                     </p>
                 </div>
                 <div className="flex items-center gap-4 flex-shrink-0 mt-1">
                     {isDirty && (
-                        <div className="flex items-center gap-2 text-purple-400 text-[10px] font-bold animate-pulse bg-purple-500/5 px-2 py-1 rounded-md border border-purple-500/10">
-                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold animate-pulse bg-yellow-500/10 px-2 py-1 rounded-md border border-yellow-500/20">
+                            <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
                             <span>ALTERAÇÕES NÃO SALVAS</span>
                         </div>
                     )}

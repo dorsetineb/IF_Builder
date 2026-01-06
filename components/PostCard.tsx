@@ -115,7 +115,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
                     <div className="flex items-center gap-6">
                         {/* Author */}
                         <div className="flex items-center gap-2">
-                            <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center overflow-hidden border border-zinc-800">
+                            <div className="w-5 h-5 rounded-lg bg-muted flex items-center justify-center overflow-hidden border border-zinc-800">
                                 {post.profiles?.avatar_url ? (
                                     <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
                                 ) : (

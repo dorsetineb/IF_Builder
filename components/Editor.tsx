@@ -696,20 +696,7 @@ const Editor: React.FC = () => {
     const navigate = useNavigate();
 
     const handleLogout = async () => {
-        if (isDirty) {
-            setConfirmationModal({
-                isOpen: true,
-                title: "Alterações não salvas",
-                message: "Existem alterações não salvas. Deseja realmente sair? Todo o progresso não salvo será perdido.",
-                isDanger: true,
-                onConfirm: () => {
-                    closeConfirmationModal();
-                    handleExit();
-                },
-                onCancel: closeConfirmationModal
-            });
-            return;
-        }
+        // As requested: discard changes and exit immediately without confirmation
         handleExit();
     };
 

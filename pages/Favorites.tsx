@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { Search, Star } from 'lucide-react';
+import { Search, Star, List, LayoutGrid } from 'lucide-react';
 import { PostCard } from '../components/PostCard';
 import { useToast } from '../components/ToastContext';
 
@@ -18,6 +18,7 @@ const Favorites: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [user, setUser] = useState<any>(null);
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 
     useEffect(() => {
         const init = async () => {
@@ -105,43 +106,53 @@ const Favorites: React.FC = () => {
     );
 
     return (
-        <div className="p-4 max-w-[1600px] mx-auto font-sans h-[calc(100vh-48px)] overflow-y-auto text-xs">
-            {/* Header */}
-            <div className="flex flex-col gap-4 mb-6">
-                <div className="flex justify-between items-end">
-                    <div>
-                        <h1 className="text-xl font-bold text-foreground mb-1">Meus Favoritos</h1>
-                        <p className="text-muted-foreground text-xs">Acesse rapidamente as discussões que você salvou.</p>
-                    </div>
+        <div className="min-h-full font-sans text-xs bg-background">
+            {/* Standard Header */}
+            <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
+                <h1 className="text-xl font-bold text-foreground">Meus Favoritos</h1>
 
+                <div className="flex items-center gap-3">
                     <div className="relative w-80">
                         <input
                             type="text"
                             placeholder="Pesquisar nos favoritos..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-input border border-input rounded-lg py-2 pl-9 pr-3 text-xs text-foreground focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 placeholder:text-muted-foreground"
+                            className="w-full bg-input border border-input rounded-lg py-1.5 pl-9 pr-3 text-xs text-foreground focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 placeholder:text-muted-foreground"
                         />
                         <Search className="absolute left-3 top-2 text-muted-foreground" size={14} />
                     </div>
+
+                    {/* View Toggle */}
+                    <div className="flex bg-muted rounded-lg p-0.5 border border-border">
+                        <button
+                            onClick={() => setViewMode('list')}
+                            className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                            title="Lista"
+                        >
+                            <List size={16} />
+                        </button>
+                        <button
+                            onClick={() => setViewMode('grid')}
+                            className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                            title="Grade"
+                        >
+                            <LayoutGrid size={16} />
+                        </button>
+                    </div>
                 </div>
-                <div className="h-px bg-border w-full"></div>
             </div>
 
-            {/* List */}
-            <div className="border border-border rounded-lg overflow-hidden bg-card/50">
-                <div className="grid grid-cols-12 gap-3 px-4 py-2 bg-muted/50 border-b border-border text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                    <div className="col-span-12 lg:col-span-7">Tópico</div>
-                    <div className="col-span-2 hidden lg:block">Criador</div>
-                    <div className="col-span-1 hidden lg:block text-center">Respostas</div>
-                    <div className="col-span-2 hidden lg:block text-right">Ações</div>
+            <div className="p-8 max-w-[1600px] mx-auto">
+                <div className="mb-6">
+                    <p className="text-muted-foreground text-xs">Acesse rapidamente as discussões que você salvou.</p>
                 </div>
 
-                <div className="divide-y divide-border">
-                    {loading ? (
-                        <div className="p-8 text-center text-muted-foreground text-xs">Carregando seus favoritos...</div>
-                    ) : filteredPosts.length > 0 ? (
-                        filteredPosts.map((post) => (
+                {loading ? (
+                    <div className="p-8 text-center text-muted-foreground text-xs">Carregando seus favoritos...</div>
+                ) : filteredPosts.length > 0 ? (
+                    <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'flex flex-col gap-3'}>
+                        {filteredPosts.map((post) => (
                             <PostCard
                                 key={post.id}
                                 post={post}
@@ -149,15 +160,16 @@ const Favorites: React.FC = () => {
                                 currentUserId={user?.id}
                                 onToggleFavorite={toggleFavorite}
                                 onDeletePost={deletePost}
+                                viewMode={viewMode}
                             />
-                        ))
-                    ) : (
-                        <div className="p-8 text-center text-muted-foreground text-xs flex flex-col items-center gap-2">
-                            <Star size={24} className="opacity-50" />
-                            <p>Você ainda não favoritou nenhuma postagem.</p>
-                        </div>
-                    )}
-                </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="p-8 text-center text-muted-foreground text-xs flex flex-col items-center gap-2">
+                        <Star size={24} className="opacity-50" />
+                        <p>Você ainda não favoritou nenhuma postagem.</p>
+                    </div>
+                )}
             </div>
         </div>
     );
