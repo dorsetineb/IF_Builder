@@ -100,7 +100,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
 
                 {/* Left Side: Image Only (Full Bleed) */}
                 {firstImage && (
-                    <div className="w-32 bg-muted relative flex-shrink-0">
+                    <div className="w-32 bg-muted relative flex-shrink-0 overflow-hidden">
                         <img src={firstImage} alt="Cover" className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
                     </div>
                 )}
@@ -189,7 +189,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
 
             {/* Hero Image (Top & Full Bleed) */}
             {firstImage ? (
-                <div className="w-full h-36 bg-muted flex-shrink-0 relative">
+                <div className="w-full h-36 bg-muted flex-shrink-0 relative overflow-hidden">
                     <img src={firstImage} alt="Post cover" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>

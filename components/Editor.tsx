@@ -662,6 +662,13 @@ const Editor: React.FC = () => {
     const [isTransitioning, setIsTransitioning] = useState(true);
 
     useEffect(() => {
+        document.title = "IF Builder";
+        return () => {
+            document.title = "Nargnar / Ficções Interativas";
+        };
+    }, []);
+
+    useEffect(() => {
         const timer = setTimeout(() => {
             setIsTransitioning(false);
         }, 2000); // 2s duration

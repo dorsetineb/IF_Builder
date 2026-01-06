@@ -30,9 +30,9 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
                 />
             </div>
 
-            {/* Static IF Logo - Bottom Right */}
-            <div className="fixed bottom-10 right-10 opacity-20 hidden lg:block select-none pointer-events-none z-10">
-                <div className="text-9xl font-black text-white italic">IF</div>
+            {/* Static Nargnar Logo - Bottom Right */}
+            <div className="fixed bottom-10 right-10 hidden lg:block select-none pointer-events-none z-10">
+                <img src="/nargnar_logo.png" alt="Nargnar" className="h-64 w-auto object-contain" />
             </div>
         </div>
     );

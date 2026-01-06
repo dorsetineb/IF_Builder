@@ -31,7 +31,7 @@ const PlatformSidebar: React.FC = () => {
         <Link
             to={to}
             className={`flex items-center gap-3 px-4 py-2.5 rounded-r-xl rounded-l-none transition-all text-sm group relative overflow-hidden ${isActive(to)
-                ? `text-purple-400 font-bold ${isCollapsed ? 'bg-transparent' : 'bg-purple-500/10 border-l-2 border-purple-500'}`
+                ? `text-purple-400 font-bold ${isCollapsed ? 'bg-transparent' : 'bg-purple-500/10 border-l-4 border-purple-500'}`
                 : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border-l-4 border-transparent'
                 } ${isCollapsed ? 'justify-center px-0 py-3 rounded-none' : ''}`}
             title={isCollapsed ? label : undefined}
@@ -57,9 +57,9 @@ const PlatformSidebar: React.FC = () => {
             <div className={`flex-shrink-0 bg-card p-4 flex items-center border-b border-border relative h-[61px] ${isCollapsed ? 'justify-center' : ''}`}>
                 <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-60" />
                 {isCollapsed ? (
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center font-bold text-white text-xs">IF</div>
+                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-lime-500 to-green-600 flex items-center justify-center font-bold text-white text-xs">N</div>
                 ) : (
-                    <h1 className="text-xl font-bold text-foreground truncate">IF Builder</h1>
+                    <h1 className="text-xl font-bold text-[#bef264] truncate">Nargnar</h1>
                 )}
             </div>
 
@@ -70,10 +70,10 @@ const PlatformSidebar: React.FC = () => {
                 <div className="space-y-1">
                     <button
                         onClick={toggleCommunity}
-                        className={`flex items-center w-full px-4 py-2 rounded-md transition-all text-sm relative ${location.pathname.startsWith('/community')
-                            ? 'text-foreground font-medium'
-                            : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-                            } ${isCollapsed ? 'justify-center px-2' : 'justify-between'}`}
+                        className={`flex items-center w-full px-4 py-2 rounded-r-xl rounded-l-none transition-all text-sm relative border-l-4 ${location.pathname.startsWith('/community')
+                            ? 'text-foreground font-medium border-transparent'
+                            : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border-transparent'
+                            } ${isCollapsed ? 'justify-center px-0 py-3 rounded-none border-l-0' : 'justify-between'}`}
                         title={isCollapsed ? "Comunidade" : undefined}
                     >
                         <div className="flex items-center gap-3">
@@ -100,10 +100,10 @@ const PlatformSidebar: React.FC = () => {
                 <Link
                     to="/editor"
                     className={`flex items-center gap-3 w-full bg-secondary hover:bg-white hover:text-zinc-900 text-secondary-foreground font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl text-base group border border-border ${isCollapsed ? 'justify-center px-0' : 'justify-center'}`}
-                    title={isCollapsed ? "Abrir Editor" : undefined}
+                    title={isCollapsed ? "Abrir IF Builder" : undefined}
                 >
                     <Share2 size={20} className="group-hover:scale-110 transition-transform text-purple-600" />
-                    {!isCollapsed && <span className="truncate">Abrir Editor</span>}
+                    {!isCollapsed && <span className="truncate">Abrir IF Builder</span>}
                 </Link>
             </div>
         </aside>

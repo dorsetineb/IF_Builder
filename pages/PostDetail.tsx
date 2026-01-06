@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ChevronLeft, ThumbsUp, Share2, Send, ThumbsDown, CornerDownRight, User, Star, Trash2, AlertCircle, List } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { useToast } from '../components/ToastContext';
+import Quill from 'quill';
+import 'quill/dist/quill.snow.css';
 
 type PostWithDetails = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
@@ -61,6 +63,85 @@ const ConfirmationModal = ({
             </div>
         </div>
     );
+
+};
+
+// Reusable Rich Text Editor Component
+const RichEditor = ({
+    value,
+    onChange,
+    placeholder,
+    minHeight = "100px",
+    autoFocus = false,
+    onSubmit,
+    submitting
+}: {
+    value: string;
+    onChange: (val: string) => void;
+    placeholder: string;
+    minHeight?: string;
+    autoFocus?: boolean;
+    onSubmit: () => void;
+    submitting: boolean;
+}) => {
+    const editorRef = useRef<HTMLDivElement>(null);
+    const quillRef = useRef<Quill | null>(null);
+
+    useEffect(() => {
+        if (editorRef.current && !quillRef.current) {
+            const quill = new Quill(editorRef.current, {
+                theme: 'snow',
+                placeholder,
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'code-block'],
+                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                        ['link']
+                    ]
+                }
+            });
+
+            quill.on('text-change', () => {
+                const html = quill.root.innerHTML === '<p><br></p>' ? '' : quill.root.innerHTML;
+                onChange(html);
+            });
+
+            quillRef.current = quill;
+            if (autoFocus) quill.focus();
+        }
+    }, []);
+
+    // Sync external value changes (reset)
+    useEffect(() => {
+        if (quillRef.current && value === '' && quillRef.current.root.innerHTML !== '<p><br></p>') {
+            quillRef.current.root.innerHTML = '';
+        }
+    }, [value]);
+
+    return (
+        <div className="flex flex-col border border-border rounded-lg bg-card overflow-hidden focus-within:ring-1 focus-within:ring-purple-500/50 transition-all text-sm">
+            <div ref={editorRef} style={{ minHeight }} className="text-foreground text-sm" />
+            <div className="bg-muted/30 border-t border-border p-2 flex justify-end">
+                <button
+                    onClick={onSubmit}
+                    disabled={submitting || !value.trim()}
+                    className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider disabled:opacity-50 transition-all flex items-center gap-2"
+                >
+                    <Send size={12} className={submitting ? "animate-pulse" : ""} />
+                    Enviar
+                </button>
+            </div>
+            <style>{`
+                .ql-toolbar.ql-snow { border: none; border-bottom: 1px solid var(--border); background: var(--muted); padding: 4px; }
+                .ql-container.ql-snow { border: none; }
+                .ql-editor { padding: 0.75rem; font-family: inherit; font-size: 0.8rem; }
+                .ql-snow .ql-stroke { stroke: var(--muted-foreground); }
+                .ql-snow .ql-fill { fill: var(--muted-foreground); }
+                .ql-snow .ql-picker { color: var(--muted-foreground); }
+                .ql-toolbar button:hover .ql-stroke { stroke: var(--foreground); }
+            `}</style>
+        </div>
+    );
 };
 
 const PostDetail: React.FC = () => {
@@ -77,6 +158,7 @@ const PostDetail: React.FC = () => {
     const [currentUser, setCurrentUser] = useState<any>(null);
     const [currentProfile, setCurrentProfile] = useState<any>(null);
     const [isFavorite, setIsFavorite] = useState(false);
+    const [favoritedBy, setFavoritedBy] = useState<any[]>([]); // Users who favorited
 
     // Modal State
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -101,7 +183,7 @@ const PostDetail: React.FC = () => {
             setCurrentProfile(profile);
         }
 
-        await Promise.all([fetchPostDetails(), fetchComments(), fetchReactions(user), fetchFavoriteStatus(user)]);
+        await Promise.all([fetchPostDetails(), fetchComments(), fetchReactions(user), fetchFavoriteStatus(user), fetchFavoritedUsers()]);
         setLoading(false);
     };
 
@@ -177,6 +259,19 @@ const PostDetail: React.FC = () => {
         setIsFavorite(!!data);
     };
 
+    const fetchFavoritedUsers = async () => {
+        if (!id) return;
+        const { data } = await supabase
+            .from('post_favorites')
+            .select('profiles(*)')
+            .eq('post_id', id)
+            .limit(5);
+
+        if (data) {
+            setFavoritedBy(data.map((f: any) => f.profiles).filter(Boolean));
+        }
+    };
+
     const handleShare = async () => {
         try {
             await navigator.clipboard.writeText(window.location.href);
@@ -189,12 +284,13 @@ const PostDetail: React.FC = () => {
     const handleToggleFavorite = async () => {
         if (!currentUser || !id) return;
         if (isFavorite) {
-            await supabase.from('post_favorites').delete().eq('post_id', id).eq('user_id', currentUser.id);
             setIsFavorite(false);
+            setFavoritedBy(prev => prev.filter(p => p.id !== currentUser.id));
             toast('Removido', 'Postagem removida dos favoritos.', 'info');
         } else {
             await supabase.from('post_favorites').insert({ post_id: id, user_id: currentUser.id });
             setIsFavorite(true);
+            if (currentProfile) setFavoritedBy(prev => [...prev, currentProfile]);
             toast('Salvo', 'Postagem adicionada aos favoritos!', 'success');
         }
     };
@@ -343,6 +439,25 @@ const PostDetail: React.FC = () => {
                 )}
             </div>
 
+            {/* Inline Editor for Replies */}
+            {replyingTo === comment.id && (
+                <div className="mt-3 ml-1 animate-in slide-in-from-top-2 duration-200">
+                    <RichEditor
+                        value={newComment}
+                        onChange={setNewComment}
+                        placeholder={`Respondendo a ${comment.profiles?.username || 'usuário'}...`}
+                        minHeight="80px"
+                        autoFocus
+                        onSubmit={handleSubmitComment}
+                        submitting={submitting}
+                    />
+                    <div className="flex justify-start mt-2">
+                        <button onClick={() => setReplyingTo(null)} className="text-[10px] text-muted-foreground hover:text-foreground underline">Cancelar</button>
+                    </div>
+                </div>
+            )}
+
+            {/* Nested Comments */}
             {comment.children && comment.children.length > 0 && (
                 <div className="mt-1 space-y-1">
                     {comment.children.map(child => <CommentItem key={child.id} comment={child} depth={depth + 1} />)}
@@ -361,242 +476,226 @@ const PostDetail: React.FC = () => {
     if (!post) return <div className="p-8 text-center text-zinc-500 text-xs">Post não encontrado.</div>;
 
     return (
-        <div className="p-6 max-w-[1600px] mx-auto font-sans pb-32">
-            <Link to="/community" className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6 transition-colors text-[10px] uppercase font-bold tracking-wider">
-                <ChevronLeft size={12} className="mr-1" /> Voltar ao Fórum
-            </Link>
+        <div className="min-h-full bg-background font-sans pb-32">
+            {/* Standard Header with Breadcrumbs */}
+            <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-20 shrink-0">
+                <div className="flex flex-col justify-center h-full">
+                    <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
+                        Fórum
+                        <span className="text-muted-foreground/50">/</span>
+                        <span className="text-sm font-medium text-muted-foreground">{post.categories?.name || 'Tópico'}</span>
+                    </h1>
+                </div>
+            </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                {/* Main Thread Content */}
-                <div className="lg:col-span-3 space-y-6">
-                    <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:border-purple-500/20 transition-all group/post relative">
-                        {/* Draft Badge in Header if Draft */}
-                        {post.status === 'draft' && (
-                            <div className="absolute top-0 left-0 bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-3 py-1 rounded-br-lg border-r border-b border-yellow-500/20 z-10">
-                                RASCUNHO - NÃO PUBLICADO
+            <div className="p-8 max-w-[1600px] mx-auto">
+
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    {/* Main Thread Content */}
+                    <div className="lg:col-span-3 space-y-6">
+                        <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:border-purple-500/20 transition-all group/post relative">
+                            {/* Draft Badge in Header if Draft */}
+                            {post.status === 'draft' && (
+                                <div className="absolute top-0 left-0 bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-3 py-1 rounded-br-lg border-r border-b border-yellow-500/20 z-10">
+                                    RASCUNHO - NÃO PUBLICADO
+                                </div>
+                            )}
+
+                            {/* Hero Image Section */}
+                            {firstImage && (
+                                <div className="w-full aspect-video md:aspect-[3/1] bg-muted relative">
+                                    <img src={firstImage} alt="Cover" className="w-full h-full object-cover" />
+                                    <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-card to-transparent" />
+                                </div>
+                            )}
+
+                            <div className="p-8 relative">
+                                {/* Header Info */}
+                                <div className="flex items-start justify-between mb-6">
+                                    <div className="space-y-4">
+                                        {post.categories && (
+                                            <span className="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                                                {post.categories.name}
+                                            </span>
+                                        )}
+                                        <h1 className="text-2xl font-bold text-foreground leading-tight tracking-tight">{post.title}</h1>
+
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-border">
+                                                {post.profiles?.avatar_url ? (
+                                                    <img src={post.profiles.avatar_url} alt={post.profiles.username || ''} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <User size={20} className="text-muted-foreground" />
+                                                )}
+                                            </div>
+                                            <div>
+                                                <p className="text-foreground text-sm font-bold">{post.profiles?.username || 'Anônimo'}</p>
+                                                <p className="text-muted-foreground text-[10px]">{new Date(post.created_at).toLocaleDateString()} às {new Date(post.created_at).toLocaleTimeString().slice(0, 5)}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2">
+                                        {/* Publish Button for Author */}
+                                        {post.status === 'draft' && currentUser && currentUser.id === post.author_id && (
+                                            <button
+                                                onClick={handlePublish}
+                                                className="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-lg transition-all text-xs font-bold uppercase tracking-wider shadow-lg shadow-green-900/20 flex items-center gap-2"
+                                            >
+                                                <Send size={12} /> Publicar
+                                            </button>
+                                        )}
+                                        <button
+                                            onClick={handleShare}
+                                            className="text-muted-foreground hover:text-foreground p-2 rounded-lg hover:bg-muted transition-colors"
+                                            title="Copiar Link"
+                                        >
+                                            <Share2 size={18} />
+                                        </button>
+                                        <button
+                                            onClick={handleToggleFavorite}
+                                            className={`p-2 rounded-lg transition-colors hover:bg-muted ${isFavorite ? 'text-yellow-500' : 'text-muted-foreground hover:text-yellow-500'}`}
+                                            title="Favoritar"
+                                        >
+                                            <Star size={18} className={isFavorite ? 'fill-current' : ''} />
+                                        </button>
+                                        {currentUser && currentUser.id === post.author_id && (
+                                            <button
+                                                onClick={() => confirmDelete('post', post.id)}
+                                                className="text-muted-foreground hover:text-red-500 p-2 rounded-lg hover:bg-red-500/10 transition-colors"
+                                                title="Excluir"
+                                            >
+                                                <Trash2 size={18} />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Post Content */}
+                                <div className="prose prose-invert prose-purple max-w-none text-sm text-foreground/90 leading-relaxed font-normal">
+                                    <div dangerouslySetInnerHTML={{ __html: post.content.replace(/<img[^>]*>/g, '') }} />
+                                </div>
+
+                                {/* Reactions Footer */}
+                                <div className="flex items-center gap-4 pt-8 mt-8 border-t border-border">
+                                    <button
+                                        onClick={() => handleReaction('like')}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${userReaction === 'like' ? 'bg-blue-500/10 border-blue-500 text-blue-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
+                                    >
+                                        <ThumbsUp size={16} className={userReaction === 'like' ? 'fill-current' : ''} />
+                                        <span className="text-xs font-bold">{reactionCounts.like}</span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => handleReaction('like')}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${userReaction === 'like' ? 'bg-blue-500/10 border-blue-500 text-blue-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
+                                    >
+                                        <ThumbsUp size={14} className={userReaction === 'like' ? 'fill-current' : ''} />
+                                        <span className="text-[10px] font-bold">{reactionCounts.like}</span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => handleReaction('dislike')}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${userReaction === 'dislike' ? 'bg-red-500/10 border-red-500 text-red-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
+                                    >
+                                        <ThumbsDown size={14} className={userReaction === 'dislike' ? 'fill-current' : ''} />
+                                        <span className="text-[10px] font-bold">{reactionCounts.dislike}</span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => handleReaction('super_like')}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${userReaction === 'super_like' ? 'bg-pink-500/10 border-pink-500 text-pink-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
+                                    >
+                                        <div className="flex relative items-center justify-center w-5 h-4">
+                                            <ThumbsUp size={14} className={`absolute left-0 ${userReaction === 'super_like' ? 'fill-current' : ''}`} />
+                                            <ThumbsUp size={14} className={`absolute left-1.5 -top-1 rotate-12 ${userReaction === 'super_like' ? 'fill-current' : ''} bg-background rounded-full`} />
+                                        </div>
+                                        <span className="text-[10px] font-bold ml-1">{reactionCounts.super_like}</span>
+                                    </button>
+
+                                    <span className="text-xs text-muted-foreground ml-auto">{post.comments ? post.comments.length : 0} visualizações</span>
+                                </div>
                             </div>
-                        )}
+                        </div>
 
-                        {/* Hero Image Section */}
-                        {firstImage && (
-                            <div className="w-full aspect-video md:aspect-[3/1] bg-muted relative">
-                                <img src={firstImage} alt="Cover" className="w-full h-full object-cover" />
-                                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-card to-transparent" />
+                        {/* Comments Section */}
+                        <div>
+                            <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
+                                Respostas <span className="text-xs bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/20">{comments.length}</span>
+                            </h3>
+
+                            <div className="space-y-4">
+                                {comments.map(comment => (
+                                    <CommentItem key={comment.id} comment={comment} />
+                                ))}
                             </div>
-                        )}
 
-                        <div className="p-8 relative">
-                            {/* Header Info */}
-                            <div className="flex items-start justify-between mb-6">
-                                <div className="space-y-4">
-                                    {post.categories && (
-                                        <span className="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                                            {post.categories.name}
-                                        </span>
-                                    )}
-                                    <h1 className="text-3xl font-bold text-foreground leading-tight tracking-tight">{post.title}</h1>
-
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-border">
-                                            {post.profiles?.avatar_url ? (
-                                                <img src={post.profiles.avatar_url} alt={post.profiles.username || ''} className="w-full h-full object-cover" />
+                            {/* Main Reply Editor (Bottom of Page) */}
+                            {post.status === 'published' && !replyingTo && (
+                                <div className="mt-8 pt-6 border-t border-border">
+                                    <h3 className="text-sm font-bold text-foreground mb-4 uppercase tracking-wider">Deixe sua resposta</h3>
+                                    <div className="flex gap-4">
+                                        <div className="w-8 h-8 rounded-full bg-muted border border-border flex-shrink-0 overflow-hidden">
+                                            {currentUser?.user_metadata?.avatar_url || currentProfile?.avatar_url ? (
+                                                <img src={currentUser?.user_metadata?.avatar_url || currentProfile?.avatar_url} className="w-full h-full object-cover" />
                                             ) : (
-                                                <User size={20} className="text-muted-foreground" />
+                                                <User size={16} className="text-muted-foreground m-auto mt-1" />
                                             )}
                                         </div>
-                                        <div>
-                                            <p className="text-foreground text-sm font-bold">{post.profiles?.username || 'Anônimo'}</p>
-                                            <p className="text-muted-foreground text-[10px]">{new Date(post.created_at).toLocaleDateString()} às {new Date(post.created_at).toLocaleTimeString().slice(0, 5)}</p>
+                                        <div className="flex-1">
+                                            <RichEditor
+                                                value={newComment}
+                                                onChange={setNewComment}
+                                                placeholder="Escreva sua resposta para este tópico..."
+                                                minHeight="100px"
+                                                onSubmit={handleSubmitComment}
+                                                submitting={submitting}
+                                            />
                                         </div>
                                     </div>
                                 </div>
-
-                                <div className="flex gap-2">
-                                    {/* Publish Button for Author */}
-                                    {post.status === 'draft' && currentUser && currentUser.id === post.author_id && (
-                                        <button
-                                            onClick={handlePublish}
-                                            className="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-lg transition-all text-xs font-bold uppercase tracking-wider shadow-lg shadow-green-900/20 flex items-center gap-2"
-                                        >
-                                            <Send size={12} /> Publicar
-                                        </button>
-                                    )}
-                                    <button
-                                        onClick={handleShare}
-                                        className="text-muted-foreground hover:text-foreground p-2 rounded-lg hover:bg-muted transition-colors"
-                                        title="Copiar Link"
-                                    >
-                                        <Share2 size={18} />
-                                    </button>
-                                    <button
-                                        onClick={handleToggleFavorite}
-                                        className={`p-2 rounded-lg transition-colors hover:bg-muted ${isFavorite ? 'text-yellow-500' : 'text-muted-foreground hover:text-yellow-500'}`}
-                                        title="Favoritar"
-                                    >
-                                        <Star size={18} className={isFavorite ? 'fill-current' : ''} />
-                                    </button>
-                                    {currentUser && currentUser.id === post.author_id && (
-                                        <button
-                                            onClick={() => confirmDelete('post', post.id)}
-                                            className="text-muted-foreground hover:text-red-500 p-2 rounded-lg hover:bg-red-500/10 transition-colors"
-                                            title="Excluir"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    )}
-                                </div>
-                            </div>
-
-                            {/* Post Content */}
-                            <div className="prose prose-invert prose-purple max-w-none text-sm text-foreground/90 leading-relaxed font-normal">
-                                <div dangerouslySetInnerHTML={{ __html: post.content.replace(/<img[^>]*>/g, '') }} />
-                            </div>
-
-                            {/* Reactions Footer */}
-                            <div className="flex items-center gap-4 pt-8 mt-8 border-t border-border">
-                                <button
-                                    onClick={() => handleReaction('like')}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${userReaction === 'like' ? 'bg-blue-500/10 border-blue-500 text-blue-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
-                                >
-                                    <ThumbsUp size={16} className={userReaction === 'like' ? 'fill-current' : ''} />
-                                    <span className="text-xs font-bold">{reactionCounts.like}</span>
-                                </button>
-
-                                <button
-                                    onClick={() => handleReaction('super_like')}
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${userReaction === 'super_like' ? 'bg-pink-500/10 border-pink-500 text-pink-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
-                                >
-                                    <div className="flex relative mr-1">
-                                        <ThumbsUp size={16} className={userReaction === 'super_like' ? 'fill-current' : ''} />
-                                        <ThumbsUp size={16} className={`absolute top-[-2px] -right-1.5 rotate-12 ${userReaction === 'super_like' ? 'fill-current' : ''}`} />
-                                    </div>
-                                    <span className="text-xs font-bold ml-1">{reactionCounts.super_like}</span>
-                                </button>
-
-                                <span className="text-xs text-muted-foreground ml-auto">{post.comments ? post.comments.length : 0} visualizações</span>
-                            </div>
+                            )}
                         </div>
                     </div>
 
-                    {/* Comments Section */}
-                    <div>
-                        <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
-                            Respostas <span className="text-xs bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/20">{comments.length}</span>
-                        </h3>
-
-                        <div className="space-y-4">
-                            {comments.map(comment => (
-                                <CommentItem key={comment.id} comment={comment} />
-                            ))}
-                        </div>
-                    </div>
-                </div>
-
-                {/* Sidebar Widgets */}
-                <div className="space-y-6">
-                    {/* Top Creators Widget */}
-                    <div className="bg-card border border-border rounded-xl p-6">
-                        <h3 className="font-bold text-foreground mb-6 text-xs uppercase tracking-wider flex items-center gap-2">
-                            <div className="bg-yellow-500/10 p-1.5 rounded-md text-yellow-500"><Star size={14} /></div>
-                            Top Criadores
-                        </h3>
-                        <div className="space-y-4">
-                            {[
-                                { name: "PW54", points: 1240, rank: 1 },
-                                { name: "AdamJohn", points: 980, rank: 2 },
-                                { name: "Karolien", points: 850, rank: 3 }
-                            ].map((author, i) => (
-                                <div key={i} className="flex items-center justify-between group">
-                                    <div className="flex items-center gap-3">
-                                        <span className={`text-sm font-bold w-4 ${i === 0 ? 'text-yellow-500' : 'text-muted-foreground'}`}>{author.rank}</span>
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-xs ${i === 0 ? 'bg-yellow-500 text-yellow-950' : 'bg-muted text-muted-foreground'}`}>
-                                            {author.name[0]}
+                    {/* Sidebar Widgets */}
+                    <div className="space-y-6">
+                        {/* Favorited By Widget */}
+                        <div className="bg-card border border-border rounded-xl p-6">
+                            <h3 className="font-bold text-foreground mb-4 text-xs uppercase tracking-wider flex items-center gap-2">
+                                <div className="bg-yellow-500/10 p-1.5 rounded-md text-yellow-500"><Star size={14} /></div>
+                                Quem Favoritou
+                            </h3>
+                            {favoritedBy.length > 0 ? (
+                                <div className="space-y-3">
+                                    {favoritedBy.map((profile, i) => (
+                                        <div key={i} className="flex items-center justify-between group">
+                                            <div className="flex items-center gap-2">
+                                                <div className="w-6 h-6 rounded-full bg-muted overflow-hidden border border-border">
+                                                    {profile.avatar_url ? (
+                                                        <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <User size={12} className="text-muted-foreground m-auto mt-1" />
+                                                    )}
+                                                </div>
+                                                <span className="text-xs font-bold text-foreground group-hover:text-purple-400 transition-colors">{profile.username}</span>
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <span className="text-xs font-bold text-foreground group-hover:text-purple-400 transition-colors">{author.name}</span>
-                                            <span className="text-[10px] text-muted-foreground">{author.points} pts</span>
-                                        </div>
-                                    </div>
-                                    {i === 0 && <Star size={12} className="text-yellow-500 fill-current" />}
+                                    ))}
                                 </div>
-                            ))}
+                            ) : (
+                                <p className="text-[10px] text-muted-foreground">Ninguém favoritou ainda.</p>
+                            )}
                         </div>
-                        <button className="w-full mt-6 text-center text-[10px] font-bold text-purple-500 hover:text-purple-400 uppercase tracking-wider transition-colors">
-                            Ver ranking completo →
-                        </button>
-                    </div>
 
-                    {/* Changelog Widget */}
-                    <div className="bg-gradient-to-br from-purple-900/10 to-transparent border border-purple-500/20 rounded-xl p-6">
-                        <h3 className="font-bold text-foreground mb-6 text-xs uppercase tracking-wider flex items-center gap-2">
-                            <div className="bg-purple-500/10 p-1.5 rounded-md text-purple-500"><CornerDownRight size={14} /></div>
-                            Changelog
-                        </h3>
-                        <div className="space-y-6 relative before:absolute before:left-1.5 before:top-2 before:bottom-2 before:w-[2px] before:bg-border">
-                            {[
-                                { ver: "v2.4.0", date: "Ontem", desc: "Novo sistema de variáveis globais e correção de bugs no player." },
-                                { ver: "v2.3.5", date: "10 Jan", desc: "Integração nativa com Google Sheets." }
-                            ].map((log, i) => (
-                                <div key={i} className="pl-6 relative">
-                                    <div className="absolute left-0 top-1.5 w-3 h-3 rounded-full bg-background border-2 border-purple-500 z-10" />
-                                    <div className="flex flex-col gap-1">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-[10px] font-mono text-muted-foreground">{log.ver}</span>
-                                            <span className="text-[10px] font-bold text-foreground">• {log.date}</span>
-                                        </div>
-                                        <p className="text-xs text-muted-foreground leading-relaxed font-medium">
-                                            {log.desc}
-                                        </p>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                        {/* Changelog Widget */}
+                        {/* Changelog Removed */}{/* Space Holder */}
                     </div>
                 </div>
             </div>
 
             {/* Expandable Inline Reply Editor */}
-            {post.status === 'published' && (
-                <div className="fixed bottom-0 left-[80px] md:left-64 right-0 p-6 bg-background/80 backdrop-blur-xl border-t border-border z-30 transition-all duration-300">
-                    <div className="max-w-3xl mx-auto w-full">
-                        {replyingTo && (
-                            <div className="flex justify-between items-center text-[10px] text-purple-400 mb-2 px-1 font-bold uppercase tracking-wider">
-                                <span>Respondendo a um comentário...</span>
-                                <button onClick={() => setReplyingTo(null)} className="hover:text-foreground transition-colors">Cancelar</button>
-                            </div>
-                        )}
-
-                        <div className="relative group bg-card border border-border focus-within:border-purple-500/50 rounded-2xl shadow-2xl focus-within:shadow-purple-900/20 transition-all overflow-hidden flex flex-col">
-                            {/* Toolbar (Visual Only for now) */}
-                            <div className="flex items-center gap-1 p-2 border-b border-border/50 bg-muted/30 text-muted-foreground">
-                                <button className="p-1.5 hover:bg-muted hover:text-foreground rounded transition-colors" title="Negrito"><span className="font-bold text-xs">B</span></button>
-                                <button className="p-1.5 hover:bg-muted hover:text-foreground rounded transition-colors" title="Itálico"><span className="italic text-xs">I</span></button>
-                                <button className="p-1.5 hover:bg-muted hover:text-foreground rounded transition-colors" title="Link"><Share2 size={12} /></button>
-                                <div className="w-px h-4 bg-border mx-1" />
-                                <button className="p-1.5 hover:bg-muted hover:text-foreground rounded transition-colors" title="Código"><span className="font-mono text-xs">{'<>'}</span></button>
-                                <button className="p-1.5 hover:bg-muted hover:text-foreground rounded transition-colors" title="Lista"><List size={12} /></button>
-                            </div>
-
-                            <div className="flex items-end p-2 gap-2">
-                                <textarea
-                                    className="flex-1 bg-transparent border-none focus:ring-0 text-foreground placeholder-muted-foreground resize-none h-12 min-h-[48px] max-h-32 py-3 px-3 text-sm"
-                                    placeholder={replyingTo ? "Escreva sua resposta..." : "Escreva uma resposta para este tópico..."}
-                                    value={newComment}
-                                    onChange={(e) => setNewComment(e.target.value)}
-                                ></textarea>
-
-                                <button
-                                    onClick={handleSubmitComment}
-                                    disabled={submitting || !newComment.trim()}
-                                    className="mb-1 bg-purple-600 hover:bg-purple-500 disabled:opacity-50 disabled:hover:bg-purple-600 text-white p-2.5 rounded-xl transition-all shadow-lg hover:shadow-purple-900/40 hover:-translate-y-0.5"
-                                >
-                                    <Send size={16} className={submitting ? "animate-pulse" : ""} />
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            {/* Floating Editor Removed */}{/* Space Holder */}
 
             {/* Confirmation Modal and others... */}
             <ConfirmationModal

@@ -195,7 +195,7 @@ const Community = () => {
                     {showFeatured && featuredPosts.length > 0 && (
                         <section className="mb-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
-                                Tópicos em Destaque
+                                Destaques
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {featuredPosts.map(post => (
@@ -217,7 +217,7 @@ const Community = () => {
                     <div className="max-w-4xl">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                                {sortBy === 'recent' ? 'Discussões Recentes' : 'Discussões Populares'}
+                                {sortBy === 'recent' ? 'Discussões Recentes' : 'Tópicos Populares'}
                             </h2>
                             <div className="flex bg-muted rounded-lg p-0.5 border border-border">
                                 <button

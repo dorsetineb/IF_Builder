@@ -98,7 +98,7 @@ export function Auth() {
                     <div className="space-y-2 text-center">
                         <h1 className="text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
                             {isSignUp ? <UserPlus className="w-6 h-6 text-purple-400" /> : <LogIn className="w-6 h-6 text-blue-400" />}
-                            {isSignUp ? 'Criar Conta' : 'Acessar IF Builder'}
+                            {isSignUp ? 'Criar Conta' : 'Acessar Nargnar'}
                         </h1>
                         <p className="text-zinc-400 text-sm">
                             {isSignUp
@@ -316,9 +316,9 @@ export function Auth() {
             </div >
 
             {/* Decorative elements */}
-            < div className="fixed bottom-10 right-10 opacity-20 hidden lg:block select-none pointer-events-none" >
-                <div className="text-9xl font-black text-white italic">IF</div>
-            </div >
+            <div className="fixed bottom-10 right-10 hidden lg:block select-none pointer-events-none z-0">
+                <img src="/nargnar_logo.png" alt="Nargnar" className="h-64 w-auto object-contain" />
+            </div>
         </div >
     );
 }

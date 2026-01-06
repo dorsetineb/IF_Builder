@@ -224,20 +224,21 @@ const Settings: React.FC = () => {
                             </div>
 
                             <div className="space-y-1 text-left">
-                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Bio</label>
+                                <div className="flex justify-between items-end">
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Sobre mim</label>
+                                    <p className="text-[10px] text-muted-foreground">{bio.length}/160 caracteres</p>
+                                </div>
                                 <textarea
                                     value={bio}
                                     onChange={(e) => setBio(e.target.value)}
                                     className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none h-20"
                                     placeholder="Conte um pouco sobre você..."
                                 ></textarea>
-                                <p className="text-right text-[10px] text-muted-foreground">{bio.length}/160 caracteres</p>
                             </div>
 
                             {/* Interests Section */}
                             <div className="space-y-1 text-left">
                                 <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-                                    <Sparkles size={12} />
                                     Interesses
                                 </label>
                                 <div className="w-full bg-input border border-input rounded px-3 py-2 min-h-[40px] flex flex-wrap gap-2 items-center">
@@ -271,21 +272,21 @@ const Settings: React.FC = () => {
                         <h2 className="text-sm font-bold text-card-foreground">Segurança</h2>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                         <div className="space-y-1 text-left">
                             <label className="text-xs font-medium text-muted-foreground">Endereço de E-mail</label>
                             <div className="bg-muted border border-border rounded px-3 py-1.5 text-muted-foreground text-sm">
                                 {email}
                             </div>
                         </div>
-                    </div>
 
-                    <div className="bg-accent/10 border border-accent/20 rounded-lg p-3 flex items-start gap-2">
-                        <AlertCircle className="text-accent flex-shrink-0 mt-0.5" size={16} />
-                        <div>
-                            <h4 className="font-medium text-foreground text-xs">Alteração de Senha</h4>
-                            <p className="text-muted-foreground text-[10px] mt-0.5">Para alterar sua senha, enviaremos um link para seu email.</p>
-                            <button className="mt-1 text-xs font-medium text-primary hover:underline">Enviar link de redefinição</button>
+                        <div className="flex items-start gap-2 h-full">
+                            <AlertCircle className="text-accent flex-shrink-0 mt-0.5" size={16} />
+                            <div>
+                                <h4 className="font-medium text-foreground text-xs">Alteração de Senha</h4>
+                                <p className="text-muted-foreground text-[10px] mt-0.5">Para alterar sua senha, receba um link via email.</p>
+                                <button className="mt-1 text-xs font-medium text-primary hover:underline">Enviar Redefinição</button>
+                            </div>
                         </div>
                     </div>
                 </div>
