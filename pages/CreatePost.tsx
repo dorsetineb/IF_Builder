@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { ChevronLeft, Save, Send, AlertCircle } from 'lucide-react';
+import { Save, Send, AlertCircle, ChevronDown } from 'lucide-react';
 import { Database } from '../types/supabase';
 import { useToast } from '../components/ToastContext';
 import Quill from 'quill';
@@ -208,12 +208,17 @@ const CreatePost: React.FC = () => {
         if (status === 'draft') setSavingDraft(true);
         else setLoading(true);
 
+        // Extract first image for preview
+        const doc = new DOMParser().parseFromString(content, 'text/html');
+        const firstImage = doc.querySelector('img')?.src || null;
+
         const postData = {
             title,
             content, // HTML content from Quill
             author_id: user.id,
             category_id: validCategoryId,
             status: status,
+            image_url: firstImage,
             updated_at: new Date().toISOString()
         };
 
@@ -264,9 +269,6 @@ const CreatePost: React.FC = () => {
         <div className="flex flex-col h-full max-w-5xl mx-auto p-4 font-sans">
             <div className="flex justify-between items-center mb-4">
                 <div className="flex items-center gap-3">
-                    <button onClick={() => navigate('/community')} className="text-muted-foreground hover:text-foreground transition-colors">
-                        <ChevronLeft size={20} />
-                    </button>
                     <div>
                         <div>
                             <h1 className="text-xl font-bold text-foreground">{id ? 'Editar Tópico' : 'Novo Tópico'}</h1>
@@ -277,43 +279,70 @@ const CreatePost: React.FC = () => {
             </div>
 
             <div className="space-y-4 flex-1 flex flex-col">
-                <div className="space-y-1">
-                    <label className="text-xs font-medium text-muted-foreground ml-1">Título do Tópico</label>
-                    <input
-                        type="text"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Digite um título cativante..."
-                        className="w-full bg-card border border-border rounded-lg px-3 py-2 text-foreground text-sm placeholder-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
-                    />
+                {/* Header Inputs: Title & Category */}
+                <div className="flex gap-4 items-end">
+                    <div className="space-y-1 flex-1">
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Título do Tópico</label>
+                        <input
+                            type="text"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder="Digite um título cativante..."
+                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-foreground text-xs font-normal placeholder-muted-foreground focus:outline-none focus:ring-0 transition-all h-10"
+                        />
+                    </div>
+                    <div className="space-y-1 w-48">
+                        <label className="text-xs font-bold text-muted-foreground uppercase tracking-wider ml-1">Categoria</label>
+                        <div className="relative h-10">
+                            <select
+                                value={categoryId}
+                                onChange={(e) => setCategoryId(e.target.value)}
+                                className="w-full h-full bg-input border border-input rounded-lg px-3 py-2 text-foreground text-xs font-normal focus:outline-none focus:ring-0 transition-all appearance-none"
+                            >
+                                <option value="">Selecionar...</option>
+                                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                            </select>
+                            <div className="absolute right-0 top-0 h-full w-10 flex items-center justify-center pointer-events-none text-muted-foreground">
+                                <ChevronDown size={14} />
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
-                <div className="bg-card border border-border rounded-lg flex flex-col flex-1 overflow-hidden">
+                {/* Editor Container - Flex Column Reverse for Bottom Toolbar */}
+                <div className="bg-input border border-input rounded-lg flex flex-col-reverse flex-1 overflow-hidden">
                     {/* Quill Editor Container */}
-                    <div ref={editorRef} className="quill-editor h-full text-foreground bg-background"></div>
+                    <div ref={editorRef} className="quill-editor h-full text-foreground bg-transparent"></div>
 
                     {/* Styles override for dark mode adaptation */}
                     <style>{`
                         /* Base Toolbar & Container */
                         .ql-toolbar.ql-snow {
                             background-color: var(--muted) !important;
-                            border-color: var(--border) !important;
-                            border-top-left-radius: 0.5rem;
-                            border-top-right-radius: 0.5rem;
-                        }
-                        .ql-container.ql-snow {
-                            border-color: var(--border) !important;
+                            border-color: var(--input) !important;
+                            border-top: 1px solid var(--input) !important; /* Separator for bottom toolbar */
+                            border-bottom: none !important;
+                            border-left: none !important;
+                            border-right: none !important;
+                            border-radius: 0 !important; /* Remove top radius default */
                             border-bottom-left-radius: 0.5rem;
                             border-bottom-right-radius: 0.5rem;
-                            background-color: var(--card) !important;
+                        }
+                        .ql-container.ql-snow {
+                            border: none !important; /* Visual border handled by parent div */
+                            background-color: transparent !important;
                             color: var(--foreground) !important;
+                            font-size: 12px !important; /* Explicitly matching input size (text-xs) */
                             font-family: inherit;
-                            font-size: 0.875rem; 
+                            flex: 1; /* Fill remaining space */
                         }
                         
                         /* Editor Area */
                         .ql-editor {
                             min-height: 200px;
+                            padding: 1rem;
+                            font-size: 12px;
+                            line-height: 1.5;
                         }
                         
                         /* --- ICONS VISIBILITY FIX --- */
@@ -322,8 +351,6 @@ const CreatePost: React.FC = () => {
                         .ql-toolbar .ql-stroke {
                             stroke: var(--foreground) !important;
                         }
-                        
-                        /* Force all fills to be white */
                         .ql-snow .ql-fill,
                         .ql-toolbar .ql-fill {
                             fill: var(--foreground) !important;
@@ -367,8 +394,10 @@ const CreatePost: React.FC = () => {
 
                         /* Dropdown Options Background */
                         .ql-snow .ql-picker-options {
-                            background-color: var(--card) !important;
+                            background-color: var(--popover) !important;
                             border-color: var(--border) !important;
+                            bottom: 100% !important; /* Open dropdown UPWARDS since toolbar is at bottom */
+                            top: auto !important;
                         }
                         .ql-snow .ql-picker-item {
                             color: var(--foreground) !important;
@@ -383,18 +412,9 @@ const CreatePost: React.FC = () => {
                 </div>
             </div>
 
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-border/50">
+            <div className="flex items-center justify-between mt-4 pt-4">
                 <div className="flex items-center gap-2 text-muted-foreground text-xs">
-                    <select
-                        value={categoryId}
-                        onChange={(e) => setCategoryId(e.target.value)}
-                        className="bg-card border border-border text-foreground text-[10px] rounded px-2 py-1 focus:outline-none focus:border-primary"
-                    >
-                        <option value="">Selecionar Categoria</option>
-                        {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                    </select>
-                    <span className="text-muted-foreground/50">|</span>
-                    <span className="text-[10px]">{id ? 'Edição de rascunho' : 'Novo rascunho'}</span>
+                    {/* Empty placeholder to keep alignment if needed, or just spacers */}
                 </div>
 
                 <div className="flex gap-3">
