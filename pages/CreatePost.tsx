@@ -52,11 +52,20 @@ const CreatePost: React.FC = () => {
             return;
         }
 
+        const validCategoryId = categoryId || categories[0]?.id;
+
+        if (!validCategoryId) {
+            alert("Erro: Nenhuma categoria disponível. Entre em contato com o suporte.");
+            setLoading(false);
+            setSavingDraft(false);
+            return;
+        }
+
         const postData = {
             title,
             content,
             author_id: user.id,
-            category_id: categoryId || categories.find(c => c.slug === 'general')?.id,
+            category_id: validCategoryId,
             status: status
         };
 
@@ -64,7 +73,8 @@ const CreatePost: React.FC = () => {
 
         if (error) {
             console.error('Error creating post:', error);
-            alert('Erro ao salvar.');
+            console.error('Error creating post:', error);
+            alert(`Erro ao salvar: ${error.message || error.details || JSON.stringify(error)}`);
         } else {
             if (status === 'published') {
                 navigate('/community');

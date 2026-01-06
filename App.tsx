@@ -7,6 +7,7 @@ import PlatformLayout from './components/layouts/PlatformLayout';
 import Dashboard from './pages/Dashboard';
 import Community from './pages/Community';
 import Profile from './pages/Profile';
+import Settings from './pages/Settings';
 import PostDetail from './pages/PostDetail';
 import CreatePost from './pages/CreatePost';
 import Editor from './components/Editor';
@@ -50,8 +51,8 @@ const App: React.FC = () => {
                     <Route path="/community/create" element={<CreatePost />} />
                     <Route path="/community/post/:id" element={<PostDetail />} />
                     <Route path="/profile" element={<Profile />} />
+                    <Route path="/settings" element={<Settings />} />
                     <Route path="/projects" element={<div className="p-8 text-white">Página de Projetos (Em construção)</div>} />
-                    <Route path="/settings" element={<div className="p-8 text-white">Configurações (Em construção)</div>} />
                 </Route>
 
                 {/* Editor Route (Standalone) */}
