@@ -109,7 +109,10 @@ const Favorites: React.FC = () => {
         <div className="min-h-full font-sans text-xs bg-background">
             {/* Standard Header */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
-                <h1 className="text-xl font-bold text-foreground">Meus Favoritos</h1>
+                <div className="flex flex-col justify-center h-full">
+                    <h1 className="text-xl font-bold text-foreground">Meus Favoritos</h1>
+                    <p className="text-[10px] text-muted-foreground hidden md:block">Acesse rapidamente as discussões que você salvou.</p>
+                </div>
 
                 <div className="flex items-center gap-3">
                     <div className="relative w-80">
@@ -144,9 +147,6 @@ const Favorites: React.FC = () => {
             </div>
 
             <div className="p-8 max-w-[1600px] mx-auto">
-                <div className="mb-6">
-                    <p className="text-muted-foreground text-xs">Acesse rapidamente as discussões que você salvou.</p>
-                </div>
 
                 {loading ? (
                     <div className="p-8 text-center text-muted-foreground text-xs">Carregando seus favoritos...</div>

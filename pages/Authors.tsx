@@ -31,8 +31,12 @@ const Authors: React.FC = () => {
     return (
         <div className="min-h-full font-sans text-xs bg-background">
             {/* Standard Header */}
+            {/* Standard Header */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
-                <h1 className="text-xl font-bold text-foreground">Comunidade de Autores</h1>
+                <div className="flex flex-col justify-center h-full">
+                    <h1 className="text-xl font-bold text-foreground">Comunidade de Autores</h1>
+                    <p className="text-[10px] text-muted-foreground hidden md:block">Conheça as mentes criativas por trás das histórias.</p>
+                </div>
 
                 <div className="relative w-80">
                     <input
@@ -47,9 +51,6 @@ const Authors: React.FC = () => {
             </div>
 
             <div className="p-8 max-w-[1600px] mx-auto">
-                <div className="mb-6">
-                    <p className="text-muted-foreground text-xs">Conheça as mentes criativas por trás das histórias.</p>
-                </div>
 
                 {/* Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

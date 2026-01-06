@@ -186,21 +186,21 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                 )}
             </div>
 
-            <div className="mt-8 pt-6 border-t border-brand-border bg-brand-surface rounded-md p-4">
-                <h4 className="text-[10px] font-bold text-white uppercase tracking-widest mb-4">Adicionar Objeto à Cena</h4>
+            <div className="mt-8 pt-6 border-t border-border bg-card rounded-md p-4">
+                <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Adicionar Objeto à Cena</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-4">
-                        <p className="text-xs text-zinc-500">Crie um novo objeto:</p>
+                        <p className="text-xs text-muted-foreground">Crie um novo objeto:</p>
                         <button
                             onClick={handleCreateNewObject}
                             className="w-full flex items-center justify-center px-4 py-2 bg-primary border border-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs"
                         >
-                            <Plus className="w-4 h-4 mr-2 text-purple-400" />
+                            <Plus className="w-4 h-4 mr-2" />
                             Criar Novo Objeto
                         </button>
                     </div>
-                    <div className="space-y-4 md:border-l md:border-zinc-800 md:pl-6">
-                        <p className="text-xs text-zinc-500">Ou vincule um existente:</p>
+                    <div className="space-y-4 md:border-l md:border-border md:pl-6">
+                        <p className="text-xs text-muted-foreground">Ou vincule um existente:</p>
                         <div className="flex gap-2">
                             <select
                                 value={selectedGlobalObjectId}

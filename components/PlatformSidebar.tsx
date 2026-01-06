@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { LayoutDashboard, Users, User, Gamepad2, Settings, ChevronDown, ChevronRight, ChevronLeft, MessageSquare, FileText, Star } from 'lucide-react';
+import { LayoutDashboard, Users, User, Gamepad2, Settings, ChevronDown, ChevronRight, ChevronLeft, MessageSquare, FileText, Star, Share2 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 const PlatformSidebar: React.FC = () => {
@@ -30,14 +30,17 @@ const PlatformSidebar: React.FC = () => {
     const NavItem = ({ to, icon: Icon, label }: { to: string, icon: any, label: string }) => (
         <Link
             to={to}
-            className={`flex items-center gap-3 px-4 py-2 rounded-md transition-all text-sm group relative ${isActive(to)
-                ? 'bg-muted text-foreground font-medium'
-                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-                } ${isCollapsed ? 'justify-center px-2' : ''}`}
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-r-xl rounded-l-none transition-all text-sm group relative overflow-hidden ${isActive(to)
+                ? `text-purple-400 font-bold ${isCollapsed ? 'bg-transparent' : 'bg-purple-500/10 border-l-2 border-purple-500'}`
+                : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border-l-4 border-transparent'
+                } ${isCollapsed ? 'justify-center px-0 py-3 rounded-none' : ''}`}
             title={isCollapsed ? label : undefined}
         >
-            <Icon size={18} className="flex-shrink-0" />
-            {!isCollapsed && <span className="truncate">{label}</span>}
+            {/* Hover Glow Effect */}
+            <div className={`absolute inset-0 bg-purple-500/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${isActive(to) ? 'translate-x-0' : ''}`} />
+
+            <Icon size={isCollapsed ? 20 : 18} className={`flex-shrink-0 relative z-10 ${isActive(to) ? 'text-purple-400' : ''}`} />
+            {!isCollapsed && <span className="truncate relative z-10">{label}</span>}
         </Link>
     );
 
@@ -81,7 +84,7 @@ const PlatformSidebar: React.FC = () => {
                     </button>
 
                     {isCommunityOpen && (
-                        <div className={`${isCollapsed ? 'ml-0 flex flex-col items-center gap-1 pt-1 bg-muted/20 rounded-lg pb-1' : 'ml-7 flex flex-col gap-1 border-l border-border pl-2'}`}>
+                        <div className={`${isCollapsed ? 'ml-0 flex flex-col items-center gap-1 pt-1 bg-muted/20 rounded-lg pb-1' : 'ml-6 flex flex-col gap-1'}`}>
                             <NavItem to="/community" icon={MessageSquare} label="Fórum" />
                             <NavItem to="/community/authors" icon={User} label="Autores" />
                             <NavItem to="/community/my-posts" icon={FileText} label="Minhas Postagens" />
@@ -96,10 +99,10 @@ const PlatformSidebar: React.FC = () => {
             <div className="mt-auto p-4 border-t border-border">
                 <Link
                     to="/editor"
-                    className={`flex items-center gap-3 w-full bg-secondary hover:bg-secondary/80 text-secondary-foreground font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl text-base group border border-border ${isCollapsed ? 'justify-center px-0' : 'justify-center'}`}
+                    className={`flex items-center gap-3 w-full bg-secondary hover:bg-white hover:text-zinc-900 text-secondary-foreground font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl text-base group border border-border ${isCollapsed ? 'justify-center px-0' : 'justify-center'}`}
                     title={isCollapsed ? "Abrir Editor" : undefined}
                 >
-                    <Gamepad2 size={20} className="group-hover:scale-110 transition-transform text-purple-500" />
+                    <Share2 size={20} className="group-hover:scale-110 transition-transform text-purple-600" />
                     {!isCollapsed && <span className="truncate">Abrir Editor</span>}
                 </Link>
             </div>

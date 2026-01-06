@@ -13,6 +13,7 @@ const Dashboard: React.FC = () => {
     const [favoritePosts, setFavoritePosts] = useState<Post[]>([]);
     const [loadingPosts, setLoadingPosts] = useState(true);
     const [user, setUser] = useState<any>(null);
+    const [displayName, setDisplayName] = useState<string>('Autor');
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -20,6 +21,17 @@ const Dashboard: React.FC = () => {
             setUser(user);
 
             if (user) {
+                // Fetch Profile for Display Name
+                const { data: profile } = await supabase
+                    .from('profiles')
+                    .select('username, full_name')
+                    .eq('id', user.id)
+                    .single();
+
+                if (profile) {
+                    setDisplayName(profile.full_name || profile.username || 'Autor');
+                }
+
                 const { data } = await supabase
                     .from('posts')
                     .select('*, comments(count)')
@@ -63,7 +75,7 @@ const Dashboard: React.FC = () => {
                     <div className="lg:col-span-2 bg-gradient-to-br from-card to-background p-4 rounded-lg border border-border relative overflow-hidden flex flex-col justify-center min-h-[120px]">
                         <div className="absolute top-0 right-0 w-48 h-48 bg-purple-500/5 rounded-full blur-3xl -mr-12 -mt-12 pointer-events-none"></div>
 
-                        <h1 className="text-lg font-bold text-foreground mb-1 relative z-10">Bem-vindo de volta, Autor!</h1>
+                        <h1 className="text-lg font-bold text-foreground mb-1 relative z-10">Bem-vindo de volta, {displayName}!</h1>
                         <p className="text-muted-foreground max-w-md relative z-10 text-xs leading-relaxed">
                             Você tem 3 rascunhos pendentes e sua última história "Fuja da Masmorra" recebeu 12 novos comentários.
                         </p>

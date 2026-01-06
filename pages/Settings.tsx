@@ -104,8 +104,12 @@ const Settings: React.FC = () => {
     return (
         <div className="min-h-full font-sans text-xs bg-background">
             {/* Standard Header */}
+            {/* Standard Header */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
-                <h1 className="text-xl font-bold text-foreground">Configurações</h1>
+                <div className="flex flex-col justify-center h-full">
+                    <h1 className="text-xl font-bold text-foreground">Configurações</h1>
+                    <p className="text-[10px] text-muted-foreground hidden md:block">Gerencie suas preferências e perfil.</p>
+                </div>
                 <button
                     onClick={handleLogout}
                     className="flex items-center gap-2 px-3 py-1.5 bg-destructive/10 text-destructive rounded-lg hover:bg-destructive/20 border border-destructive/20 text-xs font-medium transition-colors"
@@ -114,10 +118,7 @@ const Settings: React.FC = () => {
                 </button>
             </div>
 
-            <div className="p-8 max-w-4xl mx-auto">
-                <div className="mb-6">
-                    <p className="text-muted-foreground text-xs">Gerencie suas preferências e perfil.</p>
-                </div>
+            <div className="p-8 max-w-4xl mx-0">
 
                 {/* Theme Section */}
                 <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
