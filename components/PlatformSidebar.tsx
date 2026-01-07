@@ -57,9 +57,9 @@ const PlatformSidebar: React.FC = () => {
             <div className={`flex-shrink-0 bg-card p-4 flex items-center border-b border-border relative h-[61px] ${isCollapsed ? 'justify-center' : ''}`}>
                 <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-60" />
                 {isCollapsed ? (
-                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-lime-500 to-green-600 flex items-center justify-center font-bold text-white text-xs">N</div>
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center font-bold text-primary text-xs">IF</div>
                 ) : (
-                    <h1 className="text-xl font-bold text-[#bef264] truncate">Nargnar</h1>
+                    <h1 className="text-xl font-bold text-foreground truncate">IF Builder</h1>
                 )}
             </div>
 
@@ -100,10 +100,10 @@ const PlatformSidebar: React.FC = () => {
                 <Link
                     to="/editor"
                     className={`flex items-center gap-3 w-full bg-secondary hover:bg-white hover:text-zinc-900 text-secondary-foreground font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl text-base group border border-border ${isCollapsed ? 'justify-center px-0' : 'justify-center'}`}
-                    title={isCollapsed ? "Abrir IF Builder" : undefined}
+                    title={isCollapsed ? "Abrir Editor" : undefined}
                 >
                     <Share2 size={20} className="group-hover:scale-110 transition-transform text-purple-600" />
-                    {!isCollapsed && <span className="truncate">Abrir IF Builder</span>}
+                    {!isCollapsed && <span className="truncate">Abrir Editor</span>}
                 </Link>
             </div>
         </aside>

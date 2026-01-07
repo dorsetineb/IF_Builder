@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, User, MapPin, Eye, EyeOff } from 'lucide-react';
+import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, User, MapPin, Eye, EyeOff, Gamepad2 } from 'lucide-react';
 import { DitherShader } from '@/components/ui/dither-shader';
 
 export function Auth() {
@@ -98,7 +98,7 @@ export function Auth() {
                     <div className="space-y-2 text-center">
                         <h1 className="text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
                             {isSignUp ? <UserPlus className="w-6 h-6 text-purple-400" /> : <LogIn className="w-6 h-6 text-blue-400" />}
-                            {isSignUp ? 'Criar Conta' : 'Acessar Nargnar'}
+                            {isSignUp ? 'Criar Conta' : 'Acessar IF Builder'}
                         </h1>
                         <p className="text-zinc-400 text-sm">
                             {isSignUp
@@ -316,8 +316,8 @@ export function Auth() {
             </div >
 
             {/* Decorative elements */}
-            <div className="fixed bottom-10 right-10 hidden lg:block select-none pointer-events-none z-0">
-                <img src="/nargnar_logo.png" alt="Nargnar" className="h-64 w-auto object-contain" />
+            <div className="fixed bottom-10 right-24 hidden lg:block select-none pointer-events-none z-0 opacity-20">
+                <h1 className="text-9xl font-black text-white tracking-tighter italic" style={{ fontFamily: 'Inter, sans-serif' }}>IF</h1>
             </div>
         </div >
     );

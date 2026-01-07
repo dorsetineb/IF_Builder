@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, ThumbsUp, Share2, Send, ThumbsDown, CornerDownRight, User, Star, Trash2, AlertCircle, List, X } from 'lucide-react';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { ChevronLeft, ThumbsUp, Share2, Send, ThumbsDown, CornerDownRight, User, Star, Trash2, AlertCircle, List, X, Pencil, MessageSquare, Heart, LogOut } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { useToast } from '../components/ToastContext';
 import ImageModal from '../components/ImageModal';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
+import RichEditor from '../components/RichEditor';
 
 type PostWithDetails = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
@@ -67,86 +68,11 @@ const ConfirmationModal = ({
 
 };
 
-// Reusable Rich Text Editor Component
-const RichEditor = ({
-    value,
-    onChange,
-    placeholder,
-    minHeight = "100px",
-    autoFocus = false,
-    onSubmit,
-    submitting
-}: {
-    value: string;
-    onChange: (val: string) => void;
-    placeholder: string;
-    minHeight?: string;
-    autoFocus?: boolean;
-    onSubmit: () => void;
-    submitting: boolean;
-}) => {
-    const editorRef = useRef<HTMLDivElement>(null);
-    const quillRef = useRef<Quill | null>(null);
 
-    useEffect(() => {
-        if (editorRef.current && !quillRef.current) {
-            const quill = new Quill(editorRef.current, {
-                theme: 'snow',
-                placeholder,
-                modules: {
-                    toolbar: [
-                        ['bold', 'italic', 'underline', 'code-block'],
-                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                        ['link', 'image']
-                    ]
-                }
-            });
-
-            quill.on('text-change', () => {
-                const html = quill.root.innerHTML === '<p><br></p>' ? '' : quill.root.innerHTML;
-                onChange(html);
-            });
-
-            quillRef.current = quill;
-            if (autoFocus) quill.focus();
-        }
-    }, []);
-
-    // Sync external value changes (reset)
-    useEffect(() => {
-        if (quillRef.current && value === '' && quillRef.current.root.innerHTML !== '<p><br></p>') {
-            quillRef.current.root.innerHTML = '';
-        }
-    }, [value]);
-
-    return (
-        <div className="flex flex-col border border-border rounded-lg bg-card overflow-hidden focus-within:ring-1 focus-within:ring-purple-500/50 transition-all text-sm">
-            <div ref={editorRef} style={{ minHeight }} className="text-foreground text-sm" />
-            <div className="bg-muted/30 border-t border-border p-2 flex justify-end">
-                <button
-                    onClick={onSubmit}
-                    disabled={submitting || !value.trim()}
-                    className="bg-purple-600 hover:bg-purple-500 text-white px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider disabled:opacity-50 transition-all flex items-center gap-2"
-                >
-                    <Send size={12} className={submitting ? "animate-pulse" : ""} />
-                    Enviar
-                </button>
-            </div>
-            <style>{`
-                .ql-toolbar.ql-snow { border: none; border-bottom: 1px solid var(--border); background: var(--muted); padding: 4px; }
-                .ql-container.ql-snow { border: none; }
-                .ql-editor { padding: 0.75rem; font-family: inherit; font-size: 0.8rem; }
-                .ql-snow .ql-stroke { stroke: var(--muted-foreground); }
-                .ql-snow .ql-fill { fill: var(--muted-foreground); }
-                .ql-snow .ql-picker { color: var(--muted-foreground); }
-                .ql-toolbar button:hover .ql-stroke { stroke: var(--foreground); }
-            `}</style>
-        </div>
-    );
-};
 
 const PostDetail: React.FC = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const { toast } = useToast();
     const [post, setPost] = useState<PostWithDetails | null>(null);
     const [comments, setComments] = useState<CommentWithAuthor[]>([]);
@@ -161,15 +87,36 @@ const PostDetail: React.FC = () => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [favoritedBy, setFavoritedBy] = useState<any[]>([]); // Users who favorited
 
-    // Modal State
+    // Edit State for Post
+    const [isEditingPost, setIsEditingPost] = useState(false);
+
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<{ type: 'post' | 'comment', id: string } | null>(null);
-    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+    // Gallery State
+    const [galleryState, setGalleryState] = useState<{ images: string[], index: number, isOpen: boolean }>({
+        images: [],
+        index: 0,
+        isOpen: false
+    });
 
     const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
         const target = e.target as HTMLElement;
         if (target.tagName === 'IMG') {
-            setSelectedImage((target as HTMLImageElement).src);
+            const container = target.closest('.prose'); // Find the prose container
+            if (container) {
+                // Find all images in this container to build the gallery
+                const allImages = Array.from(container.querySelectorAll('img')).map(img => img.src);
+                const clickedIndex = allImages.indexOf((target as HTMLImageElement).src);
+
+                if (clickedIndex !== -1) {
+                    setGalleryState({
+                        images: allImages,
+                        index: clickedIndex,
+                        isOpen: true
+                    });
+                }
+            }
         }
     };
 
@@ -282,11 +229,32 @@ const PostDetail: React.FC = () => {
     };
 
     const handleShare = async () => {
+        const url = window.location.href;
         try {
-            await navigator.clipboard.writeText(window.location.href);
+            await navigator.clipboard.writeText(url);
             toast('Link Copiado!', 'O link da postagem foi copiado para a área de transferência.', 'success');
         } catch (err) {
-            toast('Erro', 'Não foi possível copiar o link.', 'error');
+            console.error('Clipboard API failed', err);
+            // Fallback method
+            try {
+                const textArea = document.createElement("textarea");
+                textArea.value = url;
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                const successful = document.execCommand('copy');
+                document.body.removeChild(textArea);
+                if (successful) {
+                    toast('Link Copiado!', 'O link da postagem foi copiado para a área de transferência.', 'success');
+                } else {
+                    throw new Error('Fallback failed');
+                }
+            } catch (fallbackErr) {
+                toast('Erro', 'Não foi possível copiar o link.', 'error');
+            }
         }
     };
 
@@ -330,7 +298,11 @@ const PostDetail: React.FC = () => {
     };
 
     const handleSubmitComment = async (content: string = newComment, parentId: string | null = replyingTo) => {
-        if (!content.trim() || !id) return;
+        if (!content || !content.trim() || content === '<p><br></p>') {
+            toast('Atenção', 'Por favor, escreva algo ou insira uma imagem.', 'info');
+            return;
+        }
+        if (!id) return;
         setSubmitting(true);
         if (!currentUser) {
             toast('Login necessário', "Você precisa estar logado para responder.", 'error');
@@ -403,6 +375,59 @@ const PostDetail: React.FC = () => {
         }
     };
 
+    const handleUpdatePost = async (content: string) => {
+        if (!post) return;
+
+        try {
+            const { error } = await supabase
+                .from('posts')
+                .update({
+                    content,
+                    updated_at: new Date().toISOString()
+                })
+                .eq('id', post.id);
+
+            if (error) throw error;
+
+            setPost(prev => prev ? { ...prev, content, updated_at: new Date().toISOString() } : null);
+            setIsEditingPost(false);
+            toast('Sucesso', 'Tópico atualizado com sucesso!', 'success');
+        } catch (error) {
+            console.error('Error updating post:', error);
+            toast('Erro', 'Erro ao atualizar tópico.', 'error');
+        }
+    };
+
+    const handleUpdateComment = async (commentId: string, content: string) => {
+        try {
+            const { error } = await supabase
+                .from('comments')
+                .update({ content }) // Note: updated_at might not exist on comments yet
+                .eq('id', commentId);
+
+            if (error) throw error;
+
+            // Update local state
+            const updateCommentsRecursive = (list: CommentWithAuthor[]): CommentWithAuthor[] => {
+                return list.map(c => {
+                    if (c.id === commentId) {
+                        return { ...c, content }; // We don't have updated_at in type, so just content
+                    }
+                    if (c.children && c.children.length > 0) {
+                        return { ...c, children: updateCommentsRecursive(c.children) };
+                    }
+                    return c;
+                });
+            };
+
+            setComments(prev => updateCommentsRecursive(prev));
+            toast('Sucesso', 'Resposta atualizada com sucesso!', 'success');
+        } catch (error) {
+            console.error('Error updating comment:', error);
+            toast('Erro', 'Erro ao atualizar resposta.', 'error');
+        }
+    };
+
     // Extracted CommentItem to prevent re-renders losing focus
     interface CommentItemProps {
         comment: CommentWithAuthor;
@@ -415,6 +440,7 @@ const PostDetail: React.FC = () => {
         confirmDelete: (type: 'post' | 'comment', id: string) => void;
         postStatus?: string;
         onImageClick: (e: React.MouseEvent<HTMLDivElement>) => void;
+        handleUpdateComment: (id: string, content: string) => Promise<void>;
     }
 
     const CommentItem: React.FC<CommentItemProps> = ({
@@ -427,9 +453,23 @@ const PostDetail: React.FC = () => {
         handleSubmitComment,
         confirmDelete,
         postStatus,
-        onImageClick
+        onImageClick,
+        handleUpdateComment
     }) => {
         const [localComment, setLocalComment] = useState('');
+        const [isEditing, setIsEditing] = useState(false);
+        const [editContent, setEditContent] = useState(comment.content);
+        const [isUpdating, setIsUpdating] = useState(false);
+
+        const onUpdate = async () => {
+            if (!editContent.trim() || editContent === '<p><br></p>') return;
+            setIsUpdating(true);
+            await handleUpdateComment(comment.id, editContent);
+            setIsUpdating(false);
+            setIsEditing(false);
+        };
+
+        const isAuthor = currentUser?.id === comment.author_id;
 
         // Reset local comment when closing/opening
         useEffect(() => {
@@ -454,37 +494,70 @@ const PostDetail: React.FC = () => {
                             <span className="text-muted-foreground text-[9px]">{new Date(comment.created_at).toLocaleDateString()} às {new Date(comment.created_at).toLocaleTimeString().slice(0, 5)}</span>
                         </div>
                     </div>
-                    {currentUser && currentUser.id === comment.author_id && (
-                        <button
-                            onClick={() => confirmDelete('comment', comment.id)}
-                            className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:bg-red-500 hover:text-white transition-all p-1 rounded"
-                            title="Excluir resposta"
-                        >
-                            <Trash2 size={12} />
-                        </button>
-                    )}
+                    <div className="flex gap-2 items-center">
+                        <div className="flex gap-1 items-center mr-2">
+                            <button onClick={(e) => { e.stopPropagation(); toast('Em breve', 'Reações em comentários estarão disponíveis em breve!', 'info'); }} className="text-muted-foreground hover:text-blue-500 p-1 transition-colors"><ThumbsUp size={14} /></button>
+                            <button onClick={(e) => { e.stopPropagation(); toast('Em breve', 'Reações em comentários estarão disponíveis em breve!', 'info'); }} className="text-muted-foreground hover:text-pink-500 p-1 transition-colors"><Heart size={14} /></button>
+                            <button onClick={(e) => { e.stopPropagation(); toast('Em breve', 'Reações em comentários estarão disponíveis em breve!', 'info'); }} className="text-muted-foreground hover:text-red-500 p-1 transition-colors"><ThumbsDown size={14} /></button>
+                        </div>
+
+                        {isAuthor && !isEditing && (
+                            <>
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="text-muted-foreground hover:bg-muted hover:text-purple-400 transition-all p-1.5 rounded"
+                                    title="Editar resposta"
+                                >
+                                    <Pencil size={14} />
+                                </button>
+                                <button
+                                    onClick={() => confirmDelete('comment', comment.id)}
+                                    className="text-muted-foreground hover:bg-red-500 hover:text-white transition-all p-1.5 rounded"
+                                    title="Excluir resposta"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            </>
+                        )}
+                    </div>
                 </div>
 
-                <div
-                    className="text-muted-foreground text-xs mb-2 pl-1 leading-relaxed prose prose-invert max-w-none [&_img]:max-w-full [&_img]:rounded-lg [&_img]:mt-2 [&_img]:cursor-pointer [&_img]:hover:opacity-90 transition-opacity"
-                    dangerouslySetInnerHTML={{ __html: comment.content }}
-                    onClick={onImageClick}
-                />
+                {isEditing ? (
+                    <div className="mb-2">
+                        <RichEditor
+                            value={editContent}
+                            onChange={setEditContent}
+                            placeholder="Edite sua resposta..."
+                            minHeight="100px"
+                            onSubmit={onUpdate}
+                            submitting={isUpdating}
+                            submitLabel="Salvar Edição"
+                            onCancel={() => setIsEditing(false)}
+                        />
+                    </div>
+                ) : (
+                    <div
+                        className="text-muted-foreground text-xs mb-2 pl-1 leading-relaxed prose prose-invert max-w-none [&_img]:max-w-full [&_img]:max-h-[400px] [&_img]:w-auto [&_img]:object-contain [&_img]:rounded-lg [&_img]:mt-2 [&_img]:cursor-pointer [&_img]:hover:brightness-90 transition-all"
+                        dangerouslySetInnerHTML={{ __html: comment.content }}
+                        onClick={onImageClick}
+                    />
+                )}
 
-                <div className="flex items-center gap-3 pl-1">
+                <div className="flex items-center gap-3 pl-1 mt-1 h-6">
                     {postStatus === 'published' ? (
-                        <button
-                            onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                            className={`font-medium flex items-center gap-1 transition-all text-xs ${replyingTo === comment.id
-                                ? 'text-muted-foreground hover:text-red-500 opacity-100'
-                                : 'text-muted-foreground hover:text-purple-400 opacity-0 group-hover:opacity-100'
-                                }`}
-                        >
-                            {replyingTo === comment.id ? <X size={14} /> : <CornerDownRight size={14} />}
-                            {replyingTo === comment.id ? 'Cancelar' : 'Responder'}
-                        </button>
+                        <>
+                            {replyingTo !== comment.id && (
+                                <button
+                                    onClick={() => setReplyingTo(comment.id)}
+                                    className="font-medium flex items-center gap-1.5 transition-all text-xs text-muted-foreground hover:text-purple-400 opacity-0 group-hover:opacity-100"
+                                >
+                                    <CornerDownRight size={14} />
+                                    Responder
+                                </button>
+                            )}
+                        </>
                     ) : (
-                        <span className="text-[10px] text-muted-foreground/50 cursor-not-allowed" title="Tópico não publicado">Responder</span>
+                        <span className="text-[10px] text-muted-foreground/50 cursor-not-allowed opacity-0 group-hover:opacity-100" title="Tópico não publicado">Responder</span>
                     )}
                 </div>
 
@@ -499,6 +572,7 @@ const PostDetail: React.FC = () => {
                             autoFocus
                             onSubmit={() => handleSubmitComment(localComment, comment.id)}
                             submitting={submitting}
+                            onCancel={() => setReplyingTo(null)}
                         />
 
                     </div>
@@ -520,6 +594,7 @@ const PostDetail: React.FC = () => {
                                 confirmDelete={confirmDelete}
                                 postStatus={postStatus}
                                 onImageClick={onImageClick}
+                                handleUpdateComment={handleUpdateComment}
                             />
                         ))}
                     </div>
@@ -534,19 +609,25 @@ const PostDetail: React.FC = () => {
     // Extract First Image for Hero
     const firstImage = post?.content.match(/<img[^>]+src="([^">]+)"/) ? post?.content.match(/<img[^>]+src="([^">]+)"/)?.[1] : null;
 
-    if (loading) return <div className="p-8 text-center text-zinc-500 text-xs">Carregando discussão...</div>;
-    if (!post) return <div className="p-8 text-center text-zinc-500 text-xs">Post não encontrado.</div>;
-
     return (
         <div className="min-h-full bg-background font-sans pb-32">
             {/* Standard Header with Breadcrumbs */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-20 shrink-0">
                 <div className="flex flex-col justify-center h-full">
                     <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-                        Fórum
+                        <Link to="/community" className="hover:text-purple-400 transition-colors">Fórum</Link>
                         <span className="text-muted-foreground/50">/</span>
                         <span className="text-sm font-medium text-muted-foreground">{post.categories?.name || 'Tópico'}</span>
                     </h1>
+                </div>
+                <div>
+                    <button
+                        onClick={() => navigate('/community')}
+                        className="flex items-center justify-center p-2 text-muted-foreground hover:text-destructive transition-colors"
+                        title="Sair"
+                    >
+                        <LogOut className="w-5 h-5" />
+                    </button>
                 </div>
             </div>
 
@@ -571,7 +652,7 @@ const PostDetail: React.FC = () => {
                                 </div>
                             )}
 
-                            <div className="p-8 relative">
+                            <div className="p-6 relative">
                                 {/* Header Info */}
                                 <div className="flex items-start justify-between mb-6">
                                     <div className="space-y-4">
@@ -593,6 +674,9 @@ const PostDetail: React.FC = () => {
                                             <div>
                                                 <p className="text-foreground text-sm font-bold">{post.profiles?.username || 'Anônimo'}</p>
                                                 <p className="text-muted-foreground text-[10px]">{new Date(post.created_at).toLocaleDateString()} às {new Date(post.created_at).toLocaleTimeString().slice(0, 5)}</p>
+                                                {post.updated_at && post.updated_at !== post.created_at && (
+                                                    <p className="text-muted-foreground text-[9px] italic">(editado)</p>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
@@ -607,55 +691,65 @@ const PostDetail: React.FC = () => {
                                                 <Send size={12} /> Publicar
                                             </button>
                                         )}
-                                        <button
-                                            onClick={handleShare}
-                                            className="text-muted-foreground hover:text-foreground p-2 rounded-lg hover:bg-muted transition-colors"
-                                            title="Copiar Link"
-                                        >
-                                            <Share2 size={18} />
-                                        </button>
-                                        <button
-                                            onClick={handleToggleFavorite}
-                                            className={`p-2 rounded-lg transition-colors hover:bg-muted ${isFavorite ? 'text-yellow-500' : 'text-muted-foreground hover:text-yellow-500'}`}
-                                            title="Favoritar"
-                                        >
-                                            <Star size={18} className={isFavorite ? 'fill-current' : ''} />
-                                        </button>
                                         {currentUser && currentUser.id === post.author_id && (
-                                            <button
-                                                onClick={() => confirmDelete('post', post.id)}
-                                                className="text-muted-foreground hover:text-red-500 p-2 rounded-lg hover:bg-red-500/10 transition-colors"
-                                                title="Excluir"
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
+                                            <>
+                                                <button
+                                                    onClick={() => setIsEditingPost(true)}
+                                                    className="text-muted-foreground hover:text-purple-400 p-2 rounded-lg hover:bg-muted transition-colors"
+                                                    title="Editar Tópico"
+                                                >
+                                                    <Pencil size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => confirmDelete('post', post.id)}
+                                                    className="text-muted-foreground hover:text-red-500 p-2 rounded-lg hover:bg-red-500/10 transition-colors"
+                                                    title="Excluir"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </>
                                         )}
                                     </div>
                                 </div>
 
                                 {/* Post Content */}
-                                <div
-                                    className="prose prose-invert prose-purple max-w-none text-sm text-foreground/90 leading-relaxed font-normal [&_img]:max-w-full [&_img]:rounded-lg [&_img]:mt-2 [&_img]:cursor-pointer [&_img]:hover:opacity-90 transition-opacity"
-                                    dangerouslySetInnerHTML={{ __html: post.content.replace(/<img[^>]*>/g, '') }}
-                                    onClick={handleImageClick}
-                                />
+                                {isEditingPost ? (
+                                    <div className="mt-4">
+                                        <RichEditor
+                                            value={post.content}
+                                            onChange={(val) => setPost(prev => prev ? { ...prev, content: val } : null)}
+                                            placeholder="Edite seu tópico..."
+                                            minHeight="200px"
+                                            onSubmit={() => handleUpdatePost(post.content)}
+                                            submitting={false}
+                                            submitLabel="Salvar Edição"
+                                            onCancel={() => setIsEditingPost(false)}
+                                        />
+                                    </div>
+                                ) : (
+                                    <div
+                                        className="prose prose-invert prose-purple max-w-none text-sm text-foreground/90 leading-relaxed font-normal [&_img]:max-w-full [&_img]:max-h-[500px] [&_img]:w-auto [&_img]:object-contain [&_img]:rounded-lg [&_img]:mt-2 [&_img]:cursor-pointer [&_img]:hover:brightness-90 transition-all"
+                                        dangerouslySetInnerHTML={{ __html: post.content }}
+                                        onClick={handleImageClick}
+                                    />
+                                )}
 
                                 {/* Reactions Footer */}
                                 <div className="flex items-center gap-4 pt-8 mt-8 border-t border-border">
-                                    <button
-                                        onClick={() => handleReaction('like')}
-                                        className={`flex items-center gap-2 px-4 py-2 rounded-xl border transition-all ${userReaction === 'like' ? 'bg-blue-500/10 border-blue-500 text-blue-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
-                                    >
-                                        <ThumbsUp size={16} className={userReaction === 'like' ? 'fill-current' : ''} />
-                                        <span className="text-xs font-bold">{reactionCounts.like}</span>
-                                    </button>
-
                                     <button
                                         onClick={() => handleReaction('like')}
                                         className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${userReaction === 'like' ? 'bg-blue-500/10 border-blue-500 text-blue-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
                                     >
                                         <ThumbsUp size={14} className={userReaction === 'like' ? 'fill-current' : ''} />
                                         <span className="text-[10px] font-bold">{reactionCounts.like}</span>
+                                    </button>
+
+                                    <button
+                                        onClick={() => handleReaction('super_like')}
+                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${userReaction === 'super_like' ? 'bg-pink-500/10 border-pink-500 text-pink-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
+                                    >
+                                        <Heart size={14} className={userReaction === 'super_like' ? 'fill-current' : ''} />
+                                        <span className="text-[10px] font-bold">{reactionCounts.super_like}</span>
                                     </button>
 
                                     <button
@@ -666,18 +760,24 @@ const PostDetail: React.FC = () => {
                                         <span className="text-[10px] font-bold">{reactionCounts.dislike}</span>
                                     </button>
 
-                                    <button
-                                        onClick={() => handleReaction('super_like')}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${userReaction === 'super_like' ? 'bg-pink-500/10 border-pink-500 text-pink-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
-                                    >
-                                        <div className="flex relative items-center justify-center w-5 h-4">
-                                            <ThumbsUp size={14} className={`absolute left-0 ${userReaction === 'super_like' ? 'fill-current' : ''}`} />
-                                            <ThumbsUp size={14} className={`absolute left-1.5 -top-1 rotate-12 ${userReaction === 'super_like' ? 'fill-current' : ''} bg-background rounded-full`} />
-                                        </div>
-                                        <span className="text-[10px] font-bold ml-1">{reactionCounts.super_like}</span>
-                                    </button>
+                                    <span className="text-xs text-muted-foreground ml-auto pr-4">{post.comments ? post.comments.length : 0} visualizações</span>
 
-                                    <span className="text-xs text-muted-foreground ml-auto">{post.comments ? post.comments.length : 0} visualizações</span>
+                                    <button
+                                        onClick={handleShare}
+                                        className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:bg-muted transition-all"
+                                        title="Copiar Link"
+                                    >
+                                        <Share2 size={14} />
+                                        <span className="text-[10px] font-bold">Compartilhar</span>
+                                    </button>
+                                    <button
+                                        onClick={handleToggleFavorite}
+                                        className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${isFavorite ? 'bg-yellow-500/10 border-yellow-500 text-yellow-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
+                                        title="Favoritar"
+                                    >
+                                        <Star size={14} className={isFavorite ? 'fill-current' : ''} />
+                                        <span className="text-[10px] font-bold">Favorito</span>
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -701,6 +801,7 @@ const PostDetail: React.FC = () => {
                                         confirmDelete={confirmDelete}
                                         postStatus={post?.status}
                                         onImageClick={handleImageClick}
+                                        handleUpdateComment={handleUpdateComment}
                                     />
                                 ))}
                             </div>
@@ -723,7 +824,7 @@ const PostDetail: React.FC = () => {
                                                 onChange={setNewComment}
                                                 placeholder="Escreva sua resposta para este tópico..."
                                                 minHeight="100px"
-                                                onSubmit={handleSubmitComment}
+                                                onSubmit={() => handleSubmitComment()}
                                                 submitting={submitting}
                                             />
                                         </div>
@@ -783,12 +884,16 @@ const PostDetail: React.FC = () => {
                     : 'Tem certeza que deseja excluir esta resposta? Esta ação não pode ser desfeita.'}
             />
 
-            <ImageModal
-                imageUrl={selectedImage}
-                onClose={() => setSelectedImage(null)}
-            />
+            {galleryState.isOpen && (
+                <ImageModal
+                    images={galleryState.images}
+                    initialIndex={galleryState.index}
+                    onClose={() => setGalleryState(prev => ({ ...prev, isOpen: false }))}
+                />
+            )}
         </div>
     );
 };
 
 export default PostDetail;
+

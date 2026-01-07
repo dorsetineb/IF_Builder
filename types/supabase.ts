@@ -76,6 +76,10 @@ export interface Database {
                     category_id: string | null
                     created_at: string
                     updated_at: string
+                    tags: string[] | null
+                    image_url: string | null
+                    status: 'draft' | 'published'
+                    views: number
                 }
                 Insert: {
                     id?: string
@@ -85,6 +89,9 @@ export interface Database {
                     category_id?: string | null
                     created_at?: string
                     updated_at?: string
+                    tags?: string[] | null
+                    image_url?: string | null
+                    status?: 'draft' | 'published'
                 }
                 Update: {
                     id?: string
@@ -94,6 +101,9 @@ export interface Database {
                     category_id?: string | null
                     created_at?: string
                     updated_at?: string
+                    tags?: string[] | null
+                    image_url?: string | null
+                    status?: 'draft' | 'published'
                 }
             }
             comments: {

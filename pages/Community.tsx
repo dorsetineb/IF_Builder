@@ -5,7 +5,6 @@ import { PostCard } from '../components/PostCard';
 import { Search, Plus, MessageSquare, FileText, Star } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useToast } from '../components/ToastContext';
-import { CreateTopicModal } from '../components/CreateTopicModal';
 
 type PostWithAuthor = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
@@ -30,7 +29,6 @@ const Community = () => {
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [user, setUser] = useState<any>(null);
     const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
-    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
     useEffect(() => {
         init();
@@ -156,7 +154,7 @@ const Community = () => {
 
 
                     <button
-                        onClick={() => setIsCreateModalOpen(true)}
+                        onClick={() => navigate('/community/create')}
                         className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-all shadow-lg shadow-purple-900/20 text-xs hover:-translate-y-0.5"
                     >
                         <Plus size={16} />
@@ -260,11 +258,7 @@ const Community = () => {
 
             </div>
 
-            {/* Create Topic Modal */}
-            <CreateTopicModal
-                isOpen={isCreateModalOpen}
-                onClose={() => setIsCreateModalOpen(false)}
-            />
+
         </div>
     );
 };

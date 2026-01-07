@@ -664,7 +664,7 @@ const Editor: React.FC = () => {
     useEffect(() => {
         document.title = "IF Builder";
         return () => {
-            document.title = "Nargnar / Ficções Interativas";
+            document.title = "IF Builder / Ficções Interativas";
         };
     }, []);
 
