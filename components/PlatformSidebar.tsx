@@ -48,7 +48,7 @@ const PlatformSidebar: React.FC = () => {
         <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card border-r border-border flex flex-col h-full transition-all duration-300 relative`}>
             <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
-                className="absolute -right-3 top-6 bg-card border border-border rounded-full p-1 text-muted-foreground hover:text-foreground hover:border-primary transition-colors z-50 shadow-sm"
+                className="absolute -right-3 top-6 bg-card border border-border rounded-full p-1 text-muted-foreground hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-colors z-50 shadow-sm"
             >
                 {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
             </button>
@@ -87,7 +87,6 @@ const PlatformSidebar: React.FC = () => {
                         <div className={`${isCollapsed ? 'ml-0 flex flex-col items-center gap-1 pt-1 bg-muted/20 rounded-lg pb-1' : 'ml-6 flex flex-col gap-1'}`}>
                             <NavItem to="/community" icon={MessageSquare} label="Fórum" />
                             <NavItem to="/community/authors" icon={User} label="Autores" />
-                            <NavItem to="/community/my-posts" icon={FileText} label="Minhas Postagens" />
                             <NavItem to="/community/favorites" icon={Star} label="Favoritos" />
                         </div>
                     )}

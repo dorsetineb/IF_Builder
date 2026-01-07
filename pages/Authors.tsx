@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { Search, User, ExternalLink, Calendar } from 'lucide-react';
+import { Search, User, ExternalLink, Calendar, Plus } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const Authors: React.FC = () => {
+    const navigate = useNavigate();
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -38,15 +40,25 @@ const Authors: React.FC = () => {
                     <p className="text-[10px] text-muted-foreground hidden md:block">Conheça as mentes criativas por trás das histórias.</p>
                 </div>
 
-                <div className="relative w-80">
-                    <input
-                        type="text"
-                        placeholder="Pesquisar autores..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-input border border-input rounded-lg py-1.5 pl-9 pr-3 text-xs text-foreground focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 placeholder:text-muted-foreground"
-                    />
-                    <Search className="absolute left-3 top-2 text-muted-foreground" size={14} />
+                <div className="flex items-center gap-3">
+                    <div className="relative w-64 hidden md:block">
+                        <input
+                            type="text"
+                            placeholder="Pesquisar autores..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full bg-input border border-input rounded-lg py-1.5 pl-9 pr-3 text-xs text-foreground focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 placeholder:text-muted-foreground"
+                        />
+                        <Search className="absolute left-3 top-2 text-muted-foreground" size={14} />
+                    </div>
+
+                    <button
+                        onClick={() => navigate('/community/create')}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-all shadow-lg shadow-purple-900/20 text-xs hover:-translate-y-0.5"
+                    >
+                        <Plus size={16} />
+                        Novo Tópico
+                    </button>
                 </div>
             </div>
 

@@ -150,6 +150,7 @@ const CreatePost: React.FC = () => {
 
         if (!user) {
             setUploadingImage(false);
+            toast('Erro', 'Usuário não autenticado.', 'error');
             return;
         }
 
@@ -157,23 +158,40 @@ const CreatePost: React.FC = () => {
         const fileName = `${user.id}/${Date.now()}.${fileExt}`;
 
         try {
-            const { error: uploadError } = await supabase.storage
+            console.log('Starting upload to forum-images:', fileName);
+            const { error: uploadError, data: uploadData } = await supabase.storage
                 .from('forum-images')
-                .upload(fileName, file);
+                .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: true
+                });
 
-            if (uploadError) throw uploadError;
+            if (uploadError) {
+                console.error('Supabase Upload Error:', uploadError);
+                throw uploadError;
+            }
+
+            console.log('Upload successful:', uploadData);
 
             const { data: { publicUrl } } = supabase.storage
                 .from('forum-images')
                 .getPublicUrl(fileName);
 
+            console.log('Public URL generated:', publicUrl);
             setImageUrl(publicUrl);
             toast('Sucesso', 'Imagem de capa enviada com sucesso.', 'success');
         } catch (error: any) {
-            console.error('Upload Error:', error);
-            toast('Erro no upload', 'Não foi possível enviar a imagem. Verifique se o bucket "forum-images" existe e é público.', 'error');
+            console.error('Upload Process Error:', error);
+            // Translate common storage errors
+            let msg = 'Não foi possível enviar a imagem.';
+            if (error.message?.includes('Bucket not found')) msg = 'Bucket "forum-images" não existe. Rode o SQL "setup_storage.sql".';
+            if (error.message?.includes('Policy')) msg = 'Erro de permissão. Rode o SQL "setup_storage.sql".';
+
+            toast('Erro no upload', msg, 'error');
         } finally {
             setUploadingImage(false);
+            // Reset input so same file can be selected again if needed
+            if (fileInputRef.current) fileInputRef.current.value = '';
         }
     };
 
@@ -210,6 +228,8 @@ const CreatePost: React.FC = () => {
     };
 
     const handleSave = async (status: 'draft' | 'published') => {
+        if (loading || savingDraft) return;
+
         const strippedContent = content.replace(/<[^>]*>/g, '').trim();
         if (!title.trim() || (!strippedContent && status === 'published')) {
             toast('Campos obrigatórios', 'Por favor, preencha o título e o conteúdo.', 'error');
@@ -237,6 +257,24 @@ const CreatePost: React.FC = () => {
         if (status === 'draft') setSavingDraft(true);
         else setLoading(true);
 
+        // DUPLICATE CHECK
+        if (status === 'published' && !id) {
+            const { count, error: countError } = await supabase
+                .from('posts')
+                .select('*', { count: 'exact', head: true })
+                .eq('author_id', user.id)
+                .eq('title', title)
+                .eq('content', content) // Supabase text comp
+                .gt('created_at', new Date(Date.now() - 60000).toISOString()); // Last 60s
+
+            if (count && count > 0) {
+                toast('Duplicidade', 'Você já publicou um tópico idêntico recentemente.', 'error');
+                setLoading(false);
+                setShowPublishModal(false);
+                return;
+            }
+        }
+
         const postData = {
             title,
             content,
@@ -257,6 +295,7 @@ const CreatePost: React.FC = () => {
                 .eq('id', id);
             error = updateError;
         } else {
+            // Check submit state again just in case (race condition mostly UI handled but safe here)
             const { error: insertError } = await supabase
                 .from('posts')
                 .insert(postData);
@@ -344,7 +383,7 @@ const CreatePost: React.FC = () => {
                                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                             <button
                                                 onClick={() => fileInputRef.current?.click()}
-                                                className="bg-white/20 hover:bg-white/30 text-white p-2 rounded-full backdrop-blur-sm transition-colors"
+                                                className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full backdrop-blur-sm transition-colors shadow-lg"
                                                 title="Trocar Imagem"
                                             >
                                                 <Upload size={14} />

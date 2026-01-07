@@ -14,11 +14,11 @@ interface PostCardProps {
     isFavorite: boolean;
     currentUserId?: string;
     onToggleFavorite: (e: React.MouseEvent, postId: string) => void;
-    onDeletePost: (e: React.MouseEvent, postId: string) => void;
+    onToggleFavorite: (e: React.MouseEvent, postId: string) => void;
     viewMode?: 'grid' | 'list';
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUserId, onToggleFavorite, onDeletePost, viewMode = 'grid' }) => {
+export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUserId, onToggleFavorite, viewMode = 'grid' }) => {
     const navigate = useNavigate();
 
     const getCategoryColor = (slug: string) => {
@@ -82,7 +82,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
         return img ? img.src : null;
     };
 
-    const firstImage = getFirstImage(post.content);
+    const firstImage = post.image_url || getFirstImage(post.content);
 
     // List View
     if (viewMode === 'list') {
@@ -148,15 +148,6 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
                 </div>
 
                 {/* Delete Action (Owner) - Tab Style Top Right */}
-                {currentUserId && post.author_id === currentUserId && (
-                    <button
-                        onClick={(e) => onDeletePost(e, post.id)}
-                        className="absolute top-0 right-0 z-30 p-2 bg-red-500 text-white hover:bg-red-600 transition-all shadow-md rounded-bl-xl opacity-0 group-hover:opacity-100 flex items-center justify-center"
-                        title="Excluir"
-                    >
-                        <Trash2 size={14} />
-                    </button>
-                )}
             </div>
         );
     }
@@ -177,15 +168,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
             )}
 
             {/* Delete Action (Owner) - Tab Style Top Right */}
-            {currentUserId && post.author_id === currentUserId && (
-                <button
-                    onClick={(e) => onDeletePost(e, post.id)}
-                    className="absolute top-0 right-0 z-30 p-2.5 bg-red-500 text-white hover:bg-red-600 transition-all shadow-md rounded-bl-xl opacity-0 group-hover:opacity-100 flex items-center justify-center"
-                    title="Excluir"
-                >
-                    <Trash2 size={16} />
-                </button>
-            )}
+            {/* Draft Badge */}
 
             {/* Hero Image (Top & Full Bleed) */}
             {firstImage ? (

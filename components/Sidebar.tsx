@@ -330,7 +330,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     <aside className={`${isCollapsed ? 'w-16' : 'w-1/4 xl:w-1/5'} bg-card p-4 border-r border-border flex flex-col transition-all duration-300 relative`}>
       <button
         onClick={() => setIsCollapsed(!isCollapsed)}
-        className="absolute -right-3 top-6 bg-card border border-border rounded-full p-1 text-muted-foreground hover:text-foreground hover:border-primary transition-colors z-10"
+        className="absolute -right-3 top-6 bg-card border border-border rounded-full p-1 text-muted-foreground hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-colors z-10"
       >
         {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
       </button>

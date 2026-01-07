@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { Search, Star, List, LayoutGrid } from 'lucide-react';
+import { Search, Star, List, LayoutGrid, Plus } from 'lucide-react';
 import { PostCard } from '../components/PostCard';
 import { useToast } from '../components/ToastContext';
+import { useNavigate } from 'react-router-dom';
 
 type Post = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
@@ -12,6 +13,7 @@ type Post = Database['public']['Tables']['posts']['Row'] & {
 };
 
 const Favorites: React.FC = () => {
+    const navigate = useNavigate();
     const { toast } = useToast();
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
@@ -126,6 +128,14 @@ const Favorites: React.FC = () => {
                         <Search className="absolute left-3 top-2 text-muted-foreground" size={14} />
                     </div>
 
+                    <button
+                        onClick={() => navigate('/community/create')}
+                        className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold flex items-center gap-2 transition-all shadow-lg shadow-purple-900/20 text-xs hover:-translate-y-0.5"
+                    >
+                        <Plus size={16} />
+                        Novo Tópico
+                    </button>
+
                     {/* View Toggle */}
                     <div className="flex bg-muted rounded-lg p-0.5 border border-border">
                         <button
@@ -159,7 +169,7 @@ const Favorites: React.FC = () => {
                                 isFavorite={favorites.has(post.id)}
                                 currentUserId={user?.id}
                                 onToggleFavorite={toggleFavorite}
-                                onDeletePost={deletePost}
+                                // Deletion removed
                                 viewMode={viewMode}
                             />
                         ))}

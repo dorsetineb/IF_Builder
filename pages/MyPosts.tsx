@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { MessageSquare, Search, FileText, List, LayoutGrid } from 'lucide-react';
+import { MessageSquare, Search, FileText, List, LayoutGrid, Plus } from 'lucide-react';
 import { PostCard } from '../components/PostCard';
 import { useToast } from '../components/ToastContext';
+import { useNavigate } from 'react-router-dom';
 
 type Post = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
@@ -12,6 +12,7 @@ type Post = Database['public']['Tables']['posts']['Row'] & {
 };
 
 const MyPosts: React.FC = () => {
+    const navigate = useNavigate();
     const { toast } = useToast();
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
@@ -152,7 +153,7 @@ const MyPosts: React.FC = () => {
                                 isFavorite={favorites.has(post.id)}
                                 currentUserId={user?.id}
                                 onToggleFavorite={toggleFavorite}
-                                onDeletePost={deletePost}
+                                // Deletion removed
                                 viewMode={viewMode}
                             />
                         ))}

@@ -77,7 +77,12 @@ const Community = () => {
         }
 
         if (favorites.has(postId)) {
-            await supabase.from('post_favorites').delete().eq('post_id', postId).eq('user_id', user.id);
+            const { error } = await supabase.from('post_favorites').delete().eq('post_id', postId).eq('user_id', user.id);
+            if (error) {
+                console.error('Error removing favorite:', error);
+                toast('Erro', 'Falha ao remover favorito.', 'error');
+                return;
+            }
             setFavorites(prev => {
                 const newFavs = new Set(prev);
                 newFavs.delete(postId);
@@ -85,19 +90,36 @@ const Community = () => {
             });
             toast('Removido', 'Removido dos favoritos.', 'info');
         } else {
-            await supabase.from('post_favorites').insert({ post_id: postId, user_id: user.id });
+            const { error } = await supabase.from('post_favorites').insert({ post_id: postId, user_id: user.id });
+            if (error) {
+                console.error('Error adding favorite:', error);
+                toast('Erro', 'Falha ao adicionar favorito.', 'error');
+                return;
+            }
             setFavorites(prev => new Set(prev).add(postId));
             toast('Adicionado', 'Adicionado aos favoritos!', 'success');
         }
     };
 
     const deletePost = async (postId: string) => {
+        // Manual Cascade Delete due to missing DB constraints
+        const { error: commentsError } = await supabase.from('comments').delete().eq('post_id', postId);
+        if (commentsError) console.error('Error deleting comments:', commentsError);
+
+        const { error: reactionsError } = await supabase.from('post_reactions').delete().eq('post_id', postId);
+        if (reactionsError) console.error('Error deleting reactions:', reactionsError);
+
+        const { error: favoritesError } = await supabase.from('post_favorites').delete().eq('post_id', postId);
+        if (favoritesError) console.error('Error deleting favorites:', favoritesError);
+
         const { error } = await supabase.from('posts').delete().eq('id', postId);
+
         if (!error) {
             setPosts(prev => prev.filter(p => p.id !== postId));
             toast('Sucesso', 'Tópico excluído.', 'success');
         } else {
-            toast('Erro', 'Erro ao excluir tópico.', 'error');
+            console.error('Delete error:', error);
+            toast('Erro', 'Erro ao excluir tópico. Verifique se há dependências.', 'error');
         }
     };
 
@@ -111,16 +133,16 @@ const Community = () => {
 
     const sortedPosts = [...filteredPosts].sort((a, b) => {
         if (sortBy === 'popular') {
-            const reactionsA = a.post_reactions?.length || 0;
-            const reactionsB = b.post_reactions?.length || 0;
-            return reactionsB - reactionsA;
+            const commentsA = a.comments?.[0]?.count || 0;
+            const commentsB = b.comments?.[0]?.count || 0;
+            return commentsB - commentsA;
         }
         return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
 
     const showFeatured = !searchTerm && !selectedCategory;
     const featuredPosts = showFeatured ? sortedPosts.slice(0, 3) : [];
-    const listPosts = showFeatured ? sortedPosts.slice(3) : sortedPosts;
+    const listPosts = sortedPosts;
 
     if (loading) {
         return (
@@ -135,7 +157,7 @@ const Community = () => {
             {/* Sticky Top Bar */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
                 <div className="flex flex-col">
-                    <h1 className="text-xl font-bold text-foreground tracking-tight">Comunidade</h1>
+                    <h1 className="text-xl font-bold text-foreground tracking-tight">Fórum</h1>
                     <p className="text-[10px] text-muted-foreground hidden md:block">Discuta, compartilhe e aprenda com outros criadores.</p>
                 </div>
 
@@ -203,7 +225,7 @@ const Community = () => {
                                         isFavorite={favorites.has(post.id)}
                                         currentUserId={user?.id}
                                         onToggleFavorite={toggleFavorite}
-                                        onDeletePost={deletePost}
+                                        // Deletion removed from feed
                                         viewMode="grid"
                                     />
                                 ))}
@@ -215,7 +237,7 @@ const Community = () => {
                     <div className="max-w-4xl">
                         <div className="flex items-center justify-between mb-4">
                             <h2 className="text-sm font-bold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                                {sortBy === 'recent' ? 'Discussões Recentes' : 'Tópicos Populares'}
+                                {sortBy === 'recent' ? 'Tópicos Recentes' : 'Tópicos Populares'}
                             </h2>
                             <div className="flex bg-muted rounded-lg p-0.5 border border-border">
                                 <button
@@ -246,7 +268,7 @@ const Community = () => {
                                         isFavorite={favorites.has(post.id)}
                                         currentUserId={user?.id}
                                         onToggleFavorite={toggleFavorite}
-                                        onDeletePost={deletePost}
+                                        // Deletion removed from feed
                                         viewMode="list"
                                     />
                                 ))
