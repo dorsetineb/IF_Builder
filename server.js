@@ -9,11 +9,6 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.send('Server is running properly via Node.js!');
-});
-
 const distPath = path.join(__dirname, 'dist');
 
 // Middleware to log all requests
@@ -22,37 +17,71 @@ app.use((req, res, next) => {
     next();
 });
 
-// Check if verification is needed
-if (!fs.existsSync(distPath)) {
-    console.error('CRITICAL: DIST folder not found at:', distPath);
-}
+// Health check
+app.get('/health', (req, res) => {
+    res.send('Server is running properly via Node.js!');
+});
+
+// Diagnostics endpoint to inspect server state
+app.get('/diagnostics', (req, res) => {
+    let output = `<h1>Diagnostics</h1>`;
+    output += `<p><strong>Current Directory:</strong> ${__dirname}</p>`;
+    output += `<p><strong>Dist Path:</strong> ${distPath}</p>`;
+
+    // Check dist existence
+    if (fs.existsSync(distPath)) {
+        output += `<p style="color:green">DIST folder exists.</p>`;
+
+        // List files in dist
+        try {
+            const files = fs.readdirSync(distPath);
+            output += `<h3>Files in dist:</h3><ul>`;
+            files.forEach(file => {
+                const stat = fs.statSync(path.join(distPath, file));
+                output += `<li>${file} (${stat.isDirectory() ? 'DIR' : stat.size + ' bytes'})</li>`;
+            });
+            output += `</ul>`;
+
+            // Inspect index.html content
+            const indexPath = path.join(distPath, 'index.html');
+            if (fs.existsSync(indexPath)) {
+                const content = fs.readFileSync(indexPath, 'utf8');
+                output += `<h3>dist/index.html First 500 chars:</h3>`;
+                output += `<pre style="background:#f0f0f0; padding:10px; border:1px solid #ccc;">${content.slice(0, 500).replace(/</g, '&lt;')}</pre>`;
+
+                if (content.includes('src="/src/index.tsx"')) {
+                    output += `<h2 style="color:red">DETECTED SOURCE FILE REFERENCE! Build failed or copied wrong file.</h2>`;
+                } else if (content.includes('/assets/index')) {
+                    output += `<h2 style="color:green">DETECTED BUNDLED ASSETS. Build looks correct.</h2>`;
+                }
+            } else {
+                output += `<h2 style="color:red">index.html NOT found in dist!</h2>`;
+            }
+
+        } catch (e) {
+            output += `<p style="color:red">Error reading dist: ${e.message}</p>`;
+        }
+    } else {
+        output += `<p style="color:red">CRITICAL: DIST folder does NOT exist.</p>`;
+    }
+
+    res.send(output);
+});
 
 // Serve static files from the dist directory
 app.use(express.static(distPath));
 
-// Handle SPA routing: redirect all other requests to index.html
+// Handle SPA routing
 app.get('*', (req, res) => {
     const indexPath = path.join(distPath, 'index.html');
 
     if (fs.existsSync(indexPath)) {
         res.sendFile(indexPath);
     } else {
-        console.error('CRITICAL: index.html not found at:', indexPath);
-        res.status(500).type('text/html').send(`
-          <div style="font-family: sans-serif; padding: 2rem; max-width: 600px; margin: 0 auto; border: 1px solid #ccc; border-radius: 8px; background: #fff0f0; color: #d00;">
-              <h1>Erro de Implantação</h1>
-              <p>O servidor Node.js está rodando, mas não encontrou o site compilado.</p>
-              <hr style="border: 0; border-top: 1px solid #faa;">
-              <p><strong>Caminho esperado:</strong> ${indexPath}</p>
-              <p><strong>Diretório atual:</strong> ${__dirname}</p>
-              <p><strong>Diagnóstico:</strong> O comando <code>npm run build</code> provavelmente falhou ou não foi executado.</p>
-              <p><a href="/health">Teste de Saúde do Servidor (/health)</a></p>
-          </div>
-      `);
+        res.status(500).send('Application not built. Check /diagnostics');
     }
 });
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
-    console.log(`Looking for build in: ${distPath}`);
 });
