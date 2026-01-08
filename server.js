@@ -8,22 +8,27 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Pasta de build do Vite exportada (padrão é 'dist')
+// pasta onde o build é gerado: dist ou build
 const distPath = path.join(__dirname, 'dist');
 
-// Servir arquivos estáticos (CSS, JS, imagens)
+// serve arquivos estáticos (JS/CSS/imagens) do build
 app.use(express.static(distPath));
 
-// Rotas de diagnóstico
-app.get('/health', (req, res) => {
+// rota de health opcional
+app.get('/health', (_req, res) => {
     res.send('OK');
 });
 
-// Qualquer outra rota entrega o index.html (SPA)
-app.get('*', (req, res) => {
+// rota de diagnostics opcional (se quiser manter)
+app.get('/diagnostics', (_req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'));
+});
+
+// TODAS as outras rotas, incluindo "/", devolvem o index.html compilado
+app.get('*', (_req, res) => {
     res.sendFile(path.join(distPath, 'index.html'));
 });
 
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+    console.log(`Server is running on port ${PORT}`);
 });
