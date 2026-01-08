@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { User, Lock, Save, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, X } from 'lucide-react';
+import { User, Lock, Save, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, X, Terminal } from 'lucide-react';
 import { useTheme } from '../components/ThemeProvider';
 import { useToast } from '../components/ToastContext';
 import { useNavigate } from 'react-router-dom';
@@ -127,13 +127,13 @@ const Settings: React.FC = () => {
                         <h2 className="text-sm font-bold text-card-foreground">Aparência</h2>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <button
                             onClick={() => setTheme('dark')}
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Moon size={16} className={theme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>Dark</span>
+                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>Escuro</span>
                         </button>
 
                         <button
@@ -141,7 +141,7 @@ const Settings: React.FC = () => {
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Sun size={16} className={theme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>Light</span>
+                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>Claro</span>
                         </button>
 
                         <button
@@ -149,7 +149,15 @@ const Settings: React.FC = () => {
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Coffee size={16} className={theme === 'cream' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>Cream</span>
+                            <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>Creme</span>
+                        </button>
+
+                        <button
+                            onClick={() => setTheme('terminal')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted'}`}
+                        >
+                            <Terminal size={16} className={theme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
+                            <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>Terminal</span>
                         </button>
                     </div>
                 </div>
@@ -243,9 +251,9 @@ const Settings: React.FC = () => {
                                 </label>
                                 <div className="w-full bg-input border border-input rounded px-3 py-2 min-h-[40px] flex flex-wrap gap-2 items-center">
                                     {interests.map((tag, i) => (
-                                        <span key={i} className="bg-purple-500/10 text-purple-500 border border-purple-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase flex items-center gap-1 group">
+                                        <span key={i} className="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase flex items-center gap-1 group">
                                             {tag}
-                                            <button onClick={() => removeInterest(tag)} className="hover:text-purple-300">
+                                            <button onClick={() => removeInterest(tag)} className="hover:text-primary/80">
                                                 <X size={10} />
                                             </button>
                                         </span>

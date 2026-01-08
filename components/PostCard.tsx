@@ -14,7 +14,7 @@ interface PostCardProps {
     isFavorite: boolean;
     currentUserId?: string;
     onToggleFavorite: (e: React.MouseEvent, postId: string) => void;
-    onToggleFavorite: (e: React.MouseEvent, postId: string) => void;
+
     viewMode?: 'grid' | 'list';
 }
 
@@ -94,7 +94,9 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
                 {/* Draft Badge Overlay */}
                 {post.status === 'draft' && (
                     <div className="absolute top-2 right-2 z-10">
-                        <div className="w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_10px_rgba(234,179,8,0.5)]"></div>
+                        <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-yellow-500/20 text-yellow-500 border border-yellow-500/20 uppercase tracking-wider backdrop-blur-md">
+                            Rascunho
+                        </span>
                     </div>
                 )}
 
@@ -126,7 +128,13 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
                         )}
 
                         {/* Avatar & User */}
-                        <div className="flex items-center gap-1.5 ml-1">
+                        <div
+                            className="flex items-center gap-1.5 ml-1 cursor-pointer hover:opacity-80 transition-opacity"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                if (post.profiles?.id) navigate(`/community/author/${post.profiles.id}`);
+                            }}
+                        >
                             <div className="w-3.5 h-3.5 rounded-full bg-muted flex items-center justify-center overflow-hidden border border-border/50">
                                 {post.profiles?.avatar_url ? (
                                     <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -134,7 +142,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
                                     <User size={8} className="text-muted-foreground" />
                                 )}
                             </div>
-                            <span className="font-bold text-zinc-400">{post.profiles?.username || 'Anon'}</span>
+                            <span className="font-bold text-zinc-400 hover:text-purple-400 transition-colors">{post.profiles?.username || 'Anon'}</span>
                         </div>
 
                         <span>•</span>
@@ -189,7 +197,13 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
 
                 {/* Author & Category Header */}
                 <div className="flex items-center justify-between mb-3">
-                    <div className="flex items-center gap-2">
+                    <div
+                        className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if (post.profiles?.id) navigate(`/community/author/${post.profiles.id}`);
+                        }}
+                    >
                         <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center overflow-hidden border border-border">
                             {post.profiles?.avatar_url ? (
                                 <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
@@ -197,7 +211,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
                                 <User size={10} className="text-muted-foreground" />
                             )}
                         </div>
-                        <span className="text-[11px] font-bold text-muted-foreground/80 truncate max-w-[100px]">
+                        <span className="text-[11px] font-bold text-muted-foreground/80 truncate max-w-[100px] hover:text-purple-400 transition-colors">
                             {post.profiles?.username || 'Anon'}
                         </span>
                     </div>

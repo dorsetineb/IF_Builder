@@ -234,8 +234,8 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
       </div>
       <div
         ref={containerRef}
-        className={`w-full h-full bg-zinc-950 rounded-2xl border border-zinc-800/50 overflow-hidden ${isPanning || dragInfo ? 'cursor-grabbing' : 'cursor-grab'} shadow-inner`}
-        style={{ backgroundImage: 'radial-gradient(rgba(168,85,247,0.15) 1px, transparent 1px)', backgroundSize: '30px 30px' }}
+        className={`w-full h-full bg-zinc-950 rounded-2xl border border-zinc-700 overflow-hidden ${isPanning || dragInfo ? 'cursor-grabbing' : 'cursor-grab'} shadow-inner`}
+        style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)', backgroundSize: '20px 20px' }}
         onWheel={handleWheel}
         onMouseDown={handleCanvasMouseDown}
         onMouseMove={handleMouseMove}

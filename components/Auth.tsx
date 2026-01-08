@@ -97,13 +97,13 @@ export function Auth() {
                 <div className="p-8 space-y-6">
                     <div className="space-y-2 text-center">
                         <h1 className="text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
-                            {isSignUp ? <UserPlus className="w-6 h-6 text-purple-400" /> : <LogIn className="w-6 h-6 text-blue-400" />}
+                            {isSignUp ? <UserPlus className="w-6 h-6 text-purple-400" /> : <LogIn className="w-6 h-6 text-purple-400" />}
                             {isSignUp ? 'Criar Conta' : 'Acessar IF Builder'}
                         </h1>
                         <p className="text-zinc-400 text-sm">
                             {isSignUp
                                 ? 'Junte-se à aventura e comece a criar suas histórias hoje mesmo.'
-                                : 'Entre com seu e-mail e senha para continuar.'}
+                                : <>Você acorda em uma caverna escura.<br />Um computador espera seu login e senha.</>}
                         </p>
                     </div>
 

@@ -816,13 +816,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     })}
                 </div>
 
-                <div className="bg-muted/10 -mt-px py-8 grid grid-cols-1 xl:grid-cols-[1fr_450px] gap-8 items-start px-6">
+                <div className={`bg-muted/10 -mt-px py-8 grid grid-cols-1 ${activeTab === 'cores' ? 'xl:grid-cols-[1fr_450px]' : ''} gap-8 items-start px-6`}>
                     {activeTab === 'layout' && (
                         <div className="space-y-6">
                             <div>
-                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Tela de Abertura</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
                                     <div className="space-y-8 col-span-1">
+                                        <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Tela de Abertura</h3>
                                         <div className="space-y-8">
                                             <div>
                                                 <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
@@ -840,14 +840,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${localOmitSplashTitle ? 'bg-purple-500 border-purple-500' : 'bg-input border-input group-hover:border-primary/50'}`}>
                                                     {localOmitSplashTitle && <Circle className="w-2 h-2 fill-white stroke-none" />}
                                                 </div>
-                                                <label htmlFor="omitSplashTitle" className="ml-3 text-xs font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground cursor-pointer select-none transition-colors">Ocultar título e descrição</label>
+                                                <label htmlFor="omitSplashTitle" className="ml-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground cursor-pointer select-none transition-colors">Ocultar título e descrição</label>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-4 col-span-2">
-                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-1">Pré-visualização</p>
-                                        <div className="bg-card border border-border rounded-2xl p-6 flex items-center justify-center shadow-inner h-full min-h-[300px]">
+                                    <div className="space-y-4 col-span-1 md:mt-0">
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">Pré-visualização</p>
+                                        <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-center shadow-inner h-fit aspect-video">
                                             <div
                                                 className="relative w-full max-w-full aspect-video bg-muted border border-border/50 rounded-xl flex shadow-2xl overflow-hidden"
                                                 style={{
@@ -872,9 +872,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             </div>
 
                             <div className="pt-6 border-t border-zinc-800/50">
-                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Layout do Jogo</h3>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
                                     <div className="space-y-8 col-span-1">
+                                        <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Layout do Jogo</h3>
                                         <div className="space-y-4">
                                             <div>
                                                 <label htmlFor="orientation-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Orientação</label>
@@ -928,9 +928,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         </div>
                                     </div>
 
-                                    <div className="flex flex-col col-span-2">
+                                    <div className="flex flex-col col-span-1 md:mt-0">
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">Pré-visualização do Layout</p>
-                                        <div className="bg-card border border-border rounded-2xl p-6 flex items-center justify-center h-full min-h-[300px] shadow-inner">
+                                        <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-center h-fit aspect-video shadow-inner">
                                             <div
                                                 className="w-full max-w-[400px] aspect-video border border-border/30 bg-muted rounded-xl flex p-3 gap-3 transition-all shadow-2xl overflow-hidden"
                                                 style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
@@ -1547,60 +1547,63 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     )}
 
 
-                    {/* Right Column: Live Preview at the correct level */}
-                    <div className="hidden xl:block h-fit sticky top-8">
-                        <div className="space-y-6">
-                            <div className="flex items-center justify-between px-2">
-                                <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Prévia em Tempo Real</h3>
-                                <div className="flex gap-1.5">
-                                    <div className="w-2 h-2 rounded-full bg-red-500/50" />
-                                    <div className="w-2 h-2 rounded-full bg-yellow-500/50" />
-                                    <div className="w-2 h-2 rounded-full bg-green-500/50" />
-                                </div>
-                            </div>
 
-                            <div
-                                className={`w-full aspect-video rounded-2xl overflow-hidden border-4 shadow-2xl transition-all ${localGameTheme === 'dark' ? 'bg-background border-border' : 'bg-white border-zinc-100'}`}
-                                style={{ fontFamily: localFontFamily, fontSize: `${localGameFontSize}px` }}
-                            >
-                                <div className="h-full flex flex-col p-6 space-y-4">
-                                    <div className="flex-grow flex gap-6">
-                                        {/* Image Placeholder */}
-                                        <div
-                                            className="w-1/3 rounded-xl border-border border flex items-center justify-center relative overflow-hidden bg-muted/50"
-                                            style={getFramePreviewStyles(localImageFrame).containerStyles}
-                                        >
-                                            <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                                                <ImageIcon className="w-10 h-10" />
+                    {activeTab === 'cores' && (
+                        <div className="hidden xl:block h-fit sticky top-8">
+                            <div className="space-y-6">
+                                <div className="flex items-center justify-between px-2">
+                                    <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Prévia em Tempo Real</h3>
+                                    <div className="flex gap-1.5">
+                                        <div className="w-2 h-2 rounded-full bg-red-500/50" />
+                                        <div className="w-2 h-2 rounded-full bg-yellow-500/50" />
+                                        <div className="w-2 h-2 rounded-full bg-green-500/50" />
+                                    </div>
+                                </div>
+
+                                <div
+                                    className={`w-full aspect-video rounded-2xl overflow-hidden border-4 shadow-2xl transition-all ${localGameTheme === 'dark' ? 'bg-background border-border' : 'bg-white border-zinc-100'}`}
+                                    style={{ fontFamily: localFontFamily, fontSize: `${localGameFontSize}px` }}
+                                >
+                                    <div className="h-full flex flex-col p-6 space-y-4">
+                                        <div className="flex-grow flex gap-6">
+                                            {/* Image Placeholder */}
+                                            <div
+                                                className="w-1/3 rounded-xl border-border border flex items-center justify-center relative overflow-hidden bg-muted/50"
+                                                style={getFramePreviewStyles(localImageFrame).containerStyles}
+                                            >
+                                                <div className="absolute inset-0 flex items-center justify-center opacity-20">
+                                                    <ImageIcon className="w-10 h-10" />
+                                                </div>
+                                                <div className="relative text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem</div>
                                             </div>
-                                            <div className="relative text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem</div>
+
+                                            {/* Text Preview */}
+                                            <div className="flex-1 space-y-3">
+                                                <div className="h-4 w-2/3 bg-muted/50 rounded-full animate-pulse" style={{ backgroundColor: localTitleColor }} />
+                                                <div className="space-y-2">
+                                                    <div className="h-2 w-full bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
+                                                    <div className="h-2 w-full bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
+                                                    <div className="h-2 w-4/5 bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        {/* Text Preview */}
-                                        <div className="flex-1 space-y-3">
-                                            <div className="h-4 w-2/3 bg-muted/50 rounded-full animate-pulse" style={{ backgroundColor: localTitleColor }} />
-                                            <div className="space-y-2">
-                                                <div className="h-2 w-full bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
-                                                <div className="h-2 w-full bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
-                                                <div className="h-2 w-4/5 bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
+                                        {/* Input Preview */}
+                                        <div className="pt-4 border-t border-border flex gap-3">
+                                            <div className="flex-1 h-10 rounded-lg border-2 border-border bg-muted/50 flex items-center px-4">
+                                                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{localVerbInputPlaceholder || 'Comando...'}</span>
+                                            </div>
+                                            <div className="px-6 rounded-lg font-bold text-[10px] uppercase tracking-widest flex items-center shadow-lg" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor }}>
+                                                {localActionButtonText || 'Ação'}
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* Input Preview */}
-                                    <div className="pt-4 border-t border-border flex gap-3">
-                                        <div className="flex-1 h-10 rounded-lg border-2 border-border bg-muted/50 flex items-center px-4">
-                                            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{localVerbInputPlaceholder || 'Comando...'}</span>
-                                        </div>
-                                        <div className="px-6 rounded-lg font-bold text-[10px] uppercase tracking-widest flex items-center shadow-lg" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor }}>
-                                            {localActionButtonText || 'Ação'}
-                                        </div>
-                                    </div>
                                 </div>
+                                <p className="text-[10px] text-muted-foreground italic text-center font-bold uppercase tracking-tighter">Esquema visual básico do estilo selecionado</p>
                             </div>
-                            <p className="text-[10px] text-muted-foreground italic text-center font-bold uppercase tracking-tighter">Esquema visual básico do estilo selecionado</p>
                         </div>
-                    </div>
+                    )}
+
                 </div>
             </div>
 

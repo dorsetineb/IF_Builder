@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { MessageSquare, Search, FileText, List, LayoutGrid, Plus } from 'lucide-react';
@@ -20,6 +21,8 @@ const MyPosts: React.FC = () => {
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [user, setUser] = useState<any>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
+
+    const [activeTab, setActiveTab] = useState<'published' | 'drafts'>('published');
 
     useEffect(() => {
         const init = async () => {
@@ -81,89 +84,123 @@ const MyPosts: React.FC = () => {
         }
     };
 
-    const deletePost = async (e: React.MouseEvent, postId: string) => {
-        e.preventDefault();
-        if (!confirm('Tem certeza que deseja apagar esta postagem?')) return;
+    // Filter Posts based on Tab
+    const filteredPosts = posts.filter(post => {
+        const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            post.content.toLowerCase().includes(searchTerm.toLowerCase());
 
-        const { error } = await supabase.from('posts').delete().eq('id', postId);
-        if (!error) {
-            setPosts(posts.filter(p => p.id !== postId));
-            toast('Postagem removida', 'A postagem foi excluída com sucesso.', 'success');
-        } else {
-            toast('Erro', 'Erro ao apagar postagem.', 'error');
-        }
-    };
+        if (!matchesSearch) return false;
 
-    const filteredPosts = posts.filter(post =>
-        post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        post.content.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+        if (activeTab === 'published') return post.status === 'published';
+        if (activeTab === 'drafts') return post.status === 'draft';
+        return true;
+    });
 
     return (
-        <div className="min-h-full font-sans text-xs bg-background">
+        <div className="min-h-full font-sans text-xs bg-background flex flex-col">
             {/* Standard Header */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
                 <div className="flex flex-col justify-center h-full">
-                    <h1 className="text-xl font-bold text-foreground">Minhas Postagens</h1>
+                    <h1 className="text-xl font-bold text-foreground">Meus Tópicos</h1>
                     <p className="text-[10px] text-muted-foreground hidden md:block">Gerencie os tópicos que você iniciou.</p>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="relative w-80">
+                    <div className="relative w-64 lg:w-80">
                         <input
                             type="text"
                             placeholder="Pesquisar..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-input border border-input rounded-lg py-1.5 pl-9 pr-3 text-xs text-foreground focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 placeholder:text-muted-foreground"
+                            className="w-full bg-muted/30 border border-input rounded-lg py-1.5 pl-9 pr-3 text-xs text-foreground focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/20 placeholder:text-muted-foreground transition-all"
                         />
                         <Search className="absolute left-3 top-2 text-muted-foreground" size={14} />
                     </div>
 
-                    {/* View Toggle */}
-                    <div className="flex bg-muted rounded-lg p-0.5 border border-border">
+                    <button
+                        onClick={() => navigate('/community/create')}
+                        className="bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all flex items-center gap-2 shadow-lg shadow-purple-900/20 hover:scale-105"
+                    >
+                        <Plus size={14} />
+                        Novo Tópico
+                    </button>
+                </div>
+            </div>
+
+            {/* Tabs Header */}
+            <div className="px-8 border-b border-border bg-muted/10">
+                <div className="flex items-center justify-between max-w-[1600px] mx-auto">
+                    <div className="flex gap-6">
+                        <button
+                            onClick={() => setActiveTab('published')}
+                            className={`py-3 text-[10px] font-bold uppercase tracking-wider border-b-2 transition-all ${activeTab === 'published' ? 'border-purple-500 text-purple-400' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Publicados
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('drafts')}
+                            className={`py-3 text-[10px] font-bold uppercase tracking-wider border-b-2 transition-all ${activeTab === 'drafts' ? 'border-purple-500 text-purple-400' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
+                        >
+                            Rascunhos
+                        </button>
+                    </div>
+
+                    <div className="flex bg-muted rounded-lg p-0.5 border border-border scale-90 origin-right">
                         <button
                             onClick={() => setViewMode('list')}
                             className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                             title="Lista"
                         >
-                            <List size={16} />
+                            <List size={14} />
                         </button>
                         <button
                             onClick={() => setViewMode('grid')}
                             className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                             title="Grade"
                         >
-                            <LayoutGrid size={16} />
+                            <LayoutGrid size={14} />
                         </button>
                     </div>
                 </div>
             </div>
 
-            <div className="p-8 max-w-[1600px] mx-auto">
+            {/* Content Range */}
+            <div className="flex-1 overflow-y-auto custom-scrollbar">
+                <div className="p-8 max-w-[1600px] mx-auto">
 
-                {loading ? (
-                    <div className="p-8 text-center text-muted-foreground text-xs">Carregando...</div>
-                ) : filteredPosts.length > 0 ? (
-                    <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'flex flex-col gap-3'}>
-                        {filteredPosts.map((post) => (
-                            <PostCard
-                                key={post.id}
-                                post={post}
-                                isFavorite={favorites.has(post.id)}
-                                currentUserId={user?.id}
-                                onToggleFavorite={toggleFavorite}
-                                // Deletion removed
-                                viewMode={viewMode}
-                            />
-                        ))}
-                    </div>
-                ) : (
-                    <div className="p-8 text-center text-muted-foreground text-xs flex flex-col items-center gap-2">
-                        <FileText size={24} className="opacity-50" />
-                        <p>Você ainda não publicou nenhuma postagem.</p>
-                    </div>
-                )}
+                    {/* View Toggle (Optional, maybe move to header or keep here) - Keeping simplified for now or adding back if needed. User asked for tabs. */}
+
+
+                    {loading ? (
+                        <div className="p-8 text-center text-muted-foreground text-xs">Carregando...</div>
+                    ) : filteredPosts.length > 0 ? (
+                        <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'flex flex-col gap-3'}>
+                            {filteredPosts.map((post) => (
+                                <PostCard
+                                    key={post.id}
+                                    post={post}
+                                    isFavorite={favorites.has(post.id)}
+                                    currentUserId={user?.id}
+                                    onToggleFavorite={toggleFavorite}
+                                    viewMode={viewMode}
+                                />
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="p-16 text-center text-muted-foreground text-xs flex flex-col items-center gap-3 border border-dashed border-border rounded-xl bg-muted/5">
+                            <FileText size={32} className="opacity-20" />
+                            <p>Nenhum tópico encontrado nesta categoria.</p>
+                            {activeTab === 'drafts' && (
+                                <button
+                                    onClick={() => navigate('/community/create')}
+                                    className="text-purple-400 hover:text-purple-300 underline underline-offset-4"
+                                >
+                                    Criar um rascunho
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

@@ -70,7 +70,11 @@ const Authors: React.FC = () => {
                         <div className="col-span-full text-center p-8 text-muted-foreground">Carregando autores...</div>
                     ) : filteredProfiles.length > 0 ? (
                         filteredProfiles.map(profile => (
-                            <div key={profile.id} className="bg-card border border-border rounded-lg p-4 flex flex-col gap-3 group hover:border-purple-500/30 transition-all">
+                            <div
+                                key={profile.id}
+                                onClick={() => navigate(`/community/author/${profile.id}`)}
+                                className="bg-card border border-border rounded-lg p-4 flex flex-col gap-3 group hover:border-purple-500/30 transition-all cursor-pointer"
+                            >
                                 <div className="flex items-center gap-3">
                                     <div className="w-10 h-10 rounded-lg bg-muted border border-border overflow-hidden flex-shrink-0">
                                         {profile.avatar_url ? (

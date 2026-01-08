@@ -898,7 +898,7 @@ const PostDetail: React.FC = () => {
                                         {currentUser && currentUser.id === post.author_id && (
                                             <>
                                                 <button
-                                                    onClick={() => setIsEditingPost(true)}
+                                                    onClick={() => navigate(`/community/edit/${post.id}`)}
                                                     className="text-muted-foreground hover:text-purple-400 p-2 rounded-lg hover:bg-muted transition-colors"
                                                     title="Editar Tópico"
                                                 >
@@ -917,26 +917,13 @@ const PostDetail: React.FC = () => {
                                 </div>
 
                                 {/* Post Content */}
-                                {isEditingPost ? (
-                                    <div className="mt-4">
-                                        <RichEditor
-                                            value={post.content}
-                                            onChange={(val) => setPost(prev => prev ? { ...prev, content: val } : null)}
-                                            placeholder="Edite seu tópico..."
-                                            minHeight="200px"
-                                            onSubmit={() => handleUpdatePost(post.content)}
-                                            submitting={false}
-                                            submitLabel="Salvar Edição"
-                                            onCancel={() => setIsEditingPost(false)}
-                                        />
-                                    </div>
-                                ) : (
+                                <div className="mt-4">
                                     <div
                                         className="prose prose-invert prose-purple max-w-none text-sm text-foreground/90 leading-relaxed font-normal [&_img]:max-w-full [&_img]:max-h-[500px] [&_img]:w-auto [&_img]:object-contain [&_img]:rounded-lg [&_img]:mt-2 [&_img]:cursor-pointer [&_img]:hover:brightness-90 transition-all"
                                         dangerouslySetInnerHTML={{ __html: post.content }}
                                         onClick={handleImageClick}
                                     />
-                                )}
+                                </div>
 
                                 {/* Reactions Footer */}
                                 <div className="flex items-center gap-4 pt-8 mt-8 border-t border-border">

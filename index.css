@@ -32,8 +32,8 @@
 
 /* Markdown Styles */
 .prose pre {
-  background-color: #151515;
-  border: 1px solid #2A2A2A;
+  background-color: var(--muted);
+  border: 1px solid var(--border);
   border-radius: 0;
   padding: 1rem;
   overflow-x: auto;
@@ -44,10 +44,9 @@
 }
 
 .prose code {
-  font-family: 'JetBrains Mono', monospace;
   font-size: 0.85em;
-  color: #D8B4FE;
-  background-color: rgba(147, 51, 234, 0.1);
+  color: var(--primary);
+  background-color: rgba(var(--primary), 0.1);
   padding: 0.2em 0.4em;
   border-radius: 0;
 }
@@ -234,6 +233,59 @@
   --sidebar-accent-foreground: oklch(0.20 0.02 30);
   --sidebar-border: oklch(0.85 0.05 95);
   --sidebar-ring: oklch(0.708 0 0);
+}
+
+.terminal {
+  --background: #0D1117;
+  --foreground: #4AF626;
+
+  /* Cards & Surfaces */
+  --card: #0D1117;
+  --card-foreground: #4AF626;
+  --popover: #0D1117;
+  --popover-foreground: #4AF626;
+
+  /* Brand / Primary - Terminal Green */
+  --primary: #4AF626;
+  --primary-foreground: #000000;
+
+  /* Secondary */
+  --secondary: #161B22;
+  --secondary-foreground: #4AF626;
+
+  /* Muted */
+  --muted: #161B22;
+  --muted-foreground: #238636;
+
+  /* Accent */
+  --accent: #238636;
+  --accent-foreground: #ffffff;
+
+  /* Destructive */
+  --destructive: #da3633;
+  --destructive-foreground: #ffffff;
+
+  /* Borders & Inputs */
+  --border: #30363d;
+  --input: #161B22;
+  --ring: #4AF626;
+
+  /* Charts */
+  --chart-1: #4AF626;
+  --chart-2: #238636;
+  --chart-3: #161B22;
+  --chart-4: #4AF626;
+  --chart-5: #238636;
+
+  /* Sidebar */
+  --sidebar: #0D1117;
+  --sidebar-foreground: #4AF626;
+  --sidebar-primary: #4AF626;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #161B22;
+  --sidebar-accent-foreground: #4AF626;
+  --sidebar-border: #30363d;
+  --sidebar-ring: #4AF626;
 }
 
 @layer base {

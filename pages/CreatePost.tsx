@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Save, Send, AlertCircle, ChevronDown, Image as ImageIcon, Link as LinkIcon, LogOut, Upload, X } from 'lucide-react';
+import { Save, Send, AlertCircle, ChevronDown, Image as ImageIcon, Link as LinkIcon, LogOut, Upload, X, Trash2 } from 'lucide-react';
 import { Database } from '../types/supabase';
 import { useToast } from '../components/ToastContext';
 import RichEditor from '../components/RichEditor';
 
 type Category = Database['public']['Tables']['categories']['Row'];
+type CategoryGroup = Database['public']['Tables']['category_groups']['Row'] & {
+    categories: Category[];
+};
 
 // Local Confirmation Modal
 const ConfirmationModal = ({
@@ -70,6 +73,8 @@ const CreatePost: React.FC = () => {
     const [tags, setTags] = useState<string[]>([]);
     const [tagInput, setTagInput] = useState('');
     const [imageUrl, setImageUrl] = useState('');
+    const [postStatus, setPostStatus] = useState<'draft' | 'published' | null>(null);
+    const [categoryGroups, setCategoryGroups] = useState<CategoryGroup[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
 
     const [loading, setLoading] = useState(false);
@@ -78,6 +83,7 @@ const CreatePost: React.FC = () => {
     const [uploadingImage, setUploadingImage] = useState(false);
 
     const [showPublishModal, setShowPublishModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     useEffect(() => {
         fetchCategories();
@@ -87,8 +93,22 @@ const CreatePost: React.FC = () => {
     }, [id]);
 
     const fetchCategories = async () => {
-        const { data } = await supabase.from('categories').select('*');
-        if (data) setCategories(data);
+        const { data } = await supabase
+            .from('category_groups')
+            .select(`
+                *,
+                categories (*)
+            `)
+            .order('order_index');
+
+        if (data) {
+            const sortedGroups = data.map((group: any) => ({
+                ...group,
+                categories: group.categories.sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0))
+            }));
+            setCategoryGroups(sortedGroups);
+            setCategories(sortedGroups.flatMap(g => g.categories));
+        }
     };
 
     const fetchPostData = async (postId: string) => {
@@ -128,6 +148,7 @@ const CreatePost: React.FC = () => {
             const firstImage = doc.querySelector('img')?.src || '';
             if (firstImage && !data.image_url) setImageUrl(firstImage);
         }
+        setPostStatus(data.status);
     };
 
     const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -227,6 +248,32 @@ const CreatePost: React.FC = () => {
         setShowPublishModal(true);
     };
 
+    const handleDeleteClick = () => {
+        setShowDeleteModal(true);
+    };
+
+    const performDelete = async () => {
+        if (!id) return;
+
+        setLoading(true);
+        // Manual Cascade Delete due to lack of DB constraints on some setups, just to be safe
+        await supabase.from('comments').delete().eq('post_id', id);
+        await supabase.from('post_reactions').delete().eq('post_id', id);
+        await supabase.from('post_favorites').delete().eq('post_id', id);
+
+        const { error } = await supabase.from('posts').delete().eq('id', id);
+
+        if (error) {
+            console.error('Error deleting draft:', error);
+            toast('Erro', 'Erro ao excluir rascunho.', 'error');
+            setLoading(false);
+        } else {
+            toast('Sucesso', 'Rascunho excluído.', 'success');
+            navigate('/community/my-posts');
+        }
+        setShowDeleteModal(false);
+    };
+
     const handleSave = async (status: 'draft' | 'published') => {
         if (loading || savingDraft) return;
 
@@ -306,12 +353,16 @@ const CreatePost: React.FC = () => {
             console.error('Error saving post:', error);
             toast('Erro ao salvar', error.message || 'Ocorreu um erro inesperado.', 'error');
         } else {
-            if (status === 'published') {
+            if (id) {
+                // If editing, go back to the post detail
+                toast('Sucesso', 'Alterações salvas com sucesso.', 'success');
+                navigate(`/community/post/${id}`);
+            } else if (status === 'published') {
                 toast('Sucesso!', 'Tópico publicado com sucesso.', 'success');
                 navigate('/community');
             } else {
                 toast('Rascunho salvo', 'Seu trabalho foi salvo com sucesso.', 'success');
-                if (!id) navigate('/community/my-posts');
+                navigate('/community/my-posts');
             }
         }
 
@@ -422,46 +473,28 @@ const CreatePost: React.FC = () => {
                                 />
                             </div>
 
-                            {/* Row: Category + Tags */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Category */}
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">Categoria</label>
-                                    <div className="relative">
-                                        <select
-                                            value={categoryId}
-                                            onChange={(e) => setCategoryId(e.target.value)}
-                                            className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 text-foreground text-xs font-medium focus:outline-none focus:ring-1 focus:ring-purple-500/50 focus:bg-card transition-all appearance-none cursor-pointer"
-                                        >
-                                            <option value="">Selecionar...</option>
-                                            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                                        </select>
-                                        <div className="absolute right-3 top-0 h-full flex items-center justify-center pointer-events-none text-muted-foreground">
-                                            <ChevronDown size={14} />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Tags */}
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">Tags</label>
-                                    <div className="w-full bg-muted/30 border border-border rounded-lg px-3 py-2 min-h-[38px] flex flex-wrap gap-2 items-center focus-within:ring-1 focus-within:ring-purple-500/50 focus-within:bg-card transition-all">
-                                        {tags.map((tag, i) => (
-                                            <span key={i} className="bg-purple-500/10 text-purple-500 border border-purple-500/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase flex items-center gap-1 group whitespace-nowrap">
-                                                {tag}
-                                                <button onClick={() => removeTag(tag)} className="hover:text-purple-300">
-                                                    <X size={10} />
-                                                </button>
-                                            </span>
+                            {/* Category - Full Width */}
+                            <div className="space-y-2">
+                                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">Categoria</label>
+                                <div className="relative">
+                                    <select
+                                        value={categoryId}
+                                        onChange={(e) => setCategoryId(e.target.value)}
+                                        className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 text-foreground text-xs font-medium focus:outline-none focus:ring-1 focus:ring-purple-500/50 focus:bg-card transition-all appearance-none cursor-pointer"
+                                    >
+                                        <option value="">Selecionar...</option>
+                                        {categoryGroups.map(group => (
+                                            <optgroup key={group.id} label={group.name} className="text-foreground bg-card font-bold">
+                                                {group.categories.map(cat => (
+                                                    <option key={cat.id} value={cat.id} className="text-foreground bg-card py-1">
+                                                        {cat.name}
+                                                    </option>
+                                                ))}
+                                            </optgroup>
                                         ))}
-                                        <input
-                                            type="text"
-                                            value={tagInput}
-                                            onChange={(e) => setTagInput(e.target.value)}
-                                            onKeyDown={addTag}
-                                            className="bg-transparent text-xs focus:outline-none flex-1 min-w-[60px] h-full"
-                                            placeholder={tags.length === 0 ? "Ex: Dúvida, Tutorial..." : ""}
-                                        />
+                                    </select>
+                                    <div className="absolute right-3 top-0 h-full flex items-center justify-center pointer-events-none text-muted-foreground">
+                                        <ChevronDown size={14} />
                                     </div>
                                 </div>
                             </div>
@@ -476,13 +509,43 @@ const CreatePost: React.FC = () => {
                                 value={content}
                                 onChange={setContent}
                                 placeholder="Escreva seu tópico aqui..."
-                                minHeight="300px"
+                                minHeight="200px"
                             />
                         </div>
                     </div>
 
-                    {/* Footer Actions */}
-                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-border">
+                    {/* Bottom Section: Tags */}
+                    <div className="space-y-2">
+                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1 flex items-center gap-2">
+                            Tags <span className="text-[9px] opacity-50 font-normal normal-case">(Pressione Enter para adicionar)</span>
+                        </label>
+                        <div className="bg-muted/30 border border-border rounded-lg p-2 focus-within:border-purple-500/50 focus-within:ring-1 focus-within:ring-purple-500/20 transition-all min-h-[42px] flex flex-wrap gap-2 items-center">
+                            {tags.map(tag => (
+                                <span key={tag} className="bg-purple-500/10 text-purple-400 border border-purple-500/20 px-2 py-1 rounded text-[11px] font-bold uppercase tracking-wide flex items-center gap-1 animate-in zoom-in-50 duration-200">
+                                    {tag}
+                                    <button onClick={() => removeTag(tag)} className="hover:text-purple-300 ml-1">
+                                        <X size={12} />
+                                    </button>
+                                </span>
+                            ))}
+                            <input
+                                type="text"
+                                value={tagInput}
+                                onChange={(e) => setTagInput(e.target.value)}
+                                onKeyDown={addTag}
+                                placeholder={tags.length === 0 ? "Adicione tags relacionadas ao seu tópico... (Ex: RPG, Sci-Fi, Dúvida)" : ""}
+                                className="bg-transparent border-none outline-none text-xs text-foreground placeholder:text-muted-foreground/50 flex-1 min-w-[200px]"
+                            />
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            {/* Sticky Footer Actions */}
+            <div className="border-t border-border p-4 bg-background/95 backdrop-blur z-20 shrink-0">
+                <div className="max-w-[1200px] mx-auto flex items-center justify-end gap-3">
+                    {!id && (
                         <button
                             onClick={() => handleSave('draft')}
                             disabled={savingDraft || loading}
@@ -491,16 +554,27 @@ const CreatePost: React.FC = () => {
                             <Save size={14} />
                             {savingDraft ? 'Salvando...' : 'Salvar Rascunho'}
                         </button>
-                        <button
-                            onClick={confirmPublish}
-                            disabled={loading || savingDraft}
-                            className="px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold hover:shadow-lg hover:shadow-purple-600/20 transition-all disabled:opacity-50 text-xs uppercase tracking-wide flex items-center gap-2"
-                        >
-                            {loading ? 'Publicando...' : 'Publicar Tópico'}
-                            <Send size={14} />
-                        </button>
-                    </div>
+                    )}
 
+                    {id && postStatus === 'draft' && (
+                        <button
+                            onClick={handleDeleteClick}
+                            disabled={loading}
+                            className="px-5 py-2 rounded-lg border border-red-500/20 text-red-500 font-bold hover:bg-red-500/10 transition-all disabled:opacity-50 text-xs uppercase tracking-wide flex items-center gap-2"
+                        >
+                            <Trash2 size={14} />
+                            Excluir Rascunho
+                        </button>
+                    )}
+
+                    <button
+                        onClick={confirmPublish}
+                        disabled={loading || savingDraft}
+                        className="px-5 py-2 rounded-lg bg-purple-600 hover:bg-purple-500 text-white font-bold hover:shadow-lg hover:shadow-purple-600/20 transition-all disabled:opacity-50 text-xs uppercase tracking-wide flex items-center gap-2"
+                    >
+                        {loading ? 'Publicando...' : 'Publicar Tópico'}
+                        <Send size={14} />
+                    </button>
                 </div>
             </div>
 
@@ -512,6 +586,16 @@ const CreatePost: React.FC = () => {
                 message="Tem certeza que deseja publicar este tópico? Ele ficará visível para toda a comunidade imediatamente."
                 confirmText="Publicar Agora"
                 confirmColor="bg-purple-600 hover:bg-purple-500"
+            />
+
+            <ConfirmationModal
+                isOpen={showDeleteModal}
+                onClose={() => setShowDeleteModal(false)}
+                onConfirm={performDelete}
+                title="Excluir Rascunho"
+                message="Tem certeza que deseja excluir este rascunho permanentemente? Esta ação não pode ser desfeita."
+                confirmText="Sim, Excluir"
+                confirmColor="bg-red-600 hover:bg-red-500"
             />
         </div>
     );
