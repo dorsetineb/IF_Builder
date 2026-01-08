@@ -17,21 +17,73 @@ import Favorites from './pages/Favorites';
 import Editor from './components/Editor';
 import { ThemeProvider } from './components/ThemeProvider';
 import { ToastProvider } from './components/ToastContext';
+import PendingApproval from './pages/PendingApproval';
 
 const App: React.FC = () => {
     const [session, setSession] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [isApproved, setIsApproved] = useState<boolean | null>(null);
 
     useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setLoading(false);
-        });
+        const checkApproval = async (userId: string) => {
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('is_approved')
+                    .eq('id', userId)
+                    .single();
+
+                if (error) {
+                    console.error('Error checking approval:', error);
+                    // If error (e.g. profile doesn't exist yet), default to false to be safe, 
+                    // or true if you want to be lenient. Given beta, default false.
+                    setIsApproved(false);
+                    return;
+                }
+
+                setIsApproved(!!data?.is_approved);
+            } catch (err) {
+                console.error('Unexpected error checking approval:', err);
+                setIsApproved(false);
+            }
+        };
+
+        const initSession = async () => {
+            // Safety timeout to prevent infinite loading
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('Timeout')), 5000);
+            });
+
+            const sessionLoadPromise = async () => {
+                const { data: { session } } = await supabase.auth.getSession();
+                setSession(session);
+
+                if (session?.user) {
+                    await checkApproval(session.user.id);
+                }
+            };
+
+            try {
+                await Promise.race([sessionLoadPromise(), timeoutPromise]);
+            } catch (err) {
+                console.warn('Session load timed out or failed, forcing UI render', err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        initSession();
 
         const {
             data: { subscription },
-        } = supabase.auth.onAuthStateChange((_event, session) => {
+        } = supabase.auth.onAuthStateChange(async (_event, session) => {
             setSession(session);
+            if (session?.user) {
+                // If we don't have approval status yet, or if switching users
+                await checkApproval(session.user.id);
+            } else {
+                setIsApproved(null);
+            }
             setLoading(false);
         });
 
@@ -44,6 +96,21 @@ const App: React.FC = () => {
 
     if (!session) {
         return <Auth />;
+    }
+
+    // Gate for Beta Access
+    if (isApproved === false) {
+        return (
+            <ThemeProvider defaultTheme="dark" storageKey="if-builder-theme">
+                <ToastProvider>
+                    <Router>
+                        <Routes>
+                            <Route path="*" element={<PendingApproval />} />
+                        </Routes>
+                    </Router>
+                </ToastProvider>
+            </ThemeProvider>
+        );
     }
 
     return (

@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { PostCard } from '../components/PostCard';
+import { InviteManager } from '../components/InviteManager';
 
 type Post = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
@@ -194,6 +195,9 @@ const Dashboard: React.FC = () => {
 
                     {/* Right Column: Topics & Authors */}
                     <div className="space-y-6">
+                        {/* Invite Manager (Beta) */}
+                        <InviteManager />
+
                         {/* Topics */}
                         <div className="bg-card border border-border rounded-xl p-5">
                             <h3 className="text-sm font-bold text-foreground mb-4">Tópicos de Interesse</h3>
