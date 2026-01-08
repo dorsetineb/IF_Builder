@@ -17,7 +17,7 @@ const Dashboard: React.FC = () => {
     const navigate = useNavigate();
     const [myPostsCount, setMyPostsCount] = useState(0);
     const [myCommentsCount, setMyCommentsCount] = useState(0);
-    const [myLikesReceivedCount, setMyLikesReceivedCount] = useState(0); // Mocked or fetched
+    const [myLikesReceivedCount, setMyLikesReceivedCount] = useState(0);
     const [favoritePosts, setFavoritePosts] = useState<Post[]>([]);
     const [loadingPosts, setLoadingPosts] = useState(true);
     const [user, setUser] = useState<any>(null);
@@ -53,10 +53,8 @@ const Dashboard: React.FC = () => {
                     .eq('author_id', user.id);
                 setMyCommentsCount(commentsCount || 0);
 
-                // Stats: Likes Received (Mocked for now as we don't have a direct easy query without efficient approach)
-                // We'll simulate it for now or query a few recent posts and sum reactions? 
-                // Let's just put a placeholder or small logic
-                setMyLikesReceivedCount(0); // Placeholder
+                // Stats: Likes Received (Mocked for now)
+                setMyLikesReceivedCount(0);
 
                 // Fetch Favorites
                 const { data: favData } = await supabase.from('post_favorites').select('post_id').eq('user_id', user.id).limit(5);
@@ -127,7 +125,7 @@ const Dashboard: React.FC = () => {
                             <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
                                 <FileText size={20} />
                             </div>
-                            <span className="bg-green-500/10 text-green-500 text-[10px] font-bold px-2 py-1 rounded-full">+2 hoje</span>
+                            {/* Stats Badge removed (only if change exists logic pending) */}
                         </div>
                         <div>
                             <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider mb-1">Posts Criados</p>
@@ -141,7 +139,7 @@ const Dashboard: React.FC = () => {
                             <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
                                 <MessageSquare size={20} />
                             </div>
-                            <span className="bg-green-500/10 text-green-500 text-[10px] font-bold px-2 py-1 rounded-full">+12 sem.</span>
+                            {/* Stats Badge removed */}
                         </div>
                         <div>
                             <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider mb-1">Respostas</p>
@@ -155,7 +153,7 @@ const Dashboard: React.FC = () => {
                             <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400">
                                 <Heart size={20} />
                             </div>
-                            <span className="bg-green-500/10 text-green-500 text-[10px] font-bold px-2 py-1 rounded-full">+45</span>
+                            {/* Stats Badge removed */}
                         </div>
                         <div>
                             <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider mb-1">Likes Recebidos</p>
@@ -168,9 +166,8 @@ const Dashboard: React.FC = () => {
                     {/* Left Column: Favorite Posts */}
                     <div className="lg:col-span-2 space-y-4">
                         <div className="flex items-center justify-between mb-2">
-                            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
-                                <span className="w-1 h-6 bg-purple-500 rounded-full"></span>
-                                Postagens Favoritas
+                            <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
+                                Tópicos Favoritos
                             </h2>
                             <Link to="/community/favorites" className="text-purple-400 hover:text-purple-300 text-xs font-bold">Ver tudo</Link>
                         </div>

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { User, Heart, FileText, Camera, Sparkles } from 'lucide-react';
+import { User, Heart, FileText, Camera } from 'lucide-react';
 import { PostCard } from '../components/PostCard';
 import { useToast } from '../components/ToastContext';
 
@@ -90,7 +90,6 @@ const AuthorProfile: React.FC = () => {
     };
 
     const getCoverImage = (uid: string) => {
-        // Using a stable predictable seeded random image based on ID could be better, or just this one for now to look good
         return `https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2070&auto=format&fit=crop`;
     };
 
@@ -101,7 +100,6 @@ const AuthorProfile: React.FC = () => {
         console.log("Toggle favorite", postId);
     };
 
-    // Cover Upload Logic
     const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file || !currentUser || !profile) return;
@@ -123,7 +121,7 @@ const AuthorProfile: React.FC = () => {
 
         try {
             const { error: uploadError } = await supabase.storage
-                .from('forum-images') // Reusing existing bucket
+                .from('forum-images')
                 .upload(fileName, file, { upsert: true });
 
             if (uploadError) throw uploadError;
@@ -132,7 +130,6 @@ const AuthorProfile: React.FC = () => {
                 .from('forum-images')
                 .getPublicUrl(fileName);
 
-            // Update profile
             const { error: updateError } = await supabase
                 .from('profiles')
                 .update({ cover_url: publicUrl })
@@ -171,7 +168,6 @@ const AuthorProfile: React.FC = () => {
                 />
                 <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors"></div>
 
-                {/* Edit Cover Button (Owner Only) */}
                 {isOwner && (
                     <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button
@@ -193,12 +189,11 @@ const AuthorProfile: React.FC = () => {
                 )}
             </div>
 
-            {/* Content Container - Flex Layout Adjusted */}
             <div className="max-w-6xl mx-auto px-6 py-6">
-                {/* Profile Info Header */}
-                <div className="flex flex-col md:flex-row items-start gap-6 mb-8 border-b border-border/50 pb-8">
+                {/* Profile Info Header - Row Layout */}
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8 border-b border-border/50 pb-8">
 
-                    {/* Avatar Column */}
+                    {/* 1. Avatar */}
                     <div className="flex-shrink-0">
                         <div className="w-24 h-24 md:w-32 md:h-32 rounded-full bg-card border-4 border-background shadow-lg overflow-hidden relative">
                             {profile.avatar_url ? (
@@ -211,8 +206,8 @@ const AuthorProfile: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* Middle Column: Info & Bio */}
-                    <div className="flex-1 min-w-0 pt-2 flex flex-col gap-3">
+                    {/* 2. Name & Tags (Left Block) */}
+                    <div className="flex flex-col items-center md:items-start text-center md:text-left min-w-[200px] gap-2 pt-2 md:mr-4">
                         <div>
                             <h1 className="text-2xl font-bold text-foreground">
                                 {profile.username || 'Anônimo'}
@@ -220,13 +215,8 @@ const AuthorProfile: React.FC = () => {
                             <p className="text-sm text-muted-foreground font-medium">@{profile.username?.toLowerCase().replace(/\s+/g, '') || 'usuario'}</p>
                         </div>
 
-                        {/* Bio */}
-                        <p className="text-muted-foreground text-xs leading-relaxed max-w-3xl">
-                            {profile.bio || "Este autor prefere manter o mistério e ainda não escreveu uma biografia."}
-                        </p>
-
-                        {/* Interests */}
-                        <div className="flex flex-wrap items-center gap-2 mt-1">
+                        {/* Interests / Tags */}
+                        <div className="flex flex-wrap justify-center md:justify-start gap-2">
                             {profile.interests && profile.interests.length > 0 ? (
                                 profile.interests.map((tag, i) => (
                                     <span key={i} className="px-2 py-1 rounded bg-secondary/50 text-secondary-foreground text-[10px] font-medium border border-border/50">
@@ -234,13 +224,20 @@ const AuthorProfile: React.FC = () => {
                                     </span>
                                 ))
                             ) : (
-                                <span className="text-[10px] text-muted-foreground italic">Sem interesses listados</span>
+                                <span className="text-[10px] text-muted-foreground italic">Sem interesses</span>
                             )}
                         </div>
                     </div>
 
-                    {/* Right Column: Actions */}
-                    <div className="flex-shrink-0 pt-2 md:self-start self-end mt-4 md:mt-0">
+                    {/* 3. Bio (Middle Block - Responsive Filler) */}
+                    <div className="flex-1 w-full md:w-auto pt-2">
+                        <p className="text-zinc-300 text-sm leading-relaxed text-center md:text-left">
+                            {profile.bio || "Este autor prefere manter o mistério e ainda não escreveu uma biografia. Normalmente uma biografia pode ocupar várias linhas e descrever os gostos do autor."}
+                        </p>
+                    </div>
+
+                    {/* 4. Actions (Right Block) */}
+                    <div className="flex-shrink-0 pt-2">
                         <button
                             className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:border-red-500 hover:bg-red-500/5 hover:text-red-500 transition-all text-xs font-bold text-muted-foreground group"
                             onClick={() => console.log("Toggle favorite author")}
