@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { PostCard } from '../components/PostCard';
+import { useUser } from '../components/UserContext';
+import { useToast } from '../components/ToastContext';
 import { Search, Plus, MessageSquare, FileText, Star, LayoutGrid, List } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '../components/ToastContext';
 
 type PostWithAuthor = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
@@ -21,6 +22,7 @@ type CategoryGroup = Database['public']['Tables']['category_groups']['Row'] & {
 const Community = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
+    const { user } = useUser();
 
     // State
     const [posts, setPosts] = useState<PostWithAuthor[]>([]);
@@ -28,22 +30,32 @@ const Community = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
     const [selectedScope, setSelectedScope] = useState<{ id: string; type: 'group' | 'category' } | null>(null);
-    const [categories, setCategories] = useState<Category[]>([]); // Keep flat list for generic use if needed, but we rely on groups for nav
+    const [categories, setCategories] = useState<Category[]>([]);
     const [categoryGroups, setCategoryGroups] = useState<CategoryGroup[]>([]);
-
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
-    const [user, setUser] = useState<any>(null);
     const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
 
     useEffect(() => {
         init();
-    }, []);
+    }, [user]);
 
     const init = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
-        await Promise.all([fetchCategories(), fetchPosts(), fetchFavorites(user)]);
-        setLoading(false);
+        try {
+            // Parallel fetch
+            await Promise.all([
+                fetchCategories(),
+                fetchPosts()
+            ]);
+
+            if (user) {
+                await fetchFavorites(user);
+            }
+        } catch (err: any) {
+            console.error('Error initializing community:', err);
+            toast('Erro', `Não foi possível carregar a comunidade.`, 'error');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const fetchCategories = async () => {

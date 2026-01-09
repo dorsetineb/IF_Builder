@@ -58,9 +58,8 @@ const getMimeTypeFromFileName = (name: string): string => {
 }
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { currentView, onSetView, scenes, gameData, onImportGame, onTogglePreview, ...sceneListProps } = props;
+  const { currentView, onSetView, scenes, gameData, onImportGame, onTogglePreview, isCollapsed, onToggleCollapse, ...sceneListProps } = props;
   const [isScenesExpanded, setIsScenesExpanded] = useState(currentView === 'scenes');
-  const [isCollapsed, setIsCollapsed] = useState(false);
   const importInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -79,7 +78,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     if (currentView !== 'scenes') {
       onSetView('scenes');
       setIsScenesExpanded(true);
-      if (isCollapsed) setIsCollapsed(false); // Auto-expand sidebar when opening scenes
+      if (isCollapsed) onToggleCollapse(); // Auto-expand sidebar when opening scenes
     } else {
       setIsScenesExpanded(!isScenesExpanded);
     }
@@ -327,9 +326,9 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   };
 
   return (
-    <aside className={`${isCollapsed ? 'w-16' : 'w-1/4 xl:w-1/5'} bg-card p-4 border-r border-border flex flex-col transition-all duration-300 relative`}>
+    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card p-4 border-r border-border flex flex-col transition-all duration-300 relative flex-shrink-0`}>
       <button
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        onClick={onToggleCollapse}
         className="absolute -right-3 top-6 bg-card border border-border rounded-full p-1 text-muted-foreground hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-colors z-10"
       >
         {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}

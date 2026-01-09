@@ -2,6 +2,7 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { useUser } from './UserContext';
 import { Auth } from './Auth';
 import { useToast } from './ToastContext';
 import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker, FixedVerb } from '../types';
@@ -657,9 +658,9 @@ const initialGameData: GameData = {
 
 const Editor: React.FC = () => {
     const { toast } = useToast();
-    const [session, setSession] = useState<any>(null);
-    const [loadingSession, setLoadingSession] = useState(true);
+    const { user, loading: authLoading } = useUser();
     const [isTransitioning, setIsTransitioning] = useState(true);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
     useEffect(() => {
         document.title = "IF Builder";
@@ -682,21 +683,9 @@ const Editor: React.FC = () => {
         }, 2000); // 2s duration
     };
 
-    useEffect(() => {
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setSession(session);
-            setLoadingSession(false);
-        });
-
-        const {
-            data: { subscription },
-        } = supabase.auth.onAuthStateChange((_event, session) => {
-            setSession(session);
-            setLoadingSession(false);
-        });
-
-        return () => subscription.unsubscribe();
-    }, []);
+    // Session loading handled by UserContext now.
+    // If we need to block rendering until auth is ready:
+    const loadingSession = authLoading;
 
 
 
@@ -1073,13 +1062,12 @@ const Editor: React.FC = () => {
         return <TransitionScreen isVisible={true} />;
     }
 
-    if (!session) {
+    if (!user) {
         return <Auth />;
     }
 
     return (
         <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans selection:bg-primary/30">
-            <TransitionScreen isVisible={isTransitioning} />
             <TransitionScreen isVisible={isTransitioning} />
             {isPreviewing ? (
                 <div className="flex flex-col w-full h-full">
@@ -1094,6 +1082,7 @@ const Editor: React.FC = () => {
                 </div>
             ) : (
                 <div className="flex flex-col h-full w-full">
+
                     <Header
                         gameData={gameData}
                         isPreviewing={isPreviewing}
@@ -1103,6 +1092,7 @@ const Editor: React.FC = () => {
                         }}
                         onNewGame={handleNewGame}
                         onLogout={handleLogout}
+                        sidebarCollapsed={sidebarCollapsed}
                     />
                     <div className="flex flex-1 overflow-hidden">
                         <Sidebar
@@ -1121,6 +1111,8 @@ const Editor: React.FC = () => {
                                 setPreviewSceneId(null);
                                 setIsPreviewing(true);
                             }}
+                            isCollapsed={sidebarCollapsed}
+                            onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
                         />
                         <main className="flex-1 overflow-y-auto p-6 relative bg-background">
                             {currentView === 'interface' && (

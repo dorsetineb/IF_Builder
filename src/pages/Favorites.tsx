@@ -5,6 +5,7 @@ import { Search, Star, List, LayoutGrid, Plus } from 'lucide-react';
 import { PostCard } from '../components/PostCard';
 import { useToast } from '../components/ToastContext';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../components/UserContext';
 
 type Post = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
@@ -15,25 +16,24 @@ type Post = Database['public']['Tables']['posts']['Row'] & {
 const Favorites: React.FC = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
+    const { user } = useUser();
     const [posts, setPosts] = useState<Post[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
-    const [user, setUser] = useState<any>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('list');
 
     useEffect(() => {
         const init = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            setUser(user);
             if (user) {
                 await fetchFavorites(user.id);
-            } else {
+            } else if (user === null) {
+                // Not logged in or finished loading (shouldn't really happen due to protected route, but safe to handle)
                 setLoading(false);
             }
         };
         init();
-    }, []);
+    }, [user]);
 
     const fetchFavorites = async (userId: string) => {
         setLoading(true);
@@ -79,26 +79,13 @@ const Favorites: React.FC = () => {
                 setPosts(posts.filter(p => p.id !== postId));
             }
         } else {
-            // Should not happen in favorites view (adding)
+            // Should not happen in favorites view (adding), but logic is standard
             const { error } = await supabase.from('post_favorites').insert({ user_id: user.id, post_id: postId });
             if (!error) {
                 const newFavs = new Set(favorites);
                 newFavs.add(postId);
                 setFavorites(newFavs);
             }
-        }
-    };
-
-    const deletePost = async (e: React.MouseEvent, postId: string) => {
-        e.preventDefault();
-        if (!confirm('Tem certeza que deseja apagar esta postagem?')) return;
-
-        const { error } = await supabase.from('posts').delete().eq('id', postId);
-        if (!error) {
-            setPosts(posts.filter(p => p.id !== postId));
-            toast('Postagem removida', 'A postagem foi excluída com sucesso.', 'success');
-        } else {
-            toast('Erro', 'Erro ao apagar postagem.', 'error');
         }
     };
 

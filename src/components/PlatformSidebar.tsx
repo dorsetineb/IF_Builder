@@ -12,7 +12,7 @@ const PlatformSidebar: React.FC = () => {
     const NavItem = ({ to, icon: Icon, label }: { to: string, icon: any, label: string }) => (
         <Link
             to={to}
-            className={`flex items-center gap-3 px-4 py-2.5 rounded-r-xl rounded-l-none transition-all text-sm group relative overflow-hidden ${isActive(to)
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-r-xl rounded-l-none transition-all text-xs font-medium group relative overflow-hidden ${isActive(to)
                 ? `text-primary font-bold ${isCollapsed ? 'bg-transparent' : 'bg-primary/10 border-l-4 border-primary'}`
                 : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground border-l-4 border-transparent'
                 } ${isCollapsed ? 'justify-center px-0 py-3 rounded-none' : ''}`}
