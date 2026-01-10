@@ -15,10 +15,10 @@ interface PostCardProps {
     currentUserId?: string;
     onToggleFavorite: (e: React.MouseEvent, postId: string) => void;
 
-    viewMode?: 'grid' | 'list';
+    showContent?: boolean;
 }
 
-export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUserId, onToggleFavorite, viewMode = 'grid' }) => {
+export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUserId, onToggleFavorite, viewMode = 'grid', showContent = true }) => {
     const navigate = useNavigate();
 
     const getCategoryColor = (slug: string) => {
@@ -32,16 +32,7 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
         return colors[slug] || colors['general'];
     };
 
-    const getCategoryLabel = (slug: string) => {
-        const labels: Record<string, string> = {
-            'technical': 'TÉCNICO',
-            'showcase': 'SHOWCASE',
-            'help': 'AJUDA',
-            'general': 'GERAL',
-            'off-topic': 'OFF-TOPIC'
-        };
-        return labels[slug] || 'GERAL';
-    };
+
 
     const handleCardClick = (e: React.MouseEvent) => {
         if ((e.target as HTMLElement).closest('button')) return;
@@ -74,22 +65,14 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
         return `${Math.floor(diffInSeconds / 86400)}d atrás`;
     };
 
-    // Helper to extract first image from content
-    const getFirstImage = (htmlContent: string) => {
-        const div = document.createElement('div');
-        div.innerHTML = htmlContent;
-        const img = div.querySelector('img');
-        return img ? img.src : null;
-    };
 
-    const firstImage = post.image_url || getFirstImage(post.content);
 
     // List View
     if (viewMode === 'list') {
         return (
             <div
                 onClick={handleCardClick}
-                className="group flex flex-row items-stretch bg-card hover:bg-zinc-900 border border-border hover:border-purple-500 rounded-xl transition-all duration-300 cursor-pointer relative overflow-hidden shadow-sm hover:shadow-md min-h-[120px]"
+                className="group flex flex-row items-stretch bg-card hover:bg-zinc-900 border border-border hover:border-purple-500 rounded-xl transition-all duration-300 cursor-pointer relative overflow-hidden shadow-sm hover:shadow-md min-h-[90px]"
             >
                 {/* Draft Badge Overlay */}
                 {post.status === 'draft' && (
@@ -100,36 +83,33 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
                     </div>
                 )}
 
-                {/* Left Side: Image Only (Full Bleed) */}
-                {firstImage && (
-                    <div className="w-32 bg-muted relative flex-shrink-0 overflow-hidden">
-                        <img src={firstImage} alt="Cover" className="absolute inset-0 w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
-                    </div>
-                )}
-
                 {/* Main Content */}
-                <div className="flex-1 min-w-0 flex flex-col gap-2 p-4">
+                <div className="flex-1 min-w-0 flex flex-col gap-1.5 p-3 justify-center">
                     <div>
-                        <h3 className="font-bold text-base text-foreground group-hover:text-purple-400 transition-colors truncate mb-1">
+                        <div className="flex items-center gap-2 mb-1 overflow-hidden">
+                            {post.categories && (
+                                <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider ${getCategoryColor(post.categories.slug)}`}>
+                                    {post.categories.name}
+                                </span>
+                            )}
+                        </div>
+
+                        <h3 className="font-bold text-sm text-foreground group-hover:text-purple-400 transition-colors truncate mb-1">
                             {post.title}
                         </h3>
-                        <div
-                            className="text-[10px] text-muted-foreground line-clamp-2 leading-relaxed"
-                            dangerouslySetInnerHTML={{ __html: post.content.replace(/<img[^>]*>/g, '') }}
-                        />
+                        {showContent && (
+                            <div
+                                className="text-[10px] text-muted-foreground line-clamp-2 leading-relaxed"
+                                dangerouslySetInnerHTML={{ __html: post.content.replace(/<[^>]*>/g, '') }}
+                            />
+                        )}
                     </div>
 
-                    {/* Meta Info - Bottom Row */}
-                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground mt-1 truncate">
-                        {post.categories && (
-                            <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider ${getCategoryColor(post.categories.slug)}`}>
-                                {getCategoryLabel(post.categories.slug)}
-                            </span>
-                        )}
-
+                    {/* Meta Info - Middle Row */}
+                    <div className="flex items-center gap-2 text-[10px] text-muted-foreground truncate">
                         {/* Avatar & User */}
                         <div
-                            className="flex items-center gap-1.5 ml-1 cursor-pointer hover:opacity-80 transition-opacity"
+                            className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 if (post.profiles?.id) navigate(`/community/author/${post.profiles.id}`);
@@ -154,13 +134,11 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
                         </div>
                     </div>
                 </div>
-
-                {/* Delete Action (Owner) - Tab Style Top Right */}
             </div>
         );
     }
 
-    // Default Grid View (News Style)
+    // Default Grid View (Text Only)
     return (
         <div
             onClick={handleCardClick}
@@ -175,49 +153,14 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
                 </div>
             )}
 
-            {/* Delete Action (Owner) - Tab Style Top Right */}
-            {/* Draft Badge */}
-
-            {/* Hero Image (Top & Full Bleed) */}
-            {firstImage ? (
-                <div className="w-full h-36 bg-muted flex-shrink-0 relative overflow-hidden">
-                    <img src={firstImage} alt="Post cover" className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                </div>
-            ) : (
-                // Fallback gradient if no image, to maintain "card" feel if desired, or just empty? 
-                // User said "occupy space", implying if there IS an image. If not, standard layout.
-                // But for consistency let's keep it simple or maybe a small color strip? 
-                // For now, no image means content starts higher.
-                null
-            )}
-
             {/* Content Body */}
             <div className="p-4 flex flex-col flex-1">
 
-                {/* Author & Category Header */}
-                <div className="flex items-center justify-between mb-3">
-                    <div
-                        className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition-opacity"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            if (post.profiles?.id) navigate(`/community/author/${post.profiles.id}`);
-                        }}
-                    >
-                        <div className="w-5 h-5 rounded-full bg-muted flex items-center justify-center overflow-hidden border border-border">
-                            {post.profiles?.avatar_url ? (
-                                <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                                <User size={10} className="text-muted-foreground" />
-                            )}
-                        </div>
-                        <span className="text-[11px] font-bold text-muted-foreground/80 truncate max-w-[100px] hover:text-purple-400 transition-colors">
-                            {post.profiles?.username || 'Anon'}
-                        </span>
-                    </div>
+                {/* Category & Tags Header */}
+                <div className="flex items-center gap-2 mb-2 overflow-hidden flex-wrap">
                     {post.categories && (
                         <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded border uppercase tracking-wider ${getCategoryColor(post.categories.slug)}`}>
-                            {getCategoryLabel(post.categories.slug)}
+                            {post.categories.name}
                         </span>
                     )}
                 </div>
@@ -229,19 +172,41 @@ export const PostCard: React.FC<PostCardProps> = ({ post, isFavorite, currentUse
 
                 {/* Excerpt */}
                 <div
-                    className="text-[10px] text-muted-foreground line-clamp-3 leading-relaxed mb-4"
+                    className="text-[10px] text-muted-foreground line-clamp-4 leading-relaxed mb-4"
                     dangerouslySetInnerHTML={{
-                        __html: post.content.replace(/<img[^>]*>/g, '')
+                        __html: post.content.replace(/<[^>]*>/g, '')
                     }}
                 />
 
-                {/* Footer */}
-                <div className="mt-auto flex items-center gap-3 text-xs text-muted-foreground border-t border-border/50 pt-3">
-                    <span className="text-[10px]">{timeAgo(post.created_at)}</span>
+                {/* Footer: User • Time • Comments */}
+                <div className="mt-auto flex items-center gap-2 text-[10px] text-muted-foreground border-t border-border/50 pt-3">
+                    {/* Author */}
+                    <div
+                        className="flex items-center gap-1.5 cursor-pointer hover:opacity-80 transition-opacity"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            if (post.profiles?.id) navigate(`/community/author/${post.profiles.id}`);
+                        }}
+                    >
+                        <div className="w-4 h-4 rounded-full bg-muted flex items-center justify-center overflow-hidden border border-border">
+                            {post.profiles?.avatar_url ? (
+                                <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                                <User size={10} className="text-muted-foreground" />
+                            )}
+                        </div>
+                        <span className="font-bold text-muted-foreground/80 hover:text-purple-400 transition-colors max-w-[80px] truncate">
+                            {post.profiles?.username || 'Anon'}
+                        </span>
+                    </div>
 
-                    <div className="flex items-center gap-1.5 ml-auto">
-                        <MessageSquare size={14} className="text-zinc-500" />
-                        <span className="text-[10px] font-medium">{post.comments && post.comments[0] ? post.comments[0].count : 0}</span>
+                    <span>•</span>
+                    <span>{timeAgo(post.created_at)}</span>
+                    <span>•</span>
+
+                    <div className="flex items-center gap-1.5">
+                        <MessageSquare size={12} className="text-zinc-500" />
+                        <span className="font-medium">{post.comments && post.comments[0] ? post.comments[0].count : 0}</span>
                     </div>
                 </div>
             </div>

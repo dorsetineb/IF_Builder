@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { Search, User, Star, LayoutGrid, List } from 'lucide-react'; // Added LayoutGrid, List
+import { Search, User, Star, LayoutGrid, List } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../components/UserContext';
 
 type Profile = Database['public']['Tables']['profiles']['Row'] & {
     posts: { count: number }[];
@@ -11,21 +12,15 @@ type Profile = Database['public']['Tables']['profiles']['Row'] & {
 
 const Authors: React.FC = () => {
     const navigate = useNavigate();
+    const { user } = useUser();
     const [profiles, setProfiles] = useState<Profile[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [currentUser, setCurrentUser] = useState<any>(null);
     const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid'); // View mode state
 
     useEffect(() => {
         fetchProfiles();
-        checkUser();
     }, []);
-
-    const checkUser = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) setCurrentUser(user);
-    };
 
     const fetchProfiles = async () => {
         setLoading(true);
@@ -46,14 +41,63 @@ const Authors: React.FC = () => {
 
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
-    const toggleFavorite = (e: React.MouseEvent, id: string) => {
+    const fetchFavorites = async () => {
+        if (!user) return;
+        const { data, error } = await supabase
+            .from('user_follows')
+            .select('following_id')
+            .eq('follower_id', user.id);
+
+        if (error) {
+            console.error('Error fetching favorites:', error);
+            return;
+        }
+
+        if (data) {
+            const favIds = new Set(data.map(f => f.following_id));
+            setFavorites(favIds);
+        }
+    };
+
+    const toggleFavorite = async (e: React.MouseEvent, id: string) => {
+        e.preventDefault();
         e.stopPropagation();
+        if (!user) return; // Guard
+
+        const isFavorite = favorites.has(id);
+
+        // Optimistic UI update
         setFavorites(prev => {
             const newFavs = new Set(prev);
-            if (newFavs.has(id)) newFavs.delete(id);
+            if (isFavorite) newFavs.delete(id);
             else newFavs.add(id);
             return newFavs;
         });
+
+        try {
+            if (isFavorite) {
+                const { error } = await supabase
+                    .from('user_follows')
+                    .delete()
+                    .eq('follower_id', user.id)
+                    .eq('following_id', id);
+                if (error) throw error;
+            } else {
+                const { error } = await supabase
+                    .from('user_follows')
+                    .insert({ follower_id: user.id, following_id: id });
+                if (error) throw error;
+            }
+        } catch (error) {
+            console.error('Error toggling favorite:', error);
+            // Revert on error
+            setFavorites(prev => {
+                const newFavs = new Set(prev);
+                if (isFavorite) newFavs.add(id);
+                else newFavs.delete(id);
+                return newFavs;
+            });
+        }
     };
 
     const getCoverImage = (uid: string) => {
@@ -71,7 +115,7 @@ const Authors: React.FC = () => {
             {/* Header */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-20 shrink-0">
                 <div className="flex flex-col justify-center h-full">
-                    <h1 className="text-xl font-bold text-foreground">Comunidade de Autores</h1>
+                    <h1 className="text-xl font-bold text-foreground">Autores</h1>
                     <p className="text-[10px] text-muted-foreground hidden md:block">Conheça as mentes criativas por trás das histórias.</p>
                 </div>
                 <div className="flex items-center gap-3"></div>
@@ -143,19 +187,18 @@ const Authors: React.FC = () => {
                                                 alt="Cover"
                                                 className="w-full h-full object-cover opacity-50 group-hover:opacity-75 group-hover:scale-110 transition-all duration-700"
                                             />
-                                            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card/90"></div>
+
                                         </div>
 
-                                        <button
-                                            onClick={(e) => toggleFavorite(e, profile.id)}
-                                            className={`absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg border transition-all z-20 backdrop-blur-sm shadow-sm ${isFavorite
-                                                ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/50 hover:bg-yellow-500 hover:text-white'
-                                                : 'bg-black/40 text-muted-foreground border-white/10 hover:bg-black/60 hover:text-white hover:border-white/30'
-                                                }`}
-                                            title="Favoritar Autor"
-                                        >
-                                            <Star size={14} fill={isFavorite ? "currentColor" : "none"} />
-                                        </button>
+                                        {isFavorite && (
+                                            <button
+                                                onClick={(e) => toggleFavorite(e, profile.id)}
+                                                className="absolute top-3 right-3 w-8 h-8 flex items-center justify-center rounded-lg border transition-all z-20 backdrop-blur-sm shadow-sm bg-yellow-500/20 text-yellow-500 border-yellow-500/50 hover:bg-yellow-500 hover:text-white"
+                                                title="Favorito"
+                                            >
+                                                <Star size={14} fill="currentColor" />
+                                            </button>
+                                        )}
 
                                         {/* Content Container - Increased negative margin for ~80% overlap (80px of 96px) */}
                                         <div className="w-full px-4 flex flex-col items-center z-10 relative flex-1 -mt-20">
@@ -213,21 +256,20 @@ const Authors: React.FC = () => {
                                                 alt="Cover"
                                                 className="w-full h-full object-cover opacity-50 group-hover:opacity-75 group-hover:scale-110 transition-all duration-700"
                                             />
-                                            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-card/90"></div>
+
                                         </div>
 
                                         {/* Favorite Action - Top Right (Full Button) */}
-                                        <button
-                                            onClick={(e) => toggleFavorite(e, profile.id)}
-                                            className={`absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all z-20 backdrop-blur-sm ${isFavorite
-                                                ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/50 hover:bg-yellow-500 hover:text-white'
-                                                : 'bg-black/40 text-muted-foreground border-white/10 hover:bg-black/60 hover:text-white hover:border-white/30'
-                                                }`}
-                                            title="Favoritar Autor"
-                                        >
-                                            <Star size={14} fill={isFavorite ? "currentColor" : "none"} />
-                                            <span className="font-bold text-[10px] uppercase tracking-wide">Favorito</span>
-                                        </button>
+                                        {isFavorite && (
+                                            <button
+                                                onClick={(e) => toggleFavorite(e, profile.id)}
+                                                className="absolute top-4 right-4 flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all z-20 backdrop-blur-sm bg-yellow-500/10 text-yellow-500 border-yellow-500/50 hover:bg-yellow-500 hover:text-white"
+                                                title="Favorito"
+                                            >
+                                                <Star size={14} fill="currentColor" />
+                                                <span className="font-bold text-[10px] uppercase tracking-wide">Favorito</span>
+                                            </button>
+                                        )}
 
                                         {/* Content Container */}
                                         <div className="flex flex-col md:flex-row items-stretch w-full px-6 pb-6 relative z-10 -mt-[52px]"> {/* Changed items-start to items-stretch for bottom align */}

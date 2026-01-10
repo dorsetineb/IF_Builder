@@ -19,6 +19,7 @@ import { ThemeProvider } from './components/ThemeProvider';
 import { ToastProvider } from './components/ToastContext';
 import { UserProvider } from './components/UserContext';
 import PendingApproval from './pages/PendingApproval';
+import { FeedProvider } from './components/FeedContext';
 
 const App: React.FC = () => {
     const [session, setSession] = useState<any>(null);
@@ -118,31 +119,33 @@ const App: React.FC = () => {
         <ThemeProvider defaultTheme="dark" storageKey="if-builder-theme">
             <ToastProvider>
                 <UserProvider>
-                    <Router>
-                        <Routes>
-                            {/* Platform Routes */}
-                            <Route element={<PlatformLayout />}>
-                                <Route path="/" element={<Navigate to="/dashboard" replace />} />
-                                <Route path="/dashboard" element={<Dashboard />} />
+                    <FeedProvider>
+                        <Router>
+                            <Routes>
+                                {/* Platform Routes */}
+                                <Route element={<PlatformLayout />}>
+                                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                                    <Route path="/dashboard" element={<Dashboard />} />
 
-                                <Route path="/community" element={<Community />} />
-                                <Route path="/community/authors" element={<Authors />} />
-                                <Route path="/community/author/:id" element={<AuthorProfile />} />
-                                <Route path="/community/my-posts" element={<MyPosts />} />
-                                <Route path="/community/favorites" element={<Favorites />} />
-                                <Route path="/community/create" element={<CreatePost />} />
-                                <Route path="/community/edit/:id" element={<CreatePost />} />
-                                <Route path="/community/post/:id" element={<PostDetail />} />
-                                <Route path="/profile" element={<Profile />} />
-                                <Route path="/settings" element={<Settings />} />
-                                <Route path="/projects" element={<div className="p-8 text-white">Página de Projetos (Em construção)</div>} />
-                            </Route>
-                            {/* Editor Route (Standalone) */}
-                            <Route path="/editor" element={<Editor />} />
-                            {/* Catch all */}
-                            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                        </Routes>
-                    </Router>
+                                    <Route path="/community" element={<Community />} />
+                                    <Route path="/community/authors" element={<Authors />} />
+                                    <Route path="/community/author/:id" element={<AuthorProfile />} />
+                                    <Route path="/community/my-posts" element={<MyPosts />} />
+                                    <Route path="/community/favorites" element={<Favorites />} />
+                                    <Route path="/community/create" element={<CreatePost />} />
+                                    <Route path="/community/edit/:id" element={<CreatePost />} />
+                                    <Route path="/community/post/:id" element={<PostDetail />} />
+                                    <Route path="/profile" element={<Profile />} />
+                                    <Route path="/settings" element={<Settings />} />
+                                    <Route path="/projects" element={<div className="p-8 text-white">Página de Projetos (Em construção)</div>} />
+                                </Route>
+                                {/* Editor Route (Standalone) */}
+                                <Route path="/editor" element={<Editor />} />
+                                {/* Catch all */}
+                                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                            </Routes>
+                        </Router>
+                    </FeedProvider>
                 </UserProvider>
             </ToastProvider>
         </ThemeProvider>

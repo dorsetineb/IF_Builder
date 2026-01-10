@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { PostCard } from '../components/PostCard';
+import { useFeed } from '../components/FeedContext';
 import { useUser } from '../components/UserContext';
 import { useToast } from '../components/ToastContext';
 import { Search, Plus, MessageSquare, FileText, Star, LayoutGrid, List } from 'lucide-react';
@@ -19,13 +20,16 @@ type CategoryGroup = Database['public']['Tables']['category_groups']['Row'] & {
     categories: Category[];
 };
 
+// ...
+
 const Community = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
     const { user } = useUser();
+    const { posts, setPosts, lastFetched, setLastFetched } = useFeed();
 
     // State
-    const [posts, setPosts] = useState<PostWithAuthor[]>([]);
+    // Removed local posts state
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
@@ -41,6 +45,16 @@ const Community = () => {
 
     const init = async () => {
         try {
+            const isCacheValid = posts.length > 0 && lastFetched && (Date.now() - lastFetched < 5 * 60 * 1000); // 5 min cache
+
+            if (isCacheValid) {
+                // Background update for non-critical data or just skip
+                await fetchCategories();
+                if (user) await fetchFavorites(user);
+                setLoading(false);
+                return;
+            }
+
             // Parallel fetch
             await Promise.all([
                 fetchCategories(),
@@ -52,7 +66,7 @@ const Community = () => {
             }
         } catch (err: any) {
             console.error('Error initializing community:', err);
-            toast('Erro', `Não foi possível carregar a comunidade.`, 'error');
+            toast('Erro', `Não foi possível carregar o fórum.`, 'error');
         } finally {
             setLoading(false);
         }
@@ -90,10 +104,14 @@ const Community = () => {
                 post_reactions(type)
             `)
             .order('created_at', { ascending: false })
-            .eq('status', 'published'); // Show only published posts
+            .eq('status', 'published') // Show only published posts
+            .range(0, 99); // Pagination limit to prevent slow leading
 
         if (error) console.error('Error fetching posts:', error);
-        if (data) setPosts(data as any);
+        if (data) {
+            setPosts(data as any);
+            setLastFetched(Date.now());
+        }
     };
 
     const fetchFavorites = async (user: any) => {
@@ -207,7 +225,7 @@ const Community = () => {
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
                 <div className="flex flex-col">
                     <h1 className="text-xl font-bold text-foreground tracking-tight">Fórum</h1>
-                    <p className="text-[10px] text-muted-foreground hidden md:block">Discuta, compartilhe e aprenda com outros criadores.</p>
+                    <p className="text-[10px] text-muted-foreground hidden md:block">Compartilhe e aprenda com outros autores.</p>
                 </div>
 
                 <div className="flex items-center gap-3">
@@ -328,7 +346,7 @@ const Community = () => {
                                         : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
                                         }`}
                                 >
-                                    Em Alta
+                                    Populares
                                 </button>
                             </div>
 
@@ -350,7 +368,7 @@ const Community = () => {
                             </div>
                         </div>
 
-                        <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-2 gap-4" : "flex flex-col gap-3"}>
+                        <div className={viewMode === 'grid' ? "grid grid-cols-1 md:grid-cols-3 gap-4" : "flex flex-col gap-3"}>
                             {listPosts.length === 0 ? (
                                 <div className="col-span-full text-center py-12 border border-dashed border-border rounded-xl bg-card/20">
                                     <p className="text-muted-foreground text-sm">Nenhum tópico encontrado.</p>

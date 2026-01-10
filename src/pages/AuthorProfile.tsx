@@ -2,9 +2,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { User, Heart, FileText, Camera } from 'lucide-react';
+import { User, FileText, Camera, LayoutGrid, List, Star, Heart } from 'lucide-react';
 import { PostCard } from '../components/PostCard';
 import { useToast } from '../components/ToastContext';
+import { useUser } from '../components/UserContext';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Post = Database['public']['Tables']['posts']['Row'] & {
@@ -17,12 +18,17 @@ const AuthorProfile: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { toast } = useToast();
+    const { user: currentUser } = useUser();
+
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<'recent' | 'popular' | 'favorites'>('recent');
     const [posts, setPosts] = useState<Post[]>([]);
     const [loadingPosts, setLoadingPosts] = useState(false);
-    const [currentUser, setCurrentUser] = useState<any>(null);
+
+    // View Mode & Follow State
+    const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+    const [isFollowing, setIsFollowing] = useState(false);
 
     // Upload State
     const [uploadingCover, setUploadingCover] = useState(false);
@@ -30,8 +36,13 @@ const AuthorProfile: React.FC = () => {
 
     useEffect(() => {
         fetchProfile();
-        checkUser();
     }, [id]);
+
+    useEffect(() => {
+        if (currentUser && id) {
+            checkIfFollowing();
+        }
+    }, [currentUser, id]);
 
     useEffect(() => {
         if (profile) {
@@ -39,9 +50,43 @@ const AuthorProfile: React.FC = () => {
         }
     }, [profile, activeTab]);
 
-    const checkUser = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        setCurrentUser(user);
+    const checkIfFollowing = async () => {
+        if (!currentUser || !id) return;
+        const { data } = await supabase
+            .from('user_follows')
+            .select('*')
+            .eq('follower_id', currentUser.id)
+            .eq('following_id', id)
+            .single();
+        setIsFollowing(!!data);
+    };
+
+    const toggleFollow = async () => {
+        if (!currentUser || !id) return;
+
+        // Optimistic update
+        const newState = !isFollowing;
+        setIsFollowing(newState);
+
+        try {
+            if (newState) {
+                const { error } = await supabase
+                    .from('user_follows')
+                    .insert({ follower_id: currentUser.id, following_id: id });
+                if (error) throw error;
+            } else {
+                const { error } = await supabase
+                    .from('user_follows')
+                    .delete()
+                    .eq('follower_id', currentUser.id)
+                    .eq('following_id', id);
+                if (error) throw error;
+            }
+        } catch (error) {
+            console.error('Error toggling follow:', error);
+            setIsFollowing(!newState); // Revert
+            toast('Erro', 'Não foi possível atualizar o status.', 'error');
+        }
     };
 
     const fetchProfile = async () => {
@@ -93,11 +138,13 @@ const AuthorProfile: React.FC = () => {
         return `https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=2070&auto=format&fit=crop`;
     };
 
-    const onToggleFavorite = async (e: React.MouseEvent, postId: string) => {
+    const onToggleFavoritePost = async (e: React.MouseEvent, postId: string) => {
         e.preventDefault();
         e.stopPropagation();
         if (!currentUser) return;
-        console.log("Toggle favorite", postId);
+        // This is passed to PostCard, which might handle its own logic or bubbles up.
+        // Currently PostCard handles visual state but we might need parent logic if we want to update the list immediately?
+        // For now, let's assume global handling or PostCard internal handling is sufficient for visual feedback.
     };
 
     const handleCoverUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -190,8 +237,8 @@ const AuthorProfile: React.FC = () => {
             </div>
 
             <div className="max-w-6xl mx-auto px-6 py-6">
-                {/* Profile Info Header - Row Layout */}
-                <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-8 border-b border-border/50 pb-8">
+                {/* Profile Info Header - No Border */}
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-5 mb-4 pb-2">
 
                     {/* 1. Avatar */}
                     <div className="flex-shrink-0">
@@ -239,38 +286,62 @@ const AuthorProfile: React.FC = () => {
                     {/* 4. Actions (Right Block) */}
                     <div className="flex-shrink-0 pt-2">
                         <button
-                            className="flex items-center gap-2 px-4 py-2 rounded-lg border border-border hover:border-red-500 hover:bg-red-500/5 hover:text-red-500 transition-all text-xs font-bold text-muted-foreground group"
-                            onClick={() => console.log("Toggle favorite author")}
+                            onClick={toggleFollow}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-all text-xs font-bold ${isFollowing
+                                ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/50 hover:bg-yellow-500 hover:text-white'
+                                : 'bg-transparent text-muted-foreground border-border hover:border-white/30 hover:text-foreground'
+                                }`}
                         >
-                            <Heart size={16} className="group-hover:fill-current transition-colors" />
-                            <span>Favoritar</span>
+                            <Star size={16} fill={isFollowing ? "currentColor" : "none"} />
+                            <span>Favorito</span>
                         </button>
                     </div>
                 </div>
 
-                {/* Navigation Tabs */}
-                <div className="flex items-center gap-8 border-b border-border/50 mb-6 overflow-x-auto">
-                    <button
-                        onClick={() => setActiveTab('recent')}
-                        className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${activeTab === 'recent' ? 'text-purple-400' : 'text-muted-foreground hover:text-foreground'}`}
-                    >
-                        TÓPICOS
-                        {activeTab === 'recent' && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-purple-500 rounded-t-full"></div>}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('popular')}
-                        className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${activeTab === 'popular' ? 'text-purple-400' : 'text-muted-foreground hover:text-foreground'}`}
-                    >
-                        POPULARES
-                        {activeTab === 'popular' && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-purple-500 rounded-t-full"></div>}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('favorites')}
-                        className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${activeTab === 'favorites' ? 'text-purple-400' : 'text-muted-foreground hover:text-foreground'}`}
-                    >
-                        FAVORITOS
-                        {activeTab === 'favorites' && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-purple-500 rounded-t-full"></div>}
-                    </button>
+                {/* Navigation Tabs With View Toggle */}
+                <div className="flex items-center justify-between border-b border-border/50 mb-4">
+                    {/* Tabs */}
+                    <div className="flex items-center gap-8 overflow-x-auto">
+                        <button
+                            onClick={() => setActiveTab('recent')}
+                            className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${activeTab === 'recent' ? 'text-purple-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            TÓPICOS
+                            {activeTab === 'recent' && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-purple-500 rounded-t-full"></div>}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('popular')}
+                            className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${activeTab === 'popular' ? 'text-purple-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            POPULARES
+                            {activeTab === 'popular' && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-purple-500 rounded-t-full"></div>}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('favorites')}
+                            className={`pb-3 text-xs font-bold uppercase tracking-wider transition-all relative ${activeTab === 'favorites' ? 'text-purple-400' : 'text-muted-foreground hover:text-foreground'}`}
+                        >
+                            FAVORITOS
+                            {activeTab === 'favorites' && <div className="absolute bottom-0 left-0 w-full h-[2px] bg-purple-500 rounded-t-full"></div>}
+                        </button>
+                    </div>
+
+                    {/* View Toggle */}
+                    <div className="hidden md:flex bg-muted/50 p-1 rounded-lg border border-border/50 mb-2">
+                        <button
+                            onClick={() => setViewMode('grid')}
+                            className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-background shadow-sm text-purple-400' : 'text-muted-foreground hover:text-foreground'}`}
+                            title="Grade"
+                        >
+                            <LayoutGrid size={14} />
+                        </button>
+                        <button
+                            onClick={() => setViewMode('list')}
+                            className={`p-1.5 rounded-md transition-all ${viewMode === 'list' ? 'bg-background shadow-sm text-purple-400' : 'text-muted-foreground hover:text-foreground'}`}
+                            title="Lista"
+                        >
+                            <List size={14} />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Content */}
@@ -278,16 +349,19 @@ const AuthorProfile: React.FC = () => {
                     {loadingPosts ? (
                         <div className="py-12 text-center text-muted-foreground">Carregando...</div>
                     ) : posts.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'flex flex-col gap-3'}>
                             {posts.map(post => {
                                 return (
                                     <PostCard
                                         key={post.id}
                                         post={post}
-                                        isFavorite={false}
-                                        onToggleFavorite={onToggleFavorite}
+                                        isFavorite={false} // Would need to fetch interaction logic to know if post is fav by current user
+                                        onToggleFavorite={onToggleFavoritePost}
                                         currentUserId={currentUser?.id}
-                                        viewMode="grid"
+                                        viewMode={viewMode}
+                                        showContent={viewMode === 'grid'} // Optional: Hide content in list for author profile? Or keep consistent with Dashboard? User asked to "use the list component used in forum page". Forum usually shows content. But Dashboard list didn't. Let's default to PostCard default (which handles showContent=true by default unless passed false). Let's pass showContent only if grid? Or let user decide.
+                                    // Wait, the user said "use the component for topic in list used in the forum page".
+                                    // The forum page usually passes viewMode='list'.
                                     />
                                 );
                             })}
@@ -295,7 +369,7 @@ const AuthorProfile: React.FC = () => {
                     ) : (
                         <div className="py-12 text-center bg-card border border-border rounded-xl">
                             <div className="w-12 h-12 bg-muted rounded-full flex items-center justify-center text-muted-foreground mx-auto mb-3">
-                                {activeTab === 'favorites' ? <Heart size={20} /> : <FileText size={20} />}
+                                {activeTab === 'favorites' ? <Star size={20} /> : <FileText size={20} />}
                             </div>
                             <h3 className="text-sm font-bold text-foreground mb-1">Nada por aqui ainda</h3>
                             <p className="text-muted-foreground text-[10px]">

@@ -38,7 +38,7 @@ const RichEditor = ({
                     toolbar: [
                         ['bold', 'italic', 'underline', 'code-block'],
                         [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                        ['link', 'image']
+                        ['link']
                     ]
                 }
             });
@@ -91,7 +91,9 @@ const RichEditor = ({
             <style>{`
                 .ql-toolbar.ql-snow { border: none; border-bottom: 1px solid var(--border); background: var(--muted); padding: 4px; }
                 .ql-container.ql-snow { border: none; }
-                .ql-editor { padding: 0.75rem; font-family: inherit; font-size: 0.8rem; }
+                .ql-editor { padding: 0.75rem; font-family: inherit; font-size: 0.8rem; color: white !important; }
+                .ql-editor * { color: white !important; }
+                .ql-editor.ql-blank::before { color: rgba(255, 255, 255, 0.4) !important; font-style: italic; }
                 .ql-snow .ql-stroke { stroke: var(--muted-foreground); }
                 .ql-snow .ql-fill { fill: var(--muted-foreground); }
                 .ql-snow .ql-picker { color: var(--muted-foreground); }

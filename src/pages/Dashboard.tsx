@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { MessageSquare, Heart, User, FileText } from 'lucide-react';
+import { MessageSquare, Heart, User, FileText, Star } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
@@ -25,35 +25,63 @@ const Dashboard: React.FC = () => {
     const [loadingPosts, setLoadingPosts] = useState(true);
     const [recommendedAuthors, setRecommendedAuthors] = useState<Profile[]>([]);
 
+    const [myRecentPosts, setMyRecentPosts] = useState<Post[]>([]);
+
     useEffect(() => {
         const fetchUserData = async () => {
-            if (user) {
-                // Profile is already loaded in Context (profile), so we skip fetching it individually.
+            if (!user?.id) {
+                setLoadingPosts(false); // Stop loading if user.id is not available
+                return;
+            }
 
-                try {
-                    // Stats: Posts Created
-                    const { count: postsCount } = await supabase
-                        .from('posts')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('author_id', user.id);
-                    setMyPostsCount(postsCount || 0);
+            try {
+                // Execute independent queries in parallel
+                const [
+                    postsResult,
+                    commentsResult,
+                    recentPostsResult,
+                    favoritesResult,
+                    followsResult
+                ] = await Promise.all([
+                    // 1. Stats: Posts Created
+                    supabase.from('posts').select('*', { count: 'exact', head: true }).eq('author_id', user.id),
+                    // 2. Stats: Comments
+                    supabase.from('comments').select('*', { count: 'exact', head: true }).eq('author_id', user.id),
+                    // 3. Recent Posts
+                    supabase.from('posts')
+                        .select(`
+                            *,
+                            profiles:author_id(*),
+                            categories:category_id(*),
+                            comments(count)
+                        `)
+                        .eq('author_id', user.id)
+                        .order('created_at', { ascending: false })
+                        .limit(3),
+                    // 4. Favorites IDs
+                    supabase.from('post_favorites').select('post_id').eq('user_id', user.id).limit(5),
+                    // 5. Follows IDs
+                    supabase.from('user_follows').select('following_id').eq('follower_id', user.id)
+                ]);
 
-                    // Stats: Comments (Replies)
-                    const { count: commentsCount } = await supabase
-                        .from('comments')
-                        .select('*', { count: 'exact', head: true })
-                        .eq('author_id', user.id);
-                    setMyCommentsCount(commentsCount || 0);
+                // Update Stats
+                setMyPostsCount(postsResult.count || 0);
+                setMyCommentsCount(commentsResult.count || 0);
+                setMyLikesReceivedCount(0); // Still mocked
 
-                    // Stats: Likes Received (Mocked for now)
-                    setMyLikesReceivedCount(0);
+                // Update Recent Posts
+                if (recentPostsResult.data) {
+                    setMyRecentPosts(recentPostsResult.data as any);
+                }
 
-                    // Fetch Favorites
-                    const { data: favData } = await supabase.from('post_favorites').select('post_id').eq('user_id', user.id).limit(5);
+                // Handle Dependent Queries (Favorites & Authors)
+                const promises = [];
 
-                    if (favData && favData.length > 0) {
-                        const postIds = favData.map(f => f.post_id);
-                        const { data: posts } = await supabase
+                // Fetch Favorite Posts Details
+                if (favoritesResult.data && favoritesResult.data.length > 0) {
+                    const postIds = favoritesResult.data.map(f => f.post_id);
+                    promises.push(
+                        supabase
                             .from('posts')
                             .select(`
                                 *,
@@ -63,39 +91,56 @@ const Dashboard: React.FC = () => {
                             `)
                             .in('id', postIds)
                             .eq('status', 'published')
-                            .limit(5);
-
-                        if (posts) setFavoritePosts(posts as any);
-                    }
-
-                    // Fetch Recommended Authors (Random 3, excluding self)
-                    const { data: authors } = await supabase
-                        .from('profiles')
-                        .select('*')
-                        .neq('id', user.id)
-                        .limit(3);
-                    if (authors) setRecommendedAuthors(authors || []);
-
-                } catch (error) {
-                    console.error("Error loading dashboard data:", error);
+                            .limit(5)
+                            .then(({ data }) => {
+                                if (data) setFavoritePosts(data as any);
+                            })
+                    );
                 }
+
+                // Fetch Recommended Authors (Followed) Details
+                if (followsResult.data && followsResult.data.length > 0) {
+                    const ids = followsResult.data.map(f => f.following_id);
+                    promises.push(
+                        supabase
+                            .from('profiles')
+                            .select('*')
+                            .in('id', ids)
+                            .then(({ data }) => {
+                                if (data) setRecommendedAuthors(data);
+                            })
+                    );
+                }
+
+                if (promises.length > 0) {
+                    await Promise.all(promises);
+                }
+
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+            } finally {
+                setLoadingPosts(false);
             }
-            setLoadingPosts(false);
         };
 
-        if (user) {
-            fetchUserData();
-        } else if (user === null) {
-            // If explicity null (not loading), stop loading
-            setLoadingPosts(false);
-        }
-        // If user is undefined (loading), we do nothing and wait.
-    }, [user]);
+        fetchUserData();
+    }, [user?.id]);
 
     const onToggleFavorite = async (e: React.MouseEvent, postId: string) => {
         e.preventDefault();
         e.stopPropagation();
         console.log("Toggle favorite on dashboard");
+    };
+
+    const timeAgo = (date: string) => {
+        const d = new Date(date);
+        const now = new Date();
+        const diffInSeconds = Math.floor((now.getTime() - d.getTime()) / 1000);
+
+        if (diffInSeconds < 60) return 'agora';
+        if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}min atrás`;
+        if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h atrás`;
+        return `${Math.floor(diffInSeconds / 86400)}d atrás`;
     };
 
     return (
@@ -104,61 +149,56 @@ const Dashboard: React.FC = () => {
             <div className="pt-8 px-8 pb-6">
                 <div className="flex items-center justify-between mb-2">
                     <h1 className="text-2xl font-bold text-foreground flex items-center gap-2">
-                        Bem-vindo de volta, {profile?.full_name?.split(' ')[0] || profile?.username || 'Usuário'}! <span className="text-2xl">👋</span>
+                        Olá, {profile?.full_name?.split(' ')[0] || profile?.username || 'Usuário'}! <span className="text-2xl">👋</span>
                     </h1>
                 </div>
                 <p className="text-muted-foreground text-sm">
-                    Aqui está o resumo da sua atividade e seus favoritos.
+                    Aqui está o resumo de suas atividades.
                 </p>
             </div>
 
             <div className="px-8 pb-8 max-w-[1600px] mx-auto">
                 {/* Top Section: Stats & Beta Access */}
+                {/* Top Section: Stats & Beta Access */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    {/* Stats Group - Compressed into 2 cols space */}
-                    <div className="lg:col-span-2 grid grid-cols-3 gap-4">
+                    {/* Stats Group */}
+                    <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-6">
                         {/* Posts Created */}
-                        <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between relative overflow-hidden group hover:border-purple-500/30 transition-all">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
-                                    <FileText size={20} />
-                                </div>
+                        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4 relative overflow-hidden group hover:border-purple-500/30 transition-all">
+                            <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 shrink-0">
+                                <FileText size={20} />
                             </div>
-                            <div>
-                                <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider mb-1">Tópicos</p>
-                                <h3 className="text-2xl font-bold text-foreground">{myPostsCount}</h3>
+                            <div className="flex flex-col">
+                                <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider">Tópicos</p>
+                                <h3 className="text-2xl font-bold text-foreground leading-none">{myPostsCount}</h3>
                             </div>
                         </div>
 
                         {/* Replies */}
-                        <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between relative overflow-hidden group hover:border-purple-500/30 transition-all">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400">
-                                    <MessageSquare size={20} />
-                                </div>
+                        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4 relative overflow-hidden group hover:border-purple-500/30 transition-all">
+                            <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center text-blue-400 shrink-0">
+                                <MessageSquare size={20} />
                             </div>
-                            <div>
-                                <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider mb-1">Respostas</p>
-                                <h3 className="text-2xl font-bold text-foreground">{myCommentsCount}</h3>
+                            <div className="flex flex-col">
+                                <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider">Respostas</p>
+                                <h3 className="text-2xl font-bold text-foreground leading-none">{myCommentsCount}</h3>
                             </div>
                         </div>
 
                         {/* Likes/Hearts Received */}
-                        <div className="bg-card border border-border rounded-xl p-5 flex flex-col justify-between relative overflow-hidden group hover:border-purple-500/30 transition-all">
-                            <div className="flex justify-between items-start mb-4">
-                                <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400">
-                                    <Heart size={20} />
-                                </div>
+                        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4 relative overflow-hidden group hover:border-purple-500/30 transition-all">
+                            <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400 shrink-0">
+                                <Heart size={20} />
                             </div>
-                            <div>
-                                <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider mb-1">Likes</p>
-                                <h3 className="text-2xl font-bold text-foreground">{myLikesReceivedCount}</h3>
+                            <div className="flex flex-col">
+                                <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider">Curtidas</p>
+                                <h3 className="text-2xl font-bold text-foreground leading-none">{myLikesReceivedCount}</h3>
                             </div>
                         </div>
                     </div>
 
-                    {/* Beta Access - Takes 3rd col space */}
-                    <div className="lg:col-span-1">
+                    {/* Beta Access */}
+                    <div className="lg:col-span-1 h-full">
                         <InviteManager />
                     </div>
                 </div>
@@ -175,25 +215,28 @@ const Dashboard: React.FC = () => {
                                 </h2>
                                 <Link to="/community/my-posts" className="text-purple-400 hover:text-purple-300 text-xs font-bold">Ver todos</Link>
                             </div>
-                            {/* We re-use logic? Ideally fetch 3 recent posts of mine. 
-                                Since we didn't fetch them in `fetchUserData` (only count), 
-                                let's adding a quick fetch or just link for now. 
-                                The user said "crie uma seção... que leva para uma pagina". 
-                                So acts like a shortcut wrapper? Or lists them? 
-                                "no mesmo formato da pagina de favoritos". 
-                                Let's list a few recent ones if possible, or just the header if data is missing.
-                                Re-reading: "seção chamada Meus tópicos, que leva para uma pagina" -> The section ITSELF acts as a gateway? 
-                                Usually implies listing a preview. 
-                                I'll skip listing specific posts here to save fetching, just the header area is enough? 
-                                No, "no mesmo formato da pagina de favoritos" usually means list content.
-                                I'll fetch 3 of my posts to display here. 
-                                I need to update useEffect to fetch `myPosts`.
-                            */}
-                            <div className="p-8 text-center bg-card border border-border rounded-xl border-dashed">
-                                <p className="text-muted-foreground mb-4">Gerencie seus tópicos e rascunhos.</p>
-                                <Link to="/community/my-posts" className="bg-secondary hover:bg-secondary/80 text-secondary-foreground px-4 py-2 rounded-lg font-bold text-xs inline-flex items-center gap-2">
-                                    <FileText size={14} /> Acessar Meus Tópicos
-                                </Link>
+
+                            <div className="flex flex-col gap-3">
+                                {myRecentPosts.length > 0 ? (
+                                    myRecentPosts.map(post => (
+                                        <PostCard
+                                            key={post.id}
+                                            post={post}
+                                            isFavorite={false} // Owner view, maybe treat differently later
+                                            currentUserId={user?.id}
+                                            onToggleFavorite={onToggleFavorite}
+                                            viewMode="list"
+                                            showContent={true}
+                                        />
+                                    ))
+                                ) : (
+                                    <div className="p-8 text-center bg-card border border-border rounded-xl border-dashed">
+                                        <p className="text-muted-foreground mb-4 text-xs">Você ainda não criou nenhum tópico.</p>
+                                        <Link to="/community/create" className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold text-xs inline-flex items-center gap-2 transition-all">
+                                            <FileText size={14} /> Criar Tópico
+                                        </Link>
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -203,12 +246,12 @@ const Dashboard: React.FC = () => {
                                 <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
                                     Tópicos Favoritos
                                 </h2>
-                                <Link to="/community/favorites" className="text-purple-400 hover:text-purple-300 text-xs font-bold">Ver tudo</Link>
+                                <Link to="/community/favorites" className="text-purple-400 hover:text-purple-300 text-xs font-bold">Ver todos</Link>
                             </div>
 
                             <div className="flex flex-col gap-3">
                                 {favoritePosts.length > 0 ? (
-                                    favoritePosts.map(post => (
+                                    favoritePosts.slice(0, 3).map(post => (
                                         <PostCard
                                             key={post.id}
                                             post={post}
@@ -216,6 +259,7 @@ const Dashboard: React.FC = () => {
                                             currentUserId={user?.id}
                                             onToggleFavorite={onToggleFavorite}
                                             viewMode="list"
+                                            showContent={true}
                                         />
                                     ))
                                 ) : (
@@ -253,8 +297,8 @@ const Dashboard: React.FC = () => {
                                             <h4 className="text-xs font-bold text-foreground truncate group-hover:text-purple-400 transition-colors">{author.full_name || author.username}</h4>
                                             <p className="text-[10px] text-muted-foreground truncate">{author.username ? '@' + author.username : 'User'}</p>
                                         </div>
-                                        <button className="text-purple-400 hover:text-purple-300 transition-colors">
-                                            <Heart size={14} fill="currentColor" />
+                                        <button className="text-yellow-500 hover:text-yellow-400 transition-colors">
+                                            <Star size={14} fill="currentColor" />
                                         </button>
                                     </div>
                                 )) : (

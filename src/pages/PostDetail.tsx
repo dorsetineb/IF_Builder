@@ -1,17 +1,27 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ChevronLeft, ThumbsUp, Share2, Send, ThumbsDown, CornerDownRight, User, Star, Trash2, AlertCircle, List, X, Pencil, MessageSquare, Heart, LogOut } from 'lucide-react';
+import { ChevronLeft, ThumbsUp, Share2, Send, ThumbsDown, CornerDownRight, User, Bookmark, Trash2, AlertCircle, List, X, Pencil, MessageSquare, Heart, LogOut } from 'lucide-react';
+
+// ... (skip down to usages)
+
+// In the sidebar widget (approx line 1050 based on context search, I'll use multi_replace to be precise or search first)
+
+// Actually, I should use Search/Replace effectively.
+// Let's do a replace for the Import first, then the usages.
+
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { useToast } from '../components/ToastContext';
-import ImageModal from '../components/ImageModal';
+
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import RichEditor from '../components/RichEditor';
 
 type PostWithDetails = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
-    categories: Database['public']['Tables']['categories']['Row'];
+    categories: Database['public']['Tables']['categories']['Row'] & {
+        group?: Database['public']['Tables']['category_groups']['Row'];
+    };
     tags?: string[] | null;
 };
 
@@ -23,6 +33,18 @@ type CommentWithAuthor = Database['public']['Tables']['comments']['Row'] & {
 };
 
 type ReactionType = 'like' | 'super_like' | 'dislike';
+
+const getCategoryColor = (slug: string) => {
+    switch (slug) {
+        case 'anuncios': return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
+        case 'geral': return 'bg-blue-500/10 text-blue-500 border-blue-500/20';
+        case 'duvidas': return 'bg-orange-500/10 text-orange-500 border-orange-500/20';
+        case 'sugestoes': return 'bg-green-500/10 text-green-500 border-green-500/20';
+        case 'problemas': return 'bg-red-500/10 text-red-500 border-red-500/20';
+        case 'off-topic': return 'bg-zinc-500/10 text-zinc-500 border-zinc-500/20';
+        default: return 'bg-purple-500/10 text-purple-500 border-purple-500/20';
+    }
+};
 
 // Custom Modal Component
 const ConfirmationModal = ({
@@ -96,31 +118,10 @@ const PostDetail: React.FC = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [itemToDelete, setItemToDelete] = useState<{ type: 'post' | 'comment', id: string } | null>(null);
 
-    // Gallery State
-    const [galleryState, setGalleryState] = useState<{ images: string[], index: number, isOpen: boolean }>({
-        images: [],
-        index: 0,
-        isOpen: false
-    });
+    const [fontSize, setFontSize] = useState<'sm' | 'base' | 'lg'>('base');
 
-    const handleImageClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        const target = e.target as HTMLElement;
-        if (target.tagName === 'IMG') {
-            const container = target.closest('.prose'); // Find the prose container
-            if (container) {
-                // Find all images in this container to build the gallery
-                const allImages = Array.from(container.querySelectorAll('img')).map(img => img.src);
-                const clickedIndex = allImages.indexOf((target as HTMLImageElement).src);
-
-                if (clickedIndex !== -1) {
-                    setGalleryState({
-                        images: allImages,
-                        index: clickedIndex,
-                        isOpen: true
-                    });
-                }
-            }
-        }
+    const toggleFontSize = (size: 'sm' | 'base' | 'lg') => {
+        setFontSize(size);
     };
 
     useEffect(() => {
@@ -152,7 +153,10 @@ const PostDetail: React.FC = () => {
             .select(`
                 *,
                 profiles:author_id (*),
-                categories:category_id (*)
+                categories:category_id (
+                    *,
+                    group:category_groups (*)
+                )
             `)
             .eq('id', id)
             .single();
@@ -650,114 +654,136 @@ const PostDetail: React.FC = () => {
         }, [replyingTo, comment.id]);
 
         return (
-            <div className={`group relative ${depth > 0 ? 'ml-0 mt-2 pl-4 border-l border-border/40 hover:border-purple-500/50 transition-colors' : 'bg-card/30 border border-border/50 p-3 rounded-lg hover:border-purple-500/50 transition-colors'}`}>
-                <div className="flex justify-between items-start mb-1.5">
-                    <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-muted border border-border overflow-hidden flex-shrink-0">
-                            {comment.profiles?.avatar_url ? (
-                                <img src={comment.profiles.avatar_url} alt={comment.profiles.username || ''} className="w-full h-full object-cover" />
-                            ) : (
-                                <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                                    <User size={12} />
-                                </div>
+            <div className="relative">
+                {/* Self Content - Isolated group for hover targeting to prevent parent activation when hovering children */}
+                <div className="group relative py-3 pl-3 pr-2 transition-colors hover:bg-muted/5 rounded-lg -ml-3">
+                    <div className="flex justify-between items-start mb-2">
+                        <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-full bg-muted border border-border overflow-hidden flex-shrink-0 z-10">
+                                {comment.profiles?.avatar_url ? (
+                                    <img src={comment.profiles.avatar_url} alt={comment.profiles.username || ''} className="w-full h-full object-cover" />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                                        <User size={14} />
+                                    </div>
+                                )}
+                            </div>
+                            <div className="flex flex-col justify-between h-8 py-0.5">
+                                <span className="font-bold text-card-foreground text-xs leading-none block">{comment.profiles?.username}</span>
+                                <span className="text-muted-foreground text-[10px] leading-none">{new Date(comment.created_at).toLocaleDateString()} às {new Date(comment.created_at).toLocaleTimeString().slice(0, 5)}</span>
+                            </div>
+                        </div>
+
+                        {/* Top Right Actions (Edit/Delete) - Only on Hover */}
+                        <div className="flex gap-2 items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            {isAuthor && !isEditing && (
+                                <>
+                                    <button
+                                        onClick={() => setIsEditing(true)}
+                                        className="text-muted-foreground hover:bg-muted hover:text-purple-400 transition-all p-2 rounded"
+                                        title="Editar resposta"
+                                    >
+                                        <Pencil size={15} />
+                                    </button>
+                                    <button
+                                        onClick={() => confirmDelete('comment', comment.id)}
+                                        className="text-muted-foreground hover:bg-red-500 hover:text-white transition-all p-2 rounded"
+                                        title="Excluir resposta"
+                                    >
+                                        <Trash2 size={15} />
+                                    </button>
+                                </>
                             )}
                         </div>
-                        <div>
-                            <span className="font-bold text-card-foreground text-[11px] block">{comment.profiles?.username}</span>
-                            <span className="text-muted-foreground text-[9px]">{new Date(comment.created_at).toLocaleDateString()} às {new Date(comment.created_at).toLocaleTimeString().slice(0, 5)}</span>
-                        </div>
                     </div>
-                    <div className="flex gap-2 items-center">
-                        <div className="flex gap-1 items-center mr-2">
-                            <button
-                                onClick={(e) => { e.stopPropagation(); handleCommentReaction(comment.id, 'like'); }}
-                                className={`p-1 transition-colors ${comment.user_reaction === 'like' ? 'text-blue-500 bg-blue-500/10 rounded' : 'text-muted-foreground hover:text-blue-500'}`}
-                                title={`${comment.reactions?.like || 0} curtidas`}
-                            >
-                                <ThumbsUp size={14} className={comment.user_reaction === 'like' ? 'fill-current' : ''} />
-                                {(comment.reactions?.like || 0) > 0 && <span className="ml-1 text-[9px] font-bold">{comment.reactions?.like}</span>}
-                            </button>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); handleCommentReaction(comment.id, 'super_like'); }}
-                                className={`p-1 transition-colors ${comment.user_reaction === 'super_like' ? 'text-pink-500 bg-pink-500/10 rounded' : 'text-muted-foreground hover:text-pink-500'}`}
-                                title={`${comment.reactions?.super_like || 0} amei`}
-                            >
-                                <Heart size={14} className={comment.user_reaction === 'super_like' ? 'fill-current' : ''} />
-                                {(comment.reactions?.super_like || 0) > 0 && <span className="ml-1 text-[9px] font-bold">{comment.reactions?.super_like}</span>}
-                            </button>
-                            <button
-                                onClick={(e) => { e.stopPropagation(); handleCommentReaction(comment.id, 'dislike'); }}
-                                className={`p-1 transition-colors ${comment.user_reaction === 'dislike' ? 'text-red-500 bg-red-500/10 rounded' : 'text-muted-foreground hover:text-red-500'}`}
-                                title={`${comment.reactions?.dislike || 0} não curti`}
-                            >
-                                <ThumbsDown size={14} className={comment.user_reaction === 'dislike' ? 'fill-current' : ''} />
-                                {(comment.reactions?.dislike || 0) > 0 && <span className="ml-1 text-[9px] font-bold">{comment.reactions?.dislike}</span>}
-                            </button>
-                        </div>
 
-                        {isAuthor && !isEditing && (
-                            <>
-                                <button
-                                    onClick={() => setIsEditing(true)}
-                                    className="text-muted-foreground hover:bg-muted hover:text-purple-400 transition-all p-1.5 rounded"
-                                    title="Editar resposta"
-                                >
-                                    <Pencil size={14} />
-                                </button>
-                                <button
-                                    onClick={() => confirmDelete('comment', comment.id)}
-                                    className="text-muted-foreground hover:bg-red-500 hover:text-white transition-all p-1.5 rounded"
-                                    title="Excluir resposta"
-                                >
-                                    <Trash2 size={14} />
-                                </button>
-                            </>
-                        )}
-                    </div>
-                </div>
-
-                {isEditing ? (
-                    <div className="mb-2">
-                        <RichEditor
-                            value={editContent}
-                            onChange={setEditContent}
-                            placeholder="Edite sua resposta..."
-                            minHeight="100px"
-                            onSubmit={onUpdate}
-                            submitting={isUpdating}
-                            submitLabel="Salvar Edição"
-                            onCancel={() => setIsEditing(false)}
-                        />
-                    </div>
-                ) : (
-                    <div
-                        className="text-muted-foreground text-xs mb-2 pl-1 leading-relaxed prose prose-invert max-w-none [&_img]:max-w-full [&_img]:max-h-[400px] [&_img]:w-auto [&_img]:object-contain [&_img]:rounded-lg [&_img]:mt-2 [&_img]:cursor-pointer [&_img]:hover:brightness-90 transition-all"
-                        dangerouslySetInnerHTML={{ __html: comment.content }}
-                        onClick={onImageClick}
-                    />
-                )}
-
-                <div className="flex items-center gap-3 pl-1 mt-1 h-6">
-                    {postStatus === 'published' ? (
-                        <>
-                            {replyingTo !== comment.id && (
-                                <button
-                                    onClick={() => setReplyingTo(comment.id)}
-                                    className="font-medium flex items-center gap-1.5 transition-all text-xs text-muted-foreground hover:text-purple-400 opacity-0 group-hover:opacity-100"
-                                >
-                                    <CornerDownRight size={14} />
-                                    Responder
-                                </button>
-                            )}
-                        </>
-                    ) : (
-                        <span className="text-[10px] text-muted-foreground/50 cursor-not-allowed opacity-0 group-hover:opacity-100" title="Tópico não publicado">Responder</span>
+                    {/* Vertical Line for Thread Continuity - ONLY if has children */}
+                    {comment.children && comment.children.length > 0 && (
+                        <div className="absolute left-[27px] top-11 bottom-0 w-[2px] bg-border/60" />
+                        /* left calculation: pl-3 (12px) + w-8/2 (16px) = 28px center. Adjusted to 27px for 2px width centering. */
+                        /* Wait, my previous calculation was 16px from parent.
+                           Container has `pl-3`. Avatar is first element.
+                           So Avatar starts at 12px inside this container.
+                           Avatar Center is 12 + 16 = 28px.
+                           So line should be at left-[27px] or left-[28px]. */
                     )}
+
+                    {/* Content */}
+                    <div className="pl-11">
+                        {isEditing ? (
+                            <div className="mb-2">
+                                <RichEditor
+                                    value={editContent}
+                                    onChange={setEditContent}
+                                    placeholder="Edite sua resposta..."
+                                    minHeight="100px"
+                                    onSubmit={onUpdate}
+                                    submitting={isUpdating}
+                                    submitLabel="Salvar Edição"
+                                    onCancel={() => setIsEditing(false)}
+                                />
+                            </div>
+                        ) : (
+                            <div
+                                className="text-muted-foreground text-xs mb-3 leading-relaxed prose prose-invert max-w-none [&_img]:max-w-full [&_img]:max-h-[400px] [&_img]:w-auto [&_img]:object-contain [&_img]:rounded-lg [&_img]:mt-2 [&_img]:cursor-pointer [&_img]:hover:brightness-90 transition-all"
+                                dangerouslySetInnerHTML={{ __html: comment.content }}
+                                onClick={onImageClick}
+                            />
+                        )}
+
+                        {/* Footer: Reactions & Reply Button */}
+                        <div className="flex items-center gap-4 h-6 mb-2">
+                            {/* Reactions: Always Visible */}
+                            <div className="flex gap-1.5 items-center">
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleCommentReaction(comment.id, 'like'); }}
+                                    className={`flex items-center gap-1.5 px-2 py-1 rounded-md border transition-all ${comment.user_reaction === 'like' ? 'bg-blue-500/10 border-blue-500 text-blue-500' : 'border-border/50 text-muted-foreground hover:bg-muted'}`}
+                                    title={`${comment.reactions?.like || 0} curtidas`}
+                                >
+                                    <ThumbsUp size={12} className={comment.user_reaction === 'like' ? 'fill-current' : ''} />
+                                    <span className="text-[9px] font-bold">{comment.reactions?.like || 0}</span>
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleCommentReaction(comment.id, 'super_like'); }}
+                                    className={`flex items-center gap-1.5 px-2 py-1 rounded-md border transition-all ${comment.user_reaction === 'super_like' ? 'bg-pink-500/10 border-pink-500 text-pink-500' : 'border-border/50 text-muted-foreground hover:bg-muted'}`}
+                                    title={`${comment.reactions?.super_like || 0} amei`}
+                                >
+                                    <Heart size={12} className={comment.user_reaction === 'super_like' ? 'fill-current' : ''} />
+                                    <span className="text-[9px] font-bold">{comment.reactions?.super_like || 0}</span>
+                                </button>
+                                <button
+                                    onClick={(e) => { e.stopPropagation(); handleCommentReaction(comment.id, 'dislike'); }}
+                                    className={`flex items-center gap-1.5 px-2 py-1 rounded-md border transition-all ${comment.user_reaction === 'dislike' ? 'bg-red-500/10 border-red-500 text-red-500' : 'border-border/50 text-muted-foreground hover:bg-muted'}`}
+                                    title={`${comment.reactions?.dislike || 0} não curti`}
+                                >
+                                    <ThumbsDown size={12} className={comment.user_reaction === 'dislike' ? 'fill-current' : ''} />
+                                    <span className="text-[9px] font-bold">{comment.reactions?.dislike || 0}</span>
+                                </button>
+                            </div>
+
+                            {/* Reply Button - Visible on Hover */}
+                            {postStatus === 'published' ? (
+                                <>
+                                    {replyingTo !== comment.id && (
+                                        <button
+                                            onClick={() => setReplyingTo(comment.id)}
+                                            className="font-medium flex items-center gap-1.5 transition-all text-xs text-muted-foreground hover:text-purple-400 opacity-0 group-hover:opacity-100"
+                                        >
+                                            <CornerDownRight size={14} />
+                                            Responder
+                                        </button>
+                                    )}
+                                </>
+                            ) : (
+                                <span className="text-[10px] text-muted-foreground/50 cursor-not-allowed opacity-0 group-hover:opacity-100" title="Tópico não publicado">Responder</span>
+                            )}
+                        </div>
+                    </div>
                 </div>
 
-                {/* Inline Editor for Replies */}
+                {/* Inline Editor for Replies - Separate Block */}
                 {replyingTo === comment.id && (
-                    <div className="mt-3 ml-1 animate-in slide-in-from-top-2 duration-200">
+                    <div className="ml-11 mb-4 p-1 shadow-2xl shadow-black/40 rounded-xl bg-card border border-border animate-in slide-in-from-top-2 duration-200 relative z-20">
                         <RichEditor
                             value={localComment}
                             onChange={setLocalComment}
@@ -768,13 +794,12 @@ const PostDetail: React.FC = () => {
                             submitting={submitting}
                             onCancel={() => setReplyingTo(null)}
                         />
-
                     </div>
                 )}
 
-                {/* Nested Comments */}
+                {/* Nested Comments with continuous line (Outside group div) */}
                 {comment.children && comment.children.length > 0 && (
-                    <div className="mt-1 space-y-1">
+                    <div className="ml-4 pl-4 border-l-2 border-border/60 -mt-2 pt-2 space-y-0 relative z-0">
                         {comment.children.map(child => (
                             <CommentItem
                                 key={child.id}
@@ -789,6 +814,7 @@ const PostDetail: React.FC = () => {
                                 postStatus={postStatus}
                                 onImageClick={onImageClick}
                                 handleUpdateComment={handleUpdateComment}
+                                handleCommentReaction={handleCommentReaction}
                             />
                         ))}
                     </div>
@@ -797,225 +823,271 @@ const PostDetail: React.FC = () => {
         );
     };
 
-    if (loading) return <div className="p-8 text-center text-zinc-500 text-xs">Carregando discussão...</div>;
-    if (!post) return <div className="p-8 text-center text-zinc-500 text-xs">Post não encontrado.</div>;
+    if (loading) return <div className="p-8 text-center text-zinc-500 text-xs">Carregando tópico...</div>;
+    if (!post) return <div className="p-8 text-center text-zinc-500 text-xs">Tópico não encontrado.</div>;
 
 
 
     return (
-        <div className="min-h-full bg-background font-sans pb-32">
-            {/* Standard Header with Breadcrumbs */}
-            <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-20 shrink-0">
-                <div className="flex flex-col justify-center h-full">
-                    <h1 className="text-xl font-bold text-foreground flex items-center gap-2">
-                        <Link to="/community" className="hover:text-purple-400 transition-colors">Fórum</Link>
-                        <span className="text-muted-foreground/50">/</span>
-                        <span className="text-sm font-medium text-muted-foreground">{post.categories?.name || 'Tópico'}</span>
-                    </h1>
-                </div>
-                <div>
-                    <button
-                        onClick={() => navigate('/community')}
-                        className="flex items-center justify-center p-2 text-muted-foreground hover:text-destructive transition-colors"
-                        title="Sair"
-                    >
-                        <LogOut className="w-5 h-5" />
-                    </button>
+        <div className="min-h-screen bg-background pb-20">
+            {/* Header / Breadcrumbs */}
+            <div className="bg-card border-b border-border sticky top-0 z-30 shadow-sm backdrop-blur-md bg-card/80">
+                <div className="max-w-[1400px] mx-auto px-4 h-14 flex items-center justify-between">
+                    <div className="flex items-center gap-2 overflow-hidden">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="p-1.5 -ml-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted/50 transition-colors"
+                        >
+                            <ChevronLeft size={18} />
+                        </button>
+
+                        <div className="h-4 w-[1px] bg-border mx-1" />
+
+                        <div className="flex items-center gap-1.5 text-xs truncate">
+                            <Link to="/community" className="text-muted-foreground hover:text-foreground transition-colors">
+                                Fórum
+                            </Link>
+                            {post.categories?.group && (
+                                <>
+                                    <span className="text-muted-foreground/50">/</span>
+                                    <Link
+                                        to={`/community?group=${post.categories.group.id}`}
+                                        className="font-medium text-muted-foreground hover:text-purple-400 transition-colors"
+                                    >
+                                        {post.categories.group.name}
+                                    </Link>
+                                </>
+                            )}
+                            <span className="text-muted-foreground/50">/</span>
+                            <span className={`font-bold uppercase tracking-wider ${post.categories ? getCategoryColor(post.categories.slug) : 'text-foreground'}`}>
+                                {post.categories?.name || 'Geral'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                        {/* Font Size Controls */}
+                        <div className="flex items-center bg-muted/50 rounded-lg p-1 border border-border mr-2">
+                            <button
+                                onClick={() => toggleFontSize('sm')}
+                                className={`w-7 h-7 flex items-center justify-center rounded text-xs font-bold transition-all ${fontSize === 'sm' ? 'bg-card text-purple-400 shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                            >
+                                A-
+                            </button>
+                            <button
+                                onClick={() => toggleFontSize('base')}
+                                className={`w-7 h-7 flex items-center justify-center rounded text-sm font-bold transition-all ${fontSize === 'base' ? 'bg-card text-purple-400 shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                            >
+                                A
+                            </button>
+                            <button
+                                onClick={() => toggleFontSize('lg')}
+                                className={`w-7 h-7 flex items-center justify-center rounded text-base font-bold transition-all ${fontSize === 'lg' ? 'bg-card text-purple-400 shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                            >
+                                A+
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div className="p-8 max-w-[1600px] mx-auto">
+            <div className="p-4 lg:p-8 max-w-[1400px] mx-auto">
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    {/* Main Thread Content */}
+                    {/* LEFT COLUMN: Main Content (75%) */}
                     <div className="lg:col-span-3 space-y-6">
-                        <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:border-purple-500/20 transition-all group/post relative">
-                            {/* Draft Badge in Header if Draft */}
+
+                        {/* Post Container */}
+                        <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm relative p-6 lg:p-10">
+
+                            {/* Draft Warning */}
                             {post.status === 'draft' && (
-                                <div className="absolute top-0 left-0 bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-3 py-1 rounded-br-lg border-r border-b border-yellow-500/20 z-10">
-                                    RASCUNHO - NÃO PUBLICADO
+                                <div className="absolute top-0 right-0 bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-4 py-2 rounded-bl-xl border-l border-b border-yellow-500/20">
+                                    RASCUNHO
                                 </div>
                             )}
 
-                            {/* Hero Image Section */}
-                            {firstImage && (
-                                <div className="w-full aspect-video md:aspect-[3/1] bg-muted relative">
-                                    <img src={firstImage} alt="Cover" className="w-full h-full object-cover" />
-                                    <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-card to-transparent" />
-                                </div>
-                            )}
+                            {/* Header: Title & Meta */}
+                            <div className="mb-8 pb-8 border-b border-border/50">
 
-                            <div className="p-6 relative">
-                                {/* Header Info */}
-                                <div className="flex items-start justify-between mb-6">
-                                    <div className="space-y-4">
-                                        <div className="flex items-center gap-2">
-                                            {post.categories && (
-                                                <span className="inline-block px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                                                    {post.categories.name}
-                                                </span>
-                                            )}
-                                            {post.tags && post.tags.length > 0 && (
-                                                <div className="flex items-center gap-1.5 ml-1">
-                                                    {post.tags.map((tag, i) => (
-                                                        <span key={i} className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground border border-border">
-                                                            {tag}
-                                                        </span>
-                                                    ))}
-                                                </div>
+                                <div className="flex flex-wrap gap-2 mb-4">
+                                    {post.categories && (
+                                        <span className={`px-2.5 py-1 rounded text-[10px] font-bold uppercase tracking-wider border ${getCategoryColor(post.categories.slug)} bg-opacity-10 border-opacity-20`}>
+                                            {post.categories.name}
+                                        </span>
+                                    )}
+                                    {post.tags && post.tags.map((tag, i) => (
+                                        <span key={i} className="px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider bg-muted text-muted-foreground border border-border">
+                                            #{tag}
+                                        </span>
+                                    ))}
+                                </div>
+
+                                <h1 className="text-2xl lg:text-3xl font-black text-foreground leading-tight tracking-tight mb-6">
+                                    {post.title}
+                                </h1>
+
+                                <div className="flex items-center justify-between flex-wrap gap-4">
+                                    <div className="flex items-center gap-3">
+                                        <div
+                                            onClick={() => post.profiles?.id && navigate(`/community/author/${post.profiles.id}`)}
+                                            className="w-10 h-10 rounded-full bg-muted flex items-center justify-center overflow-hidden border border-border cursor-pointer hover:border-purple-500 transition-colors"
+                                        >
+                                            {post.profiles?.avatar_url ? (
+                                                <img src={post.profiles.avatar_url} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <User size={18} className="text-muted-foreground" />
                                             )}
                                         </div>
-                                        <h1 className="text-2xl font-bold text-foreground leading-tight tracking-tight">{post.title}</h1>
-
-                                        <div className="flex items-center gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center overflow-hidden border-2 border-border">
-                                                {post.profiles?.avatar_url ? (
-                                                    <img src={post.profiles.avatar_url} alt={post.profiles.username || ''} className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <User size={20} className="text-muted-foreground" />
-                                                )}
-                                            </div>
-                                            <div>
-                                                <p className="text-foreground text-sm font-bold">{post.profiles?.username || 'Anônimo'}</p>
-                                                <p className="text-muted-foreground text-[10px]">{new Date(post.created_at).toLocaleDateString()} às {new Date(post.created_at).toLocaleTimeString().slice(0, 5)}</p>
-                                                {post.updated_at && post.updated_at !== post.created_at && (
-                                                    <p className="text-muted-foreground text-[9px] italic">(editado)</p>
-                                                )}
-                                            </div>
+                                        <div>
+                                            <p
+                                                onClick={() => post.profiles?.id && navigate(`/community/author/${post.profiles.id}`)}
+                                                className="text-sm font-bold text-foreground hover:text-purple-400 cursor-pointer transition-colors"
+                                            >
+                                                {post.profiles?.username || 'Anônimo'}
+                                            </p>
+                                            <p className="text-[11px] text-muted-foreground flex items-center gap-1.5">
+                                                <span>{new Date(post.created_at).toLocaleDateString()}</span>
+                                                <span>•</span>
+                                                <span>{new Date(post.created_at).toLocaleTimeString().slice(0, 5)}</span>
+                                            </p>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div className="flex gap-2">
-                                        {/* Publish Button for Author */}
-                                        {post.status === 'draft' && currentUser && currentUser.id === post.author_id && (
+                                {/* Author Actions - Absolute Position Top Right */}
+                                {currentUser && currentUser.id === post.author_id && (
+                                    <div className="absolute top-6 right-6 flex items-center gap-2">
+                                        {post.status === 'draft' && (
                                             <button
                                                 onClick={handlePublish}
-                                                className="bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-lg transition-all text-xs font-bold uppercase tracking-wider shadow-lg shadow-green-900/20 flex items-center gap-2"
+                                                className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
                                             >
                                                 <Send size={12} /> Publicar
                                             </button>
                                         )}
-                                        {currentUser && currentUser.id === post.author_id && (
-                                            <>
-                                                <button
-                                                    onClick={() => navigate(`/community/edit/${post.id}`)}
-                                                    className="text-muted-foreground hover:text-purple-400 p-2 rounded-lg hover:bg-muted transition-colors"
-                                                    title="Editar Tópico"
-                                                >
-                                                    <Pencil size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => confirmDelete('post', post.id)}
-                                                    className="text-muted-foreground hover:text-red-500 p-2 rounded-lg hover:bg-red-500/10 transition-colors"
-                                                    title="Excluir"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
-                                            </>
-                                        )}
+                                        <button
+                                            onClick={() => navigate(`/community/edit/${post.id}`)}
+                                            className="p-2 text-muted-foreground hover:text-purple-400 hover:bg-muted rounded-lg transition-colors"
+                                            title="Editar"
+                                        >
+                                            <Pencil size={18} />
+                                        </button>
+                                        <button
+                                            onClick={() => confirmDelete('post', post.id)}
+                                            className="p-2 text-muted-foreground hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-colors"
+                                            title="Excluir"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
                                     </div>
-                                </div>
+                                )}
+                            </div>
 
-                                {/* Post Content */}
-                                <div className="mt-4">
-                                    <div
-                                        className="prose prose-invert prose-purple max-w-none text-sm text-foreground/90 leading-relaxed font-normal [&_img]:max-w-full [&_img]:max-h-[500px] [&_img]:w-auto [&_img]:object-contain [&_img]:rounded-lg [&_img]:mt-2 [&_img]:cursor-pointer [&_img]:hover:brightness-90 transition-all"
-                                        dangerouslySetInnerHTML={{ __html: post.content }}
-                                        onClick={handleImageClick}
-                                    />
-                                </div>
+                            {/* Main Content Body */}
+                            <div className={`
+                                prose prose-invert prose-purple max-w-none 
+                                ${fontSize === 'sm' ? 'prose-sm' : fontSize === 'lg' ? 'prose-lg' : 'prose-sm'}
+                                prose-p:text-foreground/90 prose-headings:text-foreground prose-strong:text-foreground prose-blockquote:border-purple-500
+                            `}>
+                                <div dangerouslySetInnerHTML={{ __html: post.content.replace(/<img[^>]*>/g, '') }} />
+                            </div>
 
-                                {/* Reactions Footer */}
-                                <div className="flex items-center gap-4 pt-8 mt-8 border-t border-border">
+                            {/* Footer / Reactions */}
+                            <div className="border-t border-border mt-6 pt-4 flex flex-wrap gap-4 items-center justify-between">
+                                <div className="flex items-center gap-3">
                                     <button
                                         onClick={() => handleReaction('like')}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${userReaction === 'like' ? 'bg-blue-500/10 border-blue-500 text-blue-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${userReaction === 'like' ? 'bg-blue-500/10 border-blue-500 text-blue-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
                                     >
-                                        <ThumbsUp size={14} className={userReaction === 'like' ? 'fill-current' : ''} />
-                                        <span className="text-[10px] font-bold">{reactionCounts.like}</span>
+                                        <ThumbsUp size={16} className={userReaction === 'like' ? 'fill-current' : ''} />
+                                        <span className="text-xs font-bold">{reactionCounts.like}</span>
                                     </button>
-
                                     <button
                                         onClick={() => handleReaction('super_like')}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${userReaction === 'super_like' ? 'bg-pink-500/10 border-pink-500 text-pink-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${userReaction === 'super_like' ? 'bg-pink-500/10 border-pink-500 text-pink-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
                                     >
-                                        <Heart size={14} className={userReaction === 'super_like' ? 'fill-current' : ''} />
-                                        <span className="text-[10px] font-bold">{reactionCounts.super_like}</span>
+                                        <Heart size={16} className={userReaction === 'super_like' ? 'fill-current' : ''} />
+                                        <span className="text-xs font-bold">{reactionCounts.super_like}</span>
                                     </button>
-
                                     <button
                                         onClick={() => handleReaction('dislike')}
-                                        className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${userReaction === 'dislike' ? 'bg-red-500/10 border-red-500 text-red-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
+                                        className={`flex items-center gap-2 px-4 py-2 rounded-full border transition-all ${userReaction === 'dislike' ? 'bg-red-500/10 border-red-500 text-red-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
                                     >
-                                        <ThumbsDown size={14} className={userReaction === 'dislike' ? 'fill-current' : ''} />
-                                        <span className="text-[10px] font-bold">{reactionCounts.dislike}</span>
+                                        <ThumbsDown size={16} className={userReaction === 'dislike' ? 'fill-current' : ''} />
+                                        <span className="text-xs font-bold">{reactionCounts.dislike}</span>
                                     </button>
+                                </div>
 
-                                    <span className="text-xs text-muted-foreground ml-auto pr-4">{post.comments ? post.comments.length : 0} visualizações</span>
-
-                                    <button
-                                        onClick={handleShare}
-                                        className="flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg border border-border text-muted-foreground hover:bg-muted transition-all"
-                                        title="Copiar Link"
-                                    >
-                                        <Share2 size={14} />
-                                        <span className="text-[10px] font-bold">Compartilhar</span>
-                                    </button>
+                                <div className="flex items-center gap-2">
                                     <button
                                         onClick={handleToggleFavorite}
-                                        className={`flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg border transition-all ${isFavorite ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/50 hover:bg-yellow-500/20' : 'border-border text-muted-foreground hover:bg-muted'}`}
+                                        className={`p-2 rounded-full border transition-all ${isFavorite ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500' : 'border-border text-muted-foreground hover:bg-muted'}`}
                                         title="Favoritar"
                                     >
-                                        <Star size={14} className={isFavorite ? 'fill-current' : ''} />
-                                        <span className="text-[10px] font-bold">Favorito</span>
+                                        <Bookmark size={18} className={isFavorite ? 'fill-current' : ''} />
+                                    </button>
+                                    <button
+                                        onClick={handleShare}
+                                        className="p-2 rounded-full border border-border text-muted-foreground hover:bg-muted transition-all"
+                                        title="Compartilhar"
+                                    >
+                                        <Share2 size={18} />
                                     </button>
                                 </div>
                             </div>
                         </div>
 
                         {/* Comments Section */}
-                        <div>
-                            <h3 className="text-lg font-bold text-foreground mb-6 flex items-center gap-2">
-                                Respostas <span className="text-xs bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded-full border border-purple-500/20">{comments.length}</span>
+                        <div id="comments" className="bg-transparent pt-6 lg:pt-8">
+                            <h3 className="text-xl font-bold text-foreground mb-8 flex items-center gap-2">
+                                Respostas <span className="bg-muted text-muted-foreground text-xs px-2 py-1 rounded-md border border-border">{comments.length}</span>
                             </h3>
 
-                            <div className="space-y-4">
-                                {comments.map(comment => (
-                                    <CommentItem
-                                        key={comment.id}
-                                        comment={comment}
-                                        currentUser={currentUser}
-                                        replyingTo={replyingTo}
-                                        setReplyingTo={setReplyingTo}
-                                        submitting={submitting}
-                                        handleSubmitComment={handleSubmitComment}
-                                        confirmDelete={confirmDelete}
-                                        postStatus={post?.status}
-                                        onImageClick={handleImageClick}
-                                        handleUpdateComment={handleUpdateComment}
-                                        handleCommentReaction={handleCommentReaction}
-                                    />
-                                ))}
+                            <div className="space-y-6">
+                                {comments.length === 0 ? (
+                                    <div className="text-center py-10 opacity-50">
+                                        <MessageSquare size={48} className="mx-auto mb-4 text-border" />
+                                        <p>Seja o primeiro a responder!</p>
+                                    </div>
+                                ) : (
+                                    comments.map(comment => (
+                                        <CommentItem
+                                            key={comment.id}
+                                            comment={comment}
+                                            currentUser={currentUser}
+                                            replyingTo={replyingTo}
+                                            setReplyingTo={setReplyingTo}
+                                            submitting={submitting}
+                                            handleSubmitComment={handleSubmitComment}
+                                            confirmDelete={confirmDelete}
+                                            postStatus={post?.status}
+                                            onImageClick={() => { }} // Disabled
+                                            handleUpdateComment={handleUpdateComment}
+                                            handleCommentReaction={handleCommentReaction}
+                                        />
+                                    ))
+                                )}
                             </div>
 
-                            {/* Main Reply Editor (Bottom of Page) */}
+                            {/* Comment Editor */}
                             {post.status === 'published' && !replyingTo && (
-                                <div className="mt-8 pt-6 border-t border-border">
-                                    <h3 className="text-sm font-bold text-foreground mb-4 uppercase tracking-wider">Deixe sua resposta</h3>
+                                <div className="mt-10 pt-6 border-t border-border">
+                                    <h3 className="text-xl font-bold text-foreground mb-6">Responder o tópico</h3>
                                     <div className="flex gap-4">
-                                        <div className="w-8 h-8 rounded-full bg-muted border border-border flex-shrink-0 overflow-hidden">
+                                        <div className="w-10 h-10 rounded-full bg-muted border border-border flex-shrink-0 overflow-hidden">
                                             {currentUser?.user_metadata?.avatar_url || currentProfile?.avatar_url ? (
                                                 <img src={currentUser?.user_metadata?.avatar_url || currentProfile?.avatar_url} className="w-full h-full object-cover" />
                                             ) : (
-                                                <User size={16} className="text-muted-foreground m-auto mt-1" />
+                                                <User size={20} className="text-muted-foreground m-auto mt-2" />
                                             )}
                                         </div>
                                         <div className="flex-1">
                                             <RichEditor
                                                 value={newComment}
                                                 onChange={setNewComment}
-                                                placeholder="Escreva sua resposta para este tópico..."
-                                                minHeight="100px"
+                                                placeholder="Escreva sua resposta..."
+                                                minHeight="120px"
                                                 onSubmit={() => handleSubmitComment()}
                                                 submitting={submitting}
                                             />
@@ -1024,48 +1096,69 @@ const PostDetail: React.FC = () => {
                                 </div>
                             )}
                         </div>
+
                     </div>
 
-                    {/* Sidebar Widgets */}
-                    <div className="space-y-6">
-                        {/* Favorited By Widget */}
-                        <div className="bg-card border border-border rounded-xl p-6">
-                            <h3 className="font-bold text-foreground mb-4 text-xs uppercase tracking-wider flex items-center gap-2">
-                                <div className="bg-yellow-500/10 p-1.5 rounded-md text-yellow-500"><Star size={14} /></div>
-                                Quem Favoritou
+                    {/* RIGHT COLUMN: Sidebar (25%) */}
+                    <div className="lg:col-span-1 space-y-6">
+
+                        {/* Who Favorited Card */}
+                        <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+                            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <Bookmark size={12} className="text-yellow-500 fill-current" /> Quem Favoritou
                             </h3>
                             {favoritedBy.length > 0 ? (
-                                <div className="space-y-3">
+                                <div className="flex flex-col gap-3">
                                     {favoritedBy.map((profile, i) => (
-                                        <div key={i} className="flex items-center justify-between group">
-                                            <div className="flex items-center gap-2">
-                                                <div className="w-6 h-6 rounded-full bg-muted overflow-hidden border border-border">
-                                                    {profile.avatar_url ? (
-                                                        <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <User size={12} className="text-muted-foreground m-auto mt-1" />
-                                                    )}
-                                                </div>
-                                                <span className="text-xs font-bold text-foreground group-hover:text-purple-400 transition-colors">{profile.username}</span>
+                                        <div key={i}
+                                            onClick={() => navigate(`/community/author/${profile.id}`)}
+                                            className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 cursor-pointer transition-colors"
+                                        >
+                                            <div className="w-8 h-8 rounded-full bg-muted overflow-hidden border border-border">
+                                                {profile.avatar_url ? (
+                                                    <img src={profile.avatar_url} alt="" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <User size={14} className="text-muted-foreground m-auto mt-1.5" />
+                                                )}
                                             </div>
+                                            <span className="text-sm font-bold text-foreground truncate">{profile.username}</span>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <p className="text-[10px] text-muted-foreground">Ninguém favoritou ainda.</p>
+                                <div className="text-center py-6 text-muted-foreground text-xs bg-muted/20 rounded-lg border border-dashed border-border">
+                                    Ninguém favoritou ainda.
+                                </div>
                             )}
                         </div>
 
-                        {/* Changelog Widget */}
-                        {/* Changelog Removed */}{/* Space Holder */}
+                        {/* Stats Card */}
+                        <div className="bg-card border border-border rounded-xl p-5 shadow-sm">
+                            <h3 className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full bg-purple-500"></div> Estatísticas
+                            </h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg border border-border/50">
+                                    <span className="text-xs font-medium text-muted-foreground">Respostas</span>
+                                    <span className="text-sm font-bold text-foreground">{comments.length}</span>
+                                </div>
+                                <div className="flex items-center justify-between p-3 bg-muted/20 rounded-lg border border-border/50">
+                                    <span className="text-xs font-medium text-muted-foreground">Reações</span>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs font-bold text-green-500 flex items-center gap-0.5"><ThumbsUp size={10} /> {reactionCounts.like}</span>
+                                        <span className="text-xs font-bold text-pink-500 flex items-center gap-0.5"><Heart size={10} /> {reactionCounts.super_like}</span>
+                                        <span className="text-xs font-bold text-red-500 flex items-center gap-0.5"><ThumbsDown size={10} /> {reactionCounts.dislike}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
                     </div>
                 </div>
             </div>
 
-            {/* Expandable Inline Reply Editor */}
-            {/* Floating Editor Removed */} {/* Space Holder */}
-
-            {/* Confirmation Modal and others... */}
             <ConfirmationModal
                 isOpen={showDeleteModal}
                 onClose={() => setShowDeleteModal(false)}
@@ -1075,16 +1168,6 @@ const PostDetail: React.FC = () => {
                     ? 'Tem certeza que deseja excluir este tópico? Esta ação não pode ser desfeita.'
                     : 'Tem certeza que deseja excluir esta resposta? Esta ação não pode ser desfeita.'}
             />
-
-            {
-                galleryState.isOpen && (
-                    <ImageModal
-                        images={galleryState.images}
-                        initialIndex={galleryState.index}
-                        onClose={() => setGalleryState(prev => ({ ...prev, isOpen: false }))}
-                    />
-                )
-            }
         </div >
     );
 };

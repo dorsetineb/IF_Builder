@@ -72,7 +72,6 @@ const CreatePost: React.FC = () => {
     const [categoryId, setCategoryId] = useState<string>('');
     const [tags, setTags] = useState<string[]>([]);
     const [tagInput, setTagInput] = useState('');
-    const [imageUrl, setImageUrl] = useState('');
     const [postStatus, setPostStatus] = useState<'draft' | 'published' | null>(null);
     const [categoryGroups, setCategoryGroups] = useState<CategoryGroup[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
@@ -80,7 +79,6 @@ const CreatePost: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [savingDraft, setSavingDraft] = useState(false);
     const [initError, setInitError] = useState<string | null>(null);
-    const [uploadingImage, setUploadingImage] = useState(false);
 
     const [showPublishModal, setShowPublishModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -139,82 +137,10 @@ const CreatePost: React.FC = () => {
         if (data.tags) {
             setTags(data.tags);
         }
-        if (data.image_url) {
-            setImageUrl(data.image_url);
-        } else {
-            // Fallback for legacy posts or if image was embedded
-            // We prioritize content image if no explicit image_url
-            const doc = new DOMParser().parseFromString(data.content, 'text/html');
-            const firstImage = doc.querySelector('img')?.src || '';
-            if (firstImage && !data.image_url) setImageUrl(firstImage);
-        }
         setPostStatus(data.status);
     };
 
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
 
-        // Basic validation
-        if (!file.type.startsWith('image/')) {
-            toast('Arquivo inválido', 'Por favor, selecione uma imagem.', 'error');
-            return;
-        }
-
-        if (file.size > 5 * 1024 * 1024) { // 5MB limit
-            toast('Arquivo muito grande', 'A imagem deve ter no máximo 5MB.', 'error');
-            return;
-        }
-
-        setUploadingImage(true);
-        const { data: { user } } = await supabase.auth.getUser();
-
-        if (!user) {
-            setUploadingImage(false);
-            toast('Erro', 'Usuário não autenticado.', 'error');
-            return;
-        }
-
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${user.id}/${Date.now()}.${fileExt}`;
-
-        try {
-            console.log('Starting upload to forum-images:', fileName);
-            const { error: uploadError, data: uploadData } = await supabase.storage
-                .from('forum-images')
-                .upload(fileName, file, {
-                    cacheControl: '3600',
-                    upsert: true
-                });
-
-            if (uploadError) {
-                console.error('Supabase Upload Error:', uploadError);
-                throw uploadError;
-            }
-
-            console.log('Upload successful:', uploadData);
-
-            const { data: { publicUrl } } = supabase.storage
-                .from('forum-images')
-                .getPublicUrl(fileName);
-
-            console.log('Public URL generated:', publicUrl);
-            setImageUrl(publicUrl);
-            toast('Sucesso', 'Imagem de capa enviada com sucesso.', 'success');
-        } catch (error: any) {
-            console.error('Upload Process Error:', error);
-            // Translate common storage errors
-            let msg = 'Não foi possível enviar a imagem.';
-            if (error.message?.includes('Bucket not found')) msg = 'Bucket "forum-images" não existe. Rode o SQL "setup_storage.sql".';
-            if (error.message?.includes('Policy')) msg = 'Erro de permissão. Rode o SQL "setup_storage.sql".';
-
-            toast('Erro no upload', msg, 'error');
-        } finally {
-            setUploadingImage(false);
-            // Reset input so same file can be selected again if needed
-            if (fileInputRef.current) fileInputRef.current.value = '';
-        }
-    };
 
     const addTag = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && tagInput.trim()) {
@@ -328,7 +254,7 @@ const CreatePost: React.FC = () => {
             author_id: user.id,
             category_id: validCategoryId,
             status: status,
-            image_url: imageUrl || null,
+            image_url: null, // Force null
             updated_at: new Date().toISOString(),
             tags: tags
         };
@@ -404,98 +330,42 @@ const CreatePost: React.FC = () => {
             <div className="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar">
                 <div className="max-w-[1200px] mx-auto space-y-6 pb-20">
 
-                    {/* Top Section: Cover Image (Left) + Inputs (Right) */}
-                    <div className="flex flex-col md:flex-row gap-6 items-stretch">
-
-                        {/* Left Column: Cover Image Upload */}
-                        <div className="w-full md:w-[250px] shrink-0 flex flex-col gap-2">
-                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1 flex items-center gap-2">
-                                <ImageIcon size={14} /> Capa
-                            </label>
-                            <div className="flex-1 min-h-[140px] bg-muted/10 rounded-lg border border-dashed border-border hover:border-purple-500/50 transition-all relative overflow-hidden group">
-                                {!imageUrl ? (
-                                    <button
-                                        onClick={() => fileInputRef.current?.click()}
-                                        className="absolute inset-0 w-full h-full flex flex-col items-center justify-center gap-2 text-muted-foreground hover:text-purple-400 p-4 text-center"
-                                        disabled={uploadingImage}
-                                    >
-                                        {uploadingImage ? (
-                                            <span className="text-xs animate-pulse">Enviando...</span>
-                                        ) : (
-                                            <>
-                                                <Upload size={24} className="group-hover:-translate-y-1 transition-transform" />
-                                                <span className="text-xs font-bold">Enviar Imagem</span>
-                                            </>
-                                        )}
-                                    </button>
-                                ) : (
-                                    <>
-                                        <img src={imageUrl} alt="Preview" className="w-full h-full object-cover" />
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                            <button
-                                                onClick={() => fileInputRef.current?.click()}
-                                                className="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-full backdrop-blur-sm transition-colors shadow-lg"
-                                                title="Trocar Imagem"
-                                            >
-                                                <Upload size={14} />
-                                            </button>
-                                            <button
-                                                onClick={() => setImageUrl('')}
-                                                className="bg-red-500/80 hover:bg-red-500 text-white p-2 rounded-full backdrop-blur-sm transition-colors"
-                                                title="Remover"
-                                            >
-                                                <X size={14} />
-                                            </button>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
+                    {/* Top Section: Inputs */}
+                    <div className="flex flex-col gap-4">
+                        {/* Title (Full Width) */}
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">Título</label>
                             <input
-                                type="file"
-                                ref={fileInputRef}
-                                className="hidden"
-                                accept="image/*"
-                                onChange={handleImageUpload}
+                                type="text"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                placeholder="Um título curto e descritivo..."
+                                className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 text-foreground text-sm font-medium placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50 focus:bg-card transition-all"
                             />
                         </div>
 
-                        {/* Right Column: Title, Category, Tags */}
-                        <div className="flex-1 flex flex-col gap-4">
-                            {/* Title (Full Width) */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">Título</label>
-                                <input
-                                    type="text"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
-                                    placeholder="Um título curto e descritivo..."
-                                    className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 text-foreground text-sm font-medium placeholder-muted-foreground focus:outline-none focus:ring-1 focus:ring-purple-500/50 focus:bg-card transition-all"
-                                />
-                            </div>
-
-                            {/* Category - Full Width */}
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">Categoria</label>
-                                <div className="relative">
-                                    <select
-                                        value={categoryId}
-                                        onChange={(e) => setCategoryId(e.target.value)}
-                                        className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 text-foreground text-xs font-medium focus:outline-none focus:ring-1 focus:ring-purple-500/50 focus:bg-card transition-all appearance-none cursor-pointer"
-                                    >
-                                        <option value="">Selecionar...</option>
-                                        {categoryGroups.map(group => (
-                                            <optgroup key={group.id} label={group.name} className="text-foreground bg-card font-bold">
-                                                {group.categories.map(cat => (
-                                                    <option key={cat.id} value={cat.id} className="text-foreground bg-card py-1">
-                                                        {cat.name}
-                                                    </option>
-                                                ))}
-                                            </optgroup>
-                                        ))}
-                                    </select>
-                                    <div className="absolute right-3 top-0 h-full flex items-center justify-center pointer-events-none text-muted-foreground">
-                                        <ChevronDown size={14} />
-                                    </div>
+                        {/* Category - Full Width */}
+                        <div className="space-y-2">
+                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider ml-1">Categoria</label>
+                            <div className="relative">
+                                <select
+                                    value={categoryId}
+                                    onChange={(e) => setCategoryId(e.target.value)}
+                                    className="w-full bg-muted/30 border border-border rounded-lg px-4 py-2.5 text-foreground text-xs font-medium focus:outline-none focus:ring-1 focus:ring-purple-500/50 focus:bg-card transition-all appearance-none cursor-pointer"
+                                >
+                                    <option value="">Selecionar...</option>
+                                    {categoryGroups.map(group => (
+                                        <optgroup key={group.id} label={group.name} className="text-foreground bg-card font-bold">
+                                            {group.categories.map(cat => (
+                                                <option key={cat.id} value={cat.id} className="text-foreground bg-card py-1">
+                                                    {cat.name}
+                                                </option>
+                                            ))}
+                                        </optgroup>
+                                    ))}
+                                </select>
+                                <div className="absolute right-3 top-0 h-full flex items-center justify-center pointer-events-none text-muted-foreground">
+                                    <ChevronDown size={14} />
                                 </div>
                             </div>
                         </div>

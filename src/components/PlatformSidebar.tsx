@@ -27,7 +27,7 @@ const PlatformSidebar: React.FC = () => {
     );
 
     return (
-        <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card border-r border-border flex flex-col h-full transition-all duration-300 relative`}>
+        <aside className={`${isCollapsed ? 'w-20' : 'w-52'} bg-card border-r border-border flex flex-col h-full transition-all duration-300 relative`}>
             <button
                 onClick={() => setIsCollapsed(!isCollapsed)}
                 className="absolute -right-3 top-6 bg-card border border-border rounded-full p-1 text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors z-50 shadow-sm"
@@ -57,11 +57,12 @@ const PlatformSidebar: React.FC = () => {
             <div className="mt-auto p-4 border-t border-border">
                 <Link
                     to="/editor"
-                    className={`flex items-center gap-3 w-full bg-secondary hover:bg-white hover:text-zinc-900 text-secondary-foreground font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl text-base group border border-border ${isCollapsed ? 'justify-center px-0' : 'justify-center'}`}
+                    className={`flex items-center gap-3 w-full bg-secondary hover:bg-white hover:text-zinc-900 text-secondary-foreground font-bold py-4 rounded-xl transition-all shadow-lg hover:shadow-xl text-base group border border-purple-500 relative overflow-hidden ${isCollapsed ? 'justify-center px-0' : 'justify-center'}`}
                     title={isCollapsed ? "Abrir Editor" : undefined}
                 >
-                    <Gamepad2 size={20} className="group-hover:scale-110 transition-transform text-primary" />
-                    {!isCollapsed && <span className="truncate">Abrir Editor</span>}
+                    <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-purple-500/20 to-transparent pointer-events-none" />
+                    <Gamepad2 size={20} className="group-hover:scale-110 transition-transform text-primary relative z-10" />
+                    {!isCollapsed && <span className="truncate relative z-10">Abrir Editor</span>}
                 </Link>
             </div>
         </aside>

@@ -50,14 +50,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         // Get initial session
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        const initSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
             setSession(session);
             setUser(session?.user ?? null);
             if (session?.user) {
-                fetchProfile(session.user.id);
+                await fetchProfile(session.user.id);
             }
             setLoading(false);
-        });
+        };
+        initSession();
 
         // Listen for changes
         const {
@@ -65,9 +67,11 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } = supabase.auth.onAuthStateChange(async (_event, session) => {
             setSession(session);
             setUser(session?.user ?? null);
-            if (session?.user && !profile) { // Only fetch if we don't have it or if it changed (logic could be improved)
-                fetchProfile(session.user.id);
-            } else if (!session?.user) {
+            if (session?.user) {
+                // Always fetch/refresh profile on auth change (login), unless we already have it for this user?
+                // For simplicity and correctness, let's fetch.
+                await fetchProfile(session.user.id);
+            } else {
                 setProfile(null);
             }
             setLoading(false);

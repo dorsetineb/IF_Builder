@@ -262,7 +262,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         negativeEndingMusic,
         fixedVerbs,
         textAnimationType, textSpeed, imageTransitionType, imageSpeed,
-        onNavigateToTrackers
+        onNavigateToTrackers,
+        gameSplashContentVerticalAlignment: splashContentVerticalAlignment
     } = props;
 
     const [localLayoutOrientation, setLocalLayoutOrientation] = useState(layoutOrientation);
@@ -322,6 +323,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localOmitSplashTitle, setLocalOmitSplashTitle] = useState(omitSplashTitle);
     const [localSplashImage, setLocalSplashImage] = useState(splashImage);
     const [localSplashContentAlignment, setLocalSplashContentAlignment] = useState(splashContentAlignment);
+    const [localSplashContentVerticalAlignment, setLocalSplashContentVerticalAlignment] = useState(splashContentVerticalAlignment || 'bottom');
     const [localSplashDescription, setLocalSplashDescription] = useState(splashDescription);
     const [localBackgroundMusic, setLocalBackgroundMusic] = useState(backgroundMusic);
     const [localPositiveEndingImage, setLocalPositiveEndingImage] = useState(positiveEndingImage);
@@ -448,7 +450,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         title, logo, omitSplashTitle, splashImage, splashContentAlignment, splashDescription, backgroundMusic,
         positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription, positiveEndingMusic,
         negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription, negativeEndingMusic, fixedVerbs,
-        textAnimationType, textSpeed, imageTransitionType, imageSpeed
+        textAnimationType, textSpeed, imageTransitionType, imageSpeed, splashContentVerticalAlignment
     ]);
 
     useEffect(() => {
@@ -504,6 +506,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
             localOmitSplashTitle !== omitSplashTitle ||
             localSplashImage !== splashImage ||
             localSplashContentAlignment !== splashContentAlignment ||
+            localSplashContentVerticalAlignment !== splashContentVerticalAlignment ||
+            localSplashDescription !== splashDescription ||
             localSplashDescription !== splashDescription ||
             localBackgroundMusic !== backgroundMusic ||
             localPositiveEndingImage !== positiveEndingImage ||
@@ -529,7 +533,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localTitle, localLogo, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, localBackgroundMusic,
         localPositiveEndingImage, localPositiveEndingContentAlignment, localPositiveEndingDescription, localPositiveEndingMusic,
         localNegativeEndingImage, localNegativeEndingContentAlignment, localNegativeEndingDescription, localNegativeEndingMusic, localFixedVerbs,
-        localTextAnimationType, localTextSpeed, localImageTransitionType, localImageSpeed,
+        localTextAnimationType, localTextSpeed, localImageTransitionType, localImageSpeed, localSplashContentVerticalAlignment,
         props, onSetDirty
     ]);
 
@@ -586,6 +590,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localOmitSplashTitle !== omitSplashTitle) onUpdate('gameOmitSplashTitle', localOmitSplashTitle);
         if (localSplashImage !== splashImage) onUpdate('gameSplashImage', localSplashImage);
         if (localSplashContentAlignment !== splashContentAlignment) onUpdate('gameSplashContentAlignment', localSplashContentAlignment);
+        if (localSplashContentVerticalAlignment !== splashContentVerticalAlignment) onUpdate('gameSplashContentVerticalAlignment', localSplashContentVerticalAlignment);
         if (localSplashDescription !== splashDescription) onUpdate('gameSplashDescription', localSplashDescription);
         if (localBackgroundMusic !== backgroundMusic) onUpdate('gameBackgroundMusic', localBackgroundMusic);
         if (localPositiveEndingImage !== positiveEndingImage) onUpdate('positiveEndingImage', localPositiveEndingImage);
@@ -656,6 +661,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalOmitSplashTitle(omitSplashTitle);
         setLocalSplashImage(splashImage);
         setLocalSplashContentAlignment(splashContentAlignment);
+        setLocalSplashContentVerticalAlignment(splashContentVerticalAlignment as any);
         setLocalSplashDescription(splashDescription);
         setLocalBackgroundMusic(backgroundMusic);
         setLocalPositiveEndingImage(positiveEndingImage);
@@ -1091,8 +1097,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     )}
 
                     {activeTab === 'abertura' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="space-y-8 flex flex-col h-full">
+                        <div className="space-y-4"><div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            {/* LEFT COLUMN: Texts & Audio */}
+                            <div className="flex flex-col h-full gap-4">
                                 <div className="space-y-2">
                                     <label htmlFor="gameTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Título do Jogo</label>
                                     <input
@@ -1104,52 +1111,90 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         placeholder="Ex: A Masmorra Esquecida"
                                     />
                                 </div>
-                                <div className="space-y-2 flex flex-col flex-grow">
+                                <div className="flex flex-col gap-2 flex-1 h-full">
                                     <label htmlFor="splashDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Descrição do Jogo</label>
                                     <textarea
                                         id="splashDescription"
                                         value={localSplashDescription}
                                         onChange={(e) => setLocalSplashDescription(e.target.value)}
-                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all flex-grow min-h-[200px] resize-none leading-relaxed placeholder:text-muted-foreground"
+                                        className="w-full flex-1 bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all resize-none leading-relaxed placeholder:text-muted-foreground h-full"
                                         placeholder="Uma breve descrição da sua aventura..."
                                     />
                                 </div>
                             </div>
 
-                            <div className="space-y-8 flex flex-col h-full">
-                                <div className="space-y-4">
-                                    <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem de Fundo</h4>
-                                    <div className="relative w-full h-[250px]">
-                                        {localSplashImage ? (
-                                            <div className="absolute inset-0 w-full h-full border border-border rounded-xl overflow-hidden bg-card group shadow-2xl">
-                                                <img src={localSplashImage} alt="Fundo" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-40" />
-                                                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-3 bg-black/40 backdrop-blur-sm">
-                                                    <label className="p-3 bg-secondary text-secondary-foreground rounded-lg cursor-pointer hover:bg-secondary/80 transition-all shadow-xl active:scale-95">
-                                                        <Upload className="w-5 h-5" />
-                                                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
-                                                    </label>
-                                                    <button onClick={() => setLocalSplashImage('')} className="p-3 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition-all shadow-xl active:scale-95">
-                                                        <Trash2 className="w-5 h-5" />
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-border bg-muted/30 rounded-xl cursor-pointer hover:bg-muted/50 hover:border-purple-500/50 transition-all group overflow-hidden">
-                                                <div className="absolute inset-0 bg-gradient-to-b from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                <Upload className="w-10 h-10 text-muted-foreground mb-4 transition-colors group-hover:text-purple-400" />
-                                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground">Carregar Imagem de Fundo</span>
-                                                <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
-                                            </label>
+
+
+
+                            {/* RIGHT COLUMN: Preview & Image Settings */}
+                            <div className="flex flex-col h-full gap-2">
+                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem de Fundo</label>
+                                <div className="relative w-full aspect-video bg-black/50 border border-border rounded-xl overflow-hidden shadow-2xl group flex-shrink-0">
+                                    {/* Background Image Layer */}
+                                    {localSplashImage ? (
+                                        <div className="absolute inset-0 w-full h-full">
+                                            <img src={localSplashImage} alt="Fundo" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-40" />
+                                        </div>
+                                    ) : (
+                                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/10">
+                                            <ImageIcon className="w-8 h-8 text-muted-foreground/30 mb-2" />
+                                            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/50 font-bold">Sem imagem de fundo</p>
+                                        </div>
+                                    )}
+
+                                    {/* Upload Overlay (Hover) */}
+                                    <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-all gap-3 backdrop-blur-sm">
+                                        <label className="p-3 bg-secondary text-secondary-foreground rounded-lg cursor-pointer hover:bg-secondary/80 transition-all shadow-xl active:scale-95 transform hover:-translate-y-1">
+                                            <Upload className="w-5 h-5" />
+                                            <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
+                                        </label>
+                                        {localSplashImage && (
+                                            <button onClick={() => setLocalSplashImage('')} className="p-3 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition-all shadow-xl active:scale-95 transform hover:-translate-y-1">
+                                                <Trash2 className="w-5 h-5" />
+                                            </button>
                                         )}
                                     </div>
-                                    <p className="text-[10px] text-muted-foreground font-medium text-center italic">Recomendado: Full HD (1920x1080), proporção 16:9.</p>
-                                </div>
 
-                                <div className="space-y-4 pt-8 border-t border-zinc-800/50">
+                                    {/* Content Preview Overlay */}
+                                    {!localOmitSplashTitle && (
+                                        <div
+                                            className={`absolute inset-0 z-20 p-8 flex flex-col pointer-events-none transition-all duration-300
+                                                ${localSplashContentVerticalAlignment === 'top' ? 'justify-start' : 'justify-end'}
+                                                ${localSplashContentAlignment === 'right' ? 'items-end text-right' : 'items-start text-left'}
+                                            `}
+                                        >
+                                            <div className={`max-w-[70%] space-y-3 flex flex-col ${localSplashContentAlignment === 'right' ? 'items-end' : 'items-start'}`}>
+                                                <h1 className="text-lg font-black uppercase tracking-tight drop-shadow-lg" style={{ color: localTitleColor }}>
+                                                    {localTitle || "Título do Jogo"}
+                                                </h1>
+                                                <p className="text-[9px] text-white/90 leading-relaxed line-clamp-3 drop-shadow-md font-medium">
+                                                    {localSplashDescription || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."}
+                                                </p>
+                                                <div className="pt-2">
+                                                    <span className="px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] rounded shadow-lg block hover:scale-105 transition-transform" style={{ backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor }}>
+                                                        {localSplashButtonText || "COMEÇAR"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                                <div className="space-y-1 pt-2 w-full flex flex-col items-center text-center">
+                                    <p className="text-[10px] text-muted-foreground font-medium italic">Recomendado: Full HD (1920x1080), proporção 16:9.</p>
+                                    <p className="text-[10px] text-muted-foreground/50 font-medium">
+                                        Para alterar as cores da interface, acesse a aba <button onClick={() => setActiveTab('layout')} className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Layout</button>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                            {/* LOWER SECTION: Soundtrack & Controls */}
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-0">
+                                {/* Left: Soundtrack */}
+                                <div className="space-y-4">
                                     <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha Sonora Inicial</h4>
                                     <div className="flex items-center gap-3">
-                                        <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
-                                            <Upload className="w-4 h-4 mr-2 text-purple-400" /> {localBackgroundMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
+                                        <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg group">
+                                            <Upload className="w-4 h-4 mr-2 text-purple-400 group-hover:scale-110 transition-transform" /> {localBackgroundMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
                                             <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalBackgroundMusic)} className="hidden" />
                                         </label>
                                         {localBackgroundMusic && (
@@ -1164,451 +1209,499 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     </div>
                                     <p className="text-[10px] text-muted-foreground font-medium italic">Esta trilha começará a tocar assim que a tela de início for carregada.</p>
                                 </div>
-                            </div>
-                        </div>
-                    )}
 
-                    {activeTab === 'fim_de_jogo' && (
-                        <div className="space-y-6">
-                            <div>
-                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Final Positivo</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
-                                    <div className="space-y-8 flex flex-col h-full col-span-1">
-                                        <div className="space-y-2">
-                                            <label htmlFor="posEndingContent" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
+                                {/* Right: Controls */}
+                                <div className="space-y-6">
+                                    <div className="space-y-2">
+                                        <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
+                                        <div className="grid grid-cols-2 gap-4">
                                             <select
-                                                id="posEndingContent"
-                                                value={localPositiveEndingContentAlignment}
-                                                onChange={(e) => setLocalPositiveEndingContentAlignment(e.target.value as 'left' | 'right')}
-                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all [&>option]:bg-input shadow-lg"
+                                                id="splashContentAlignment"
+                                                value={localSplashContentAlignment}
+                                                onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input shadow-lg"
                                             >
                                                 <option value="right">Direita</option>
                                                 <option value="left">Esquerda</option>
                                             </select>
-                                        </div>
-                                        <div className="space-y-2 flex flex-col flex-grow">
-                                            <label htmlFor="positiveEndingDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Mensagem de Vitória</label>
-                                            <textarea
-                                                id="positiveEndingDescription"
-                                                value={localPositiveEndingDescription}
-                                                onChange={(e) => setLocalPositiveEndingDescription(e.target.value)}
-                                                className="w-full flex-grow bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all min-h-[160px] resize-none leading-relaxed placeholder:text-muted-foreground"
-                                                placeholder="Parabéns! Você venceu."
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="space-y-8 col-span-2">
-                                        <div className="space-y-4">
-                                            <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem de Vitória</h4>
-                                            <div className="relative w-full h-[225px]">
-                                                {localPositiveEndingImage ? (
-                                                    <div className="absolute inset-0 w-full h-full border border-border rounded-xl overflow-hidden bg-card group shadow-2xl">
-                                                        <img src={localPositiveEndingImage} alt="Final Positivo" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-40" />
-                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-3 bg-black/40 backdrop-blur-sm">
-                                                            <label className="p-3 bg-secondary text-secondary-foreground rounded-lg cursor-pointer hover:bg-secondary/80 transition-all shadow-xl">
-                                                                <Upload className="w-5 h-5" />
-                                                                <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
-                                                            </label>
-                                                            <button onClick={() => setLocalPositiveEndingImage('')} className="p-3 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition-all shadow-xl">
-                                                                <Trash2 className="w-5 h-5" />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-border bg-muted/30 rounded-xl cursor-pointer hover:bg-muted/50 transition-all group overflow-hidden">
-                                                        <Upload className="w-10 h-10 text-muted-foreground mb-4 transition-colors group-hover:text-purple-400" />
-                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground">Carregar Imagem</span>
-                                                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
-                                                    </label>
-                                                )}
-                                            </div>
-                                        </div>
-                                        <div className="space-y-4 pt-6 border-t border-zinc-800/50">
-                                            <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha de Vitória</h4>
-                                            <div className="flex items-center gap-3">
-                                                <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
-                                                    <Upload className="w-4 h-4 mr-2 text-purple-400" /> {localPositiveEndingMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
-                                                    <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalPositiveEndingMusic)} className="hidden" />
-                                                </label>
-                                                {localPositiveEndingMusic && (
-                                                    <button onClick={() => setLocalPositiveEndingMusic('')} className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-border hover:bg-red-500 hover:text-white transition-all shadow-lg">
-                                                        <Trash2 className="w-5 h-5" />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="pt-6 border-t border-zinc-800/50">
-                                <h3 className="text-xs font-bold text-zinc-100 mb-4 uppercase tracking-widest">Final Negativo</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
-                                    <div className="space-y-8 flex flex-col h-full col-span-1">
-                                        <div className="space-y-2">
-                                            <label htmlFor="negEndingContent" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
                                             <select
-                                                id="negEndingContent"
-                                                value={localNegativeEndingContentAlignment}
-                                                onChange={(e) => setLocalNegativeEndingContentAlignment(e.target.value as 'left' | 'right')}
-                                                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all [&>option]:bg-zinc-950 shadow-lg"
+                                                id="splashContentVerticalAlignment"
+                                                value={localSplashContentVerticalAlignment}
+                                                onChange={(e) => setLocalSplashContentVerticalAlignment(e.target.value as 'top' | 'bottom')}
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input shadow-lg"
                                             >
-                                                <option value="right">Direita</option>
-                                                <option value="left">Esquerda</option>
+                                                <option value="bottom">Inferior</option>
+                                                <option value="top">Superior</option>
                                             </select>
                                         </div>
-                                        <div className="space-y-2 flex flex-col flex-grow">
-                                            <label htmlFor="negativeEndingDescription" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Mensagem de Derrota</label>
-                                            <textarea
-                                                id="negativeEndingDescription"
-                                                value={localNegativeEndingDescription}
-                                                onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
-                                                className="w-full flex-grow bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-xs text-zinc-300 focus:ring-0 focus:border-purple-500/50 transition-all min-h-[160px] resize-none leading-relaxed placeholder:text-zinc-800"
-                                                placeholder="Fim de jogo."
-                                            />
-                                        </div>
                                     </div>
-                                    <div className="space-y-8 col-span-2">
-                                        <div className="space-y-4">
-                                            <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Imagem de Derrota</h4>
-                                            <div className="relative w-full h-[225px]">
-                                                {localNegativeEndingImage ? (
-                                                    <div className="absolute inset-0 w-full h-full border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 group shadow-2xl">
-                                                        <img src={localNegativeEndingImage} alt="Final Negativo" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-40" />
-                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-3 bg-zinc-950/40 backdrop-blur-sm">
-                                                            <label className="p-3 bg-white text-zinc-950 rounded-lg cursor-pointer hover:bg-zinc-200 transition-all shadow-xl">
-                                                                <Upload className="w-5 h-5" />
-                                                                <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
-                                                            </label>
-                                                            <button onClick={() => setLocalNegativeEndingImage('')} className="p-3 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition-all shadow-xl">
-                                                                <Trash2 className="w-5 h-5" />
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 bg-zinc-900/30 rounded-xl cursor-pointer hover:bg-zinc-800/50 transition-all group overflow-hidden">
-                                                        <Upload className="w-10 h-10 text-muted-foreground mb-4 transition-colors group-hover:text-purple-400" />
-                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground">Carregar Imagem</span>
-                                                        <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
-                                                    </label>
-                                                )}
+
+                                    <div className="flex items-center">
+                                        <label className="flex items-center gap-3 cursor-pointer group select-none">
+                                            <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${localOmitSplashTitle ? 'bg-purple-500 border-purple-500' : 'bg-transparent border-input group-hover:border-purple-500/50'}`}>
+                                                {localOmitSplashTitle && <Check size={12} className="text-white bg-transparent" />}
                                             </div>
-                                        </div>
-                                        <div className="space-y-4 pt-6 border-t border-zinc-800/50">
-                                            <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Trilha de Derrota</h4>
-                                            <div className="flex items-center gap-3">
-                                                <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
-                                                    <Upload className="w-4 h-4 mr-2 text-purple-400" /> {localNegativeEndingMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
-                                                    <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalNegativeEndingMusic)} className="hidden" />
-                                                </label>
-                                                {localNegativeEndingMusic && (
-                                                    <button onClick={() => setLocalNegativeEndingMusic('')} className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-border hover:bg-red-500 hover:text-white transition-all shadow-lg">
-                                                        <Trash2 className="w-5 h-5" />
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
+                                            <input type="checkbox" checked={localOmitSplashTitle} onChange={() => setLocalOmitSplashTitle(!localOmitSplashTitle)} className="hidden" />
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground transition-colors">Ocultar título e descrição</span>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    )}
-                    {activeTab === 'textos' && (
-                        <div className="space-y-6">
-                            <div>
-                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Textos da Interface</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                                    <div className="space-y-2">
-                                        <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Ação</label>
-                                        <input type="text" id="actionButtonText" value={localActionButtonText} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Campo de Comando</label>
-                                        <input type="text" id="verbInputPlaceholder" value={localVerbInputPlaceholder} onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="viewEndingButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão "Ver Final"</label>
-                                        <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText} onChange={(e) => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg placeholder:text-muted-foreground" placeholder="Ver Final" />
-                                        <p className="text-[10px] text-muted-foreground mt-2 italic">Aparece quando o jogo termina, para levar às telas de final.</p>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Nome do Jogador no Diário</label>
-                                        <input type="text" id="diaryPlayerName" value={localDiaryPlayerName} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="splashButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Início</label>
-                                        <input type="text" id="splashButtonText" value={localSplashButtonText} onChange={(e) => setLocalSplashButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="INICIAR" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="continueButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Continuar</label>
-                                        <input type="text" id="continueButtonText" value={localContinueButtonText} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Continuar Aventura" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Reiniciar</label>
-                                        <input type="text" id="restartButtonText" value={localRestartButtonText} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Reiniciar Aventura" />
-                                    </div>
-                                </div>
-                            </div>
 
-                            <div className="pt-6 border-t border-border/50">
-                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Botões de Navegação</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                                    <div className="space-y-2">
-                                        <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Sugestões</label>
-                                        <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Inventário</label>
-                                        <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Diário</label>
-                                        <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="trackersButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Rastreadores</label>
-                                        <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed" placeholder="Rastreadores" disabled={localGameSystemEnabled !== 'trackers'} />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="systemButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Sistema</label>
-                                        <input type="text" id="systemButtonText" value={localSystemButtonText} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Sistema" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Principal</label>
-                                        <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Menu Principal" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="pt-6 border-t border-border/50">
-                                <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Menu de Sistema</h3>
-                                    <div className="flex items-center gap-3 px-4 py-2 bg-card border border-border rounded-xl group cursor-pointer" onClick={() => setLocalGameShowSystemButton(!localGameShowSystemButton)}>
-                                        <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${localGameShowSystemButton ? 'bg-purple-500 border-purple-500' : 'bg-input border-input group-hover:border-primary/50'}`}>
-                                            {localGameShowSystemButton && <Check className="w-3 h-3 text-white" />}
-                                        </div>
-                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground select-none">Mostrar Menu de Sistema</span>
-                                    </div>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                                    <div className="space-y-2">
-                                        <label htmlFor="saveMenuTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Título Tela Salvar</label>
-                                        <input type="text" id="saveMenuTitle" value={localSaveMenuTitle} onChange={e => setLocalSaveMenuTitle(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Salvar Jogo" />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="loadMenuTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Título Tela Carregar</label>
-                                        <input type="text" id="loadMenuTitle" value={localLoadMenuTitle} onChange={e => setLocalLoadMenuTitle(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Carregar Jogo" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-[10px] font-bold text-foreground mb-4 uppercase tracking-widest">Efeitos de Texto</h3>
-                                {/* Unsaved Changes Notification - Matching SceneEditor */}
-                                {isDirty && (
-                                    <div className="flex items-center gap-2 text-purple-400 text-[10px] font-bold animate-pulse bg-purple-500/5 px-2 py-1 rounded-md border border-purple-500/10">
-                                        <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                                        <span>ALTERAÇÕES NÃO SALVAS</span>
-                                    </div>
-                                )}
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                                <div className="space-y-2">
-                                    <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Estilo de Animação</label>
-                                    <select
-                                        id="textAnimationType"
-                                        value={localTextAnimationType}
-                                        onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
-                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg"
-                                    >
-                                        <option value="fade">Esmaecer (Fade In)</option>
-                                        <option value="typewriter">Máquina de Escrever (Letra a letra)</option>
-                                    </select>
-                                </div>
-                                <div className="space-y-2">
-                                    <label htmlFor="textSpeed" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Velocidade da Animação</label>
-                                    <div className="flex items-center gap-6 px-2">
-                                        <input
-                                            type="range"
-                                            id="textSpeed"
-                                            min="1"
-                                            max="5"
-                                            value={localTextSpeed}
-                                            onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
-                                            className="flex-grow h-1.5 bg-input rounded-lg appearance-none cursor-pointer accent-purple-500"
-                                        />
-                                        <div className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center font-mono text-xs font-bold text-purple-400 shadow-inner">
-                                            {localTextSpeed}
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-between text-[9px] text-muted-foreground font-bold uppercase tracking-tighter px-2">
-                                        <span>Lento</span>
-                                        <span>Rápido</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
                     )}
 
-                    {activeTab === 'cores' && (
-                        <div className="space-y-6">
-                            <div>
-                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Temas Predefinidos</h3>
-                                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                    {[
-                                        { id: 'dark', name: 'GitHub Dark', primary: '#30363d', accent: '#58a6ff' },
-                                        { id: 'light', name: 'GitHub Light', primary: '#ffffff', accent: '#0969da' },
-                                        { id: 'zinc', name: 'Zinc & Purple', primary: '#09090b', accent: '#a855f7' },
-                                        { id: 'slate', name: 'Slate & Blue', primary: '#0f172a', accent: '#3b82f6' }
-                                    ].map(theme => (
-                                        <button
-                                            key={theme.id}
-                                            onClick={() => setLocalGameTheme(theme.id as 'dark' | 'light')}
-                                            className={`group relative p-4 rounded-xl border-2 transition-all ${localGameTheme === theme.id ? 'border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.2)]' : 'border-border hover:border-primary/50'}`}
-                                        >
-                                            <div className="flex flex-col gap-2">
-                                                <div className="flex gap-1">
-                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.primary }} />
-                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.accent }} />
-                                                </div>
-                                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter group-hover:text-foreground">{theme.name}</span>
-                                            </div>
-                                            {localGameTheme === theme.id && (
-                                                <div className="absolute -top-2 -right-2 bg-purple-500 text-white p-1 rounded-full shadow-lg">
-                                                    <Check className="w-3 h-3" />
-                                                </div>
-                                            )}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="pt-6 border-t border-border/50">
-                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Cores do Sistema</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                                    <ColorInput label="Título do Jogo" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#FFFFFF" />
-                                    <ColorInput label="Texto Geral" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
-                                    <ColorInput label="Destaque / Foco" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#FFFFFF" />
-                                    <ColorInput label="Seta de Indicação" id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
-                                </div>
-                            </div>
-
-                            <div className="pt-6 border-t border-border/50">
-                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Cores dos Botões</h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                                    <ColorInput label="Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
-                                    <ColorInput label="Texto do Botão Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
-                                    <ColorInput label="Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
-                                    <ColorInput label="Texto do Botão Ação" id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {activeTab === 'verbos' && (
-                        <div className="space-y-8">
-                            <div className="bg-purple-500/5 border border-purple-500/10 p-6 rounded-2xl flex items-start gap-4">
-                                <TriangleAlert className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" />
-                                <div className="space-y-2">
-                                    <h4 className="text-sm font-bold text-foreground uppercase tracking-widest">Informação de Verbos</h4>
-                                    <p className="text-xs text-muted-foreground leading-relaxed">
-                                        Os verbos <strong className="text-foreground">olhar</strong> e <strong className="text-foreground">examinar</strong> são ações fundamentais e já estão integradas por padrão. Adicione aqui apenas verbos específicos que devem estar disponíveis globalmente em toda a aventura.
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div className="space-y-4">
-                                {localFixedVerbs.map((verb) => (
-                                    <FixedVerbItem
-                                        key={verb.id}
-                                        verb={verb}
-                                        onUpdate={handleFixedVerbChange}
-                                        onRemove={handleRemoveFixedVerb}
-                                    />
-                                ))}
-
-                                {localFixedVerbs.length === 0 && (
-                                    <div className="text-center py-12 border-2 border-dashed border-border rounded-2xl bg-muted/30">
-                                        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Nenhum verbo global definido</p>
-                                    </div>
-                                )}
-
-                                <div className="flex justify-center mt-8">
-                                    <button
-                                        onClick={handleAddFixedVerb}
-                                        className="flex items-center px-6 py-3 bg-muted text-foreground font-bold rounded-xl hover:bg-muted/80 transition-all active:scale-95 shadow-xl text-xs uppercase tracking-widest"
-                                    >
-                                        <Plus className="w-4 h-4 mr-2" /> Adicionar Novo Verbo Global
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-
-
-                    {activeTab === 'cores' && (
-                        <div className="hidden xl:block h-fit sticky top-8">
+                    {
+                        activeTab === 'fim_de_jogo' && (
                             <div className="space-y-6">
-                                <div className="flex items-center justify-between px-2">
-                                    <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Prévia em Tempo Real</h3>
-                                    <div className="flex gap-1.5">
-                                        <div className="w-2 h-2 rounded-full bg-red-500/50" />
-                                        <div className="w-2 h-2 rounded-full bg-yellow-500/50" />
-                                        <div className="w-2 h-2 rounded-full bg-green-500/50" />
-                                    </div>
-                                </div>
-
-                                <div
-                                    className={`w-full aspect-video rounded-2xl overflow-hidden border-4 shadow-2xl transition-all ${localGameTheme === 'dark' ? 'bg-background border-border' : 'bg-white border-zinc-100'}`}
-                                    style={{ fontFamily: localFontFamily, fontSize: `${localGameFontSize}px` }}
-                                >
-                                    <div className="h-full flex flex-col p-6 space-y-4">
-                                        <div className="flex-grow flex gap-6">
-                                            {/* Image Placeholder */}
-                                            <div
-                                                className="w-1/3 rounded-xl border-border border flex items-center justify-center relative overflow-hidden bg-muted/50"
-                                                style={getFramePreviewStyles(localImageFrame).containerStyles}
-                                            >
-                                                <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                                                    <ImageIcon className="w-10 h-10" />
-                                                </div>
-                                                <div className="relative text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem</div>
+                                <div>
+                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Final Positivo</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
+                                        <div className="space-y-8 flex flex-col h-full col-span-1">
+                                            <div className="space-y-2">
+                                                <label htmlFor="posEndingContent" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
+                                                <select
+                                                    id="posEndingContent"
+                                                    value={localPositiveEndingContentAlignment}
+                                                    onChange={(e) => setLocalPositiveEndingContentAlignment(e.target.value as 'left' | 'right')}
+                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all [&>option]:bg-input shadow-lg"
+                                                >
+                                                    <option value="right">Direita</option>
+                                                    <option value="left">Esquerda</option>
+                                                </select>
                                             </div>
-
-                                            {/* Text Preview */}
-                                            <div className="flex-1 space-y-3">
-                                                <div className="h-4 w-2/3 bg-muted/50 rounded-full animate-pulse" style={{ backgroundColor: localTitleColor }} />
-                                                <div className="space-y-2">
-                                                    <div className="h-2 w-full bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
-                                                    <div className="h-2 w-full bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
-                                                    <div className="h-2 w-4/5 bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
+                                            <div className="space-y-2 flex flex-col flex-grow">
+                                                <label htmlFor="positiveEndingDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Mensagem de Vitória</label>
+                                                <textarea
+                                                    id="positiveEndingDescription"
+                                                    value={localPositiveEndingDescription}
+                                                    onChange={(e) => setLocalPositiveEndingDescription(e.target.value)}
+                                                    className="w-full flex-grow bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all min-h-[160px] resize-none leading-relaxed placeholder:text-muted-foreground"
+                                                    placeholder="Parabéns! Você venceu."
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-8 col-span-2">
+                                            <div className="space-y-4">
+                                                <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem de Vitória</h4>
+                                                <div className="relative w-full h-[225px]">
+                                                    {localPositiveEndingImage ? (
+                                                        <div className="absolute inset-0 w-full h-full border border-border rounded-xl overflow-hidden bg-card group shadow-2xl">
+                                                            <img src={localPositiveEndingImage} alt="Final Positivo" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-40" />
+                                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-3 bg-black/40 backdrop-blur-sm">
+                                                                <label className="p-3 bg-secondary text-secondary-foreground rounded-lg cursor-pointer hover:bg-secondary/80 transition-all shadow-xl">
+                                                                    <Upload className="w-5 h-5" />
+                                                                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
+                                                                </label>
+                                                                <button onClick={() => setLocalPositiveEndingImage('')} className="p-3 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition-all shadow-xl">
+                                                                    <Trash2 className="w-5 h-5" />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-border bg-muted/30 rounded-xl cursor-pointer hover:bg-muted/50 transition-all group overflow-hidden">
+                                                            <Upload className="w-10 h-10 text-muted-foreground mb-4 transition-colors group-hover:text-purple-400" />
+                                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground">Carregar Imagem</span>
+                                                            <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
+                                                        </label>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="space-y-4 pt-6 border-t border-zinc-800/50">
+                                                <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha de Vitória</h4>
+                                                <div className="flex items-center gap-3">
+                                                    <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
+                                                        <Upload className="w-4 h-4 mr-2 text-purple-400" /> {localPositiveEndingMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
+                                                        <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalPositiveEndingMusic)} className="hidden" />
+                                                    </label>
+                                                    {localPositiveEndingMusic && (
+                                                        <button onClick={() => setLocalPositiveEndingMusic('')} className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-border hover:bg-red-500 hover:text-white transition-all shadow-lg">
+                                                            <Trash2 className="w-5 h-5" />
+                                                        </button>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
 
-                                        {/* Input Preview */}
-                                        <div className="pt-4 border-t border-border flex gap-3">
-                                            <div className="flex-1 h-10 rounded-lg border-2 border-border bg-muted/50 flex items-center px-4">
-                                                <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{localVerbInputPlaceholder || 'Comando...'}</span>
+                                <div className="pt-6 border-t border-zinc-800/50">
+                                    <h3 className="text-xs font-bold text-zinc-100 mb-4 uppercase tracking-widest">Final Negativo</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
+                                        <div className="space-y-8 flex flex-col h-full col-span-1">
+                                            <div className="space-y-2">
+                                                <label htmlFor="negEndingContent" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
+                                                <select
+                                                    id="negEndingContent"
+                                                    value={localNegativeEndingContentAlignment}
+                                                    onChange={(e) => setLocalNegativeEndingContentAlignment(e.target.value as 'left' | 'right')}
+                                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all [&>option]:bg-zinc-950 shadow-lg"
+                                                >
+                                                    <option value="right">Direita</option>
+                                                    <option value="left">Esquerda</option>
+                                                </select>
                                             </div>
-                                            <div className="px-6 rounded-lg font-bold text-[10px] uppercase tracking-widest flex items-center shadow-lg" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor }}>
-                                                {localActionButtonText || 'Ação'}
+                                            <div className="space-y-2 flex flex-col flex-grow">
+                                                <label htmlFor="negativeEndingDescription" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Mensagem de Derrota</label>
+                                                <textarea
+                                                    id="negativeEndingDescription"
+                                                    value={localNegativeEndingDescription}
+                                                    onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
+                                                    className="w-full flex-grow bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-xs text-zinc-300 focus:ring-0 focus:border-purple-500/50 transition-all min-h-[160px] resize-none leading-relaxed placeholder:text-zinc-800"
+                                                    placeholder="Fim de jogo."
+                                                />
+                                            </div>
+                                        </div>
+                                        <div className="space-y-8 col-span-2">
+                                            <div className="space-y-4">
+                                                <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Imagem de Derrota</h4>
+                                                <div className="relative w-full h-[225px]">
+                                                    {localNegativeEndingImage ? (
+                                                        <div className="absolute inset-0 w-full h-full border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 group shadow-2xl">
+                                                            <img src={localNegativeEndingImage} alt="Final Negativo" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-40" />
+                                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-3 bg-zinc-950/40 backdrop-blur-sm">
+                                                                <label className="p-3 bg-white text-zinc-950 rounded-lg cursor-pointer hover:bg-zinc-200 transition-all shadow-xl">
+                                                                    <Upload className="w-5 h-5" />
+                                                                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
+                                                                </label>
+                                                                <button onClick={() => setLocalNegativeEndingImage('')} className="p-3 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition-all shadow-xl">
+                                                                    <Trash2 className="w-5 h-5" />
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 bg-zinc-900/30 rounded-xl cursor-pointer hover:bg-zinc-800/50 transition-all group overflow-hidden">
+                                                            <Upload className="w-10 h-10 text-muted-foreground mb-4 transition-colors group-hover:text-purple-400" />
+                                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground">Carregar Imagem</span>
+                                                            <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
+                                                        </label>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <div className="space-y-4 pt-6 border-t border-zinc-800/50">
+                                                <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Trilha de Derrota</h4>
+                                                <div className="flex items-center gap-3">
+                                                    <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
+                                                        <Upload className="w-4 h-4 mr-2 text-purple-400" /> {localNegativeEndingMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
+                                                        <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalNegativeEndingMusic)} className="hidden" />
+                                                    </label>
+                                                    {localNegativeEndingMusic && (
+                                                        <button onClick={() => setLocalNegativeEndingMusic('')} className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-border hover:bg-red-500 hover:text-white transition-all shadow-lg">
+                                                            <Trash2 className="w-5 h-5" />
+                                                        </button>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <p className="text-[10px] text-muted-foreground italic text-center font-bold uppercase tracking-tighter">Esquema visual básico do estilo selecionado</p>
                             </div>
-                        </div>
-                    )}
+                        )
+                    }
+                    {
+                        activeTab === 'textos' && (
+                            <div className="space-y-6">
+                                <div>
+                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Textos da Interface</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                        <div className="space-y-2">
+                                            <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Ação</label>
+                                            <input type="text" id="actionButtonText" value={localActionButtonText} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Campo de Comando</label>
+                                            <input type="text" id="verbInputPlaceholder" value={localVerbInputPlaceholder} onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="viewEndingButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão "Ver Final"</label>
+                                            <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText} onChange={(e) => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg placeholder:text-muted-foreground" placeholder="Ver Final" />
+                                            <p className="text-[10px] text-muted-foreground mt-2 italic">Aparece quando o jogo termina, para levar às telas de final.</p>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Nome do Jogador no Diário</label>
+                                            <input type="text" id="diaryPlayerName" value={localDiaryPlayerName} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="splashButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Início</label>
+                                            <input type="text" id="splashButtonText" value={localSplashButtonText} onChange={(e) => setLocalSplashButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="INICIAR" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="continueButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Continuar</label>
+                                            <input type="text" id="continueButtonText" value={localContinueButtonText} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Continuar Aventura" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Reiniciar</label>
+                                            <input type="text" id="restartButtonText" value={localRestartButtonText} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Reiniciar Aventura" />
+                                        </div>
+                                    </div>
+                                </div>
 
-                </div>
-            </div>
+                                <div className="pt-6 border-t border-border/50">
+                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Botões de Navegação</h3>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                        <div className="space-y-2">
+                                            <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Sugestões</label>
+                                            <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Inventário</label>
+                                            <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Diário</label>
+                                            <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="trackersButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Rastreadores</label>
+                                            <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed" placeholder="Rastreadores" disabled={localGameSystemEnabled !== 'trackers'} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="systemButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Sistema</label>
+                                            <input type="text" id="systemButtonText" value={localSystemButtonText} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Sistema" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Principal</label>
+                                            <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Menu Principal" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-border/50">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Menu de Sistema</h3>
+                                        <div className="flex items-center gap-3 px-4 py-2 bg-card border border-border rounded-xl group cursor-pointer" onClick={() => setLocalGameShowSystemButton(!localGameShowSystemButton)}>
+                                            <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${localGameShowSystemButton ? 'bg-purple-500 border-purple-500' : 'bg-input border-input group-hover:border-primary/50'}`}>
+                                                {localGameShowSystemButton && <Check className="w-3 h-3 text-white" />}
+                                            </div>
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground select-none">Mostrar Menu de Sistema</span>
+                                        </div>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                        <div className="space-y-2">
+                                            <label htmlFor="saveMenuTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Título Tela Salvar</label>
+                                            <input type="text" id="saveMenuTitle" value={localSaveMenuTitle} onChange={e => setLocalSaveMenuTitle(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Salvar Jogo" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="loadMenuTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Título Tela Carregar</label>
+                                            <input type="text" id="loadMenuTitle" value={localLoadMenuTitle} onChange={e => setLocalLoadMenuTitle(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Carregar Jogo" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <h3 className="text-[10px] font-bold text-foreground mb-4 uppercase tracking-widest">Efeitos de Texto</h3>
+                                    {/* Unsaved Changes Notification - Matching SceneEditor */}
+                                    {isDirty && (
+                                        <div className="flex items-center gap-2 text-purple-400 text-[10px] font-bold animate-pulse bg-purple-500/5 px-2 py-1 rounded-md border border-purple-500/10">
+                                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                                            <span>ALTERAÇÕES NÃO SALVAS</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
+                                    <div className="space-y-2">
+                                        <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Estilo de Animação</label>
+                                        <select
+                                            id="textAnimationType"
+                                            value={localTextAnimationType}
+                                            onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
+                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg"
+                                        >
+                                            <option value="fade">Esmaecer (Fade In)</option>
+                                            <option value="typewriter">Máquina de Escrever (Letra a letra)</option>
+                                        </select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <label htmlFor="textSpeed" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Velocidade da Animação</label>
+                                        <div className="flex items-center gap-6 px-2">
+                                            <input
+                                                type="range"
+                                                id="textSpeed"
+                                                min="1"
+                                                max="5"
+                                                value={localTextSpeed}
+                                                onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
+                                                className="flex-grow h-1.5 bg-input rounded-lg appearance-none cursor-pointer accent-purple-500"
+                                            />
+                                            <div className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center font-mono text-xs font-bold text-purple-400 shadow-inner">
+                                                {localTextSpeed}
+                                            </div>
+                                        </div>
+                                        <div className="flex justify-between text-[9px] text-muted-foreground font-bold uppercase tracking-tighter px-2">
+                                            <span>Lento</span>
+                                            <span>Rápido</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    }
+
+                    {
+                        activeTab === 'cores' && (
+                            <div className="space-y-6">
+                                <div>
+                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Temas Predefinidos</h3>
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                        {[
+                                            { id: 'dark', name: 'GitHub Dark', primary: '#30363d', accent: '#58a6ff' },
+                                            { id: 'light', name: 'GitHub Light', primary: '#ffffff', accent: '#0969da' },
+                                            { id: 'zinc', name: 'Zinc & Purple', primary: '#09090b', accent: '#a855f7' },
+                                            { id: 'slate', name: 'Slate & Blue', primary: '#0f172a', accent: '#3b82f6' }
+                                        ].map(theme => (
+                                            <button
+                                                key={theme.id}
+                                                onClick={() => setLocalGameTheme(theme.id as 'dark' | 'light')}
+                                                className={`group relative p-4 rounded-xl border-2 transition-all ${localGameTheme === theme.id ? 'border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.2)]' : 'border-border hover:border-primary/50'}`}
+                                            >
+                                                <div className="flex flex-col gap-2">
+                                                    <div className="flex gap-1">
+                                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.primary }} />
+                                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.accent }} />
+                                                    </div>
+                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter group-hover:text-foreground">{theme.name}</span>
+                                                </div>
+                                                {localGameTheme === theme.id && (
+                                                    <div className="absolute -top-2 -right-2 bg-purple-500 text-white p-1 rounded-full shadow-lg">
+                                                        <Check className="w-3 h-3" />
+                                                    </div>
+                                                )}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-border/50">
+                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Cores do Sistema</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                                        <ColorInput label="Título do Jogo" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#FFFFFF" />
+                                        <ColorInput label="Texto Geral" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
+                                        <ColorInput label="Destaque / Foco" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#FFFFFF" />
+                                        <ColorInput label="Seta de Indicação" id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-border/50">
+                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Cores dos Botões</h3>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+                                        <ColorInput label="Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
+                                        <ColorInput label="Texto do Botão Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
+                                        <ColorInput label="Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
+                                        <ColorInput label="Texto do Botão Ação" id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    }
+
+                    {
+                        activeTab === 'verbos' && (
+                            <div className="space-y-8">
+                                <div className="bg-purple-500/5 border border-purple-500/10 p-6 rounded-2xl flex items-start gap-4">
+                                    <TriangleAlert className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" />
+                                    <div className="space-y-2">
+                                        <h4 className="text-sm font-bold text-foreground uppercase tracking-widest">Informação de Verbos</h4>
+                                        <p className="text-xs text-muted-foreground leading-relaxed">
+                                            Os verbos <strong className="text-foreground">olhar</strong> e <strong className="text-foreground">examinar</strong> são ações fundamentais e já estão integradas por padrão. Adicione aqui apenas verbos específicos que devem estar disponíveis globalmente em toda a aventura.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {localFixedVerbs.map((verb) => (
+                                        <FixedVerbItem
+                                            key={verb.id}
+                                            verb={verb}
+                                            onUpdate={handleFixedVerbChange}
+                                            onRemove={handleRemoveFixedVerb}
+                                        />
+                                    ))}
+
+                                    {localFixedVerbs.length === 0 && (
+                                        <div className="text-center py-12 border-2 border-dashed border-border rounded-2xl bg-muted/30">
+                                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Nenhum verbo global definido</p>
+                                        </div>
+                                    )}
+
+                                    <div className="flex justify-center mt-8">
+                                        <button
+                                            onClick={handleAddFixedVerb}
+                                            className="flex items-center px-6 py-3 bg-muted text-foreground font-bold rounded-xl hover:bg-muted/80 transition-all active:scale-95 shadow-xl text-xs uppercase tracking-widest"
+                                        >
+                                            <Plus className="w-4 h-4 mr-2" /> Adicionar Novo Verbo Global
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    }
+
+
+
+                    {
+                        activeTab === 'cores' && (
+                            <div className="hidden xl:block h-fit sticky top-8">
+                                <div className="space-y-6">
+                                    <div className="flex items-center justify-between px-2">
+                                        <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Prévia em Tempo Real</h3>
+                                        <div className="flex gap-1.5">
+                                            <div className="w-2 h-2 rounded-full bg-red-500/50" />
+                                            <div className="w-2 h-2 rounded-full bg-yellow-500/50" />
+                                            <div className="w-2 h-2 rounded-full bg-green-500/50" />
+                                        </div>
+                                    </div>
+
+                                    <div
+                                        className={`w-full aspect-video rounded-2xl overflow-hidden border-4 shadow-2xl transition-all ${localGameTheme === 'dark' ? 'bg-background border-border' : 'bg-white border-zinc-100'}`}
+                                        style={{ fontFamily: localFontFamily, fontSize: `${localGameFontSize}px` }}
+                                    >
+                                        <div className="h-full flex flex-col p-6 space-y-4">
+                                            <div className="flex-grow flex gap-6">
+                                                {/* Image Placeholder */}
+                                                <div
+                                                    className="w-1/3 rounded-xl border-border border flex items-center justify-center relative overflow-hidden bg-muted/50"
+                                                    style={getFramePreviewStyles(localImageFrame).containerStyles}
+                                                >
+                                                    <div className="absolute inset-0 flex items-center justify-center opacity-20">
+                                                        <ImageIcon className="w-10 h-10" />
+                                                    </div>
+                                                    <div className="relative text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem</div>
+                                                </div>
+
+                                                {/* Text Preview */}
+                                                <div className="flex-1 space-y-3">
+                                                    <div className="h-4 w-2/3 bg-muted/50 rounded-full animate-pulse" style={{ backgroundColor: localTitleColor }} />
+                                                    <div className="space-y-2">
+                                                        <div className="h-2 w-full bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
+                                                        <div className="h-2 w-full bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
+                                                        <div className="h-2 w-4/5 bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {/* Input Preview */}
+                                            <div className="pt-4 border-t border-border flex gap-3">
+                                                <div className="flex-1 h-10 rounded-lg border-2 border-border bg-muted/50 flex items-center px-4">
+                                                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{localVerbInputPlaceholder || 'Comando...'}</span>
+                                                </div>
+                                                <div className="px-6 rounded-lg font-bold text-[10px] uppercase tracking-widest flex items-center shadow-lg" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor }}>
+                                                    {localActionButtonText || 'Ação'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <p className="text-[10px] text-muted-foreground italic text-center font-bold uppercase tracking-tighter">Esquema visual básico do estilo selecionado</p>
+                                </div>
+                            </div>
+                        )
+                    }
+
+                </div >
+            </div >
 
             {/* Fixed Action Footer to match SceneEditor */}
-            <div className="fixed bottom-6 right-10 z-50 flex gap-2">
+            < div className="fixed bottom-6 right-10 z-50 flex gap-2" >
                 <button
                     onClick={handleUndo}
                     disabled={!isDirty}
@@ -1623,7 +1716,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 >
                     Salvar
                 </button>
-            </div>
+            </div >
         </div >
     );
 };

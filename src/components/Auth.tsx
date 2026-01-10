@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, User, MapPin, Eye, EyeOff, Gamepad2 } from 'lucide-react';
+import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, User, MapPin, Eye, EyeOff, Ticket, ArrowLeft } from 'lucide-react';
 import { DitherShader } from '@/components/ui/dither-shader';
 
 export function Auth() {
     const [loading, setLoading] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false);
+
+    // Step State for Sign Up: 1 = Invite Code, 2 = Details
+    const [signUpStep, setSignUpStep] = useState(1);
+    const [inviteCode, setInviteCode] = useState('');
 
     // Form States
     const [email, setEmail] = useState('');
@@ -28,6 +32,22 @@ export function Auth() {
 
         try {
             if (isSignUp) {
+                if (signUpStep === 1) {
+                    // Verify Invite Code
+                    if (!inviteCode.trim()) throw new Error("Insira um código de convite.");
+
+                    const { data: isValid, error: rpcError } = await supabase.rpc('check_invite', { code_input: inviteCode });
+
+                    if (rpcError) throw rpcError;
+                    if (!isValid) throw new Error("Código inválido ou expirado.");
+
+                    // Determine username automatically or proceed
+                    setSignUpStep(2);
+                    setLoading(false);
+                    return; // Stop here, UI updates to step 2
+                }
+
+                // Step 2: Final Registration
                 // Validation
                 if (password !== confirmPassword) {
                     throw new Error("As senhas não coincidem.");
@@ -39,7 +59,8 @@ export function Auth() {
                     throw new Error("Por favor, insira seu nome e sobrenome.");
                 }
 
-                // Sign Up
+                // Sign Up via Supabase Auth
+                // Metadata will trigger the handle_new_user function which consumes the invite
                 const { error } = await supabase.auth.signUp({
                     email,
                     password,
@@ -47,10 +68,12 @@ export function Auth() {
                         data: {
                             full_name: fullName,
                             location: location,
-                            username: email.split('@')[0] // Default username
+                            username: email.split('@')[0], // Default username
+                            invite_code: inviteCode // CRITICAL: This allows the trigger to validate & consume
                         }
                     }
                 });
+
                 if (error) throw error;
                 setMessage('Conta criada com sucesso! Verifique seu e-mail para confirmar.');
             } else {
@@ -67,8 +90,21 @@ export function Auth() {
             if (msg === 'User already registered') msg = 'Este usuário já está cadastrado.';
             setError(msg || 'Ocorreu um erro na autenticação.');
         } finally {
-            setLoading(false);
+            // Only stop loading if we are NOT moving to step 2 (handled above)
+            // or if we finished/errored
+            if (isSignUp && signUpStep === 1 && !error) {
+                // logic handled inside try block for step transition
+            } else {
+                setLoading(false);
+            }
         }
+    };
+
+    const toggleMode = () => {
+        setIsSignUp(!isSignUp);
+        setSignUpStep(1); // Reset to step 1
+        setError(null);
+        setMessage(null);
     };
 
     return (
@@ -91,7 +127,7 @@ export function Auth() {
                 />
             </div>
 
-            <div className={`w-full ${isSignUp ? 'max-w-4xl' : 'max-w-md'} bg-zinc-900/50 border border-zinc-800 backdrop-blur-xl relative z-10 overflow-hidden rounded-2xl shadow-2xl transition-all duration-500`}>
+            <div className={`w-full ${isSignUp && signUpStep === 2 ? 'max-w-4xl' : 'max-w-md'} bg-zinc-900/50 border border-zinc-800 backdrop-blur-xl relative z-10 overflow-hidden rounded-2xl shadow-2xl`}>
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-50" />
 
                 <div className="p-8 space-y-6">
@@ -102,216 +138,263 @@ export function Auth() {
                         </h1>
                         <p className="text-zinc-400 text-sm">
                             {isSignUp
-                                ? 'Junte-se à aventura e comece a criar suas histórias hoje mesmo.'
+                                ? (signUpStep === 1 ? 'Insira o código de 6 dígitos para avançar.' : 'Preencha seus dados para finalizar.')
                                 : <>Você acorda em uma caverna escura.<br />Um computador espera seu login e senha.</>}
                         </p>
                     </div>
 
-                    <form onSubmit={handleAuth} className={isSignUp ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "space-y-4"}>
-                        {/* Left Column / Main Fields */}
-                        <div className="space-y-4">
-                            {isSignUp && (
-                                <>
+                    <form onSubmit={handleAuth} className={isSignUp && signUpStep === 2 ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "space-y-4"}>
+
+                        {/* INVITE CODE STEP (Sign Up Step 1) */}
+                        {isSignUp && signUpStep === 1 && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
+                                <div className="space-y-4">
+                                    <div className="relative group">
+                                        <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                            <Ticket className="h-6 w-6 text-purple-500 group-focus-within:text-purple-400 transition-colors" />
+                                        </div>
+                                        <input
+                                            type="text"
+                                            maxLength={6}
+                                            placeholder="XXXXXX"
+                                            value={inviteCode}
+                                            onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                                            className="w-full pl-12 pr-4 py-4 bg-zinc-950/50 border border-purple-500/30 rounded-xl text-white placeholder:text-zinc-700 focus:outline-none focus:ring-2 focus:ring-purple-500/50 focus:border-purple-500 transition-all text-2xl font-mono tracking-[0.5em] text-center uppercase shadow-[0_0_30px_rgba(168,85,247,0.1)]"
+                                            required
+                                            autoFocus
+                                        />
+                                    </div>
+                                </div>
+
+                                <button
+                                    type="submit"
+                                    className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-xl transition-all flex items-center justify-center gap-2 group font-semibold text-base shadow-xl shadow-white/5"
+                                    disabled={loading}
+                                >
+                                    {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <>Validar Código <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" /></>}
+                                </button>
+                            </div>
+                        )}
+
+                        {/* REGISTRATION FORM (Sign Up Step 2) or LOGIN */}
+                        {((isSignUp && signUpStep === 2) || !isSignUp) && (
+                            <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                                <div className={isSignUp && signUpStep === 2 ? "grid grid-cols-1 md:grid-cols-2 gap-6" : "space-y-4"}>
+                                    {isSignUp && (
+                                        <>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Nome e Sobrenome</label>
+                                                <div className="relative">
+                                                    <User className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Ex: João Silva"
+                                                        value={fullName}
+                                                        onChange={(e) => setFullName(e.target.value)}
+                                                        className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                        required
+                                                    />
+                                                </div>
+                                            </div>
+                                        </>
+                                    )}
+
                                     <div className="space-y-2">
-                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Nome e Sobrenome</label>
+                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">E-mail</label>
                                         <div className="relative">
-                                            <User className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                            <Mail className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                                             <input
-                                                type="text"
-                                                placeholder="Ex: João Silva"
-                                                value={fullName}
-                                                onChange={(e) => setFullName(e.target.value)}
+                                                type="email"
+                                                placeholder="seu@email.com"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
                                                 className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
                                                 required
                                             />
                                         </div>
                                     </div>
-                                </>
-                            )}
 
-
-                            <div className="space-y-2">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">E-mail</label>
-                                <div className="relative">
-                                    <Mail className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                    <input
-                                        type="email"
-                                        placeholder="seu@email.com"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            {isSignUp && (
-                                <div className="space-y-2">
-                                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Local (Opcional)</label>
-                                    <div className="relative">
-                                        <MapPin className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                        <input
-                                            type="text"
-                                            placeholder="Ex: São Paulo, SP"
-                                            value={location}
-                                            onChange={(e) => setLocation(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                        />
-                                    </div>
-                                </div>
-                            )}
-
-                            {!isSignUp && (
-                                <div className="space-y-2">
-                                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Senha</label>
-                                    <div className="relative">
-                                        <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            placeholder="Sua senha"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
-                                        >
-                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Right Column / Security Fields & Actions */}
-                        <div className="space-y-4">
-                            {isSignUp && (
-                                <>
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Senha</label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                            <input
-                                                type={showPassword ? "text" : "password"}
-                                                placeholder="Mínimo de 6 caracteres"
-                                                value={password}
-                                                onChange={(e) => setPassword(e.target.value)}
-                                                className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                                required
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowPassword(!showPassword)}
-                                                className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
-                                            >
-                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                            </button>
+                                    {isSignUp && (
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Local (Opcional)</label>
+                                            <div className="relative">
+                                                <MapPin className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                                <input
+                                                    type="text"
+                                                    placeholder="Ex: São Paulo, SP"
+                                                    value={location}
+                                                    onChange={(e) => setLocation(e.target.value)}
+                                                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                />
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
 
-                                    <div className="space-y-2">
-                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Confirmar Senha</label>
-                                        <div className="relative">
-                                            <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                            <input
-                                                type={showConfirmPassword ? "text" : "password"}
-                                                placeholder="Repita sua senha"
-                                                value={confirmPassword}
-                                                onChange={(e) => setConfirmPassword(e.target.value)}
-                                                className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                                required
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
-                                            >
-                                                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                            </button>
+                                    {!isSignUp && (
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Senha</label>
+                                            <div className="relative">
+                                                <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                                <input
+                                                    type={showPassword ? "text" : "password"}
+                                                    placeholder="Sua senha"
+                                                    value={password}
+                                                    onChange={(e) => setPassword(e.target.value)}
+                                                    className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                    required
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                                                >
+                                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                </button>
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
+                                </div>
 
-                                    <div className="space-y-2">
-                                        {/* Terms as Label slot */}
-                                        <div className="flex items-center gap-2 px-1 h-6">
-                                            <input
-                                                id="terms"
-                                                type="checkbox"
-                                                checked={acceptedTerms}
-                                                onChange={(e) => setAcceptedTerms(e.target.checked)}
-                                                className="w-3.5 h-3.5 rounded border-purple-500/30 bg-purple-500/10 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 cursor-pointer checked:bg-purple-500 checked:border-purple-500"
-                                            />
-                                            <label htmlFor="terms" className="text-[10px] text-zinc-400 leading-tight">
-                                                Li e concordo com os <a href="#" className="text-purple-400 hover:text-purple-300">Termos</a> e <a href="#" className="text-purple-400 hover:text-purple-300">Privacidade</a>.
-                                            </label>
-                                        </div>
+                                {/* Right Column / Security Fields & Actions */}
+                                <div className="space-y-4">
+                                    {isSignUp && (
+                                        <>
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Senha</label>
+                                                <div className="relative">
+                                                    <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                                    <input
+                                                        type={showPassword ? "text" : "password"}
+                                                        placeholder="Mínimo de 6 caracteres"
+                                                        value={password}
+                                                        onChange={(e) => setPassword(e.target.value)}
+                                                        className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                        required
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowPassword(!showPassword)}
+                                                        className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                                                    >
+                                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                    </button>
+                                                </div>
+                                            </div>
 
-                                        {/* Button as Input slot */}
+                                            <div className="space-y-2">
+                                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Confirmar Senha</label>
+                                                <div className="relative">
+                                                    <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                                    <input
+                                                        type={showConfirmPassword ? "text" : "password"}
+                                                        placeholder="Repita sua senha"
+                                                        value={confirmPassword}
+                                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                                        className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                        required
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                        className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                                                    >
+                                                        {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                    </button>
+                                                </div>
+                                            </div>
+
+                                            <div className="space-y-2">
+                                                {/* Terms as Label slot */}
+                                                <div className="flex items-center gap-2 px-1 h-6">
+                                                    <input
+                                                        id="terms"
+                                                        type="checkbox"
+                                                        checked={acceptedTerms}
+                                                        onChange={(e) => setAcceptedTerms(e.target.checked)}
+                                                        className="w-3.5 h-3.5 rounded border-purple-500/30 bg-purple-500/10 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 cursor-pointer checked:bg-purple-500 checked:border-purple-500"
+                                                    />
+                                                    <label htmlFor="terms" className="text-[10px] text-zinc-400 leading-tight">
+                                                        Li e concordo com os <a href="#" className="text-purple-400 hover:text-purple-300">Termos</a> e <a href="#" className="text-purple-400 hover:text-purple-300">Privacidade</a>.
+                                                    </label>
+                                                </div>
+
+                                                {/* Create Button */}
+                                                <button
+                                                    type="submit"
+                                                    className="w-full bg-white text-black hover:bg-zinc-200 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-white/5"
+                                                    disabled={loading}
+                                                >
+                                                    {loading ? (
+                                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                                    ) : (
+                                                        <>
+                                                            Criar Conta
+                                                            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                                                        </>
+                                                    )}
+                                                </button>
+
+                                                {/* Back Button (Only step 2) */}
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setSignUpStep(1)}
+                                                    className="w-full text-zinc-500 hover:text-white py-2 transition-colors text-xs flex items-center justify-center gap-1"
+                                                >
+                                                    <ArrowLeft size={12} /> Voltar para o Código
+                                                </button>
+                                            </div>
+                                        </>
+                                    )}
+
+                                    {!isSignUp && (
                                         <button
                                             type="submit"
-                                            className="w-full bg-white text-black hover:bg-zinc-200 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-white/5"
+                                            className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-xl shadow-white/5"
                                             disabled={loading}
                                         >
                                             {loading ? (
                                                 <Loader2 className="h-4 w-4 animate-spin" />
                                             ) : (
                                                 <>
-                                                    Criar Conta
+                                                    Entrar
                                                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                                                 </>
                                             )}
                                         </button>
-                                    </div>
-                                </>
-                            )}
-
-                            {error && (
-                                <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
-                                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                    <p>{error}</p>
-                                </div>
-                            )}
-
-                            {message && (
-                                <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
-                                    <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                                    <p>{message}</p>
-                                </div>
-                            )}
-
-                            {!isSignUp && (
-                                <button
-                                    type="submit"
-                                    className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-xl shadow-white/5"
-                                    disabled={loading}
-                                >
-                                    {loading ? (
-                                        <Loader2 className="h-4 w-4 animate-spin" />
-                                    ) : (
-                                        <>
-                                            Entrar
-                                            <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                                        </>
                                     )}
-                                </button>
-                            )}
-                        </div>
+                                </div>
+                            </div>
+                        )}
                     </form>
 
-                    <div className="pt-4 border-t border-zinc-800/50">
-                        <p className="text-xs text-zinc-500 text-center">
-                            {isSignUp ? 'Já tem uma conta?' : 'Ainda não tem conta?'}
-                            <button
-                                onClick={() => setIsSignUp(!isSignUp)}
-                                className="ml-1 text-white hover:text-purple-400 underline underline-offset-4 transition-colors font-medium"
-                            >
-                                {isSignUp ? 'Fazer login' : 'Cadastre-se'}
-                            </button>
-                        </p>
-                    </div>
+                    {error && (
+                        <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                            <p>{error}</p>
+                        </div>
+                    )}
+
+                    {message && (
+                        <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
+                            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                            <p>{message}</p>
+                        </div>
+                    )}
+
+                    {/* Toggle Login/Sign Up (Hide on SignUp Step 2 to avoid confusion, forcing back first) */}
+                    {!(isSignUp && signUpStep === 2) && (
+                        <div className="pt-4 border-t border-zinc-800/50">
+                            <p className="text-xs text-zinc-500 text-center">
+                                {isSignUp ? 'Já tem uma conta?' : 'Ainda não tem conta?'}
+                                <button
+                                    onClick={toggleMode}
+                                    className="ml-1 text-white hover:text-purple-400 underline underline-offset-4 transition-colors font-medium"
+                                >
+                                    {isSignUp ? 'Fazer login' : 'Cadastre-se'}
+                                </button>
+                            </p>
+                        </div>
+                    )}
                 </div>
             </div >
 

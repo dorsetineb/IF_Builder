@@ -83,15 +83,10 @@ export const InviteManager: React.FC = () => {
 
     return (
         <div className="bg-card border border-border rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden group hover:border-purple-500/30 transition-all">
-            {/* Header Section */}
-            <div className="flex justify-between items-start">
-                <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400">
-                    <Ticket size={20} />
-                </div>
-            </div>
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-purple-500/20 to-transparent pointer-events-none" />
 
             <div>
-                <div className="flex justify-between items-center mb-3">
+                <div className="flex justify-between items-center mb-3 relative z-10">
                     <p className="text-muted-foreground text-[10px] font-medium uppercase tracking-wider">Código para Acesso Beta</p>
                     <button
                         onClick={() => setShowHistory(true)}
@@ -101,7 +96,7 @@ export const InviteManager: React.FC = () => {
                     </button>
                 </div>
 
-                <div className="space-y-4">
+                <div className="space-y-4 relative z-10">
                     {/* Control Row: Button Left, Input Right */}
                     <div className="flex gap-3">
                         <button
@@ -109,7 +104,7 @@ export const InviteManager: React.FC = () => {
                             disabled={generating}
                             className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold text-xs transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-lg shadow-purple-900/20 whitespace-nowrap"
                         >
-                            {generating ? <RefreshCw size={14} className="animate-spin" /> : null}
+                            {generating ? <RefreshCw size={14} className="animate-spin" /> : <Ticket size={14} />}
                             {generating ? 'Gerando...' : 'Gerar Código'}
                         </button>
 
@@ -118,7 +113,7 @@ export const InviteManager: React.FC = () => {
                                 type="text"
                                 readOnly
                                 placeholder="Código gerado..."
-                                className="w-full bg-secondary/50 border border-border rounded-lg pl-3 pr-9 py-2 text-xs font-mono text-center tracking-wider focus:ring-1 focus:ring-purple-500 outline-none transition-all placeholder:text-muted-foreground/50 cursor-copy"
+                                className="w-full bg-secondary/50 border border-purple-500 rounded-lg pl-3 pr-9 py-2 text-xs font-mono text-center tracking-wider focus:ring-1 focus:ring-purple-500 outline-none transition-all placeholder:text-muted-foreground/50 cursor-copy"
                                 value={lastInviteCode}
                                 onClick={() => copyToClipboard(lastInviteCode)}
                             />

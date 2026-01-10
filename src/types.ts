@@ -97,6 +97,7 @@ export interface GameData {
   gameHideTitle?: boolean;
   gameOmitSplashTitle?: boolean;
   gameSplashContentAlignment?: 'left' | 'right';
+  gameSplashContentVerticalAlignment?: 'top' | 'bottom';
   gameSplashDescription?: string;
   gameSplashButtonText?: string;
   // Added missing properties to support splash button customization
@@ -153,7 +154,7 @@ export interface GameData {
   gameMainMenuButtonText?: string;
   gameContinueIndicatorColor?: string;
   gameViewEndingButtonText?: string;
-  
+
   // Transitions
   gameTextAnimationType?: 'fade' | 'typewriter';
   gameTextSpeed?: number; // 1 (slow) to 10 (fast)

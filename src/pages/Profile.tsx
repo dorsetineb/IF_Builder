@@ -71,7 +71,7 @@ const Profile: React.FC = () => {
             {/* Banner */}
             <div className="h-40 sticky top-0 bg-gradient-to-r from-purple-900 via-indigo-900 to-blue-900 overflow-hidden relative">
                 <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-40 mix-blend-overlay"></div>
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent"></div>
+
             </div>
 
             <div className="max-w-5xl mx-auto px-4 relative z-10 -mt-16 text-left">
@@ -165,7 +165,7 @@ const Profile: React.FC = () => {
                             <div className="h-28 bg-muted relative overflow-hidden">
                                 {post.category_id && <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white border border-white/10">DEVLOG</div>}
                                 {/* Placeholder Gradient for thumbnail */}
-                                <div className="absolute inset-0 bg-gradient-to-br from-muted to-card group-hover:scale-105 transition-transform duration-500"></div>
+
                             </div>
                             <div className="p-3">
                                 <h3 className="font-bold text-sm text-card-foreground mb-1 line-clamp-1">{post.title}</h3>
