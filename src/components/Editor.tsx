@@ -553,17 +553,17 @@ body.with-spacing .main-wrapper { height: 100%; }
 @keyframes blurOut { from { filter: blur(0); opacity: 1; } to { filter: blur(20px); opacity: 0; } }
 
 body.frame-none .image-panel { border: none; }
-body.frame-rounded-top .game-container .image-panel { padding: 10px; background: __FRAME_ROUND_TOP_COLOR__; border: none; border-radius: 150px 150px 6px 6px; box-shadow: none; }
-body.frame-rounded-top .game-container .image-container { border-radius: 140px 140px 0 0; }
-body.frame-book-cover .game-container .image-panel { padding: 10px; background: __FRAME_BOOK_COLOR__; border: none; }
+body.frame-rounded-top .game-container .image-panel { padding: 5px; background: __FRAME_ROUNDED_TOP_COLOR__; border: none; border-radius: 40px 40px 4px 4px; box-shadow: none; }
+body.frame-rounded-top .game-container .image-container { border-radius: 35px 35px 0 0; }
+body.frame-book-cover .game-container .image-panel { padding: 5px; background: __FRAME_BOOK_COLOR__; border: none; }
 body.frame-book-cover .game-container .image-container { box-shadow: none; border-radius: 0 !important; }
 body.frame-book-cover #scene-image, body.frame-book-cover #scene-image-back { border-radius: 0 !important; }
-body.frame-trading-card .image-panel { padding: 8px; background: __FRAME_TRADING_CARD_COLOR__; border-radius: 20px; }
+body.frame-trading-card .image-panel { padding: 4px; background: __FRAME_TRADING_CARD_COLOR__; border-radius: 12px; }
 body.frame-trading-card .game-container:not(.layout-image-last) .image-panel { border-right-color: transparent; }
 body.frame-trading-card .game-container.layout-image-last .image-panel { border-left-color: transparent; }
-body.frame-trading-card .image-container { border: none; border-radius: 12px; }
-#scene-image { border-radius: 10px; }
-#scene-image-back { border-radius: 10px; }
+body.frame-trading-card .image-container { border: none; border-radius: 8px; }
+#scene-image { border-radius: 0px; }
+#scene-image-back { border-radius: 0px; }
 body.font-adjust-gothic { font-size: 1.1em; }
 .scene-description::-webkit-scrollbar, .diary-log::-webkit-scrollbar, #trackers-content::-webkit-scrollbar { width: 10px; }
 .scene-description::-webkit-scrollbar-track, .diary-log::-webkit-scrollbar-track, #trackers-content::-webkit-scrollbar-track { background: var(--panel-bg); }
@@ -631,7 +631,7 @@ const initialGameData: GameData = {
     gameTextSpeed: 5,
     gameImageTransitionType: 'fade',
     gameImageSpeed: 5,
-    gameFontSize: '0.85em',
+    gameFontSize: '12',
     gameActionButtonText: 'Ação',
     gameSplashButtonText: 'INICIAR',
     gameContinueButtonText: 'Continuar Aventura',
@@ -1093,6 +1093,7 @@ const Editor: React.FC = () => {
                         onNewGame={handleNewGame}
                         onLogout={handleLogout}
                         sidebarCollapsed={sidebarCollapsed}
+                        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
                     />
                     <div className="flex flex-1 overflow-hidden">
                         <Sidebar

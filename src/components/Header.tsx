@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { GameData } from '../types';
-import { Eye, Plus, CircleHelp, LogOut } from 'lucide-react';
+import { Eye, Plus, CircleHelp, LogOut, ChevronLeft, ChevronRight, PanelLeft } from 'lucide-react';
 import UserManualModal from './UserManualModal';
 
 const Header: React.FC<{
@@ -11,14 +11,15 @@ const Header: React.FC<{
   onNewGame: () => void;
   onLogout: () => void;
   sidebarCollapsed?: boolean;
-}> = ({ gameData, isPreviewing, onTogglePreview, onNewGame, onLogout, sidebarCollapsed }) => {
+  onToggleCollapse?: () => void;
+}> = ({ gameData, isPreviewing, onTogglePreview, onNewGame, onLogout, sidebarCollapsed, onToggleCollapse }) => {
   const [isManualOpen, setIsManualOpen] = useState(false);
 
   return (
     <header className="flex w-full h-[61px]">
       {/* Left Pane - Sidebar Alignment */}
       <div
-        className={`flex-shrink-0 bg-card border-b border-border flex items-center relative transition-all duration-300 ${sidebarCollapsed ? 'w-20 justify-center' : 'w-64 px-4'}`}
+        className={`flex-shrink-0 bg-card border-b border-r border-border flex items-center relative transition-all duration-300 ${sidebarCollapsed ? 'w-20 justify-center' : 'w-64 px-4'}`}
       >
         <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-60" />
 
@@ -27,11 +28,21 @@ const Header: React.FC<{
         ) : (
           <h1 className="text-xl font-bold text-foreground truncate">IF Builder</h1>
         )}
+
+        {onToggleCollapse && (
+          <button
+            onClick={onToggleCollapse}
+            className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-card border border-border rounded-full flex items-center justify-center text-muted-foreground hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all z-50 shadow-sm"
+            title={sidebarCollapsed ? "Expandir Sidebar" : "Recolher Sidebar"}
+          >
+            {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+          </button>
+        )}
       </div>
 
       {/* Right Pane - Top Bar Content */}
       <div className="flex-1 flex items-center justify-between bg-zinc-950 border-b border-border px-6">
-        <div className="flex items-center h-full">
+        <div className="flex items-center h-full gap-4">
           <span
             className="text-muted-foreground text-sm font-medium truncate max-w-[400px]"
             title={gameData.gameTitle}

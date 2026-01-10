@@ -28,21 +28,22 @@ const PlatformSidebar: React.FC = () => {
 
     return (
         <aside className={`${isCollapsed ? 'w-20' : 'w-52'} bg-card border-r border-border flex flex-col h-full transition-all duration-300 relative`}>
-            <button
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                className="absolute -right-3 top-6 bg-card border border-border rounded-full p-1 text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors z-50 shadow-sm"
-            >
-                {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-            </button>
+
 
             {/* Logo aligned with Header - EXACT MATCH with Header.tsx */}
-            <div className={`flex-shrink-0 bg-card p-4 flex items-center border-b border-border relative h-[61px] ${isCollapsed ? 'justify-center' : ''}`}>
+            <div className={`flex-shrink-0 bg-card p-4 flex items-center border-b border-border relative h-[61px] ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
                 <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-60" />
                 {isCollapsed ? (
                     <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center font-bold text-foreground text-xs">IF</div>
                 ) : (
                     <h1 className="text-xl font-bold text-foreground truncate">IF Builder</h1>
                 )}
+                <button
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-card border border-border rounded-full flex items-center justify-center text-muted-foreground hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all z-50 shadow-sm"
+                >
+                    {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
+                </button>
             </div>
 
             <nav className="flex flex-col gap-1 flex-1 px-3 py-4 overflow-y-auto overflow-x-hidden">

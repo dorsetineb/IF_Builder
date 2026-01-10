@@ -72,10 +72,27 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('__NEGATIVE_ENDING_BG_STYLE__', gameData.negativeEndingImage ? `style="background-image: url('${gameData.negativeEndingImage}')"` : '')
             .replace('__NEGATIVE_ENDING_ALIGN_CLASS__', gameData.negativeEndingContentAlignment === 'left' ? 'align-left' : '')
             .replace('__NEGATIVE_ENDING_DESCRIPTION__', gameData.negativeEndingDescription || '');
-            
-        let finalCss = gameData.gameCSS
+
+
+        // CSS Overrides to fix legacy/stale gameCSS state
+        const cssOverrides = `
+            body.frame-rounded-top .game-container .image-panel { padding: 5px; background: __FRAME_ROUNDED_TOP_COLOR__; border: none; border-radius: 40px 40px 4px 4px; box-shadow: none; }
+            body.frame-rounded-top .game-container .image-container { border-radius: 35px 35px 0 0; }
+            body.frame-trading-card .image-panel { padding: 4px; background: __FRAME_TRADING_CARD_COLOR__; border-radius: 12px; }
+            body.frame-trading-card .image-container { border: none; border-radius: 8px; }
+            body.frame-book-cover .game-container .image-panel { padding: 5px; }
+            #scene-image { border-radius: 0px; }
+            #scene-image-back { border-radius: 0px; }
+        `;
+
+        let finalCss = (gameData.gameCSS + cssOverrides)
+            // Hotfix for legacy typo
+            .replace('__FRAME_ROUND_TOP_COLOR__', '__FRAME_ROUNDED_TOP_COLOR__')
             .replace(/__FONT_FAMILY__/g, fontFamily)
-            .replace(/__GAME_FONT_SIZE__/g, gameData.gameFontSize || '1em')
+            .replace(/__GAME_FONT_SIZE__/g, (() => {
+                const size = gameData.gameFontSize || '12';
+                return /^\d+$/.test(size) ? `${size}px` : size;
+            })())
             .replace(/__GAME_TEXT_COLOR__/g, gameData.gameTextColor || '#c9d1d9')
             .replace(/__GAME_TITLE_COLOR__/g, gameData.gameTitleColor || '#58a6ff')
             .replace(/__GAME_FOCUS_COLOR__/g, gameData.gameFocusColor || '#58a6ff')
@@ -93,7 +110,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace(/__SCENE_NAME_OVERLAY_BG__/g, gameData.gameSceneNameOverlayBg || '#0d1117')
             .replace(/__SCENE_NAME_OVERLAY_TEXT_COLOR__/g, gameData.gameSceneNameOverlayTextColor || '#c9d1d9')
             .replace(/__CONTINUE_INDICATOR_COLOR__/g, gameData.gameContinueIndicatorColor || gameData.gameTitleColor || '#58a6ff');
-            
+
         const engineData = prepareGameDataForEngine(gameData);
         if (testSceneId) {
             (engineData as any).cena_inicial = testSceneId;
@@ -110,8 +127,8 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
         const gameScriptTag = `<script>${gameJS}</script>`;
 
         return finalHtml
-          .replace('</head>', `${styleTag}</head>`)
-          .replace('</body>', `${dataScript}${gameScriptTag}</body>`);
+            .replace('</head>', `${styleTag}</head>`)
+            .replace('</body>', `${dataScript}${gameScriptTag}</body>`);
 
     }, [gameData, testSceneId]);
 

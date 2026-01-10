@@ -834,14 +834,7 @@ const PostDetail: React.FC = () => {
             <div className="bg-card border-b border-border sticky top-0 z-30 shadow-sm backdrop-blur-md bg-card/80">
                 <div className="max-w-[1400px] mx-auto px-4 h-14 flex items-center justify-between">
                     <div className="flex items-center gap-2 overflow-hidden">
-                        <button
-                            onClick={() => navigate(-1)}
-                            className="p-1.5 -ml-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-muted/50 transition-colors"
-                        >
-                            <ChevronLeft size={18} />
-                        </button>
 
-                        <div className="h-4 w-[1px] bg-border mx-1" />
 
                         <div className="flex items-center gap-1.5 text-xs truncate">
                             <Link to="/community" className="text-muted-foreground hover:text-foreground transition-colors">

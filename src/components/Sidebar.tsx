@@ -327,12 +327,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
   return (
     <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card p-4 border-r border-border flex flex-col transition-all duration-300 relative flex-shrink-0`}>
-      <button
-        onClick={onToggleCollapse}
-        className="absolute -right-3 top-6 bg-card border border-border rounded-full p-1 text-muted-foreground hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-colors z-10"
-      >
-        {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-      </button>
+
 
       <nav className="flex flex-col gap-2 flex-grow overflow-y-auto overflow-x-hidden">
         <button

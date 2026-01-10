@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { GameData, FixedVerb } from '../types';
-import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save } from 'lucide-react';
+import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor } from 'lucide-react';
 
 interface UIEditorProps {
     html: string;
@@ -343,12 +343,22 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
     const TABS = {
         abertura: 'Início',
-        layout: 'Layout',
+        aparencia: 'Aparência',
         sistemas: 'Sistemas',
         textos: 'Textos',
-        cores: 'Cores & Tema',
         fim_de_jogo: 'Fim de Jogo',
         verbos: 'Verbos Fixos'
+    };
+
+    const [activeSections, setActiveSections] = useState({
+        estrutura: true,
+        estilo: true,
+        texto: true,
+        cores: false
+    });
+
+    const toggleSection = (section: keyof typeof activeSections) => {
+        setActiveSections(prev => ({ ...prev, [section]: !prev[section] }));
     };
 
     const handleFixedVerbChange = (id: string, field: 'verbs' | 'description', value: any) => {
@@ -404,7 +414,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalFocusColor(focusColor);
         setLocalChanceIconColor(chanceIconColor);
         setLocalFontFamily(gameFontFamily);
-        setLocalGameFontSize(gameFontSize);
+        if (gameFontSize === '0.85em') {
+            setLocalGameFontSize('12');
+        } else {
+            setLocalGameFontSize(gameFontSize);
+        }
         setLocalChanceIcon(chanceIcon);
         setLocalChanceLossMessage(chanceLossMessage || '');
         setLocalChanceRestoreMessage(chanceRestoreMessage || '');
@@ -700,6 +714,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalActionButtonColor(theme.actionButtonColor);
         setLocalActionButtonTextColor(theme.actionButtonTextColor);
         setLocalChanceIconColor(theme.chanceIconColor);
+        setLocalGameContinueIndicatorColor(theme.focusColor);
+        // Default overlay colors for themes
+        setLocalGameSceneNameOverlayBg('#000000');
+        setLocalGameSceneNameOverlayTextColor('#FFFFFF');
 
         const newFrameColor = localGameTheme === 'dark' ? '#FFFFFF' : '#1a202c';
         setLocalFrameBookColor(newFrameColor);
@@ -760,6 +778,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
             justifyContent: 'center',
             boxSizing: 'border-box',
         };
+        let panelClass = '';
+        let containerClass = '';
 
         switch (frame) {
             case 'rounded-top':
@@ -768,11 +788,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 panelStyles.border = 'none';
                 panelStyles.borderRadius = '40px 40px 4px 4px';
                 containerStyles.borderRadius = '35px 35px 0 0';
+                panelClass = 'frame-preview-portal';
+                containerClass = 'frame-preview-portal-container';
                 break;
             case 'book-cover':
-                panelStyles.padding = '10px';
+                panelStyles.padding = '5px';
                 panelStyles.backgroundColor = localFrameBookColor;
                 panelStyles.border = 'none';
+                panelClass = 'frame-preview-book';
                 break;
             case 'trading-card':
                 panelStyles.backgroundColor = localFrameTradingCardColor;
@@ -780,46 +803,42 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 panelStyles.padding = '4px';
                 containerStyles.border = 'none';
                 containerStyles.borderRadius = '8px';
+                panelClass = 'frame-preview-trading';
+                containerClass = 'frame-preview-trading-container';
                 break;
             default:
                 panelStyles.border = 'none';
                 panelStyles.padding = '0';
         }
-        return { panelStyles, containerStyles };
+        return { panelStyles, containerStyles, panelClass, containerClass };
     };
 
     return (
         <div className="space-y-6 pb-24">
-            <div className="flex justify-between items-start">
-                <div>
-                    <p className="text-zinc-500 mt-1 text-xs font-medium">
-                        Configure o título, a interface, as cores e as telas de vitória/derrota do seu jogo.
-                    </p>
-                </div>
-                {isDirty && (
-                    <div className="flex items-center gap-2 text-purple-400 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
-                        <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
-                        <span>Alterações não salvas</span>
-                    </div>
-                )}
-            </div>
-
             <div>
-                <div className="border-b border-border flex space-x-1 overflow-x-auto">
-                    {Object.entries(TABS).map(([key, name]) => {
-                        return (
-                            <button
-                                key={key}
-                                onClick={() => setActiveTab(key as any)}
-                                className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-2 ${activeTab === key
-                                    ? 'border-purple-500 text-foreground bg-purple-500/5'
-                                    : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
-                                    }`}
-                            >
-                                {name}
-                            </button>
-                        );
-                    })}
+                <div className="border-b border-border flex items-center justify-between pr-4">
+                    <div className="flex space-x-1 overflow-x-auto">
+                        {Object.entries(TABS).map(([key, name]) => {
+                            return (
+                                <button
+                                    key={key}
+                                    onClick={() => setActiveTab(key as any)}
+                                    className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-2 ${activeTab === key
+                                        ? 'border-purple-500 text-foreground bg-purple-500/5'
+                                        : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                                        }`}
+                                >
+                                    {name}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    {isDirty && (
+                        <div className="flex items-center gap-2 text-purple-400 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
+                            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                            <span>Alterações não salvas</span>
+                        </div>
+                    )}
                 </div>
 
                 <div className={`bg-muted/10 -mt-px py-8 grid grid-cols-1 ${activeTab === 'cores' ? 'xl:grid-cols-[1fr_450px]' : ''} gap-8 items-start px-6`}>
@@ -1162,6 +1181,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 ${localSplashContentVerticalAlignment === 'top' ? 'justify-start' : 'justify-end'}
                                                 ${localSplashContentAlignment === 'right' ? 'items-end text-right' : 'items-start text-left'}
                                             `}
+                                            style={{ fontFamily: localFontFamily }}
                                         >
                                             <div className={`max-w-[70%] space-y-3 flex flex-col ${localSplashContentAlignment === 'right' ? 'items-end' : 'items-start'}`}>
                                                 <h1 className="text-lg font-black uppercase tracking-tight drop-shadow-lg" style={{ color: localTitleColor }}>
@@ -1181,9 +1201,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
                                 <div className="space-y-1 pt-2 w-full flex flex-col items-center text-center">
                                     <p className="text-[10px] text-muted-foreground font-medium italic">Recomendado: Full HD (1920x1080), proporção 16:9.</p>
-                                    <p className="text-[10px] text-muted-foreground/50 font-medium">
-                                        Para alterar as cores da interface, acesse a aba <button onClick={() => setActiveTab('layout')} className="text-purple-400 hover:text-purple-300 underline underline-offset-2">Layout</button>
-                                    </p>
+
                                 </div>
                             </div>
                         </div>
@@ -1539,163 +1557,356 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     }
 
                     {
-                        activeTab === 'cores' && (
-                            <div className="space-y-6">
-                                <div>
-                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Temas Predefinidos</h3>
-                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                                        {[
-                                            { id: 'dark', name: 'GitHub Dark', primary: '#30363d', accent: '#58a6ff' },
-                                            { id: 'light', name: 'GitHub Light', primary: '#ffffff', accent: '#0969da' },
-                                            { id: 'zinc', name: 'Zinc & Purple', primary: '#09090b', accent: '#a855f7' },
-                                            { id: 'slate', name: 'Slate & Blue', primary: '#0f172a', accent: '#3b82f6' }
-                                        ].map(theme => (
-                                            <button
-                                                key={theme.id}
-                                                onClick={() => setLocalGameTheme(theme.id as 'dark' | 'light')}
-                                                className={`group relative p-4 rounded-xl border-2 transition-all ${localGameTheme === theme.id ? 'border-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.2)]' : 'border-border hover:border-primary/50'}`}
-                                            >
-                                                <div className="flex flex-col gap-2">
-                                                    <div className="flex gap-1">
-                                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.primary }} />
-                                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.accent }} />
-                                                    </div>
-                                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter group-hover:text-foreground">{theme.name}</span>
-                                                </div>
-                                                {localGameTheme === theme.id && (
-                                                    <div className="absolute -top-2 -right-2 bg-purple-500 text-white p-1 rounded-full shadow-lg">
-                                                        <Check className="w-3 h-3" />
-                                                    </div>
-                                                )}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
+                        activeTab === 'aparencia' && (
+                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
+                                {/* Left Column: Settings (Reduced width) */}
+                                <div className="col-span-1 lg:col-span-5 space-y-8 pr-2 custom-scrollbar pb-20">
 
-                                <div className="pt-6 border-t border-border/50">
-                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Cores do Sistema</h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                                        <ColorInput label="Título do Jogo" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#FFFFFF" />
-                                        <ColorInput label="Texto Geral" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
-                                        <ColorInput label="Destaque / Foco" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#FFFFFF" />
-                                        <ColorInput label="Seta de Indicação" id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
-                                    </div>
-                                </div>
-
-                                <div className="pt-6 border-t border-border/50">
-                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Cores dos Botões</h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
-                                        <ColorInput label="Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
-                                        <ColorInput label="Texto do Botão Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
-                                        <ColorInput label="Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
-                                        <ColorInput label="Texto do Botão Ação" id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    }
-
-                    {
-                        activeTab === 'verbos' && (
-                            <div className="space-y-8">
-                                <div className="bg-purple-500/5 border border-purple-500/10 p-6 rounded-2xl flex items-start gap-4">
-                                    <TriangleAlert className="w-6 h-6 text-purple-400 flex-shrink-0 mt-1" />
-                                    <div className="space-y-2">
-                                        <h4 className="text-sm font-bold text-foreground uppercase tracking-widest">Informação de Verbos</h4>
-                                        <p className="text-xs text-muted-foreground leading-relaxed">
-                                            Os verbos <strong className="text-foreground">olhar</strong> e <strong className="text-foreground">examinar</strong> são ações fundamentais e já estão integradas por padrão. Adicione aqui apenas verbos específicos que devem estar disponíveis globalmente em toda a aventura.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    {localFixedVerbs.map((verb) => (
-                                        <FixedVerbItem
-                                            key={verb.id}
-                                            verb={verb}
-                                            onUpdate={handleFixedVerbChange}
-                                            onRemove={handleRemoveFixedVerb}
-                                        />
-                                    ))}
-
-                                    {localFixedVerbs.length === 0 && (
-                                        <div className="text-center py-12 border-2 border-dashed border-border rounded-2xl bg-muted/30">
-                                            <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Nenhum verbo global definido</p>
-                                        </div>
-                                    )}
-
-                                    <div className="flex justify-center mt-8">
+                                    {/* SECTION: ESTRUTURA */}
+                                    <div className="space-y-4">
                                         <button
-                                            onClick={handleAddFixedVerb}
-                                            className="flex items-center px-6 py-3 bg-muted text-foreground font-bold rounded-xl hover:bg-muted/80 transition-all active:scale-95 shadow-xl text-xs uppercase tracking-widest"
+                                            onClick={() => toggleSection('estrutura')}
+                                            className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
-                                            <Plus className="w-4 h-4 mr-2" /> Adicionar Novo Verbo Global
+                                            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                                                <LayoutTemplate className="w-4 h-4 text-purple-400" /> ESTRUTURA
+                                            </h3>
+                                            {activeSections.estrutura ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    }
 
-
-
-                    {
-                        activeTab === 'cores' && (
-                            <div className="hidden xl:block h-fit sticky top-8">
-                                <div className="space-y-6">
-                                    <div className="flex items-center justify-between px-2">
-                                        <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Prévia em Tempo Real</h3>
-                                        <div className="flex gap-1.5">
-                                            <div className="w-2 h-2 rounded-full bg-red-500/50" />
-                                            <div className="w-2 h-2 rounded-full bg-yellow-500/50" />
-                                            <div className="w-2 h-2 rounded-full bg-green-500/50" />
-                                        </div>
-                                    </div>
-
-                                    <div
-                                        className={`w-full aspect-video rounded-2xl overflow-hidden border-4 shadow-2xl transition-all ${localGameTheme === 'dark' ? 'bg-background border-border' : 'bg-white border-zinc-100'}`}
-                                        style={{ fontFamily: localFontFamily, fontSize: `${localGameFontSize}px` }}
-                                    >
-                                        <div className="h-full flex flex-col p-6 space-y-4">
-                                            <div className="flex-grow flex gap-6">
-                                                {/* Image Placeholder */}
-                                                <div
-                                                    className="w-1/3 rounded-xl border-border border flex items-center justify-center relative overflow-hidden bg-muted/50"
-                                                    style={getFramePreviewStyles(localImageFrame).containerStyles}
-                                                >
-                                                    <div className="absolute inset-0 flex items-center justify-center opacity-20">
-                                                        <ImageIcon className="w-10 h-10" />
+                                        {activeSections.estrutura && (
+                                            <div className="space-y-6 pl-2 border-l-2 border-border/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                                                <div className="space-y-2">
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Orientação</label>
+                                                    <div className="relative">
+                                                        <select
+                                                            value={localLayoutOrientation}
+                                                            onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
+                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
+                                                        >
+                                                            <option value="vertical">Vertical</option>
+                                                            <option value="horizontal">Horizontal</option>
+                                                        </select>
+                                                        <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                                                     </div>
-                                                    <div className="relative text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem</div>
                                                 </div>
 
-                                                {/* Text Preview */}
-                                                <div className="flex-1 space-y-3">
-                                                    <div className="h-4 w-2/3 bg-muted/50 rounded-full animate-pulse" style={{ backgroundColor: localTitleColor }} />
+                                                <div className="space-y-2">
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Posição da Imagem</label>
+                                                    <div className="relative">
+                                                        <select
+                                                            value={localLayoutOrder}
+                                                            onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
+                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
+                                                        >
+                                                            {localLayoutOrientation === 'vertical' ? (
+                                                                <>
+                                                                    <option value="image-first">Esquerda</option>
+                                                                    <option value="image-last">Direita</option>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <option value="image-first">Acima do Texto</option>
+                                                                    <option value="image-last">Abaixo do Texto</option>
+                                                                </>
+                                                            )}
+                                                        </select>
+                                                        <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Tipo de Moldura</label>
+                                                    <div className="relative">
+                                                        <select
+                                                            value={localImageFrame}
+                                                            onChange={(e) => setLocalImageFrame(e.target.value as any)}
+                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
+                                                        >
+                                                            <option value="none">Sem moldura</option>
+                                                            <option value="rounded-top">Portal</option>
+                                                            <option value="book-cover">Quadrada</option>
+                                                            <option value="trading-card">Arredondada</option>
+                                                        </select>
+                                                        <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* SECTION: ESTILO & TEMA */}
+                                    <div className="space-y-4">
+                                        <button
+                                            onClick={() => toggleSection('estilo')}
+                                            className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
+                                        >
+                                            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                                                <Palette className="w-4 h-4 text-purple-400" /> ESTILO & TEMA
+                                            </h3>
+                                            {activeSections.estilo ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                                        </button>
+
+                                        {activeSections.estilo && (
+                                            <div className="space-y-6 pl-2 border-l-2 border-border/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                                                <div className="space-y-2">
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Cor da Interface</label>
+                                                    <div className="flex bg-input rounded-lg p-1 border border-input">
+                                                        <button
+                                                            onClick={() => handleThemeChange('dark')}
+                                                            className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'dark' ? 'bg-purple-500 text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                                                        >
+                                                            Escuro
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleThemeChange('light')}
+                                                            className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'light' ? 'bg-purple-500 text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                                                        >
+                                                            Claro
+                                                        </button>
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Temas Predefinidos</label>
+                                                    <div className="grid grid-cols-3 gap-2">
+                                                        {PREDEFINED_THEMES.map((theme) => (
+                                                            <button
+                                                                key={theme.name}
+                                                                onClick={() => applyTheme(theme)}
+                                                                className="flex flex-col items-center justify-center p-3 rounded-lg border border-border bg-input hover:border-purple-500/50 hover:bg-input/80 transition-all gap-2 group"
+                                                            >
+                                                                <div className="flex -space-x-1">
+                                                                    <div className="w-3 h-3 rounded-full border border-border" style={{ backgroundColor: theme.textColorLight }}></div>
+                                                                    <div className="w-3 h-3 rounded-full border border-border" style={{ backgroundColor: theme.titleColor }}></div>
+                                                                </div>
+                                                                <span className="text-[9px] font-bold uppercase tracking-tight text-muted-foreground group-hover:text-foreground">{theme.name}</span>
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="pt-2">
+                                                    <button
+                                                        onClick={() => toggleSection('cores')}
+                                                        className="flex items-center justify-between w-full text-left bg-muted/30 p-3 rounded-lg hover:bg-muted/50 transition-all"
+                                                    >
+                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cores do Sistema (Avançado)</span>
+                                                        {activeSections.cores ? <ChevronUp className="w-3 h-3 text-muted-foreground" /> : <ChevronDown className="w-3 h-3 text-muted-foreground" />}
+                                                    </button>
+                                                    {activeSections.cores && (
+                                                        <div className="mt-3 space-y-6 animate-in fade-in slide-in-from-top-1 px-1">
+                                                            <div className="space-y-4">
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Cores (Tema {localGameTheme === 'dark' ? 'Escuro' : 'Claro'})</h4>
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                                                    <ColorInput label="Texto Padrão" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label="Título / Destaque" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
+                                                                    <ColorInput label="Destaque (Foco)" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label="Seta Indicação" id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="space-y-4">
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Botões (Geral)</h4>
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                                                    <ColorInput label="Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label="Texto Botão de Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label="Botão Início (Hover)" id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label="Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label="Texto Botão de Ação" id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="space-y-4">
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Box de Nome da Cena</h4>
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                                                    <ColorInput label="Fundo do Box" id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
+                                                                    <ColorInput label="Texto do Box" id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
+                                                                </div>
+                                                            </div>
+
+                                                            <div className="space-y-4">
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Outros</h4>
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                                                    <ColorInput label="Fundo Principal" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#000000" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* SECTION: UI TEXT */}
+                                    <div className="space-y-4">
+                                        <button
+                                            onClick={() => toggleSection('texto')}
+                                            className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
+                                        >
+                                            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                                                <Type className="w-4 h-4 text-purple-400" /> UI TEXT
+                                            </h3>
+                                            {activeSections.texto ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                                        </button>
+
+                                        {activeSections.texto && (
+                                            <div className="space-y-6 pl-2 border-l-2 border-border/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                                                <div className="space-y-2">
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Botão de Ação (Principal)</label>
+                                                    <input
+                                                        type="text"
+                                                        value={localActionButtonText}
+                                                        onChange={(e) => setLocalActionButtonText(e.target.value)}
+                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground font-bold"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Placeholder do Input</label>
+                                                    <input
+                                                        type="text"
+                                                        value={localVerbInputPlaceholder}
+                                                        onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)}
+                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground"
+                                                    />
+                                                </div>
+                                                <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-2">
-                                                        <div className="h-2 w-full bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
-                                                        <div className="h-2 w-full bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
-                                                        <div className="h-2 w-4/5 bg-muted/20 rounded-full" style={{ backgroundColor: localTextColor, opacity: 0.1 }} />
+                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Fonte</label>
+                                                        <div className="relative">
+                                                            <select
+                                                                value={localFontFamily}
+                                                                onChange={(e) => setLocalFontFamily(e.target.value)}
+                                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
+                                                            >
+                                                                {FONTS.map(font => (
+                                                                    <option key={font.name} value={font.family}>{font.name}</option>
+                                                                ))}
+                                                            </select>
+                                                            <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                                        </div>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Tamanho</label>
+                                                        <div className="relative">
+                                                            <select
+                                                                value={localGameFontSize}
+                                                                onChange={(e) => setLocalGameFontSize(e.target.value)}
+                                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
+                                                            >
+                                                                <option value="12">Pequeno</option>
+                                                                <option value="14">Médio</option>
+                                                                <option value="16">Grande</option>
+                                                            </select>
+                                                            <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
+                                        )}
+                                    </div>
 
-                                            {/* Input Preview */}
-                                            <div className="pt-4 border-t border-border flex gap-3">
-                                                <div className="flex-1 h-10 rounded-lg border-2 border-border bg-muted/50 flex items-center px-4">
-                                                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-widest">{localVerbInputPlaceholder || 'Comando...'}</span>
+                                </div>
+
+                                {/* Right Column: Preview (Expanded width) */}
+                                <div className="col-span-1 lg:col-span-7 relative">
+                                    <div className="sticky top-4 space-y-2 h-[calc(100vh-100px)] flex flex-col">
+
+
+                                        <div
+                                            className={`
+                                                rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300 flex-1 w-full
+                                                ${localGameTheme === 'dark' ? 'bg-zinc-950 border-zinc-900' : 'bg-white border-zinc-200'}
+                                                ${localLayoutOrientation === 'horizontal' ? 'aspect-[9/16]' : 'aspect-video'}
+                                            `}
+                                            style={{ fontFamily: localFontFamily, maxHeight: '500px' }}
+                                        >
+
+
+                                            {/* Preview Content Area - Dynamic Flex Direction (INVERTED LOGIC) */}
+                                            <div className={`flex-1 p-6 flex gap-6 overflow-hidden relative ${localLayoutOrientation === 'vertical' ? 'flex-row' : 'flex-col'}`}>
+
+                                                {/* Image Area - Dynamic Order & Frame */}
+                                                {/* Image Area - Dynamic Order & Frame using getFramePreviewStyles Logic */}
+                                                <div
+                                                    className={`
+                                                        relative flex items-center justify-center flex-shrink-0 transition-all duration-300
+                                                        ${localLayoutOrientation === 'vertical' ? 'w-1/2 h-full' : 'w-full h-1/2 min-h-[50%]'}
+                                                        ${localLayoutOrder === 'image-first' ? 'order-first' : 'order-last'}
+                                                    `}
+                                                >
+                                                    {(() => {
+                                                        const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(localImageFrame as any);
+
+                                                        // Ensure the panel takes full size of the flex item
+                                                        const adaptedPanelStyles = {
+                                                            ...panelStyles,
+                                                            width: '100%',
+                                                            height: '100%',
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            justifyContent: 'center'
+                                                        };
+
+                                                        return (
+                                                            <div style={adaptedPanelStyles} className={panelClass}>
+                                                                <div style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }} className={containerClass}>
+                                                                    <ImageIcon className="w-12 h-12 text-zinc-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50" />
+                                                                    {/* Scene Name Overlay inside the inner container */}
+                                                                    <div className="absolute bottom-4 left-0 right-0 flex justify-center z-20">
+                                                                        <div
+                                                                            className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest"
+                                                                            style={{ backgroundColor: localGameSceneNameOverlayBg, color: localGameSceneNameOverlayTextColor }}
+                                                                        >
+                                                                            Nome da Cena
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        );
+                                                    })()}
                                                 </div>
-                                                <div className="px-6 rounded-lg font-bold text-[10px] uppercase tracking-widest flex items-center shadow-lg" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor }}>
-                                                    {localActionButtonText || 'Ação'}
+
+
+                                                {/* Text Area */}
+                                                <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
+                                                    <p className="leading-relaxed" style={{ color: localTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize }}>
+                                                        Esta é uma descrição de exemplo para a cena. O texto flui conforme as <span style={{ color: localTitleColor, fontWeight: 'bold' }}>CONFIGURAÇÕES</span> escolhidas.
+                                                    </p>
+                                                    <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: '0.85em' }}>
+                                                        {'>'} COMANDO DE EXEMPLO
+                                                    </p>
                                                 </div>
                                             </div>
+
+
+                                            {/* Preview Footer (Input) */}
+                                            <div className={`p-3 border-t backdrop-blur-sm flex-shrink-0 space-y-2 ${localGameTheme === 'dark' ? 'border-zinc-900 bg-zinc-950/80' : 'border-zinc-200 bg-white/80'}`}>
+                                                <div className="flex gap-2">
+                                                    <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${localGameTheme === 'dark' ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
+                                                        <span className="font-mono truncate" style={{ fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily, color: localGameTheme === 'dark' ? '#52525b' : '#a1a1aa' }}>{localVerbInputPlaceholder}</span>
+                                                    </div>
+                                                    <button
+                                                        className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
+                                                        style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}
+                                                    >
+                                                        {localActionButtonText || 'AÇÃO'}
+                                                    </button>
+                                                </div>
+                                                <button
+                                                    className="w-full h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center transition-colors hover:opacity-90 truncate"
+                                                    style={{ backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}
+                                                >
+                                                    {localSplashButtonText || 'BOTÃO DE INÍCIO'}
+                                                </button>
+                                            </div>
                                         </div>
+
+                                        {/* Footer text removed as per request */}
                                     </div>
-                                    <p className="text-[10px] text-muted-foreground italic text-center font-bold uppercase tracking-tighter">Esquema visual básico do estilo selecionado</p>
                                 </div>
                             </div>
-                        )
-                    }
+                        )}
 
                 </div >
             </div >

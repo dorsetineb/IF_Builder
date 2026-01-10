@@ -286,6 +286,7 @@
   }
 }
 
+
 /* Custom Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 10px;
@@ -313,4 +314,25 @@
 ::-webkit-scrollbar-corner {
   background: #09090b;
   /* zinc-950 */
+}
+
+/* Forced Frame Styles to override global * { border-radius: 0 !important } */
+.frame-preview-portal {
+  border-radius: 40px 40px 4px 4px !important;
+}
+
+.frame-preview-portal-container {
+  border-radius: 35px 35px 0 0 !important;
+}
+
+.frame-preview-trading {
+  border-radius: 12px !important;
+}
+
+.frame-preview-trading-container {
+  border-radius: 8px !important;
+}
+
+.frame-preview-book {
+  border-radius: 0 !important;
 }
