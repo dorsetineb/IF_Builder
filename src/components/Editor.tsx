@@ -1248,7 +1248,7 @@ const Editor: React.FC = () => {
                                     splashButtonText={gameData.gameSplashButtonText || 'INICIAR'}
                                     continueButtonText={gameData.gameContinueButtonText || 'Continuar'}
                                     restartButtonText={gameData.gameRestartButtonText || 'Reiniciar'}
-                                    gameInteractionType={gameData.gameInteractionType || 'choice'}
+                                    gameInteractionType={gameData.gameInteractionType || 'parser'}
                                     gameSystemEnabled={gameData.gameSystemEnabled || 'none'}
                                     maxChances={gameData.gameMaxChances || 3}
                                     textColor={gameData.gameTextColor || '#c9d1d9'}
@@ -1332,6 +1332,7 @@ const Editor: React.FC = () => {
                                     onSelectScene={handleSelectScene}
                                     onUpdateScenePosition={handleUpdateScenePosition}
                                     onAddScene={handleAddScene}
+                                    gameInteractionType={gameData.gameInteractionType || 'parser'}
                                 />
                             )}
 

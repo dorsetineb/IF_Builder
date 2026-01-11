@@ -317,8 +317,8 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                 </div>
                 <div className="flex items-center gap-4 flex-shrink-0 mt-1">
                     {isDirty && (
-                        <div className="flex items-center gap-2 text-purple-400 text-xs font-bold uppercase tracking-widest animate-pulse">
-                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20">
+                            <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
                             <span>Alterações não salvas</span>
                         </div>
                     )}

@@ -11,6 +11,7 @@ interface SceneMapProps {
   onSelectScene: (sceneId: string) => void;
   onUpdateScenePosition: (sceneId: string, x: number, y: number) => void;
   onAddScene: () => void;
+  gameInteractionType?: 'parser' | 'choice';
 }
 
 const NODE_WIDTH = 250;
@@ -28,14 +29,14 @@ type Node = Scene & { x: number; y: number; level: number; height: number };
 type Edge = {
   source: string;
   target: string;
-  sourceInteractionId: string;
+  sourceItemId: string; // interaction.id or choice.id
   sSide: 'L' | 'R';
   tSide: 'L' | 'R';
   sDir: number;
   tDir: number;
 };
 
-const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startSceneId, onSelectScene, onUpdateScenePosition, onAddScene }) => {
+const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startSceneId, onSelectScene, onUpdateScenePosition, onAddScene, gameInteractionType = 'parser' }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState({ x: 0, y: 0, scale: 1 });
   const [isPanning, setIsPanning] = useState(false);
@@ -43,12 +44,31 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
   const [dragInfo, setDragInfo] = useState<{ id: string; offsetX: number; offsetY: number } | null>(null);
   const dragStartPos = useRef({ x: 0, y: 0 });
 
+  // Helper to get linking items based on mode
+  const getLinkingItems = useCallback((scene: Scene) => {
+    if (gameInteractionType === 'choice') {
+      return scene.choices?.filter(c => c.targetSceneId).map(c => ({
+        id: c.id,
+        targetId: c.targetSceneId,
+        label: c.label
+      })) || [];
+    } else {
+      return scene.interactions?.filter(i => i.goToScene).map(i => ({
+        id: i.id,
+        targetId: i.goToScene!,
+        label: i.verbs?.[0] || 'Ação', // Simply used for count
+        original: i // Keep access to original interaction for detailed label if needed
+      })) || [];
+    }
+  }, [gameInteractionType]);
+
   const { initialNodes, edges, bounds, activeAnchors } = useMemo(() => {
     const nodeData = new Map<string, { height: number }>();
+
     Object.values(allScenesMap).forEach((scene: Scene) => {
-      const linkingInteractions = scene.interactions?.filter(inter => inter.goToScene) || [];
-      const interactionsHeight = linkingInteractions.length > 0
-        ? (linkingInteractions.length * INTERACTION_ITEM_HEIGHT) + ((linkingInteractions.length - 1) * INTERACTION_ITEM_MARGIN_Y) + PADDING_BOTTOM + PADDING_TOP
+      const linkingItems = getLinkingItems(scene);
+      const interactionsHeight = linkingItems.length > 0
+        ? (linkingItems.length * INTERACTION_ITEM_HEIGHT) + ((linkingItems.length - 1) * INTERACTION_ITEM_MARGIN_Y) + PADDING_BOTTOM + PADDING_TOP
         : 0;
 
       const imagePadding = scene.image ? THUMBNAIL_HEIGHT : 0;
@@ -68,10 +88,14 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
         nodeLevels.set(id, level);
         if (!levels.has(level)) levels.set(level, []);
         levels.get(level)!.push(id);
-        allScenesMap[id].interactions?.forEach(inter => {
-          if (inter.goToScene && allScenesMap[inter.goToScene] && !visited.has(inter.goToScene)) {
-            visited.add(inter.goToScene);
-            queue.push({ id: inter.goToScene, level: level + 1 });
+
+        const scene = allScenesMap[id];
+        const linkingItems = getLinkingItems(scene);
+
+        linkingItems.forEach(item => {
+          if (item.targetId && allScenesMap[item.targetId] && !visited.has(item.targetId)) {
+            visited.add(item.targetId);
+            queue.push({ id: item.targetId, level: level + 1 });
           }
         });
       }
@@ -116,17 +140,17 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
       const sourcePos = positionedNodes.find(n => n.id === scene.id);
       if (!sourcePos) return;
 
-      const linkingInteractions = scene.interactions?.filter(inter => inter.goToScene && allScenesMap[inter.goToScene]) || [];
+      const linkingItems = getLinkingItems(scene);
 
-      linkingInteractions.forEach((inter) => {
-        const targetPos = positionedNodes.find(n => n.id === inter.goToScene);
+      linkingItems.forEach((item) => {
+        const targetPos = positionedNodes.find(n => n.id === item.targetId);
         if (!targetPos) return;
 
-        const interactionIndex = linkingInteractions.findIndex(i => i.id === inter.id);
+        const itemIndex = linkingItems.findIndex(i => i.id === item.id);
         const imagePadding = scene.image ? THUMBNAIL_HEIGHT : 0;
 
         // Calculate center of the interaction output circle
-        const y1_offset = NODE_HEADER_HEIGHT + imagePadding + PADDING_TOP + (interactionIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y)) + (INTERACTION_ITEM_HEIGHT / 2);
+        const y1_offset = NODE_HEADER_HEIGHT + imagePadding + PADDING_TOP + (itemIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y)) + (INTERACTION_ITEM_HEIGHT / 2);
         // Calculate center of the target node input circle (header center)
         const y2_offset = NODE_HEADER_HEIGHT / 2;
 
@@ -150,16 +174,16 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
 
         createdEdges.push({
           source: scene.id,
-          target: inter.goToScene!,
-          sourceInteractionId: inter.id,
+          target: item.targetId,
+          sourceItemId: item.id,
           sSide: best.sSide,
           tSide: best.tSide,
           sDir: best.sDir,
           tDir: best.tDir
         });
 
-        activeAnchors.add(`${inter.id}-${best.sSide}`);
-        activeAnchors.add(`${inter.goToScene}-${best.tSide}`);
+        activeAnchors.add(`${item.id}-${best.sSide}`);
+        activeAnchors.add(`${item.targetId}-${best.tSide}`);
       });
     });
 
@@ -169,7 +193,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
       bounds: { minX: minX === Infinity ? 0 : minX, minY: minY === Infinity ? 0 : minY, maxX: maxX === -Infinity ? NODE_WIDTH : maxX, maxY: maxY === -Infinity ? NODE_HEADER_HEIGHT : maxY },
       activeAnchors
     };
-  }, [allScenesMap, startSceneId]);
+  }, [allScenesMap, startSceneId, getLinkingItems]);
 
   const [nodes, setNodes] = useState(initialNodes);
 
@@ -257,11 +281,11 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
               const targetNode = nodes.find(n => n.id === edge.target);
               if (!sourceNode || !targetNode) return null;
 
-              const linkingInteractions = sourceNode.interactions.filter(inter => inter.goToScene);
-              const interactionIndex = linkingInteractions.findIndex(inter => inter.id === edge.sourceInteractionId);
+              const linkingItems = getLinkingItems(sourceNode);
+              const itemIndex = linkingItems.findIndex(item => item.id === edge.sourceItemId);
               const imagePadding = sourceNode.image ? THUMBNAIL_HEIGHT : 0;
 
-              const y1_offset = NODE_HEADER_HEIGHT + imagePadding + PADDING_TOP + (interactionIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y)) + (INTERACTION_ITEM_HEIGHT / 2);
+              const y1_offset = NODE_HEADER_HEIGHT + imagePadding + PADDING_TOP + (itemIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y)) + (INTERACTION_ITEM_HEIGHT / 2);
               const y2_offset = NODE_HEADER_HEIGHT / 2;
 
               const x1 = (edge.sSide === 'L' ? sourceNode.x : sourceNode.x + NODE_WIDTH) - bounds.minX;
@@ -291,7 +315,7 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
           </svg>
 
           {nodes.map(node => {
-            const linkingInteractions = node.interactions.filter(inter => inter.goToScene && allScenesMap[inter.goToScene]);
+            const linkingItems = getLinkingItems(node);
             const borderColorClass = node.id === startSceneId ? 'border-purple-500' : node.isEndingScene ? 'border-zinc-100' : node.removesChanceOnEntry ? 'border-red-500' : node.restoresChanceOnEntry ? 'border-green-500' : 'border-zinc-800/80';
 
             return (
@@ -311,7 +335,6 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
                 style={{ width: NODE_WIDTH, transform: `translate(${node.x}px, ${node.y}px)`, height: node.height, userSelect: 'none' }}
               >
                 <div className="p-3 relative flex-shrink-0 text-center bg-zinc-900/50" style={{ height: NODE_HEADER_HEIGHT }}>
-                  {/* Removido o node no canto superior esquerdo da cena inicial conforme solicitado */}
                   {node.id !== startSceneId && (
                     <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${node.id}-L`) ? 'bg-purple-500 border-purple-400' : 'bg-zinc-950 border-zinc-700'}`} />
                   )}
@@ -336,20 +359,24 @@ const SceneMap: React.FC<SceneMapProps> = ({ allScenesMap, globalObjects, startS
                   </div>
                 )}
 
-                {linkingInteractions.length > 0 && (
+                {linkingItems.length > 0 && (
                   <div className="flex flex-col gap-1 pt-1 pb-2 border-t border-zinc-800/50">
-                    {linkingInteractions.map(inter => {
-                      const actionText = inter.verbs?.[0] || 'Ação';
-                      const reqObj = inter.requiresInInventory ? globalObjects[inter.requiresInInventory] : null;
-                      const targetObj = inter.target ? globalObjects[inter.target] : null;
-
-                      const displayLabel = `${actionText}${reqObj ? ' ' + reqObj.name : ''}${targetObj ? ' ' + targetObj.name : ''}`;
+                    {linkingItems.map(item => {
+                      let displayLabel = item.label;
+                      // Logic for detailed label recovery if needed for Parser
+                      if (gameInteractionType === 'parser' && item.original) {
+                        const inter = item.original;
+                        const actionText = inter.verbs?.[0] || 'Ação';
+                        const reqObj = inter.requiresInInventory ? globalObjects[inter.requiresInInventory] : null;
+                        const targetObj = inter.target ? globalObjects[inter.target] : null;
+                        displayLabel = `${actionText}${reqObj ? ' ' + reqObj.name : ''}${targetObj ? ' ' + targetObj.name : ''}`;
+                      }
 
                       return (
-                        <div key={inter.id} className="relative bg-purple-500/5 text-purple-400 font-bold py-1 flex items-center w-full" style={{ height: INTERACTION_ITEM_HEIGHT }}>
-                          <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${inter.id}-L`) ? 'bg-purple-500 border-purple-400' : 'bg-zinc-950 border-zinc-700'}`} />
+                        <div key={item.id} className="relative bg-purple-500/5 text-purple-400 font-bold py-1 flex items-center w-full" style={{ height: INTERACTION_ITEM_HEIGHT }}>
+                          <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${item.id}-L`) ? 'bg-purple-500 border-purple-400' : 'bg-zinc-950 border-zinc-700'}`} />
                           <span className="truncate px-4 text-center w-full text-[10px] uppercase tracking-wider" title={displayLabel}>{displayLabel}</span>
-                          <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${inter.id}-R`) ? 'bg-purple-500 border-purple-400' : 'bg-zinc-950 border-zinc-700'}`} />
+                          <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${item.id}-R`) ? 'bg-purple-500 border-purple-400' : 'bg-zinc-950 border-zinc-700'}`} />
                         </div>
                       );
                     })}

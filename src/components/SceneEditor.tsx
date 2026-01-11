@@ -327,9 +327,9 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                 </div>
                 <div className="flex items-center gap-4 flex-shrink-0 mt-1">
                     {isDirty && (
-                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold animate-pulse bg-yellow-500/10 px-2 py-1 rounded-md border border-yellow-500/20">
+                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20">
                             <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            <span>ALTERAÇÕES NÃO SALVAS</span>
+                            <span>Alterações não salvas</span>
                         </div>
                     )}
                     <button

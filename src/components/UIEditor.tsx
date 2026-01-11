@@ -497,6 +497,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalTextAnimationType(textAnimationType);
         setLocalTextSpeed(textSpeed);
         setLocalTextReadingFlow(textReadingFlow || 'paused');
+        setLocalGameInteractionType(gameInteractionType || 'parser');
         setLocalImageTransitionType(imageTransitionType);
         setLocalImageSpeed(imageSpeed);
 
@@ -533,7 +534,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         gameSystemButtonText, gameSaveMenuTitle, gameLoadMenuTitle, gameMainMenuButtonText, gameViewEndingButtonText,
         title, logo, omitSplashTitle, splashImage, splashContentAlignment, splashDescription, backgroundMusic, positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription, positiveEndingMusic,
         negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription, negativeEndingMusic, fixedVerbs,
-        textAnimationType, textSpeed, textReadingFlow, imageTransitionType, imageSpeed, splashContentVerticalAlignment,
+        textAnimationType, textSpeed, textReadingFlow, gameInteractionType, imageTransitionType, imageSpeed, splashContentVerticalAlignment,
         // New dependencies
         enableTrackers, enableInventory, enableDiary, enableFixedVerbs, enableChances, enableImages, enableTextControl,
         inventoryCapacity, inventoryMaxWeight,
@@ -933,8 +934,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         })}
                     </div>
                     {isDirty && (
-                        <div className="flex items-center gap-2 text-purple-400 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-purple-500/10 px-2 py-0.5 rounded-full border border-purple-500/20">
-                            <div className="w-1.5 h-1.5 bg-purple-400 rounded-full"></div>
+                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20">
+                            <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
                             <span>Alterações não salvas</span>
                         </div>
                     )}
