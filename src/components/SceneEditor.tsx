@@ -1,10 +1,10 @@
 
 import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
-import { Scene, Interaction, GameObject, ConsequenceTracker } from '../types';
+import { Scene, Interaction, GameObject, ConsequenceTracker, Choice } from '../types';
 import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
 import ConnectionsView from './ConnectionsView';
-import { Upload, Eye, Trash2 } from 'lucide-react';
+import { Upload, Eye, Trash2, Plus, ArrowRight } from 'lucide-react';
 
 interface SceneEditorProps {
     scene: Scene;
@@ -23,6 +23,7 @@ interface SceneEditorProps {
     layoutOrientation: 'vertical' | 'horizontal';
     consequenceTrackers: ConsequenceTracker[];
     isStartScene: boolean;
+    gameInteractionType: 'parser' | 'choice';
 }
 
 const getCleanSceneState = (s: Scene): Scene => {
@@ -33,6 +34,7 @@ const getCleanSceneState = (s: Scene): Scene => {
         restoresChanceOnEntry: !!s.restoresChanceOnEntry,
         objectIds: s.objectIds || [],
         interactions: s.interactions || [],
+        choices: s.choices || [],
     };
 };
 
@@ -57,11 +59,12 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     onSetDirty,
     layoutOrientation,
     consequenceTrackers,
-    isStartScene
+    isStartScene,
+    gameInteractionType
 }) => {
     const [localScene, setLocalScene] = useState<Scene>(() => getCleanSceneState(scene));
     const [pendingObjectUpdates, setPendingObjectUpdates] = useState<{ [id: string]: Partial<GameObject> }>({});
-    const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions' | 'connections'>('properties');
+    const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions' | 'connections' | 'choices'>('properties');
     const [isDraggingOver, setIsDraggingOver] = useState(false);
     const initialSceneJson = useRef(JSON.stringify(getCleanSceneState(scene)));
 
@@ -296,12 +299,21 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         onPreviewScene(localScene);
     };
 
-    const TABS = {
-        properties: 'Propriedades',
-        objects: 'Objetos',
-        interactions: 'Interações',
-        connections: 'Conexões',
-    };
+    const TABS = useMemo(() => {
+        if (gameInteractionType === 'choice') {
+            return {
+                properties: 'Propriedades',
+                choices: 'Decisões',
+                connections: 'Conexões',
+            };
+        }
+        return {
+            properties: 'Propriedades',
+            objects: 'Objetos',
+            interactions: 'Interações',
+            connections: 'Conexões',
+        };
+    }, [gameInteractionType]);
 
     const isAnyCheckboxChecked = !!localScene.isEndingScene || !!localScene.removesChanceOnEntry || !!localScene.restoresChanceOnEntry;
 
@@ -525,6 +537,93 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                             allTakableObjects={allAvailableInventoryObjects}
                             consequenceTrackers={consequenceTrackers}
                         />
+                    )}
+
+                    {activeTab === 'choices' && (
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center mb-4">
+                                <h3 className="text-sm font-bold text-foreground">Escolhas da Cena</h3>
+                                <button
+                                    onClick={() => {
+                                        const newChoice: Choice = {
+                                            id: `choice_${Date.now()}`,
+                                            label: 'Nova Escolha',
+                                            targetSceneId: ''
+                                        };
+                                        updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
+                                    }}
+                                    className="flex items-center px-3 py-2 bg-purple-600 text-white text-xs font-bold rounded-md hover:bg-purple-700 transition"
+                                >
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Adicionar Escolha
+                                </button>
+                            </div>
+
+                            <div className="space-y-3">
+                                {(localScene.choices || []).length === 0 && (
+                                    <div className="text-center py-8 text-muted-foreground bg-muted/30 rounded-lg border border-border border-dashed">
+                                        <p className="text-xs">Nenhuma escolha definida.</p>
+                                        <p className="text-[10px] opacity-70">Adicione escolhas para que o jogador possa navegar para outras cenas.</p>
+                                    </div>
+                                )}
+                                {(localScene.choices || []).map((choice, index) => (
+                                    <div key={choice.id} className="bg-card border border-border p-4 rounded-lg flex flex-col gap-4">
+                                        <div className="flex items-start gap-4">
+                                            <div className="flex-1">
+                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
+                                                    Texto da Escolha
+                                                </label>
+                                                <input
+                                                    type="text"
+                                                    value={choice.label}
+                                                    onChange={(e) => {
+                                                        const newChoices = [...(localScene.choices || [])];
+                                                        newChoices[index] = { ...choice, label: e.target.value };
+                                                        updateLocalScene('choices', newChoices);
+                                                    }}
+                                                    className="w-full bg-input border border-input rounded p-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/50"
+                                                    placeholder="Ex: Abrir a porta..."
+                                                />
+                                            </div>
+                                            <div className="w-1/3 min-w-[200px]">
+                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
+                                                    Cena de Destino
+                                                </label>
+                                                <div className="relative">
+                                                    <select
+                                                        value={choice.targetSceneId}
+                                                        onChange={(e) => {
+                                                            const newChoices = [...(localScene.choices || [])];
+                                                            newChoices[index] = { ...choice, targetSceneId: e.target.value };
+                                                            updateLocalScene('choices', newChoices);
+                                                        }}
+                                                        className="w-full bg-input border border-input rounded p-2 text-xs text-foreground pr-8 appearance-none focus:ring-1 focus:ring-purple-500/50"
+                                                    >
+                                                        <option value="">Selecione uma cena...</option>
+                                                        {allScenes.map(s => (
+                                                            <option key={s.id} value={s.id}>
+                                                                {s.name} ({s.id})
+                                                            </option>
+                                                        ))}
+                                                    </select>
+                                                    <ArrowRight className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => {
+                                                    const newChoices = (localScene.choices || []).filter((_, i) => i !== index);
+                                                    updateLocalScene('choices', newChoices);
+                                                }}
+                                                className="mt-6 p-2 text-muted-foreground hover:text-red-500 transition-colors"
+                                                title="Remover Escolha"
+                                            >
+                                                <Trash2 className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     )}
 
                     {activeTab === 'connections' && (

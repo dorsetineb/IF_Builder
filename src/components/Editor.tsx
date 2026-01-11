@@ -673,6 +673,7 @@ const initialGameData: GameData = {
     enableFixedVerbs: false,
     enableChances: false,
     gameTextReadingFlow: 'paused',
+    gameInteractionType: 'parser',
 
     // Inventory Defaults
     inventoryCapacity: 10,
@@ -1317,6 +1318,7 @@ const Editor: React.FC = () => {
                                     layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
                                     consequenceTrackers={consequenceTrackers}
                                     isStartScene={selectedScene.id === gameData.startScene}
+                                    gameInteractionType={gameData.gameInteractionType || 'parser'}
                                 />
                             ) : currentView === 'scenes' ? (
                                 <WelcomePlaceholder />

@@ -31,6 +31,12 @@ export interface Interaction {
   transitionSpeed?: number;
 }
 
+export interface Choice {
+  id: string;
+  label: string;
+  targetSceneId: string;
+}
+
 export interface Exits {
   norte?: string;
   sul?: string;
@@ -49,6 +55,7 @@ export interface Scene {
   objectIds: string[]; // References to GameData.globalObjects
   objects?: GameObject[]; // Deprecated: Kept for migration types
   interactions: Interaction[];
+  choices?: Choice[];
   exits?: Exits;
   isEndingScene?: boolean;
   removesChanceOnEntry?: boolean;

@@ -304,7 +304,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localMaxChances, setLocalMaxChances] = useState(maxChances);
     const [localGameShowTrackersUI, setLocalGameShowTrackersUI] = useState(gameShowTrackersUI);
     const [localGameShowSystemButton, setLocalGameShowSystemButton] = useState(gameShowSystemButton);
-    const [localGameInteractionType, setLocalGameInteractionType] = useState<'parser' | 'choice'>(gameInteractionType || 'choice');
+    const [localGameInteractionType, setLocalGameInteractionType] = useState<'parser' | 'choice'>(gameInteractionType || 'parser');
     const [localSuggestionsButtonText, setLocalSuggestionsButtonText] = useState(suggestionsButtonText);
     const [localInventoryButtonText, setLocalInventoryButtonText] = useState(inventoryButtonText);
     const [localDiaryButtonText, setLocalDiaryButtonText] = useState(diaryButtonText);
@@ -628,7 +628,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
             localImageSpeed !== imageSpeed ||
             localEnableImages !== (enableImages ?? true) ||
             localEnableTextControl !== (enableTextControl ?? true) ||
-            localTextReadingFlow !== (textReadingFlow || 'paused');
+            localTextReadingFlow !== (textReadingFlow || 'paused') ||
+            localGameInteractionType !== (gameInteractionType || 'parser');
         if (dirty !== isDirty) {
             onSetDirty(dirty);
         }
@@ -706,7 +707,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localEnableImages !== (enableImages ?? true)) onUpdate('enableImages', localEnableImages);
         if (localEnableTextControl !== (enableTextControl ?? true)) onUpdate('enableTextControl', localEnableTextControl);
         if (localTextReadingFlow !== (textReadingFlow || 'paused')) onUpdate('gameTextReadingFlow', localTextReadingFlow);
-        if (localGameInteractionType !== (gameInteractionType || 'choice')) onUpdate('gameInteractionType', localGameInteractionType);
+        if (localGameInteractionType !== (gameInteractionType || 'parser')) onUpdate('gameInteractionType', localGameInteractionType);
 
         // Sync new systems
         if (localEnableTrackers !== (enableTrackers ?? (gameSystemEnabled === 'trackers'))) onUpdate('enableTrackers', localEnableTrackers);
@@ -732,7 +733,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalMaxChances(maxChances);
         setLocalGameShowTrackersUI(gameShowTrackersUI);
         setLocalGameShowSystemButton(gameShowSystemButton);
-        setLocalGameInteractionType(gameInteractionType || 'choice');
+        setLocalGameInteractionType(gameInteractionType || 'parser');
         setLocalSuggestionsButtonText(suggestionsButtonText);
         setLocalInventoryButtonText(inventoryButtonText);
         setLocalDiaryButtonText(diaryButtonText);
@@ -857,7 +858,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         switch (type) {
             case 'heart': return <Heart fill={color} stroke="none" className={className} />;
             case 'circle': return <Circle fill={color} stroke="none" className={className} />;
-            case 'cross': return <X color={color} className={className} />;
+            case 'cross': return <svg stroke={color} strokeWidth="4" strokeLinecap="round" viewBox="0 0 24 24" className={className} fill="none"><path d="M12 5 V19 M5 12 H19" /></svg>;
             case 'square': return <Square fill={color} stroke="none" className={className} />;
             case 'diamond': return <Diamond fill={color} stroke="none" className={className} />;
             default: return <Heart fill={color} stroke="none" className={className} />;

@@ -17,7 +17,8 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 isEndingScene: scene.isEndingScene,
                 removesChanceOnEntry: scene.removesChanceOnEntry,
                 restoresChanceOnEntry: scene.restoresChanceOnEntry,
-                objectIds: scene.objectIds || []
+                objectIds: scene.objectIds || [],
+                choices: scene.choices || []
             };
         }
     }
@@ -68,6 +69,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         enableFixedVerbs: data.enableFixedVerbs,
         enableImages: data.enableImages,
         enableTextControl: data.enableTextControl,
+        gameInteractionType: data.gameInteractionType,
     };
 };
 
@@ -525,6 +527,53 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon.innerHTML = i < chances ? iconSvg : iconOutlineSvg; chancesContainer.appendChild(icon);
             }
         }
+        
+        // CHOICE MODE HANDLING
+        if (gameData.gameInteractionType === 'choice') {
+            document.querySelector('.input-area').classList.add('hidden');
+            const choicesContainer = document.createElement('div');
+            choicesContainer.className = 'choices-container';
+            choicesContainer.style.marginTop = '20px';
+            choicesContainer.style.display = 'flex';
+            choicesContainer.style.flexDirection = 'column';
+            choicesContainer.style.gap = '10px';
+            
+            if (scene.choices && scene.choices.length > 0) {
+                scene.choices.forEach(choice => {
+                    const btn = document.createElement('button');
+                    btn.textContent = choice.label;
+                    btn.className = 'choice-button';
+                    // Inline styles for basic look, can be moved to CSS later or use existing classes
+                    btn.style.padding = '12px 16px';
+                    btn.style.textAlign = 'left';
+                    btn.style.backgroundColor = 'var(--button-bg, #21262d)';
+                    btn.style.border = '1px solid var(--border-color, rgba(255,255,255,0.2))';
+                    btn.style.borderRadius = '8px';
+                    btn.style.color = 'var(--text-color, #e0e0e0)';
+                    btn.style.cursor = 'pointer';
+                    btn.style.transition = 'all 0.2s';
+                    
+                    btn.onmouseover = () => { 
+                         btn.style.borderColor = 'var(--highlight-color, #a855f7)'; 
+                         btn.style.transform = 'translateX(4px)'; 
+                    };
+                    btn.onmouseout = () => { 
+                         btn.style.borderColor = 'var(--border-color, rgba(255,255,255,0.2))'; 
+                         btn.style.transform = 'none'; 
+                    };
+
+                    btn.onclick = () => {
+                        actionLog.push({ type: 'choice', text: '> ' + choice.label });
+                        loadScene(choice.targetSceneId, true);
+                    };
+                    choicesContainer.appendChild(btn);
+                });
+            }
+            sceneDescription.appendChild(choicesContainer);
+        } else {
+            document.querySelector('.input-area').classList.remove('hidden');
+        }
+
         actionPopup.classList.add('hidden'); verbInput.value = ''; activePopupType = null;
     };
 

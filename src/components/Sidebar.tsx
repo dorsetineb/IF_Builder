@@ -379,14 +379,16 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Mapa de Cenas</span>}
         </button>
 
-        <button
-          className={getButtonClass('global_objects')}
-          onClick={() => onSetView('global_objects')}
-          title={isCollapsed ? "Objetos" : undefined}
-        >
-          <Box className="w-4 h-4 flex-shrink-0" />
-          {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Objetos</span>}
-        </button>
+        {(gameData.gameInteractionType || 'parser') !== 'choice' && (
+          <button
+            className={getButtonClass('global_objects')}
+            onClick={() => onSetView('global_objects')}
+            title={isCollapsed ? "Objetos" : undefined}
+          >
+            <Box className="w-4 h-4 flex-shrink-0" />
+            {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Objetos</span>}
+          </button>
+        )}
         <button
           className={getButtonClass('trackers')}
           onClick={() => onSetView('trackers')}
