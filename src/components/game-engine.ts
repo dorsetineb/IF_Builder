@@ -36,6 +36,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameTextColorLight: data.textColorLight,
         gameTitleColorLight: data.titleColorLight,
         gameFocusColorLight: data.focusColorLight,
+        gameTextReadingFlow: data.gameTextReadingFlow,
         gameBackgroundMusic: data.gameBackgroundMusic,
         positiveEndingImage: data.positiveEndingImage,
         positiveEndingContentAlignment: data.positiveEndingContentAlignment,
@@ -60,6 +61,13 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameTextSpeed: data.gameTextSpeed,
         gameImageTransitionType: data.gameImageTransitionType,
         gameImageSpeed: data.gameImageSpeed,
+        enableInventory: data.enableInventory,
+        enableChances: data.enableChances ?? (data.gameSystemEnabled === 'chances'),
+        enableTrackers: data.enableTrackers ?? (data.gameSystemEnabled === 'trackers'),
+        enableDiary: data.enableDiary,
+        enableFixedVerbs: data.enableFixedVerbs,
+        enableImages: data.enableImages,
+        enableTextControl: data.enableTextControl,
     };
 };
 
@@ -390,8 +398,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
         const scene = gameData.cenas[sceneId]; if (!scene) return;
         if (scene.backgroundMusic) playBgm(scene.backgroundMusic);
-        if (scene.removesChanceOnEntry) chances--; 
-        if (scene.restoresChanceOnEntry && gameData.gameSystemEnabled === 'chances') chances = Math.min(chances + 1, gameData.gameMaxChances);
+        if (scene.removesChanceOnEntry && gameData.enableChances) chances--; 
+        if (scene.restoresChanceOnEntry && gameData.enableChances) chances = Math.min(chances + 1, gameData.gameMaxChances);
         currentSceneId = sceneId;
         if (!visitedScenes.includes(sceneId)) visitedScenes.push(sceneId);
         actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
@@ -404,7 +412,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const defaultDuration = Math.max(0.3, 5.0 - ((gameData.gameImageSpeed || 3) * 0.9)) + 's';
             document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
         }
-        if (transition && sceneImage && sceneImageBack) {
+        if (transition && sceneImage && sceneImageBack && gameData.enableImages !== false) {
              sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
              if (sceneImage.src) {
                  sceneImage.classList.remove('hidden'); const animClass = 'trans-' + effectiveTransition + '-out'; sceneImage.classList.add(animClass);
@@ -431,7 +439,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderScene = (scene, successPrefix = null) => {
-        if (scene.image) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
+        if (scene.image && gameData.enableImages !== false) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
         else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
         if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
         sceneDescription.innerHTML = '';
@@ -440,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (successPrefix) fullDescription = successPrefix + "\\n\\n" + fullDescription;
 
         const paragraphs = fullDescription.split('\\n').filter(p => p.trim().length > 0);
-        let pIndex = 0; const textAnimType = gameData.gameTextAnimationType || 'fade';
+        let pIndex = 0; const textAnimType = (gameData.enableTextControl !== false) ? (gameData.gameTextAnimationType || 'fade') : 'none';
         const isImmersive = document.body.classList.contains('behavior-immersive') && window.innerWidth <= 768;
 
         isPrinting = true;
@@ -474,6 +482,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const finishParagraph = () => {
             pIndex++;
             if (pIndex < paragraphs.length) {
+                if (gameData.gameTextReadingFlow === 'continuous') {
+                    // Bypass pause for continuous flow
+                    setTimeout(renderNextParagraph, 30);
+                    return;
+                }
                 const continueBtn = document.createElement('div'); continueBtn.className = 'continue-indicator'; continueBtn.innerHTML = '<span>▼</span>';
                 const continueHandler = (e) => { 
                     if (e) { if (e.type === 'keydown' && e.key !== 'Enter') return; e.stopPropagation(); if (e.type === 'keydown') e.preventDefault(); }
@@ -503,7 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
         renderNextParagraph();
         
         const chancesContainer = document.getElementById('chances-container');
-        if (chancesContainer && gameData.gameSystemEnabled === 'chances') {
+        if (chancesContainer) {
             chancesContainer.innerHTML = '';
             const iconSvg = ICONS[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
             const iconOutlineSvg = ICONS_OUTLINE[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
@@ -566,7 +579,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         if (foundInteraction) { executeInteraction(foundInteraction); return; }
-        if (hasWord('inventario', inputLower) || hasWord('i', inputLower)) { actionPopup.classList.add('hidden'); activePopupType = null; togglePopup('inventory'); return; }
+        if (hasWord('inventario', inputLower) || hasWord('i', inputLower)) { 
+            if (gameData.enableInventory) { actionPopup.classList.add('hidden'); activePopupType = null; togglePopup('inventory'); }
+            else { printOutput("O sistema de inventário está desativado."); }
+            return; 
+        }
         const lookVerbs = ['olhar', 'examinar', 'ver', 'ler'];
         if (lookVerbs.some(v => hasWord(v, inputLower))) {
              const obj = sceneObjects.find(o => hasWord(o.name.toLowerCase(), inputLower)) || inventory.find(o => hasWord(o.name.toLowerCase(), inputLower));

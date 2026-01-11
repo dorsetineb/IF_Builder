@@ -82,8 +82,8 @@ const gameHTML = `
                     <div id="action-popup" class="action-popup hidden"></div>
                     <div class="action-buttons">
                         <button id="suggestions-button">__SUGGESTIONS_BUTTON_TEXT__</button>
-                        <button id="inventory-button">__INVENTORY_BUTTON_TEXT__</button>
-                        <button id="diary-button">__DIARY_BUTTON_TEXT__</button>
+                        __INVENTORY_BUTTON__
+                        __DIARY_BUTTON__
                         __TRACKERS_BUTTON__
                         __SYSTEM_BUTTON__
                     </div>
@@ -582,6 +582,71 @@ body.font-adjust-gothic { font-size: 1.1em; }
 .typewriter-cursor::after { content: '|'; animation: blink 1s step-end infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes fadeIn { to { opacity: 1; } }
+
+/* Implementação de Layout Full-Bleed (Sem Borda) Desktop */
+@media (min-width: 769px) {
+    body.frame-none.with-spacing {
+        padding: 0 !important;
+    }
+    body.frame-none .main-wrapper {
+        max-width: none !important;
+        margin: 0 !important;
+        height: 100vh !important;
+    }
+    body.frame-none .game-container {
+        height: 100vh !important;
+    }
+    body.frame-none .image-panel {
+        height: 100vh !important;
+        border-right: none !important;
+        padding: 0 !important;
+    }
+    /* Manteve borda apenas se layout for Horizontal */
+    body.frame-none .game-container.layout-horizontal .image-panel {
+        width: 100% !important;
+        flex-basis: auto !important;
+        height: 45vh !important; /* Ajuste para horizontal */
+    }
+    /* Ajuste para Image-Last (Imagem na direita) */
+    body.frame-none .game-container.layout-image-last .image-panel {
+        border-left: none !important;
+    }
+}
+
+
+
+/* LIFE SYSTEM POSITIONING */
+/* Desktop: Flow-based (Between Description and Action Bar) */
+@media (min-width: 769px) {
+    .chances-container {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        width: 100%;
+        gap: 8px;
+        padding-bottom: 10px; /* Space above separator */
+        position: relative;
+        z-index: 5;
+    }
+}
+
+/* Mobile: Fixed Top Right */
+@media (max-width: 768px) {
+    .chances-container {
+        position: fixed;
+        top: 15px;
+        right: 15px;
+        margin: 0;
+        padding: 0;
+        z-index: 2000;
+        display: flex;
+        gap: 6px;
+    }
+}
+
+/* Common Icon Style */
+.chance-icon svg { width: 24px; height: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); display: block; }
+.chance-icon.lost svg { opacity: 0.3; }
 `;
 
 const generateUniqueId = (prefix: 'scn' | 'obj' | 'inter' | 'trk' | 'verb', existingIds: string[]): string => {
@@ -602,23 +667,23 @@ const initialGameData: GameData = {
     gameCSS: gameCSS,
     gameTitle: 'Minha Aventura de Texto',
     gameSystemEnabled: 'none',
+    enableTrackers: false,
+    enableInventory: true,
+    enableDiary: true,
+    enableFixedVerbs: false,
+    enableChances: false,
+    gameTextReadingFlow: 'paused',
+
+    // Inventory Defaults
+    inventoryCapacity: 10,
+    inventoryMaxWeight: 0,
+
+    // Diary Defaults
+    diaryAutoScroll: true,
+    diaryAllowExport: false,
+    diaryMaxMessages: 100,
+
     gameMaxChances: 3,
-    gameTheme: 'dark',
-    gameImageFrame: 'none',
-    gameMobileLayoutBehavior: 'immersive',
-    gameLayoutOrientation: 'vertical',
-    gameLayoutOrder: 'image-first',
-    gameTextColor: '#c9d1d9',
-    gameTitleColor: '#58a6ff',
-    gameFocusColor: '#58a6ff',
-    textColorLight: '#24292f',
-    titleColorLight: '#0969da',
-    focusColorLight: '#0969da',
-    gameSplashButtonColor: '#2ea043',
-    gameSplashButtonHoverColor: '#238636',
-    gameSplashButtonTextColor: '#ffffff',
-    gameActionButtonColor: '#ffffff',
-    gameActionButtonTextColor: '#0d1117',
     gameChanceIcon: 'heart',
     gameChanceIconColor: '#ff4d4d',
     frameBookColor: '#FFFFFF',
@@ -659,6 +724,8 @@ const initialGameData: GameData = {
 const Editor: React.FC = () => {
     const { toast } = useToast();
     const { user, loading: authLoading } = useUser();
+
+
     const [isTransitioning, setIsTransitioning] = useState(true);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -697,6 +764,37 @@ const Editor: React.FC = () => {
     };
 
     const [gameData, setGameData] = useState<GameData>(initialGameData);
+
+    // --- Auto-Detection Logic for Legacy Saves ---
+    const detectedActiveSystems = useMemo(() => {
+        let hasInventoryUsage = false;
+        let hasChancesUsage = false;
+        // Cast to any to avoid strict type error if property missing in old types
+        const hasTrackers = (gameData as any).trackers && (gameData as any).trackers.length > 0;
+
+        // Scan all scenes for usage
+        if (gameData.scenes) {
+            Object.values(gameData.scenes).forEach((scene: any) => {
+                if (scene.removesChanceOnEntry || scene.restoresChanceOnEntry) {
+                    hasChancesUsage = true;
+                }
+                if (scene.interactions) {
+                    scene.interactions.forEach((interaction: any) => {
+                        if (interaction.addsToInventory || interaction.requiresInInventory) {
+                            hasInventoryUsage = true;
+                        }
+                    });
+                }
+            });
+        }
+
+        return {
+            inventory: hasInventoryUsage,
+            chances: hasChancesUsage,
+            trackers: hasTrackers
+        };
+    }, [gameData.scenes, (gameData as any).trackers]);
+
     const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
     const [previewSceneId, setPreviewSceneId] = useState<string | null>(null);
     const [currentView, setCurrentView] = useState<View>('scenes');
@@ -1119,6 +1217,9 @@ const Editor: React.FC = () => {
                             {currentView === 'interface' && (
                                 <UIEditor
                                     {...gameData}
+                                    enableInventory={gameData.enableInventory ?? detectedActiveSystems.inventory}
+                                    enableChances={(gameData.enableChances ?? detectedActiveSystems.chances) || gameData.gameSystemEnabled === 'chances'}
+                                    enableTrackers={(gameData.enableTrackers ?? detectedActiveSystems.trackers) || gameData.gameSystemEnabled === 'trackers'}
                                     html={gameData.gameHTML}
                                     css={gameData.gameCSS}
                                     onUpdate={handleUpdateGameData}
@@ -1146,6 +1247,7 @@ const Editor: React.FC = () => {
                                     splashButtonText={gameData.gameSplashButtonText || 'INICIAR'}
                                     continueButtonText={gameData.gameContinueButtonText || 'Continuar'}
                                     restartButtonText={gameData.gameRestartButtonText || 'Reiniciar'}
+                                    gameInteractionType={gameData.gameInteractionType || 'choice'}
                                     gameSystemEnabled={gameData.gameSystemEnabled || 'none'}
                                     maxChances={gameData.gameMaxChances || 3}
                                     textColor={gameData.gameTextColor || '#c9d1d9'}
@@ -1178,6 +1280,8 @@ const Editor: React.FC = () => {
                                     suggestionsButtonText={gameData.gameSuggestionsButtonText}
                                     inventoryButtonText={gameData.gameInventoryButtonText}
                                     diaryButtonText={gameData.gameDiaryButtonText}
+                                    diaryShowSceneImage={gameData.diaryShowSceneImage}
+                                    diaryShowPlayerAction={gameData.diaryShowPlayerAction}
                                     trackersButtonText={gameData.gameTrackersButtonText}
                                     gameSystemButtonText={gameData.gameSystemButtonText}
                                     gameSaveMenuTitle={gameData.gameSaveMenuTitle}

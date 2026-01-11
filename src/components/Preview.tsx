@@ -22,9 +22,12 @@ const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
 
 const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = ({ gameData, testSceneId }) => {
     const srcDoc = useMemo(() => {
-        const chancesContainerHTML = gameData.gameSystemEnabled === 'chances' ? '<div id="chances-container" class="chances-container"></div>' : '';
+        const enableChances = gameData.enableChances || gameData.gameSystemEnabled === 'chances';
+        const enableTrackers = gameData.enableTrackers || gameData.gameSystemEnabled === 'trackers';
 
-        const trackersButtonHTML = (gameData.gameSystemEnabled === 'trackers' && (gameData.gameShowTrackersUI ?? true))
+        const chancesContainerHTML = enableChances ? '<div id="chances-container" class="chances-container"></div>' : '';
+
+        const trackersButtonHTML = (enableTrackers && (gameData.gameShowTrackersUI ?? true))
             ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>'
             : '';
 
@@ -35,6 +38,14 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
         const fontFamily = gameData.gameFontFamily || "'Silkscreen', sans-serif";
         const fontUrl = getFontUrl(fontFamily);
         const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
+
+        const inventoryButtonHTML = (gameData.enableInventory ?? true)
+            ? `<button id="inventory-button">${gameData.gameInventoryButtonText || 'Inventário'}</button>`
+            : '';
+
+        const diaryButtonHTML = (gameData.enableDiary ?? true)
+            ? `<button id="diary-button">${gameData.gameDiaryButtonText || 'Diário'}</button>`
+            : '';
 
         let finalHtml = gameData.gameHTML
             .replace(/__GAME_TITLE__/g, gameData.gameTitle || 'IF Builder Game')
@@ -47,9 +58,9 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
             .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
             .replace('__SYSTEM_BUTTON__', systemButtonHTML)
+            .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
+            .replace('__DIARY_BUTTON__', diaryButtonHTML)
             .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, gameData.gameSuggestionsButtonText || 'Sugestões')
-            .replace(/__INVENTORY_BUTTON_TEXT__/g, gameData.gameInventoryButtonText || 'Inventário')
-            .replace(/__DIARY_BUTTON_TEXT__/g, gameData.gameDiaryButtonText || 'Diário')
             .replace(/__TRACKERS_BUTTON_TEXT__/g, gameData.gameTrackersButtonText || 'Rastreadores')
             .replace(/__SYSTEM_BUTTON_TEXT__/g, gameData.gameSystemButtonText || 'Sistema')
             .replace('__SAVE_MENU_TITLE__', gameData.gameSaveMenuTitle || 'Salvar Jogo')
@@ -83,6 +94,38 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             body.frame-book-cover .game-container .image-panel { padding: 5px; }
             #scene-image { border-radius: 0px; }
             #scene-image-back { border-radius: 0px; }
+            
+            #scene-image { border-radius: 0px; }
+            #scene-image-back { border-radius: 0px; }
+            
+            /* Life System Fixes */
+            @media (min-width: 769px) {
+                .chances-container {
+                    display: flex;
+                    justify-content: flex-end;
+                    align-items: center;
+                    width: 100%;
+                    gap: 8px;
+                    padding-bottom: 10px; /* Space above separator */
+                    position: relative;
+                    z-index: 5;
+                }
+            }
+            @media (max-width: 768px) {
+                 .chances-container {
+                    position: fixed;
+                    top: 15px;
+                    right: 15px;
+                    margin: 0;
+                    padding: 0;
+                    z-index: 2000;
+                    display: flex;
+                    gap: 6px;
+                }
+            }
+            /* Common Icon Style */
+            .chance-icon svg { width: 24px; height: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); display: block; }
+            .chance-icon.lost svg { opacity: 0.3; }
         `;
 
         let finalCss = (gameData.gameCSS + cssOverrides)

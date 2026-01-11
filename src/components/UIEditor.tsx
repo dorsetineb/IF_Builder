@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { GameData, FixedVerb } from '../types';
-import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor } from 'lucide-react';
+import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List } from 'lucide-react';
 
 interface UIEditorProps {
     html: string;
@@ -46,6 +46,7 @@ interface UIEditorProps {
     onSetDirty: (isDirty: boolean) => void;
     gameShowTrackersUI?: boolean;
     gameShowSystemButton?: boolean;
+    gameInteractionType?: 'parser' | 'choice';
     suggestionsButtonText?: string;
     inventoryButtonText?: string;
     diaryButtonText?: string;
@@ -76,8 +77,26 @@ interface UIEditorProps {
 
     textAnimationType: 'fade' | 'typewriter';
     textSpeed: number;
+    textReadingFlow?: 'continuous' | 'paused';
     imageTransitionType: GameData['gameImageTransitionType'];
     imageSpeed: number;
+
+    onAnnotate?: (annotation: any) => void;
+    // New System Props
+    enableTrackers?: boolean;
+    enableInventory?: boolean;
+    enableDiary?: boolean;
+    enableFixedVerbs?: boolean;
+    enableChances?: boolean;
+    enableImages?: boolean;
+    enableTextControl?: boolean;
+    inventoryCapacity?: number;
+    inventoryMaxWeight?: number;
+    diaryAutoScroll?: boolean;
+    diaryAllowExport?: boolean;
+    diaryMaxMessages?: number;
+    diaryShowSceneImage?: boolean;
+    diaryShowPlayerAction?: boolean;
 
     onNavigateToTrackers?: () => void;
 }
@@ -261,9 +280,15 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription,
         negativeEndingMusic,
         fixedVerbs,
-        textAnimationType, textSpeed, imageTransitionType, imageSpeed,
+        textAnimationType, textSpeed, textReadingFlow, imageTransitionType, imageSpeed,
         onNavigateToTrackers,
-        gameSplashContentVerticalAlignment: splashContentVerticalAlignment
+        gameSplashContentVerticalAlignment: splashContentVerticalAlignment,
+        // New System Props
+        enableTrackers, enableInventory, enableDiary, enableFixedVerbs, enableChances,
+        enableImages, enableTextControl,
+        inventoryCapacity, inventoryMaxWeight,
+        diaryAutoScroll, diaryAllowExport, diaryMaxMessages, diaryShowSceneImage, diaryShowPlayerAction,
+        gameInteractionType
     } = props;
 
     const [localLayoutOrientation, setLocalLayoutOrientation] = useState(layoutOrientation);
@@ -279,6 +304,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localMaxChances, setLocalMaxChances] = useState(maxChances);
     const [localGameShowTrackersUI, setLocalGameShowTrackersUI] = useState(gameShowTrackersUI);
     const [localGameShowSystemButton, setLocalGameShowSystemButton] = useState(gameShowSystemButton);
+    const [localGameInteractionType, setLocalGameInteractionType] = useState<'parser' | 'choice'>(gameInteractionType || 'choice');
     const [localSuggestionsButtonText, setLocalSuggestionsButtonText] = useState(suggestionsButtonText);
     const [localInventoryButtonText, setLocalInventoryButtonText] = useState(inventoryButtonText);
     const [localDiaryButtonText, setLocalDiaryButtonText] = useState(diaryButtonText);
@@ -336,18 +362,18 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localNegativeEndingMusic, setLocalNegativeEndingMusic] = useState(negativeEndingMusic);
     const [localFixedVerbs, setLocalFixedVerbs] = useState(fixedVerbs);
 
-    const [localTextAnimationType, setLocalTextAnimationType] = useState(textAnimationType);
-    const [localTextSpeed, setLocalTextSpeed] = useState(textSpeed);
-    const [localImageTransitionType, setLocalImageTransitionType] = useState(imageTransitionType);
+    const [localTextAnimationType, setLocalTextAnimationType] = useState<'fade' | 'typewriter'>(props.textAnimationType || 'typewriter');
+    const [localTextSpeed, setLocalTextSpeed] = useState<number>(props.textSpeed || 3);
+    const [localTextReadingFlow, setLocalTextReadingFlow] = useState<'continuous' | 'paused'>(textReadingFlow || 'paused');
+    const [localImageTransitionType, setLocalImageTransitionType] = useState<GameData['gameImageTransitionType']>(props.imageTransitionType || 'fade');
     const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed);
 
     const TABS = {
         abertura: 'Início',
         aparencia: 'Aparência',
         sistemas: 'Sistemas',
-        textos: 'Textos',
-        fim_de_jogo: 'Fim de Jogo',
-        verbos: 'Verbos Fixos'
+        global: 'Comandos Globais',
+        textos: 'Textos'
     };
 
     const [activeSections, setActiveSections] = useState({
@@ -380,6 +406,25 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         };
         setLocalFixedVerbs(prev => [...prev, newVerb]);
     };
+
+    // New System States
+    // New System States
+    const [localEnableTrackers, setLocalEnableTrackers] = useState(enableTrackers ?? (gameSystemEnabled === 'trackers'));
+    const [localEnableInventory, setLocalEnableInventory] = useState(enableInventory ?? true);
+    const [localEnableDiary, setLocalEnableDiary] = useState(enableDiary ?? true);
+    const [localEnableFixedVerbs, setLocalEnableFixedVerbs] = useState(enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0));
+    const [localEnableChances, setLocalEnableChances] = useState(enableChances ?? (gameSystemEnabled === 'chances'));
+    const [localEnableImages, setLocalEnableImages] = useState(enableImages ?? true);
+    const [localEnableTextControl, setLocalEnableTextControl] = useState(enableTextControl ?? true);
+
+    const [localInventoryCapacity, setLocalInventoryCapacity] = useState(inventoryCapacity ?? 10);
+    const [localInventoryMaxWeight, setLocalInventoryMaxWeight] = useState(inventoryMaxWeight ?? 0);
+
+    const [localDiaryAutoScroll, setLocalDiaryAutoScroll] = useState(diaryAutoScroll ?? true);
+    const [localDiaryAllowExport, setLocalDiaryAllowExport] = useState(diaryAllowExport ?? false);
+    const [localDiaryMaxMessages, setLocalDiaryMaxMessages] = useState(diaryMaxMessages ?? 100);
+    const [localDiaryShowSceneImage, setLocalDiaryShowSceneImage] = useState(diaryShowSceneImage ?? false);
+    const [localDiaryShowPlayerAction, setLocalDiaryShowPlayerAction] = useState(diaryShowPlayerAction ?? true);
 
     useEffect(() => {
         setLocalLayoutOrientation(layoutOrientation);
@@ -451,8 +496,33 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalFixedVerbs(fixedVerbs);
         setLocalTextAnimationType(textAnimationType);
         setLocalTextSpeed(textSpeed);
+        setLocalTextReadingFlow(textReadingFlow || 'paused');
         setLocalImageTransitionType(imageTransitionType);
         setLocalImageSpeed(imageSpeed);
+
+        // Sync new systems
+        // Sync new systems
+        setLocalEnableTrackers(enableTrackers ?? (gameSystemEnabled === 'trackers'));
+        setLocalEnableInventory(enableInventory ?? false);
+        setLocalEnableDiary(enableDiary ?? false);
+        setLocalEnableFixedVerbs(enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0));
+        setLocalEnableChances(enableChances ?? (gameSystemEnabled === 'chances'));
+        setLocalEnableImages(enableImages ?? true);
+        setLocalEnableTextControl(enableTextControl ?? true);
+
+        setLocalEnableImages(enableImages ?? true);
+        setLocalEnableTextControl(enableTextControl ?? true);
+
+        setLocalInventoryCapacity(inventoryCapacity ?? 10);
+        setLocalInventoryMaxWeight(inventoryMaxWeight ?? 0);
+        setLocalDiaryAutoScroll(diaryAutoScroll ?? true);
+        setLocalDiaryAllowExport(diaryAllowExport ?? false);
+        setLocalDiaryAutoScroll(diaryAutoScroll ?? true);
+        setLocalDiaryAllowExport(diaryAllowExport ?? false);
+        setLocalDiaryMaxMessages(diaryMaxMessages ?? 100);
+        setLocalDiaryShowSceneImage(diaryShowSceneImage ?? false);
+        setLocalDiaryShowPlayerAction(diaryShowPlayerAction ?? true);
+
     }, [
         layoutOrientation, layoutOrder, imageFrame, actionButtonText, verbInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, gameSystemEnabled, maxChances,
         textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
@@ -461,10 +531,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, gameContinueIndicatorColor,
         gameShowTrackersUI, gameShowSystemButton, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText,
         gameSystemButtonText, gameSaveMenuTitle, gameLoadMenuTitle, gameMainMenuButtonText, gameViewEndingButtonText,
-        title, logo, omitSplashTitle, splashImage, splashContentAlignment, splashDescription, backgroundMusic,
-        positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription, positiveEndingMusic,
+        title, logo, omitSplashTitle, splashImage, splashContentAlignment, splashDescription, backgroundMusic, positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription, positiveEndingMusic,
         negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription, negativeEndingMusic, fixedVerbs,
-        textAnimationType, textSpeed, imageTransitionType, imageSpeed, splashContentVerticalAlignment
+        textAnimationType, textSpeed, textReadingFlow, imageTransitionType, imageSpeed, splashContentVerticalAlignment,
+        // New dependencies
+        enableTrackers, enableInventory, enableDiary, enableFixedVerbs, enableChances, enableImages, enableTextControl,
+        inventoryCapacity, inventoryMaxWeight,
+        diaryAutoScroll, diaryAllowExport, diaryMaxMessages, diaryShowSceneImage, diaryShowPlayerAction
     ]);
 
     useEffect(() => {
@@ -478,6 +551,22 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
             localVerbInputPlaceholder !== verbInputPlaceholder ||
             localDiaryPlayerName !== diaryPlayerName ||
             localGameSystemEnabled !== gameSystemEnabled ||
+
+            // Dirty checks for new systems
+            localEnableTrackers !== (enableTrackers ?? (gameSystemEnabled === 'trackers')) ||
+            localEnableInventory !== (enableInventory ?? false) ||
+            localEnableDiary !== (enableDiary ?? false) ||
+            localEnableFixedVerbs !== (enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0)) ||
+            localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances')) ||
+            localInventoryCapacity !== (inventoryCapacity ?? 10) ||
+            localInventoryMaxWeight !== (inventoryMaxWeight ?? 0) ||
+            localDiaryAutoScroll !== (diaryAutoScroll ?? true) ||
+            localDiaryAllowExport !== (diaryAllowExport ?? false) ||
+            localDiaryAllowExport !== (diaryAllowExport ?? false) ||
+            localDiaryMaxMessages !== (diaryMaxMessages ?? 100) ||
+            localDiaryShowSceneImage !== (diaryShowSceneImage ?? false) ||
+            localDiaryShowPlayerAction !== (diaryShowPlayerAction ?? true) ||
+
             localMaxChances !== maxChances ||
             localGameShowTrackersUI !== gameShowTrackersUI ||
             localGameShowSystemButton !== gameShowSystemButton ||
@@ -536,20 +625,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
             localTextAnimationType !== textAnimationType ||
             localTextSpeed !== textSpeed ||
             localImageTransitionType !== imageTransitionType ||
-            localImageSpeed !== imageSpeed;
-        onSetDirty(dirty);
-    }, [
-        localLayoutOrientation, localLayoutOrder, localImageFrame, localActionButtonText, localVerbInputPlaceholder, localDiaryPlayerName, localSplashButtonText, localContinueButtonText, localRestartButtonText, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI, localGameShowSystemButton, localSuggestionsButtonText, localInventoryButtonText, localDiaryButtonText, localTrackersButtonText,
-        localSystemButtonText, localSaveMenuTitle, localLoadMenuTitle, localMainMenuButtonText, localViewEndingButtonText,
-        localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight,
-        localFrameBookColor, localFrameTradingCardColor,
-        frameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor, localGameContinueIndicatorColor,
-        localTitle, localLogo, localOmitSplashTitle, localSplashImage, localSplashContentAlignment, localSplashDescription, localBackgroundMusic,
-        localPositiveEndingImage, localPositiveEndingContentAlignment, localPositiveEndingDescription, localPositiveEndingMusic,
-        localNegativeEndingImage, localNegativeEndingContentAlignment, localNegativeEndingDescription, localNegativeEndingMusic, localFixedVerbs,
-        localTextAnimationType, localTextSpeed, localImageTransitionType, localImageSpeed, localSplashContentVerticalAlignment,
-        props, onSetDirty
-    ]);
+            localImageSpeed !== imageSpeed ||
+            localEnableImages !== (enableImages ?? true) ||
+            localEnableTextControl !== (enableTextControl ?? true) ||
+            localTextReadingFlow !== (textReadingFlow || 'paused');
+        if (dirty !== isDirty) {
+            onSetDirty(dirty);
+        }
+    });
 
     const handleSave = () => {
         if (localLayoutOrientation !== layoutOrientation) onUpdate('gameLayoutOrientation', localLayoutOrientation);
@@ -620,7 +703,20 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localTextSpeed !== textSpeed) onUpdate('gameTextSpeed', localTextSpeed);
         if (localImageTransitionType !== imageTransitionType) onUpdate('gameImageTransitionType', localImageTransitionType);
         if (localImageSpeed !== imageSpeed) onUpdate('gameImageSpeed', localImageSpeed);
+        if (localEnableImages !== (enableImages ?? true)) onUpdate('enableImages', localEnableImages);
+        if (localEnableTextControl !== (enableTextControl ?? true)) onUpdate('enableTextControl', localEnableTextControl);
+        if (localTextReadingFlow !== (textReadingFlow || 'paused')) onUpdate('gameTextReadingFlow', localTextReadingFlow);
+        if (localGameInteractionType !== (gameInteractionType || 'choice')) onUpdate('gameInteractionType', localGameInteractionType);
+
+        // Sync new systems
+        if (localEnableTrackers !== (enableTrackers ?? (gameSystemEnabled === 'trackers'))) onUpdate('enableTrackers', localEnableTrackers);
+        if (localEnableInventory !== (enableInventory ?? false)) onUpdate('enableInventory', localEnableInventory);
+        if (localEnableDiary !== (enableDiary ?? false)) onUpdate('enableDiary', localEnableDiary);
+        if (localEnableFixedVerbs !== (enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0))) onUpdate('enableFixedVerbs', localEnableFixedVerbs);
+        if (localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances'))) onUpdate('enableChances', localEnableChances);
     };
+
+
 
     const handleUndo = () => {
         setLocalLayoutOrientation(layoutOrientation);
@@ -636,6 +732,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalMaxChances(maxChances);
         setLocalGameShowTrackersUI(gameShowTrackersUI);
         setLocalGameShowSystemButton(gameShowSystemButton);
+        setLocalGameInteractionType(gameInteractionType || 'choice');
         setLocalSuggestionsButtonText(suggestionsButtonText);
         setLocalInventoryButtonText(inventoryButtonText);
         setLocalDiaryButtonText(diaryButtonText);
@@ -689,6 +786,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalFixedVerbs(fixedVerbs);
         setLocalTextAnimationType(textAnimationType);
         setLocalTextSpeed(textSpeed);
+        setLocalTextReadingFlow(textReadingFlow || 'paused');
         setLocalImageTransitionType(imageTransitionType);
         setLocalImageSpeed(imageSpeed);
     };
@@ -986,129 +1084,543 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     )}
 
                     {activeTab === 'sistemas' && (
-                        <div className="space-y-6">
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div>
-                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Configuração de Sistemas</h3>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                                    <div className="space-y-6">
-                                        <div>
-                                            <label htmlFor="system-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Habilitar sistemas</label>
-                                            <select
-                                                id="system-select"
-                                                value={localGameSystemEnabled}
-                                                onChange={(e) => setLocalGameSystemEnabled(e.target.value as 'none' | 'chances' | 'trackers')}
-                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input shadow-lg"
-                                            >
-                                                <option value="none">Nenhum</option>
-                                                <option value="chances">Chances (Vidas)</option>
-                                                <option value="trackers">Rastreadores (Variáveis)</option>
-                                            </select>
+                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest flex items-center gap-2">
+                                    <Grid className="w-4 h-4 text-purple-400" /> Sistemas Ativos
+                                </h3>
+                                <p className="text-xs text-muted-foreground mb-6 max-w-2xl">
+                                    Habilite e configure os sistemas que estarão disponíveis no seu jogo. Você pode combinar múltiplos sistemas.
+                                </p>
+
+                                {/* --- BENTO BOX LAYOUT: FULL WIDTH HEADER + 2 INDEPENDENT COLUMNS + FOOTER --- */}
+                                <div className="space-y-6">
+
+                                    {/* --- ROW 1: GAME STYLE (Full Width) --- */}
+                                    <div className={`w-full p-6 bg-card border ${localGameInteractionType ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
+                                        <div className="flex justify-between items-start mb-6">
+                                            <div className="flex items-center gap-3">
+                                                <div className={`p-2.5 rounded-xl transition-colors bg-purple-500 text-white shadow-md`}>
+                                                    <LayoutTemplate className="w-5 h-5" />
+                                                </div>
+                                                <div>
+                                                    <h4 className="text-sm font-bold uppercase tracking-wide text-foreground">Estilo de Jogo</h4>
+                                                    <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Define a interação principal do jogador</p>
+                                                </div>
+                                            </div>
                                         </div>
 
-                                        <div className="p-4 rounded-xl bg-purple-500/5 border border-purple-500/10 text-xs text-muted-foreground leading-relaxed">
-                                            {localGameSystemEnabled === 'none' && "Nenhum sistema de jogo adicional habilitado. O jogo será puramente baseado em navegação e interações simples."}
-                                            {localGameSystemEnabled === 'chances' && (
-                                                <div className="flex gap-3">
-                                                    <Heart className="w-5 h-5 text-purple-400 flex-shrink-0" />
-                                                    <p>Gerencie a 'vida' do jogador. Defina um número máximo de tentativas antes que o jogo termine automaticamente.</p>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <button
+                                                onClick={() => setLocalGameInteractionType('parser')}
+                                                className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-purple-500 bg-purple-500/5 text-purple-400' : 'border-border/50 bg-input/50 text-muted-foreground hover:border-purple-500/30'}`}
+                                            >
+                                                <div className={`p-3 rounded-lg ${localGameInteractionType === 'parser' ? 'bg-purple-500/20' : 'bg-background'}`}>
+                                                    <Type className="w-6 h-6" />
                                                 </div>
-                                            )}
-                                            {localGameSystemEnabled === 'trackers' && (
-                                                <div className="flex gap-3">
-                                                    <SlidersHorizontal className="w-5 h-5 text-purple-400 flex-shrink-0" />
-                                                    <p>Crie variáveis customizadas (Ex: Sanidade, Dinheiro, Força). O progresso pode ser condicionado a esses valores.</p>
+                                                <div>
+                                                    <span className="text-xs font-bold uppercase block">Parser (Digite Comandos)</span>
+                                                    <span className="text-[10px] opacity-70 mt-0.5">O jogador digita ações como "pegar chave" ou "olhar mesa"</span>
                                                 </div>
-                                            )}
+                                            </button>
+                                            <button
+                                                onClick={() => setLocalGameInteractionType('choice')}
+                                                className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-purple-500 bg-purple-500/5 text-purple-400' : 'border-border/50 bg-input/50 text-muted-foreground hover:border-purple-500/30'}`}
+                                            >
+                                                <div className={`p-3 rounded-lg ${localGameInteractionType === 'choice' ? 'bg-purple-500/20' : 'bg-background'}`}>
+                                                    <List className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <span className="text-xs font-bold uppercase block">Decisão (Árvore de Opções)</span>
+                                                    <span className="text-[10px] opacity-70 mt-0.5">O jogador escolhe entre opções pré-definidas na tela</span>
+                                                </div>
+                                            </button>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-8">
-                                        {localGameSystemEnabled === 'chances' && (
-                                            <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-                                                <div className="grid grid-cols-2 gap-6">
-                                                    <div>
-                                                        <label htmlFor="maxChances" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Máximo de Chances</label>
-                                                        <input
-                                                            type="number"
-                                                            id="maxChances"
-                                                            value={localMaxChances}
-                                                            onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
-                                                            min="1"
-                                                            max="10"
-                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all shadow-lg"
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label htmlFor="chanceIcon" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Ícone</label>
-                                                        <div className="flex gap-2">
-                                                            <select
-                                                                id="chanceIcon"
-                                                                value={localChanceIcon}
-                                                                onChange={(e) => setLocalChanceIcon(e.target.value as any)}
-                                                                className="flex-grow bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg"
-                                                            >
-                                                                <option value="heart">Corações</option>
-                                                                <option value="circle">Círculos</option>
-                                                                <option value="square">Quadrados</option>
-                                                                <option value="diamond">Losangos</option>
-                                                            </select>
-                                                            <div className="flex-shrink-0 flex items-center justify-center w-12 bg-input border border-input rounded-lg shadow-lg">
-                                                                <ChanceIcon type={localChanceIcon} color={localChanceIconColor} className="w-5 h-5 shadow-[0_0_10px_rgba(168,85,247,0.2)]" />
+                                    <div className="flex flex-col md:flex-row gap-6 items-start">
+                                        {/* --- LEFT COLUMN --- */}
+                                        <div className="flex-1 w-full space-y-6">
+                                            {/* INVENTORY */}
+                                            <div className="w-full">
+                                                <div className={`w-full p-6 bg-card border ${localEnableInventory ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableInventory ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                                <Package className="w-5 h-5" />
+                                                            </div>
+                                                            <div>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>Inventário</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Gestão de itens pegos pelo jogador</p>
                                                             </div>
                                                         </div>
-                                                    </div>
-                                                </div>
-
-                                                <ColorInput label="Cor dos Ícones" id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
-
-                                                <div className="space-y-4 pt-4 border-t border-zinc-800/50">
-                                                    <div>
-                                                        <label htmlFor="chanceLossMessage" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Mensagem de Perda</label>
-                                                        <input
-                                                            type="text"
-                                                            id="chanceLossMessage"
-                                                            value={localChanceLossMessage}
-                                                            onChange={(e) => setLocalChanceLossMessage(e.target.value)}
-                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all shadow-lg"
-                                                            placeholder="Suas chances acabaram."
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <label htmlFor="chanceRestoreMessage" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Mensagem de Recuperação</label>
-                                                        <input
-                                                            type="text"
-                                                            id="chanceRestoreMessage"
-                                                            value={localChanceRestoreMessage}
-                                                            onChange={(e) => setLocalChanceRestoreMessage(e.target.value)}
-                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all shadow-lg"
-                                                            placeholder="Suas chances foram restauradas."
-                                                        />
+                                                        <label className="relative inline-flex items-center cursor-pointer">
+                                                            <input type="checkbox" checked={localEnableInventory} onChange={(e) => setLocalEnableInventory(e.target.checked)} className="sr-only peer" />
+                                                            <div className="w-10 h-6 bg-muted border-2 border-border rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                                            </div>
+                                                        </label>
                                                     </div>
                                                 </div>
                                             </div>
-                                        )}
 
-                                        {localGameSystemEnabled === 'trackers' && (
-                                            <div className="flex flex-col items-center justify-center h-full p-8 bg-card border border-border border-dashed rounded-2xl text-center space-y-4 animate-in fade-in slide-in-from-right-4 duration-500">
-                                                <SlidersHorizontal className="w-10 h-10 text-muted-foreground/50 mb-2" />
-                                                <div>
-                                                    <p className="text-sm font-bold text-foreground">Rastreadores Habilitados</p>
-                                                    <p className="text-xs text-muted-foreground mt-2 max-w-[240px]">Para criar e editar as variáveis específicas do jogo, utilize a guia "Rastreadores" no menu superior.</p>
+                                            {/* TEXT CONTROL */}
+                                            <div className="w-full">
+                                                <div className={`w-full p-6 bg-card border ${localEnableTextControl ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableTextControl ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                                <Type className="w-5 h-5" />
+                                                            </div>
+                                                            <div>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>Controle de Texto</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Animação e fluxo da descrição de cena</p>
+                                                            </div>
+                                                        </div>
+                                                        <label className="relative inline-flex items-center cursor-pointer">
+                                                            <input type="checkbox" checked={localEnableTextControl} onChange={(e) => setLocalEnableTextControl(e.target.checked)} className="sr-only peer" />
+                                                            <div className="w-10 h-6 bg-muted border-2 border-border rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    {localEnableTextControl && (
+                                                        <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <div className="space-y-2">
+                                                                    <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Estilo de Animação</label>
+                                                                    <select
+                                                                        id="textAnimationType"
+                                                                        value={localTextAnimationType}
+                                                                        onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
+                                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30"
+                                                                    >
+                                                                        <option value="fade">Esmaecer (Fade In)</option>
+                                                                        <option value="typewriter">Máquina de Escrever</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div className="space-y-2">
+                                                                    <label htmlFor="textReadingFlow" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Fluxo de Leitura</label>
+                                                                    <select
+                                                                        id="textReadingFlow"
+                                                                        value={localTextReadingFlow}
+                                                                        onChange={(e) => setLocalTextReadingFlow(e.target.value as 'continuous' | 'paused')}
+                                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30"
+                                                                    >
+                                                                        <option value="paused">Pausado (Por Parágrafo)</option>
+                                                                        <option value="continuous">Contínuo (Texto Completo)</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Velocidade</label>
+                                                                <div className="flex items-center gap-4">
+                                                                    <input
+                                                                        type="range"
+                                                                        min="1"
+                                                                        max="5"
+                                                                        value={localTextSpeed}
+                                                                        onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
+                                                                        className="flex-grow h-1.5 bg-input rounded-lg appearance-none cursor-pointer accent-purple-500"
+                                                                    />
+                                                                    <span className="text-xl font-mono font-bold w-6 text-center">{localTextSpeed}</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                 </div>
-                                                <button
-                                                    onClick={() => props.onNavigateToTrackers?.()}
-                                                    className="px-6 py-2 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-purple-500 hover:text-white transition-all active:scale-95"
-                                                >
-                                                    Gerenciar Rastreadores
-                                                </button>
                                             </div>
-                                        )}
 
-                                        {localGameSystemEnabled === 'none' && (
-                                            <div className="h-full border border-border/30 rounded-2xl bg-muted/20 flex items-center justify-center p-12 text-center text-muted-foreground font-bold uppercase tracking-[0.2em] text-[10px]">
-                                                Nenhum sistema selecionado
+                                            {/* LIFE SYSTEM */}
+                                            <div className="w-full">
+                                                <div className={`w-full p-6 bg-card border ${localEnableChances ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableChances ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                                <Heart className="w-5 h-5" />
+                                                            </div>
+                                                            <div>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>Sistema de Vidas</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Limitar tentativas</p>
+                                                            </div>
+                                                        </div>
+                                                        <label className="relative inline-flex items-center cursor-pointer">
+                                                            <input type="checkbox" checked={localEnableChances} onChange={(e) => setLocalEnableChances(e.target.checked)} className="sr-only peer" />
+                                                            <div className="w-10 h-6 bg-muted border-2 border-border rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    {localEnableChances && (
+                                                        <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                            <div className="flex items-end gap-3 w-full">
+                                                                <div className="space-y-1 flex-1 min-w-0">
+                                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Ícone</label>
+                                                                    <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-border/50 h-9 w-full">
+                                                                        {['heart', 'circle', 'diamond', 'cross'].map((icon) => (
+                                                                            <button
+                                                                                key={icon}
+                                                                                onClick={() => setLocalChanceIcon(icon as any)}
+                                                                                className={`flex-1 h-full flex items-center justify-center rounded-md transition-all ${localChanceIcon === icon ? 'bg-purple-500 text-white shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+                                                                                title={icon}
+                                                                            >
+                                                                                <ChanceIcon type={icon as any} color={localChanceIcon === icon ? '#ffffff' : 'currentColor'} className="w-4 h-4" />
+                                                                            </button>
+                                                                        ))}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="space-y-1 flex-1 min-w-0">
+                                                                    <label htmlFor="chanceColor" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cor</label>
+                                                                    <div className="flex items-center gap-2 p-1 bg-input border border-input rounded-lg focus-within:border-purple-500/50 transition-all h-9 w-full">
+                                                                        <input
+                                                                            type="color"
+                                                                            id="chanceColor-picker"
+                                                                            value={localChanceIconColor}
+                                                                            onChange={(e) => setLocalChanceIconColor(e.target.value)}
+                                                                            className="w-8 h-full p-0 border-none rounded cursor-pointer bg-transparent shrink-0"
+                                                                            aria-label="Seletor de cor"
+                                                                        />
+                                                                        <input
+                                                                            type="text"
+                                                                            id="chanceColor"
+                                                                            value={localChanceIconColor}
+                                                                            onChange={(e) => setLocalChanceIconColor(e.target.value)}
+                                                                            className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase truncate"
+                                                                            placeholder="#FF0000"
+                                                                        />
+                                                                    </div>
+                                                                </div>
+                                                                <div className="space-y-1 w-20 shrink-0">
+                                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Vidas</label>
+                                                                    <input
+                                                                        type="number"
+                                                                        value={localMaxChances}
+                                                                        onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
+                                                                        min="1"
+                                                                        max="10"
+                                                                        className="w-full h-9 bg-input border border-input rounded-lg px-2 text-sm font-bold text-center focus:ring-1 focus:ring-purple-500/50 transition-all"
+                                                                    />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
                                             </div>
-                                        )}
+                                        </div>
+
+                                        {/* --- RIGHT COLUMN --- */}
+                                        <div className="flex-1 w-full space-y-6">
+                                            {/* DIARY */}
+                                            <div className="w-full">
+                                                <div className={`w-full p-6 bg-card border ${localEnableDiary ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableDiary ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                                <Book className="w-5 h-5" />
+                                                            </div>
+                                                            <div>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>Diário de Bordo</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Registro de eventos</p>
+                                                            </div>
+                                                        </div>
+                                                        <label className="relative inline-flex items-center cursor-pointer">
+                                                            <input type="checkbox" checked={localEnableDiary} onChange={(e) => setLocalEnableDiary(e.target.checked)} className="sr-only peer" />
+                                                            <div className="w-10 h-6 bg-muted border-2 border-border rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    {localEnableDiary && (
+                                                        <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                            <div className="space-y-3">
+                                                                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50">
+                                                                    <span className="text-xs font-medium text-foreground">Mostrar Imagem da Cena</span>
+                                                                    <input type="checkbox" checked={localDiaryShowSceneImage} onChange={(e) => setLocalDiaryShowSceneImage(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded border-gray-300 focus:ring-purple-500" />
+                                                                </div>
+                                                                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50">
+                                                                    <span className="text-xs font-medium text-foreground">Mostrar Ação do Jogador</span>
+                                                                    <input type="checkbox" checked={localDiaryShowPlayerAction} onChange={(e) => setLocalDiaryShowPlayerAction(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded border-gray-300 focus:ring-purple-500" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* IMAGES */}
+                                            <div className="w-full">
+                                                <div className={`w-full p-6 bg-card border ${localEnableImages ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableImages ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                                <ImageIcon className="w-5 h-5" />
+                                                            </div>
+                                                            <div>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>Imagens nas Cenas</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Cenas ilustradas por imagens</p>
+                                                            </div>
+                                                        </div>
+                                                        <label className="relative inline-flex items-center cursor-pointer">
+                                                            <input type="checkbox" checked={localEnableImages} onChange={(e) => setLocalEnableImages(e.target.checked)} className="sr-only peer" />
+                                                            <div className="w-10 h-6 bg-muted border-2 border-border rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    {localEnableImages && (
+                                                        <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                            <div className="space-y-2">
+                                                                <label htmlFor="imageTransitionType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Transição de Imagem</label>
+                                                                <select
+                                                                    id="imageTransitionType"
+                                                                    value={localImageTransitionType}
+                                                                    onChange={(e) => setLocalImageTransitionType(e.target.value as any)}
+                                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30"
+                                                                >
+                                                                    <option value="fade">Esmaecer (Fade)</option>
+                                                                    <option value="slide">Deslizar (Slide)</option>
+                                                                    <option value="none">Nenhuma</option>
+                                                                </select>
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Velocidade</label>
+                                                                <div className="flex items-center gap-4">
+                                                                    <input
+                                                                        type="range"
+                                                                        min="0.1"
+                                                                        max="3"
+                                                                        step="0.1"
+                                                                        value={localImageSpeed}
+                                                                        onChange={(e) => setLocalImageSpeed(parseFloat(e.target.value))}
+                                                                        className="flex-grow h-1.5 bg-input rounded-lg appearance-none cursor-pointer accent-purple-500"
+                                                                    />
+                                                                    <span className="text-xl font-mono font-bold w-6 text-center">{localImageSpeed}s</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* TRACKERS */}
+                                            <div className="w-full">
+                                                <div className={`w-full p-6 bg-card border ${localEnableTrackers ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableTrackers ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                                <SlidersHorizontal className="w-5 h-5" />
+                                                            </div>
+                                                            <div>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>Rastreadores</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Variáveis Numéricas</p>
+                                                            </div>
+                                                        </div>
+                                                        <label className="relative inline-flex items-center cursor-pointer">
+                                                            <input type="checkbox" checked={localEnableTrackers} onChange={(e) => setLocalEnableTrackers(e.target.checked)} className="sr-only peer" />
+                                                            <div className="w-10 h-6 bg-muted border-2 border-border rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                    {localEnableTrackers && (
+                                                        <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                            <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                                                Rastreadores são variáveis para pontos de vida alternativos, dinheiro, sanidade, etc.
+                                                            </p>
+                                                            <button
+                                                                onClick={() => props.onNavigateToTrackers?.()}
+                                                                className="w-full py-3 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-purple-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+                                                            >
+                                                                <SlidersHorizontal className="w-4 h-4" /> Configurar Rastreadores
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'global' && (
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div>
+                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest flex items-center gap-2">
+                                    <Command className="w-4 h-4 text-purple-400" /> Comandos Globais
+                                </h3>
+                                <p className="text-xs text-muted-foreground mb-6 max-w-2xl">
+                                    Configure comandos/verbos que estarão sempre disponíveis para o jogador, independente da cena atual (ex: inventário, ajuda, status).
+                                </p>
+
+                                <div className={`p-6 bg-card border ${localEnableFixedVerbs ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                    <div className="flex justify-between items-start">
+                                        <div className="flex items-center gap-3">
+                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableFixedVerbs ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                <Command className="w-5 h-5" />
+                                            </div>
+                                            <div>
+                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableFixedVerbs ? 'text-foreground' : 'text-muted-foreground'}`}>Habilitar Comandos Globais</h4>
+                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Ativa o processamento de verbos globais</p>
+                                            </div>
+                                        </div>
+                                        <label className="relative inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" checked={localEnableFixedVerbs} onChange={(e) => setLocalEnableFixedVerbs(e.target.checked)} className="sr-only peer" />
+                                            <div className="w-10 h-6 bg-muted border-2 border-border/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                    {localEnableFixedVerbs && (
+                                        <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                            <button
+                                                onClick={() => handleAddFixedVerb()}
+                                                className="w-full py-2 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-purple-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+                                            >
+                                                <Plus className="w-4 h-4" /> Adicionar Novo Comando
+                                            </button>
+                                            {localFixedVerbs.length > 0 && (
+                                                <div className="text-[10px] text-muted-foreground text-center">
+                                                    {localFixedVerbs.length} comando(s) configurado(s)
+                                                </div>
+                                            )}
+                                            <div className="grid grid-cols-1 gap-2">
+                                                {localFixedVerbs.map(verb => (
+                                                    <FixedVerbItem
+                                                        key={verb.id}
+                                                        verb={verb}
+                                                        onUpdate={handleFixedVerbChange}
+                                                        onRemove={handleRemoveFixedVerb}
+                                                    />
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                    {/* --- SECTION: FIM DE JOGO (Consolidated) --- */}
+                    {activeTab === 'sistemas' && (
+                        <div className="mt-12 pt-8 border-t border-border">
+                            <h3 className="text-xs font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
+                                <Trophy className="w-4 h-4 text-purple-400" /> Telas de Final
+                            </h3>
+                            <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
+                                {/* ENDING POSITIVE */}
+                                <div className="space-y-6">
+                                    <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest flex items-center gap-2 p-2 bg-green-400/10 rounded-lg w-fit border border-green-400/20">
+                                        <Trophy className="w-3 h-3" /> Vitória
+                                    </h4>
+                                    <div className="bg-card border border-border rounded-xl p-4 space-y-4">
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Alinhamento</label>
+                                            <select
+                                                value={localPositiveEndingContentAlignment}
+                                                onChange={(e) => setLocalPositiveEndingContentAlignment(e.target.value as 'left' | 'right')}
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground font-bold"
+                                            >
+                                                <option value="right">Direita</option>
+                                                <option value="left">Esquerda</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Mensagem</label>
+                                            <textarea
+                                                value={localPositiveEndingDescription}
+                                                onChange={(e) => setLocalPositiveEndingDescription(e.target.value)}
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground min-h-[100px] resize-none"
+                                                placeholder="Mensagem de vitória..."
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem</label>
+                                            <div className="relative w-full aspect-video bg-muted rounded-lg overflow-hidden group border border-border">
+                                                {localPositiveEndingImage ? (
+                                                    <>
+                                                        <img src={localPositiveEndingImage} className="w-full h-full object-cover" />
+                                                        <button onClick={() => setLocalPositiveEndingImage('')} className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4" /></button>
+                                                    </>
+                                                ) : (
+                                                    <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors">
+                                                        <Upload className="w-6 h-6 text-muted-foreground mb-1" />
+                                                        <span className="text-[9px] font-bold uppercase text-muted-foreground">Upload</span>
+                                                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} />
+                                                    </label>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Música</label>
+                                            <div className="flex gap-2">
+                                                <label className="flex-1 flex items-center justify-center px-3 py-2 bg-muted border border-border rounded-lg cursor-pointer hover:bg-muted/80 text-[10px] font-bold uppercase">
+                                                    <Upload className="w-3 h-3 mr-2" /> {localPositiveEndingMusic ? 'Alterar' : 'Carregar'}
+                                                    <input type="file" accept="audio/*" className="hidden" onChange={(e) => handleAudioUpload(e, setLocalPositiveEndingMusic)} />
+                                                </label>
+                                                {localPositiveEndingMusic && (
+                                                    <button onClick={() => setLocalPositiveEndingMusic('')} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white"><Trash2 className="w-4 h-4" /></button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* ENDING NEGATIVE */}
+                                <div className="space-y-6">
+                                    <h4 className="text-xs font-bold text-red-400 uppercase tracking-widest flex items-center gap-2 p-2 bg-red-400/10 rounded-lg w-fit border border-red-400/20">
+                                        <Skull className="w-3 h-3" /> Derrota
+                                    </h4>
+                                    <div className="bg-card border border-border rounded-xl p-4 space-y-4">
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Alinhamento</label>
+                                            <select
+                                                value={localNegativeEndingContentAlignment}
+                                                onChange={(e) => setLocalNegativeEndingContentAlignment(e.target.value as 'left' | 'right')}
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground font-bold"
+                                            >
+                                                <option value="right">Direita</option>
+                                                <option value="left">Esquerda</option>
+                                            </select>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Mensagem</label>
+                                            <textarea
+                                                value={localNegativeEndingDescription}
+                                                onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground min-h-[100px] resize-none"
+                                                placeholder="Mensagem de derrota..."
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem</label>
+                                            <div className="relative w-full aspect-video bg-muted rounded-lg overflow-hidden group border border-border">
+                                                {localNegativeEndingImage ? (
+                                                    <>
+                                                        <img src={localNegativeEndingImage} className="w-full h-full object-cover" />
+                                                        <button onClick={() => setLocalNegativeEndingImage('')} className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"><Trash2 className="w-4 h-4" /></button>
+                                                    </>
+                                                ) : (
+                                                    <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-muted/80 transition-colors">
+                                                        <Upload className="w-6 h-6 text-muted-foreground mb-1" />
+                                                        <span className="text-[9px] font-bold uppercase text-muted-foreground">Upload</span>
+                                                        <input type="file" accept="image/*" className="hidden" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} />
+                                                    </label>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Música</label>
+                                            <div className="flex gap-2">
+                                                <label className="flex-1 flex items-center justify-center px-3 py-2 bg-muted border border-border rounded-lg cursor-pointer hover:bg-muted/80 text-[10px] font-bold uppercase">
+                                                    <Upload className="w-3 h-3 mr-2" /> {localNegativeEndingMusic ? 'Alterar' : 'Carregar'}
+                                                    <input type="file" accept="audio/*" className="hidden" onChange={(e) => handleAudioUpload(e, setLocalNegativeEndingMusic)} />
+                                                </label>
+                                                {localNegativeEndingMusic && (
+                                                    <button onClick={() => setLocalNegativeEndingMusic('')} className="p-2 bg-red-500/5 text-muted-foreground rounded-lg border border-border hover:bg-red-500 hover:text-white transition-all shadow-lg"><Trash2 className="w-4 h-4" /></button>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -1269,153 +1781,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                     )}
 
-                    {
-                        activeTab === 'fim_de_jogo' && (
-                            <div className="space-y-6">
-                                <div>
-                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Final Positivo</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
-                                        <div className="space-y-8 flex flex-col h-full col-span-1">
-                                            <div className="space-y-2">
-                                                <label htmlFor="posEndingContent" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
-                                                <select
-                                                    id="posEndingContent"
-                                                    value={localPositiveEndingContentAlignment}
-                                                    onChange={(e) => setLocalPositiveEndingContentAlignment(e.target.value as 'left' | 'right')}
-                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all [&>option]:bg-input shadow-lg"
-                                                >
-                                                    <option value="right">Direita</option>
-                                                    <option value="left">Esquerda</option>
-                                                </select>
-                                            </div>
-                                            <div className="space-y-2 flex flex-col flex-grow">
-                                                <label htmlFor="positiveEndingDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Mensagem de Vitória</label>
-                                                <textarea
-                                                    id="positiveEndingDescription"
-                                                    value={localPositiveEndingDescription}
-                                                    onChange={(e) => setLocalPositiveEndingDescription(e.target.value)}
-                                                    className="w-full flex-grow bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all min-h-[160px] resize-none leading-relaxed placeholder:text-muted-foreground"
-                                                    placeholder="Parabéns! Você venceu."
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="space-y-8 col-span-2">
-                                            <div className="space-y-4">
-                                                <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem de Vitória</h4>
-                                                <div className="relative w-full h-[225px]">
-                                                    {localPositiveEndingImage ? (
-                                                        <div className="absolute inset-0 w-full h-full border border-border rounded-xl overflow-hidden bg-card group shadow-2xl">
-                                                            <img src={localPositiveEndingImage} alt="Final Positivo" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-40" />
-                                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-3 bg-black/40 backdrop-blur-sm">
-                                                                <label className="p-3 bg-secondary text-secondary-foreground rounded-lg cursor-pointer hover:bg-secondary/80 transition-all shadow-xl">
-                                                                    <Upload className="w-5 h-5" />
-                                                                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
-                                                                </label>
-                                                                <button onClick={() => setLocalPositiveEndingImage('')} className="p-3 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition-all shadow-xl">
-                                                                    <Trash2 className="w-5 h-5" />
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-border bg-muted/30 rounded-xl cursor-pointer hover:bg-muted/50 transition-all group overflow-hidden">
-                                                            <Upload className="w-10 h-10 text-muted-foreground mb-4 transition-colors group-hover:text-purple-400" />
-                                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground">Carregar Imagem</span>
-                                                            <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalPositiveEndingImage)} className="hidden" />
-                                                        </label>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="space-y-4 pt-6 border-t border-zinc-800/50">
-                                                <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha de Vitória</h4>
-                                                <div className="flex items-center gap-3">
-                                                    <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
-                                                        <Upload className="w-4 h-4 mr-2 text-purple-400" /> {localPositiveEndingMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
-                                                        <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalPositiveEndingMusic)} className="hidden" />
-                                                    </label>
-                                                    {localPositiveEndingMusic && (
-                                                        <button onClick={() => setLocalPositiveEndingMusic('')} className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-border hover:bg-red-500 hover:text-white transition-all shadow-lg">
-                                                            <Trash2 className="w-5 h-5" />
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div className="pt-6 border-t border-zinc-800/50">
-                                    <h3 className="text-xs font-bold text-zinc-100 mb-4 uppercase tracking-widest">Final Negativo</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
-                                        <div className="space-y-8 flex flex-col h-full col-span-1">
-                                            <div className="space-y-2">
-                                                <label htmlFor="negEndingContent" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
-                                                <select
-                                                    id="negEndingContent"
-                                                    value={localNegativeEndingContentAlignment}
-                                                    onChange={(e) => setLocalNegativeEndingContentAlignment(e.target.value as 'left' | 'right')}
-                                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all [&>option]:bg-zinc-950 shadow-lg"
-                                                >
-                                                    <option value="right">Direita</option>
-                                                    <option value="left">Esquerda</option>
-                                                </select>
-                                            </div>
-                                            <div className="space-y-2 flex flex-col flex-grow">
-                                                <label htmlFor="negativeEndingDescription" className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-2">Mensagem de Derrota</label>
-                                                <textarea
-                                                    id="negativeEndingDescription"
-                                                    value={localNegativeEndingDescription}
-                                                    onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
-                                                    className="w-full flex-grow bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-3 text-xs text-zinc-300 focus:ring-0 focus:border-purple-500/50 transition-all min-h-[160px] resize-none leading-relaxed placeholder:text-zinc-800"
-                                                    placeholder="Fim de jogo."
-                                                />
-                                            </div>
-                                        </div>
-                                        <div className="space-y-8 col-span-2">
-                                            <div className="space-y-4">
-                                                <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Imagem de Derrota</h4>
-                                                <div className="relative w-full h-[225px]">
-                                                    {localNegativeEndingImage ? (
-                                                        <div className="absolute inset-0 w-full h-full border border-zinc-800 rounded-xl overflow-hidden bg-zinc-950 group shadow-2xl">
-                                                            <img src={localNegativeEndingImage} alt="Final Negativo" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-40" />
-                                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-3 bg-zinc-950/40 backdrop-blur-sm">
-                                                                <label className="p-3 bg-white text-zinc-950 rounded-lg cursor-pointer hover:bg-zinc-200 transition-all shadow-xl">
-                                                                    <Upload className="w-5 h-5" />
-                                                                    <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
-                                                                </label>
-                                                                <button onClick={() => setLocalNegativeEndingImage('')} className="p-3 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition-all shadow-xl">
-                                                                    <Trash2 className="w-5 h-5" />
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        <label className="absolute inset-0 flex flex-col items-center justify-center border-2 border-dashed border-zinc-800 bg-zinc-900/30 rounded-xl cursor-pointer hover:bg-zinc-800/50 transition-all group overflow-hidden">
-                                                            <Upload className="w-10 h-10 text-muted-foreground mb-4 transition-colors group-hover:text-purple-400" />
-                                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground">Carregar Imagem</span>
-                                                            <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalNegativeEndingImage)} className="hidden" />
-                                                        </label>
-                                                    )}
-                                                </div>
-                                            </div>
-                                            <div className="space-y-4 pt-6 border-t border-zinc-800/50">
-                                                <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Trilha de Derrota</h4>
-                                                <div className="flex items-center gap-3">
-                                                    <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg">
-                                                        <Upload className="w-4 h-4 mr-2 text-purple-400" /> {localNegativeEndingMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
-                                                        <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalNegativeEndingMusic)} className="hidden" />
-                                                    </label>
-                                                    {localNegativeEndingMusic && (
-                                                        <button onClick={() => setLocalNegativeEndingMusic('')} className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-border hover:bg-red-500 hover:text-white transition-all shadow-lg">
-                                                            <Trash2 className="w-5 h-5" />
-                                                        </button>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    }
                     {
                         activeTab === 'textos' && (
                             <div className="space-y-6">
@@ -1484,74 +1850,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     </div>
                                 </div>
 
-                                <div className="pt-6 border-t border-border/50">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h3 className="text-sm font-bold text-foreground uppercase tracking-widest">Menu de Sistema</h3>
-                                        <div className="flex items-center gap-3 px-4 py-2 bg-card border border-border rounded-xl group cursor-pointer" onClick={() => setLocalGameShowSystemButton(!localGameShowSystemButton)}>
-                                            <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${localGameShowSystemButton ? 'bg-purple-500 border-purple-500' : 'bg-input border-input group-hover:border-primary/50'}`}>
-                                                {localGameShowSystemButton && <Check className="w-3 h-3 text-white" />}
-                                            </div>
-                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground select-none">Mostrar Menu de Sistema</span>
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                                        <div className="space-y-2">
-                                            <label htmlFor="saveMenuTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Título Tela Salvar</label>
-                                            <input type="text" id="saveMenuTitle" value={localSaveMenuTitle} onChange={e => setLocalSaveMenuTitle(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Salvar Jogo" />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="loadMenuTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Título Tela Carregar</label>
-                                            <input type="text" id="loadMenuTitle" value={localLoadMenuTitle} onChange={e => setLocalLoadMenuTitle(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Carregar Jogo" />
-                                        </div>
-                                    </div>
-                                </div>
 
-                                <div className="flex items-center justify-between">
-                                    <h3 className="text-[10px] font-bold text-foreground mb-4 uppercase tracking-widest">Efeitos de Texto</h3>
-                                    {/* Unsaved Changes Notification - Matching SceneEditor */}
-                                    {isDirty && (
-                                        <div className="flex items-center gap-2 text-purple-400 text-[10px] font-bold animate-pulse bg-purple-500/5 px-2 py-1 rounded-md border border-purple-500/10">
-                                            <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
-                                            <span>ALTERAÇÕES NÃO SALVAS</span>
-                                        </div>
-                                    )}
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                                    <div className="space-y-2">
-                                        <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Estilo de Animação</label>
-                                        <select
-                                            id="textAnimationType"
-                                            value={localTextAnimationType}
-                                            onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
-                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg"
-                                        >
-                                            <option value="fade">Esmaecer (Fade In)</option>
-                                            <option value="typewriter">Máquina de Escrever (Letra a letra)</option>
-                                        </select>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <label htmlFor="textSpeed" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Velocidade da Animação</label>
-                                        <div className="flex items-center gap-6 px-2">
-                                            <input
-                                                type="range"
-                                                id="textSpeed"
-                                                min="1"
-                                                max="5"
-                                                value={localTextSpeed}
-                                                onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
-                                                className="flex-grow h-1.5 bg-input rounded-lg appearance-none cursor-pointer accent-purple-500"
-                                            />
-                                            <div className="w-10 h-10 rounded-lg bg-card border border-border flex items-center justify-center font-mono text-xs font-bold text-purple-400 shadow-inner">
-                                                {localTextSpeed}
-                                            </div>
-                                        </div>
-                                        <div className="flex justify-between text-[9px] text-muted-foreground font-bold uppercase tracking-tighter px-2">
-                                            <span>Lento</span>
-                                            <span>Rápido</span>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
                         )
                     }
@@ -1691,13 +1990,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         onClick={() => toggleSection('cores')}
                                                         className="flex items-center justify-between w-full text-left bg-muted/30 p-3 rounded-lg hover:bg-muted/50 transition-all"
                                                     >
-                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cores do Sistema (Avançado)</span>
+                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Personalização de Cores</span>
                                                         {activeSections.cores ? <ChevronUp className="w-3 h-3 text-muted-foreground" /> : <ChevronDown className="w-3 h-3 text-muted-foreground" />}
                                                     </button>
                                                     {activeSections.cores && (
                                                         <div className="mt-3 space-y-6 animate-in fade-in slide-in-from-top-1 px-1">
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Cores (Tema {localGameTheme === 'dark' ? 'Escuro' : 'Claro'})</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Descrição de Cena</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                                     <ColorInput label="Texto Padrão" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
                                                                     <ColorInput label="Título / Destaque" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
@@ -1707,7 +2006,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             </div>
 
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Botões (Geral)</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Botões da interface</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                                     <ColorInput label="Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
                                                                     <ColorInput label="Texto Botão de Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
@@ -1720,8 +2019,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             <div className="space-y-4">
                                                                 <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Box de Nome da Cena</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label="Fundo do Box" id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
-                                                                    <ColorInput label="Texto do Box" id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label="Cor de fundo" id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
+                                                                    <ColorInput label="Texto" id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
                                                                 </div>
                                                             </div>
 
@@ -1745,7 +2044,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <Type className="w-4 h-4 text-purple-400" /> UI TEXT
+                                                <Type className="w-4 h-4 text-purple-400" /> FONTES & TEXTO
                                             </h3>
                                             {activeSections.texto ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
@@ -1753,7 +2052,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         {activeSections.texto && (
                                             <div className="space-y-6 pl-2 border-l-2 border-border/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Botão de Ação (Principal)</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Botão de Ação</label>
                                                     <input
                                                         type="text"
                                                         value={localActionButtonText}
@@ -1762,7 +2061,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Placeholder do Input</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Input do ogador</label>
                                                     <input
                                                         type="text"
                                                         value={localVerbInputPlaceholder}

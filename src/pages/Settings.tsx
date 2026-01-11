@@ -78,11 +78,14 @@ const Settings: React.FC = () => {
     };
 
     const handleLogout = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) {
+        try {
+            const { error } = await supabase.auth.signOut();
+            if (error) throw error;
+        } catch (error: any) {
             console.error('Error logging out:', error);
-            toast("Erro ao sair", "Não foi possível encerrar a sessão.", "error");
-        } else {
+            // Even if server request fails, we clear local session where possible and redirect
+            toast("Aviso", "Sessão encerrada localmente.", "default");
+        } finally {
             navigate('/');
         }
     };

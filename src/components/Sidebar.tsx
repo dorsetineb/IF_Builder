@@ -183,7 +183,15 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     const trackersButtonHTML = (exportData.gameSystemEnabled === 'trackers' && (exportData.gameShowTrackersUI ?? true)) ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>' : '';
     const systemButtonHTML = (exportData.gameShowSystemButton ?? true) ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>' : '';
 
-    let html = exportData.gameHTML
+    const inventoryButtonHTML = (exportData.enableInventory ?? true)
+      ? `<button id="inventory-button">${exportData.gameInventoryButtonText || 'Inventário'}</button>`
+      : '';
+
+    const diaryButtonHTML = (exportData.enableDiary ?? true)
+      ? `<button id="diary-button">${exportData.gameDiaryButtonText || 'Diário'}</button>`
+      : '';
+
+    let htmlContent = gameData.gameHTML
       .replace('__GAME_TITLE__', exportData.gameTitle || 'IF Builder Game')
       .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme with-spacing`)
       .replace('__LAYOUT_ORIENTATION_CLASS__', exportData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : '')
@@ -191,12 +199,12 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       .replace('__FRAME_CLASS__', getFrameClass(exportData.gameImageFrame))
       .replace('__MOBILE_BEHAVIOR_CLASS__', 'behavior-immersive') // FIXO: COMPORTAMENTO IMERSIVO
       .replace('__FONT_STYLESHEET__', fontStylesheet)
-      .replace('__CHANCES_CONTAINER__', exportData.gameSystemEnabled === 'chances' ? '<div id="chances-container" class="chances-container"></div>' : '')
+      .replace('__CHANCES_CONTAINER__', (exportData.enableChances || exportData.gameSystemEnabled === 'chances') ? '<div id="chances-container" class="chances-container"></div>' : '')
       .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
       .replace('__SYSTEM_BUTTON__', systemButtonHTML)
+      .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
+      .replace('__DIARY_BUTTON__', diaryButtonHTML)
       .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, exportData.gameSuggestionsButtonText || 'Sugestões')
-      .replace(/__INVENTORY_BUTTON_TEXT__/g, exportData.gameInventoryButtonText || 'Inventário')
-      .replace(/__DIARY_BUTTON_TEXT__/g, exportData.gameDiaryButtonText || 'Diário')
       .replace(/__TRACKERS_BUTTON_TEXT__/g, exportData.gameTrackersButtonText || 'Rastreadores')
       .replace(/__SYSTEM_BUTTON_TEXT__/g, exportData.gameSystemButtonText || 'Sistema')
       .replace('__SAVE_MENU_TITLE__', exportData.gameSaveMenuTitle || 'Salvar Jogo')
@@ -220,7 +228,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       .replace('__NEGATIVE_ENDING_ALIGN_CLASS__', exportData.negativeEndingContentAlignment === 'left' ? 'align-left' : '')
       .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '');
 
-    html = html.replace('</body>', '<script src="game.js"></script></body>');
+    htmlContent = htmlContent.replace('</body>', '<script src="game.js"></script></body>');
 
     const css = finalCss
       .replace(/__FONT_FAMILY__/g, fontFamily)
@@ -244,7 +252,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       .replace(/__SCENE_NAME_OVERLAY_TEXT_COLOR__/g, exportData.gameSceneNameOverlayTextColor || '#c9d1d9')
       .replace(/__CONTINUE_INDICATOR_COLOR__/g, exportData.gameContinueIndicatorColor || exportData.gameTitleColor || '#58a6ff');
 
-    zip.file("index.html", html);
+    zip.file("index.html", htmlContent);
     zip.file("style.css", css);
     zip.file("game.js", finalGameScript);
 

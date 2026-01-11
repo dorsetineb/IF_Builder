@@ -96,6 +96,7 @@ export interface GameData {
   gameTitleColor?: string;
   gameHideTitle?: boolean;
   gameOmitSplashTitle?: boolean;
+  gameInteractionType?: 'parser' | 'choice';
   gameSplashContentAlignment?: 'left' | 'right';
   gameSplashContentVerticalAlignment?: 'top' | 'bottom';
   gameSplashDescription?: string;
@@ -116,7 +117,26 @@ export interface GameData {
   gameVerbInputPlaceholder?: string;
   gameDiaryPlayerName?: string;
   gameFocusColor?: string;
-  gameSystemEnabled?: 'none' | 'chances' | 'trackers';
+  gameSystemEnabled?: 'none' | 'chances' | 'trackers'; // Legacy, keep for migration
+  enableTrackers?: boolean;
+  enableInventory?: boolean;
+  enableDiary?: boolean;
+  enableFixedVerbs?: boolean;
+  enableChances?: boolean; // Legacy/Basic system
+
+  // Inventory Config
+  inventoryCapacity?: number;
+  inventoryMaxWeight?: number;
+
+  // Diary Config
+  diaryAutoScroll?: boolean;
+  diaryAllowExport?: boolean;
+  diaryMaxMessages?: number;
+  diaryShowSceneImage?: boolean;
+  diaryShowPlayerAction?: boolean;
+  enableImages?: boolean;
+  enableTextControl?: boolean;
+
   gameMaxChances?: number;
   gameChanceIcon?: 'circle' | 'cross' | 'heart' | 'square' | 'diamond';
   gameChanceIconColor?: string;
@@ -160,6 +180,7 @@ export interface GameData {
   gameTextSpeed?: number; // 1 (slow) to 10 (fast)
   gameImageTransitionType?: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom' | 'blur' | 'none';
   gameImageSpeed?: number; // 1 (slow) to 10 (fast)
+  gameTextReadingFlow?: 'continuous' | 'paused';
 }
 
 export type View = 'scenes' | 'interface' | 'map' | 'global_objects' | 'trackers';
