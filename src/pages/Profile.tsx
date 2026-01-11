@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { User, MapPin, Calendar, Link as LinkIcon, MessageSquare, BookOpen, Heart, MoreHorizontal, Mail, CheckCircle, Search, Bell } from 'lucide-react';
 import { useParams } from 'react-router-dom';
+import { LoadingOverlay } from '../components/LoadingOverlay';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 type Post = Database['public']['Tables']['posts']['Row'] & { category_id?: string | null };
@@ -48,11 +49,11 @@ const Profile: React.FC = () => {
         if (data) setPosts(data);
     };
 
-    if (loading) return <div className="text-white p-8">Carregando perfil...</div>;
-    if (!profile) return <div className="text-white p-8">Perfil não encontrado.</div>;
+    if (!loading && !profile) return <div className="text-white p-8">Perfil não encontrado.</div>;
 
     return (
-        <div className="font-sans text-foreground min-h-screen bg-background text-xs text-left">
+        <div className="font-sans text-foreground min-h-screen bg-background text-xs text-left relative">
+            {loading && <LoadingOverlay message="Carregando perfil..." />}
             {/* Top Navigation Bar Helper (Ideally global) */}
             <div className="border-b border-border bg-card/50 px-4 py-2 flex justify-between items-center mb-0">
                 <h1 className="text-sm font-bold text-foreground">Perfil</h1>

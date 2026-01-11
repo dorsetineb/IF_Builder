@@ -6,6 +6,7 @@ import { PostCard } from '../components/PostCard';
 import { useToast } from '../components/ToastContext';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../components/UserContext';
+import { LoadingOverlay } from '../components/LoadingOverlay';
 
 type Post = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
@@ -95,7 +96,8 @@ const Favorites: React.FC = () => {
     );
 
     return (
-        <div className="min-h-full font-sans text-xs bg-background">
+        <div className="min-h-full font-sans text-xs bg-background relative">
+            {loading && <LoadingOverlay message="Carregando seus favoritos..." />}
             {/* Standard Header */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
                 <div className="flex flex-col justify-center h-full">
@@ -145,9 +147,7 @@ const Favorites: React.FC = () => {
 
             <div className="p-8 max-w-[1600px] mx-auto">
 
-                {loading ? (
-                    <div className="p-8 text-center text-muted-foreground text-xs">Carregando seus favoritos...</div>
-                ) : filteredPosts.length > 0 ? (
+                {filteredPosts.length > 0 ? (
                     <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'flex flex-col gap-3'}>
                         {filteredPosts.map((post) => (
                             <PostCard

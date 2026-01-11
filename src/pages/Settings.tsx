@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { User, Lock, Save, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, X, Terminal } from 'lucide-react';
+import { User, Lock, Save, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, X, Terminal, Mail } from 'lucide-react';
+import { LoadingOverlay } from '../components/LoadingOverlay';
 import { useTheme } from '../components/ThemeProvider';
 import { useToast } from '../components/ToastContext';
 import { useNavigate } from 'react-router-dom';
@@ -24,30 +25,44 @@ const Settings: React.FC = () => {
     const [interests, setInterests] = useState<string[]>([]);
     const [tagInput, setTagInput] = useState('');
 
+    const [pageLoading, setPageLoading] = useState(true);
+
     useEffect(() => {
         getProfile();
     }, []);
 
     const getProfile = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-            setEmail(user.email || '');
-            const { data } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-            if (data) {
-                setDisplayName(data.full_name || '');
-                setUsername(data.username || '');
-                setWebsite(data.website || '');
-                setBio(data.bio || '');
-                setAvatarUrl(data.avatar_url || '');
-                setInterests(data.interests || []);
-            } else {
-                // Pre-fill from auth metadata if profile doesn't exist
-                const meta = user.user_metadata;
-                console.log('No profile found, using metadata:', meta);
-                setDisplayName(meta.full_name || '');
-                setUsername(meta.username || '');
-                setAvatarUrl(meta.avatar_url || '');
+        setPageLoading(true);
+        try {
+            const { data: { user } } = await supabase.auth.getUser();
+            if (user) {
+                setEmail(user.email || '');
+                const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
+
+                if (error && error.code !== 'PGRST116') {
+                    console.error('Error fetching profile:', error);
+                }
+
+                if (data) {
+                    setDisplayName(data.full_name || '');
+                    setUsername(data.username || '');
+                    setWebsite(data.website || '');
+                    setBio(data.bio || '');
+                    setAvatarUrl(data.avatar_url || '');
+                    setInterests(data.interests || []);
+                } else {
+                    // Pre-fill from auth metadata if profile doesn't exist
+                    const meta = user.user_metadata || {};
+                    console.log('No profile found, using metadata:', meta);
+                    setDisplayName(meta.full_name || meta.name || '');
+                    setUsername(meta.username || '');
+                    setAvatarUrl(meta.avatar_url || meta.picture || '');
+                }
             }
+        } catch (error) {
+            console.error('Critical error in Settings:', error);
+        } finally {
+            setPageLoading(false);
         }
     };
 
@@ -103,8 +118,10 @@ const Settings: React.FC = () => {
     };
 
     return (
-        <div className="min-h-full font-sans text-xs bg-background">
-            {/* Standard Header */}
+        <div className="min-h-full font-sans text-xs bg-background flex flex-col relative">
+            {/* Loading Overlay */}
+            {pageLoading && <LoadingOverlay />}
+
             {/* Standard Header */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
                 <div className="flex flex-col justify-center h-full">
@@ -113,7 +130,7 @@ const Settings: React.FC = () => {
                 </div>
                 <button
                     onClick={handleLogout}
-                    className="flex items-center gap-2 px-3 py-1.5 bg-destructive/10 text-destructive rounded-lg hover:bg-destructive/20 border border-destructive/20 text-xs font-medium transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white border border-red-500/20 text-xs font-bold transition-all shadow-sm"
                 >
                     <LogOut size={14} /> Sair da Conta
                 </button>
@@ -284,8 +301,14 @@ const Settings: React.FC = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                         <div className="space-y-1 text-left">
                             <label className="text-xs font-medium text-muted-foreground">Endereço de E-mail</label>
-                            <div className="bg-muted border border-border rounded px-3 py-1.5 text-muted-foreground text-sm">
-                                {email}
+                            <div className="flex gap-2 relative mt-1">
+                                <Mail className="absolute left-3 top-2.5 text-muted-foreground w-4 h-4" />
+                                <input
+                                    type="email"
+                                    value={email}
+                                    disabled
+                                    className="flex-1 bg-muted/50 border border-border rounded-lg pl-9 pr-4 py-2 text-xs text-muted-foreground cursor-not-allowed w-full"
+                                />
                             </div>
                         </div>
 

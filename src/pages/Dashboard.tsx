@@ -6,6 +6,7 @@ import { Database } from '../types/supabase';
 import { PostCard } from '../components/PostCard';
 import { InviteManager } from '../components/InviteManager';
 import { useUser } from '../components/UserContext';
+import { LoadingOverlay } from '../components/LoadingOverlay';
 
 type Post = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
@@ -144,7 +145,8 @@ const Dashboard: React.FC = () => {
     };
 
     return (
-        <div className="min-h-full font-sans text-xs bg-background overflow-y-auto">
+        <div className="min-h-full font-sans text-xs bg-background overflow-y-auto relative">
+            {loadingPosts && <LoadingOverlay message="Carregando atividades..." />}
             {/* Header */}
             <div className="pt-8 px-8 pb-6">
                 <div className="flex items-center justify-between mb-2">

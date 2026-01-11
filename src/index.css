@@ -336,3 +336,66 @@
 .frame-preview-book {
   border-radius: 0 !important;
 }
+
+/* 3D Cube Loader Animation */
+@keyframes cube-rotate {
+  0% {
+    transform: rotateX(0deg) rotateY(0deg);
+  }
+
+  100% {
+    transform: rotateX(360deg) rotateY(360deg);
+  }
+}
+
+.cube-container {
+  perspective: 800px;
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cube {
+  width: 40px;
+  height: 40px;
+  position: relative;
+  transform-style: preserve-3d;
+  animation: cube-rotate 2s infinite linear;
+}
+
+.cube-face {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border: 1.5px solid rgba(168, 85, 247, 0.8);
+  /* border-purple-500 */
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(139, 92, 246, 0.1));
+  backdrop-filter: blur(2px);
+  box-shadow: inset 0 0 10px rgba(168, 85, 247, 0.2), 0 0 20px rgba(168, 85, 247, 0.2);
+}
+
+.face-front {
+  transform: translateZ(20px);
+}
+
+.face-back {
+  transform: rotateY(180deg) translateZ(20px);
+}
+
+.face-right {
+  transform: rotateY(90deg) translateZ(20px);
+}
+
+.face-left {
+  transform: rotateY(-90deg) translateZ(20px);
+}
+
+.face-top {
+  transform: rotateX(90deg) translateZ(20px);
+}
+
+.face-bottom {
+  transform: rotateX(-90deg) translateZ(20px);
+}

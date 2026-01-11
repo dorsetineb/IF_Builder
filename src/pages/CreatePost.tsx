@@ -3,6 +3,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { Save, Send, AlertCircle, ChevronDown, Image as ImageIcon, Link as LinkIcon, LogOut, Upload, X, Trash2 } from 'lucide-react';
 import { Database } from '../types/supabase';
+import { LoadingOverlay } from '../components/LoadingOverlay';
 import { useToast } from '../components/ToastContext';
 import RichEditor from '../components/RichEditor';
 
@@ -308,7 +309,8 @@ const CreatePost: React.FC = () => {
     }
 
     return (
-        <div className="flex flex-col h-full bg-background font-sans overflow-hidden">
+        <div className="flex flex-col h-full bg-background font-sans overflow-hidden relative">
+            {loading && <LoadingOverlay message={id ? "Carregando tópico..." : "Preparando editor..."} />}
             {/* Header */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-20 shrink-0">
                 <div className="flex flex-col justify-center h-full">

@@ -1,8 +1,7 @@
 
-import React, { useState } from 'react';
+import React, { useRef } from 'react';
 import { GameData } from '../types';
-import { Eye, Plus, CircleHelp, LogOut, ChevronLeft, ChevronRight, PanelLeft } from 'lucide-react';
-import UserManualModal from './UserManualModal';
+import { Eye, Plus, CircleHelp, LogOut, ChevronLeft, ChevronRight, PanelLeft, FileUp, Download } from 'lucide-react';
 
 const Header: React.FC<{
   gameData: GameData;
@@ -12,8 +11,10 @@ const Header: React.FC<{
   onLogout: () => void;
   sidebarCollapsed?: boolean;
   onToggleCollapse?: () => void;
-}> = ({ gameData, isPreviewing, onTogglePreview, onNewGame, onLogout, sidebarCollapsed, onToggleCollapse }) => {
-  const [isManualOpen, setIsManualOpen] = useState(false);
+  onExport: () => void;
+  onImport: (file: File) => void;
+}> = ({ gameData, isPreviewing, onTogglePreview, onNewGame, onLogout, sidebarCollapsed, onToggleCollapse, onExport, onImport }) => {
+  const importInputRef = useRef<HTMLInputElement>(null);
 
   return (
     <header className="flex w-full h-[61px]">
@@ -52,6 +53,19 @@ const Header: React.FC<{
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Hidden Import Input */}
+          <input
+            type="file"
+            ref={importInputRef}
+            className="hidden"
+            accept=".json,.zip"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) onImport(file);
+              e.target.value = '';
+            }}
+          />
+
           {isPreviewing ? (
             <button onMouseDown={onTogglePreview} className="flex items-center px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs uppercase tracking-wider">
               <Eye className="w-3.5 h-3.5 mr-2" /> Fechar Preview
@@ -59,34 +73,34 @@ const Header: React.FC<{
           ) : (
             <>
               <button
-                onClick={() => setIsManualOpen(true)}
+                onClick={() => importInputRef.current?.click()}
                 className="flex items-center justify-center px-3 py-2 text-muted-foreground hover:text-foreground transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
-                title="Ver manual de instruções"
+                title="Importar Jogo"
               >
-                <CircleHelp className="w-4 h-4" /> Manual
+                <FileUp className="w-4 h-4" /> Importar
               </button>
 
               <button
-                onClick={onNewGame}
-                className="flex items-center justify-center px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition-all text-xs shadow-lg shadow-purple-900/20 hover:-translate-y-0.5"
+                onClick={onExport}
+                className="flex items-center justify-center px-3 py-2 text-muted-foreground hover:text-foreground transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
+                title="Exportar Jogo"
               >
-                <Plus className="w-3.5 h-3.5 mr-2" /> Novo Jogo
+                <Download className="w-4 h-4" /> Exportar
               </button>
 
               <button
-                onClick={onLogout}
-                className="flex items-center justify-center p-2 text-muted-foreground hover:text-red-400 transition-colors"
-                title="Sair"
+                onClick={onTogglePreview}
+                className="flex items-center justify-center px-4 py-2 bg-zinc-100 hover:bg-white text-zinc-900 font-bold rounded-lg transition-all text-xs shadow-sm hover:shadow-md border border-zinc-200"
+                title="Pré-visualizar Jogo"
               >
-                <LogOut className="w-4 h-4" />
+                <Eye className="w-3.5 h-3.5 mr-2" /> Pré-visualizar
               </button>
+
             </>
           )}
         </div>
       </div>
-
-      <UserManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
-    </header>
+    </header >
   );
 };
 

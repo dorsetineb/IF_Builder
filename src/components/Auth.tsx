@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '@/lib/supabase';
-import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, User, MapPin, Eye, EyeOff, Ticket, ArrowLeft } from 'lucide-react';
+import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, User, MapPin, Eye, EyeOff, Ticket, ArrowLeft, Send } from 'lucide-react';
 import { DitherShader } from '@/components/ui/dither-shader';
 
 export function Auth() {
@@ -23,6 +23,27 @@ export function Auth() {
 
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
+
+    // Access Request State
+    const [accessEmail, setAccessEmail] = useState('');
+    const [requestLoading, setRequestLoading] = useState(false);
+    const [requestSent, setRequestSent] = useState(false);
+
+    const handleRequestAccess = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!accessEmail.trim()) return;
+
+        setRequestLoading(true);
+        // Simulate network request
+        await new Promise(resolve => setTimeout(resolve, 1500));
+
+        setRequestSent(true);
+        setRequestLoading(false);
+        setAccessEmail('');
+
+        // Reset success message after a few seconds
+        setTimeout(() => setRequestSent(false), 5000);
+    };
 
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -137,13 +158,45 @@ export function Auth() {
                             <h3 className="text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2 h-8 text-center w-full">
                                 Sobre o IF Builder
                             </h3>
-                            <div className="space-y-4 text-zinc-400 text-sm leading-relaxed flex-1 flex flex-col justify-center text-center">
+                            <div className="space-y-4 text-zinc-400 text-sm leading-relaxed flex-1 flex flex-col justify-end pb-4 text-center">
                                 <p>
                                     Esta plataforma é uma iniciativa pessoal e independente, dedicada ao desenvolvimento de ficções interativas.
                                 </p>
                                 <p>
-                                    O acesso é controlado para que o projeto cresça de forma sustentável, respeitando os limites da nossa infraestrutura atual.
+                                    O acesso é controlado para que o projeto cresça de forma sustentável, respeitando os limites da nossa infraestrutura.
                                 </p>
+                            </div>
+
+                            {/* Access Request Form */}
+                            <div className="pt-4 mt-auto border-t border-zinc-800/50">
+                                <form onSubmit={handleRequestAccess} className="relative">
+                                    <div className="flex gap-2">
+                                        <div className="relative flex-1">
+                                            <Mail className="absolute left-3 top-2.5 h-4 w-4 text-zinc-600" />
+                                            <input
+                                                type="email"
+                                                placeholder="seu@email.com"
+                                                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg py-2 pl-9 pr-3 text-sm text-zinc-200 focus:outline-none focus:border-purple-500/50 focus:ring-1 focus:ring-purple-500/50 placeholder:text-zinc-600 disabled:opacity-50"
+                                                value={accessEmail}
+                                                onChange={(e) => setAccessEmail(e.target.value)}
+                                                disabled={requestLoading || requestSent}
+                                                required
+                                            />
+                                        </div>
+                                        <button
+                                            type="submit"
+                                            disabled={requestLoading || requestSent}
+                                            className="bg-zinc-100 hover:bg-white text-zinc-900 px-4 rounded-lg text-xs font-bold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 whitespace-nowrap"
+                                        >
+                                            {requestLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : requestSent ? 'Enviado!' : 'Pedir acesso'}
+                                        </button>
+                                    </div>
+                                    {requestSent && (
+                                        <p className="absolute -bottom-6 left-0 w-full text-center text-[10px] text-emerald-500 font-medium animate-in fade-in slide-in-from-top-1">
+                                            Solicitação registrada com sucesso.
+                                        </p>
+                                    )}
+                                </form>
                             </div>
                         </div>
                     )}

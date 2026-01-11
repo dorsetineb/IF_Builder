@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
 import { User, FileText, Camera, LayoutGrid, List, Star, Heart } from 'lucide-react';
 import { PostCard } from '../components/PostCard';
+import { LoadingOverlay } from '../components/LoadingOverlay';
 import { useToast } from '../components/ToastContext';
 import { useUser } from '../components/UserContext';
 
@@ -194,18 +195,15 @@ const AuthorProfile: React.FC = () => {
         }
     };
 
-    if (loading) {
-        return <div className="h-full flex items-center justify-center text-muted-foreground">Carregando perfil...</div>;
-    }
-
-    if (!profile) {
+    if (!loading && !profile) {
         return <div className="h-full flex items-center justify-center text-muted-foreground">Autor não encontrado.</div>;
     }
 
-    const isOwner = currentUser?.id === profile.id;
+    const isOwner = currentUser?.id === profile?.id;
 
     return (
-        <div className="min-h-full font-sans text-xs bg-background overflow-y-auto">
+        <div className="min-h-full font-sans text-xs bg-background overflow-y-auto relative">
+            {loading && <LoadingOverlay message="Carregando perfil..." />}
             {/* Cover Image */}
             <div className="h-32 md:h-48 w-full relative overflow-hidden group bg-muted">
                 <img
@@ -346,9 +344,7 @@ const AuthorProfile: React.FC = () => {
 
                 {/* Content */}
                 <div className="pb-12">
-                    {loadingPosts ? (
-                        <div className="py-12 text-center text-muted-foreground">Carregando...</div>
-                    ) : posts.length > 0 ? (
+                    {posts.length > 0 ? (
                         <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'flex flex-col gap-3'}>
                             {posts.map(post => {
                                 return (

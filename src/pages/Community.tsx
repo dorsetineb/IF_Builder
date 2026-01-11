@@ -7,6 +7,7 @@ import { useUser } from '../components/UserContext';
 import { useToast } from '../components/ToastContext';
 import { Search, Plus, MessageSquare, FileText, Star, LayoutGrid, List } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { LoadingOverlay } from '../components/LoadingOverlay';
 
 type PostWithAuthor = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
@@ -30,7 +31,8 @@ const Community = () => {
 
     // State
     // Removed local posts state
-    const [loading, setLoading] = useState(true);
+    // Initialize loading to true ONLY if we have no posts
+    const [loading, setLoading] = useState(() => posts.length === 0);
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
     const [selectedScope, setSelectedScope] = useState<{ id: string; type: 'group' | 'category' } | null>(null);
@@ -45,29 +47,37 @@ const Community = () => {
 
     const init = async () => {
         try {
-            const isCacheValid = posts.length > 0 && lastFetched && (Date.now() - lastFetched < 5 * 60 * 1000); // 5 min cache
+            // Check if we have data (even if cache is slightly stale, show it first)
+            const hasData = posts.length > 0;
 
-            if (isCacheValid) {
-                // Background update for non-critical data or just skip
-                await fetchCategories();
-                if (user) await fetchFavorites(user);
+            // If we have data, ensure loading is false immediately
+            if (hasData) {
                 setLoading(false);
-                return;
             }
 
-            // Parallel fetch
-            await Promise.all([
+            // Always fetch fresh data, but don't block UI if we already have some
+            const fetchPromises = [
                 fetchCategories(),
                 fetchPosts()
-            ]);
+            ];
 
             if (user) {
-                await fetchFavorites(user);
+                fetchPromises.push(fetchFavorites(user));
             }
+
+            // If no data, wait for fetch to complete before removing loading screen
+            if (!hasData) {
+                await Promise.all(fetchPromises);
+            } else {
+                // If we have data, run fetch in background (optimistic UI)
+                Promise.all(fetchPromises).catch(err => console.error("Background fetch error:", err));
+            }
+
         } catch (err: any) {
             console.error('Error initializing community:', err);
             toast('Erro', `Não foi possível carregar o fórum.`, 'error');
         } finally {
+            // Always ensure loading is false at the end
             setLoading(false);
         }
     };
@@ -211,16 +221,9 @@ const Community = () => {
     const featuredPosts = showFeatured ? sortedPosts.slice(0, 3) : [];
     const listPosts = sortedPosts;
 
-    if (loading) {
-        return (
-            <div className="flex-1 p-8 text-center text-zinc-500 text-xs animate-pulse">
-                Carregando comunidade...
-            </div>
-        );
-    }
-
     return (
-        <div className="flex-1 flex flex-col h-full bg-background font-sans overflow-hidden">
+        <div className="flex-1 flex flex-col h-full bg-background font-sans overflow-hidden relative">
+            {loading && <LoadingOverlay message="Carregando comunidade..." />}
             {/* Sticky Top Bar */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
                 <div className="flex flex-col">

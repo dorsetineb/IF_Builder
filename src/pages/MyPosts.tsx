@@ -5,6 +5,7 @@ import { MessageSquare, Search, FileText, List, LayoutGrid, Plus } from 'lucide-
 import { PostCard } from '../components/PostCard';
 import { useToast } from '../components/ToastContext';
 import { useNavigate } from 'react-router-dom';
+import { LoadingOverlay } from '../components/LoadingOverlay';
 
 type Post = Database['public']['Tables']['posts']['Row'] & {
     profiles: Database['public']['Tables']['profiles']['Row'];
@@ -97,7 +98,8 @@ const MyPosts: React.FC = () => {
     });
 
     return (
-        <div className="min-h-full font-sans text-xs bg-background flex flex-col">
+        <div className="min-h-full font-sans text-xs bg-background flex flex-col relative">
+            {loading && <LoadingOverlay message="Carregando seus tópicos..." />}
             {/* Standard Header */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
                 <div className="flex flex-col justify-center h-full">
@@ -171,9 +173,7 @@ const MyPosts: React.FC = () => {
                     {/* View Toggle (Optional, maybe move to header or keep here) - Keeping simplified for now or adding back if needed. User asked for tabs. */}
 
 
-                    {loading ? (
-                        <div className="p-8 text-center text-muted-foreground text-xs">Carregando...</div>
-                    ) : filteredPosts.length > 0 ? (
+                    {filteredPosts.length > 0 ? (
                         <div className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4' : 'flex flex-col gap-3'}>
                             {filteredPosts.map((post) => (
                                 <PostCard

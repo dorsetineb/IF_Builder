@@ -17,6 +17,46 @@ import GlobalObjectsEditor from './GlobalObjectsEditor';
 import TrackersEditor from './TrackersEditor';
 import { ConfirmationModal } from './ConfirmationModal';
 import { TransitionScreen } from './TransitionScreen';
+import UserManualModal from './UserManualModal';
+import { gameJS, prepareGameDataForEngine } from './game-engine';
+import { Info, Settings, CircleHelp } from 'lucide-react';
+
+declare var JSZip: any;
+
+const getFontUrl = (fontFamily: string) => {
+    const fontName = fontFamily.split(',')[0].replace(/'/g, '').trim();
+    if (!fontName) return '';
+    const googleFontName = fontName.replace(/ /g, '+');
+    return `https://fonts.googleapis.com/css2?family=${googleFontName}&display=swap`;
+};
+
+const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
+    switch (frame) {
+        case 'rounded-top': return 'frame-rounded-top';
+        case 'book-cover': return 'frame-book-cover';
+        case 'trading-card': return 'frame-trading-card';
+        default: return 'frame-none';
+    }
+}
+
+const getMimeTypeFromFileName = (name: string): string => {
+    const ext = name.split('.').pop()?.toLowerCase();
+    switch (ext) {
+        case 'png': return 'image/png';
+        case 'jpg':
+        case 'jpeg': return 'image/jpeg';
+        case 'gif': return 'image/gif';
+        case 'svg': return 'image/svg+xml';
+        case 'webp': return 'image/webp';
+        case 'mp3':
+        case 'mpeg': return 'audio/mpeg';
+        case 'ogg': return 'audio/ogg';
+        case 'wav': return 'audio/wav';
+        case 'm4a':
+        case 'mp4': return 'audio/mp4';
+        default: return 'application/octet-stream';
+    }
+}
 
 const gameHTML = `
 <!DOCTYPE html>
@@ -725,10 +765,11 @@ const initialGameData: GameData = {
 const Editor: React.FC = () => {
     const { toast } = useToast();
     const { user, loading: authLoading } = useUser();
-
+    const navigate = useNavigate();
 
     const [isTransitioning, setIsTransitioning] = useState(true);
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
         document.title = "IF Builder";
@@ -756,8 +797,6 @@ const Editor: React.FC = () => {
     const loadingSession = authLoading;
 
 
-
-    const navigate = useNavigate();
 
     const handleLogout = async () => {
         // As requested: discard changes and exit immediately without confirmation
@@ -812,6 +851,257 @@ const Editor: React.FC = () => {
 
     const closeConfirmationModal = () => {
         setConfirmationModal(prev => ({ ...prev, isOpen: false }));
+    };
+
+    const [isManualOpen, setIsManualOpen] = useState(false);
+
+    const handleExport = async () => {
+        if (typeof JSZip === 'undefined') {
+            alert('A biblioteca JSZip não foi carregada. Não é possível exportar.');
+            return;
+        }
+        const zip = new JSZip();
+        const assetsFolder = zip.folder("assets");
+        if (!assetsFolder) return;
+
+        const exportData = JSON.parse(JSON.stringify(gameData));
+        const assetMap = new Map<string, string>();
+
+        const processAsset = (base64String: string | undefined, baseName: string): string | undefined => {
+            if (!base64String || !base64String.startsWith('data:')) return base64String;
+            if (assetMap.has(base64String)) return assetMap.get(base64String);
+
+            const commaIndex = base64String.indexOf(',');
+            if (commaIndex === -1) return base64String;
+
+            const header = base64String.substring(0, commaIndex);
+            const data = base64String.substring(commaIndex + 1);
+
+            const mimeMatch = header.match(/data:([^;]+)/);
+            if (!mimeMatch || !mimeMatch[1]) return base64String;
+
+            const mimeType = mimeMatch[1];
+            let extension = mimeType.split('/')[1]?.split('+')[0] || 'bin';
+
+            const filename = `assets/${baseName}.${extension}`;
+            assetsFolder.file(`${baseName}.${extension}`, data, { base64: true });
+            assetMap.set(base64String, filename);
+            return filename;
+        };
+
+        exportData.gameLogo = processAsset(exportData.gameLogo, 'logo');
+        exportData.gameSplashImage = processAsset(exportData.gameSplashImage, 'splash_image');
+        exportData.gameBackgroundMusic = processAsset(exportData.gameBackgroundMusic, 'global_bgm');
+        exportData.positiveEndingImage = processAsset(exportData.positiveEndingImage, 'positive_ending');
+        exportData.negativeEndingImage = processAsset(exportData.negativeEndingImage, 'negative_ending');
+
+        for (const sceneId in exportData.scenes) {
+            const scene = exportData.scenes[sceneId];
+            scene.image = processAsset(scene.image, `scene_image_${sceneId}`);
+            scene.backgroundMusic = processAsset(scene.backgroundMusic, `scene_bgm_${sceneId}`);
+            if (scene.interactions) {
+                scene.interactions.forEach((inter: any, index: number) => {
+                    inter.soundEffect = processAsset(inter.soundEffect, `sfx_${sceneId}_${index}`);
+                });
+            }
+        }
+
+        for (const objId in exportData.globalObjects) {
+            const obj = exportData.globalObjects[objId];
+            obj.image = processAsset(obj.image, `obj_image_${objId}`);
+        }
+
+        zip.file("editor_data.json", JSON.stringify(exportData));
+        const fontFamily = exportData.gameFontFamily || "'Silkscreen', sans-serif";
+        const fontName = fontFamily.split(',')[0].replace(/'/g, '').trim();
+        let fontStylesheet = '';
+        let finalCss = exportData.gameCSS;
+
+        if (fontName) {
+            const googleFontName = fontName.replace(/ /g, '+');
+            const fontCssUrl = `https://fonts.googleapis.com/css2?family=${googleFontName}:wght@400;700&display=swap`;
+            try {
+                const cssResponse = await fetch(fontCssUrl);
+                if (cssResponse.ok) {
+                    let fontCssText = await cssResponse.text();
+                    const fontUrlRegex = /url\((https:\/\/[^)]+\.woff2)\)/g;
+                    const fontFolder = zip.folder("fonts");
+                    const fontUrlsToDownload = new Set<string>();
+                    let match;
+                    while ((match = fontUrlRegex.exec(fontCssText)) !== null) fontUrlsToDownload.add(match[1]);
+
+                    for (const originalUrl of fontUrlsToDownload) {
+                        const fontFileName = originalUrl.substring(originalUrl.lastIndexOf('/') + 1);
+                        fontCssText = fontCssText.replace(new RegExp(originalUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), `fonts/${fontFileName}`);
+                        const fontRes = await fetch(originalUrl);
+                        if (fontRes.ok) fontFolder.file(fontFileName, await fontRes.blob());
+                    }
+                    finalCss = fontCssText + '\n\n' + finalCss;
+                } else {
+                    const fontUrl = getFontUrl(fontFamily);
+                    fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
+                }
+            } catch (e) {
+                const fontUrl = getFontUrl(fontFamily);
+                fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
+            }
+        }
+
+        const engineData = prepareGameDataForEngine(exportData);
+        const safeJson = JSON.stringify(engineData).replace(/<\/script/g, '<\\/script>');
+        const finalGameScript = `window.embeddedGameData = ${safeJson};\n\n${gameJS}`;
+
+        const trackersButtonHTML = (exportData.gameSystemEnabled === 'trackers' && (exportData.gameShowTrackersUI ?? true)) ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>' : '';
+        const systemButtonHTML = (exportData.gameShowSystemButton ?? true) ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>' : '';
+
+        const inventoryButtonHTML = (exportData.enableInventory ?? true)
+            ? `<button id="inventory-button">${exportData.gameInventoryButtonText || 'Inventário'}</button>`
+            : '';
+
+        const diaryButtonHTML = (exportData.enableDiary ?? true)
+            ? `<button id="diary-button">${exportData.gameDiaryButtonText || 'Diário'}</button>`
+            : '';
+
+        let htmlContent = gameData.gameHTML
+            .replace('__GAME_TITLE__', exportData.gameTitle || 'IF Builder Game')
+            .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme with-spacing`)
+            .replace('__LAYOUT_ORIENTATION_CLASS__', exportData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : '')
+            .replace('__LAYOUT_ORDER_CLASS__', exportData.gameLayoutOrder === 'image-last' ? 'layout-image-last' : '')
+            .replace('__FRAME_CLASS__', getFrameClass(exportData.gameImageFrame))
+            .replace('__MOBILE_BEHAVIOR_CLASS__', 'behavior-immersive') // FIXO: COMPORTAMENTO IMERSIVO
+            .replace('__FONT_STYLESHEET__', fontStylesheet)
+            .replace('__CHANCES_CONTAINER__', (exportData.enableChances || exportData.gameSystemEnabled === 'chances') ? '<div id="chances-container" class="chances-container"></div>' : '')
+            .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
+            .replace('__SYSTEM_BUTTON__', systemButtonHTML)
+            .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
+            .replace('__DIARY_BUTTON__', diaryButtonHTML)
+            .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, exportData.gameSuggestionsButtonText || 'Sugestões')
+            .replace(/__TRACKERS_BUTTON_TEXT__/g, exportData.gameTrackersButtonText || 'Rastreadores')
+            .replace(/__SYSTEM_BUTTON_TEXT__/g, exportData.gameSystemButtonText || 'Sistema')
+            .replace('__SAVE_MENU_TITLE__', exportData.gameSaveMenuTitle || 'Salvar Jogo')
+            .replace('__LOAD_MENU_TITLE__', exportData.gameLoadMenuTitle || 'Carregar Jogo')
+            .replace('__MAIN_MENU_BUTTON_TEXT__', exportData.gameMainMenuButtonText || 'Menu Principal')
+            .replace('__SPLASH_BG_STYLE__', exportData.gameSplashImage ? `style="background-image: url('${exportData.gameSplashImage}')"` : '')
+            .replace('__SPLASH_ALIGN_CLASS__', exportData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
+            .replace('__SPLASH_LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="splash-logo">` : '')
+            .replace('__SPLASH_TITLE_H1_TAG__', !exportData.gameOmitSplashTitle ? `<h1>${exportData.gameTitle}</h1>` : '')
+            .replace('__SPLASH_DESCRIPTION__', exportData.gameSplashDescription || '')
+            .replace('__SPLASH_BUTTON_TEXT__', exportData.gameSplashButtonText || 'Start')
+            .replace('__CONTINUE_BUTTON_TEXT__', exportData.gameContinueButtonText || 'Continue')
+            .replace(/__RESTART_BUTTON_TEXT__/g, exportData.gameRestartButtonText || 'Reiniciar Aventura')
+            .replace('__ACTION_BUTTON_TEXT__', exportData.gameActionButtonText || 'Action')
+            .replace('__VERB_INPUT_PLACEHOLDER__', exportData.gameVerbInputPlaceholder || 'What do you do?')
+            .replace('__VIEW_ENDING_BUTTON_TEXT__', exportData.gameViewEndingButtonText || 'Ver Final')
+            .replace('__POSITIVE_ENDING_BG_STYLE__', exportData.positiveEndingImage ? `style="background-image: url('${exportData.positiveEndingImage}')"` : '')
+            .replace('__POSITIVE_ENDING_ALIGN_CLASS__', exportData.positiveEndingContentAlignment === 'left' ? 'align-left' : '')
+            .replace('__POSITIVE_ENDING_DESCRIPTION__', exportData.positiveEndingDescription || '')
+            .replace('__NEGATIVE_ENDING_BG_STYLE__', exportData.negativeEndingImage ? `style="background-image: url('${exportData.negativeEndingImage}')"` : '')
+            .replace('__NEGATIVE_ENDING_ALIGN_CLASS__', exportData.negativeEndingContentAlignment === 'left' ? 'align-left' : '')
+            .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '');
+
+        htmlContent = htmlContent.replace('</body>', '<script src="game.js"></script></body>');
+
+        const css = finalCss
+            .replace(/__FONT_FAMILY__/g, fontFamily)
+            .replace(/__GAME_FONT_SIZE__/g, exportData.gameFontSize || '1em')
+            .replace(/__GAME_TEXT_COLOR__/g, exportData.gameTextColor || '#c9d1d9')
+            .replace(/__GAME_TITLE_COLOR__/g, exportData.gameTitleColor || '#58a6ff')
+            .replace(/__GAME_FOCUS_COLOR__/g, exportData.gameFocusColor || '#58a6ff')
+            .replace(/__GAME_TEXT_COLOR_LIGHT__/g, exportData.textColorLight || '#24292f')
+            .replace(/__GAME_TITLE_COLOR_LIGHT__/g, exportData.titleColorLight || '#0969da')
+            .replace(/__GAME_FOCUS_COLOR_LIGHT__/g, exportData.focusColorLight || '#0969da')
+            .replace(/__SPLASH_BUTTON_COLOR__/g, exportData.gameSplashButtonColor || '#2ea043')
+            .replace(/__SPLASH_BUTTON_HOVER_COLOR__/g, exportData.gameSplashButtonHoverColor || '#238636')
+            .replace(/__SPLASH_BUTTON_TEXT_COLOR__/g, exportData.gameSplashButtonTextColor || '#ffffff')
+            .replace(/__ACTION_BUTTON_COLOR__/g, exportData.gameActionButtonColor || '#ffffff')
+            .replace(/__SPLASH_BUTTON_TEXT_COLOR__/g, exportData.gameSplashButtonTextColor || '#ffffff')
+            .replace(/__ACTION_BUTTON_TEXT_COLOR__/g, exportData.gameActionButtonTextColor || '#0d1117')
+            .replace(/__FRAME_BOOK_COLOR__/g, exportData.frameBookColor || '#FFFFFF')
+            .replace(/__FRAME_TRADING_CARD_COLOR__/g, exportData.frameTradingCardColor || '#1c1917')
+            .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, exportData.frameRoundedTopColor || '#facc15')
+            .replace(/__SCENE_NAME_OVERLAY_BG__/g, exportData.gameSceneNameOverlayBg || '#0d1117')
+            .replace(/__SCENE_NAME_OVERLAY_TEXT_COLOR__/g, exportData.gameSceneNameOverlayTextColor || '#c9d1d9')
+            .replace(/__CONTINUE_INDICATOR_COLOR__/g, exportData.gameContinueIndicatorColor || exportData.gameTitleColor || '#58a6ff');
+
+        zip.file("index.html", htmlContent);
+        zip.file("style.css", css);
+        zip.file("game.js", finalGameScript);
+
+        const zipContent = await zip.generateAsync({ type: "blob" });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(zipContent);
+        link.download = `${exportData.gameTitle?.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'game'}.zip`;
+        link.click();
+    };
+
+    const handleImportFile = async (file: File) => {
+        if (typeof JSZip === 'undefined') {
+            alert('A biblioteca JSZip não foi carregada. Não é possível importar.');
+            return;
+        }
+
+        const reader = new FileReader();
+        if (file.name.endsWith('.zip')) {
+            reader.onload = async (ev) => {
+                try {
+                    const zip = await JSZip.loadAsync(ev.target?.result);
+                    const editorDataStr = await zip.file('editor_data.json')?.async('string');
+                    if (!editorDataStr) throw new Error("editor_data.json não encontrado no pacote ZIP.");
+
+                    const data = JSON.parse(editorDataStr);
+
+                    const restoreAsset = async (path: string | undefined): Promise<string | undefined> => {
+                        if (!path || !path.startsWith('assets/')) return path;
+                        const zipFile = zip.file(path);
+                        if (!zipFile) return path;
+
+                        const mimeType = getMimeTypeFromFileName(path);
+                        const buffer = await zipFile.async('arraybuffer');
+                        const blob = new Blob([buffer], { type: mimeType });
+
+                        return new Promise((resolve) => {
+                            const readerAsset = new FileReader();
+                            readerAsset.onloadend = () => resolve(readerAsset.result as string);
+                            readerAsset.readAsDataURL(blob);
+                        });
+                    };
+
+                    data.gameLogo = await restoreAsset(data.gameLogo);
+                    data.gameSplashImage = await restoreAsset(data.gameSplashImage);
+                    data.gameBackgroundMusic = await restoreAsset(data.gameBackgroundMusic);
+                    data.positiveEndingImage = await restoreAsset(data.positiveEndingImage);
+                    data.negativeEndingImage = await restoreAsset(data.negativeEndingImage);
+
+                    if (data.scenes) {
+                        for (const sId in data.scenes) {
+                            const scene = data.scenes[sId];
+                            scene.image = await restoreAsset(scene.image);
+                            scene.backgroundMusic = await restoreAsset(scene.backgroundMusic);
+                            if (scene.interactions) {
+                                for (const inter of scene.interactions) {
+                                    inter.soundEffect = await restoreAsset(inter.soundEffect);
+                                }
+                            }
+                        }
+                    }
+
+                    if (data.globalObjects) {
+                        for (const oId in data.globalObjects) {
+                            const obj = data.globalObjects[oId];
+                            obj.image = await restoreAsset(obj.image);
+                        }
+                    }
+
+                    handleImportGame(data);
+                } catch (err) {
+                    alert("Erro ao importar ZIP: " + (err as Error).message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        } else {
+            reader.onload = (ev) => handleImportGame(JSON.parse(ev.target?.result as string));
+            reader.readAsText(file);
+        }
     };
 
     const scenesList = useMemo(() => {
@@ -1156,6 +1446,13 @@ const Editor: React.FC = () => {
     };
 
 
+    const handleGoToForum = async () => {
+        setIsSaving(true);
+        // Clean save simulation if needed, or trigger actual save if implemented
+        await new Promise(resolve => setTimeout(resolve, 500));
+        setIsSaving(false);
+        navigate('/community');
+    };
 
     if (loadingSession) {
         return <TransitionScreen isVisible={true} />;
@@ -1193,19 +1490,22 @@ const Editor: React.FC = () => {
                         onLogout={handleLogout}
                         sidebarCollapsed={sidebarCollapsed}
                         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+                        onExport={handleExport}
+                        onImport={handleImportFile}
                     />
                     <div className="flex flex-1 overflow-hidden">
                         <Sidebar
                             scenes={scenesList}
                             startSceneId={gameData.startScene}
-                            selectedSceneId={selectedSceneId}
+                            selectedSceneId={selectedScene?.id || null}
                             currentView={currentView}
                             gameData={gameData}
                             onSelectScene={handleSelectScene}
                             onAddScene={handleAddScene}
                             onDeleteScene={handleDeleteScene}
                             onReorderScenes={handleReorderScenes}
-                            onSetView={handleSetView}
+                            onSetView={setCurrentView}
+                            onExit={handleGoToForum}
                             onImportGame={handleImportGame}
                             onTogglePreview={() => {
                                 setPreviewSceneId(null);
@@ -1213,6 +1513,7 @@ const Editor: React.FC = () => {
                             }}
                             isCollapsed={sidebarCollapsed}
                             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+                            onOpenManual={() => setIsManualOpen(true)}
                         />
                         <main className="flex-1 overflow-y-auto p-6 relative bg-background">
                             {currentView === 'interface' && (
@@ -1364,6 +1665,7 @@ const Editor: React.FC = () => {
                     </div>
                 </div>
             )}
+            <UserManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
         </div>
     );
 };

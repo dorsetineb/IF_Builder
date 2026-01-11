@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
+import { LoadingOverlay } from '../components/LoadingOverlay';
 import { ChevronLeft, ThumbsUp, Share2, Send, ThumbsDown, CornerDownRight, User, Bookmark, Trash2, AlertCircle, List, X, Pencil, MessageSquare, Heart, LogOut } from 'lucide-react';
 
 // ... (skip down to usages)
@@ -823,13 +824,11 @@ const PostDetail: React.FC = () => {
         );
     };
 
-    if (loading) return <div className="p-8 text-center text-zinc-500 text-xs">Carregando tópico...</div>;
-    if (!post) return <div className="p-8 text-center text-zinc-500 text-xs">Tópico não encontrado.</div>;
-
-
+    if (!loading && !post) return <div className="p-8 text-center text-zinc-500 text-xs">Tópico não encontrado.</div>;
 
     return (
-        <div className="min-h-screen bg-background pb-20">
+        <div className="min-h-screen bg-background pb-20 relative">
+            {loading && <LoadingOverlay message="Carregando tópico..." />}
             {/* Header / Breadcrumbs */}
             <div className="bg-card border-b border-border sticky top-0 z-30 shadow-sm backdrop-blur-md bg-card/80">
                 <div className="max-w-[1400px] mx-auto px-4 h-14 flex items-center justify-between">

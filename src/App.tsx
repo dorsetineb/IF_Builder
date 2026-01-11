@@ -20,6 +20,7 @@ import { ToastProvider } from './components/ToastContext';
 import { UserProvider } from './components/UserContext';
 import PendingApproval from './pages/PendingApproval';
 import { FeedProvider } from './components/FeedContext';
+import AboutProject from './pages/AboutProject';
 
 const App: React.FC = () => {
     const [session, setSession] = useState<any>(null);
@@ -124,7 +125,7 @@ const App: React.FC = () => {
                             <Routes>
                                 {/* Platform Routes */}
                                 <Route element={<PlatformLayout />}>
-                                    <Route path="/" element={<Navigate to="/dashboard" replace />} />
+                                    <Route path="/" element={<Navigate to="/editor" replace />} />
                                     <Route path="/dashboard" element={<Dashboard />} />
 
                                     <Route path="/community" element={<Community />} />
@@ -137,6 +138,7 @@ const App: React.FC = () => {
                                     <Route path="/community/post/:id" element={<PostDetail />} />
                                     <Route path="/profile" element={<Profile />} />
                                     <Route path="/settings" element={<Settings />} />
+                                    <Route path="/about" element={<AboutProject />} />
                                     <Route path="/projects" element={<div className="p-8 text-white">Página de Projetos (Em construção)</div>} />
                                 </Route>
                                 {/* Editor Route (Standalone) */}
