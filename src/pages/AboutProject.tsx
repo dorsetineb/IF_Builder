@@ -23,7 +23,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
             <button
                 onClick={handleClick}
                 className={`w-full py-3 rounded-lg font-bold text-white shadow-lg flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 ${variant === 'primary'
-                    ? 'bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 shadow-purple-900/40 text-xs'
+                    ? 'bg-primary hover:bg-primary/90 shadow-primary/40 text-xs'
                     : 'bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs'
                     }`}
             >
@@ -57,7 +57,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 <button
                                     onClick={() => setActiveTab('what_is')}
                                     className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'what_is'
-                                        ? 'text-purple-400 border-b-4 border-purple-500'
+                                        ? 'text-primary border-b-4 border-primary'
                                         : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                 >
@@ -66,7 +66,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 <button
                                     onClick={() => setActiveTab('about_project')}
                                     className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'about_project'
-                                        ? 'text-purple-400 border-b-4 border-purple-500'
+                                        ? 'text-primary border-b-4 border-primary'
                                         : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                 >
@@ -75,7 +75,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 <button
                                     onClick={() => setActiveTab('dev')}
                                     className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'dev'
-                                        ? 'text-purple-400 border-b-4 border-purple-500'
+                                        ? 'text-primary border-b-4 border-primary'
                                         : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                 >
@@ -84,7 +84,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 <button
                                     onClick={() => setActiveTab('support')}
                                     className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'support'
-                                        ? 'text-purple-400 border-b-4 border-purple-500'
+                                        ? 'text-primary border-b-4 border-primary'
                                         : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                 >
@@ -175,8 +175,8 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             <div className="space-y-8 animate-in slide-in-from-left-4 duration-300">
                                 <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <div className="p-3 bg-purple-500/10 rounded-lg">
-                                            <Heart className="w-6 h-6 text-purple-500" />
+                                        <div className="p-3 bg-primary/10 rounded-lg">
+                                            <Heart className="w-6 h-6 text-primary" />
                                         </div>
                                         <h2 className="text-lg font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
                                             Por que apoiar o IF Builder?
@@ -223,7 +223,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                                 Para mim, a tecnologia é uma ferramenta de expressão humana, seja ilustrando um cenário, diagramando um livro, documentando procedimentos ou desenvolvendo jogos.
                                             </p>
                                             <p className="pt-4 text-zinc-400">
-                                                Tento escrever com alguma regularidade no Substack - <a href="https://substack.com/@dorsetineb" target="_blank" rel="noreferrer" className="text-purple-400 hover:text-purple-300 hover:underline">https://substack.com/@dorsetineb</a>. Seria legal conversar com voce por lá.
+                                                Tento escrever com alguma regularidade no Substack - <a href="https://substack.com/@dorsetineb" target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80 hover:underline">https://substack.com/@dorsetineb</a>. Seria legal conversar com voce por lá.
                                             </p>
                                         </div>
                                     </div>
@@ -236,7 +236,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     <div className="lg:col-span-1 lg:sticky lg:top-0 space-y-6">
                         <div className="bg-card border border-border rounded-xl p-6 shadow-sm relative overflow-hidden group">
                             <div className="flex items-center gap-2 mb-4">
-                                <Heart className="w-4 h-4 text-purple-500 fill-current" />
+                                <Heart className="w-4 h-4 text-primary fill-current" />
                                 <h3 className="font-bold text-sm text-white">Apoie o Projeto</h3>
                             </div>
 
@@ -251,22 +251,22 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             <div className="space-y-3 mb-6">
                                 {/* Key Points */}
                                 <div className="flex items-start gap-2 text-xs text-zinc-400">
-                                    <Check className="w-3 h-3 text-purple-500 mt-0.5 shrink-0" />
+                                    <Check className="w-3 h-3 text-primary mt-0.5 shrink-0" />
                                     <span>100% para infraestrutura</span>
                                 </div>
                                 <div className="flex items-start gap-2 text-xs text-zinc-400">
-                                    <Check className="w-3 h-3 text-purple-500 mt-0.5 shrink-0" />
+                                    <Check className="w-3 h-3 text-primary mt-0.5 shrink-0" />
                                     <span>Plataforma livre de ads</span>
                                 </div>
                                 <div className="flex items-start gap-2 text-xs text-zinc-400">
-                                    <Check className="w-3 h-3 text-purple-500 mt-0.5 shrink-0" />
+                                    <Check className="w-3 h-3 text-primary mt-0.5 shrink-0" />
                                     <span>Recursos experimentais</span>
                                 </div>
                             </div>
 
                             <button
                                 onClick={() => setShowPixModal(true)}
-                                className="w-full py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-purple-900/20"
+                                className="w-full py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20"
                             >
                                 <BadgeDollarSign className="w-4 h-4" />
                                 Contribuir via PIX
@@ -298,10 +298,10 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             </p>
 
                             <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-xl mb-6 relative group cursor-pointer" onClick={handleCopyPix}>
-                                <p className="text-xs font-mono break-all text-purple-300">
+                                <p className="text-xs font-mono break-all text-primary/80">
                                     4f489a50-c458-4adf-b211-62075adebf13
                                 </p>
-                                <div className="absolute inset-0 bg-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
+                                <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
                                     <span className="text-xs font-bold text-white flex items-center gap-1">
                                         <Copy size={12} /> Copiar
                                     </span>

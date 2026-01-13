@@ -765,9 +765,14 @@ const initialGameData: GameData = {
     negativeEndingMusic: '',
 };
 
+import { useTheme } from './ThemeProvider';
+
+// ... (existing imports)
+
 const Editor: React.FC = () => {
     const { toast } = useToast();
     const { user, profile, loading: authLoading } = useUser();
+    const { theme: appTheme } = useTheme();
     const navigate = useNavigate();
 
     const [isTransitioning, setIsTransitioning] = useState(true);
@@ -1586,6 +1591,7 @@ DATE:        ${exportDate.toLocaleString()}
                             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
                             isDirty={isDirty}
                             onOpenManual={() => setIsManualOpen(true)}
+                            theme={appTheme}
                         />
                         <main className={`flex-1 overflow-y-auto relative bg-background ${currentView === 'scenes' && !selectedScene ? 'p-0' : 'p-6'}`}>
                             {currentView === 'interface' && (
@@ -1698,6 +1704,7 @@ DATE:        ${exportDate.toLocaleString()}
                                     onCreateScene={handleStartCreating}
                                     onDownloadExample={handleDownloadExample}
                                     onMeetProject={() => setCurrentView('about')}
+                                    theme={appTheme}
                                 />
                             ) : currentView === 'guide' ? (
                                 <GuideView />

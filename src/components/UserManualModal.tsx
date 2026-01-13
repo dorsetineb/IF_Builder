@@ -36,10 +36,10 @@ const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) =>
           </section>
 
           <section>
-            <h3 className="text-xs font-bold text-purple-400 uppercase tracking-[0.2em] mb-4">1. Editor de Cenas</h3>
+            <h3 className="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4">1. Editor de Cenas</h3>
             <div className="space-y-4 text-sm">
               <p>Cada cena é um local ou momento no seu jogo. Configure:</p>
-              <ul className="list-disc ml-6 space-y-3 marker:text-purple-500">
+              <ul className="list-disc ml-6 space-y-3 marker:text-primary">
                 <li><strong className="text-zinc-200">Texto Interativo:</strong> Use a sintaxe <code>&lt;palavra&gt;</code> na descrição. Isso tornará a palavra clicável no jogo, facilitando a digitação de comandos para o jogador.</li>
                 <li><strong className="text-zinc-200">Imagem e Música:</strong> Cada cena pode ter uma imagem de fundo única e uma trilha sonora que começa a tocar assim que o jogador entra nela.</li>
                 <li><strong className="text-zinc-200">Cena Inicial:</strong> Defina qual cena será o ponto de partida do seu jogo no menu lateral.</li>
@@ -48,15 +48,15 @@ const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) =>
           </section>
 
           <section>
-            <h3 className="text-xs font-bold text-purple-400 uppercase tracking-[0.2em] mb-4">2. Biblioteca de Objetos</h3>
+            <h3 className="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4">2. Biblioteca de Objetos</h3>
             <p className="text-sm">Os objetos são itens que podem estar em uma cena. Eles são <strong className="text-white">globais</strong>: você cria um objeto uma vez (ex: "Chave de Ouro") e pode vinculá-lo a múltiplas cenas ou usá-lo em interações em qualquer lugar do jogo.</p>
-            <ul className="list-disc ml-6 mt-4 space-y-2 text-sm marker:text-purple-500">
+            <ul className="list-disc ml-6 mt-4 space-y-2 text-sm marker:text-primary">
               <li><strong className="text-zinc-200">Exame:</strong> Defina uma descrição detalhada que o jogador verá ao usar o comando "olhar" ou "examinar" o objeto.</li>
             </ul>
           </section>
 
           <section>
-            <h3 className="text-xs font-bold text-purple-400 uppercase tracking-[0.2em] mb-4">3. Interações</h3>
+            <h3 className="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4">3. Interações</h3>
             <p className="text-sm">As interações definem o que acontece quando o jogador digita um comando.</p>
             <div className="bg-zinc-900/50 p-8 rounded-xl border border-zinc-800 mt-6 space-y-6">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
@@ -79,7 +79,7 @@ const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) =>
               </div>
 
               <div className="mt-8 pt-8 border-t border-zinc-800">
-                <p className="text-[10px] font-bold text-purple-400 uppercase tracking-widest mb-4">Exemplo de comando do jogador:</p>
+                <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-4">Exemplo de comando do jogador:</p>
                 <div className="text-lg bg-zinc-950 p-6 rounded-xl border border-zinc-900 shadow-inner italic text-white flex items-center gap-3">
                   <span className="text-zinc-600 font-mono">&gt;</span> "Destrancar porta com a chave"
                 </div>
@@ -96,16 +96,16 @@ const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) =>
           </section>
 
           <section>
-            <h3 className="text-xs font-bold text-purple-400 uppercase tracking-[0.2em] mb-4">4. Rastreadores</h3>
+            <h3 className="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4">4. Rastreadores</h3>
             <p className="text-sm">Use rastreadores para criar sistemas complexos como <strong className="text-white">Vida, Dinheiro ou Estresse</strong>.</p>
-            <ul className="list-disc ml-6 mt-4 space-y-3 text-sm marker:text-purple-500">
+            <ul className="list-disc ml-6 mt-4 space-y-3 text-sm marker:text-primary">
               <li>Interações podem aumentar ou diminuir o valor de um rastreador.</li>
               <li>Quando um rastreador atinge seu <strong>valor máximo</strong>, o jogador é automaticamente transportado para uma <strong>Cena de Consequência</strong>.</li>
             </ul>
           </section>
 
           <section>
-            <h3 className="text-xs font-bold text-purple-400 uppercase tracking-[0.2em] mb-4">5. Finalização</h3>
+            <h3 className="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4">5. Finalização</h3>
             <p className="text-sm">Quando seu jogo estiver pronto:</p>
             <ol className="list-decimal ml-6 space-y-3 mt-4 text-sm marker:text-white font-medium">
               <li>Use o botão <strong className="text-white px-2 py-0.5 bg-zinc-900 rounded border border-zinc-800">Pré-visualizar</strong> para testar toda a experiência.</li>

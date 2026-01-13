@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { User, Lock, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, Terminal, Mail } from 'lucide-react';
+import { User, Lock, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, Terminal, Mail, Check } from 'lucide-react';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { useTheme } from '../components/ThemeProvider';
 import { useToast } from '../components/ToastContext';
@@ -23,9 +23,23 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const [bio, setBio] = useState('');
     const [avatarUrl, setAvatarUrl] = useState('');
 
+    // Initial State for Dirty Checking
+    const [initialProfile, setInitialProfile] = useState<Partial<Profile> | null>(null);
 
+    // Theme Logic
+    const [originalTheme] = useState(theme); // Capture theme on mount
+    const savedRef = useRef(false);
 
     const [pageLoading, setPageLoading] = useState(true);
+
+    // Revert theme on unmount if not saved
+    useEffect(() => {
+        return () => {
+            if (!savedRef.current) {
+                setTheme(originalTheme);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         getProfile();
@@ -41,10 +55,6 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     setEmail(user.email || '');
                     const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
-                    if (error && error.code !== 'PGRST116') {
-                        console.error('Error fetching profile:', error);
-                    }
-
                     if (data) {
                         setDisplayName(data.full_name || '');
                         setUsername(data.username || '');
@@ -52,75 +62,97 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         setBio(data.bio || '');
                         setAvatarUrl(data.avatar_url || '');
 
+                        setInitialProfile({
+                            full_name: data.full_name,
+                            username: data.username,
+                            website: data.website,
+                            bio: data.bio,
+                            avatar_url: data.avatar_url
+                        });
                     } else {
-                        // Pre-fill from auth metadata if profile doesn't exist
+                        // Pre-fill from auth metadata
                         const meta = user.user_metadata || {};
-                        console.log('No profile found, using metadata:', meta);
                         setDisplayName(meta.full_name || meta.name || '');
                         setUsername(meta.username || '');
                         setAvatarUrl(meta.avatar_url || meta.picture || '');
+
+                        setInitialProfile({});
                     }
                 }
             } catch (error) {
                 console.error('Critical error in Settings:', error);
-                toast("Erro", "Falha ao carregar perfil. Verifique sua conexão.", "error");
+                toast("Erro", "Falha ao carregar perfil.", "error");
             }
         };
 
         const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Profile load timeout')), 5000);
+            setTimeout(() => reject(new Error('Timeout')), 5000);
         });
 
         try {
             await Promise.race([fetchProfilePromise(), timeoutPromise]);
         } catch (err) {
             console.error('Profile loading timed out:', err);
-            toast("Alerta", "O carregamento demorou mais que o esperado.", "warning");
         } finally {
             setPageLoading(false);
         }
     };
 
-    const [draftTheme, setDraftTheme] = useState(theme);
+    const handleThemeChange = (newTheme: typeof theme) => {
+        setTheme(newTheme);
+    };
 
-    // Sync draft theme if external theme changes (rare, but good practice)
-    useEffect(() => {
-        setDraftTheme(theme);
-    }, [theme]);
+    // Calculate isDirty
+    const isDirty = (
+        theme !== originalTheme ||
+        displayName !== (initialProfile?.full_name || '') ||
+        username !== (initialProfile?.username || '') ||
+        website !== (initialProfile?.website || '') ||
+        bio !== (initialProfile?.bio || '') ||
+        avatarUrl !== (initialProfile?.avatar_url || '')
+    );
 
     const handleSave = async () => {
         setLoading(true);
+        try {
+            savedRef.current = true; // Mark as saved so we don't revert theme
 
-        // 1. Apply Theme
-        if (draftTheme !== theme) {
-            setTheme(draftTheme);
-        }
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                return;
+            }
 
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) {
+            const updates = {
+                id: user.id,
+                full_name: displayName,
+                username,
+                website,
+                bio,
+                avatar_url: avatarUrl,
+                updated_at: new Date().toISOString(),
+            };
+
+            const { error } = await supabase.from('profiles').upsert(updates);
+
+            if (error) {
+                toast("Erro ao salvar perfil", error.message, "error");
+                savedRef.current = false; // Reset if failed
+            } else {
+                toast("Sucesso!", "Configurações atualizadas.", "success");
+                setInitialProfile({
+                    full_name: displayName,
+                    username,
+                    website,
+                    bio,
+                    avatar_url: avatarUrl
+                });
+            }
+        } catch (err) {
+            console.error("Unexpected error saving profile:", err);
+            toast("Erro", "Ocorreu um erro inesperado.", "error");
+        } finally {
             setLoading(false);
-            return;
         }
-
-        const updates = {
-            id: user.id,
-            full_name: displayName,
-            username,
-            website,
-            bio,
-            avatar_url: avatarUrl,
-
-            updated_at: new Date().toISOString(),
-        };
-
-        const { error } = await supabase.from('profiles').upsert(updates);
-
-        if (error) {
-            toast("Erro ao salvar perfil", error.message, "error");
-        } else {
-            toast("Sucesso!", "Configurações atualizadas.", "success");
-        }
-        setLoading(false);
     };
 
     const handleLogout = async () => {
@@ -132,8 +164,6 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
             window.location.href = '/';
         }
     };
-
-
 
     return (
         <div className="min-h-full font-sans text-xs bg-background flex flex-col relative">
@@ -165,35 +195,35 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <button
-                            onClick={() => setDraftTheme('dark')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${draftTheme === 'dark' ? 'border-primary bg-primary/5 shadow-md shadow-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                            onClick={() => handleThemeChange('dark')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
-                            <Moon size={16} className={draftTheme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${draftTheme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>Escuro</span>
+                            <Moon size={16} className={theme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
+                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>Escuro</span>
                         </button>
 
                         <button
-                            onClick={() => setDraftTheme('light')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${draftTheme === 'light' ? 'border-primary bg-primary/5 shadow-md shadow-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                            onClick={() => handleThemeChange('light')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
-                            <Sun size={16} className={draftTheme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${draftTheme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>Claro</span>
+                            <Sun size={16} className={theme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
+                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>Claro</span>
                         </button>
 
                         <button
-                            onClick={() => setDraftTheme('cream')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${draftTheme === 'cream' ? 'border-primary bg-primary/5 shadow-md shadow-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                            onClick={() => handleThemeChange('cream')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
-                            <Coffee size={16} className={draftTheme === 'cream' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${draftTheme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>Creme</span>
+                            <Coffee size={16} className={theme === 'cream' ? 'text-primary' : 'text-muted-foreground'} />
+                            <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>Creme</span>
                         </button>
 
                         <button
-                            onClick={() => setDraftTheme('terminal')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${draftTheme === 'terminal' ? 'border-primary bg-primary/5 shadow-md shadow-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                            onClick={() => handleThemeChange('terminal')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
-                            <Terminal size={16} className={draftTheme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${draftTheme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>Terminal</span>
+                            <Terminal size={16} className={theme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
+                            <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>Terminal</span>
                         </button>
                     </div>
                 </div>
@@ -208,7 +238,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     <div className="flex flex-col md:flex-row gap-6">
                         {/* Avatar Actions */}
                         <div className="flex flex-col items-center gap-2">
-                            <div className="w-24 h-24 rounded-lg bg-muted border-2 border-card shadow-lg overflow-hidden flex items-center justify-center">
+                            <div className="w-24 h-24 rounded-lg bg-muted border-2 border-card shadow-sm overflow-hidden flex items-center justify-center">
                                 {avatarUrl ? (
                                     <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
@@ -302,10 +332,10 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 <div className="flex justify-end pt-2">
                     <button
                         onClick={handleSave}
-                        disabled={loading}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-all disabled:opacity-50 text-xs uppercase tracking-widest"
+                        disabled={loading || !isDirty}
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 px-6 rounded-lg flex items-center gap-2 transition-all disabled:opacity-50 text-xs"
                     >
-                        Salvar Alterações
+                        {loading ? 'Salvando...' : 'Salvar alterações'}
                     </button>
                 </div>
             </div>

@@ -1625,7 +1625,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         id="gameTitle"
                                         value={localTitle}
                                         onChange={(e) => setLocalTitle(e.target.value)}
-                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 focus:border-purple-500/50 transition-all font-bold placeholder:text-muted-foreground"
+                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 focus:border-primary/50 transition-all font-bold placeholder:text-muted-foreground"
                                         placeholder="Ex: A Masmorra Esquecida"
                                     />
                                 </div>
@@ -1635,7 +1635,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         id="splashDescription"
                                         value={localSplashDescription}
                                         onChange={(e) => setLocalSplashDescription(e.target.value)}
-                                        className="w-full flex-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 focus:border-purple-500/50 transition-all resize-none leading-relaxed placeholder:text-muted-foreground h-full"
+                                        className="w-full flex-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 focus:border-primary/50 transition-all resize-none leading-relaxed placeholder:text-muted-foreground h-full"
                                         placeholder="Uma breve descrição da sua aventura..."
                                     />
                                 </div>
@@ -1711,7 +1711,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha Sonora Inicial</h4>
                                     <div className="flex items-center gap-3">
                                         <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-muted-foreground/50 text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg group">
-                                            <Upload className="w-4 h-4 mr-2 text-purple-400 group-hover:scale-110 transition-transform" /> {localBackgroundMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
+                                            <Upload className="w-4 h-4 mr-2 text-primary group-hover:scale-110 transition-transform" /> {localBackgroundMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
                                             <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalBackgroundMusic)} className="hidden" />
                                         </label>
                                         {localBackgroundMusic && (
@@ -1736,7 +1736,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 id="splashContentAlignment"
                                                 value={localSplashContentAlignment}
                                                 onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-zinc-950 shadow-lg"
+                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-zinc-950 shadow-lg"
                                             >
                                                 <option value="right">Direita</option>
                                                 <option value="left">Esquerda</option>
@@ -1745,7 +1745,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 id="splashContentVerticalAlignment"
                                                 value={localSplashContentVerticalAlignment}
                                                 onChange={(e) => setLocalSplashContentVerticalAlignment(e.target.value as 'top' | 'bottom')}
-                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-zinc-950 shadow-lg"
+                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-zinc-950 shadow-lg"
                                             >
                                                 <option value="bottom">Inferior</option>
                                                 <option value="top">Superior</option>
@@ -1755,7 +1755,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                     <div className="flex items-center">
                                         <label className="flex items-center gap-3 cursor-pointer group select-none">
-                                            <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${localOmitSplashTitle ? 'bg-purple-500 border-purple-500' : 'bg-transparent border-input group-hover:border-purple-500/50'}`}>
+                                            <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${localOmitSplashTitle ? 'bg-primary border-primary' : 'bg-transparent border-input group-hover:border-primary/50'}`}>
                                                 {localOmitSplashTitle && <Check size={12} className="text-white bg-transparent" />}
                                             </div>
                                             <input type="checkbox" checked={localOmitSplashTitle} onChange={() => setLocalOmitSplashTitle(!localOmitSplashTitle)} className="hidden" />
@@ -1777,7 +1777,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                         <div className="space-y-2">
                                             <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Ação</label>
-                                            <input type="text" id="actionButtonText" value={localActionButtonText} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                            <input type="text" id="actionButtonText" value={localActionButtonText} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Campo de Comando</label>
@@ -1832,7 +1832,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Principal</label>
-                                            <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Menu Principal" />
+                                            <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all shadow-lg" placeholder="Menu Principal" />
                                         </div>
                                     </div>
                                 </div>
@@ -1855,7 +1855,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <LayoutTemplate className="w-4 h-4 text-purple-400" /> ESTRUTURA
+                                                <LayoutTemplate className="w-4 h-4 text-primary" /> ESTRUTURA
                                             </h3>
                                             {activeSections.estrutura ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
@@ -1868,7 +1868,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <select
                                                             value={localLayoutOrientation}
                                                             onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
-                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
+                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
                                                         >
                                                             <option value="vertical">Vertical</option>
                                                             <option value="horizontal">Horizontal</option>
@@ -1928,7 +1928,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <Palette className="w-4 h-4 text-purple-400" /> ESTILO & TEMA
+                                                <Palette className="w-4 h-4 text-primary" /> ESTILO & TEMA
                                             </h3>
                                             {activeSections.estilo ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
@@ -1940,13 +1940,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     <div className="flex bg-input rounded-lg p-1 border border-input">
                                                         <button
                                                             onClick={() => handleThemeChange('dark')}
-                                                            className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'dark' ? 'bg-purple-500 text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                                                            className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                                         >
                                                             Escuro
                                                         </button>
                                                         <button
                                                             onClick={() => handleThemeChange('light')}
-                                                            className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'light' ? 'bg-purple-500 text-white shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                                                            className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'light' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                                         >
                                                             Claro
                                                         </button>
@@ -1960,7 +1960,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             <button
                                                                 key={theme.name}
                                                                 onClick={() => applyTheme(theme)}
-                                                                className="flex flex-col items-center justify-center p-3 rounded-lg border border-muted-foreground/50 bg-input hover:border-purple-500/50 hover:bg-input/80 transition-all gap-2 group"
+                                                                className="flex flex-col items-center justify-center p-3 rounded-lg border border-muted-foreground/50 bg-input hover:border-primary/50 hover:bg-input/80 transition-all gap-2 group"
                                                             >
                                                                 <div className="flex -space-x-1">
                                                                     <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.textColorLight }}></div>
@@ -2031,7 +2031,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <Type className="w-4 h-4 text-purple-400" /> FONTES & TEXTO
+                                                <Type className="w-4 h-4 text-primary" /> FONTES & TEXTO
                                             </h3>
                                             {activeSections.texto ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
@@ -2063,7 +2063,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             <select
                                                                 value={localFontFamily}
                                                                 onChange={(e) => setLocalFontFamily(e.target.value)}
-                                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
+                                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
                                                             >
                                                                 {FONTS.map(font => (
                                                                     <option key={font.name} value={font.family}>{font.name}</option>
@@ -2203,7 +2203,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     onClick={handleUndo}
                     disabled={!isDirty}
                     className={`px-4 py-2 font-bold rounded-lg transition-all text-xs border ${isDirty
-                        ? 'bg-purple-600 hover:bg-purple-700 text-white border-purple-500 shadow-lg shadow-purple-900/20'
+                        ? 'bg-primary hover:bg-primary/90 text-primary-foreground border-primary shadow-lg shadow-primary/20'
                         : 'bg-zinc-900 border-zinc-800 text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed'
                         }`}
                 >

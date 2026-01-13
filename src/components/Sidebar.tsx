@@ -23,14 +23,15 @@ interface SidebarProps {
   isCollapsed: boolean;
   onToggleCollapse: () => void;
   isDirty?: boolean;
+  theme?: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { onExit, onNavigate, currentView, onSetView, scenes, gameData, isCollapsed, onToggleCollapse, onOpenManual, isDirty, ...sceneListProps } = props;
+  const { onExit, onNavigate, currentView, onSetView, scenes, gameData, isCollapsed, onToggleCollapse, onOpenManual, isDirty, theme = 'dark', ...sceneListProps } = props;
   const [isScenesExpanded, setIsScenesExpanded] = useState(false);
+  const [showAltamiraModal, setShowAltamiraModal] = useState(false);
 
   // Altamira State
-  const [showAltamiraModal, setShowAltamiraModal] = useState(false);
   const [isAltamiraVisible, setIsAltamiraVisible] = useState(false);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -46,13 +47,13 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       clearTimeout(hoverTimerRef.current);
       hoverTimerRef.current = null;
     }
+    setIsAltamiraVisible(false);
   };
-
 
   // Platform Sidebar Style Button Class
   const getButtonClass = (view: View) =>
     `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${currentView === view
-      ? `bg-primary text-primary-foreground font-bold shadow-md shadow-primary/20`
+      ? `bg-primary text-primary-foreground font-bold shadow-sm`
       : 'text-muted-foreground hover:bg-zinc-800 hover:text-white'
     } ${isCollapsed ? 'justify-center px-0 py-3' : ''}`;
 
@@ -86,7 +87,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           {/* Hover Glow Effect */}
           <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`} />
 
-          <Code className={`flex-shrink-0 relative z-10 ${currentView === 'interface' ? 'text-primary-foreground' : ''}`} size={isCollapsed ? 20 : 16} />
+          <Code className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && <span className="truncate relative z-10">Informações e Interface</span>}
         </button>
 
@@ -94,7 +95,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         <div className="flex flex-col">
           <button
             className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${isScenesExpanded
-              ? `bg-primary text-primary-foreground font-bold shadow-md shadow-primary/20`
+              ? `bg-primary text-primary-foreground font-bold shadow-sm`
               : 'text-muted-foreground hover:bg-zinc-800 hover:text-white'
               } ${isCollapsed ? 'justify-center px-0 py-3' : ''}`}
             onClick={handleToggleScenes}
@@ -103,7 +104,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             {/* Hover Glow Effect */}
             <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${isScenesExpanded ? 'translate-x-0' : ''}`} />
 
-            <BookOpen className={`flex-shrink-0 relative z-10 ${isScenesExpanded ? 'text-primary-foreground' : ''}`} size={isCollapsed ? 20 : 16} />
+            <BookOpen className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && (
               <>
                 <span className="truncate relative z-10 flex-1 text-left">Editor de Cenas</span>
@@ -115,7 +116,6 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               </>
             )}
 
-            {/* Show tiny counter badge if collapsed */}
             {/* Show tiny counter badge if collapsed */}
             {isCollapsed && (
               <div className="absolute top-1 right-1 w-4 h-4 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-[8px] font-bold border border-white/20 z-20 shadow-sm">
@@ -152,7 +152,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             title={isCollapsed ? "Objetos" : undefined}
           >
             <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'global_objects' ? 'translate-x-0' : ''}`} />
-            <Box className={`flex-shrink-0 relative z-10 ${currentView === 'global_objects' ? 'text-primary-foreground' : ''}`} size={isCollapsed ? 20 : 16} />
+            <Box className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && <span className="truncate relative z-10">Objetos</span>}
           </button>
         )}
@@ -162,7 +162,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           title={isCollapsed ? "Rastreadores" : undefined}
         >
           <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'trackers' ? 'translate-x-0' : ''}`} />
-          <SlidersHorizontal className={`flex-shrink-0 relative z-10 ${currentView === 'trackers' ? 'text-primary-foreground' : ''}`} size={isCollapsed ? 20 : 16} />
+          <SlidersHorizontal className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && <span className="truncate relative z-10">Rastreadores</span>}
         </button>
 
@@ -172,12 +172,13 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           title={isCollapsed ? "Guia Rápido" : undefined}
         >
           <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'guide' ? 'translate-x-0' : ''}`} />
-          <CircleHelp className={`flex-shrink-0 relative z-10 ${currentView === 'guide' ? 'text-primary-foreground' : ''}`} size={isCollapsed ? 20 : 16} />
+          <CircleHelp className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && <span className="truncate relative z-10">Guia Rápido</span>}
         </button>
 
         {/* Bottom Menu Items */}
         <div className="mt-auto pt-4 flex flex-col gap-1 relative">
+
           {/* Altamira Trigger Zone & Button */}
           <div
             className="relative z-10"
@@ -187,7 +188,12 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             <div className={`overflow-hidden transition-all duration-500 ease-out ${isAltamiraVisible ? 'max-h-12 opacity-100 mb-1' : 'max-h-0 opacity-0'}`}>
               <button
                 onClick={() => setShowAltamiraModal(true)}
-                className={`w-full flex items-center justify-center gap-3 px-4 py-2 rounded-lg bg-zinc-900 border border-primary/30 text-primary hover:text-primary-foreground hover:bg-primary hover:border-primary transition-all text-xs font-bold uppercase tracking-widest shadow-lg ${isCollapsed ? 'px-0' : ''}`}
+                className={`w-full flex items-center justify-center gap-3 px-4 py-2 rounded-lg transition-all text-xs font-bold uppercase tracking-widest shadow-lg ${isCollapsed ? 'px-0' : ''} ${theme === 'cream'
+                  ? 'bg-primary text-amber-50 hover:bg-primary/90 border border-amber-900/20' // Cream: Brown Button
+                  : theme === 'light'
+                    ? 'bg-zinc-800 text-white hover:bg-black border border-zinc-600' // Light: Dark Button
+                    : 'bg-zinc-900 border border-primary/30 text-primary hover:text-primary-foreground hover:bg-primary hover:border-primary' // Dark/Terminal
+                  }`}
               >
                 <Unlock size={14} />
                 {!isCollapsed && <span>Altamira</span>}
@@ -202,7 +208,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               />
             )}
 
-            <div className="h-px bg-muted-foreground my-2 -mx-3 opacity-50 relative z-0"></div>
+            <div className="h-px bg-muted-foreground my-2 -mx-3 opacity-20 relative z-0"></div>
           </div>
 
           <button
@@ -211,7 +217,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             title={isCollapsed ? "Sobre o Projeto" : undefined}
           >
             <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'about' ? 'translate-x-0' : ''}`} />
-            <Info className={`flex-shrink-0 relative z-10 ${currentView === 'about' ? 'text-primary' : ''}`} size={isCollapsed ? 20 : 16} />
+            <Info className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && <span className="truncate relative z-10">Sobre o Projeto</span>}
           </button>
 
@@ -221,17 +227,19 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             title={isCollapsed ? "Configurações" : undefined}
           >
             <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'settings' ? 'translate-x-0' : ''}`} />
-            <Settings className={`flex-shrink-0 relative z-10 ${currentView === 'settings' ? 'text-primary' : ''}`} size={isCollapsed ? 20 : 16} />
+            <Settings className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && <span className="truncate relative z-10">Configurações</span>}
           </button>
         </div>
-      </nav>
+      </nav >
 
       {/* Altamira Modal */}
-      {showAltamiraModal && (
-        <AltamiraModal onClose={() => setShowAltamiraModal(false)} />
-      )}
-    </aside>
+      {
+        showAltamiraModal && (
+          <AltamiraModal onClose={() => setShowAltamiraModal(false)} />
+        )
+      }
+    </aside >
   );
 };
 

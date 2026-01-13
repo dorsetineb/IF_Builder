@@ -172,8 +172,8 @@ const Dashboard: React.FC = () => {
                     {/* Stats Group */}
                     <div className="lg:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-6">
                         {/* Posts Created */}
-                        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4 relative overflow-hidden group hover:border-purple-500/30 transition-all">
-                            <div className="w-10 h-10 rounded-lg bg-purple-500/10 flex items-center justify-center text-purple-400 shrink-0">
+                        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4 relative overflow-hidden group hover:border-primary/30 transition-all">
+                            <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
                                 <FileText size={20} />
                             </div>
                             <div className="flex flex-col">
@@ -194,7 +194,7 @@ const Dashboard: React.FC = () => {
                         </div>
 
                         {/* Likes/Hearts Received */}
-                        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4 relative overflow-hidden group hover:border-purple-500/30 transition-all">
+                        <div className="bg-card border border-border rounded-xl p-4 flex items-center gap-4 relative overflow-hidden group hover:border-primary/30 transition-all">
                             <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center text-red-400 shrink-0">
                                 <Heart size={20} />
                             </div>
@@ -221,7 +221,7 @@ const Dashboard: React.FC = () => {
                                 <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
                                     Meus Tópicos
                                 </h2>
-                                <Link to="/community/my-posts" className="text-purple-400 hover:text-purple-300 text-xs font-bold">Ver todos</Link>
+                                <Link to="/community/my-posts" className="text-primary hover:text-primary/80 text-xs font-bold">Ver todos</Link>
                             </div>
 
                             <div className="flex flex-col gap-3">
@@ -240,7 +240,7 @@ const Dashboard: React.FC = () => {
                                 ) : (
                                     <div className="p-8 text-center bg-card border border-border rounded-xl border-dashed">
                                         <p className="text-muted-foreground mb-4 text-xs">Você ainda não criou nenhum tópico.</p>
-                                        <Link to="/community/create" className="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg font-bold text-xs inline-flex items-center gap-2 transition-all">
+                                        <Link to="/community/create" className="bg-primary hover:bg-primary/90 text-primary-foreground px-4 py-2 rounded-lg font-bold text-xs inline-flex items-center gap-2 transition-all">
                                             <FileText size={14} /> Criar Tópico
                                         </Link>
                                     </div>
@@ -254,7 +254,7 @@ const Dashboard: React.FC = () => {
                                 <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
                                     Tópicos Favoritos
                                 </h2>
-                                <Link to="/community/favorites" className="text-purple-400 hover:text-purple-300 text-xs font-bold">Ver todos</Link>
+                                <Link to="/community/favorites" className="text-primary hover:text-primary/80 text-xs font-bold">Ver todos</Link>
                             </div>
 
                             <div className="flex flex-col gap-3">
@@ -302,7 +302,7 @@ const Dashboard: React.FC = () => {
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h4 className="text-xs font-bold text-foreground truncate group-hover:text-purple-400 transition-colors">{author.full_name || author.username}</h4>
+                                            <h4 className="text-xs font-bold text-foreground truncate group-hover:text-primary transition-colors">{author.full_name || author.username}</h4>
                                             <p className="text-[10px] text-muted-foreground truncate">{author.username ? '@' + author.username : 'User'}</p>
                                         </div>
                                         <button className="text-yellow-500 hover:text-yellow-400 transition-colors">
