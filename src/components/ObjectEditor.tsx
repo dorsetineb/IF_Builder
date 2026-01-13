@@ -56,10 +56,10 @@ const SceneObjectItem: React.FC<{
     };
 
     return (
-        <div className="relative pt-6 p-4 bg-card rounded-lg border border-border">
+        <div className="relative pt-6 p-4 bg-card rounded-lg border border-muted-foreground/50">
             <button
                 onClick={() => onUnlinkObject(sceneId, obj.id)}
-                className="absolute top-0 right-0 p-2 bg-muted text-muted-foreground rounded-bl-lg hover:bg-destructive/80 hover:text-destructive-foreground transition-all"
+                className="absolute top-0 right-0 p-2 bg-zinc-950 text-muted-foreground rounded-bl-lg hover:bg-destructive/80 hover:text-destructive-foreground transition-all"
                 title="Desvincular objeto desta cena (não apaga do jogo)"
             >
                 <Trash2 className="w-4 h-4" />
@@ -73,13 +73,13 @@ const SceneObjectItem: React.FC<{
                             type="text"
                             value={obj.name}
                             onChange={(e) => onUpdateGlobalObject(obj.id, { name: e.target.value })}
-                            className="w-full bg-input border border-input rounded-md px-3 py-2 text-xs text-foreground focus:ring-0"
+                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-md px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                         />
                     </div>
                     <div>
                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1 px-1">ID do Objeto</label>
                         <p
-                            className="w-full bg-muted border border-border rounded-md px-3 py-2 text-xs text-muted-foreground font-mono select-all"
+                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-md px-3 py-2 text-xs text-muted-foreground font-mono select-all"
                             title="Use este ID para referência interna."
                         >
                             {obj.id}
@@ -91,7 +91,7 @@ const SceneObjectItem: React.FC<{
                             value={obj.examineDescription}
                             onChange={(e) => onUpdateGlobalObject(obj.id, { examineDescription: e.target.value })}
                             rows={4}
-                            className="w-full bg-input border border-input rounded-md px-3 py-2 text-xs text-foreground focus:ring-0"
+                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-md px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                         />
                     </div>
                 </div>
@@ -100,7 +100,7 @@ const SceneObjectItem: React.FC<{
                     <label className="block text-[10px] font-bold text-brand-text-dim mb-1">Imagem do Objeto</label>
                     <div className="relative flex-grow w-full min-h-[150px]">
                         {obj.image ? (
-                            <div className="absolute inset-0 w-full h-full border border-border rounded-md overflow-hidden bg-background group">
+                            <div className="absolute inset-0 w-full h-full border border-muted-foreground/50 rounded-md overflow-hidden bg-background group">
                                 <img src={obj.image} alt={obj.name} className="w-full h-full object-cover bg-brand-bg" />
                                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
                                     <label htmlFor={`image-upload-${obj.id}`} className="p-2 bg-secondary text-secondary-foreground rounded-lg cursor-pointer hover:bg-secondary/80 flex items-center gap-2 font-bold text-xs transition-all">
@@ -120,7 +120,7 @@ const SceneObjectItem: React.FC<{
                         ) : (
                             <label
                                 htmlFor={`image-upload-${obj.id}`}
-                                className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-muted/50 rounded-lg cursor-pointer hover:bg-muted transition-all ${isDraggingOver ? 'border-primary bg-primary/5' : 'border-border'}`}
+                                className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-zinc-950/50 rounded-lg cursor-pointer hover:bg-zinc-950 transition-all ${isDraggingOver ? 'border-primary bg-primary/5' : 'border-muted-foreground/50'}`}
                                 onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                 onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                 onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
@@ -172,55 +172,62 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
         <>
             <div className="space-y-4">
                 {objects.length > 0 ? (
-                    objects.map((obj) => (
-                        <SceneObjectItem
-                            key={obj.id}
-                            obj={obj}
-                            sceneId={sceneId}
-                            onUnlinkObject={onUnlinkObject}
-                            onUpdateGlobalObject={onUpdateGlobalObject}
-                        />
-                    ))
+                    <>
+                        {objects.map((obj) => (
+                            <SceneObjectItem
+                                key={obj.id}
+                                obj={obj}
+                                sceneId={sceneId}
+                                onUnlinkObject={onUnlinkObject}
+                                onUpdateGlobalObject={onUpdateGlobalObject}
+                            />
+                        ))}
+                        <div className="flex justify-start pt-4">
+                            <button
+                                onClick={handleCreateNewObject}
+                                className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs shadow-sm"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Novo Objeto
+                            </button>
+                        </div>
+                    </>
                 ) : (
-                    <p className="text-center text-muted-foreground py-12 text-xs italic">Nenhum objeto vinculado a esta cena.</p>
+                    <div className="w-full py-8 flex flex-col items-center gap-4">
+                        <p className="text-xs italic text-muted-foreground text-center">Nenhum objeto vinculado a esta cena.</p>
+                        <button
+                            onClick={handleCreateNewObject}
+                            className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs shadow-sm"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Novo Objeto
+                        </button>
+                    </div>
                 )}
             </div>
 
-            <div className="mt-8 pt-6 border-t border-border bg-card rounded-md p-4">
-                <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">Adicionar Objeto à Cena</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-4">
-                        <p className="text-xs text-muted-foreground">Crie um novo objeto:</p>
-                        <button
-                            onClick={handleCreateNewObject}
-                            className="w-full flex items-center justify-center px-4 py-2 bg-primary border border-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs"
-                        >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Criar Novo Objeto
-                        </button>
-                    </div>
-                    <div className="space-y-4 md:border-l md:border-border md:pl-6">
-                        <p className="text-xs text-muted-foreground">Ou vincule um existente:</p>
-                        <div className="flex gap-2">
-                            <select
-                                value={selectedGlobalObjectId}
-                                onChange={(e) => setSelectedGlobalObjectId(e.target.value)}
-                                className="flex-grow bg-input border border-input rounded-lg px-3 py-2 text-xs focus:ring-0 text-foreground [&>option]:bg-background"
-                            >
-                                <option value="">Selecione um objeto...</option>
-                                {availableObjects.map(obj => (
-                                    <option key={obj.id} value={obj.id}>{obj.name} ({obj.id})</option>
-                                ))}
-                            </select>
-                            <button
-                                onClick={handleLinkExistingObject}
-                                disabled={!selectedGlobalObjectId}
-                                className="px-4 py-2 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 transition-all text-xs disabled:opacity-30 disabled:cursor-not-allowed"
-                            >
-                                Vincular
-                            </button>
-                        </div>
-                    </div>
+            <div className="mt-8 pt-6">
+                <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4">VINCULAR OBJETO EXISTENTE A CENA</h4>
+                <div className="flex gap-2 items-center">
+                    <select
+                        value={selectedGlobalObjectId}
+                        onChange={(e) => setSelectedGlobalObjectId(e.target.value)}
+                        className="w-1/3 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs focus:ring-0 text-zinc-300 [&>option]:bg-background"
+                    >
+                        <option value="">Selecione um objeto...</option>
+                        {availableObjects.map(obj => (
+                            <option key={obj.id} value={obj.id}>{obj.name} ({obj.id})</option>
+                        ))}
+                    </select>
+                    <button
+                        onClick={handleLinkExistingObject}
+                        disabled={!selectedGlobalObjectId}
+                        className={`px-4 py-2 font-bold rounded-lg transition-all text-xs shadow-sm ${!selectedGlobalObjectId
+                            ? 'bg-zinc-900 border border-muted-foreground/50 text-zinc-400 opacity-50 cursor-not-allowed'
+                            : 'bg-purple-600 text-white hover:bg-purple-700'}`}
+                    >
+                        Vincular
+                    </button>
                 </div>
             </div>
         </>

@@ -35,6 +35,11 @@ const Dashboard: React.FC = () => {
                 return;
             }
 
+            // USER REQUEST: Disable all forum/post fetching to improve performance.
+            // Only user profile data (handled by UserContext) is needed.
+            setLoadingPosts(false);
+
+            /* 
             try {
                 // Execute independent queries in parallel
                 const [
@@ -122,6 +127,7 @@ const Dashboard: React.FC = () => {
             } finally {
                 setLoadingPosts(false);
             }
+            */
         };
 
         fetchUserData();

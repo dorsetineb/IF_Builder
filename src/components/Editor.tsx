@@ -10,6 +10,7 @@ import Sidebar from './Sidebar';
 import SceneEditor from './SceneEditor';
 import Header from './Header';
 import { WelcomePlaceholder } from './WelcomePlaceholder';
+import { GuideView } from './GuideView';
 import { UIEditor } from './UIEditor';
 import Preview from './Preview';
 import SceneMap from './SceneMap';
@@ -19,7 +20,9 @@ import { ConfirmationModal } from './ConfirmationModal';
 import { TransitionScreen } from './TransitionScreen';
 import UserManualModal from './UserManualModal';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
-import { Info, Settings, CircleHelp } from 'lucide-react';
+import { Info, Settings as SettingsIcon, CircleHelp } from 'lucide-react';
+import Settings from '../pages/Settings';
+import AboutProject from '../pages/AboutProject';
 
 declare var JSZip: any;
 
@@ -764,7 +767,7 @@ const initialGameData: GameData = {
 
 const Editor: React.FC = () => {
     const { toast } = useToast();
-    const { user, loading: authLoading } = useUser();
+    const { user, profile, loading: authLoading } = useUser();
     const navigate = useNavigate();
 
     const [isTransitioning, setIsTransitioning] = useState(true);
@@ -785,12 +788,14 @@ const Editor: React.FC = () => {
         return () => clearTimeout(timer);
     }, []);
 
-    const handleExit = () => {
+    const handleNavigate = (path: string) => {
         setIsTransitioning(true);
         setTimeout(() => {
-            navigate('/dashboard');
+            navigate(path);
         }, 2000); // 2s duration
     };
+
+    const handleExit = () => handleNavigate('/dashboard');
 
     // Session loading handled by UserContext now.
     // If we need to block rendering until auth is ready:
@@ -911,6 +916,33 @@ const Editor: React.FC = () => {
             obj.image = processAsset(obj.image, `obj_image_${objId}`);
         }
 
+        // Add Metadata
+        const exportDate = new Date();
+        const userName = profile?.username?.replace(/[^a-zA-Z0-9 _-]/g, '') || 'IF Builder User';
+
+        exportData.metadata = {
+            exportedBy: userName,
+            exportDate: exportDate.toISOString(),
+            platform: 'IF Builder',
+            version: '1.0'
+        };
+
+        const readmeContent = `
+================================================================
+                    GAME INFORMATION
+================================================================
+
+TITLE:       ${exportData.gameTitle || 'Untitled Game'}
+PLATFORM:    IF Builder
+EXPORTED BY: ${userName}
+DATE:        ${exportDate.toLocaleString()}
+
+================================================================
+        THANK YOU FOR CREATING WITH IF BUILDER
+================================================================
+`.trim();
+
+        zip.file("README.txt", readmeContent);
         zip.file("editor_data.json", JSON.stringify(exportData));
         const fontFamily = exportData.gameFontFamily || "'Silkscreen', sans-serif";
         const fontName = fontFamily.split(',')[0].replace(/'/g, '').trim();
@@ -1027,11 +1059,20 @@ const Editor: React.FC = () => {
         zip.file("style.css", css);
         zip.file("game.js", finalGameScript);
 
-        const zipContent = await zip.generateAsync({ type: "blob" });
+        // Explicitly set MIME type to avoid browser security warnings
+        const zipContent = await zip.generateAsync({ type: "blob", compression: "DEFLATE" });
+        const finalBlob = new Blob([zipContent], { type: "application/zip" });
         const link = document.createElement('a');
-        link.href = URL.createObjectURL(zipContent);
+        link.href = URL.createObjectURL(finalBlob);
         link.download = `${exportData.gameTitle?.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'game'}.zip`;
+        document.body.appendChild(link);
         link.click();
+
+        // Delay cleanup to ensure browser captures the download
+        setTimeout(() => {
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(link.href);
+        }, 100);
     };
 
     const handleImportFile = async (file: File) => {
@@ -1131,6 +1172,7 @@ const Editor: React.FC = () => {
             gameCSS: gameCSS,
             gameMobileLayoutBehavior: 'immersive', // FORÇA O COMPORTAMENTO IMERSIVO NA IMPORTAÇÃO
             fixedVerbs: data.fixedVerbs || [],
+            enableFixedVerbs: !!data.enableFixedVerbs || (Array.isArray(data.fixedVerbs) && data.fixedVerbs.length > 0),
             consequenceTrackers: data.consequenceTrackers || [],
             gameTextAnimationType: data.gameTextAnimationType || 'fade',
             gameTextSpeed: data.gameTextSpeed || 5,
@@ -1184,6 +1226,15 @@ const Editor: React.FC = () => {
         });
         setSelectedSceneId(newId);
         setIsDirty(true);
+    };
+
+    const handleDownloadExample = () => {
+        const element = document.createElement("a");
+        element.href = "/fuja_da_masmorra.zip";
+        element.download = "fuja_da_masmorra.zip";
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
     };
 
     const handleDeleteScene = (id: string) => {
@@ -1297,6 +1348,7 @@ const Editor: React.FC = () => {
                     closeConfirmationModal();
                     setGameData(initialGameData);
                     setSelectedSceneId(null);
+                    setCurrentView('interface'); // Redirect to Interface
                     setIsDirty(false);
                 },
                 onCancel: closeConfirmationModal
@@ -1305,7 +1357,13 @@ const Editor: React.FC = () => {
         }
         setGameData(initialGameData);
         setSelectedSceneId(null);
+        setCurrentView('interface'); // Redirect to Interface
         setIsDirty(false);
+    };
+
+    const handleStartCreating = () => {
+        handleAddScene();
+        setCurrentView('interface');
     };
 
     const handleCreateGlobalObject = (obj: GameObject, linkToSceneId?: string) => {
@@ -1473,6 +1531,10 @@ const Editor: React.FC = () => {
                         onTogglePreview={() => setIsPreviewing(false)}
                         onNewGame={handleNewGame}
                         onLogout={handleLogout}
+                        onHome={() => {
+                            setCurrentView('scenes');
+                            setSelectedSceneId(null);
+                        }}
                     />
                     <Preview gameData={gameData} testSceneId={previewSceneId} />
                 </div>
@@ -1492,20 +1554,29 @@ const Editor: React.FC = () => {
                         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
                         onExport={handleExport}
                         onImport={handleImportFile}
+                        onHome={() => {
+                            setCurrentView('scenes');
+                            setSelectedSceneId(null);
+                        }}
+                        currentView={currentView}
                     />
                     <div className="flex flex-1 overflow-hidden">
                         <Sidebar
                             scenes={scenesList}
                             startSceneId={gameData.startScene}
-                            selectedSceneId={selectedScene?.id || null}
+                            selectedSceneId={selectedSceneId}
                             currentView={currentView}
                             gameData={gameData}
                             onSelectScene={handleSelectScene}
                             onAddScene={handleAddScene}
                             onDeleteScene={handleDeleteScene}
                             onReorderScenes={handleReorderScenes}
-                            onSetView={setCurrentView}
-                            onExit={handleGoToForum}
+                            onSetView={(view) => {
+                                setCurrentView(view);
+                                setIsDirty(false);
+                            }}
+                            onExit={handleExit}
+                            onNavigate={handleNavigate}
                             onImportGame={handleImportGame}
                             onTogglePreview={() => {
                                 setPreviewSceneId(null);
@@ -1513,9 +1584,10 @@ const Editor: React.FC = () => {
                             }}
                             isCollapsed={sidebarCollapsed}
                             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+                            isDirty={isDirty}
                             onOpenManual={() => setIsManualOpen(true)}
                         />
-                        <main className="flex-1 overflow-y-auto p-6 relative bg-background">
+                        <main className={`flex-1 overflow-y-auto relative bg-background ${currentView === 'scenes' && !selectedScene ? 'p-0' : 'p-6'}`}>
                             {currentView === 'interface' && (
                                 <UIEditor
                                     {...gameData}
@@ -1622,7 +1694,13 @@ const Editor: React.FC = () => {
                                     gameInteractionType={gameData.gameInteractionType || 'parser'}
                                 />
                             ) : currentView === 'scenes' ? (
-                                <WelcomePlaceholder />
+                                <WelcomePlaceholder
+                                    onCreateScene={handleStartCreating}
+                                    onDownloadExample={handleDownloadExample}
+                                    onMeetProject={() => setCurrentView('about')}
+                                />
+                            ) : currentView === 'guide' ? (
+                                <GuideView />
                             ) : null}
 
                             {currentView === 'map' && (
@@ -1661,10 +1739,21 @@ const Editor: React.FC = () => {
                                     onSelectScene={handleSelectScene}
                                 />
                             )}
+
+                            {currentView === 'settings' && <Settings hideHeader />}
+                            {currentView === 'about' && <AboutProject hideHeader />}
                         </main>
                     </div>
                 </div>
             )}
+            <ConfirmationModal
+                isOpen={confirmationModal.isOpen}
+                title={confirmationModal.title}
+                message={confirmationModal.message}
+                onConfirm={confirmationModal.onConfirm}
+                onCancel={confirmationModal.onCancel}
+                isDanger={confirmationModal.isDanger}
+            />
             <UserManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
         </div>
     );

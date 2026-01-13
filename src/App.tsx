@@ -94,7 +94,30 @@ const App: React.FC = () => {
     }, []);
 
     if (loading) {
-        return <div className="h-screen w-screen bg-zinc-950 flex items-center justify-center text-white">Carregando...</div>;
+        return (
+            <div className="fixed inset-0 z-[9999] bg-black text-white font-['Silkscreen'] text-sm p-4 sm:p-8 flex flex-col justify-start overflow-hidden selection:bg-white selection:text-black">
+                <div className="space-y-1 max-w-3xl">
+                    <p>IF-BUILDER BIOS v1.0.24</p>
+                    <p className="mb-4">Copyright (C) 2026 Deepmind Systems Inc.</p>
+
+                    <p>System Memory: 640KB OK</p>
+                    <p>Extended Memory: 32MB OK</p>
+                    <p>Shadow RAM: Cached</p>
+                    <br />
+                    <p>Detecting Primary Master ... IF_BUILDER_CORE</p>
+                    <p>Detecting Primary Slave ... USER_DATA</p>
+                    <br />
+                    <p>Booting from Hard Disk...</p>
+                    <p>Loading interactive_fiction_engine.sys ... OK</p>
+                    <p>Mounting file system ... OK</p>
+                    <br />
+                    <div className="flex items-center gap-2">
+                        <span>A:\&gt; RUN IF-BUILDER.EXE</span>
+                        <span className="w-2.5 h-5 bg-white animate-pulse"></span>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     if (!session) {
@@ -120,34 +143,34 @@ const App: React.FC = () => {
         <ThemeProvider defaultTheme="dark" storageKey="if-builder-theme">
             <ToastProvider>
                 <UserProvider>
-                    <FeedProvider>
-                        <Router>
-                            <Routes>
-                                {/* Platform Routes */}
-                                <Route element={<PlatformLayout />}>
-                                    <Route path="/" element={<Navigate to="/editor" replace />} />
-                                    <Route path="/dashboard" element={<Dashboard />} />
+                    <Router>
+                        <Routes>
+                            {/* Platform Routes */}
+                            <Route element={<PlatformLayout />}>
+                                <Route path="/" element={<Navigate to="/editor" replace />} />
+                                <Route path="/dashboard" element={<Dashboard />} />
 
-                                    <Route path="/community" element={<Community />} />
-                                    <Route path="/community/authors" element={<Authors />} />
-                                    <Route path="/community/author/:id" element={<AuthorProfile />} />
-                                    <Route path="/community/my-posts" element={<MyPosts />} />
-                                    <Route path="/community/favorites" element={<Favorites />} />
-                                    <Route path="/community/create" element={<CreatePost />} />
-                                    <Route path="/community/edit/:id" element={<CreatePost />} />
-                                    <Route path="/community/post/:id" element={<PostDetail />} />
-                                    <Route path="/profile" element={<Profile />} />
-                                    <Route path="/settings" element={<Settings />} />
-                                    <Route path="/about" element={<AboutProject />} />
-                                    <Route path="/projects" element={<div className="p-8 text-white">Página de Projetos (Em construção)</div>} />
-                                </Route>
-                                {/* Editor Route (Standalone) */}
-                                <Route path="/editor" element={<Editor />} />
-                                {/* Catch all */}
-                                <Route path="*" element={<Navigate to="/dashboard" replace />} />
-                            </Routes>
-                        </Router>
-                    </FeedProvider>
+                                {/* Community Routes - HIDDEN AS REQUESTED
+                                <Route path="/community" element={<Community />} />
+                                <Route path="/community/authors" element={<Authors />} />
+                                <Route path="/community/author/:id" element={<AuthorProfile />} />
+                                <Route path="/community/my-posts" element={<MyPosts />} />
+                                <Route path="/community/favorites" element={<Favorites />} />
+                                <Route path="/community/create" element={<CreatePost />} />
+                                <Route path="/community/edit/:id" element={<CreatePost />} />
+                                <Route path="/community/post/:id" element={<PostDetail />} />
+                                */}
+                                <Route path="/profile" element={<Profile />} />
+                                <Route path="/settings" element={<Settings />} />
+                                <Route path="/about" element={<AboutProject />} />
+                                <Route path="/projects" element={<div className="p-8 text-white">Página de Projetos (Em construção)</div>} />
+                            </Route>
+                            {/* Editor Route (Standalone) */}
+                            <Route path="/editor" element={<Editor />} />
+                            {/* Catch all */}
+                            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                        </Routes>
+                    </Router>
                 </UserProvider>
             </ToastProvider>
         </ThemeProvider>

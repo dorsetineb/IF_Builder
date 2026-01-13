@@ -11,6 +11,7 @@ interface SceneListProps {
   onAddScene: () => void;
   onDeleteScene: (id: string) => void;
   onReorderScenes: (newOrder: string[]) => void;
+  isDirty?: boolean;
 }
 
 const SceneList: React.FC<SceneListProps> = ({
@@ -21,6 +22,7 @@ const SceneList: React.FC<SceneListProps> = ({
   onAddScene,
   onDeleteScene,
   onReorderScenes,
+  isDirty,
 }) => {
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
@@ -56,7 +58,9 @@ const SceneList: React.FC<SceneListProps> = ({
           <li
             key={scene.id}
             className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-lg transition-all overflow-hidden ${selectedSceneId === scene.id
-              ? 'bg-purple-500/20 text-purple-100 border border-purple-500/30'
+              ? isDirty
+                ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold'
+                : 'bg-primary/20 text-primary border border-primary/30'
               : 'hover:bg-muted/50'
               } ${scene.id === startSceneId ? 'cursor-default' : ''}`}
             onDragStart={(e) => scene.id !== startSceneId && handleDragStart(e, index)}
@@ -67,7 +71,7 @@ const SceneList: React.FC<SceneListProps> = ({
           >
             <div className={`flex items-center flex-grow p-2`}>
               {scene.id !== startSceneId ? (
-                <Menu className={`w-4 h-4 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? 'text-purple-400' : 'text-muted-foreground'}`} />
+                <Menu className={`w-4 h-4 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? (isDirty ? 'text-yellow-500' : 'text-primary') : 'text-muted-foreground'}`} />
               ) : null}
 
               <div
@@ -76,7 +80,11 @@ const SceneList: React.FC<SceneListProps> = ({
               >
                 <span className="truncate font-medium text-xs">{scene.name}</span>
                 {startSceneId === scene.id && (
-                  <span className={`ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${selectedSceneId === scene.id ? 'bg-purple-500/20 text-purple-400 border-purple-500/30' : 'bg-muted text-muted-foreground border-border'
+                  <span className={`ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${selectedSceneId === scene.id
+                    ? isDirty
+                      ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
+                      : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
+                    : 'bg-primary text-primary-foreground border-primary/50' // Inactive Start
                     }`}>
                     Início
                   </span>
@@ -87,10 +95,10 @@ const SceneList: React.FC<SceneListProps> = ({
             {startSceneId !== scene.id && (
               <button
                 onClick={(e) => { e.stopPropagation(); onDeleteScene(scene.id); }}
-                className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out"
+                className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer"
                 title="Deletar cena"
               >
-                <Trash2 className="w-5 h-5" />
+                <Trash2 className="w-5 h-5 pointer-events-none" />
               </button>
             )}
           </li>
@@ -98,9 +106,9 @@ const SceneList: React.FC<SceneListProps> = ({
       </ul>
       <button
         onClick={onAddScene}
-        className="w-full flex items-center justify-center px-4 py-2 bg-muted/50 border border-border text-foreground font-bold rounded-lg hover:bg-muted transition-all text-xs"
+        className="w-full flex items-center justify-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-md active:scale-95 text-xs"
       >
-        <Plus className="w-4 h-4 mr-2 text-purple-400" />
+        <Plus className="w-4 h-4 mr-2 text-zinc-950" />
         Adicionar Cena
       </button>
     </div>

@@ -263,6 +263,7 @@ export type Database = {
                     username: string | null
                     website: string | null
                     cover_url: string | null
+                    is_approved: boolean | null
                 }
                 Insert: {
                     avatar_url?: string | null
@@ -273,6 +274,7 @@ export type Database = {
                     username?: string | null
                     website?: string | null
                     cover_url?: string | null
+                    is_approved?: boolean | null
                 }
                 Update: {
                     avatar_url?: string | null
@@ -283,6 +285,81 @@ export type Database = {
                     username?: string | null
                     website?: string | null
                     cover_url?: string | null
+                    is_approved?: boolean | null
+                }
+                Relationships: []
+            }
+            invites: {
+                Row: {
+                    code: string
+                    created_at: string
+                    id: string
+                    max_uses: number
+                    used_count: number
+                }
+                Insert: {
+                    code?: string
+                    created_at?: string
+                    id?: string
+                    max_uses?: number
+                    used_count?: number
+                }
+                Update: {
+                    code?: string
+                    created_at?: string
+                    id?: string
+                    max_uses?: number
+                    used_count?: number
+                }
+                Relationships: []
+            }
+            access_requests: {
+                Row: {
+                    id: string
+                    user_id: string
+                    status: string
+                    created_at: string
+                    updated_at: string | null
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    status?: string
+                    created_at?: string
+                    updated_at?: string | null
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    status?: string
+                    created_at?: string
+                    updated_at?: string | null
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "access_requests_user_id_fkey"
+                        columns: ["user_id"]
+                        isOneToOne: false
+                        referencedRelation: "profiles"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
+            landing_page_requests: {
+                Row: {
+                    id: string
+                    email: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    email: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    email?: string
+                    created_at?: string
                 }
                 Relationships: []
             }
@@ -291,7 +368,18 @@ export type Database = {
             [_ in never]: never
         }
         Functions: {
-            [_ in never]: never
+            check_invite: {
+                Args: {
+                    code_input: string
+                }
+                Returns: boolean
+            }
+            create_invite: {
+                Args: {
+                    uses: number
+                }
+                Returns: string
+            }
         }
         Enums: {
             [_ in never]: never

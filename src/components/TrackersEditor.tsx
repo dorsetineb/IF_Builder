@@ -22,7 +22,7 @@ const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
 };
 
 const whiteChevron = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20' stroke-width='1.5' stroke='white'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='m5.25 7.5 4.5 4.5 4.5-4.5' /%3e%3c/svg%3e";
-const selectBaseClasses = "w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 appearance-none bg-no-repeat pr-8 focus:ring-0 [&>option]:bg-zinc-950";
+const selectBaseClasses = "w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 appearance-none bg-no-repeat pr-8 focus:ring-0 [&>option]:bg-zinc-950";
 const selectStyle = { backgroundImage: `url("${whiteChevron}")`, backgroundPosition: 'right 0.5rem center', backgroundSize: '1.25em' };
 const optionBaseClasses = "bg-zinc-950 text-zinc-300";
 const optionDimClasses = "bg-zinc-950 text-zinc-500";
@@ -43,7 +43,7 @@ const TrackerItem: React.FC<{
     }, [tracker.consequenceSceneId, allScenes]);
 
     return (
-        <div className={`bg-zinc-900/30 rounded-lg border ${isOpen ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.05)]' : 'border-zinc-800/80'} overflow-hidden transition-all duration-300 relative`}>
+        <div className={`bg-zinc-900/30 rounded-lg border ${isOpen ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.05)]' : 'border-muted-foreground/50'} overflow-hidden transition-all duration-300 relative`}>
             {/* Header - Always visible summary */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
@@ -65,7 +65,7 @@ const TrackerItem: React.FC<{
 
                 <div className="flex flex-1 items-center overflow-hidden h-6">
                     {/* Nome & ID */}
-                    <div className="flex items-center gap-2 min-w-0 pr-6 border-r border-zinc-800 h-full">
+                    <div className="flex items-center gap-2 min-w-0 pr-6 border-r border-muted-foreground/50 h-full">
                         <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Nome:</span>
                         <div className="flex items-center truncate">
                             <span className="text-xs font-bold text-white truncate">{tracker.name || '(Sem nome)'}</span>
@@ -74,15 +74,15 @@ const TrackerItem: React.FC<{
                     </div>
 
                     {/* Alcance */}
-                    <div className="flex items-center gap-2 min-w-0 px-6 border-r border-zinc-800 h-full">
+                    <div className="flex items-center gap-2 min-w-0 px-6 border-r border-muted-foreground/50 h-full">
                         <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Início / Max:</span>
-                        <span className="text-xs font-bold text-purple-400 truncate">{tracker.initialValue} / {tracker.maxValue}</span>
+                        <span className="text-xs text-purple-400 truncate">{tracker.initialValue} / {tracker.maxValue}</span>
                     </div>
 
                     {/* Cena */}
                     <div className="flex items-center gap-2 min-w-0 px-6 h-full">
                         <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Cena:</span>
-                        <span className="text-xs font-bold text-purple-400 truncate">{consequenceSceneName}</span>
+                        <span className="text-xs text-purple-400 truncate">{consequenceSceneName}</span>
                     </div>
 
                     {/* Color Indicator */}
@@ -105,7 +105,7 @@ const TrackerItem: React.FC<{
                                     type="text"
                                     value={tracker.name}
                                     onChange={e => onUpdate(tracker.id, 'name', e.target.value)}
-                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
+                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                     placeholder="Nome do Rastreador"
                                 />
                             </div>
@@ -122,7 +122,7 @@ const TrackerItem: React.FC<{
                                         type="number"
                                         value={tracker.initialValue}
                                         onChange={e => onUpdate(tracker.id, 'initialValue', parseInt(e.target.value, 10) || 0)}
-                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
+                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                     />
                                 </div>
                                 <div>
@@ -131,7 +131,7 @@ const TrackerItem: React.FC<{
                                         type="number"
                                         value={tracker.maxValue}
                                         onChange={e => onUpdate(tracker.id, 'maxValue', parseInt(e.target.value, 10) || 0)}
-                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
+                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                     />
                                 </div>
                             </div>
@@ -164,7 +164,7 @@ const TrackerItem: React.FC<{
                                         value={tracker.barColor || ''}
                                         onChange={e => onUpdate(tracker.id, 'barColor', e.target.value)}
                                         placeholder="Hex: #ffffff"
-                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
+                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                     />
                                     <input
                                         type="color"
@@ -214,7 +214,7 @@ const TrackerItem: React.FC<{
                                         <li key={`${interaction.id}-${index}`}>
                                             <button
                                                 onClick={() => onSelectScene(scene.id)}
-                                                className="w-full flex justify-between items-center text-left p-3 bg-zinc-950/50 rounded-lg border border-zinc-900 hover:border-zinc-800 transition-all shadow-sm"
+                                                className="w-full flex justify-between items-center text-left p-3 bg-zinc-950/50 rounded-lg border border-zinc-900 hover:border-muted-foreground/50 transition-all shadow-sm"
                                                 title={`Ir para a cena: ${scene.name}`}
                                             >
                                                 <div className="flex-1 min-w-0">
@@ -327,45 +327,59 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
 
             <div className="space-y-4">
                 {localTrackers.length > 0 ? (
-                    localTrackers.map((tracker) => (
-                        <TrackerItem
-                            key={tracker.id}
-                            tracker={tracker}
-                            onUpdate={handleTrackerChange}
-                            onRemove={handleRemoveTracker}
-                            onSelectScene={onSelectScene}
-                            allScenes={allScenes}
-                            usages={allTrackerUsages.get(tracker.id) || []}
-                        />
-                    ))
+                    <>
+                        {localTrackers.map((tracker) => (
+                            <TrackerItem
+                                key={tracker.id}
+                                tracker={tracker}
+                                onUpdate={handleTrackerChange}
+                                onRemove={handleRemoveTracker}
+                                onSelectScene={onSelectScene}
+                                allScenes={allScenes}
+                                usages={allTrackerUsages.get(tracker.id) || []}
+                            />
+                        ))}
+                        <div className="flex justify-start pt-4">
+                            <button
+                                onClick={handleAddTracker}
+                                className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Novo Rastreador
+                            </button>
+                        </div>
+                    </>
                 ) : (
-                    <p className="text-center text-zinc-500 py-16 border-2 border-dashed border-zinc-800/50 rounded-xl bg-zinc-950/20 italic text-xs">Nenhum rastreador criado.</p>
+                    <div className="w-full py-8 flex flex-col items-center gap-4">
+                        <p className="text-xs italic text-muted-foreground w-full text-center">Nenhum rastreador criado.</p>
+                        <button
+                            onClick={handleAddTracker}
+                            className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Novo Rastreador
+                        </button>
+                    </div>
                 )}
             </div>
 
-            {/* Floating Add Button - Adjusted to match sidebar constraints */}
-            <div className="fixed bottom-6 left-[calc(25%+2.5rem)] xl:left-[calc(20%+2.5rem)] z-10 flex gap-2">
-                <button
-                    onClick={handleAddTracker}
-                    className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
-                >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Novo Rastreador
-                </button>
-            </div>
+
 
             <div className="fixed bottom-6 right-10 z-10 flex gap-2">
                 <button
                     onClick={handleUndo}
                     disabled={!isDirty}
-                    className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 font-bold rounded-lg hover:bg-zinc-800 transition-all text-xs disabled:opacity-30 disabled:cursor-not-allowed"
+                    className={`px-4 py-2 font-bold rounded-lg transition-all text-xs border ${isDirty
+                        ? 'bg-purple-600 hover:bg-purple-700 text-white border-purple-500 shadow-lg shadow-purple-900/20'
+                        : 'bg-zinc-900 border-muted-foreground/50 text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed'
+                        }`}
                 >
                     Desfazer
                 </button>
                 <button
                     onClick={handleSave}
                     disabled={!isDirty}
-                    className="px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-xl"
+                    className="px-4 py-2 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed"
                     title="Salvar"
                 >
                     Salvar Alterações

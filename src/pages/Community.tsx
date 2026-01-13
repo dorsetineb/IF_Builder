@@ -27,35 +27,36 @@ const Community = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
     const { user } = useUser();
-    const { posts, setPosts, lastFetched, setLastFetched } = useFeed();
+    const { posts, setPosts, lastFetched, setLastFetched, categories, setCategories, categoryGroups, setCategoryGroups } = useFeed();
 
     // State
-    // Removed local posts state
-    // Initialize loading to true ONLY if we have no posts
-    const [loading, setLoading] = useState(() => posts.length === 0);
+    // Initialize loading to true if we are missing CRITICAL data (categories are structural)
+    const [loading, setLoading] = useState(() => categories.length === 0);
+    const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState('');
     const [viewMode, setViewMode] = useState<'list' | 'grid'>('list');
     const [selectedScope, setSelectedScope] = useState<{ id: string; type: 'group' | 'category' } | null>(null);
-    const [categories, setCategories] = useState<Category[]>([]);
-    const [categoryGroups, setCategoryGroups] = useState<CategoryGroup[]>([]);
     const [favorites, setFavorites] = useState<Set<string>>(new Set());
     const [sortBy, setSortBy] = useState<'recent' | 'popular'>('recent');
 
     useEffect(() => {
         init();
-    }, [user]);
+    }, [user?.id]);
 
     const init = async () => {
+        setError(null);
         try {
-            // Check if we have data (even if cache is slightly stale, show it first)
-            const hasData = posts.length > 0;
+            // CRITICAL: We need categories to render the sidebar. Posts are secondary but important.
+            // If we have categories cached, we can show the UI immediately.
+            const hasCachedCategories = categories.length > 0;
 
-            // If we have data, ensure loading is false immediately
-            if (hasData) {
+            if (hasCachedCategories) {
                 setLoading(false);
+            } else {
+                setLoading(true);
             }
 
-            // Always fetch fresh data, but don't block UI if we already have some
+            // Always fetch fresh data to ensure sync, but strictly wait if we have no cache
             const fetchPromises = [
                 fetchCategories(),
                 fetchPosts()
@@ -65,41 +66,81 @@ const Community = () => {
                 fetchPromises.push(fetchFavorites(user));
             }
 
-            // If no data, wait for fetch to complete before removing loading screen
-            if (!hasData) {
+            // If we lack categories, we MUST wait.
+            if (!hasCachedCategories) {
                 await Promise.all(fetchPromises);
             } else {
-                // If we have data, run fetch in background (optimistic UI)
+                // Background update
                 Promise.all(fetchPromises).catch(err => console.error("Background fetch error:", err));
             }
 
         } catch (err: any) {
             console.error('Error initializing community:', err);
-            toast('Erro', `Não foi possível carregar o fórum.`, 'error');
+            // Only show error screen if we have absolutely nothing to show
+            if (categories.length === 0) {
+                setError('Falha ao conectar com o servidor. Verifique sua internet.');
+            } else {
+                toast('Alerta', 'Não foi possível atualizar os dados mais recentes.', 'error');
+            }
         } finally {
-            // Always ensure loading is false at the end
             setLoading(false);
         }
     };
 
     const fetchCategories = async () => {
-        const { data } = await supabase
-            .from('category_groups')
-            .select(`
-                *,
-                categories (*)
-            `)
-            .order('order_index');
+        try {
+            // Fetch groups and categories separately to ensure we get everything
+            const { data: groupsData, error: groupsError } = await supabase
+                .from('category_groups')
+                .select('*')
+                .order('order_index');
 
-        if (data) {
-            // Sort categories within groups by order_index
-            const sortedGroups = data.map((group: any) => ({
-                ...group,
-                categories: group.categories.sort((a: any, b: any) => (a.order_index || 0) - (b.order_index || 0))
-            }));
-            setCategoryGroups(sortedGroups);
-            // Flatten for legacy support if needed, or just unused
-            setCategories(sortedGroups.flatMap(g => g.categories));
+            if (groupsError) throw groupsError;
+
+            const { data: categoriesData, error: categoriesError } = await supabase
+                .from('categories')
+                .select('*')
+                .order('order_index');
+
+            if (categoriesError) throw categoriesError;
+
+            if (categoriesData) {
+                // Initialize groups from DB or empty if none
+                let groups: CategoryGroup[] = (groupsData || []).map((g: any) => ({ ...g, categories: [] }));
+
+                // "Outros" group for orphaned categories (only created if needed)
+                const otherGroup: CategoryGroup = {
+                    id: 'other',
+                    name: 'Outros',
+                    slug: 'outros',
+                    order_index: 9999,
+                    created_at: null,
+                    categories: []
+                };
+
+                // Distribute categories into groups
+                categoriesData.forEach((cat: Category) => {
+                    const groupIndex = groups.findIndex(g => g.id === cat.group_id);
+                    if (groupIndex !== -1) {
+                        groups[groupIndex].categories.push(cat);
+                    } else {
+                        // Category has no group or group doesn't exist
+                        otherGroup.categories.push(cat);
+                    }
+                });
+
+                // Add "Outros" group if it has categories
+                if (otherGroup.categories.length > 0) {
+                    groups.push(otherGroup);
+                }
+
+                // Update context state
+                setCategoryGroups(groups);
+                setCategories(categoriesData);
+            }
+        } catch (err) {
+            console.error("Critical error in fetchCategories:", err);
+            throw err; // Re-throw to be caught by init()
         }
     };
 
@@ -223,7 +264,22 @@ const Community = () => {
 
     return (
         <div className="flex-1 flex flex-col h-full bg-background font-sans overflow-hidden relative">
-            {loading && <LoadingOverlay message="Carregando comunidade..." />}
+            {error && (
+                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-background/95 backdrop-blur-sm p-6 text-center">
+                    <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-4">
+                        <FileText className="w-8 h-8 text-red-500" />
+                    </div>
+                    <h2 className="text-xl font-bold text-foreground mb-2">Erro ao carregar</h2>
+                    <p className="text-muted-foreground mb-6 max-w-md">{error}</p>
+                    <button
+                        onClick={() => { setLoading(true); init(); }}
+                        className="px-6 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-colors"
+                    >
+                        Tentar Novamente
+                    </button>
+                </div>
+            )}
+            {loading && <LoadingOverlay message="Conectando à Comunidade..." />}
             {/* Sticky Top Bar */}
             <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
                 <div className="flex flex-col">

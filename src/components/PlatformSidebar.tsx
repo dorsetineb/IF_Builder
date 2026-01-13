@@ -1,13 +1,38 @@
-
-import React, { useState } from 'react';
-import { LayoutDashboard, Users, Gamepad2, Settings, ChevronDown, ChevronRight, ChevronLeft, MessageSquare, FileText, Star, Share2, Tornado, Info } from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { LayoutDashboard, Users, Gamepad2, Settings, ChevronDown, ChevronRight, ChevronLeft, MessageSquare, FileText, Star, Share2, Tornado, Info, Unlock } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { AltamiraModal } from './AltamiraModal';
 
 const PlatformSidebar: React.FC = () => {
     const location = useLocation();
     const isActive = (path: string) => location.pathname === path;
 
     const [isCollapsed, setIsCollapsed] = useState(false);
+
+    // Altamira State
+    const [showAltamiraModal, setShowAltamiraModal] = useState(false);
+    const [isAltamiraVisible, setIsAltamiraVisible] = useState(false);
+    const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    const handleMouseMoveTrigger = () => {
+        if (isAltamiraVisible) return;
+
+        // Reset timer on movement (enforces "Stationary" / "Parado")
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+        }
+
+        hoverTimerRef.current = setTimeout(() => {
+            setIsAltamiraVisible(true);
+        }, 2000); // 2 seconds stationary to reveal
+    };
+
+    const handleMouseLeaveTrigger = () => {
+        if (hoverTimerRef.current) {
+            clearTimeout(hoverTimerRef.current);
+            hoverTimerRef.current = null;
+        }
+    };
 
     const NavItem = ({ to, icon: Icon, label }: { to: string, icon: any, label: string }) => (
         <Link
@@ -58,11 +83,39 @@ const PlatformSidebar: React.FC = () => {
                 </Link>
 
                 <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" />
+                {/* Community/Forum Routes - HIDDEN AS REQUESTED
                 <NavItem to="/community" icon={MessageSquare} label="Fórum" />
                 <NavItem to="/community/authors" icon={Users} label="Autores" />
+                */}
 
-                <div className="mt-auto pt-4 flex flex-col gap-1">
-                    <div className="h-px bg-border my-2 mx-1 opacity-50"></div>
+                <div className="mt-auto pt-4 flex flex-col gap-1 relative">
+                    {/* Altamira Trigger Zone & Button */}
+                    <div
+                        className="relative z-10"
+                        onMouseLeave={handleMouseLeaveTrigger}
+                    >
+                        {/* Hidden Button that slides up */}
+                        <div className={`overflow-hidden transition-all duration-500 ease-out ${isAltamiraVisible ? 'max-h-12 opacity-100 mb-1' : 'max-h-0 opacity-0'}`}>
+                            <button
+                                onClick={() => setShowAltamiraModal(true)}
+                                className={`w-full flex items-center gap-3 px-4 py-2 rounded-lg bg-zinc-900 border border-purple-500/30 text-purple-400 hover:text-white hover:bg-purple-600 hover:border-purple-500 transition-all text-xs font-bold uppercase tracking-widest shadow-lg ${isCollapsed ? 'justify-center px-0' : ''}`}
+                            >
+                                <Unlock size={14} />
+                                {!isCollapsed && <span>Altamira</span>}
+                            </button>
+                        </div>
+
+                        {/* Invisible Trigger Area above separator */}
+                        {!isAltamiraVisible && (
+                            <div
+                                className="h-20 w-full absolute -top-20 left-0 z-50 cursor-help"
+                                onMouseMove={handleMouseMoveTrigger}
+                            />
+                        )}
+
+                        <div className="h-px bg-border my-2 mx-1 opacity-50 relative z-0"></div>
+                    </div>
+
                     <NavItem to="/about" icon={Info} label="Sobre o Projeto" />
                     <NavItem to="/settings" icon={Settings} label="Configurações" />
                 </div>
@@ -70,6 +123,11 @@ const PlatformSidebar: React.FC = () => {
 
             {/* Removed bottom button container since it moved up */}
             <div className="p-1"></div>
+
+            {/* Altamira Modal */}
+            {showAltamiraModal && (
+                <AltamiraModal onClose={() => setShowAltamiraModal(false)} />
+            )}
         </aside>
     );
 };

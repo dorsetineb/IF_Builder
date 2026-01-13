@@ -172,7 +172,7 @@ const ColorInput: React.FC<{
 }> = ({ label, id, value, onChange, placeholder }) => (
     <div>
         <label htmlFor={id} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{label}</label>
-        <div className="flex items-center gap-2 p-1 bg-input border border-input rounded-lg focus-within:border-purple-500/50 transition-all">
+        <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all">
             <input
                 type="color"
                 id={`${id}-picker`}
@@ -215,7 +215,7 @@ const FixedVerbItem: React.FC<{
     };
 
     return (
-        <div className="relative p-6 bg-muted/30 rounded-xl border border-border hover:border-purple-500/30 transition-all group">
+        <div className="relative p-6 bg-muted/30 rounded-xl border border-muted-foreground/50 hover:border-primary/30 transition-all group">
             <button
                 onClick={() => onRemove(verb.id)}
                 className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
@@ -233,7 +233,7 @@ const FixedVerbItem: React.FC<{
                         onChange={e => setLocalVerbs(e.target.value)}
                         onBlur={handleVerbsBlur}
                         placeholder="ex: ajuda, help, ?"
-                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 transition-all"
+                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all"
                     />
                 </div>
                 <div className="flex flex-col h-full">
@@ -244,7 +244,7 @@ const FixedVerbItem: React.FC<{
                         onChange={e => onUpdate(verb.id, 'description', e.target.value)}
                         placeholder="Texto que será exibido para o jogador."
                         rows={3}
-                        className="w-full flex-grow bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 transition-all resize-none"
+                        className="w-full flex-grow bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all resize-none"
                     />
                 </div>
             </div>
@@ -504,8 +504,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         // Sync new systems
         // Sync new systems
         setLocalEnableTrackers(enableTrackers ?? (gameSystemEnabled === 'trackers'));
-        setLocalEnableInventory(enableInventory ?? false);
-        setLocalEnableDiary(enableDiary ?? false);
+        setLocalEnableInventory(enableInventory ?? true);
+        setLocalEnableDiary(enableDiary ?? true);
         setLocalEnableFixedVerbs(enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0));
         setLocalEnableChances(enableChances ?? (gameSystemEnabled === 'chances'));
         setLocalEnableImages(enableImages ?? true);
@@ -541,100 +541,85 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         diaryAutoScroll, diaryAllowExport, diaryMaxMessages, diaryShowSceneImage, diaryShowPlayerAction
     ]);
 
-    useEffect(() => {
-        const dirty = localLayoutOrientation !== layoutOrientation ||
-            localLayoutOrder !== layoutOrder ||
-            localImageFrame !== imageFrame ||
-            localSplashButtonText !== splashButtonText ||
-            localContinueButtonText !== continueButtonText ||
-            localRestartButtonText !== restartButtonText ||
-            localActionButtonText !== actionButtonText ||
-            localVerbInputPlaceholder !== verbInputPlaceholder ||
-            localDiaryPlayerName !== diaryPlayerName ||
-            localGameSystemEnabled !== gameSystemEnabled ||
+    // --- SNAPSHOT DIRTY STRATEGY ---
+    // Instead of comparing against potentially unstable props, we capture
+    // the initial state on mount and compare against that.
 
-            // Dirty checks for new systems
-            localEnableTrackers !== (enableTrackers ?? (gameSystemEnabled === 'trackers')) ||
-            localEnableInventory !== (enableInventory ?? false) ||
-            localEnableDiary !== (enableDiary ?? false) ||
-            localEnableFixedVerbs !== (enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0)) ||
-            localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances')) ||
-            localInventoryCapacity !== (inventoryCapacity ?? 10) ||
-            localInventoryMaxWeight !== (inventoryMaxWeight ?? 0) ||
-            localDiaryAutoScroll !== (diaryAutoScroll ?? true) ||
-            localDiaryAllowExport !== (diaryAllowExport ?? false) ||
-            localDiaryAllowExport !== (diaryAllowExport ?? false) ||
-            localDiaryMaxMessages !== (diaryMaxMessages ?? 100) ||
-            localDiaryShowSceneImage !== (diaryShowSceneImage ?? false) ||
-            localDiaryShowPlayerAction !== (diaryShowPlayerAction ?? true) ||
-
-            localMaxChances !== maxChances ||
-            localGameShowTrackersUI !== gameShowTrackersUI ||
-            localGameShowSystemButton !== gameShowSystemButton ||
-            localSuggestionsButtonText !== suggestionsButtonText ||
-            localInventoryButtonText !== inventoryButtonText ||
-            localDiaryButtonText !== diaryButtonText ||
-            localTrackersButtonText !== trackersButtonText ||
-            localSystemButtonText !== gameSystemButtonText ||
-            localSaveMenuTitle !== gameSaveMenuTitle ||
-            localLoadMenuTitle !== gameLoadMenuTitle ||
-            localMainMenuButtonText !== gameMainMenuButtonText ||
-            localViewEndingButtonText !== gameViewEndingButtonText ||
-            localTextColor !== textColor ||
-            localTitleColor !== titleColor ||
-            localSplashButtonColor !== splashButtonColor ||
-            localSplashButtonHoverColor !== splashButtonHoverColor ||
-            localSplashButtonTextColor !== splashButtonTextColor ||
-            localActionButtonColor !== actionButtonColor ||
-            localActionButtonTextColor !== actionButtonTextColor ||
-            localFocusColor !== focusColor ||
-            localChanceIconColor !== chanceIconColor ||
-            localFontFamily !== gameFontFamily ||
-            localGameFontSize !== gameFontSize ||
-            localChanceIcon !== chanceIcon ||
-            localChanceLossMessage !== chanceLossMessage ||
-            localChanceRestoreMessage !== chanceRestoreMessage ||
-            localChanceReturnButtonText !== chanceReturnButtonText ||
-            localGameTheme !== gameTheme ||
-            localTextColorLight !== textColorLight ||
-            localTitleColorLight !== titleColorLight ||
-            localFocusColorLight !== focusColorLight ||
-            localFrameBookColor !== frameBookColor ||
-            localFrameTradingCardColor !== frameTradingCardColor ||
-            localFrameRoundedTopColor !== frameRoundedTopColor ||
-            localGameSceneNameOverlayBg !== gameSceneNameOverlayBg ||
-            localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor ||
-            localGameContinueIndicatorColor !== gameContinueIndicatorColor ||
-            localTitle !== title ||
-            localLogo !== logo ||
-            localOmitSplashTitle !== omitSplashTitle ||
-            localSplashImage !== splashImage ||
-            localSplashContentAlignment !== splashContentAlignment ||
-            localSplashContentVerticalAlignment !== splashContentVerticalAlignment ||
-            localSplashDescription !== splashDescription ||
-            localSplashDescription !== splashDescription ||
-            localBackgroundMusic !== backgroundMusic ||
-            localPositiveEndingImage !== positiveEndingImage ||
-            localPositiveEndingContentAlignment !== positiveEndingContentAlignment ||
-            localPositiveEndingDescription !== positiveEndingDescription ||
-            localPositiveEndingMusic !== positiveEndingMusic ||
-            localNegativeEndingImage !== negativeEndingImage ||
-            localNegativeEndingContentAlignment !== negativeEndingContentAlignment ||
-            localNegativeEndingDescription !== negativeEndingDescription ||
-            localNegativeEndingMusic !== negativeEndingMusic ||
-            JSON.stringify(localFixedVerbs) !== JSON.stringify(fixedVerbs) ||
-            localTextAnimationType !== textAnimationType ||
-            localTextSpeed !== textSpeed ||
-            localImageTransitionType !== imageTransitionType ||
-            localImageSpeed !== imageSpeed ||
-            localEnableImages !== (enableImages ?? true) ||
-            localEnableTextControl !== (enableTextControl ?? true) ||
-            localTextReadingFlow !== (textReadingFlow || 'paused') ||
-            localGameInteractionType !== (gameInteractionType || 'parser');
-        if (dirty !== isDirty) {
-            onSetDirty(dirty);
-        }
+    const getCurrentState = () => ({
+        localLayoutOrientation, localLayoutOrder, localImageFrame, localSplashButtonText,
+        localContinueButtonText, localRestartButtonText, localActionButtonText, localVerbInputPlaceholder,
+        localDiaryPlayerName, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI,
+        localGameShowSystemButton, localGameInteractionType, localSuggestionsButtonText,
+        localInventoryButtonText, localDiaryButtonText, localTrackersButtonText, localSystemButtonText,
+        localSaveMenuTitle, localLoadMenuTitle, localMainMenuButtonText, localViewEndingButtonText,
+        localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor,
+        localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor,
+        localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceLossMessage,
+        localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight,
+        localTitleColorLight, localFocusColorLight, localFrameBookColor, localFrameTradingCardColor,
+        localFrameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
+        localGameContinueIndicatorColor, localTitle, localLogo, localOmitSplashTitle, localSplashImage,
+        localSplashContentAlignment, localSplashContentVerticalAlignment, localSplashDescription,
+        localBackgroundMusic, localPositiveEndingImage, localPositiveEndingContentAlignment,
+        localPositiveEndingDescription, localPositiveEndingMusic, localNegativeEndingImage,
+        localNegativeEndingContentAlignment, localNegativeEndingDescription, localNegativeEndingMusic,
+        localFixedVerbs, localTextAnimationType, localTextSpeed, localTextReadingFlow,
+        localImageTransitionType, localImageSpeed,
+        // New Systems
+        localEnableTrackers, localEnableInventory, localEnableDiary, localEnableFixedVerbs,
+        localEnableChances, localEnableImages, localEnableTextControl, localInventoryCapacity,
+        localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
+        localDiaryShowSceneImage, localDiaryShowPlayerAction
     });
+
+    // Store the initial state on mount
+    const initialStateRef = React.useRef<ReturnType<typeof getCurrentState> | null>(null);
+
+    // Initialize snapshot on mount
+    useEffect(() => {
+        initialStateRef.current = getCurrentState();
+        onSetDirty(false);
+    }, []); // Run ONCE on mount
+
+    // Check dirty status against the SNAPSHOT
+    useEffect(() => {
+        if (!initialStateRef.current) return;
+
+        const currentState = getCurrentState();
+        const initialState = initialStateRef.current;
+
+        const isStateDirty =
+            JSON.stringify(currentState) !== JSON.stringify(initialState);
+
+        if (isStateDirty !== isDirty) {
+            onSetDirty(isStateDirty);
+        }
+    }, [
+        localLayoutOrientation, localLayoutOrder, localImageFrame, localSplashButtonText,
+        localContinueButtonText, localRestartButtonText, localActionButtonText, localVerbInputPlaceholder,
+        localDiaryPlayerName, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI,
+        localGameShowSystemButton, localGameInteractionType, localSuggestionsButtonText,
+        localInventoryButtonText, localDiaryButtonText, localTrackersButtonText, localSystemButtonText,
+        localSaveMenuTitle, localLoadMenuTitle, localMainMenuButtonText, localViewEndingButtonText,
+        localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor,
+        localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor,
+        localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceLossMessage,
+        localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight,
+        localTitleColorLight, localFocusColorLight, localFrameBookColor, localFrameTradingCardColor,
+        localFrameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
+        localGameContinueIndicatorColor, localTitle, localLogo, localOmitSplashTitle, localSplashImage,
+        localSplashContentAlignment, localSplashContentVerticalAlignment, localSplashDescription,
+        localBackgroundMusic, localPositiveEndingImage, localPositiveEndingContentAlignment,
+        localPositiveEndingDescription, localPositiveEndingMusic, localNegativeEndingImage,
+        localNegativeEndingContentAlignment, localNegativeEndingDescription, localNegativeEndingMusic,
+        localFixedVerbs, localTextAnimationType, localTextSpeed, localTextReadingFlow,
+        localImageTransitionType, localImageSpeed,
+        localEnableTrackers, localEnableInventory, localEnableDiary, localEnableFixedVerbs,
+        localEnableChances, localEnableImages, localEnableTextControl, localInventoryCapacity,
+        localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
+        localDiaryShowSceneImage, localDiaryShowPlayerAction
+    ]);
+
 
     const handleSave = () => {
         if (localLayoutOrientation !== layoutOrientation) onUpdate('gameLayoutOrientation', localLayoutOrientation);
@@ -916,15 +901,15 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     return (
         <div className="space-y-6 pb-24">
             <div>
-                <div className="border-b border-border flex items-center justify-between pr-4">
+                <div className="border-b border-muted-foreground/50 flex items-center justify-between pr-4">
                     <div className="flex space-x-1 overflow-x-auto">
                         {Object.entries(TABS).map(([key, name]) => {
                             return (
                                 <button
                                     key={key}
                                     onClick={() => setActiveTab(key as any)}
-                                    className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-2 ${activeTab === key
-                                        ? 'border-purple-500 text-foreground bg-purple-500/5'
+                                    className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 ${activeTab === key
+                                        ? 'border-primary text-primary bg-primary/5'
                                         : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
                                         }`}
                                 >
@@ -955,14 +940,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     id="splashContentAlignment"
                                                     value={localSplashContentAlignment}
                                                     onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input shadow-lg"
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-zinc-950 shadow-lg"
                                                 >
                                                     <option value="right">Direita</option>
                                                     <option value="left">Esquerda</option>
                                                 </select>
                                             </div>
                                             <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}>
-                                                <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${localOmitSplashTitle ? 'bg-purple-500 border-purple-500' : 'bg-input border-input group-hover:border-primary/50'}`}>
+                                                <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${localOmitSplashTitle ? 'bg-primary border-primary' : 'bg-input border-input group-hover:border-primary/50'}`}>
                                                     {localOmitSplashTitle && <Circle className="w-2 h-2 fill-white stroke-none" />}
                                                 </div>
                                                 <label htmlFor="omitSplashTitle" className="ml-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground cursor-pointer select-none transition-colors">Ocultar título e descrição</label>
@@ -972,9 +957,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                     <div className="space-y-4 col-span-1 md:mt-0">
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">Pré-visualização</p>
-                                        <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-center shadow-inner h-fit aspect-video">
+                                        <div className="bg-card border border-muted-foreground/50 rounded-2xl p-4 flex items-center justify-center shadow-inner h-fit aspect-video">
                                             <div
-                                                className="relative w-full max-w-full aspect-video bg-muted border border-border/50 rounded-xl flex shadow-2xl overflow-hidden"
+                                                className="relative w-full max-w-full aspect-video bg-muted border border-muted-foreground/50 rounded-xl flex shadow-2xl overflow-hidden"
                                                 style={{
                                                     justifyContent: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
                                                     alignItems: 'flex-end'
@@ -985,7 +970,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 </div>
                                                 {!localOmitSplashTitle && (
                                                     <div
-                                                        className="w-2/3 h-1/3 m-6 bg-purple-500/5 backdrop-blur-sm border border-purple-500/20 rounded-lg flex items-center justify-center text-center text-[8px] p-2 text-purple-400 font-bold uppercase tracking-widest shadow-xl"
+                                                        className="w-2/3 h-1/3 m-6 bg-primary/5 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center justify-center text-center text-[8px] p-2 text-primary font-bold uppercase tracking-widest shadow-xl"
                                                     >
                                                         Título e Descrição
                                                     </div>
@@ -1007,7 +992,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     id="orientation-select"
                                                     value={localLayoutOrientation}
                                                     onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
-                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input"
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-zinc-950"
                                                 >
                                                     <option value="vertical">Vertical</option>
                                                     <option value="horizontal">Horizontal</option>
@@ -1019,7 +1004,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     id="order-select"
                                                     value={localLayoutOrder}
                                                     onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
-                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input"
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-zinc-950"
                                                 >
                                                     <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
                                                     <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
@@ -1031,7 +1016,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     id="frame-select"
                                                     value={localImageFrame}
                                                     onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
-                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input"
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-zinc-950"
                                                 >
                                                     <option value="none">Sem moldura</option>
                                                     <option value="rounded-top">Portal</option>
@@ -1055,9 +1040,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                     <div className="flex flex-col col-span-1 md:mt-0">
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">Pré-visualização do Layout</p>
-                                        <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-center h-fit aspect-video shadow-inner">
+                                        <div className="bg-card border border-muted-foreground/50 rounded-2xl p-4 flex items-center justify-center h-fit aspect-video shadow-inner">
                                             <div
-                                                className="w-full max-w-[400px] aspect-video border border-border/30 bg-muted rounded-xl flex p-3 gap-3 transition-all shadow-2xl overflow-hidden"
+                                                className="w-full max-w-[400px] aspect-video border border-muted-foreground/50 bg-muted rounded-xl flex p-3 gap-3 transition-all shadow-2xl overflow-hidden"
                                                 style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
                                             >
                                                 <div
@@ -1065,7 +1050,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     style={getFramePreviewStyles(localImageFrame).panelStyles}
                                                 >
                                                     <div
-                                                        className={`flex-1 w-full h-full rounded-lg flex items-center justify-center text-center text-[7px] p-2 font-black uppercase tracking-[0.2em] text-muted-foreground border border-border/30 bg-card shadow-inner`}
+                                                        className={`flex-1 w-full h-full rounded-lg flex items-center justify-center text-center text-[7px] p-2 font-black uppercase tracking-[0.2em] text-muted-foreground border border-muted-foreground/50 bg-card shadow-inner`}
                                                         style={{
                                                             ...getFramePreviewStyles(localImageFrame).containerStyles,
                                                             backgroundColor: undefined
@@ -1074,7 +1059,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         FOTO
                                                     </div>
                                                 </div>
-                                                <div className={`flex-1 bg-purple-500/5 border border-purple-500/20 rounded-lg flex items-center justify-center text-center text-[7px] p-2 text-purple-400 font-black uppercase tracking-[0.2em] shadow-lg ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}>
+                                                <div className={`flex-1 bg-primary/5 border border-primary/20 rounded-lg flex items-center justify-center text-center text-[7px] p-2 text-primary font-black uppercase tracking-[0.2em] shadow-lg ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}>
                                                     TEXTO
                                                 </div>
                                             </div>
@@ -1089,7 +1074,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div>
                                 <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest flex items-center gap-2">
-                                    <Grid className="w-4 h-4 text-purple-400" /> Sistemas Ativos
+                                    <Grid className="w-4 h-4 text-primary" /> Sistemas Ativos
                                 </h3>
                                 <p className="text-xs text-muted-foreground mb-6 max-w-2xl">
                                     Habilite e configure os sistemas que estarão disponíveis no seu jogo. Você pode combinar múltiplos sistemas.
@@ -1099,10 +1084,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="space-y-6">
 
                                     {/* --- ROW 1: GAME STYLE (Full Width) --- */}
-                                    <div className={`w-full p-6 bg-card border ${localGameInteractionType ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
+                                    <div className={`w-full p-6 bg-card border ${localGameInteractionType ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
                                         <div className="flex justify-between items-start mb-6">
                                             <div className="flex items-center gap-3">
-                                                <div className={`p-2.5 rounded-xl transition-colors bg-purple-500 text-white shadow-md`}>
+                                                <div className={`p-2.5 rounded-xl transition-colors bg-primary text-primary-foreground shadow-md`}>
                                                     <LayoutTemplate className="w-5 h-5" />
                                                 </div>
                                                 <div>
@@ -1115,9 +1100,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="grid grid-cols-2 gap-4">
                                             <button
                                                 onClick={() => setLocalGameInteractionType('parser')}
-                                                className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-purple-500 bg-purple-500/5 text-purple-400' : 'border-border/50 bg-input/50 text-muted-foreground hover:border-purple-500/30'}`}
+                                                className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/5 text-primary' : 'border-muted-foreground/20 bg-zinc-900 text-muted-foreground hover:border-primary/30'}`}
                                             >
-                                                <div className={`p-3 rounded-lg ${localGameInteractionType === 'parser' ? 'bg-purple-500/20' : 'bg-background'}`}>
+                                                <div className={`p-3 rounded-lg ${localGameInteractionType === 'parser' ? 'bg-primary/20' : 'bg-black/40'}`}>
                                                     <Type className="w-6 h-6" />
                                                 </div>
                                                 <div>
@@ -1127,9 +1112,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             </button>
                                             <button
                                                 onClick={() => setLocalGameInteractionType('choice')}
-                                                className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-purple-500 bg-purple-500/5 text-purple-400' : 'border-border/50 bg-input/50 text-muted-foreground hover:border-purple-500/30'}`}
+                                                className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-primary bg-primary/5 text-primary' : 'border-muted-foreground/20 bg-zinc-900 text-muted-foreground hover:border-primary/30'}`}
                                             >
-                                                <div className={`p-3 rounded-lg ${localGameInteractionType === 'choice' ? 'bg-purple-500/20' : 'bg-background'}`}>
+                                                <div className={`p-3 rounded-lg ${localGameInteractionType === 'choice' ? 'bg-primary/20' : 'bg-black/40'}`}>
                                                     <List className="w-6 h-6" />
                                                 </div>
                                                 <div>
@@ -1145,10 +1130,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="flex-1 w-full space-y-6">
                                             {/* INVENTORY */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableInventory ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
+                                                <div className={`w-full p-6 bg-card border ${localEnableInventory ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableInventory ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableInventory ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
                                                                 <Package className="w-5 h-5" />
                                                             </div>
                                                             <div>
@@ -1158,7 +1143,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableInventory} onChange={(e) => setLocalEnableInventory(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-border rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                                                 <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
                                                             </div>
                                                         </label>
@@ -1168,10 +1153,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* TEXT CONTROL */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableTextControl ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                                <div className={`w-full p-6 bg-card border ${localEnableTextControl ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableTextControl ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableTextControl ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
                                                                 <Type className="w-5 h-5" />
                                                             </div>
                                                             <div>
@@ -1181,13 +1166,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableTextControl} onChange={(e) => setLocalEnableTextControl(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-border rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                                                 <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
                                                             </div>
                                                         </label>
                                                     </div>
                                                     {localEnableTextControl && (
-                                                        <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                        <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
                                                             <div className="grid grid-cols-2 gap-4">
                                                                 <div className="space-y-2">
                                                                     <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Estilo de Animação</label>
@@ -1195,7 +1180,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         id="textAnimationType"
                                                                         value={localTextAnimationType}
                                                                         onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
-                                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30"
+                                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                                     >
                                                                         <option value="fade">Esmaecer (Fade In)</option>
                                                                         <option value="typewriter">Máquina de Escrever</option>
@@ -1207,7 +1192,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         id="textReadingFlow"
                                                                         value={localTextReadingFlow}
                                                                         onChange={(e) => setLocalTextReadingFlow(e.target.value as 'continuous' | 'paused')}
-                                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30"
+                                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                                     >
                                                                         <option value="paused">Pausado (Por Parágrafo)</option>
                                                                         <option value="continuous">Contínuo (Texto Completo)</option>
@@ -1223,7 +1208,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         max="5"
                                                                         value={localTextSpeed}
                                                                         onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
-                                                                        className="flex-grow h-1.5 bg-input rounded-lg appearance-none cursor-pointer accent-purple-500"
+                                                                        className="flex-grow h-1.5 bg-zinc-950 rounded-lg appearance-none cursor-pointer accent-primary"
                                                                     />
                                                                     <span className="text-xl font-mono font-bold w-6 text-center">{localTextSpeed}</span>
                                                                 </div>
@@ -1235,10 +1220,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* LIFE SYSTEM */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableChances ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
+                                                <div className={`w-full p-6 bg-card border ${localEnableChances ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableChances ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableChances ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
                                                                 <Heart className="w-5 h-5" />
                                                             </div>
                                                             <div>
@@ -1248,22 +1233,22 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableChances} onChange={(e) => setLocalEnableChances(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-border rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                                                 <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
                                                             </div>
                                                         </label>
                                                     </div>
                                                     {localEnableChances && (
-                                                        <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                        <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
                                                             <div className="flex items-end gap-3 w-full">
                                                                 <div className="space-y-1 flex-1 min-w-0">
                                                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Ícone</label>
-                                                                    <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-border/50 h-9 w-full">
+                                                                    <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-muted-foreground/50 h-9 w-full">
                                                                         {['heart', 'circle', 'diamond', 'cross'].map((icon) => (
                                                                             <button
                                                                                 key={icon}
                                                                                 onClick={() => setLocalChanceIcon(icon as any)}
-                                                                                className={`flex-1 h-full flex items-center justify-center rounded-md transition-all ${localChanceIcon === icon ? 'bg-purple-500 text-white shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+                                                                                className={`flex-1 h-full flex items-center justify-center rounded-md transition-all ${localChanceIcon === icon ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
                                                                                 title={icon}
                                                                             >
                                                                                 <ChanceIcon type={icon as any} color={localChanceIcon === icon ? '#ffffff' : 'currentColor'} className="w-4 h-4" />
@@ -1273,7 +1258,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 </div>
                                                                 <div className="space-y-1 flex-1 min-w-0">
                                                                     <label htmlFor="chanceColor" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cor</label>
-                                                                    <div className="flex items-center gap-2 p-1 bg-input border border-input rounded-lg focus-within:border-purple-500/50 transition-all h-9 w-full">
+                                                                    <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all h-9 w-full">
                                                                         <input
                                                                             type="color"
                                                                             id="chanceColor-picker"
@@ -1300,7 +1285,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
                                                                         min="1"
                                                                         max="10"
-                                                                        className="w-full h-9 bg-input border border-input rounded-lg px-2 text-sm font-bold text-center focus:ring-1 focus:ring-purple-500/50 transition-all"
+                                                                        className="w-full h-9 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-2 text-sm font-bold text-center text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all"
                                                                     />
                                                                 </div>
                                                             </div>
@@ -1314,10 +1299,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="flex-1 w-full space-y-6">
                                             {/* DIARY */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableDiary ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                                <div className={`w-full p-6 bg-card border ${localEnableDiary ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableDiary ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableDiary ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
                                                                 <Book className="w-5 h-5" />
                                                             </div>
                                                             <div>
@@ -1327,21 +1312,21 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableDiary} onChange={(e) => setLocalEnableDiary(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-border rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                                                 <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
                                                             </div>
                                                         </label>
                                                     </div>
                                                     {localEnableDiary && (
-                                                        <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                        <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
                                                             <div className="space-y-3">
-                                                                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50">
+                                                                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-muted-foreground/50">
                                                                     <span className="text-xs font-medium text-foreground">Mostrar Imagem da Cena</span>
-                                                                    <input type="checkbox" checked={localDiaryShowSceneImage} onChange={(e) => setLocalDiaryShowSceneImage(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded border-gray-300 focus:ring-purple-500" />
+                                                                    <input type="checkbox" checked={localDiaryShowSceneImage} onChange={(e) => setLocalDiaryShowSceneImage(e.target.checked)} className="w-4 h-4 accent-primary rounded border-gray-300 focus:ring-primary" />
                                                                 </div>
-                                                                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-border/50">
+                                                                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-muted-foreground/50">
                                                                     <span className="text-xs font-medium text-foreground">Mostrar Ação do Jogador</span>
-                                                                    <input type="checkbox" checked={localDiaryShowPlayerAction} onChange={(e) => setLocalDiaryShowPlayerAction(e.target.checked)} className="w-4 h-4 accent-purple-500 rounded border-gray-300 focus:ring-purple-500" />
+                                                                    <input type="checkbox" checked={localDiaryShowPlayerAction} onChange={(e) => setLocalDiaryShowPlayerAction(e.target.checked)} className="w-4 h-4 accent-primary rounded border-gray-300 focus:ring-primary" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1351,10 +1336,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* IMAGES */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableImages ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                                <div className={`w-full p-6 bg-card border ${localEnableImages ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableImages ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableImages ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
                                                                 <ImageIcon className="w-5 h-5" />
                                                             </div>
                                                             <div>
@@ -1364,20 +1349,20 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableImages} onChange={(e) => setLocalEnableImages(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-border rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                                                 <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
                                                             </div>
                                                         </label>
                                                     </div>
                                                     {localEnableImages && (
-                                                        <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                        <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
                                                             <div className="space-y-2">
                                                                 <label htmlFor="imageTransitionType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Transição de Imagem</label>
                                                                 <select
                                                                     id="imageTransitionType"
                                                                     value={localImageTransitionType}
                                                                     onChange={(e) => setLocalImageTransitionType(e.target.value as any)}
-                                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30"
+                                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                                 >
                                                                     <option value="fade">Esmaecer (Fade)</option>
                                                                     <option value="slide">Deslizar (Slide)</option>
@@ -1394,7 +1379,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         step="0.1"
                                                                         value={localImageSpeed}
                                                                         onChange={(e) => setLocalImageSpeed(parseFloat(e.target.value))}
-                                                                        className="flex-grow h-1.5 bg-input rounded-lg appearance-none cursor-pointer accent-purple-500"
+                                                                        className="flex-grow h-1.5 bg-zinc-950 rounded-lg appearance-none cursor-pointer accent-primary"
                                                                     />
                                                                     <span className="text-xl font-mono font-bold w-6 text-center">{localImageSpeed}s</span>
                                                                 </div>
@@ -1406,10 +1391,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* TRACKERS */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableTrackers ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
+                                                <div className={`w-full p-6 bg-card border ${localEnableTrackers ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableTrackers ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableTrackers ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}>
                                                                 <SlidersHorizontal className="w-5 h-5" />
                                                             </div>
                                                             <div>
@@ -1419,19 +1404,19 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableTrackers} onChange={(e) => setLocalEnableTrackers(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-border rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                                                 <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
                                                             </div>
                                                         </label>
                                                     </div>
                                                     {localEnableTrackers && (
-                                                        <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                        <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
                                                             <p className="text-[11px] text-muted-foreground leading-relaxed">
                                                                 Rastreadores são variáveis para pontos de vida alternativos, dinheiro, sanidade, etc.
                                                             </p>
                                                             <button
                                                                 onClick={() => props.onNavigateToTrackers?.()}
-                                                                className="w-full py-3 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-purple-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
+                                                                className="w-full py-3 bg-primary/10 text-primary border border-primary/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all active:scale-95 flex items-center justify-center gap-2"
                                                             >
                                                                 <SlidersHorizontal className="w-4 h-4" /> Configurar Rastreadores
                                                             </button>
@@ -1450,16 +1435,16 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div>
                                 <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest flex items-center gap-2">
-                                    <Command className="w-4 h-4 text-purple-400" /> Comandos Globais
+                                    <Command className="w-4 h-4 text-primary" /> Comandos Globais
                                 </h3>
                                 <p className="text-xs text-muted-foreground mb-6 max-w-2xl">
-                                    Configure comandos/verbos que estarão sempre disponíveis para o jogador, independente da cena atual (ex: inventário, ajuda, status).
+                                    Configure verbos, palavras e descrições que estarão sempre disponíveis para o jogador, independente da cena em que o jogador está (por exemplo, ajuda ou tutorial).
                                 </p>
 
-                                <div className={`p-6 bg-card border ${localEnableFixedVerbs ? 'border-purple-500/30 ring-1 ring-purple-500/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                <div className={`p-6 bg-card border ${localEnableFixedVerbs ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-3">
-                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableFixedVerbs ? 'bg-purple-500 text-white shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableFixedVerbs ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
                                                 <Command className="w-5 h-5" />
                                             </div>
                                             <div>
@@ -1469,24 +1454,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
                                             <input type="checkbox" checked={localEnableFixedVerbs} onChange={(e) => setLocalEnableFixedVerbs(e.target.checked)} className="sr-only peer" />
-                                            <div className="w-10 h-6 bg-muted border-2 border-border/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-purple-500/20 peer peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-all relative">
+                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                                 <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
                                             </div>
                                         </label>
                                     </div>
                                     {localEnableFixedVerbs && (
-                                        <div className="space-y-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-top-2 duration-300">
-                                            <button
-                                                onClick={() => handleAddFixedVerb()}
-                                                className="w-full py-2 bg-purple-500/10 text-purple-400 border border-purple-500/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-purple-500 hover:text-white transition-all active:scale-95 flex items-center justify-center gap-2"
-                                            >
-                                                <Plus className="w-4 h-4" /> Adicionar Novo Comando
-                                            </button>
-                                            {localFixedVerbs.length > 0 && (
-                                                <div className="text-[10px] text-muted-foreground text-center">
-                                                    {localFixedVerbs.length} comando(s) configurado(s)
-                                                </div>
-                                            )}
+                                        <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
                                             <div className="grid grid-cols-1 gap-2">
                                                 {localFixedVerbs.map(verb => (
                                                     <FixedVerbItem
@@ -1497,6 +1471,17 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     />
                                                 ))}
                                             </div>
+                                            {localFixedVerbs.length > 0 && (
+                                                <div className="text-[10px] text-muted-foreground text-center mt-2 mb-2">
+                                                    {localFixedVerbs.length} comando(s) configurado(s)
+                                                </div>
+                                            )}
+                                            <button
+                                                onClick={() => handleAddFixedVerb()}
+                                                className="w-full py-2 bg-white text-zinc-950 border border-muted-foreground/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-200 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
+                                            >
+                                                <Plus className="w-4 h-4" /> Adicionar novo comando
+                                            </button>
                                         </div>
                                     )}
                                 </div>
@@ -1505,9 +1490,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     )}
                     {/* --- SECTION: FIM DE JOGO (Consolidated) --- */}
                     {activeTab === 'sistemas' && (
-                        <div className="mt-12 pt-8 border-t border-border">
+                        <div className="mt-12 pt-8 border-t border-muted-foreground/50">
                             <h3 className="text-xs font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
-                                <Trophy className="w-4 h-4 text-purple-400" /> Telas de Final
+                                <Trophy className="w-4 h-4 text-primary" /> Telas de Final
                             </h3>
                             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
                                 {/* ENDING POSITIVE */}
@@ -1515,13 +1500,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <h4 className="text-xs font-bold text-green-400 uppercase tracking-widest flex items-center gap-2 p-2 bg-green-400/10 rounded-lg w-fit border border-green-400/20">
                                         <Trophy className="w-3 h-3" /> Vitória
                                     </h4>
-                                    <div className="bg-card border border-border rounded-xl p-4 space-y-4">
+                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-4 space-y-4">
                                         <div className="space-y-2">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Alinhamento</label>
                                             <select
                                                 value={localPositiveEndingContentAlignment}
                                                 onChange={(e) => setLocalPositiveEndingContentAlignment(e.target.value as 'left' | 'right')}
-                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground font-bold"
+                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 font-bold"
                                             >
                                                 <option value="right">Direita</option>
                                                 <option value="left">Esquerda</option>
@@ -1532,13 +1517,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             <textarea
                                                 value={localPositiveEndingDescription}
                                                 onChange={(e) => setLocalPositiveEndingDescription(e.target.value)}
-                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground min-h-[100px] resize-none"
+                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 min-h-[100px] resize-none"
                                                 placeholder="Mensagem de vitória..."
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem</label>
-                                            <div className="relative w-full aspect-video bg-muted rounded-lg overflow-hidden group border border-border">
+                                            <div className="relative w-full aspect-video bg-muted rounded-lg overflow-hidden group border border-muted-foreground/50">
                                                 {localPositiveEndingImage ? (
                                                     <>
                                                         <img src={localPositiveEndingImage} className="w-full h-full object-cover" />
@@ -1556,7 +1541,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="space-y-2">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Música</label>
                                             <div className="flex gap-2">
-                                                <label className="flex-1 flex items-center justify-center px-3 py-2 bg-muted border border-border rounded-lg cursor-pointer hover:bg-muted/80 text-[10px] font-bold uppercase">
+                                                <label className="flex-1 flex items-center justify-center px-3 py-2 bg-muted border border-muted-foreground/50 rounded-lg cursor-pointer hover:bg-muted/80 text-[10px] font-bold uppercase">
                                                     <Upload className="w-3 h-3 mr-2" /> {localPositiveEndingMusic ? 'Alterar' : 'Carregar'}
                                                     <input type="file" accept="audio/*" className="hidden" onChange={(e) => handleAudioUpload(e, setLocalPositiveEndingMusic)} />
                                                 </label>
@@ -1573,13 +1558,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <h4 className="text-xs font-bold text-red-400 uppercase tracking-widest flex items-center gap-2 p-2 bg-red-400/10 rounded-lg w-fit border border-red-400/20">
                                         <Skull className="w-3 h-3" /> Derrota
                                     </h4>
-                                    <div className="bg-card border border-border rounded-xl p-4 space-y-4">
+                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-4 space-y-4">
                                         <div className="space-y-2">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Alinhamento</label>
                                             <select
                                                 value={localNegativeEndingContentAlignment}
                                                 onChange={(e) => setLocalNegativeEndingContentAlignment(e.target.value as 'left' | 'right')}
-                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground font-bold"
+                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 font-bold"
                                             >
                                                 <option value="right">Direita</option>
                                                 <option value="left">Esquerda</option>
@@ -1590,13 +1575,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             <textarea
                                                 value={localNegativeEndingDescription}
                                                 onChange={(e) => setLocalNegativeEndingDescription(e.target.value)}
-                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground min-h-[100px] resize-none"
+                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 min-h-[100px] resize-none"
                                                 placeholder="Mensagem de derrota..."
                                             />
                                         </div>
                                         <div className="space-y-2">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem</label>
-                                            <div className="relative w-full aspect-video bg-muted rounded-lg overflow-hidden group border border-border">
+                                            <div className="relative w-full aspect-video bg-muted rounded-lg overflow-hidden group border border-muted-foreground/50">
                                                 {localNegativeEndingImage ? (
                                                     <>
                                                         <img src={localNegativeEndingImage} className="w-full h-full object-cover" />
@@ -1614,12 +1599,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="space-y-2">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Música</label>
                                             <div className="flex gap-2">
-                                                <label className="flex-1 flex items-center justify-center px-3 py-2 bg-muted border border-border rounded-lg cursor-pointer hover:bg-muted/80 text-[10px] font-bold uppercase">
+                                                <label className="flex-1 flex items-center justify-center px-3 py-2 bg-muted border border-muted-foreground/50 rounded-lg cursor-pointer hover:bg-muted/80 text-[10px] font-bold uppercase">
                                                     <Upload className="w-3 h-3 mr-2" /> {localNegativeEndingMusic ? 'Alterar' : 'Carregar'}
                                                     <input type="file" accept="audio/*" className="hidden" onChange={(e) => handleAudioUpload(e, setLocalNegativeEndingMusic)} />
                                                 </label>
                                                 {localNegativeEndingMusic && (
-                                                    <button onClick={() => setLocalNegativeEndingMusic('')} className="p-2 bg-red-500/5 text-muted-foreground rounded-lg border border-border hover:bg-red-500 hover:text-white transition-all shadow-lg"><Trash2 className="w-4 h-4" /></button>
+                                                    <button onClick={() => setLocalNegativeEndingMusic('')} className="p-2 bg-red-500/5 text-muted-foreground rounded-lg border border-muted-foreground/50 hover:bg-red-500 hover:text-white transition-all shadow-lg"><Trash2 className="w-4 h-4" /></button>
                                                 )}
                                             </div>
                                         </div>
@@ -1640,7 +1625,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         id="gameTitle"
                                         value={localTitle}
                                         onChange={(e) => setLocalTitle(e.target.value)}
-                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all font-bold placeholder:text-muted-foreground"
+                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 focus:border-purple-500/50 transition-all font-bold placeholder:text-muted-foreground"
                                         placeholder="Ex: A Masmorra Esquecida"
                                     />
                                 </div>
@@ -1650,7 +1635,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         id="splashDescription"
                                         value={localSplashDescription}
                                         onChange={(e) => setLocalSplashDescription(e.target.value)}
-                                        className="w-full flex-1 bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-purple-500/50 transition-all resize-none leading-relaxed placeholder:text-muted-foreground h-full"
+                                        className="w-full flex-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 focus:border-purple-500/50 transition-all resize-none leading-relaxed placeholder:text-muted-foreground h-full"
                                         placeholder="Uma breve descrição da sua aventura..."
                                     />
                                 </div>
@@ -1662,14 +1647,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             {/* RIGHT COLUMN: Preview & Image Settings */}
                             <div className="flex flex-col h-full gap-2">
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem de Fundo</label>
-                                <div className="relative w-full aspect-video bg-black/50 border border-border rounded-xl overflow-hidden shadow-2xl group flex-shrink-0">
+                                <div className="relative w-full aspect-video bg-black/50 border border-muted-foreground/50 rounded-xl overflow-hidden shadow-2xl group flex-shrink-0">
                                     {/* Background Image Layer */}
                                     {localSplashImage ? (
                                         <div className="absolute inset-0 w-full h-full">
                                             <img src={localSplashImage} alt="Fundo" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-40" />
                                         </div>
                                     ) : (
-                                        <div className="absolute inset-0 flex flex-col items-center justify-center bg-muted/10">
+                                        <div className="absolute inset-0 flex flex-col items-start justify-start p-4 bg-muted/10">
                                             <ImageIcon className="w-8 h-8 text-muted-foreground/30 mb-2" />
                                             <p className="text-[9px] uppercase tracking-widest text-muted-foreground/50 font-bold">Sem imagem de fundo</p>
                                         </div>
@@ -1725,14 +1710,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="space-y-4">
                                     <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha Sonora Inicial</h4>
                                     <div className="flex items-center gap-3">
-                                        <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-border text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg group">
+                                        <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-muted-foreground/50 text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg group">
                                             <Upload className="w-4 h-4 mr-2 text-purple-400 group-hover:scale-110 transition-transform" /> {localBackgroundMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
                                             <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalBackgroundMusic)} className="hidden" />
                                         </label>
                                         {localBackgroundMusic && (
                                             <button
                                                 onClick={() => setLocalBackgroundMusic('')}
-                                                className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-border hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-lg"
+                                                className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-muted-foreground/50 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-lg"
                                                 title="Remover Música"
                                             >
                                                 <Trash2 className="w-5 h-5" />
@@ -1751,7 +1736,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 id="splashContentAlignment"
                                                 value={localSplashContentAlignment}
                                                 onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input shadow-lg"
+                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-zinc-950 shadow-lg"
                                             >
                                                 <option value="right">Direita</option>
                                                 <option value="left">Esquerda</option>
@@ -1760,7 +1745,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 id="splashContentVerticalAlignment"
                                                 value={localSplashContentVerticalAlignment}
                                                 onChange={(e) => setLocalSplashContentVerticalAlignment(e.target.value as 'top' | 'bottom')}
-                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-input shadow-lg"
+                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 focus:border-purple-500/50 transition-all [&>option]:bg-zinc-950 shadow-lg"
                                             >
                                                 <option value="bottom">Inferior</option>
                                                 <option value="top">Superior</option>
@@ -1792,62 +1777,62 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                         <div className="space-y-2">
                                             <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Ação</label>
-                                            <input type="text" id="actionButtonText" value={localActionButtonText} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                            <input type="text" id="actionButtonText" value={localActionButtonText} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Campo de Comando</label>
-                                            <input type="text" id="verbInputPlaceholder" value={localVerbInputPlaceholder} onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                            <input type="text" id="verbInputPlaceholder" value={localVerbInputPlaceholder} onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="viewEndingButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão "Ver Final"</label>
-                                            <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText} onChange={(e) => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg placeholder:text-muted-foreground" placeholder="Ver Final" />
+                                            <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText} onChange={(e) => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg placeholder:text-muted-foreground" placeholder="Ver Final" />
                                             <p className="text-[10px] text-muted-foreground mt-2 italic">Aparece quando o jogo termina, para levar às telas de final.</p>
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Nome do Jogador no Diário</label>
-                                            <input type="text" id="diaryPlayerName" value={localDiaryPlayerName} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                            <input type="text" id="diaryPlayerName" value={localDiaryPlayerName} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="splashButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Início</label>
-                                            <input type="text" id="splashButtonText" value={localSplashButtonText} onChange={(e) => setLocalSplashButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="INICIAR" />
+                                            <input type="text" id="splashButtonText" value={localSplashButtonText} onChange={(e) => setLocalSplashButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="INICIAR" />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="continueButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Continuar</label>
-                                            <input type="text" id="continueButtonText" value={localContinueButtonText} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Continuar Aventura" />
+                                            <input type="text" id="continueButtonText" value={localContinueButtonText} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Continuar Aventura" />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Reiniciar</label>
-                                            <input type="text" id="restartButtonText" value={localRestartButtonText} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Reiniciar Aventura" />
+                                            <input type="text" id="restartButtonText" value={localRestartButtonText} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Reiniciar Aventura" />
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="pt-6 border-t border-border/50">
+                                <div className="pt-6 border-t border-muted-foreground/50">
                                     <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Botões de Navegação</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                         <div className="space-y-2">
                                             <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Sugestões</label>
-                                            <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                            <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Inventário</label>
-                                            <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                            <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Diário</label>
-                                            <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
+                                            <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="trackersButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Rastreadores</label>
-                                            <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed" placeholder="Rastreadores" disabled={localGameSystemEnabled !== 'trackers'} />
+                                            <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed" placeholder="Rastreadores" disabled={localGameSystemEnabled !== 'trackers'} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="systemButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Sistema</label>
-                                            <input type="text" id="systemButtonText" value={localSystemButtonText} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Sistema" />
+                                            <input type="text" id="systemButtonText" value={localSystemButtonText} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Sistema" />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Principal</label>
-                                            <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Menu Principal" />
+                                            <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Menu Principal" />
                                         </div>
                                     </div>
                                 </div>
@@ -1876,7 +1861,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         </button>
 
                                         {activeSections.estrutura && (
-                                            <div className="space-y-6 pl-2 border-l-2 border-border/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                                            <div className="space-y-6 pl-2 border-l-2 border-muted-foreground/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
                                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Orientação</label>
                                                     <div className="relative">
@@ -1949,7 +1934,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         </button>
 
                                         {activeSections.estilo && (
-                                            <div className="space-y-6 pl-2 border-l-2 border-border/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                                            <div className="space-y-6 pl-2 border-l-2 border-muted-foreground/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
                                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Cor da Interface</label>
                                                     <div className="flex bg-input rounded-lg p-1 border border-input">
@@ -1975,11 +1960,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             <button
                                                                 key={theme.name}
                                                                 onClick={() => applyTheme(theme)}
-                                                                className="flex flex-col items-center justify-center p-3 rounded-lg border border-border bg-input hover:border-purple-500/50 hover:bg-input/80 transition-all gap-2 group"
+                                                                className="flex flex-col items-center justify-center p-3 rounded-lg border border-muted-foreground/50 bg-input hover:border-purple-500/50 hover:bg-input/80 transition-all gap-2 group"
                                                             >
                                                                 <div className="flex -space-x-1">
-                                                                    <div className="w-3 h-3 rounded-full border border-border" style={{ backgroundColor: theme.textColorLight }}></div>
-                                                                    <div className="w-3 h-3 rounded-full border border-border" style={{ backgroundColor: theme.titleColor }}></div>
+                                                                    <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.textColorLight }}></div>
+                                                                    <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.titleColor }}></div>
                                                                 </div>
                                                                 <span className="text-[9px] font-bold uppercase tracking-tight text-muted-foreground group-hover:text-foreground">{theme.name}</span>
                                                             </button>
@@ -1998,7 +1983,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     {activeSections.cores && (
                                                         <div className="mt-3 space-y-6 animate-in fade-in slide-in-from-top-1 px-1">
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Descrição de Cena</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">Descrição de Cena</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                                     <ColorInput label="Texto Padrão" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
                                                                     <ColorInput label="Título / Destaque" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
@@ -2008,7 +1993,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             </div>
 
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Botões da interface</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">Botões da interface</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                                     <ColorInput label="Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
                                                                     <ColorInput label="Texto Botão de Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
@@ -2019,7 +2004,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             </div>
 
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Box de Nome da Cena</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">Box de Nome da Cena</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                                     <ColorInput label="Cor de fundo" id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
                                                                     <ColorInput label="Texto" id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
@@ -2027,7 +2012,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             </div>
 
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border/50 pb-1">Outros</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">Outros</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                                     <ColorInput label="Fundo Principal" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#000000" />
                                                                 </div>
@@ -2052,7 +2037,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         </button>
 
                                         {activeSections.texto && (
-                                            <div className="space-y-6 pl-2 border-l-2 border-border/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                                            <div className="space-y-6 pl-2 border-l-2 border-muted-foreground/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
                                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Botão de Ação</label>
                                                     <input
@@ -2217,16 +2202,19 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 <button
                     onClick={handleUndo}
                     disabled={!isDirty}
-                    className="px-4 py-2 bg-muted border border-border text-muted-foreground font-semibold rounded-lg hover:bg-muted/80 transition-all text-xs disabled:opacity-30 disabled:cursor-not-allowed"
+                    className={`px-4 py-2 font-bold rounded-lg transition-all text-xs border ${isDirty
+                        ? 'bg-purple-600 hover:bg-purple-700 text-white border-purple-500 shadow-lg shadow-purple-900/20'
+                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed'
+                        }`}
                 >
                     Desfazer
                 </button>
                 <button
                     onClick={handleSave}
                     disabled={!isDirty}
-                    className="px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
                 >
-                    Salvar
+                    Salvar Alterações
                 </button>
             </div >
         </div >

@@ -68,7 +68,7 @@ const GlobalObjectItem: React.FC<{
     }, [scenes, obj.id]);
 
     return (
-        <div className={`bg-zinc-900/30 rounded-lg border ${isOpen ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.05)]' : 'border-zinc-800/80'} overflow-hidden transition-all duration-300 relative`}>
+        <div className={`bg-zinc-900/30 rounded-lg border ${isOpen ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.05)]' : 'border-muted-foreground/50'} overflow-hidden transition-all duration-300 relative`}>
             {/* Header - Fixed height to allow full-height image */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
@@ -92,7 +92,7 @@ const GlobalObjectItem: React.FC<{
 
                 {/* Larger Thumbnail - Only rendered if image exists, otherwise no space occupied */}
                 {obj.image && (
-                    <div className="w-14 h-14 shrink-0 bg-zinc-950 border-r border-zinc-800/50 overflow-hidden flex items-center justify-center">
+                    <div className="w-14 h-14 shrink-0 bg-zinc-950 border-r border-muted-foreground/50 overflow-hidden flex items-center justify-center">
                         <img src={obj.image} alt="" className="w-full h-full object-cover" />
                     </div>
                 )}
@@ -105,7 +105,7 @@ const GlobalObjectItem: React.FC<{
 
                     {usages.length > 0 && (
                         <>
-                            <div className="mx-6 h-4 border-r border-zinc-800 shrink-0"></div>
+                            <div className="mx-6 h-4 border-r border-muted-foreground/50 shrink-0"></div>
                             <div className="flex items-center gap-2 overflow-hidden text-[9px]">
                                 <span className="uppercase font-bold text-zinc-600 tracking-wider shrink-0">Cenas:</span>
                                 <div className="flex gap-1 overflow-hidden truncate">
@@ -133,7 +133,7 @@ const GlobalObjectItem: React.FC<{
                                     type="text"
                                     value={obj.name}
                                     onChange={e => onUpdate(obj.id, 'name', e.target.value)}
-                                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
+                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                 />
                             </div>
                             <div>
@@ -152,7 +152,7 @@ const GlobalObjectItem: React.FC<{
                                     value={obj.examineDescription}
                                     onChange={e => onUpdate(obj.id, 'examineDescription', e.target.value)}
                                     rows={4}
-                                    className="w-full h-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
+                                    className="w-full h-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                 />
                             </div>
                             <div>
@@ -179,7 +179,7 @@ const GlobalObjectItem: React.FC<{
                             <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Imagem do Objeto</label>
                             <div className="relative flex-grow w-full min-h-[150px]">
                                 {obj.image ? (
-                                    <div className="absolute inset-0 w-full h-full border border-zinc-800 rounded-lg overflow-hidden bg-zinc-950 group/img">
+                                    <div className="absolute inset-0 w-full h-full border border-muted-foreground/50 rounded-lg overflow-hidden bg-zinc-950 group/img">
                                         <img src={obj.image} alt={obj.name} className="w-full h-full object-cover bg-zinc-950" />
                                         <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity gap-2">
                                             <label htmlFor={`image-upload-${obj.id}`} className="px-4 py-2 bg-white text-black rounded-lg cursor-pointer hover:bg-zinc-200 transition-all flex items-center gap-2 font-bold text-xs uppercase tracking-widest">
@@ -199,7 +199,7 @@ const GlobalObjectItem: React.FC<{
                                 ) : (
                                     <label
                                         htmlFor={`image-upload-${obj.id}`}
-                                        className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-zinc-950 rounded-lg cursor-pointer hover:bg-zinc-900 transition-all ${isDraggingOver ? 'border-purple-500 bg-purple-500/5' : 'border-zinc-800'}`}
+                                        className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-zinc-950 rounded-lg cursor-pointer hover:bg-zinc-900 transition-all ${isDraggingOver ? 'border-purple-500 bg-purple-500/5' : 'border-muted-foreground/50'}`}
                                         onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                         onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
                                         onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
@@ -301,44 +301,58 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
 
             <div className="space-y-4">
                 {localObjects.length > 0 ? (
-                    localObjects.map(obj => (
-                        <GlobalObjectItem
-                            key={obj.id}
-                            obj={obj}
-                            onUpdate={handleObjectChange}
-                            onDelete={onDeleteObject}
-                            scenes={scenes}
-                            onSelectScene={onSelectScene}
-                        />
-                    ))
+                    <>
+                        {localObjects.map(obj => (
+                            <GlobalObjectItem
+                                key={obj.id}
+                                obj={obj}
+                                onUpdate={handleObjectChange}
+                                onDelete={onDeleteObject}
+                                scenes={scenes}
+                                onSelectScene={onSelectScene}
+                            />
+                        ))}
+                        <div className="flex justify-start pt-4">
+                            <button
+                                onClick={handleCreate}
+                                className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Novo Objeto
+                            </button>
+                        </div>
+                    </>
                 ) : (
-                    <p className="text-center text-zinc-500 py-16 border-2 border-dashed border-zinc-800/50 rounded-xl bg-zinc-950/20 italic text-xs">Nenhum objeto na biblioteca.</p>
+                    <div className="w-full py-8 flex flex-col items-center gap-4">
+                        <p className="text-xs italic text-muted-foreground w-full text-center">Nenhum objeto na biblioteca.</p>
+                        <button
+                            onClick={handleCreate}
+                            className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Novo Objeto
+                        </button>
+                    </div>
                 )}
             </div>
 
-            {/* Floating Add Button - Adjusted to match sidebar constraints */}
-            <div className="fixed bottom-6 left-[calc(25%+2.5rem)] xl:left-[calc(20%+2.5rem)] z-10 flex gap-2">
-                <button
-                    onClick={handleCreate}
-                    className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
-                >
-                    <Plus className="w-4 h-4 mr-2" />
-                    Novo Objeto
-                </button>
-            </div>
+
 
             <div className="fixed bottom-6 right-10 z-10 flex gap-2">
                 <button
                     onClick={handleUndo}
                     disabled={!isDirty}
-                    className="px-4 py-2 bg-zinc-900 border border-zinc-800 text-zinc-400 font-bold rounded-lg hover:bg-zinc-800 transition-all text-xs disabled:opacity-30 disabled:cursor-not-allowed"
+                    className={`px-4 py-2 font-bold rounded-lg transition-all text-xs border ${isDirty
+                        ? 'bg-purple-600 hover:bg-purple-700 text-white border-purple-500 shadow-lg shadow-purple-900/20'
+                        : 'bg-zinc-900 border-muted-foreground/50 text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed'
+                        }`}
                 >
                     Desfazer
                 </button>
                 <button
                     onClick={handleSave}
                     disabled={!isDirty}
-                    className="px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-xl"
+                    className="px-4 py-2 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed"
                 >
                     Salvar Alterações
                 </button>

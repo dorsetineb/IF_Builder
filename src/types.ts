@@ -190,4 +190,4 @@ export interface GameData {
   gameTextReadingFlow?: 'continuous' | 'paused';
 }
 
-export type View = 'scenes' | 'interface' | 'map' | 'global_objects' | 'trackers';
+export type View = 'scenes' | 'interface' | 'map' | 'global_objects' | 'trackers' | 'settings' | 'about' | 'guide';

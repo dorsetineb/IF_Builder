@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import SceneList from './SceneList';
 import { Scene, View, GameData } from '../types';
-import { Code, BookOpen, Map, Box, SlidersHorizontal, Settings, Info, CircleHelp, ChevronLeft, ChevronRight, MessageSquare, Gamepad2 } from 'lucide-react';
+import { Code, BookOpen, Map, Box, SlidersHorizontal, Settings, Info, CircleHelp, ChevronLeft, ChevronRight, MessageSquare, Gamepad2, ChevronDown, Unlock } from 'lucide-react';
+import { AltamiraModal } from './AltamiraModal';
 
 interface SidebarProps {
   scenes: Scene[];
@@ -16,147 +17,220 @@ interface SidebarProps {
   onReorderScenes: (newOrder: string[]) => void;
   onSetView: (view: View) => void;
   onExit?: () => void;
+  onNavigate?: (path: string) => void;
   onImportGame: (data: GameData) => void;
   onTogglePreview: () => void;
   isCollapsed: boolean;
   onToggleCollapse: () => void;
-  onOpenManual: () => void;
+  isDirty?: boolean;
 }
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { onExit, currentView, onSetView, scenes, gameData, isCollapsed, onToggleCollapse, onOpenManual, ...sceneListProps } = props;
-  const [isScenesExpanded, setIsScenesExpanded] = useState(currentView === 'scenes');
+  const { onExit, onNavigate, currentView, onSetView, scenes, gameData, isCollapsed, onToggleCollapse, onOpenManual, isDirty, ...sceneListProps } = props;
+  const [isScenesExpanded, setIsScenesExpanded] = useState(false);
 
-  useEffect(() => {
-    if (currentView === 'scenes') {
-      setIsScenesExpanded(true);
+  // Altamira State
+  const [showAltamiraModal, setShowAltamiraModal] = useState(false);
+  const [isAltamiraVisible, setIsAltamiraVisible] = useState(false);
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  const handleMouseEnterTrigger = () => {
+    if (isAltamiraVisible) return;
+    hoverTimerRef.current = setTimeout(() => {
+      setIsAltamiraVisible(true);
+    }, 2000); // 2 seconds to reveal
+  };
+
+  const handleMouseLeaveTrigger = () => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
     }
-  }, [currentView]);
+  };
 
+
+  // Platform Sidebar Style Button Class
   const getButtonClass = (view: View) =>
-    `w-full flex items-center p-2 rounded-lg transition-all text-left ${currentView === view
-      ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20 shadow-[0_0_15px_rgba(168,85,247,0.1)]'
-      : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-100'
-    }`;
+    `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${currentView === view
+      ? `bg-primary text-primary-foreground font-bold shadow-md shadow-primary/20`
+      : 'text-muted-foreground hover:bg-zinc-800 hover:text-white'
+    } ${isCollapsed ? 'justify-center px-0 py-3' : ''}`;
 
   const handleToggleScenes = () => {
-    if (currentView !== 'scenes') {
+    if (currentView !== 'scenes' && currentView !== 'map') {
       onSetView('scenes');
       setIsScenesExpanded(true);
-      if (isCollapsed) onToggleCollapse(); // Auto-expand sidebar when opening scenes
     } else {
       setIsScenesExpanded(!isScenesExpanded);
     }
   };
 
+  const handleSetView = (view: View) => {
+    onSetView(view);
+    setIsScenesExpanded(false);
+  };
+
   return (
-    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card p-4 border-r border-border flex flex-col transition-all duration-300 relative flex-shrink-0`}>
+    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0`}>
 
 
-      <nav className="flex flex-col gap-2 flex-grow overflow-y-auto overflow-x-hidden">
-        {/* Manual Button - Styled like "Abrir Editor" */}
-        <button
-          onClick={onOpenManual}
-          className={`flex items-center gap-3 w-full bg-secondary hover:bg-white hover:text-zinc-900 text-secondary-foreground font-bold py-3 rounded-xl transition-all shadow-sm hover:shadow-md text-sm group border border-purple-500/50 mb-4 relative overflow-hidden flex-shrink-0 ${isCollapsed ? 'justify-center px-0' : 'pl-4 justify-start'}`}
-          title={isCollapsed ? "Manual" : undefined}
-        >
-          <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-purple-500/20 to-transparent pointer-events-none" />
-          <CircleHelp size={20} className="group-hover:scale-110 transition-transform text-primary relative z-10" />
-          {!isCollapsed && <span className="truncate relative z-10">Guia Rápido</span>}
-        </button>
+      <nav className="flex flex-col gap-1 flex-grow overflow-y-auto overflow-x-hidden px-3 py-4">
+        {/* Community Button - REMOVED AS REQUESTED */}
 
+        {/* Informações e Interface - Moved to top as requested */}
         <button
           className={getButtonClass('interface')}
-          onClick={() => onSetView('interface')}
+          onClick={() => handleSetView('interface')}
           title={isCollapsed ? "Informações e Interface" : undefined}
         >
-          <Code className="w-4 h-4 flex-shrink-0" />
-          {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Informações e Interface</span>}
+          {/* Hover Glow Effect */}
+          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`} />
+
+          <Code className={`flex-shrink-0 relative z-10 ${currentView === 'interface' ? 'text-primary-foreground' : ''}`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && <span className="truncate relative z-10">Informações e Interface</span>}
         </button>
 
-        <div>
+        {/* Scene Editor - Accordion */}
+        <div className="flex flex-col">
           <button
-            className={getButtonClass('scenes')}
+            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${isScenesExpanded
+              ? `bg-primary text-primary-foreground font-bold shadow-md shadow-primary/20`
+              : 'text-muted-foreground hover:bg-zinc-800 hover:text-white'
+              } ${isCollapsed ? 'justify-center px-0 py-3' : ''}`}
             onClick={handleToggleScenes}
             title={isCollapsed ? "Editor de Cenas" : undefined}
           >
-            <BookOpen className="w-4 h-4 flex-shrink-0" />
+            {/* Hover Glow Effect */}
+            <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${isScenesExpanded ? 'translate-x-0' : ''}`} />
+
+            <BookOpen className={`flex-shrink-0 relative z-10 ${isScenesExpanded ? 'text-primary-foreground' : ''}`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && (
               <>
-                <span className="font-semibold text-xs ml-3 truncate">Editor de Cenas</span>
-                <span className="ml-auto bg-muted text-muted-foreground text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-border">
+                <span className="truncate relative z-10 flex-1 text-left">Editor de Cenas</span>
+                {/* Counter */}
+                <span className="bg-black/30 text-white text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-white/20 shadow-sm relative z-10">
                   {scenes.length}
                 </span>
+                {/* Arrow removed as requested */}
               </>
             )}
+
+            {/* Show tiny counter badge if collapsed */}
+            {/* Show tiny counter badge if collapsed */}
+            {isCollapsed && (
+              <div className="absolute top-1 right-1 w-4 h-4 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-[8px] font-bold border border-white/20 z-20 shadow-sm">
+                {scenes.length}
+              </div>
+            )}
           </button>
-          {!isCollapsed && isScenesExpanded && (
-            <div className="pl-4 mt-2 ml-2 border-l border-border">
-              <SceneList scenes={scenes} {...sceneListProps} />
+
+          {/* Expanded Content */}
+          {(!isCollapsed && isScenesExpanded) && (
+            <div className="pl-4 mt-1 mb-2 animate-in slide-in-from-top-2 duration-200">
+              <div className="pl-3 border-l-2 border-primary/30 flex flex-col gap-1">
+                <SceneList scenes={scenes} isDirty={isDirty} {...sceneListProps} />
+
+                {/* Map Button inside accordion */}
+                <button
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-xs font-medium text-left mt-1 ${currentView === 'map'
+                    ? 'bg-primary/20 text-primary border border-primary/30'
+                    : 'text-muted-foreground hover:bg-zinc-800 hover:text-white border border-transparent'}`}
+                  onClick={() => onSetView('map')}
+                >
+                  <Map size={14} />
+                  <span>Mapa de Cenas</span>
+                </button>
+              </div>
             </div>
           )}
         </div>
 
-        <button
-          className={getButtonClass('map')}
-          onClick={() => onSetView('map')}
-          title={isCollapsed ? "Mapa de Cenas" : undefined}
-        >
-          <Map className="w-4 h-4 flex-shrink-0" />
-          {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Mapa de Cenas</span>}
-        </button>
-
         {(gameData.gameInteractionType || 'parser') !== 'choice' && (
           <button
             className={getButtonClass('global_objects')}
-            onClick={() => onSetView('global_objects')}
+            onClick={() => handleSetView('global_objects')}
             title={isCollapsed ? "Objetos" : undefined}
           >
-            <Box className="w-4 h-4 flex-shrink-0" />
-            {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Objetos</span>}
+            <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'global_objects' ? 'translate-x-0' : ''}`} />
+            <Box className={`flex-shrink-0 relative z-10 ${currentView === 'global_objects' ? 'text-primary-foreground' : ''}`} size={isCollapsed ? 20 : 16} />
+            {!isCollapsed && <span className="truncate relative z-10">Objetos</span>}
           </button>
         )}
         <button
           className={getButtonClass('trackers')}
-          onClick={() => onSetView('trackers')}
+          onClick={() => handleSetView('trackers')}
           title={isCollapsed ? "Rastreadores" : undefined}
         >
-          <SlidersHorizontal className="w-4 h-4 flex-shrink-0" />
-          {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Rastreadores</span>}
+          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'trackers' ? 'translate-x-0' : ''}`} />
+          <SlidersHorizontal className={`flex-shrink-0 relative z-10 ${currentView === 'trackers' ? 'text-primary-foreground' : ''}`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && <span className="truncate relative z-10">Rastreadores</span>}
+        </button>
+
+        <button
+          onClick={() => onSetView('guide')}
+          className={getButtonClass('guide')}
+          title={isCollapsed ? "Guia Rápido" : undefined}
+        >
+          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'guide' ? 'translate-x-0' : ''}`} />
+          <CircleHelp className={`flex-shrink-0 relative z-10 ${currentView === 'guide' ? 'text-primary-foreground' : ''}`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && <span className="truncate relative z-10">Guia Rápido</span>}
         </button>
 
         {/* Bottom Menu Items */}
-        <div className="mt-auto pt-4 flex flex-col gap-1">
-          <div className="h-px bg-border my-2 mx-2"></div>
+        <div className="mt-auto pt-4 flex flex-col gap-1 relative">
+          {/* Altamira Trigger Zone & Button */}
+          <div
+            className="relative z-10"
+            onMouseLeave={handleMouseLeaveTrigger}
+          >
+            {/* Hidden Button that slides up */}
+            <div className={`overflow-hidden transition-all duration-500 ease-out ${isAltamiraVisible ? 'max-h-12 opacity-100 mb-1' : 'max-h-0 opacity-0'}`}>
+              <button
+                onClick={() => setShowAltamiraModal(true)}
+                className={`w-full flex items-center justify-center gap-3 px-4 py-2 rounded-lg bg-zinc-900 border border-primary/30 text-primary hover:text-primary-foreground hover:bg-primary hover:border-primary transition-all text-xs font-bold uppercase tracking-widest shadow-lg ${isCollapsed ? 'px-0' : ''}`}
+              >
+                <Unlock size={14} />
+                {!isCollapsed && <span>Altamira</span>}
+              </button>
+            </div>
+
+            {/* Invisible Trigger Area above separator */}
+            {!isAltamiraVisible && (
+              <div
+                className="h-20 w-full absolute -top-20 left-0 z-50 pointer-events-auto"
+                onMouseEnter={handleMouseEnterTrigger}
+              />
+            )}
+
+            <div className="h-px bg-muted-foreground my-2 -mx-3 opacity-50 relative z-0"></div>
+          </div>
 
           <button
-            className="flex w-full items-center px-2 py-1.5 rounded-lg mb-1 transition-colors text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-            onClick={onExit}
-            title={isCollapsed ? "Comunidade" : undefined}
-          >
-            <MessageSquare className="w-4 h-4 flex-shrink-0" />
-            {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Comunidade</span>}
-          </button>
-
-          <Link
-            to="/about"
-            className="flex w-full items-center px-2 py-1.5 rounded-lg mb-1 transition-colors text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+            onClick={() => handleSetView('about')}
+            className={getButtonClass('about')}
             title={isCollapsed ? "Sobre o Projeto" : undefined}
           >
-            <Info className="w-4 h-4 flex-shrink-0" />
-            {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Sobre o Projeto</span>}
-          </Link>
+            <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'about' ? 'translate-x-0' : ''}`} />
+            <Info className={`flex-shrink-0 relative z-10 ${currentView === 'about' ? 'text-primary' : ''}`} size={isCollapsed ? 20 : 16} />
+            {!isCollapsed && <span className="truncate relative z-10">Sobre o Projeto</span>}
+          </button>
 
-          <Link
-            to="/settings"
-            className="flex w-full items-center px-2 py-1.5 rounded-lg mb-1 transition-colors text-muted-foreground hover:bg-muted/50 hover:text-foreground"
+          <button
+            onClick={() => handleSetView('settings')}
+            className={getButtonClass('settings')}
             title={isCollapsed ? "Configurações" : undefined}
           >
-            <Settings className="w-4 h-4 flex-shrink-0" />
-            {!isCollapsed && <span className="font-semibold text-xs ml-3 truncate">Configurações</span>}
-          </Link>
+            <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'settings' ? 'translate-x-0' : ''}`} />
+            <Settings className={`flex-shrink-0 relative z-10 ${currentView === 'settings' ? 'text-primary' : ''}`} size={isCollapsed ? 20 : 16} />
+            {!isCollapsed && <span className="truncate relative z-10">Configurações</span>}
+          </button>
         </div>
       </nav>
+
+      {/* Altamira Modal */}
+      {showAltamiraModal && (
+        <AltamiraModal onClose={() => setShowAltamiraModal(false)} />
+      )}
     </aside>
   );
 };

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { User, Lock, Save, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, X, Terminal, Mail } from 'lucide-react';
+import { User, Lock, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, Terminal, Mail } from 'lucide-react';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { useTheme } from '../components/ThemeProvider';
 import { useToast } from '../components/ToastContext';
@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
-const Settings: React.FC = () => {
+const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { theme, setTheme } = useTheme();
     const { toast } = useToast();
     const navigate = useNavigate();
@@ -22,8 +22,8 @@ const Settings: React.FC = () => {
     const [website, setWebsite] = useState('');
     const [bio, setBio] = useState('');
     const [avatarUrl, setAvatarUrl] = useState('');
-    const [interests, setInterests] = useState<string[]>([]);
-    const [tagInput, setTagInput] = useState('');
+
+
 
     const [pageLoading, setPageLoading] = useState(true);
 
@@ -33,43 +33,74 @@ const Settings: React.FC = () => {
 
     const getProfile = async () => {
         setPageLoading(true);
-        try {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                setEmail(user.email || '');
-                const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
-                if (error && error.code !== 'PGRST116') {
-                    console.error('Error fetching profile:', error);
-                }
+        const fetchProfilePromise = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    setEmail(user.email || '');
+                    const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
 
-                if (data) {
-                    setDisplayName(data.full_name || '');
-                    setUsername(data.username || '');
-                    setWebsite(data.website || '');
-                    setBio(data.bio || '');
-                    setAvatarUrl(data.avatar_url || '');
-                    setInterests(data.interests || []);
-                } else {
-                    // Pre-fill from auth metadata if profile doesn't exist
-                    const meta = user.user_metadata || {};
-                    console.log('No profile found, using metadata:', meta);
-                    setDisplayName(meta.full_name || meta.name || '');
-                    setUsername(meta.username || '');
-                    setAvatarUrl(meta.avatar_url || meta.picture || '');
+                    if (error && error.code !== 'PGRST116') {
+                        console.error('Error fetching profile:', error);
+                    }
+
+                    if (data) {
+                        setDisplayName(data.full_name || '');
+                        setUsername(data.username || '');
+                        setWebsite(data.website || '');
+                        setBio(data.bio || '');
+                        setAvatarUrl(data.avatar_url || '');
+
+                    } else {
+                        // Pre-fill from auth metadata if profile doesn't exist
+                        const meta = user.user_metadata || {};
+                        console.log('No profile found, using metadata:', meta);
+                        setDisplayName(meta.full_name || meta.name || '');
+                        setUsername(meta.username || '');
+                        setAvatarUrl(meta.avatar_url || meta.picture || '');
+                    }
                 }
+            } catch (error) {
+                console.error('Critical error in Settings:', error);
+                toast("Erro", "Falha ao carregar perfil. Verifique sua conexão.", "error");
             }
-        } catch (error) {
-            console.error('Critical error in Settings:', error);
+        };
+
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Profile load timeout')), 5000);
+        });
+
+        try {
+            await Promise.race([fetchProfilePromise(), timeoutPromise]);
+        } catch (err) {
+            console.error('Profile loading timed out:', err);
+            toast("Alerta", "O carregamento demorou mais que o esperado.", "warning");
         } finally {
             setPageLoading(false);
         }
     };
 
+    const [draftTheme, setDraftTheme] = useState(theme);
+
+    // Sync draft theme if external theme changes (rare, but good practice)
+    useEffect(() => {
+        setDraftTheme(theme);
+    }, [theme]);
+
     const handleSave = async () => {
         setLoading(true);
+
+        // 1. Apply Theme
+        if (draftTheme !== theme) {
+            setTheme(draftTheme);
+        }
+
         const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        if (!user) {
+            setLoading(false);
+            return;
+        }
 
         const updates = {
             id: user.id,
@@ -78,7 +109,7 @@ const Settings: React.FC = () => {
             website,
             bio,
             avatar_url: avatarUrl,
-            interests,
+
             updated_at: new Date().toISOString(),
         };
 
@@ -87,7 +118,7 @@ const Settings: React.FC = () => {
         if (error) {
             toast("Erro ao salvar perfil", error.message, "error");
         } else {
-            toast("Sucesso!", "Perfil atualizado com sucesso.", "success");
+            toast("Sucesso!", "Configurações atualizadas.", "success");
         }
         setLoading(false);
     };
@@ -95,7 +126,6 @@ const Settings: React.FC = () => {
     const handleLogout = async () => {
         try {
             await supabase.auth.signOut();
-            // Force a hard redirect to clear all states and ensure Auth screen renders
             window.location.href = '/';
         } catch (error: any) {
             console.error('Error logging out:', error);
@@ -103,38 +133,26 @@ const Settings: React.FC = () => {
         }
     };
 
-    const addInterest = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && tagInput.trim()) {
-            e.preventDefault();
-            if (!interests.includes(tagInput.trim())) {
-                setInterests([...interests, tagInput.trim()]);
-            }
-            setTagInput('');
-        }
-    };
 
-    const removeInterest = (tag: string) => {
-        setInterests(interests.filter(i => i !== tag));
-    };
 
     return (
         <div className="min-h-full font-sans text-xs bg-background flex flex-col relative">
-            {/* Loading Overlay */}
-            {pageLoading && <LoadingOverlay />}
 
             {/* Standard Header */}
-            <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
-                <div className="flex flex-col justify-center h-full">
-                    <h1 className="text-xl font-bold text-foreground">Configurações</h1>
-                    <p className="text-[10px] text-muted-foreground hidden md:block">Gerencie suas preferências e perfil.</p>
+            {!hideHeader && (
+                <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
+                    <div className="flex flex-col justify-center h-full">
+                        <h1 className="text-xl font-bold text-foreground">Configurações</h1>
+                        <p className="text-[10px] text-muted-foreground hidden md:block">Gerencie suas preferências e perfil.</p>
+                    </div>
+                    <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white border border-red-500/20 text-xs font-bold transition-all shadow-sm"
+                    >
+                        <LogOut size={14} /> Sair da Conta
+                    </button>
                 </div>
-                <button
-                    onClick={handleLogout}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white border border-red-500/20 text-xs font-bold transition-all shadow-sm"
-                >
-                    <LogOut size={14} /> Sair da Conta
-                </button>
-            </div>
+            )}
 
             <div className="p-8 max-w-4xl mx-0">
 
@@ -147,35 +165,35 @@ const Settings: React.FC = () => {
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                         <button
-                            onClick={() => setTheme('dark')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted'}`}
+                            onClick={() => setDraftTheme('dark')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${draftTheme === 'dark' ? 'border-primary bg-primary/5 shadow-md shadow-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
-                            <Moon size={16} className={theme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>Escuro</span>
+                            <Moon size={16} className={draftTheme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
+                            <span className={`font-medium text-xs ${draftTheme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>Escuro</span>
                         </button>
 
                         <button
-                            onClick={() => setTheme('light')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted'}`}
+                            onClick={() => setDraftTheme('light')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${draftTheme === 'light' ? 'border-primary bg-primary/5 shadow-md shadow-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
-                            <Sun size={16} className={theme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>Claro</span>
+                            <Sun size={16} className={draftTheme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
+                            <span className={`font-medium text-xs ${draftTheme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>Claro</span>
                         </button>
 
                         <button
-                            onClick={() => setTheme('cream')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted'}`}
+                            onClick={() => setDraftTheme('cream')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${draftTheme === 'cream' ? 'border-primary bg-primary/5 shadow-md shadow-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
-                            <Coffee size={16} className={theme === 'cream' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>Creme</span>
+                            <Coffee size={16} className={draftTheme === 'cream' ? 'text-primary' : 'text-muted-foreground'} />
+                            <span className={`font-medium text-xs ${draftTheme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>Creme</span>
                         </button>
 
                         <button
-                            onClick={() => setTheme('terminal')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/5' : 'border-border bg-card hover:bg-muted'}`}
+                            onClick={() => setDraftTheme('terminal')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${draftTheme === 'terminal' ? 'border-primary bg-primary/5 shadow-md shadow-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
-                            <Terminal size={16} className={theme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>Terminal</span>
+                            <Terminal size={16} className={draftTheme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
+                            <span className={`font-medium text-xs ${draftTheme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>Terminal</span>
                         </button>
                     </div>
                 </div>
@@ -210,29 +228,16 @@ const Settings: React.FC = () => {
 
                         {/* Form Fields */}
                         <div className="flex-1 space-y-3">
-                            <div className="space-y-1 text-left">
-                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Nome de Exibição</label>
-                                <input
-                                    type="text"
-                                    value={displayName}
-                                    onChange={(e) => setDisplayName(e.target.value)}
-                                    className="w-full bg-input border border-input rounded px-3 py-1.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
-                                    placeholder="Como você quer ser chamado"
-                                />
-                            </div>
-
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                 <div className="space-y-1 text-left">
-                                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Nome de Usuário</label>
-                                    <div className="relative">
-                                        <span className="absolute left-2.5 top-1.5 text-muted-foreground text-xs">@</span>
-                                        <input
-                                            type="text"
-                                            value={username}
-                                            onChange={(e) => setUsername(e.target.value)}
-                                            className="w-full bg-input border border-input rounded pl-7 pr-3 py-1.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
-                                        />
-                                    </div>
+                                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Nome de Exibição</label>
+                                    <input
+                                        type="text"
+                                        value={displayName}
+                                        onChange={(e) => setDisplayName(e.target.value)}
+                                        className="w-full bg-input border border-input rounded px-3 py-1.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
+                                        placeholder="Como você quer ser chamado"
+                                    />
                                 </div>
                                 <div className="space-y-1 text-left">
                                     <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Website (Opcional)</label>
@@ -250,42 +255,13 @@ const Settings: React.FC = () => {
                             </div>
 
                             <div className="space-y-1 text-left">
-                                <div className="flex justify-between items-end">
-                                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Sobre mim</label>
-                                    <p className="text-[10px] text-muted-foreground">{bio.length}/160 caracteres</p>
-                                </div>
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Sobre mim</label>
                                 <textarea
                                     value={bio}
                                     onChange={(e) => setBio(e.target.value)}
                                     className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none h-20"
                                     placeholder="Conte um pouco sobre você..."
                                 ></textarea>
-                            </div>
-
-                            {/* Interests Section */}
-                            <div className="space-y-1 text-left">
-                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1">
-                                    Interesses
-                                </label>
-                                <div className="w-full bg-input border border-input rounded px-3 py-2 min-h-[40px] flex flex-wrap gap-2 items-center">
-                                    {interests.map((tag, i) => (
-                                        <span key={i} className="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded text-[10px] font-bold uppercase flex items-center gap-1 group">
-                                            {tag}
-                                            <button onClick={() => removeInterest(tag)} className="hover:text-primary/80">
-                                                <X size={10} />
-                                            </button>
-                                        </span>
-                                    ))}
-                                    <input
-                                        type="text"
-                                        value={tagInput}
-                                        onChange={(e) => setTagInput(e.target.value)}
-                                        onKeyDown={addInterest}
-                                        className="bg-transparent text-xs focus:outline-none flex-1 min-w-[80px]"
-                                        placeholder={interests.length === 0 ? "Ex: Ficção, Terror, Romance..." : ""}
-                                    />
-                                </div>
-                                <p className="text-[10px] text-muted-foreground">Pressione Enter para adicionar tags</p>
                             </div>
                         </div>
                     </div>
@@ -327,9 +303,8 @@ const Settings: React.FC = () => {
                     <button
                         onClick={handleSave}
                         disabled={loading}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-all disabled:opacity-50 text-xs"
+                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2 transition-all disabled:opacity-50 text-xs uppercase tracking-widest"
                     >
-                        <Save size={14} />
                         Salvar Alterações
                     </button>
                 </div>
