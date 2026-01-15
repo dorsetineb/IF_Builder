@@ -44,18 +44,18 @@ export const InviteManager: React.FC = () => {
         setGenerating(true);
         setLastInviteCode('');
         try {
-            const { data, error } = await supabase.rpc('create_invite', { uses: 1 });
+            // Call the secure Edge Function
+            const { data, error } = await supabase.functions.invoke('generate-invite', {
+                method: 'POST',
+            });
+
             if (error) throw error;
 
-            // The RPC returns the new code directly as text
-            if (data && typeof data === 'string') {
-                setLastInviteCode(data);
-            } else {
-                // Fallback
-                const { data: latest } = await supabase.from('invites').select('code').order('created_at', { ascending: false }).limit(1).single();
-                if (latest) setLastInviteCode(latest.code);
+            if (data && data.code) {
+                setLastInviteCode(data.code);
             }
 
+            // Refresh list
             await fetchInvites();
         } catch (err) {
             console.error('Error generating invite:', err);
@@ -132,7 +132,7 @@ export const InviteManager: React.FC = () => {
                     {showHistory && (
                         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200" onClick={() => setShowHistory(false)}>
                             <div
-                                className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl relative animate-in zoom-in-95 duration-200"
+                                className="bg-card border border-primary rounded-xl p-6 w-full max-w-md shadow-2xl relative animate-in zoom-in-95 duration-200"
                                 onClick={e => e.stopPropagation()}
                             >
                                 <div className="flex justify-between items-center mb-4">
@@ -147,7 +147,7 @@ export const InviteManager: React.FC = () => {
 
                                 <div className="max-h-[60vh] overflow-y-auto space-y-2 pr-2 custom-scrollbar">
                                     {invites.length > 0 ? invites.map((invite) => (
-                                        <div key={invite.id} className="flex items-center justify-between bg-secondary/50 p-3 rounded-lg border border-border hover:border-purple-500/30 transition-colors group/invite">
+                                        <div key={invite.id} className="flex items-center justify-between bg-secondary/50 p-3 rounded-lg border border-border hover:border-primary transition-colors group/invite">
                                             <span className="font-mono text-sm font-bold text-foreground tracking-wider select-all">{invite.code}</span>
                                             <div className="flex items-center gap-2">
                                                 <span className={`text-[10px] px-2 py-0.5 rounded ${invite.used_count >= invite.max_uses ? 'bg-red-500/10 text-red-400' : 'bg-green-500/10 text-green-400'}`}>

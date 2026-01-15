@@ -27,7 +27,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const [initialProfile, setInitialProfile] = useState<Partial<Profile> | null>(null);
 
     // Theme Logic
-    const [originalTheme] = useState(theme); // Capture theme on mount
+    const [originalTheme, setOriginalTheme] = useState(theme); // Capture theme on mount
     const savedRef = useRef(false);
 
     const [pageLoading, setPageLoading] = useState(true);
@@ -146,6 +146,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     bio,
                     avatar_url: avatarUrl
                 });
+                setOriginalTheme(theme); // Update original theme to current to plain dirty state
             }
         } catch (err) {
             console.error("Unexpected error saving profile:", err);
@@ -232,7 +233,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
                     <div className="flex items-center gap-2 mb-4 text-primary">
                         <User size={16} />
-                        <h2 className="text-sm font-bold text-card-foreground">Informações Públicas</h2>
+                        <h2 className="text-sm font-bold text-card-foreground">Informações do usuário</h2>
                     </div>
 
                     <div className="flex flex-col md:flex-row gap-6">
@@ -333,9 +334,9 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     <button
                         onClick={handleSave}
                         disabled={loading || !isDirty}
-                        className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold py-2 px-6 rounded-lg flex items-center gap-2 transition-all disabled:opacity-50 text-xs"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold py-2 px-6 rounded-lg flex items-center gap-2 transition-all disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed text-xs"
                     >
-                        {loading ? 'Salvando...' : 'Salvar alterações'}
+                        {loading ? 'Salvando...' : 'Salvar Alterações'}
                     </button>
                 </div>
             </div>

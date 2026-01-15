@@ -26,7 +26,7 @@ export const AltamiraModal: React.FC<AltamiraModalProps> = ({ onClose }) => {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
             <div
-                className="bg-card border border-primary/50 rounded-2xl p-6 w-full max-w-lg shadow-2xl relative animate-in zoom-in-95 duration-300"
+                className="bg-card border border-primary rounded-2xl p-6 w-full max-w-lg shadow-2xl relative animate-in zoom-in-95 duration-300"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}

@@ -41,7 +41,7 @@ interface UIEditorProps {
     frameRoundedTopColor: string;
     gameSceneNameOverlayBg: string;
     gameSceneNameOverlayTextColor: string;
-    onUpdate: (field: keyof GameData, value: any) => void;
+    onUpdate: (field: keyof GameData, value: any, skipDirty?: boolean) => void;
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
     gameShowTrackersUI?: boolean;
@@ -326,7 +326,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localFocusColor, setLocalFocusColor] = useState(focusColor);
     const [localChanceIconColor, setLocalChanceIconColor] = useState(chanceIconColor);
     const [localFontFamily, setLocalFontFamily] = useState(gameFontFamily);
-    const [localGameFontSize, setLocalGameFontSize] = useState(gameFontSize);
+    const [localGameFontSize, setLocalGameFontSize] = useState(gameFontSize === '0.85em' ? '12' : gameFontSize);
     const [localChanceIcon, setLocalChanceIcon] = useState(chanceIcon);
     const [localChanceLossMessage, setLocalChanceLossMessage] = useState(chanceLossMessage || '');
     const [localChanceRestoreMessage, setLocalChanceRestoreMessage] = useState(chanceRestoreMessage || '');
@@ -426,120 +426,111 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localDiaryShowSceneImage, setLocalDiaryShowSceneImage] = useState(diaryShowSceneImage ?? false);
     const [localDiaryShowPlayerAction, setLocalDiaryShowPlayerAction] = useState(diaryShowPlayerAction ?? true);
 
+    // --- Granular State Check Effects ---
+    // Splitting the monolithic useEffect avoids resetting ALL fields when ONE prop changes.
+
+    // 1. Layout & Appearance
+    useEffect(() => { setLocalLayoutOrientation(layoutOrientation); }, [layoutOrientation]);
+    useEffect(() => { setLocalLayoutOrder(layoutOrder); }, [layoutOrder]);
+    useEffect(() => { setLocalImageFrame(imageFrame); }, [imageFrame]);
+    useEffect(() => { setLocalGameTheme(gameTheme); }, [gameTheme]);
+
+    // 2. Buttons & Text
+    useEffect(() => { setLocalSplashButtonText(splashButtonText); }, [splashButtonText]);
+    useEffect(() => { setLocalContinueButtonText(continueButtonText); }, [continueButtonText]);
+    useEffect(() => { setLocalRestartButtonText(restartButtonText); }, [restartButtonText]);
+    useEffect(() => { setLocalActionButtonText(actionButtonText); }, [actionButtonText]);
+    useEffect(() => { setLocalVerbInputPlaceholder(verbInputPlaceholder); }, [verbInputPlaceholder]);
+    useEffect(() => { setLocalSuggestionsButtonText(suggestionsButtonText); }, [suggestionsButtonText]);
+    useEffect(() => { setLocalInventoryButtonText(inventoryButtonText); }, [inventoryButtonText]);
+    useEffect(() => { setLocalDiaryButtonText(diaryButtonText); }, [diaryButtonText]);
+    useEffect(() => { setLocalTrackersButtonText(trackersButtonText); }, [trackersButtonText]);
+    useEffect(() => { setLocalSystemButtonText(gameSystemButtonText); }, [gameSystemButtonText]);
+    useEffect(() => { setLocalMainMenuButtonText(gameMainMenuButtonText); }, [gameMainMenuButtonText]);
+    useEffect(() => { setLocalViewEndingButtonText(gameViewEndingButtonText || 'Ver Final'); }, [gameViewEndingButtonText]);
+    useEffect(() => { setLocalSaveMenuTitle(gameSaveMenuTitle); }, [gameSaveMenuTitle]);
+    useEffect(() => { setLocalLoadMenuTitle(gameLoadMenuTitle); }, [gameLoadMenuTitle]);
+    useEffect(() => { setLocalChanceReturnButtonText(chanceReturnButtonText); }, [chanceReturnButtonText]);
+
+    // 3. Colors
+    useEffect(() => { setLocalTextColor(textColor); }, [textColor]);
+    useEffect(() => { setLocalTitleColor(titleColor); }, [titleColor]);
+    useEffect(() => { setLocalSplashButtonColor(splashButtonColor); }, [splashButtonColor]);
+    useEffect(() => { setLocalSplashButtonHoverColor(splashButtonHoverColor); }, [splashButtonHoverColor]);
+    useEffect(() => { setLocalSplashButtonTextColor(splashButtonTextColor); }, [splashButtonTextColor]);
+    useEffect(() => { setLocalActionButtonColor(actionButtonColor); }, [actionButtonColor]);
+    useEffect(() => { setLocalActionButtonTextColor(actionButtonTextColor); }, [actionButtonTextColor]);
+    useEffect(() => { setLocalFocusColor(focusColor); }, [focusColor]);
+    useEffect(() => { setLocalChanceIconColor(chanceIconColor); }, [chanceIconColor]);
+    useEffect(() => { setLocalTextColorLight(textColorLight); }, [textColorLight]);
+    useEffect(() => { setLocalTitleColorLight(titleColorLight); }, [titleColorLight]);
+    useEffect(() => { setLocalFocusColorLight(focusColorLight); }, [focusColorLight]);
+    useEffect(() => { setLocalFrameBookColor(frameBookColor); }, [frameBookColor]);
+    useEffect(() => { setLocalFrameTradingCardColor(frameTradingCardColor); }, [frameTradingCardColor]);
+    useEffect(() => { setLocalFrameRoundedTopColor(frameRoundedTopColor); }, [frameRoundedTopColor]);
+    useEffect(() => { setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg); }, [gameSceneNameOverlayBg]);
+    useEffect(() => { setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor); }, [gameSceneNameOverlayTextColor]);
+    useEffect(() => { setLocalGameContinueIndicatorColor(gameContinueIndicatorColor); }, [gameContinueIndicatorColor]);
+
+    // 4. Game Params (Fonts, Title, etc.)
+    useEffect(() => { setLocalFontFamily(gameFontFamily); }, [gameFontFamily]);
     useEffect(() => {
-        setLocalLayoutOrientation(layoutOrientation);
-        setLocalLayoutOrder(layoutOrder);
-        setLocalImageFrame(imageFrame);
-        setLocalSplashButtonText(splashButtonText);
-        setLocalContinueButtonText(continueButtonText);
-        setLocalRestartButtonText(restartButtonText);
-        setLocalActionButtonText(actionButtonText);
-        setLocalVerbInputPlaceholder(verbInputPlaceholder);
-        setLocalDiaryPlayerName(diaryPlayerName);
-        setLocalGameSystemEnabled(gameSystemEnabled);
-        setLocalMaxChances(maxChances);
-        setLocalGameShowTrackersUI(gameShowTrackersUI ?? true);
-        setLocalGameShowSystemButton(gameShowSystemButton ?? true);
-        setLocalSuggestionsButtonText(suggestionsButtonText);
-        setLocalInventoryButtonText(inventoryButtonText);
-        setLocalDiaryButtonText(diaryButtonText);
-        setLocalTrackersButtonText(trackersButtonText);
-        setLocalSystemButtonText(gameSystemButtonText);
-        setLocalSaveMenuTitle(gameSaveMenuTitle);
-        setLocalLoadMenuTitle(gameLoadMenuTitle);
-        setLocalMainMenuButtonText(gameMainMenuButtonText);
-        setLocalViewEndingButtonText(gameViewEndingButtonText || 'Ver Final');
-        setLocalTextColor(textColor);
-        setLocalTitleColor(titleColor);
-        setLocalSplashButtonColor(splashButtonColor);
-        setLocalSplashButtonHoverColor(splashButtonHoverColor);
-        setLocalSplashButtonTextColor(splashButtonTextColor);
-        setLocalActionButtonColor(actionButtonColor);
-        setLocalActionButtonTextColor(actionButtonTextColor);
-        setLocalFocusColor(focusColor);
-        setLocalChanceIconColor(chanceIconColor);
-        setLocalFontFamily(gameFontFamily);
-        if (gameFontSize === '0.85em') {
-            setLocalGameFontSize('12');
-        } else {
-            setLocalGameFontSize(gameFontSize);
-        }
-        setLocalChanceIcon(chanceIcon);
-        setLocalChanceLossMessage(chanceLossMessage || '');
-        setLocalChanceRestoreMessage(chanceRestoreMessage || '');
-        setLocalChanceReturnButtonText(chanceReturnButtonText);
-        setLocalGameTheme(gameTheme);
-        setLocalTextColorLight(textColorLight);
-        setLocalTitleColorLight(titleColorLight);
-        setLocalFocusColorLight(focusColorLight);
-        setLocalFrameBookColor(frameBookColor);
-        setLocalFrameTradingCardColor(frameTradingCardColor);
-        setLocalFrameRoundedTopColor(frameRoundedTopColor);
-        setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg);
-        setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor);
-        setLocalGameContinueIndicatorColor(gameContinueIndicatorColor);
-        setLocalTitle(title);
-        setLocalLogo(logo);
-        setLocalOmitSplashTitle(omitSplashTitle);
-        setLocalSplashImage(splashImage);
-        setLocalSplashContentAlignment(splashContentAlignment);
-        setLocalSplashDescription(splashDescription);
-        setLocalBackgroundMusic(backgroundMusic);
-        setLocalPositiveEndingImage(positiveEndingImage);
-        setLocalPositiveEndingContentAlignment(positiveEndingContentAlignment);
-        setLocalPositiveEndingDescription(positiveEndingDescription);
-        setLocalPositiveEndingMusic(positiveEndingMusic);
-        setLocalNegativeEndingImage(negativeEndingImage);
-        setLocalNegativeEndingContentAlignment(negativeEndingContentAlignment);
-        setLocalNegativeEndingDescription(negativeEndingDescription);
-        setLocalNegativeEndingMusic(negativeEndingMusic);
-        setLocalFixedVerbs(fixedVerbs);
-        setLocalTextAnimationType(textAnimationType);
-        setLocalTextSpeed(textSpeed);
-        setLocalTextReadingFlow(textReadingFlow || 'paused');
-        setLocalGameInteractionType(gameInteractionType || 'parser');
-        setLocalImageTransitionType(imageTransitionType);
-        setLocalImageSpeed(imageSpeed);
+        setLocalGameFontSize(gameFontSize === '0.85em' ? '12' : gameFontSize);
+    }, [gameFontSize]);
 
-        // Sync new systems
-        // Sync new systems
-        setLocalEnableTrackers(enableTrackers ?? (gameSystemEnabled === 'trackers'));
-        setLocalEnableInventory(enableInventory ?? true);
-        setLocalEnableDiary(enableDiary ?? true);
-        setLocalEnableFixedVerbs(enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0));
-        setLocalEnableChances(enableChances ?? (gameSystemEnabled === 'chances'));
-        setLocalEnableImages(enableImages ?? true);
-        setLocalEnableTextControl(enableTextControl ?? true);
+    useEffect(() => { setLocalTitle(title); }, [title]);
+    useEffect(() => { setLocalLogo(logo); }, [logo]);
+    useEffect(() => { setLocalOmitSplashTitle(omitSplashTitle); }, [omitSplashTitle]);
+    useEffect(() => { setLocalSplashImage(splashImage); }, [splashImage]);
+    useEffect(() => { setLocalSplashContentAlignment(splashContentAlignment); }, [splashContentAlignment]);
+    useEffect(() => { setLocalSplashContentVerticalAlignment(splashContentVerticalAlignment || 'bottom'); }, [splashContentVerticalAlignment]);
+    useEffect(() => { setLocalSplashDescription(splashDescription); }, [splashDescription]);
+    useEffect(() => { setLocalBackgroundMusic(backgroundMusic); }, [backgroundMusic]);
 
-        setLocalEnableImages(enableImages ?? true);
-        setLocalEnableTextControl(enableTextControl ?? true);
+    // 5. Endings
+    useEffect(() => { setLocalPositiveEndingImage(positiveEndingImage); }, [positiveEndingImage]);
+    useEffect(() => { setLocalPositiveEndingContentAlignment(positiveEndingContentAlignment); }, [positiveEndingContentAlignment]);
+    useEffect(() => { setLocalPositiveEndingDescription(positiveEndingDescription); }, [positiveEndingDescription]);
+    useEffect(() => { setLocalPositiveEndingMusic(positiveEndingMusic); }, [positiveEndingMusic]);
+    useEffect(() => { setLocalNegativeEndingImage(negativeEndingImage); }, [negativeEndingImage]);
+    useEffect(() => { setLocalNegativeEndingContentAlignment(negativeEndingContentAlignment); }, [negativeEndingContentAlignment]);
+    useEffect(() => { setLocalNegativeEndingDescription(negativeEndingDescription); }, [negativeEndingDescription]);
+    useEffect(() => { setLocalNegativeEndingMusic(negativeEndingMusic); }, [negativeEndingMusic]);
 
-        setLocalInventoryCapacity(inventoryCapacity ?? 10);
-        setLocalInventoryMaxWeight(inventoryMaxWeight ?? 0);
-        setLocalDiaryAutoScroll(diaryAutoScroll ?? true);
-        setLocalDiaryAllowExport(diaryAllowExport ?? false);
-        setLocalDiaryAutoScroll(diaryAutoScroll ?? true);
-        setLocalDiaryAllowExport(diaryAllowExport ?? false);
-        setLocalDiaryMaxMessages(diaryMaxMessages ?? 100);
-        setLocalDiaryShowSceneImage(diaryShowSceneImage ?? false);
-        setLocalDiaryShowPlayerAction(diaryShowPlayerAction ?? true);
+    // 6. Systems & Configs
+    useEffect(() => { setLocalGameSystemEnabled(gameSystemEnabled); }, [gameSystemEnabled]);
+    useEffect(() => { setLocalMaxChances(maxChances); }, [maxChances]);
+    useEffect(() => { setLocalGameShowTrackersUI(gameShowTrackersUI ?? true); }, [gameShowTrackersUI]);
+    useEffect(() => { setLocalGameShowSystemButton(gameShowSystemButton ?? true); }, [gameShowSystemButton]);
+    useEffect(() => { setLocalDiaryPlayerName(diaryPlayerName); }, [diaryPlayerName]);
+    useEffect(() => { setLocalChanceIcon(chanceIcon); }, [chanceIcon]);
+    useEffect(() => { setLocalChanceLossMessage(chanceLossMessage || ''); }, [chanceLossMessage]);
+    useEffect(() => { setLocalChanceRestoreMessage(chanceRestoreMessage || ''); }, [chanceRestoreMessage]);
+    useEffect(() => { setLocalFixedVerbs(fixedVerbs); }, [fixedVerbs]);
+    useEffect(() => { setLocalTextAnimationType(textAnimationType); }, [textAnimationType]);
+    useEffect(() => { setLocalTextSpeed(textSpeed); }, [textSpeed]);
+    useEffect(() => { setLocalTextReadingFlow(textReadingFlow || 'paused'); }, [textReadingFlow]);
+    useEffect(() => { setLocalGameInteractionType(gameInteractionType || 'parser'); }, [gameInteractionType]);
+    useEffect(() => { setLocalImageTransitionType(imageTransitionType); }, [imageTransitionType]);
+    useEffect(() => { setLocalImageSpeed(imageSpeed); }, [imageSpeed]);
 
-    }, [
-        layoutOrientation, layoutOrder, imageFrame, actionButtonText, verbInputPlaceholder, diaryPlayerName, splashButtonText, continueButtonText, restartButtonText, gameSystemEnabled, maxChances,
-        textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor, actionButtonColor, actionButtonTextColor, focusColor,
-        chanceIconColor, gameFontFamily, gameFontSize, chanceIcon, chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText, gameTheme, textColorLight, titleColorLight, focusColorLight,
-        frameBookColor, frameTradingCardColor,
-        frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, gameContinueIndicatorColor,
-        gameShowTrackersUI, gameShowSystemButton, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText,
-        gameSystemButtonText, gameSaveMenuTitle, gameLoadMenuTitle, gameMainMenuButtonText, gameViewEndingButtonText,
-        title, logo, omitSplashTitle, splashImage, splashContentAlignment, splashDescription, backgroundMusic, positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription, positiveEndingMusic,
-        negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription, negativeEndingMusic, fixedVerbs,
-        textAnimationType, textSpeed, textReadingFlow, gameInteractionType, imageTransitionType, imageSpeed, splashContentVerticalAlignment,
-        // New dependencies
-        enableTrackers, enableInventory, enableDiary, enableFixedVerbs, enableChances, enableImages, enableTextControl,
-        inventoryCapacity, inventoryMaxWeight,
-        diaryAutoScroll, diaryAllowExport, diaryMaxMessages, diaryShowSceneImage, diaryShowPlayerAction
-    ]);
+    // 7. Feature Flags (Enablers)
+    useEffect(() => { setLocalEnableTrackers(enableTrackers ?? (gameSystemEnabled === 'trackers')); }, [enableTrackers, gameSystemEnabled]);
+    useEffect(() => { setLocalEnableInventory(enableInventory ?? true); }, [enableInventory]);
+    useEffect(() => { setLocalEnableDiary(enableDiary ?? true); }, [enableDiary]);
+    useEffect(() => { setLocalEnableFixedVerbs(enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0)); }, [enableFixedVerbs, fixedVerbs]);
+    useEffect(() => { setLocalEnableChances(enableChances ?? (gameSystemEnabled === 'chances')); }, [enableChances, gameSystemEnabled]);
+    useEffect(() => { setLocalEnableImages(enableImages ?? true); }, [enableImages]);
+    useEffect(() => { setLocalEnableTextControl(enableTextControl ?? true); }, [enableTextControl]);
+
+    // 8. Specific System Settings
+    useEffect(() => { setLocalInventoryCapacity(inventoryCapacity ?? 10); }, [inventoryCapacity]);
+    useEffect(() => { setLocalInventoryMaxWeight(inventoryMaxWeight ?? 0); }, [inventoryMaxWeight]);
+    useEffect(() => { setLocalDiaryAutoScroll(diaryAutoScroll ?? true); }, [diaryAutoScroll]);
+    useEffect(() => { setLocalDiaryAllowExport(diaryAllowExport ?? false); }, [diaryAllowExport]);
+    useEffect(() => { setLocalDiaryMaxMessages(diaryMaxMessages ?? 100); }, [diaryMaxMessages]);
+    useEffect(() => { setLocalDiaryShowSceneImage(diaryShowSceneImage ?? false); }, [diaryShowSceneImage]);
+    useEffect(() => { setLocalDiaryShowPlayerAction(diaryShowPlayerAction ?? true); }, [diaryShowPlayerAction]);
 
     // --- SNAPSHOT DIRTY STRATEGY ---
     // Instead of comparing against potentially unstable props, we capture
@@ -622,85 +613,89 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
 
     const handleSave = () => {
-        if (localLayoutOrientation !== layoutOrientation) onUpdate('gameLayoutOrientation', localLayoutOrientation);
-        if (localLayoutOrder !== layoutOrder) onUpdate('gameLayoutOrder', localLayoutOrder);
-        if (localImageFrame !== imageFrame) onUpdate('gameImageFrame', localImageFrame);
-        if (localSplashButtonText !== splashButtonText) onUpdate('gameSplashButtonText', localSplashButtonText);
-        if (localContinueButtonText !== continueButtonText) onUpdate('gameContinueButtonText', localContinueButtonText);
-        if (localRestartButtonText !== restartButtonText) onUpdate('gameRestartButtonText', localRestartButtonText);
-        if (localActionButtonText !== actionButtonText) onUpdate('gameActionButtonText', localActionButtonText);
-        if (localVerbInputPlaceholder !== verbInputPlaceholder) onUpdate('gameVerbInputPlaceholder', localVerbInputPlaceholder);
-        if (localDiaryPlayerName !== diaryPlayerName) onUpdate('gameDiaryPlayerName', localDiaryPlayerName);
-        if (localGameSystemEnabled !== gameSystemEnabled) onUpdate('gameSystemEnabled', localGameSystemEnabled);
-        if (localMaxChances !== maxChances) onUpdate('gameMaxChances', localMaxChances);
-        if (localGameShowTrackersUI !== gameShowTrackersUI) onUpdate('gameShowTrackersUI', localGameShowTrackersUI);
-        if (localGameShowSystemButton !== gameShowSystemButton) onUpdate('gameShowSystemButton', localGameShowSystemButton);
-        if (localSuggestionsButtonText !== suggestionsButtonText) onUpdate('gameSuggestionsButtonText', localSuggestionsButtonText);
-        if (localInventoryButtonText !== inventoryButtonText) onUpdate('gameInventoryButtonText', localInventoryButtonText);
-        if (localDiaryButtonText !== diaryButtonText) onUpdate('gameDiaryButtonText', localDiaryButtonText);
-        if (localTrackersButtonText !== trackersButtonText) onUpdate('gameTrackersButtonText', localTrackersButtonText);
-        if (localSystemButtonText !== gameSystemButtonText) onUpdate('gameSystemButtonText', localSystemButtonText);
-        if (localSaveMenuTitle !== gameSaveMenuTitle) onUpdate('gameSaveMenuTitle', localSaveMenuTitle);
-        if (localLoadMenuTitle !== gameLoadMenuTitle) onUpdate('gameLoadMenuTitle', localLoadMenuTitle);
-        if (localMainMenuButtonText !== gameMainMenuButtonText) onUpdate('gameMainMenuButtonText', localMainMenuButtonText);
-        if (localViewEndingButtonText !== gameViewEndingButtonText) onUpdate('gameViewEndingButtonText', localViewEndingButtonText);
-        if (localTextColor !== textColor) onUpdate('gameTextColor', localTextColor);
-        if (localTitleColor !== titleColor) onUpdate('gameTitleColor', localTitleColor);
-        if (localSplashButtonColor !== splashButtonColor) onUpdate('gameSplashButtonColor', localSplashButtonColor);
-        if (localSplashButtonHoverColor !== splashButtonHoverColor) onUpdate('gameSplashButtonHoverColor', localSplashButtonHoverColor);
-        if (localSplashButtonTextColor !== splashButtonTextColor) onUpdate('gameSplashButtonTextColor', localSplashButtonTextColor);
-        if (localActionButtonColor !== actionButtonColor) onUpdate('gameActionButtonColor', localActionButtonColor);
-        if (localActionButtonTextColor !== actionButtonTextColor) onUpdate('gameActionButtonTextColor', localActionButtonTextColor);
-        if (localFocusColor !== focusColor) onUpdate('gameFocusColor', localFocusColor);
-        if (localChanceIconColor !== chanceIconColor) onUpdate('gameChanceIconColor', localChanceIconColor);
-        if (localFontFamily !== gameFontFamily) onUpdate('gameFontFamily', localFontFamily);
-        if (localGameFontSize !== gameFontSize) onUpdate('gameFontSize', localGameFontSize);
-        if (localChanceIcon !== chanceIcon) onUpdate('gameChanceIcon', localChanceIcon);
-        if (localChanceLossMessage !== chanceLossMessage) onUpdate('gameChanceLossMessage', localChanceLossMessage);
-        if (localChanceRestoreMessage !== chanceRestoreMessage) onUpdate('gameChanceRestoreMessage', localChanceRestoreMessage);
-        if (localChanceReturnButtonText !== chanceReturnButtonText) onUpdate('gameChanceReturnButtonText', localChanceReturnButtonText);
-        if (localGameTheme !== gameTheme) onUpdate('gameTheme', localGameTheme);
-        if (localTextColorLight !== textColorLight) onUpdate('textColorLight', localTextColorLight);
-        if (localTitleColorLight !== titleColorLight) onUpdate('titleColorLight', localTitleColorLight);
-        if (localFocusColorLight !== focusColorLight) onUpdate('focusColorLight', localFocusColorLight);
-        if (localFrameBookColor !== frameBookColor) onUpdate('frameBookColor', localFrameBookColor);
-        if (localFrameTradingCardColor !== frameTradingCardColor) onUpdate('frameTradingCardColor', localFrameTradingCardColor);
-        if (localFrameRoundedTopColor !== frameRoundedTopColor) onUpdate('frameRoundedTopColor', localFrameRoundedTopColor);
-        if (localGameSceneNameOverlayBg !== gameSceneNameOverlayBg) onUpdate('gameSceneNameOverlayBg', localGameSceneNameOverlayBg);
-        if (localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor) onUpdate('gameSceneNameOverlayTextColor', localGameSceneNameOverlayTextColor);
-        if (localGameContinueIndicatorColor !== gameContinueIndicatorColor) onUpdate('gameContinueIndicatorColor', localGameContinueIndicatorColor);
-        if (localTitle !== title) onUpdate('gameTitle', localTitle);
-        if (localLogo !== logo) onUpdate('gameLogo', localLogo);
-        if (localOmitSplashTitle !== omitSplashTitle) onUpdate('gameOmitSplashTitle', localOmitSplashTitle);
-        if (localSplashImage !== splashImage) onUpdate('gameSplashImage', localSplashImage);
-        if (localSplashContentAlignment !== splashContentAlignment) onUpdate('gameSplashContentAlignment', localSplashContentAlignment);
-        if (localSplashContentVerticalAlignment !== splashContentVerticalAlignment) onUpdate('gameSplashContentVerticalAlignment', localSplashContentVerticalAlignment);
-        if (localSplashDescription !== splashDescription) onUpdate('gameSplashDescription', localSplashDescription);
-        if (localBackgroundMusic !== backgroundMusic) onUpdate('gameBackgroundMusic', localBackgroundMusic);
-        if (localPositiveEndingImage !== positiveEndingImage) onUpdate('positiveEndingImage', localPositiveEndingImage);
-        if (localPositiveEndingContentAlignment !== positiveEndingContentAlignment) onUpdate('positiveEndingContentAlignment', localPositiveEndingContentAlignment);
-        if (localPositiveEndingDescription !== positiveEndingDescription) onUpdate('positiveEndingDescription', localPositiveEndingDescription);
-        if (localPositiveEndingMusic !== positiveEndingMusic) onUpdate('positiveEndingMusic', localPositiveEndingMusic);
-        if (localNegativeEndingImage !== negativeEndingImage) onUpdate('negativeEndingImage', localNegativeEndingImage);
-        if (localNegativeEndingContentAlignment !== negativeEndingContentAlignment) onUpdate('negativeEndingContentAlignment', localNegativeEndingContentAlignment);
-        if (localNegativeEndingDescription !== negativeEndingDescription) onUpdate('negativeEndingDescription', localNegativeEndingDescription);
-        if (localNegativeEndingMusic !== negativeEndingMusic) onUpdate('negativeEndingMusic', localNegativeEndingMusic);
-        if (JSON.stringify(localFixedVerbs) !== JSON.stringify(fixedVerbs)) onUpdate('fixedVerbs', localFixedVerbs);
-        if (localTextAnimationType !== textAnimationType) onUpdate('gameTextAnimationType', localTextAnimationType);
-        if (localTextSpeed !== textSpeed) onUpdate('gameTextSpeed', localTextSpeed);
-        if (localImageTransitionType !== imageTransitionType) onUpdate('gameImageTransitionType', localImageTransitionType);
-        if (localImageSpeed !== imageSpeed) onUpdate('gameImageSpeed', localImageSpeed);
-        if (localEnableImages !== (enableImages ?? true)) onUpdate('enableImages', localEnableImages);
-        if (localEnableTextControl !== (enableTextControl ?? true)) onUpdate('enableTextControl', localEnableTextControl);
-        if (localTextReadingFlow !== (textReadingFlow || 'paused')) onUpdate('gameTextReadingFlow', localTextReadingFlow);
-        if (localGameInteractionType !== (gameInteractionType || 'parser')) onUpdate('gameInteractionType', localGameInteractionType);
+        if (localLayoutOrientation !== layoutOrientation) onUpdate('gameLayoutOrientation', localLayoutOrientation, true);
+        if (localLayoutOrder !== layoutOrder) onUpdate('gameLayoutOrder', localLayoutOrder, true);
+        if (localImageFrame !== imageFrame) onUpdate('gameImageFrame', localImageFrame, true);
+        if (localSplashButtonText !== splashButtonText) onUpdate('gameSplashButtonText', localSplashButtonText, true);
+        if (localContinueButtonText !== continueButtonText) onUpdate('gameContinueButtonText', localContinueButtonText, true);
+        if (localRestartButtonText !== restartButtonText) onUpdate('gameRestartButtonText', localRestartButtonText, true);
+        if (localActionButtonText !== actionButtonText) onUpdate('gameActionButtonText', localActionButtonText, true);
+        if (localVerbInputPlaceholder !== verbInputPlaceholder) onUpdate('gameVerbInputPlaceholder', localVerbInputPlaceholder, true);
+        if (localDiaryPlayerName !== diaryPlayerName) onUpdate('gameDiaryPlayerName', localDiaryPlayerName, true);
+        if (localGameSystemEnabled !== gameSystemEnabled) onUpdate('gameSystemEnabled', localGameSystemEnabled, true);
+        if (localMaxChances !== maxChances) onUpdate('gameMaxChances', localMaxChances, true);
+        if (localGameShowTrackersUI !== gameShowTrackersUI) onUpdate('gameShowTrackersUI', localGameShowTrackersUI, true);
+        if (localGameShowSystemButton !== gameShowSystemButton) onUpdate('gameShowSystemButton', localGameShowSystemButton, true);
+        if (localSuggestionsButtonText !== suggestionsButtonText) onUpdate('gameSuggestionsButtonText', localSuggestionsButtonText, true);
+        if (localInventoryButtonText !== inventoryButtonText) onUpdate('gameInventoryButtonText', localInventoryButtonText, true);
+        if (localDiaryButtonText !== diaryButtonText) onUpdate('gameDiaryButtonText', localDiaryButtonText, true);
+        if (localTrackersButtonText !== trackersButtonText) onUpdate('gameTrackersButtonText', localTrackersButtonText, true);
+        if (localSystemButtonText !== gameSystemButtonText) onUpdate('gameSystemButtonText', localSystemButtonText, true);
+        if (localSaveMenuTitle !== gameSaveMenuTitle) onUpdate('gameSaveMenuTitle', localSaveMenuTitle, true);
+        if (localLoadMenuTitle !== gameLoadMenuTitle) onUpdate('gameLoadMenuTitle', localLoadMenuTitle, true);
+        if (localMainMenuButtonText !== gameMainMenuButtonText) onUpdate('gameMainMenuButtonText', localMainMenuButtonText, true);
+        if (localViewEndingButtonText !== gameViewEndingButtonText) onUpdate('gameViewEndingButtonText', localViewEndingButtonText, true);
+        if (localTextColor !== textColor) onUpdate('gameTextColor', localTextColor, true);
+        if (localTitleColor !== titleColor) onUpdate('gameTitleColor', localTitleColor, true);
+        if (localSplashButtonColor !== splashButtonColor) onUpdate('gameSplashButtonColor', localSplashButtonColor, true);
+        if (localSplashButtonHoverColor !== splashButtonHoverColor) onUpdate('gameSplashButtonHoverColor', localSplashButtonHoverColor, true);
+        if (localSplashButtonTextColor !== splashButtonTextColor) onUpdate('gameSplashButtonTextColor', localSplashButtonTextColor, true);
+        if (localActionButtonColor !== actionButtonColor) onUpdate('gameActionButtonColor', localActionButtonColor, true);
+        if (localActionButtonTextColor !== actionButtonTextColor) onUpdate('gameActionButtonTextColor', localActionButtonTextColor, true);
+        if (localFocusColor !== focusColor) onUpdate('gameFocusColor', localFocusColor, true);
+        if (localChanceIconColor !== chanceIconColor) onUpdate('gameChanceIconColor', localChanceIconColor, true);
+        if (localFontFamily !== gameFontFamily) onUpdate('gameFontFamily', localFontFamily, true);
+        if (localGameFontSize !== gameFontSize) onUpdate('gameFontSize', localGameFontSize, true);
+        if (localChanceIcon !== chanceIcon) onUpdate('gameChanceIcon', localChanceIcon, true);
+        if (localChanceLossMessage !== chanceLossMessage) onUpdate('gameChanceLossMessage', localChanceLossMessage, true);
+        if (localChanceRestoreMessage !== chanceRestoreMessage) onUpdate('gameChanceRestoreMessage', localChanceRestoreMessage, true);
+        if (localChanceReturnButtonText !== chanceReturnButtonText) onUpdate('gameChanceReturnButtonText', localChanceReturnButtonText, true);
+        if (localGameTheme !== gameTheme) onUpdate('gameTheme', localGameTheme, true);
+        if (localTextColorLight !== textColorLight) onUpdate('textColorLight', localTextColorLight, true);
+        if (localTitleColorLight !== titleColorLight) onUpdate('titleColorLight', localTitleColorLight, true);
+        if (localFocusColorLight !== focusColorLight) onUpdate('focusColorLight', localFocusColorLight, true);
+        if (localFrameBookColor !== frameBookColor) onUpdate('frameBookColor', localFrameBookColor, true);
+        if (localFrameTradingCardColor !== frameTradingCardColor) onUpdate('frameTradingCardColor', localFrameTradingCardColor, true);
+        if (localFrameRoundedTopColor !== frameRoundedTopColor) onUpdate('frameRoundedTopColor', localFrameRoundedTopColor, true);
+        if (localGameSceneNameOverlayBg !== gameSceneNameOverlayBg) onUpdate('gameSceneNameOverlayBg', localGameSceneNameOverlayBg, true);
+        if (localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor) onUpdate('gameSceneNameOverlayTextColor', localGameSceneNameOverlayTextColor, true);
+        if (localGameContinueIndicatorColor !== gameContinueIndicatorColor) onUpdate('gameContinueIndicatorColor', localGameContinueIndicatorColor, true);
+        if (localTitle !== title) onUpdate('gameTitle', localTitle, true);
+        if (localLogo !== logo) onUpdate('gameLogo', localLogo, true);
+        if (localOmitSplashTitle !== omitSplashTitle) onUpdate('gameOmitSplashTitle', localOmitSplashTitle, true);
+        if (localSplashImage !== splashImage) onUpdate('gameSplashImage', localSplashImage, true);
+        if (localSplashContentAlignment !== splashContentAlignment) onUpdate('gameSplashContentAlignment', localSplashContentAlignment, true);
+        if (localSplashContentVerticalAlignment !== splashContentVerticalAlignment) onUpdate('gameSplashContentVerticalAlignment', localSplashContentVerticalAlignment, true);
+        if (localSplashDescription !== splashDescription) onUpdate('gameSplashDescription', localSplashDescription, true);
+        if (localBackgroundMusic !== backgroundMusic) onUpdate('gameBackgroundMusic', localBackgroundMusic, true);
+        if (localPositiveEndingImage !== positiveEndingImage) onUpdate('positiveEndingImage', localPositiveEndingImage, true);
+        if (localPositiveEndingContentAlignment !== positiveEndingContentAlignment) onUpdate('positiveEndingContentAlignment', localPositiveEndingContentAlignment, true);
+        if (localPositiveEndingDescription !== positiveEndingDescription) onUpdate('positiveEndingDescription', localPositiveEndingDescription, true);
+        if (localPositiveEndingMusic !== positiveEndingMusic) onUpdate('positiveEndingMusic', localPositiveEndingMusic, true);
+        if (localNegativeEndingImage !== negativeEndingImage) onUpdate('negativeEndingImage', localNegativeEndingImage, true);
+        if (localNegativeEndingContentAlignment !== negativeEndingContentAlignment) onUpdate('negativeEndingContentAlignment', localNegativeEndingContentAlignment, true);
+        if (localNegativeEndingDescription !== negativeEndingDescription) onUpdate('negativeEndingDescription', localNegativeEndingDescription, true);
+        if (localNegativeEndingMusic !== negativeEndingMusic) onUpdate('negativeEndingMusic', localNegativeEndingMusic, true);
+        if (JSON.stringify(localFixedVerbs) !== JSON.stringify(fixedVerbs)) onUpdate('fixedVerbs', localFixedVerbs, true);
+        if (localTextAnimationType !== textAnimationType) onUpdate('gameTextAnimationType', localTextAnimationType, true);
+        if (localTextSpeed !== textSpeed) onUpdate('gameTextSpeed', localTextSpeed, true);
+        if (localImageTransitionType !== imageTransitionType) onUpdate('gameImageTransitionType', localImageTransitionType, true);
+        if (localImageSpeed !== imageSpeed) onUpdate('gameImageSpeed', localImageSpeed, true);
+        if (localEnableImages !== (enableImages ?? true)) onUpdate('enableImages', localEnableImages, true);
+        if (localEnableTextControl !== (enableTextControl ?? true)) onUpdate('enableTextControl', localEnableTextControl, true);
+        if (localTextReadingFlow !== (textReadingFlow || 'paused')) onUpdate('gameTextReadingFlow', localTextReadingFlow, true);
+        if (localGameInteractionType !== (gameInteractionType || 'parser')) onUpdate('gameInteractionType', localGameInteractionType, true);
 
         // Sync new systems
-        if (localEnableTrackers !== (enableTrackers ?? (gameSystemEnabled === 'trackers'))) onUpdate('enableTrackers', localEnableTrackers);
-        if (localEnableInventory !== (enableInventory ?? false)) onUpdate('enableInventory', localEnableInventory);
-        if (localEnableDiary !== (enableDiary ?? false)) onUpdate('enableDiary', localEnableDiary);
-        if (localEnableFixedVerbs !== (enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0))) onUpdate('enableFixedVerbs', localEnableFixedVerbs);
-        if (localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances'))) onUpdate('enableChances', localEnableChances);
+        if (localEnableTrackers !== (enableTrackers ?? (gameSystemEnabled === 'trackers'))) onUpdate('enableTrackers', localEnableTrackers, true);
+        if (localEnableInventory !== (enableInventory ?? true)) onUpdate('enableInventory', localEnableInventory, true);
+        if (localEnableDiary !== (enableDiary ?? true)) onUpdate('enableDiary', localEnableDiary, true);
+        if (localEnableFixedVerbs !== (enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0))) onUpdate('enableFixedVerbs', localEnableFixedVerbs, true);
+        if (localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances'))) onUpdate('enableChances', localEnableChances, true);
+
+        // Update snapshot to current state to prevent dirty flag from persisting
+        initialStateRef.current = getCurrentState();
+        onSetDirty(false);
     };
 
 
@@ -728,7 +723,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalSaveMenuTitle(gameSaveMenuTitle);
         setLocalLoadMenuTitle(gameLoadMenuTitle);
         setLocalMainMenuButtonText(gameMainMenuButtonText);
-        setLocalViewEndingButtonText(gameViewEndingButtonText);
+        setLocalViewEndingButtonText(gameViewEndingButtonText || 'Ver Final');
         setLocalTextColor(textColor);
         setLocalTitleColor(titleColor);
         setLocalSplashButtonColor(splashButtonColor);
@@ -739,7 +734,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalFocusColor(focusColor);
         setLocalChanceIconColor(chanceIconColor);
         setLocalFontFamily(gameFontFamily);
-        setLocalGameFontSize(gameFontSize);
+        setLocalGameFontSize(gameFontSize === '0.85em' ? '12' : gameFontSize);
         setLocalChanceIcon(chanceIcon);
         setLocalChanceLossMessage(chanceLossMessage || '');
         setLocalChanceRestoreMessage(chanceRestoreMessage || '');
@@ -759,7 +754,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalOmitSplashTitle(omitSplashTitle);
         setLocalSplashImage(splashImage);
         setLocalSplashContentAlignment(splashContentAlignment);
-        setLocalSplashContentVerticalAlignment(splashContentVerticalAlignment as any);
+        setLocalSplashContentVerticalAlignment((splashContentVerticalAlignment || 'bottom') as any);
         setLocalSplashDescription(splashDescription);
         setLocalBackgroundMusic(backgroundMusic);
         setLocalPositiveEndingImage(positiveEndingImage);
@@ -776,6 +771,23 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalTextReadingFlow(textReadingFlow || 'paused');
         setLocalImageTransitionType(imageTransitionType);
         setLocalImageSpeed(imageSpeed);
+
+        // Reset New Systems
+        setLocalEnableTrackers(enableTrackers ?? (gameSystemEnabled === 'trackers'));
+        setLocalEnableInventory(enableInventory ?? true);
+        setLocalEnableDiary(enableDiary ?? true);
+        setLocalEnableFixedVerbs(enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0));
+        setLocalEnableChances(enableChances ?? (gameSystemEnabled === 'chances'));
+        setLocalEnableImages(enableImages ?? true);
+        setLocalEnableTextControl(enableTextControl ?? true);
+
+        setLocalInventoryCapacity(inventoryCapacity ?? 10);
+        setLocalInventoryMaxWeight(inventoryMaxWeight ?? 0);
+        setLocalDiaryAutoScroll(diaryAutoScroll ?? true);
+        setLocalDiaryAllowExport(diaryAllowExport ?? false);
+        setLocalDiaryMaxMessages(diaryMaxMessages ?? 100);
+        setLocalDiaryShowSceneImage(diaryShowSceneImage ?? false);
+        setLocalDiaryShowPlayerAction(diaryShowPlayerAction ?? true);
     };
 
     const handleThemeChange = (theme: 'dark' | 'light') => {

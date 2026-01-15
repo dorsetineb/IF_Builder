@@ -786,6 +786,8 @@ const Editor: React.FC = () => {
         };
     }, []);
 
+    const [importKey, setImportKey] = useState(0);
+
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsTransitioning(false);
@@ -1195,16 +1197,19 @@ DATE:        ${exportDate.toLocaleString()}
             setSelectedSceneId(data.sceneOrder[0]);
         }
         setIsDirty(false);
+        setImportKey(prev => prev + 1);
     }, []);
 
-    const handleUpdateGameData = (field: keyof GameData, value: any) => {
+    const handleUpdateGameData = (field: keyof GameData, value: any, skipDirty?: boolean) => {
         setGameData(prev => {
             if (field === 'gameSystemEnabled' && value === 'trackers') {
                 return { ...prev, [field]: value, gameShowTrackersUI: true };
             }
             return { ...prev, [field]: value };
         });
-        setIsDirty(true);
+        if (!skipDirty) {
+            setIsDirty(true);
+        }
     };
 
     const handleAddScene = () => {
@@ -1361,9 +1366,9 @@ DATE:        ${exportDate.toLocaleString()}
             return;
         }
         setGameData(initialGameData);
-        setSelectedSceneId(null);
-        setCurrentView('interface'); // Redirect to Interface
+
         setIsDirty(false);
+        setImportKey(prev => prev + 1);
     };
 
     const handleStartCreating = () => {
@@ -1596,6 +1601,7 @@ DATE:        ${exportDate.toLocaleString()}
                         <main className={`flex-1 overflow-y-auto relative bg-background ${currentView === 'scenes' && !selectedScene ? 'p-0' : 'p-6'}`}>
                             {currentView === 'interface' && (
                                 <UIEditor
+                                    key={importKey}
                                     {...gameData}
                                     enableInventory={gameData.enableInventory ?? detectedActiveSystems.inventory}
                                     enableChances={(gameData.enableChances ?? detectedActiveSystems.chances) || gameData.gameSystemEnabled === 'chances'}

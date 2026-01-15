@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Heart, ExternalLink, Activity, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop } from 'lucide-react';
+import { Check, Heart, ExternalLink, Activity, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key } from 'lucide-react';
 import { useUser } from '../components/UserContext';
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
@@ -88,7 +88,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                         : 'text-muted-foreground hover:text-foreground'
                                         }`}
                                 >
-                                    Apoiar
+                                    Apoie o IF Builder
                                 </button>
                             </div>
                         </div>
@@ -102,13 +102,13 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                         <div className="p-3 bg-blue-500/10 rounded-lg">
                                             <Workflow className="w-6 h-6 text-blue-500" />
                                         </div>
-                                        <h2 className="text-lg font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+                                        <h2 className="text-lg font-bold text-foreground">
                                             O que é uma ficção interativa?
                                         </h2>
                                     </div>
-                                    <div className="space-y-6 text-zinc-300 leading-relaxed font-light text-sm">
+                                    <div className="space-y-6 text-muted-foreground leading-relaxed font-light text-sm">
                                         <p>
-                                            Ficções interativas (IF) são narrativas onde o leitor toma decisões que alteram o rumo da história. Elas funcionam como um meio termo entre a literatura tradicional e o design de jogos, sendo utilizadas em diversos contextos além do entretenimento.
+                                            <b className="text-foreground">Ficções interativas</b> são narrativas onde o leitor toma decisões que alteram o rumo da história. Talvez você já tenha folheado um livro-jogo em que, ao chegar no fim da página, o livro sugere: Caso você queira A, vá para a página 11; Se quiser B, vá para a página 34. Ficções Interativas são uma mistura de literatura tradicional e o design de jogos. Se você assistiu o episódio Bandersnatch de Black Mirror, já teve contato com uma ficção interativa.
                                         </p>
                                     </div>
                                 </div>
@@ -119,26 +119,26 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                         <div className="p-3 bg-indigo-500/10 rounded-lg">
                                             <Crop className="w-6 h-6 text-indigo-500" />
                                         </div>
-                                        <h2 className="text-lg font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+                                        <h2 className="text-lg font-bold text-foreground">
                                             Em que contexto ficções interativas podem ser utilizadas?
                                         </h2>
                                     </div>
-                                    <div className="space-y-8 text-zinc-300 leading-relaxed font-light text-sm">
+                                    <div className="space-y-8 text-muted-foreground leading-relaxed font-light text-sm">
                                         <div className="space-y-2">
-                                            <h3 className="font-bold text-white text-base">1. Educação e Treinamento</h3>
-                                            <p>Utilizadas para colocar estudantes ou profissionais diante de dilemas éticos, históricos ou técnicos. Em vez de apenas ler sobre um conceito, o usuário precisa aplicar o conhecimento para avançar. Ajuda no desenvolvimento da lógica de causa e efeito, onde cada escolha gera uma consequência clara no sistema.</p>
+                                            <h3 className="font-bold text-foreground text-base">1. Educação e Treinamento</h3>
+                                            <p>Educadores podem colocar estudantes e profissionais diante de dilemas éticos, históricos ou técnicos. Em vez de apenas ler sobre um conceito, precisam aplicar o conhecimento para avançar. Ajuda no desenvolvimento da lógica de causa e efeito, onde cada escolha gera uma consequência clara no sistema.</p>
                                         </div>
                                         <div className="space-y-2">
-                                            <h3 className="font-bold text-white text-base">2. Prototipagem Narrativa</h3>
+                                            <h3 className="font-bold text-foreground text-base">2. Prototipagem Narrativa</h3>
                                             <p>Escritores e desenvolvedores utilizam ficções interativas para testar estrutura de diálogos e árvores de decisão antes de investir em produções complexas (como jogos 3D ou filmes interativos). É uma forma rápida de verificar se um enredo complexo possui furos de roteiro ou becos sem saída.</p>
                                         </div>
                                         <div className="space-y-2">
-                                            <h3 className="font-bold text-white text-base">3. Entretenimento</h3>
-                                            <p>Artistas e autores podem experimentar uma formato narrativo diferente para contar suas histórias, e desenvolvedores podem criar pequenos jogos. Fanfics, simuladores de relacionamento, dramas de um apocalipse zumbi (ou robótico). Diversão é sempre um bom contexto.</p>
+                                            <h3 className="font-bold text-foreground text-base">3. Entretenimento</h3>
+                                            <p>Artistas e autores podem experimentar uma formato narrativo diferente para contar suas histórias, e desenvolvedores podem criar pequenos jogos. Fanfics, simuladores de relacionamento, dramas de um apocalipse zumbi (ou robótico). Diversão é sempre um bom contexto!</p>
                                         </div>
                                         <div className="space-y-2">
-                                            <h3 className="font-bold text-white text-base">4. Terapia e Saúde</h3>
-                                            <p>Profissionais da saúde podem criar situações interativas para auxílio no tratamento de fobias e ansiedade por meio de exposição controlada a cenários desafiadores em um ambiente virtual e seguro.</p>
+                                            <h3 className="font-bold text-foreground text-base">4. Terapia e Saúde</h3>
+                                            <p>Profissionais da saúde podem criar situações interativas para ajudar no tratamento de fobias, com a exposição controlada de cenários desafiadores, em um ambiente virtual e seguro.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -154,16 +154,22 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                         <div className="p-3 bg-emerald-500/10 rounded-lg">
                                             <Activity className="w-6 h-6 text-emerald-500" />
                                         </div>
-                                        <h2 className="text-lg font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+                                        <h2 className="text-lg font-bold text-foreground">
                                             Sobre o IF Builder
                                         </h2>
                                     </div>
-                                    <div className="space-y-6 text-zinc-300 leading-relaxed font-light text-sm text-justify">
+                                    <div className="space-y-6 text-muted-foreground leading-relaxed font-light text-sm">
                                         <p>
-                                            O IF Builder é uma ferramenta gratuita de criação de histórias interativas e não-lineares por meio de cenas que se conectam através de interações. Todas as ficções interativas criadas aqui são exportadas em um arquivo .zip autossuficiente. Ele não precisa de internet nem do editor para funcionar, apenas um navegador. Pense nele como um disquete: você pode guardá-lo em uma gaveta, ou entregá-lo a alguém. Quem receber o seu arquivo .zip pode rodar a ficção, e também pode importá-lo no IF Builder para ver exatamente como foi encaixada cada peça da narrativa.
+                                            O IF Builder é uma ferramenta gratuita que ajuda a criar histórias interativas e não-lineares. Sua lógica funciona a partir de cenas, que são interligadas entre si através de interações definidas pelo usuário.
                                         </p>
                                         <p>
-                                            Este é um projeto independente, que utiliza Inteligência Artificial Generativa em sua estrutura e desenvolvimento. No entanto, ele não foi criado para a automação narrativa. O objetivo desta ferramenta é exatamente o oposto: Incentivar nas pessoas o pensamento, planejamento, criatividade e o manuseio de dados com uma tecnologia low-tech.
+                                            Todas as ficções interativas criadas aqui são exportadas em um arquivo .zip autossuficiente. Ele não precisa de internet nem do editor para funcionar - apenas um navegador. Pense nesse arquivo como um pendrive: você pode guardá-lo em uma gaveta, ou entregá-lo a alguém. Quem receber o seu arquivo .zip pode rodar a ficção, e também pode importá-lo no IF Builder para ver exatamente como você encaixou cada peça da narrativa.
+                                        </p>
+                                        <p>
+                                            Este site foi criado com o auxílio de inteligência artificial generativa — seria hipocrisia esconder isso. Mas o IF Builder não foi feito para gerar histórias automáticas. Ele é uma ferramenta mecânica, que exige atenção, e foi desenhada para que você possa fazer o trabalho humano de contar uma história que pareça real.
+                                        </p>
+                                        <p>
+                                            <b className="text-foreground">Sua intenção é que controla esta máquina.</b>
                                         </p>
                                     </div>
                                 </div>
@@ -178,17 +184,17 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                         <div className="p-3 bg-primary/10 rounded-lg">
                                             <Heart className="w-6 h-6 text-primary" />
                                         </div>
-                                        <h2 className="text-lg font-bold bg-gradient-to-r from-white to-zinc-400 bg-clip-text text-transparent">
+                                        <h2 className="text-lg font-bold text-foreground">
                                             Por que apoiar o IF Builder?
                                         </h2>
                                     </div>
 
-                                    <div className="space-y-6 text-zinc-300 leading-relaxed font-light text-sm">
+                                    <div className="space-y-6 text-muted-foreground leading-relaxed font-light text-sm">
                                         <p>
-                                            <strong className="text-white font-medium">Não temos anúncios, e não vendemos dados.</strong> Por ser um projeto gratuito e sem fins lucrativos, os custos são arcados inteiramente pelo desenvolvedor. Se esta ferramenta é útil para você, considere fazer uma doação de qualquer valor. Todo o recurso arrecadado é destinado exclusivamente ao pagamento dos custos de infraestrutura do site, incluindo a manutenção e as futuras melhorias.
+                                            <strong className="text-foreground font-medium">Não temos anúncios, e não vendemos dados.</strong> Por ser um projeto gratuito e sem fins lucrativos, os custos são arcados inteiramente pelo desenvolvedor. Se esta ferramenta é útil para você, considere fazer uma doação de qualquer valor. Todo o recurso arrecadado é destinado exclusivamente ao pagamento dos custos de infraestrutura do site, incluindo a manutenção e as futuras melhorias.
                                         </p>
                                         <p>
-                                            Esta plataforma foi criada com o auxílio de inteligência artificial generativa — seria hipocrisia esconder isso. Mas o IF Builder não foi feito para gerar histórias automáticas. Ele é uma ferramenta mecânica, que exige atenção, e foi desenhada para que você possa fazer o trabalho humano de contar uma história que pareça real. Sua intenção controla a máquina.
+                                            Se tiver sugestões, críticas ou quiser compartilhar suas histórias, entre em contato pelo e-mail: <strong><a className="text-primary hover:underline hover:text-primary/80" href="mailto:ola@ifbuildr.com">ola@ifbuildr.com</a></strong>
                                         </p>
                                     </div>
                                 </div>
@@ -211,19 +217,16 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                                 />
                                             </div>
                                             <div className="mt-4 text-center">
-                                                <h3 className="text-lg font-bold text-white">@dorsetineb</h3>
+                                                <h3 className="text-lg font-bold text-foreground">@dorsetineb</h3>
                                             </div>
                                         </div>
 
-                                        <div className="flex-1 space-y-6 text-zinc-300 leading-relaxed font-light text-sm text-left">
+                                        <div className="flex-1 space-y-6 text-muted-foreground leading-relaxed font-light text-sm text-left">
                                             <p>
-                                                Formado em Artes Visuais e atuando há mais de uma década em projetos de design, inovação educacional e recursos tecnológicos. Entrei no Senac São Paulo como ilustrador, e conforme os projetos aumentavam em complexidade, trabalhei como diretor de arte, articulador de demandas audiovisuais, analista de novas tecnologias aplicadas à educação (foco em Realidade Estendida e IA Generativa) e hoje me dedico ao monitoramento estratégico de projetos de tecnologia da informação.
+                                                Sou formado em Artes Visuais e atuo há mais de uma década em projetos de design, inovação educacional e recursos tecnológicos. Entrei no Senac São Paulo como ilustrador, e já trabalhei como diretor de arte, supervisor de demandas audiovisuais, analista de tecnologias aplicadas à educação (foco em Realidade Estendida e IA Generativa). Ainda no Senac, hoje me dedico ao monitoramento estratégico de projetos de tecnologia da informação, e eventualmente me envolvo com projetos freelancer de diagramação de livros e ilustração.
                                             </p>
                                             <p>
-                                                Para mim, a tecnologia é uma ferramenta de expressão humana, seja ilustrando um cenário, diagramando um livro, documentando procedimentos ou desenvolvendo jogos.
-                                            </p>
-                                            <p className="pt-4 text-zinc-400">
-                                                Tento escrever com alguma regularidade no Substack - <a href="https://substack.com/@dorsetineb" target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80 hover:underline">https://substack.com/@dorsetineb</a>. Seria legal conversar com voce por lá.
+                                                Tento escrever com alguma regularidade no <a href="https://substack.com/@dorsetineb" target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80 hover:underline">Substack</a>, e seria muito legal conversar com você por lá também!
                                             </p>
                                         </div>
                                     </div>
@@ -234,11 +237,15 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                     {/* Sidebar - Fixa/Sticky */}
                     <div className="lg:col-span-1 lg:sticky lg:top-0 space-y-6">
-                        <div className="bg-card border border-border rounded-xl p-6 shadow-sm relative overflow-hidden group">
-                            <div className="flex items-center gap-2 mb-4">
+                        <div className="bg-gradient-to-b from-primary/20 to-transparent border border-primary/20 rounded-xl p-6 shadow-sm relative overflow-hidden group">
+                            <div className="flex items-center gap-2 mb-2">
                                 <Heart className="w-4 h-4 text-primary fill-current" />
                                 <h3 className="font-bold text-sm text-white">Apoie o Projeto</h3>
                             </div>
+
+                            <p className="text-[10px] text-zinc-400 leading-relaxed mb-4">
+                                este site é mantido com amor e com doações. Se ele é útil pra voce, considere contribuir! Aceitamos PIX pelo QR Code e pela Chave Aleatória.
+                            </p>
 
                             <div className="bg-white p-2 rounded-lg flex justify-center mb-6">
                                 <img
@@ -268,8 +275,8 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 onClick={() => setShowPixModal(true)}
                                 className="w-full py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20"
                             >
-                                <BadgeDollarSign className="w-4 h-4" />
-                                Contribuir via PIX
+                                <Key className="w-4 h-4" />
+                                Ver Chave PIX
                             </button>
                         </div>
                     </div>
@@ -283,7 +290,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
                         onClick={() => setShowPixModal(false)}
                     />
-                    <div className="bg-zinc-950 border border-border rounded-2xl p-8 shadow-2xl relative z-10 w-full max-w-sm animate-in zoom-in duration-300">
+                    <div className="bg-zinc-950 border-2 border-primary rounded-2xl p-8 shadow-2xl relative z-10 w-full max-w-sm animate-in zoom-in duration-300">
                         <button
                             onClick={() => setShowPixModal(false)}
                             className="absolute top-4 right-4 text-muted-foreground hover:text-foreground transition-colors"

@@ -97,13 +97,7 @@ const Header: React.FC<{
                 </button>
               ) : (
                 <>
-                  <button
-                    onClick={onNewGame}
-                    className="flex items-center justify-center px-3 py-2 text-muted-foreground hover:text-foreground transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
-                    title="Novo Jogo"
-                  >
-                    <Plus className="w-4 h-4" /> Novo Jogo
-                  </button>
+
 
                   <button
                     onClick={() => importInputRef.current?.click()}

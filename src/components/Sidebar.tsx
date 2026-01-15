@@ -72,7 +72,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   };
 
   return (
-    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0`}>
+    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full`}>
 
 
       <nav className="flex flex-col gap-1 flex-grow overflow-y-auto overflow-x-hidden px-3 py-4">
@@ -176,62 +176,61 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           {!isCollapsed && <span className="truncate relative z-10">Guia Rápido</span>}
         </button>
 
-        {/* Bottom Menu Items */}
-        <div className="mt-auto pt-4 flex flex-col gap-1 relative">
+      </nav>
 
-          {/* Altamira Trigger Zone & Button */}
-          <div
-            className="relative z-10"
-            onMouseLeave={handleMouseLeaveTrigger}
-          >
-            {/* Hidden Button that slides up */}
-            <div className={`overflow-hidden transition-all duration-500 ease-out ${isAltamiraVisible ? 'max-h-12 opacity-100 mb-1' : 'max-h-0 opacity-0'}`}>
-              <button
-                onClick={() => setShowAltamiraModal(true)}
-                className={`w-full flex items-center justify-center gap-3 px-4 py-2 rounded-lg transition-all text-xs font-bold uppercase tracking-widest shadow-lg ${isCollapsed ? 'px-0' : ''} ${theme === 'cream'
-                  ? 'bg-primary text-amber-50 hover:bg-primary/90 border border-amber-900/20' // Cream: Brown Button
-                  : theme === 'light'
-                    ? 'bg-zinc-800 text-white hover:bg-black border border-zinc-600' // Light: Dark Button
-                    : 'bg-zinc-900 border border-primary/30 text-primary hover:text-primary-foreground hover:bg-primary hover:border-primary' // Dark/Terminal
-                  }`}
-              >
-                <Unlock size={14} />
-                {!isCollapsed && <span>Altamira</span>}
-              </button>
-            </div>
+      {/* Bottom Menu Items - Pinned to Bottom */}
+      <div className="mt-auto pt-2 pb-4 px-3 flex flex-col gap-1 relative border-t border-muted-foreground/20 bg-card z-20 flex-shrink-0">
 
-            {/* Invisible Trigger Area above separator */}
-            {!isAltamiraVisible && (
-              <div
-                className="h-20 w-full absolute -top-20 left-0 z-50 pointer-events-auto"
-                onMouseEnter={handleMouseEnterTrigger}
-              />
-            )}
-
-            <div className="h-px bg-muted-foreground my-2 -mx-3 opacity-20 relative z-0"></div>
+        {/* Altamira Trigger Zone & Button */}
+        <div
+          className="relative z-10"
+          onMouseLeave={handleMouseLeaveTrigger}
+        >
+          {/* Hidden Button that slides up */}
+          <div className={`overflow-hidden transition-all duration-500 ease-out ${isAltamiraVisible ? 'max-h-12 opacity-100 mb-1' : 'max-h-0 opacity-0'}`}>
+            <button
+              onClick={() => setShowAltamiraModal(true)}
+              className={`w-full flex items-center justify-center gap-3 px-4 py-2 rounded-lg transition-all text-xs font-bold uppercase tracking-widest shadow-lg ${isCollapsed ? 'px-0' : ''} ${theme === 'cream'
+                ? 'bg-primary text-amber-50 hover:bg-primary/90 border border-amber-900/20' // Cream: Brown Button
+                : theme === 'light'
+                  ? 'bg-zinc-800 text-white hover:bg-black border border-zinc-600' // Light: Dark Button
+                  : 'bg-zinc-900 border border-primary/30 text-primary hover:text-primary-foreground hover:bg-primary hover:border-primary' // Dark/Terminal
+                }`}
+            >
+              <Unlock size={14} />
+              {!isCollapsed && <span>Altamira</span>}
+            </button>
           </div>
 
-          <button
-            onClick={() => handleSetView('about')}
-            className={getButtonClass('about')}
-            title={isCollapsed ? "Sobre o Projeto" : undefined}
-          >
-            <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'about' ? 'translate-x-0' : ''}`} />
-            <Info className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-            {!isCollapsed && <span className="truncate relative z-10">Sobre o Projeto</span>}
-          </button>
-
-          <button
-            onClick={() => handleSetView('settings')}
-            className={getButtonClass('settings')}
-            title={isCollapsed ? "Configurações" : undefined}
-          >
-            <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'settings' ? 'translate-x-0' : ''}`} />
-            <Settings className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-            {!isCollapsed && <span className="truncate relative z-10">Configurações</span>}
-          </button>
+          {/* Invisible Trigger Area above separator */}
+          {!isAltamiraVisible && (
+            <div
+              className="h-20 w-full absolute -top-20 left-0 z-50 pointer-events-auto"
+              onMouseEnter={handleMouseEnterTrigger}
+            />
+          )}
         </div>
-      </nav >
+
+        <button
+          onClick={() => handleSetView('about')}
+          className={getButtonClass('about')}
+          title={isCollapsed ? "Sobre o Projeto" : undefined}
+        >
+          <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'about' ? 'translate-x-0' : ''}`} />
+          <Info className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && <span className="truncate relative z-10">Sobre o Projeto</span>}
+        </button>
+
+        <button
+          onClick={() => handleSetView('settings')}
+          className={getButtonClass('settings')}
+          title={isCollapsed ? "Configurações" : undefined}
+        >
+          <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'settings' ? 'translate-x-0' : ''}`} />
+          <Settings className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && <span className="truncate relative z-10">Configurações</span>}
+        </button>
+      </div>
 
       {/* Altamira Modal */}
       {

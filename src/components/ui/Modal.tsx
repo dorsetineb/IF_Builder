@@ -34,9 +34,9 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children, 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4 animate-in fade-in duration-200">
             <div
-                className={`bg-[#1A1A1A] border border-[#2A2A2A] rounded-xl shadow-2xl w-full flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 ${sizeClasses[size]}`}
+                className={`bg-[#1A1A1A] border-2 border-primary rounded-xl shadow-2xl w-full flex flex-col max-h-[90vh] animate-in zoom-in-95 duration-200 ${sizeClasses[size]}`}
             >
-                <div className="flex items-center justify-between p-6 border-b border-[#2A2A2A]">
+                <div className="flex items-center justify-between p-6 border-b border-primary/20">
                     <h2 className="text-xl font-bold text-white tracking-tight">{title}</h2>
                     <button
                         onClick={onClose}

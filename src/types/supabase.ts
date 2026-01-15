@@ -363,6 +363,81 @@ export type Database = {
                 }
                 Relationships: []
             }
+            user_follows: {
+                Row: {
+                    created_at: string
+                    follower_id: string
+                    following_id: string
+                    id: string
+                }
+                Insert: {
+                    created_at?: string
+                    follower_id: string
+                    following_id: string
+                    id?: string
+                }
+                Update: {
+                    created_at?: string
+                    follower_id?: string
+                    following_id?: string
+                    id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "user_follows_follower_id_fkey"
+                        columns: ["follower_id"]
+                        isOneToOne: false
+                        referencedRelation: "profiles"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "user_follows_following_id_fkey"
+                        columns: ["following_id"]
+                        isOneToOne: false
+                        referencedRelation: "profiles"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
+            comment_reactions: {
+                Row: {
+                    comment_id: string
+                    created_at: string
+                    id: string
+                    type: string
+                    user_id: string
+                }
+                Insert: {
+                    comment_id: string
+                    created_at?: string
+                    id?: string
+                    type: string
+                    user_id: string
+                }
+                Update: {
+                    comment_id?: string
+                    created_at?: string
+                    id?: string
+                    type?: string
+                    user_id?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "comment_reactions_comment_id_fkey"
+                        columns: ["comment_id"]
+                        isOneToOne: false
+                        referencedRelation: "comments"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "comment_reactions_user_id_fkey"
+                        columns: ["user_id"]
+                        isOneToOne: false
+                        referencedRelation: "profiles"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
         }
         Views: {
             [_ in never]: never
@@ -379,6 +454,28 @@ export type Database = {
                     uses: number
                 }
                 Returns: string
+            }
+            get_post_favorites: {
+                Args: {
+                    target_post_id: string
+                }
+                Returns: {
+                    user_id: string
+                    username: string
+                    avatar_url: string
+                }[]
+            }
+            toggle_favorite: {
+                Args: {
+                    target_post_id: string
+                }
+                Returns: boolean
+            }
+            delete_topic_fully: {
+                Args: {
+                    target_post_id: string
+                }
+                Returns: void
             }
         }
         Enums: {

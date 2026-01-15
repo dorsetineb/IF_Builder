@@ -53,7 +53,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'bg-primary/10 group-hover:bg-primary' : 'bg-white/10 group-hover:bg-white'}`}>
                             <Plus className={`w-6 h-6 transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary group-hover:text-primary-foreground' : 'text-white group-hover:text-black'}`} />
                         </div>
-                        <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">Começar a Criar</span>
+                        <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">Crie uma ficção</span>
                     </button>
 
                     {/* Botão 2: Baixar Exemplo */}
@@ -73,7 +73,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                                 : (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary group-hover:text-primary-foreground' : 'text-white group-hover:text-black')
                                 }`} />
                         </div>
-                        <span className={`font-bold text-lg transition-colors ${isFlashing ? (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>Baixar exemplo</span>
+                        <span className={`font-bold text-lg transition-colors ${isFlashing ? (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>Baixe um exemplo</span>
                     </button>
 
                     {/* Botão 3: Conheça o projeto */}

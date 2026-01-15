@@ -190,12 +190,15 @@ export function Auth() {
                             <h3 className="text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2 h-8 text-center w-full">
                                 Sobre o IF Builder
                             </h3>
-                            <div className="space-y-4 text-zinc-400 text-sm leading-relaxed flex-1 flex flex-col justify-end pb-4 text-center">
+                            <div className="space-y-4 text-zinc-400 text-sm leading-relaxed flex-1 flex flex-col justify-end pb-4 text-left">
                                 <p>
-                                    Esta plataforma é uma iniciativa pessoal e independente, dedicada ao desenvolvimento de ficções interativas.
+                                    Este site é uma iniciativa independente dedicada ao desenvolvimento de ficções interativas, e sua manutenção é feita por um desenvolvedor solo muito dedicado.
                                 </p>
                                 <p>
-                                    O acesso é controlado para que o projeto cresça de forma sustentável, respeitando os limites da nossa infraestrutura.
+                                    O acesso é controlado para que o projeto cresça de forma sustentável, respeitando os limites da infraestrutura e do desenvolvedor.
+                                </p>
+                                <p>
+                                    Insira seu e-mail abaixo para solicitar acesso. O envio do código pode demorar um pouco, mas ele chegará ;)
                                 </p>
                             </div>
 
