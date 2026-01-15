@@ -41,9 +41,9 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
             <div className="relative z-10 flex flex-col items-center justify-center text-center p-8">
                 <h2 className="text-3xl font-bold text-white mb-4">Bem-vindo ao IF Builder</h2>
                 <p className="max-w-md text-zinc-300 mb-12">
-                    Selecione uma cena no menu à esquerda para começar a editar, ou adicione uma nova cena para expandir seu mundo.
+                    Voce acordou em uma caverna escura. Um antigo computador está ao seu lado, e estranhamente ele ainda funciona.
                 </p>
-
+                <p className="max-w-md text-zinc-300 mb-12"><b>O que você quer fazer?</b></p>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
                     {/* Botão 1: Começar a Criar */}
                     <button
