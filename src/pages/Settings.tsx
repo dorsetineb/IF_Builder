@@ -154,23 +154,31 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         }
     };
 
-    const handleLogout = async (e: React.MouseEvent) => {
+    const handleLogout = (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
-        setLoading(true);
-        toast("Saindo...", "Encerrando sessão...", "info");
+        // Use async IIFE to properly await everything
+        (async () => {
+            try {
+                // STEP 1: Tell Supabase server to invalidate session (AWAIT THIS!)
+                await supabase.auth.signOut({ scope: 'global' });
+            } catch (error) {
+                console.error('SignOut error (continuing anyway):', error);
+            }
 
-        try {
-            await supabase.auth.signOut();
+            // STEP 2: NOW clear local storage (session is already dead on server)
             localStorage.clear();
-            // No reload, just let state propagate
-        } catch (error) {
-            console.error('SignOut error:', error);
-            localStorage.clear();
-        } finally {
-            setLoading(false);
-        }
+            sessionStorage.clear();
+
+            // Clear cookies
+            document.cookie.split(";").forEach((c) => {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
+
+            // STEP 3: Force reload - server session is dead, storage is empty, MUST show Auth
+            window.location.href = '/';
+        })();
     };
 
     return (
