@@ -98,7 +98,7 @@ const App: React.FC = () => {
                             {/* Platform Routes */}
                             <Route element={<PlatformLayout />}>
                                 <Route path="/" element={<Navigate to="/editor" replace />} />
-                                <Route path="/dashboard" element={<Dashboard />} />
+                                {/* Dashboard route removed */}
 
                                 {/* Community Routes - HIDDEN AS REQUESTED
                                 <Route path="/community" element={<Community />} />
@@ -118,7 +118,7 @@ const App: React.FC = () => {
                             {/* Editor Route (Standalone) */}
                             <Route path="/editor" element={<Editor />} />
                             {/* Catch all */}
-                            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                            <Route path="*" element={<Navigate to="/editor" replace />} />
                         </Routes>
                     </Router>
                 </UserProvider>

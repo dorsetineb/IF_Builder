@@ -82,7 +82,7 @@ const PlatformSidebar: React.FC = () => {
                     {!isCollapsed && <span className="truncate relative z-10">Abrir Editor</span>}
                 </Link>
 
-                <NavItem to="/dashboard" icon={LayoutDashboard} label="Dashboard" />
+                {/* Dashboard Removed */}
                 {/* Community/Forum Routes - HIDDEN AS REQUESTED
                 <NavItem to="/community" icon={MessageSquare} label="Fórum" />
                 <NavItem to="/community/authors" icon={Users} label="Autores" />

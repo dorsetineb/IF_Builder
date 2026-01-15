@@ -101,7 +101,7 @@ const Header: React.FC<{
 
                   <button
                     onClick={() => importInputRef.current?.click()}
-                    className="flex items-center justify-center px-3 py-2 text-muted-foreground hover:text-foreground transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
+                    className="flex items-center justify-center px-3 py-2 text-primary hover:text-primary/80 transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
                     title="Importar Jogo"
                   >
                     <Download className="w-4 h-4" /> Importar
@@ -109,7 +109,7 @@ const Header: React.FC<{
 
                   <button
                     onClick={onExport}
-                    className="flex items-center justify-center px-3 py-2 text-muted-foreground hover:text-foreground transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
+                    className="flex items-center justify-center px-3 py-2 text-primary hover:text-primary/80 transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
                     title="Exportar Jogo"
                   >
                     <Upload className="w-4 h-4" /> Exportar

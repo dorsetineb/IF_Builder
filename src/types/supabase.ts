@@ -264,6 +264,7 @@ export type Database = {
                     website: string | null
                     cover_url: string | null
                     is_approved: boolean | null
+                    location: string | null
                 }
                 Insert: {
                     avatar_url?: string | null
@@ -275,6 +276,7 @@ export type Database = {
                     website?: string | null
                     cover_url?: string | null
                     is_approved?: boolean | null
+                    location?: string | null
                 }
                 Update: {
                     avatar_url?: string | null
@@ -286,6 +288,7 @@ export type Database = {
                     website?: string | null
                     cover_url?: string | null
                     is_approved?: boolean | null
+                    location?: string | null
                 }
                 Relationships: []
             }

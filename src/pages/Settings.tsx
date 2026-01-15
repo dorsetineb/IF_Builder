@@ -21,8 +21,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const [username, setUsername] = useState('');
     const [website, setWebsite] = useState('');
     const [bio, setBio] = useState('');
-    const [avatarUrl, setAvatarUrl] = useState('');
-
+    const [location, setLocation] = useState('');
     // Initial State for Dirty Checking
     const [initialProfile, setInitialProfile] = useState<Partial<Profile> | null>(null);
 
@@ -60,21 +59,20 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         setUsername(data.username || '');
                         setWebsite(data.website || '');
                         setBio(data.bio || '');
-                        setAvatarUrl(data.avatar_url || '');
 
                         setInitialProfile({
                             full_name: data.full_name,
                             username: data.username,
                             website: data.website,
                             bio: data.bio,
-                            avatar_url: data.avatar_url
+                            location: data.location
                         });
+                        setLocation(data.location || user.user_metadata.location || '');
                     } else {
-                        // Pre-fill from auth metadata
                         const meta = user.user_metadata || {};
                         setDisplayName(meta.full_name || meta.name || '');
                         setUsername(meta.username || '');
-                        setAvatarUrl(meta.avatar_url || meta.picture || '');
+                        setLocation(meta.location || '');
 
                         setInitialProfile({});
                     }
@@ -109,7 +107,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         username !== (initialProfile?.username || '') ||
         website !== (initialProfile?.website || '') ||
         bio !== (initialProfile?.bio || '') ||
-        avatarUrl !== (initialProfile?.avatar_url || '')
+        location !== (initialProfile?.location || '')
     );
 
     const handleSave = async () => {
@@ -125,10 +123,10 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
             const updates = {
                 id: user.id,
                 full_name: displayName,
-                username,
-                website,
+                title: bio, // Storing bio as 'title' temporarily if needed, but bio is bio column
                 bio,
-                avatar_url: avatarUrl,
+                website,
+                location,
                 updated_at: new Date().toISOString(),
             };
 
@@ -144,7 +142,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     username,
                     website,
                     bio,
-                    avatar_url: avatarUrl
+                    location
                 });
                 setOriginalTheme(theme); // Update original theme to current to plain dirty state
             }
@@ -156,13 +154,22 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         }
     };
 
-    const handleLogout = async () => {
+    const handleLogout = async (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        setLoading(true);
+        toast("Saindo...", "Encerrando sessão...", "info");
+
         try {
             await supabase.auth.signOut();
-            window.location.href = '/';
-        } catch (error: any) {
-            console.error('Error logging out:', error);
-            window.location.href = '/';
+            localStorage.clear();
+            // No reload, just let state propagate
+        } catch (error) {
+            console.error('SignOut error:', error);
+            localStorage.clear();
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -177,7 +184,8 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         <p className="text-[10px] text-muted-foreground hidden md:block">Gerencie suas preferências e perfil.</p>
                     </div>
                     <button
-                        onClick={handleLogout}
+                        type="button"
+                        onClick={(e) => handleLogout(e)}
                         className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white border border-red-500/20 text-xs font-bold transition-all shadow-sm"
                     >
                         <LogOut size={14} /> Sair da Conta
@@ -229,106 +237,122 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     </div>
                 </div>
 
-                {/* Public Info Section */}
+                {/* Account Data Section - Matches Signup */}
                 <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
                     <div className="flex items-center gap-2 mb-4 text-primary">
                         <User size={16} />
-                        <h2 className="text-sm font-bold text-card-foreground">Informações do usuário</h2>
+                        <h2 className="text-sm font-bold text-card-foreground">Dados da Conta</h2>
                     </div>
 
-                    <div className="flex flex-col md:flex-row gap-6">
-                        {/* Avatar Actions */}
-                        <div className="flex flex-col items-center gap-2">
-                            <div className="w-24 h-24 rounded-lg bg-muted border-2 border-card shadow-sm overflow-hidden flex items-center justify-center">
-                                {avatarUrl ? (
-                                    <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
-                                ) : (
-                                    <User size={32} className="text-muted-foreground" />
-                                )}
-                            </div>
-                            <button
-                                className="text-primary hover:text-primary/80 text-[10px] font-bold uppercase tracking-wider flex items-center gap-1"
-                                onClick={() => {
-                                    const url = prompt("Insira a URL da imagem:");
-                                    if (url) setAvatarUrl(url);
-                                }}
-                            >
-                                Alterar Foto
-                            </button>
+                    <div className="space-y-4">
+                        <div className="space-y-1 text-left">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Nome e Sobrenome</label>
+                            <input
+                                type="text"
+                                value={displayName}
+                                onChange={(e) => setDisplayName(e.target.value)}
+                                className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium placeholder:text-muted-foreground/50"
+                                placeholder="Ex: João Silva"
+                            />
                         </div>
 
-                        {/* Form Fields */}
-                        <div className="flex-1 space-y-3">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div className="space-y-1 text-left">
-                                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Nome de Exibição</label>
+                        <div className="space-y-1 text-left">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">E-mail</label>
+                            <div className="flex gap-2 items-center">
+                                <div className="relative flex-1">
+                                    <Mail className="absolute left-3 top-2.5 text-muted-foreground w-4 h-4" />
                                     <input
-                                        type="text"
-                                        value={displayName}
-                                        onChange={(e) => setDisplayName(e.target.value)}
-                                        className="w-full bg-input border border-input rounded px-3 py-1.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
-                                        placeholder="Como você quer ser chamado"
+                                        type="email"
+                                        value={email}
+                                        disabled
+                                        className="w-full bg-muted/50 border border-border rounded pl-9 pr-4 py-2 text-xs text-muted-foreground cursor-not-allowed font-medium"
                                     />
                                 </div>
-                                <div className="space-y-1 text-left">
-                                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Website (Opcional)</label>
-                                    <div className="relative">
-                                        <span className="absolute left-2.5 top-1.5 text-muted-foreground"><LinkIcon size={12} /></span>
-                                        <input
-                                            type="text"
-                                            value={website}
-                                            onChange={(e) => setWebsite(e.target.value)}
-                                            className="w-full bg-input border border-input rounded pl-7 pr-3 py-1.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
-                                            placeholder="https://"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-1 text-left">
-                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Sobre mim</label>
-                                <textarea
-                                    value={bio}
-                                    onChange={(e) => setBio(e.target.value)}
-                                    className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none h-20"
-                                    placeholder="Conte um pouco sobre você..."
-                                ></textarea>
+                                <button
+                                    className="px-3 py-2 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 rounded text-xs font-bold transition-all whitespace-nowrap"
+                                    onClick={async () => {
+                                        if (!email) return;
+                                        setLoading(true);
+                                        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                                            redirectTo: window.location.origin + '/settings',
+                                        });
+                                        if (error) toast("Erro", error.message, "error");
+                                        else toast("Sucesso", "Email de redefinição enviado!", "success");
+                                        setLoading(false);
+                                    }}
+                                    disabled={loading}
+                                >
+                                    Redefinir senha
+                                </button>
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                {/* Security Section (Visual Only for now) */}
-                <div className="bg-card border border-border rounded-lg p-4 mb-6 shadow-sm">
-                    <div className="flex items-center gap-2 mb-4 text-primary">
-                        <Lock size={16} />
-                        <h2 className="text-sm font-bold text-card-foreground">Segurança</h2>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                         <div className="space-y-1 text-left">
-                            <label className="text-xs font-medium text-muted-foreground">Endereço de E-mail</label>
-                            <div className="flex gap-2 relative mt-1">
-                                <Mail className="absolute left-3 top-2.5 text-muted-foreground w-4 h-4" />
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Local (Opcional)</label>
+                            <div className="relative">
+                                <span className="absolute left-2.5 top-1.5 text-muted-foreground text-[10px] font-bold"><User size={12} className="opacity-0" /></span> {/* Spacer if needed or icon */}
                                 <input
-                                    type="email"
-                                    value={email}
-                                    disabled
-                                    className="flex-1 bg-muted/50 border border-border rounded-lg pl-9 pr-4 py-2 text-xs text-muted-foreground cursor-not-allowed w-full"
+                                    type="text"
+                                    value={location}
+                                    onChange={(e) => setLocation(e.target.value)}
+                                    className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium placeholder:text-muted-foreground/50"
+                                    placeholder="Ex: São Paulo, SP"
                                 />
                             </div>
                         </div>
+                    </div>
+                </div>
 
-                        <div className="flex items-start gap-2 h-full">
-                            <AlertCircle className="text-accent flex-shrink-0 mt-0.5" size={16} />
-                            <div>
-                                <h4 className="font-medium text-foreground text-xs">Alteração de Senha</h4>
-                                <p className="text-muted-foreground text-[10px] mt-0.5">Para alterar sua senha, receba um link via email.</p>
-                                <button className="mt-1 text-xs font-medium text-primary hover:underline">Enviar Redefinição</button>
+                {/* Public Profile Section */}
+                <div className="bg-card border border-border rounded-lg p-4 mb-6 shadow-sm">
+                    <div className="flex items-center gap-2 mb-4 text-primary">
+                        <User size={16} /> {/* Can use a different icon like Globe or Share */}
+                        <h2 className="text-sm font-bold text-card-foreground">Perfil Público</h2>
+                    </div>
+
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div className="space-y-1 text-left">
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Username</label>
+                                <div className="relative">
+                                    <span className="absolute left-2.5 top-1.5 text-muted-foreground text-[10px] font-bold">@</span>
+                                    <input
+                                        type="text"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        className="w-full bg-input border border-input rounded pl-6 pr-3 py-1.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
+                                        placeholder="username"
+                                    />
+                                </div>
                             </div>
+                            <div className="space-y-1 text-left">
+                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Website</label>
+                                <div className="relative">
+                                    <span className="absolute left-2.5 top-1.5 text-muted-foreground"><LinkIcon size={12} /></span>
+                                    <input
+                                        type="text"
+                                        value={website}
+                                        onChange={(e) => setWebsite(e.target.value)}
+                                        className="w-full bg-input border border-input rounded pl-7 pr-3 py-1.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
+                                        placeholder="https://"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="space-y-1 text-left">
+                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Sobre mim</label>
+                            <textarea
+                                value={bio}
+                                onChange={(e) => setBio(e.target.value)}
+                                className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none h-20"
+                                placeholder="Conte um pouco sobre você..."
+                            ></textarea>
                         </div>
                     </div>
                 </div>
+
+
 
                 <div className="flex justify-end pt-2">
                     <button
