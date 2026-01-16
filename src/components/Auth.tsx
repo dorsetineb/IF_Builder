@@ -17,7 +17,6 @@ export function Auth() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [fullName, setFullName] = useState('');
     const [location, setLocation] = useState('');
-    const [acceptedTerms, setAcceptedTerms] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -104,9 +103,6 @@ export function Auth() {
                 // Validation
                 if (password !== confirmPassword) {
                     throw new Error("As senhas não coincidem.");
-                }
-                if (!acceptedTerms) {
-                    throw new Error("Você precisa aceitar os Termos de Serviço.");
                 }
                 if (fullName.length < 3) {
                     throw new Error("Por favor, insira seu nome e sobrenome.");
@@ -412,19 +408,6 @@ export function Auth() {
 
                                     {isSignUp ? (
                                         <div className="pt-2 space-y-4">
-                                            <div className="flex items-center gap-2 px-1 h-6">
-                                                <input
-                                                    id="terms"
-                                                    type="checkbox"
-                                                    checked={acceptedTerms}
-                                                    onChange={(e) => setAcceptedTerms(e.target.checked)}
-                                                    className="custom-checkbox"
-                                                />
-                                                <label htmlFor="terms" className="text-[11px] text-muted-foreground">
-                                                    Li e concordo com os <a href="#" className="text-purple-400 hover:text-purple-300">Termos</a> e <a href="#" className="text-purple-400 hover:text-purple-300">Privacidade</a>.
-                                                </label>
-                                            </div>
-
                                             <button
                                                 type="submit"
                                                 className="w-full bg-white text-black hover:bg-zinc-200 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-white/5"
