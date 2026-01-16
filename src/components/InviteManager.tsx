@@ -17,6 +17,7 @@ export const InviteManager: React.FC = () => {
     const [lastInviteCode, setLastInviteCode] = useState<string>('');
     const [copied, setCopied] = useState(false);
     const [showHistory, setShowHistory] = useState(false);
+    const [copiedId, setCopiedId] = useState<string | null>(null);
 
     const fetchInvites = async () => {
         try {
@@ -44,15 +45,13 @@ export const InviteManager: React.FC = () => {
         setGenerating(true);
         setLastInviteCode('');
         try {
-            // Call the secure Edge Function
-            const { data, error } = await supabase.functions.invoke('generate-invite', {
-                method: 'POST',
-            });
+            // Call the database function directly (more reliable than Edge Function)
+            const { data, error } = await supabase.rpc('create_invite', { uses: 1 });
 
             if (error) throw error;
 
-            if (data && data.code) {
-                setLastInviteCode(data.code);
+            if (data) {
+                setLastInviteCode(data);
             }
 
             // Refresh list
@@ -71,8 +70,10 @@ export const InviteManager: React.FC = () => {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const copyFromList = (code: string) => {
+    const copyFromList = (code: string, id: string) => {
         navigator.clipboard.writeText(code);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
     }
 
     useEffect(() => {
@@ -154,11 +155,11 @@ export const InviteManager: React.FC = () => {
                                                     {invite.used_count}/{invite.max_uses}
                                                 </span>
                                                 <button
-                                                    onClick={() => copyFromList(invite.code)}
+                                                    onClick={() => copyFromList(invite.code, invite.id)}
                                                     className="text-muted-foreground hover:text-white transition-colors p-1"
                                                     title="Copiar"
                                                 >
-                                                    <Copy size={14} />
+                                                    {copiedId === invite.id ? <Check size={14} className="text-green-400" /> : <Copy size={14} />}
                                                 </button>
                                             </div>
                                         </div>

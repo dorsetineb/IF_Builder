@@ -1,5 +1,7 @@
 
+// @ts-ignore
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
+// @ts-ignore
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
@@ -7,7 +9,7 @@ const corsHeaders = {
     'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-serve(async (req) => {
+serve(async (req: Request) => {
     // Handle CORS preflight requests
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: corsHeaders })
@@ -21,7 +23,9 @@ serve(async (req) => {
         }
 
         const supabaseClient = createClient(
+            // @ts-ignore
             Deno.env.get('SUPABASE_URL') ?? '',
+            // @ts-ignore
             Deno.env.get('SUPABASE_ANON_KEY') ?? '',
             { global: { headers: { Authorization: authHeader } } }
         )
@@ -41,20 +45,19 @@ serve(async (req) => {
             code += characters.charAt(Math.floor(Math.random() * characters.length));
         }
 
-        // 3. Admin Client for DB insert (bypass RLS if needed, or strictly use auth context)
-        // Using service role key is safer for backend operations but we must check permissions manually if not using RLS.
-        // However, keeping it simple: use the user's client if RLS allows insert.
-        // Assuming RLS allows authenticated users to create invites.
+        // 3. Admin Client for DB insert (bypass RLS)
+        const supabaseAdmin = createClient(
+            // @ts-ignore
+            Deno.env.get('SUPABASE_URL') ?? '',
+            // @ts-ignore
+            Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+        )
 
-        // NOTE: To ensure the code is unique, we could check, but collision probability is low for small scale. 
-        // Let's rely on DB constraint or simple insert.
-
-        const { error: insertError } = await supabaseClient
+        const { error: insertError } = await supabaseAdmin
             .from('invites')
             .insert({
                 code: code,
-                created_by: user.id,
-                uses: 1 // Default to 1 usage per invite if not specified
+                max_uses: 1
             })
 
         if (insertError) throw insertError
@@ -68,7 +71,7 @@ serve(async (req) => {
             }
         )
 
-    } catch (error) {
+    } catch (error: any) {
         return new Response(
             JSON.stringify({ error: error.message }),
             {
