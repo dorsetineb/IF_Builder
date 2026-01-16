@@ -69,7 +69,7 @@ const TrackerItem: React.FC<{
                         <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Nome:</span>
                         <div className="flex items-center truncate">
                             <span className="text-xs font-bold text-white truncate">{tracker.name || '(Sem nome)'}</span>
-                            <span className="ml-2 text-[10px] text-zinc-600 font-mono opacity-50 shrink-0">({tracker.id})</span>
+                            <span className="ml-2 text-[10px] text-zinc-400 font-mono shrink-0">({tracker.id})</span>
                         </div>
                     </div>
 
@@ -97,9 +97,9 @@ const TrackerItem: React.FC<{
             {/* Collapsible Content */}
             {isOpen && (
                 <div className="p-6 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                        <div className="space-y-4">
-                            <div>
+                    <div className="space-y-4">
+                        <div className="grid grid-cols-3 gap-4">
+                            <div className="col-span-2">
                                 <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Nome do Rastreador</label>
                                 <input
                                     type="text"
@@ -109,99 +109,101 @@ const TrackerItem: React.FC<{
                                     placeholder="Nome do Rastreador"
                                 />
                             </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">ID do Rastreador</label>
-                                <p className="w-full bg-zinc-950/50 border border-zinc-900 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all">
+                            <div className="col-span-1">
+                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">ID</label>
+                                <p className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all truncate">
                                     {tracker.id}
                                 </p>
                             </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Valor Inicial</label>
-                                    <input
-                                        type="number"
-                                        value={tracker.initialValue}
-                                        onChange={e => onUpdate(tracker.id, 'initialValue', parseInt(e.target.value, 10) || 0)}
-                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Valor Máximo</label>
-                                    <input
-                                        type="number"
-                                        value={tracker.maxValue}
-                                        onChange={e => onUpdate(tracker.id, 'maxValue', parseInt(e.target.value, 10) || 0)}
-                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
-                                    />
-                                </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Valor Inicial</label>
+                                <input
+                                    type="number"
+                                    value={tracker.initialValue}
+                                    onChange={e => onUpdate(tracker.id, 'initialValue', parseInt(e.target.value, 10) || 0)}
+                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Valor Máximo</label>
+                                <input
+                                    type="number"
+                                    value={tracker.maxValue}
+                                    onChange={e => onUpdate(tracker.id, 'maxValue', parseInt(e.target.value, 10) || 0)}
+                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
+                                />
                             </div>
                         </div>
-                        <div className="space-y-4">
-                            <div>
-                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Consequência</label>
-                                <select
-                                    value={tracker.consequenceSceneId}
-                                    onChange={e => onUpdate(tracker.id, 'consequenceSceneId', e.target.value)}
-                                    className={selectBaseClasses}
-                                    style={selectStyle}
-                                >
-                                    <option value="" className={optionDimClasses}>Selecione uma cena...</option>
-                                    {allScenes.map(scene => (
-                                        <option key={scene.id} value={scene.id} className={optionBaseClasses}>
-                                            {scene.name}
-                                        </option>
-                                    ))}
-                                </select>
-                                <p className="text-[10px] text-zinc-600 mt-2 italic">
-                                    O jogador irá para esta cena quando o valor máximo for atingido.
-                                </p>
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Cor da Barra (Opcional)</label>
-                                <div className="flex items-center gap-2">
-                                    <input
-                                        type="text"
-                                        value={tracker.barColor || ''}
-                                        onChange={e => onUpdate(tracker.id, 'barColor', e.target.value)}
-                                        placeholder="Hex: #ffffff"
-                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
-                                    />
-                                    <input
-                                        type="color"
-                                        value={tracker.barColor || '#a855f7'}
-                                        onChange={e => onUpdate(tracker.id, 'barColor', e.target.value)}
-                                        className="w-8 h-8 p-1 bg-transparent border-none rounded-lg cursor-pointer"
-                                    />
-                                </div>
-                            </div>
-                            <div className="flex flex-col space-y-3 pt-2">
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id={`invertBar-${tracker.id}`}
-                                        checked={!!tracker.invertBar}
-                                        onChange={e => onUpdate(tracker.id, 'invertBar', e.target.checked)}
-                                        className="custom-checkbox"
-                                    />
-                                    <label htmlFor={`invertBar-${tracker.id}`} className="ml-2 block text-xs text-zinc-500 font-medium">
-                                        Inverter preenchimento da barra
-                                    </label>
-                                </div>
-                                <div className="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id={`hideValue-${tracker.id}`}
-                                        checked={!!tracker.hideValue}
-                                        onChange={e => onUpdate(tracker.id, 'hideValue', e.target.checked)}
-                                        className="custom-checkbox"
-                                    />
-                                    <label htmlFor={`hideValue-${tracker.id}`} className="ml-2 block text-xs text-zinc-500 font-medium">
-                                        Ocultar valores numéricos no jogo
-                                    </label>
-                                </div>
+                        <div>
+                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Cor da Barra (Opcional)</label>
+                            <div className="flex items-center gap-2">
+                                <input
+                                    type="text"
+                                    value={tracker.barColor || ''}
+                                    onChange={e => onUpdate(tracker.id, 'barColor', e.target.value)}
+                                    placeholder="Hex: #ffffff"
+                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
+                                />
+                                <input
+                                    type="color"
+                                    value={tracker.barColor || '#a855f7'}
+                                    onChange={e => onUpdate(tracker.id, 'barColor', e.target.value)}
+                                    className="w-8 h-8 p-1 bg-transparent border-none rounded-lg cursor-pointer"
+                                />
                             </div>
                         </div>
                     </div>
+                    <div className="space-y-4">
+                        <div>
+                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Consequência</label>
+                            <select
+                                value={tracker.consequenceSceneId}
+                                onChange={e => onUpdate(tracker.id, 'consequenceSceneId', e.target.value)}
+                                className={selectBaseClasses}
+                                style={selectStyle}
+                            >
+                                <option value="" className={optionDimClasses}>Selecione uma cena...</option>
+                                {allScenes.map(scene => (
+                                    <option key={scene.id} value={scene.id} className={optionBaseClasses}>
+                                        {scene.name}
+                                    </option>
+                                ))}
+                            </select>
+                            <p className="text-[10px] text-zinc-600 mt-2 italic">
+                                O jogador irá para esta cena quando o valor máximo for atingido.
+                            </p>
+                        </div>
+
+                        <div className="flex flex-col space-y-3 pt-2">
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id={`invertBar-${tracker.id}`}
+                                    checked={!!tracker.invertBar}
+                                    onChange={e => onUpdate(tracker.id, 'invertBar', e.target.checked)}
+                                    className="custom-checkbox"
+                                />
+                                <label htmlFor={`invertBar-${tracker.id}`} className="ml-2 block text-[11px] text-muted-foreground">
+                                    Inverter preenchimento da barra
+                                </label>
+                            </div>
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id={`hideValue-${tracker.id}`}
+                                    checked={!!tracker.hideValue}
+                                    onChange={e => onUpdate(tracker.id, 'hideValue', e.target.checked)}
+                                    className="custom-checkbox"
+                                />
+                                <label htmlFor={`hideValue-${tracker.id}`} className="ml-2 block text-[11px] text-muted-foreground">
+                                    Ocultar valores numéricos no jogo
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
 
                     <div className="mt-8 pt-6 border-t border-zinc-900">
                         <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Uso do Rastreador</h4>
@@ -238,8 +240,9 @@ const TrackerItem: React.FC<{
                         )}
                     </div>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 };
 
@@ -348,18 +351,22 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                 Novo Rastreador
                             </button>
                         </div>
+                        <div className="w-full border-b border-muted-foreground/50 mt-6"></div>
                     </>
                 ) : (
-                    <div className="w-full py-8 flex flex-col items-center gap-4">
-                        <p className="text-xs italic text-muted-foreground w-full text-center">Nenhum rastreador criado.</p>
-                        <button
-                            onClick={handleAddTracker}
-                            className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
-                        >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Novo Rastreador
-                        </button>
-                    </div>
+                    <>
+                        <div className="w-full py-8 flex flex-col items-center gap-4">
+                            <p className="text-xs italic text-muted-foreground w-full text-center">Nenhum rastreador criado.</p>
+                            <button
+                                onClick={handleAddTracker}
+                                className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Novo Rastreador
+                            </button>
+                        </div>
+                        <div className="w-full border-b border-muted-foreground/50 mb-6"></div>
+                    </>
                 )}
             </div>
 

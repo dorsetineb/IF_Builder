@@ -63,7 +63,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameImageTransitionType: data.gameImageTransitionType,
         gameImageSpeed: data.gameImageSpeed,
         enableInventory: data.enableInventory,
-        enableChances: data.enableChances ?? (data.gameSystemEnabled === 'chances'),
+        enableChances: data.enableChances === true || (data.gameSystemEnabled === 'chances') || Object.values(data.scenes).some((s: any) => s.removesChanceOnEntry || s.restoresChanceOnEntry),
         enableTrackers: data.enableTrackers ?? (data.gameSystemEnabled === 'trackers'),
         enableDiary: data.enableDiary,
         enableFixedVerbs: data.enableFixedVerbs,

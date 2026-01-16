@@ -298,6 +298,62 @@
   }
 }
 
+@layer components {
+  .custom-checkbox {
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    width: 1.25rem !important;
+    height: 1.25rem !important;
+    border: 1px solid rgba(113, 113, 122, 0.5) !important;
+    border-radius: 0.375rem !important;
+    background-color: #09090b !important;
+    cursor: pointer;
+    position: relative;
+    vertical-align: middle;
+    transition: all 0.15s ease-in-out;
+    flex-shrink: 0;
+
+    /* Nuclear reset for unwanted artifacts */
+    background-image: none !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+    mask: none !important;
+    -webkit-mask: none !important;
+  }
+
+  /* Ensure no pseudo-elements create the checkmark */
+  .custom-checkbox::before,
+  .custom-checkbox::after {
+    content: none !important;
+    display: none !important;
+    width: 0 !important;
+    height: 0 !important;
+    opacity: 0 !important;
+  }
+
+  .custom-checkbox:checked {
+    border-color: var(--primary) !important;
+    background-color: var(--primary) !important;
+    background-image: none !important;
+
+    /* Re-assert checks */
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
+  }
+
+  .custom-checkbox:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .custom-checkbox:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+
 
 /* Custom Scrollbar Styling */
 ::-webkit-scrollbar {

@@ -67,23 +67,25 @@ const SceneObjectItem: React.FC<{
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                 {/* Editable fields */}
                 <div className="space-y-4">
-                    <div>
-                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1 px-1">Nome do Objeto</label>
-                        <input
-                            type="text"
-                            value={obj.name}
-                            onChange={(e) => onUpdateGlobalObject(obj.id, { name: e.target.value })}
-                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-md px-3 py-2 text-xs text-zinc-300 focus:ring-0"
-                        />
-                    </div>
-                    <div>
-                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1 px-1">ID do Objeto</label>
-                        <p
-                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-md px-3 py-2 text-xs text-muted-foreground font-mono select-all"
-                            title="Use este ID para referência interna."
-                        >
-                            {obj.id}
-                        </p>
+                    <div className="grid grid-cols-3 gap-4">
+                        <div className="col-span-2">
+                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1 px-1">Nome do Objeto</label>
+                            <input
+                                type="text"
+                                value={obj.name}
+                                onChange={(e) => onUpdateGlobalObject(obj.id, { name: e.target.value })}
+                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-md px-3 py-2 text-xs text-zinc-300 focus:ring-0"
+                            />
+                        </div>
+                        <div className="col-span-1">
+                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1 px-1">ID</label>
+                            <p
+                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-md px-3 py-2 text-xs text-muted-foreground font-mono select-all truncate"
+                                title="Use este ID para referência interna."
+                            >
+                                {obj.id}
+                            </p>
+                        </div>
                     </div>
                     <div className="flex flex-col">
                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1 px-1">Descrição ao olhar/examinar</label>
@@ -191,18 +193,22 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                 Novo Objeto
                             </button>
                         </div>
+                        <div className="w-full border-b border-muted-foreground/50 mt-6"></div>
                     </>
                 ) : (
-                    <div className="w-full py-8 flex flex-col items-center gap-4">
-                        <p className="text-xs italic text-muted-foreground text-center">Nenhum objeto vinculado a esta cena.</p>
-                        <button
-                            onClick={handleCreateNewObject}
-                            className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs shadow-sm"
-                        >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Novo Objeto
-                        </button>
-                    </div>
+                    <>
+                        <div className="w-full py-8 flex flex-col items-center gap-4">
+                            <p className="text-xs italic text-muted-foreground text-center">Nenhum objeto vinculado a esta cena.</p>
+                            <button
+                                onClick={handleCreateNewObject}
+                                className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs shadow-sm"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Novo Objeto
+                            </button>
+                        </div>
+                        <div className="w-full border-b border-muted-foreground/50 mb-6"></div>
+                    </>
                 )}
             </div>
 

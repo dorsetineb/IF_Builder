@@ -100,7 +100,7 @@ const GlobalObjectItem: React.FC<{
                 <div className="flex flex-1 items-center px-6 overflow-hidden">
                     <div className="flex items-center min-w-0">
                         <span className="text-xs font-bold text-zinc-200 truncate">{obj.name || '(Sem nome)'}</span>
-                        <span className="ml-2 text-[9px] text-zinc-600 font-mono opacity-50 shrink-0 uppercase tracking-tighter">({obj.id})</span>
+                        <span className="ml-2 text-[10px] text-zinc-400 font-mono shrink-0 uppercase tracking-tighter">({obj.id})</span>
                     </div>
 
                     {usages.length > 0 && (
@@ -126,24 +126,26 @@ const GlobalObjectItem: React.FC<{
                 <div className="p-6 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                         <div className="space-y-4">
-                            <div>
-                                <label htmlFor={`obj-name-${obj.id}`} className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Nome do Objeto</label>
-                                <input
-                                    id={`obj-name-${obj.id}`}
-                                    type="text"
-                                    value={obj.name}
-                                    onChange={e => onUpdate(obj.id, 'name', e.target.value)}
-                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">ID do Objeto</label>
-                                <p
-                                    className="w-full bg-zinc-950/50 border border-zinc-900 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all"
-                                    title="Use este ID para referência interna."
-                                >
-                                    {obj.id}
-                                </p>
+                            <div className="grid grid-cols-3 gap-4">
+                                <div className="col-span-2">
+                                    <label htmlFor={`obj-name-${obj.id}`} className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Nome do Objeto</label>
+                                    <input
+                                        id={`obj-name-${obj.id}`}
+                                        type="text"
+                                        value={obj.name}
+                                        onChange={e => onUpdate(obj.id, 'name', e.target.value)}
+                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
+                                    />
+                                </div>
+                                <div className="col-span-1">
+                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">ID</label>
+                                    <p
+                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all truncate"
+                                        title="Use este ID para referência interna."
+                                    >
+                                        {obj.id}
+                                    </p>
+                                </div>
                             </div>
                             <div className="flex flex-col flex-grow">
                                 <label htmlFor={`obj-desc-${obj.id}`} className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Descrição ao examinar</label>
@@ -321,18 +323,22 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                 Novo Objeto
                             </button>
                         </div>
+                        <div className="w-full border-b border-muted-foreground/50 mt-6"></div>
                     </>
                 ) : (
-                    <div className="w-full py-8 flex flex-col items-center gap-4">
-                        <p className="text-xs italic text-muted-foreground w-full text-center">Nenhum objeto na biblioteca.</p>
-                        <button
-                            onClick={handleCreate}
-                            className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
-                        >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Novo Objeto
-                        </button>
-                    </div>
+                    <>
+                        <div className="w-full py-8 flex flex-col items-center gap-4">
+                            <p className="text-xs italic text-muted-foreground w-full text-center">Nenhum objeto na biblioteca.</p>
+                            <button
+                                onClick={handleCreate}
+                                className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Novo Objeto
+                            </button>
+                        </div>
+                        <div className="w-full border-b border-muted-foreground/50 mb-6"></div>
+                    </>
                 )}
             </div>
 

@@ -196,7 +196,7 @@ const InteractionItem: React.FC<{
                             </select>
                             <div className="flex items-center mt-3">
                                 <input type="checkbox" id={`consumesItem-${index}`} checked={!!interaction.consumesItem} onChange={e => handleInteractionChange('consumesItem', e.target.checked)} disabled={!interaction.requiresInInventory} className="custom-checkbox" />
-                                <label htmlFor={`consumesItem-${index}`} className={`ml-2 block text-[10px] text-muted-foreground font-medium ${!interaction.requiresInInventory ? 'opacity-30' : ''}`}>Consome item após uso</label>
+                                <label htmlFor={`consumesItem-${index}`} className={`ml-2 block text-[11px] text-muted-foreground ${!interaction.requiresInInventory ? 'opacity-30' : ''}`}>Consome item após uso</label>
                             </div>
                         </div>
 
@@ -210,11 +210,11 @@ const InteractionItem: React.FC<{
                                 <div className="space-y-3 mt-3">
                                     <div className="flex items-center">
                                         <input type="checkbox" id={`removesTarget-${index}`} checked={!!interaction.removesTargetFromScene} onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)} className="custom-checkbox" />
-                                        <label htmlFor={`removesTarget-${index}`} className="ml-2 block text-[10px] text-muted-foreground font-medium">Remove objeto da cena</label>
+                                        <label htmlFor={`removesTarget-${index}`} className="ml-2 block text-[11px] text-muted-foreground">Remove objeto da cena</label>
                                     </div>
                                     <div className="flex items-center">
                                         <input type="checkbox" id={`addsToInventory-${index}`} checked={!!interaction.addsToInventory} onChange={e => handleInteractionChange('addsToInventory', e.target.checked)} className="custom-checkbox" />
-                                        <label htmlFor={`addsToInventory-${index}`} className="ml-2 block text-[10px] font-bold text-purple-400 uppercase tracking-wide">Adiciona ao Inventário</label>
+                                        <label htmlFor={`addsToInventory-${index}`} className="ml-2 block text-[11px] text-purple-400">Adiciona ao Inventário</label>
                                     </div>
                                 </div>
                             )}
@@ -228,8 +228,8 @@ const InteractionItem: React.FC<{
                             <div>
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Resultado da Ação</label>
                                 <div className="flex gap-2 mb-3 p-1 bg-muted border border-muted-foreground/50 rounded-lg">
-                                    <button onClick={() => handleOutcomeChange('goToScene')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'goToScene' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Mudar de Cena</button>
-                                    <button onClick={() => handleOutcomeChange('newSceneDescription')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'newSceneDescription' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Atualizar Texto</button>
+                                    <button onClick={() => handleOutcomeChange('goToScene')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'goToScene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Mudar de Cena</button>
+                                    <button onClick={() => handleOutcomeChange('newSceneDescription')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'newSceneDescription' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Atualizar Texto</button>
                                 </div>
                                 {outcomeType === 'goToScene' ? (
                                     <select value={interaction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className={selectBaseClasses}>
@@ -358,29 +358,35 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions, onU
                     />
                 ))
             ) : (
-                <div className="w-full py-8 flex flex-col items-center gap-4">
-                    <p className="text-xs italic text-muted-foreground text-center">Nenhuma interação definida para esta cena.</p>
-                    <button
-                        onClick={handleAdd}
-                        className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs shadow-sm"
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        Nova Interação
-                    </button>
-                </div>
-            )}
-
-            {/* Floating Add Button for Non-Empty State */
-                interactions.length > 0 && (
-                    <div className="mt-4 pt-4 flex justify-start">
+                <>
+                    <div className="w-full py-8 flex flex-col items-center gap-4">
+                        <p className="text-xs italic text-muted-foreground text-center">Nenhuma interação definida para esta cena.</p>
                         <button
                             onClick={handleAdd}
-                            className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-sm active:scale-95 text-xs"
+                            className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs shadow-sm"
                         >
                             <Plus className="w-4 h-4 mr-2" />
                             Nova Interação
                         </button>
                     </div>
+                    <div className="w-full border-b border-muted-foreground/50 mb-6"></div>
+                </>
+            )}
+
+            {/* Floating Add Button for Non-Empty State */
+                interactions.length > 0 && (
+                    <>
+                        <div className="mt-4 pt-4 flex justify-start">
+                            <button
+                                onClick={handleAdd}
+                                className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-sm active:scale-95 text-xs"
+                            >
+                                <Plus className="w-4 h-4 mr-2" />
+                                Nova Interação
+                            </button>
+                        </div>
+                        <div className="w-full border-b border-muted-foreground/50 mt-6"></div>
+                    </>
                 )}
         </div>
     );

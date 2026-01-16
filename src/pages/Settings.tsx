@@ -154,31 +154,30 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         }
     };
 
-    const handleLogout = (e: React.MouseEvent) => {
+    const handleLogout = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
 
-        // Use async IIFE to properly await everything
-        (async () => {
-            try {
-                // STEP 1: Tell Supabase server to invalidate session (AWAIT THIS!)
-                await supabase.auth.signOut({ scope: 'global' });
-            } catch (error) {
-                console.error('SignOut error (continuing anyway):', error);
-            }
+        try {
+            // 1. Sign out from Supabase
+            // This will trigger onAuthStateChange in App.tsx -> setSession(null) -> Shows Auth
+            const { error } = await supabase.auth.signOut({ scope: 'global' });
+            if (error) throw error;
 
-            // STEP 2: NOW clear local storage (session is already dead on server)
+        } catch (error) {
+            console.error('Error during sign out attempt:', error);
+        } finally {
+            // 2. Clear local storage to be absolutely sure
             localStorage.clear();
             sessionStorage.clear();
 
-            // Clear cookies
+            // 3. Clear cookies
             document.cookie.split(";").forEach((c) => {
                 document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
             });
 
-            // STEP 3: Force reload - server session is dead, storage is empty, MUST show Auth
-            window.location.href = '/';
-        })();
+            // Do NOT force reload. Let React state handle the view switch.
+        }
     };
 
     return (

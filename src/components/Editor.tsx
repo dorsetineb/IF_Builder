@@ -811,8 +811,19 @@ const Editor: React.FC = () => {
 
 
     const handleLogout = async () => {
-        // As requested: discard changes and exit immediately without confirmation
-        handleExit();
+        try {
+            // Perform actual logout
+            await supabase.auth.signOut({ scope: 'global' });
+        } catch (error) {
+            console.error('Logout error:', error);
+        } finally {
+            localStorage.clear();
+            sessionStorage.clear();
+            document.cookie.split(";").forEach((c) => {
+                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+            });
+            // App.tsx will handle the redirect to Auth
+        }
     };
 
     const [gameData, setGameData] = useState<GameData>(initialGameData);
@@ -1014,6 +1025,7 @@ DATE:        ${exportDate.toLocaleString()}
             .replace('__SYSTEM_BUTTON__', systemButtonHTML)
             .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
             .replace('__DIARY_BUTTON__', diaryButtonHTML)
+            .replace(/__INVENTORY_BUTTON_TEXT__/g, exportData.gameInventoryButtonText || 'Inventário')
             .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, exportData.gameSuggestionsButtonText || 'Sugestões')
             .replace(/__TRACKERS_BUTTON_TEXT__/g, exportData.gameTrackersButtonText || 'Rastreadores')
             .replace(/__SYSTEM_BUTTON_TEXT__/g, exportData.gameSystemButtonText || 'Sistema')

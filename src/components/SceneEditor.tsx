@@ -375,19 +375,21 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                             <div className="space-y-4 flex flex-col order-2 md:order-1">
                                 {/* Name and ID Column */}
                                 <div className="space-y-4">
-                                    <div>
-                                        <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Nome da Cena</label>
-                                        <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all shadow-lg" />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="sceneId" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">ID da Cena</label>
-                                        <p
-                                            id="sceneId"
-                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all"
-                                            title="O ID da cena é único e não pode ser alterado."
-                                        >
-                                            {localScene.id}
-                                        </p>
+                                    <div className="grid grid-cols-3 gap-4">
+                                        <div className="col-span-2">
+                                            <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Nome da Cena</label>
+                                            <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all shadow-lg" />
+                                        </div>
+                                        <div className="col-span-1">
+                                            <label htmlFor="sceneId" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">ID</label>
+                                            <p
+                                                id="sceneId"
+                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all"
+                                                title="O ID da cena é único e não pode ser alterado."
+                                            >
+                                                {localScene.id}
+                                            </p>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -449,7 +451,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                 </div>
 
                                 <div className="pt-4 border-t border-zinc-800">
-                                    <label className="block text-sm font-medium text-muted-foreground mb-2">Trilha sonora da cena</label>
+                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Trilha sonora da cena</label>
                                     <div className="flex items-center gap-2">
                                         <label className="flex-grow flex items-center justify-center px-3 py-2 bg-muted border border-muted-foreground/50 text-foreground font-bold rounded-lg hover:bg-muted/80 transition-all cursor-pointer text-xs">
                                             <Upload className="w-4 h-4 mr-2 text-primary" /> {localScene.backgroundMusic ? 'Alterar Trilha' : 'Carregar Trilha (.mp3)'}
@@ -479,7 +481,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                 className="custom-checkbox"
                                                 disabled={isAnyCheckboxChecked && !localScene.isEndingScene}
                                             />
-                                            <label htmlFor="isEndingScene" className={`ml-2 block text-xs font-bold text-muted-foreground uppercase tracking-widest ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
+                                            <label htmlFor="isEndingScene" className={`ml-2 block text-[11px] text-muted-foreground ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
                                                 Esta cena vence o jogo.
                                             </label>
                                         </div>
@@ -492,7 +494,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                 className="custom-checkbox"
                                                 disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
                                             />
-                                            <label htmlFor="removesChance" className={`ml-2 block text-xs font-bold text-muted-foreground uppercase tracking-widest ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
+                                            <label htmlFor="removesChance" className={`ml-2 block text-[11px] text-muted-foreground ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
                                                 Esta cena remove uma chance.
                                             </label>
                                         </div>
@@ -505,7 +507,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                 className="custom-checkbox"
                                                 disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
                                             />
-                                            <label htmlFor="restoresChance" className={`ml-2 block text-xs font-bold text-muted-foreground uppercase tracking-widest ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
+                                            <label htmlFor="restoresChance" className={`ml-2 block text-[11px] text-muted-foreground ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
                                                 Esta cena restaura uma chance.
                                             </label>
                                         </div>

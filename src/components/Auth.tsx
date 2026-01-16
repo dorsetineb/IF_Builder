@@ -418,9 +418,9 @@ export function Auth() {
                                                     type="checkbox"
                                                     checked={acceptedTerms}
                                                     onChange={(e) => setAcceptedTerms(e.target.checked)}
-                                                    className="w-3.5 h-3.5 rounded border-purple-500/30 bg-purple-500/10 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 cursor-pointer checked:bg-purple-500 checked:border-purple-500"
+                                                    className="custom-checkbox"
                                                 />
-                                                <label htmlFor="terms" className="text-[10px] text-zinc-400 leading-tight">
+                                                <label htmlFor="terms" className="text-[11px] text-muted-foreground">
                                                     Li e concordo com os <a href="#" className="text-purple-400 hover:text-purple-300">Termos</a> e <a href="#" className="text-purple-400 hover:text-purple-300">Privacidade</a>.
                                                 </label>
                                             </div>

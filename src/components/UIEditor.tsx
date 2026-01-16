@@ -959,10 +959,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 </select>
                                             </div>
                                             <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}>
-                                                <div className={`w-5 h-5 rounded border transition-all flex items-center justify-center ${localOmitSplashTitle ? 'bg-primary border-primary' : 'bg-input border-input group-hover:border-primary/50'}`}>
-                                                    {localOmitSplashTitle && <Circle className="w-2 h-2 fill-white stroke-none" />}
-                                                </div>
-                                                <label htmlFor="omitSplashTitle" className="ml-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground cursor-pointer select-none transition-colors">Ocultar título e descrição</label>
+                                                <input
+                                                    type="checkbox"
+                                                    id="omitSplashTitle"
+                                                    checked={localOmitSplashTitle}
+                                                    onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
+                                                    className="custom-checkbox"
+                                                />
+                                                <label htmlFor="omitSplashTitle" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">Ocultar título e descrição</label>
                                             </div>
                                         </div>
                                     </div>
@@ -1333,12 +1337,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
                                                             <div className="space-y-3">
                                                                 <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-muted-foreground/50">
-                                                                    <span className="text-xs font-medium text-foreground">Mostrar Imagem da Cena</span>
-                                                                    <input type="checkbox" checked={localDiaryShowSceneImage} onChange={(e) => setLocalDiaryShowSceneImage(e.target.checked)} className="w-4 h-4 accent-primary rounded border-gray-300 focus:ring-primary" />
+                                                                    <span className="text-[11px] text-muted-foreground">Mostrar Imagem da Cena</span>
+                                                                    <input type="checkbox" checked={localDiaryShowSceneImage} onChange={(e) => setLocalDiaryShowSceneImage(e.target.checked)} className="custom-checkbox" />
                                                                 </div>
                                                                 <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-muted-foreground/50">
-                                                                    <span className="text-xs font-medium text-foreground">Mostrar Ação do Jogador</span>
-                                                                    <input type="checkbox" checked={localDiaryShowPlayerAction} onChange={(e) => setLocalDiaryShowPlayerAction(e.target.checked)} className="w-4 h-4 accent-primary rounded border-gray-300 focus:ring-primary" />
+                                                                    <span className="text-[11px] text-muted-foreground">Mostrar Ação do Jogador</span>
+                                                                    <input type="checkbox" checked={localDiaryShowPlayerAction} onChange={(e) => setLocalDiaryShowPlayerAction(e.target.checked)} className="custom-checkbox" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1767,11 +1771,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                     <div className="flex items-center">
                                         <label className="flex items-center gap-3 cursor-pointer group select-none">
-                                            <div className={`w-5 h-5 rounded border flex items-center justify-center transition-all ${localOmitSplashTitle ? 'bg-primary border-primary' : 'bg-transparent border-input group-hover:border-primary/50'}`}>
-                                                {localOmitSplashTitle && <Check size={12} className="text-white bg-transparent" />}
-                                            </div>
-                                            <input type="checkbox" checked={localOmitSplashTitle} onChange={() => setLocalOmitSplashTitle(!localOmitSplashTitle)} className="hidden" />
-                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground transition-colors">Ocultar título e descrição</span>
+                                            <input
+                                                type="checkbox"
+                                                checked={localOmitSplashTitle}
+                                                onChange={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}
+                                                className="custom-checkbox"
+                                            />
+                                            <span className="text-[11px] text-muted-foreground group-hover:text-foreground transition-colors">Ocultar título e descrição</span>
                                         </label>
                                     </div>
                                 </div>
