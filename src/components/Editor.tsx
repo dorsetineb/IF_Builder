@@ -780,7 +780,7 @@ const Editor: React.FC = () => {
     const [isSaving, setIsSaving] = useState(false);
 
     useEffect(() => {
-        document.title = "IF Builder";
+        document.title = "IF Builder / Ficções Interativas";
         return () => {
             document.title = "IF Builder / Ficções Interativas";
         };
