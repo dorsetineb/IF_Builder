@@ -59,6 +59,7 @@ export interface Scene {
   choices?: Choice[];
   exits?: Exits;
   isEndingScene?: boolean;
+  conclusionVignetteId?: string;
   removesChanceOnEntry?: boolean;
   restoresChanceOnEntry?: boolean;
   mapX?: number;
@@ -96,6 +97,8 @@ export interface Vignette {
   showDescription?: boolean; // Controls visibility of the description
   buttonText?: string; // Custom button text for this vignette
   nextSceneId?: string;
+  isConclusion?: boolean;
+  isSystemDefeat?: boolean; // If true, shown when chances run out
 }
 
 export interface GameData {

@@ -123,7 +123,6 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
             const updates = {
                 id: user.id,
                 full_name: displayName,
-                title: bio, // Storing bio as 'title' temporarily if needed, but bio is bio column
                 bio,
                 website,
                 location,

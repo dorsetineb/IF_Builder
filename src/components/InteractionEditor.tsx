@@ -15,7 +15,7 @@ interface InteractionEditorProps {
 }
 
 const getOutcomeType = (inter: Interaction): 'goToScene' | 'newSceneDescription' | 'playVignette' => {
-    if (inter.vignetteId) return 'playVignette';
+    if (inter.vignetteId !== undefined) return 'playVignette';
     if (inter.newSceneDescription !== undefined) return 'newSceneDescription';
     return 'goToScene';
 };

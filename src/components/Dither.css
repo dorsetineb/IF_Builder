@@ -5,7 +5,7 @@
   top: 0;
   left: 0;
   overflow: hidden;
-  background: linear-gradient(45deg, #18181b, #2e1065, #000000);
+  background: linear-gradient(45deg, var(--dither-bg-1), var(--dither-bg-2), var(--dither-bg-3));
   z-index: 0;
 }
 
@@ -73,7 +73,7 @@
 .dither-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, transparent 0%, #000 100%);
+  background: radial-gradient(circle at center, transparent 0%, var(--dither-overlay) 100%);
   pointer-events: none;
   z-index: 1;
 }

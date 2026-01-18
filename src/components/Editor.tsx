@@ -5,7 +5,7 @@ import { supabase } from '../lib/supabase';
 import { useUser } from './UserContext';
 import { Auth } from './Auth';
 import { useToast } from './ToastContext';
-import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker, FixedVerb } from '../types';
+import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker, FixedVerb, Vignette } from '../types';
 import Sidebar from './Sidebar';
 import SceneEditor from './SceneEditor';
 import Header from './Header';
@@ -764,6 +764,44 @@ const initialGameData: GameData = {
     consequenceTrackers: [],
     positiveEndingMusic: '',
     negativeEndingMusic: '',
+    vignettes: [
+        {
+            id: 'VNT_OPENING',
+            name: 'Abertura',
+            title: 'Minha Aventura de Texto',
+            description: '',
+            image: '',
+            backgroundMusic: '',
+            contentAlignment: 'left',
+            verticalAlignment: 'bottom',
+            omitTitle: false,
+            buttonText: 'INICIAR'
+        },
+        {
+            id: 'VNT_VICTORY',
+            name: 'Vitória',
+            title: 'Vitória',
+            description: 'Parabéns! Você completou a aventura.',
+            image: '',
+            backgroundMusic: '',
+            contentAlignment: 'left',
+            verticalAlignment: 'bottom',
+            isConclusion: true,
+            buttonText: 'REINICIAR'
+        },
+        {
+            id: 'VNT_DEFEAT',
+            name: 'Derrota',
+            title: 'Fim de Jogo',
+            description: 'Sua jornada chegou ao fim.',
+            image: '',
+            backgroundMusic: '',
+            contentAlignment: 'left',
+            verticalAlignment: 'bottom',
+            isConclusion: true,
+            buttonText: 'TENTAR NOVAMENTE'
+        }
+    ]
 };
 
 import { useTheme } from './ThemeProvider';
@@ -1180,7 +1218,10 @@ DATE:        ${exportDate.toLocaleString()}
             cleanedScenes[id] = {
                 ...cleanedScenes[id],
                 objectIds: cleanedScenes[id].objectIds || [],
-                interactions: cleanedScenes[id].interactions || []
+                interactions: cleanedScenes[id].interactions || [],
+                // Reset layout coordinates to force auto-arrangement
+                mapX: undefined,
+                mapY: undefined
             };
         });
 
@@ -1203,6 +1244,56 @@ DATE:        ${exportDate.toLocaleString()}
             gameViewEndingButtonText: data.gameViewEndingButtonText || 'Ver Final',
             positiveEndingMusic: data.positiveEndingMusic || '',
             negativeEndingMusic: data.negativeEndingMusic || '',
+            vignettes: data.vignettes && data.vignettes.length > 0 ? data.vignettes : (() => {
+                // Migrate Legacy Data to Vignettes
+                const initialVignettes: any[] = [];
+
+                // Opening
+                initialVignettes.push({
+                    id: 'VNT_OPENING',
+                    name: 'Abertura',
+                    title: data.gameTitle || '',
+                    description: data.gameSplashDescription || '',
+                    image: data.gameSplashImage || '',
+                    backgroundMusic: data.gameBackgroundMusic || '',
+                    contentAlignment: data.gameSplashContentAlignment || 'left',
+                    verticalAlignment: data.gameSplashContentVerticalAlignment || 'bottom',
+                    omitTitle: data.gameOmitSplashTitle || false,
+                    buttonText: data.gameSplashButtonText || 'INICIAR'
+                });
+
+                // Positive Ending
+                if (data.positiveEndingDescription || data.positiveEndingImage) {
+                    initialVignettes.push({
+                        id: 'VNT_VICTORY',
+                        name: 'Vitória',
+                        title: 'Vitória',
+                        description: data.positiveEndingDescription || '',
+                        image: data.positiveEndingImage || '',
+                        backgroundMusic: data.positiveEndingMusic,
+                        contentAlignment: data.positiveEndingContentAlignment || 'left',
+                        verticalAlignment: 'bottom',
+                        isConclusion: true
+                    });
+                }
+
+                // Negative Ending
+                if (data.negativeEndingDescription || data.negativeEndingImage) {
+                    initialVignettes.push({
+                        id: 'VNT_DEFEAT',
+                        name: 'Derrota',
+                        title: 'Derrota',
+                        description: data.negativeEndingDescription || '',
+                        image: data.negativeEndingImage || '',
+                        backgroundMusic: data.negativeEndingMusic,
+                        contentAlignment: data.negativeEndingContentAlignment || 'left',
+                        verticalAlignment: 'bottom',
+                        isConclusion: true,
+                        isSystemDefeat: true // Legacy import assumption
+                    });
+                }
+                return initialVignettes;
+            })(),
         }));
         if (data.startScene) {
             setSelectedSceneId(data.startScene);
@@ -1213,12 +1304,22 @@ DATE:        ${exportDate.toLocaleString()}
         setImportKey(prev => prev + 1);
     }, []);
 
-    const handleUpdateGameData = (field: keyof GameData, value: any, skipDirty?: boolean) => {
+    const handleUpdateGameData = (field: keyof GameData | Partial<GameData>, value?: any, skipDirty?: boolean) => {
+        if (typeof field === 'object' && field !== null) {
+            const updates = field as Partial<GameData>;
+            setGameData(prev => ({ ...prev, ...updates }));
+            // If called with just one argument (updates object), mark as dirty unless specified (though skipDirty arg position varies)
+            // In VignettesEditor call: onUpdate(updates). So value is undefined.
+            setIsDirty(true);
+            return;
+        }
+
+        const key = field as keyof GameData;
         setGameData(prev => {
-            if (field === 'gameSystemEnabled' && value === 'trackers') {
-                return { ...prev, [field]: value, gameShowTrackersUI: true };
+            if (key === 'gameSystemEnabled' && value === 'trackers') {
+                return { ...prev, [key]: value, gameShowTrackersUI: true };
             }
-            return { ...prev, [field]: value };
+            return { ...prev, [key]: value };
         });
         if (!skipDirty) {
             setIsDirty(true);
@@ -1337,11 +1438,37 @@ DATE:        ${exportDate.toLocaleString()}
         setGameData(prev => {
             const newScenes = { ...prev.scenes, [newId]: newScene };
             const orderWithNew = [...prev.sceneOrder, newId];
-            return { ...prev, scenes: newScenes, sceneOrder: orderWithNew };
+            return {
+                ...prev,
+                scenes: newScenes,
+                sceneOrder: orderWithNew
+            };
         });
         setSelectedSceneId(newId);
         setIsDirty(true);
     };
+
+    const handleAddVignette = useCallback(() => {
+        const newId = `VNT_${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
+        const newVignette: Vignette = {
+            id: newId,
+            name: 'Nova Vinheta',
+            title: '',
+            description: '',
+            contentAlignment: 'left',
+            verticalAlignment: 'bottom'
+        };
+        setGameData(prev => ({
+            ...prev,
+            vignettes: [...(prev.vignettes || []), newVignette]
+        }));
+        setIsDirty(true);
+        // Optional: switch to vignettes view? 
+        // setCurrentView('vignettes'); 
+        // But user is in Scene Map, better stay there.
+        toast("Vinheta Criada", "Nova vinheta criada com sucesso.", "success");
+    }, []);
+
 
     const handleReorderScenes = (newSceneIds: string[]) => {
         setGameData(prev => ({ ...prev, sceneOrder: newSceneIds }));
@@ -1387,6 +1514,32 @@ DATE:        ${exportDate.toLocaleString()}
     const handleStartCreating = () => {
         handleAddScene();
         setCurrentView('interface');
+    };
+
+    const handleCreateNewProject = () => {
+        const hasScenes = Object.keys(gameData.scenes).length > 0;
+
+        if (hasScenes) {
+            setConfirmationModal({
+                isOpen: true,
+                title: "Novo Projeto",
+                message: "Deseja iniciar um novo projeto? O projeto atual (não exportado) será perdido.",
+                isDanger: true,
+                onConfirm: () => {
+                    closeConfirmationModal();
+                    setGameData(initialGameData);
+                    setIsDirty(false);
+                    setImportKey(prev => prev + 1);
+                    setCurrentView('interface');
+                },
+                onCancel: closeConfirmationModal
+            });
+        } else {
+            setGameData(initialGameData);
+            setIsDirty(false);
+            setImportKey(prev => prev + 1);
+            setCurrentView('interface');
+        }
     };
 
     const handleCreateGlobalObject = (obj: GameObject, linkToSceneId?: string) => {
@@ -1729,7 +1882,7 @@ DATE:        ${exportDate.toLocaleString()}
                                 />
                             ) : currentView === 'scenes' ? (
                                 <WelcomePlaceholder
-                                    onCreateScene={handleStartCreating}
+                                    onCreateScene={handleCreateNewProject}
                                     onDownloadExample={handleDownloadExample}
                                     onMeetProject={() => setCurrentView('about')}
                                     theme={appTheme}
@@ -1743,9 +1896,11 @@ DATE:        ${exportDate.toLocaleString()}
                                     allScenesMap={gameData.scenes}
                                     globalObjects={gameData.globalObjects}
                                     startSceneId={gameData.startScene}
+                                    vignettes={gameData.vignettes || []}
                                     onSelectScene={handleSelectScene}
                                     onUpdateScenePosition={handleUpdateScenePosition}
                                     onAddScene={handleAddScene}
+                                    onAddVignette={handleAddVignette}
                                     gameInteractionType={gameData.gameInteractionType || 'parser'}
                                 />
                             )}

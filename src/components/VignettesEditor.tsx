@@ -15,8 +15,9 @@ const VignetteItem: React.FC<{
     onUpdate: (id: string, field: keyof Vignette, value: any) => void;
     onDelete: (id: string) => void;
     isOpening?: boolean;
+    canDelete?: boolean;
     allScenes: Scene[];
-}> = ({ vignette, gameData, onUpdate, onDelete, isOpening, allScenes }) => {
+}> = ({ vignette, gameData, onUpdate, onDelete, isOpening, canDelete = true, allScenes }) => {
     const [isOpen, setIsOpen] = useState(isOpening);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
 
@@ -69,8 +70,8 @@ const VignetteItem: React.FC<{
                 onClick={() => setIsOpen(!isOpen)}
                 className={`relative flex items-center h-16 cursor-pointer hover:bg-zinc-800/50 transition-all overflow-hidden group ${isOpen ? 'bg-purple-500/5 border-b border-purple-500/10' : ''}`}
             >
-                {/* Sliding Trash Button (Only if not opening) */}
-                {!isOpening && (
+                {/* Sliding Trash Button (Only if can delete) */}
+                {canDelete && !isOpening && (
                     <button
                         onClick={(e) => { e.stopPropagation(); onDelete(vignette.id); }}
                         className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20"
@@ -101,6 +102,7 @@ const VignetteItem: React.FC<{
                         <span className="text-xs font-bold text-zinc-200 truncate flex items-center gap-2">
                             {vignette.title || '(Sem título)'}
                             {isOpening && <span className="px-1.5 py-0.5 rounded-full bg-primary/20 text-primary text-[9px] uppercase tracking-widest border border-primary/30">Abertura</span>}
+                            {vignette.isConclusion && <span className="px-1.5 py-0.5 rounded-full bg-purple-500/20 text-purple-400 text-[9px] uppercase tracking-widest border border-purple-500/30">Conclusão</span>}
                         </span>
                         <span className="text-[10px] text-zinc-500 font-mono shrink-0 uppercase tracking-tighter truncate">{vignette.id} {vignette.name ? `• ${vignette.name}` : ''}</span>
                     </div>
@@ -114,13 +116,7 @@ const VignetteItem: React.FC<{
                         {/* LEFT COLUMN: Inputs */}
                         <div className="flex flex-col h-full gap-6">
                             {(isOpening) || (
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2">
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">ID (Fixo)</label>
-                                        <div className="w-full bg-zinc-900/50 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all truncate" title={vignette.id}>
-                                            {vignette.id}
-                                        </div>
-                                    </div>
+                                <div className="grid grid-cols-[1fr_120px] gap-4">
                                     <div className="space-y-2">
                                         <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Nome Interno</label>
                                         <input
@@ -131,22 +127,7 @@ const VignetteItem: React.FC<{
                                             placeholder="Ex: vinheta_final_ruim"
                                         />
                                     </div>
-                                </div>
-                            )}
-
-                            <div className="space-y-4">
-                                <div className="flex gap-4">
-                                    <div className="w-2/3 space-y-2">
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Título Exibido</label>
-                                        <input
-                                            type="text"
-                                            value={vignette.title}
-                                            onChange={(e) => onUpdate(vignette.id, 'title', e.target.value)}
-                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 font-bold placeholder:text-muted-foreground/30"
-                                            placeholder="Título da Vinheta"
-                                        />
-                                    </div>
-                                    <div className="w-1/3 space-y-2">
+                                    <div className="space-y-2">
                                         <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">ID</label>
                                         <input
                                             type="text"
@@ -156,13 +137,28 @@ const VignetteItem: React.FC<{
                                         />
                                     </div>
                                 </div>
+                            )}
+
+                            <div className="space-y-4">
+                                <div className="flex gap-4">
+                                    <div className="w-full space-y-2">
+                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Título Exibido</label>
+                                        <input
+                                            type="text"
+                                            value={vignette.title}
+                                            onChange={(e) => onUpdate(vignette.id, 'title', e.target.value)}
+                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 font-bold placeholder:text-muted-foreground/30"
+                                            placeholder="Título da Vinheta"
+                                        />
+                                    </div>
+                                </div>
                                 <div className="space-y-4">
                                     <div className="space-y-2">
                                         <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Descrição / Texto</label>
                                         <textarea
                                             value={vignette.description}
                                             onChange={(e) => onUpdate(vignette.id, 'description', e.target.value)}
-                                            className="w-full h-46 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 resize-none leading-relaxed placeholder:text-muted-foreground/30"
+                                            className="w-full h-38 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 resize-none leading-relaxed placeholder:text-muted-foreground/30"
                                             placeholder="O texto descritivo da vinheta..."
                                         />
                                     </div>
@@ -247,7 +243,7 @@ const VignetteItem: React.FC<{
 
                         {/* RIGHT COLUMN: Preview */}
                         <div className="flex flex-col h-full gap-4">
-                            {!isOpening && <div className="h-[65px] hidden lg:block" aria-hidden="true" />}
+
                             <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Preview</label>
                             <div
                                 className="relative w-full aspect-video border border-muted-foreground/20 rounded-xl overflow-hidden shadow-2xl group flex-shrink-0"
@@ -316,20 +312,67 @@ const VignetteItem: React.FC<{
                                         <p className="text-xs text-zinc-400">Esta é a vinheta de abertura. Ao terminar, o jogo iniciará automaticamente na <strong>Cena Inicial</strong>.</p>
                                     </div>
                                 ) : (
-                                    <div className="space-y-2">
-                                        <label className="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Ir para cena (após a vinheta)</label>
-                                        <select
-                                            value={vignette.nextSceneId || ''}
-                                            onChange={(e) => onUpdate(vignette.id, 'nextSceneId', e.target.value)}
-                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all"
-                                        >
-                                            <option value="">(Nenhuma - Apenas fecha a vinheta)</option>
-                                            {allScenes.map(scene => (
-                                                <option key={scene.id} value={scene.id}>
-                                                    {scene.name} ({scene.id})
-                                                </option>
-                                            ))}
-                                        </select>
+                                    <div className="space-y-4">
+                                        <div className="flex bg-zinc-950 rounded-lg p-1 border border-muted-foreground/20">
+                                            <button
+                                                onClick={() => onUpdate(vignette.id, 'isConclusion', false)}
+                                                className={`flex-1 py-1.5 text-[9px] uppercase font-bold tracking-wider rounded-md transition-all ${!vignette.isConclusion ? 'bg-primary/20 text-primary shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                            >
+                                                Mudar de Cena
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    onUpdate(vignette.id, 'isConclusion', true);
+                                                    onUpdate(vignette.id, 'nextSceneId', ''); // Clear next scene
+                                                }}
+                                                className={`flex-1 py-1.5 text-[9px] uppercase font-bold tracking-wider rounded-md transition-all ${vignette.isConclusion ? 'bg-purple-500/20 text-purple-400 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                            >
+                                                Vinheta de Conclusão
+                                            </button>
+                                        </div>
+
+                                        {vignette.isConclusion ? (
+                                            <div className="p-3 bg-purple-500/5 border border-purple-500/10 rounded-lg text-center space-y-3">
+                                                <p className="text-[10px] font-bold text-purple-400 uppercase tracking-wider">O jogo termina aqui</p>
+
+                                                {/* System Defeat Toggle */}
+                                                {(gameData.gameSystemEnabled === 'chances') && (
+                                                    <div className="flex items-center justify-center gap-2">
+                                                        <label className="flex items-center gap-2 cursor-pointer group select-none">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={vignette.isSystemDefeat || false}
+                                                                onChange={(e) => {
+                                                                    // Only allow enabling via checkbox. Disabling is done by unchecking or enabling another.
+                                                                    // Actually standard checkbox behavior is fine, but we enforce "only one" in parent.
+                                                                    onUpdate(vignette.id, 'isSystemDefeat', e.target.checked);
+                                                                }}
+                                                                className="custom-checkbox accent-purple-500"
+                                                            />
+                                                            <span className="text-[9px] text-zinc-400 group-hover:text-zinc-300 transition-colors font-medium text-left">
+                                                                Será mostrada ao perder todas as chances
+                                                            </span>
+                                                        </label>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                                                <label className="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Ir para cena (após a vinheta)</label>
+                                                <select
+                                                    value={vignette.nextSceneId || ''}
+                                                    onChange={(e) => onUpdate(vignette.id, 'nextSceneId', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all"
+                                                >
+                                                    <option value="">(Nenhuma - Apenas fecha a vinheta)</option>
+                                                    {allScenes.map(scene => (
+                                                        <option key={scene.id} value={scene.id}>
+                                                            {scene.name} ({scene.id})
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
+                                        )}
                                     </div>
                                 )}
                             </div>
@@ -369,7 +412,7 @@ const VignettesEditor: React.FC<VignettesEditorProps> = ({ gameData, onUpdate, o
         if (!gameData.vignettes || gameData.vignettes.length === 0) {
             // Create initial "Opening" vignette from legacy data
             const openingVignette: Vignette = {
-                id: 'vignette_opening',
+                id: 'VNT_OPENING',
                 name: 'Abertura',
                 title: gameData.gameTitle || '',
                 description: gameData.gameSplashDescription || '',
@@ -379,7 +422,38 @@ const VignettesEditor: React.FC<VignettesEditorProps> = ({ gameData, onUpdate, o
                 verticalAlignment: gameData.gameSplashContentVerticalAlignment || 'bottom',
                 omitTitle: gameData.gameOmitSplashTitle || false
             };
-            setVignettes([openingVignette]);
+            const initialVignettes = [openingVignette];
+
+            // Migrate Endings
+            if (gameData.positiveEndingDescription || gameData.positiveEndingImage) {
+                initialVignettes.push({
+                    id: 'VNT_VICTORY',
+                    name: 'Vitória',
+                    title: 'Vitória',
+                    description: gameData.positiveEndingDescription || '',
+                    image: gameData.positiveEndingImage || '',
+                    backgroundMusic: gameData.positiveEndingMusic,
+                    contentAlignment: gameData.positiveEndingContentAlignment || 'left',
+                    verticalAlignment: 'bottom',
+                    isConclusion: true
+                });
+            }
+
+            if (gameData.negativeEndingDescription || gameData.negativeEndingImage) {
+                initialVignettes.push({
+                    id: 'VNT_DEFEAT',
+                    name: 'Derrota',
+                    title: 'Derrota',
+                    description: gameData.negativeEndingDescription || '',
+                    image: gameData.negativeEndingImage || '',
+                    backgroundMusic: gameData.negativeEndingMusic,
+                    contentAlignment: gameData.negativeEndingContentAlignment || 'left',
+                    verticalAlignment: 'bottom',
+                    isConclusion: true
+                });
+            }
+
+            setVignettes(initialVignettes);
         } else {
             setVignettes(gameData.vignettes);
         }
@@ -397,15 +471,31 @@ const VignettesEditor: React.FC<VignettesEditorProps> = ({ gameData, onUpdate, o
 
 
     const handleUpdateVignette = (id: string, field: keyof Vignette, value: any) => {
-        setVignettes(prev => prev.map(v => v.id === id ? { ...v, [field]: value } : v));
+        if (field === 'isSystemDefeat' && value === true) {
+            // Enforce only one System Defeat vignette
+            setVignettes(prev => prev.map(v => ({
+                ...v,
+                isSystemDefeat: v.id === id ? true : false
+            })));
+        } else {
+            setVignettes(prev => prev.map(v => v.id === id ? { ...v, [field]: value } : v));
+        }
     };
 
     const handleDeleteVignette = (id: string) => {
+        const vignetteToDelete = vignettes.find(v => v.id === id);
+        if (vignetteToDelete?.isConclusion) {
+            const conclusionCount = vignettes.filter(v => v.isConclusion).length;
+            if (conclusionCount <= 1) {
+                alert("É obrigatório ter sempre pelo menos uma vinheta de conclusão.");
+                return;
+            }
+        }
         setVignettes(prev => prev.filter(v => v.id !== id));
     };
 
     const handleCreateVignette = () => {
-        const newId = `vignette_${Math.random().toString(36).substring(2, 9)}`;
+        const newId = `VNT_${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
         const newVignette: Vignette = {
             id: newId,
             name: 'Nova Vinheta',
@@ -418,7 +508,7 @@ const VignettesEditor: React.FC<VignettesEditorProps> = ({ gameData, onUpdate, o
     };
 
     const handleSave = () => {
-        const opening = vignettes.find(v => v.id === 'vignette_opening') || vignettes[0];
+        const opening = vignettes.find(v => v.id === 'VNT_OPENING') || vignettes[0];
 
         // Prepare update object
         const updates: Partial<GameData> = {
@@ -446,7 +536,7 @@ const VignettesEditor: React.FC<VignettesEditorProps> = ({ gameData, onUpdate, o
             setVignettes(gameData.vignettes);
         } else {
             const openingVignette: Vignette = {
-                id: 'vignette_opening',
+                id: 'VNT_OPENING',
                 name: 'Abertura',
                 title: gameData.gameTitle || '',
                 description: gameData.gameSplashDescription || '',
@@ -484,17 +574,25 @@ const VignettesEditor: React.FC<VignettesEditorProps> = ({ gameData, onUpdate, o
             </div>
 
             <div className="space-y-4">
-                {vignettes.map((v, index) => (
-                    <VignetteItem
-                        key={v.id}
-                        vignette={v}
-                        gameData={gameData}
-                        onUpdate={handleUpdateVignette}
-                        onDelete={handleDeleteVignette}
-                        isOpening={index === 0} // First one is implicitly opening
-                        allScenes={allScenes}
-                    />
-                ))}
+                {vignettes.map((v, index) => {
+                    const isOpening = index === 0;
+                    const conclusionCount = vignettes.filter(vg => vg.isConclusion).length;
+                    const isLastConclusion = v.isConclusion && conclusionCount <= 1;
+                    const canDelete = !isOpening && !isLastConclusion;
+
+                    return (
+                        <VignetteItem
+                            key={v.id}
+                            vignette={v}
+                            gameData={gameData}
+                            onUpdate={handleUpdateVignette}
+                            onDelete={handleDeleteVignette}
+                            isOpening={isOpening}
+                            canDelete={canDelete}
+                            allScenes={allScenes}
+                        />
+                    );
+                })}
 
                 <div className="flex justify-start pt-4">
                     <button

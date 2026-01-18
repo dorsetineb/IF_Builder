@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SceneList from './SceneList';
 import { Scene, View, GameData } from '../types';
@@ -50,6 +50,15 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     setIsAltamiraVisible(false);
   };
 
+  // Sync accordion state with current view
+  useEffect(() => {
+    if (currentView === 'scenes' || currentView === 'map') {
+      setIsScenesExpanded(true);
+    } else {
+      setIsScenesExpanded(false);
+    }
+  }, [currentView]);
+
   // Platform Sidebar Style Button Class
   const getButtonClass = (view: View) =>
     `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${currentView === view
@@ -78,16 +87,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       <nav className="flex flex-col gap-1 flex-grow overflow-y-auto overflow-x-hidden px-3 py-4">
         {/* Community Button - REMOVED AS REQUESTED */}
 
-        {/* Vinhetas */}
-        <button
-          className={getButtonClass('vignettes')}
-          onClick={() => handleSetView('vignettes')}
-          title={isCollapsed ? "Vinhetas" : undefined}
-        >
-          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'vignettes' ? 'translate-x-0' : ''}`} />
-          <MonitorPlay className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">Vinhetas</span>}
-        </button>
+
 
         {/* Informações e Interface - Moved to top as requested */}
         <button
@@ -155,6 +155,18 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             </div>
           )}
         </div>
+
+
+        {/* Vinhetas */}
+        <button
+          className={getButtonClass('vignettes')}
+          onClick={() => handleSetView('vignettes')}
+          title={isCollapsed ? "Vinhetas" : undefined}
+        >
+          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'vignettes' ? 'translate-x-0' : ''}`} />
+          <MonitorPlay className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && <span className="truncate relative z-10">Vinhetas</span>}
+        </button>
 
         {(gameData.gameInteractionType || 'parser') !== 'choice' && (
           <button

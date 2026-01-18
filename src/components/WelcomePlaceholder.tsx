@@ -20,6 +20,21 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
         setShowDownloadHelp(true);
     };
 
+    const getDitherColors = () => {
+        switch (theme) {
+            case 'cream':
+                return { primary: '#5c4033', secondary: '#fdfbf7' };
+            case 'terminal':
+                return { primary: '#0d1117', secondary: '#4af626' };
+            case 'light':
+                return { primary: '#000000', secondary: '#ffffff' };
+            default: // dark
+                return { primary: '#000000', secondary: '#581c87' };
+        }
+    };
+
+    const ditherColors = getDitherColors();
+
     return (
         <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden bg-zinc-950">
             <div className="absolute inset-0 z-0">
@@ -28,8 +43,8 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     gridSize={2}
                     ditherMode="bayer"
                     colorMode="duotone"
-                    primaryColor="#000000"
-                    secondaryColor="#581c87"
+                    primaryColor={ditherColors.primary}
+                    secondaryColor={ditherColors.secondary}
                     invert={false}
                     animated={true}
                     animationSpeed={0.005}

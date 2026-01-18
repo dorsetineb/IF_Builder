@@ -133,6 +133,13 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+  /* Dither Colors */
+  --dither-bg-1: #ffffff;
+  --dither-bg-2: #e4e4e7;
+  /* Zinc-200 for subtle contrast, or #000 for high contrast? User said "highlight becomes black". Let's try #d4d4d8 first to avoid too harsh contrast, or maybe opacity handling? User said "highlight becomes black". Let's try var(--primary) which is dark grey. */
+  --dither-bg-2: var(--primary);
+  --dither-bg-3: #ffffff;
+  --dither-overlay: #ffffff;
 }
 
 .dark {
@@ -188,6 +195,12 @@
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: #2A2A2A;
   --sidebar-ring: #9D4EDD;
+
+  /* Dither Colors */
+  --dither-bg-1: #18181b;
+  --dither-bg-2: #2e1065;
+  --dither-bg-3: #000000;
+  --dither-overlay: #000000;
 }
 
 .cream {
@@ -211,7 +224,8 @@
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.85 0.05 95);
   --input: oklch(0.85 0.05 95);
-  --ring: oklch(0.708 0 0);
+  /* warm brown */
+  --ring: oklch(0.40 0.08 30);
   --sidebar: oklch(0.96 0.03 95);
   --sidebar-foreground: oklch(0.20 0.02 30);
   --sidebar-primary: oklch(0.40 0.08 30);
@@ -219,7 +233,13 @@
   --sidebar-accent: oklch(0.90 0.04 95);
   --sidebar-accent-foreground: oklch(0.20 0.02 30);
   --sidebar-border: oklch(0.85 0.05 95);
-  --sidebar-ring: oklch(0.708 0 0);
+  --sidebar-ring: oklch(0.40 0.08 30);
+
+  /* Dither Colors */
+  --dither-bg-1: oklch(0.98 0.02 95);
+  --dither-bg-2: oklch(0.40 0.08 30);
+  --dither-bg-3: oklch(0.98 0.02 95);
+  --dither-overlay: oklch(0.98 0.02 95);
 }
 
 .terminal {
@@ -273,6 +293,12 @@
   --sidebar-accent-foreground: #4AF626;
   --sidebar-border: #30363d;
   --sidebar-ring: #4AF626;
+
+  /* Dither Colors */
+  --dither-bg-1: #0D1117;
+  --dither-bg-2: #161B22;
+  --dither-bg-3: #000000;
+  --dither-overlay: #000000;
 }
 
 @layer base {
@@ -362,25 +388,25 @@
 }
 
 ::-webkit-scrollbar-track {
-  background: #09090b;
+  background: var(--background);
   /* zinc-950 */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #9333ea;
+  background: var(--primary);
   /* purple-600 */
   border-radius: 0;
-  border: 2px solid #09090b;
+  border: 2px solid var(--background);
   /* zinc-950 (border matches bg to create padded look) */
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #7e22ce;
+  background: var(--primary);
   /* purple-700 */
 }
 
 ::-webkit-scrollbar-corner {
-  background: #09090b;
+  background: var(--background);
   /* zinc-950 */
 }
 

@@ -474,44 +474,70 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
                                 {!isStartScene && (
                                     <div className="space-y-4 pt-4 border-t border-muted-foreground/50">
-                                        <div className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                id="isEndingScene"
-                                                checked={!!localScene.isEndingScene}
-                                                onChange={e => handleToggle('isEndingScene', e.target.checked)}
-                                                className="custom-checkbox"
-                                                disabled={isAnyCheckboxChecked && !localScene.isEndingScene}
-                                            />
-                                            <label htmlFor="isEndingScene" className={`ml-2 block text-[11px] text-muted-foreground ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
-                                                Esta cena vence o jogo.
-                                            </label>
+                                        <div className="flex gap-4">
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    id="removesChance"
+                                                    checked={!!localScene.removesChanceOnEntry}
+                                                    onChange={e => handleToggle('removesChanceOnEntry', e.target.checked)}
+                                                    className="custom-checkbox"
+                                                    disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
+                                                />
+                                                <label htmlFor="removesChance" className={`ml-2 block text-[11px] text-muted-foreground ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
+                                                    Esta cena remove uma chance.
+                                                </label>
+                                            </div>
+                                            <div className="flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    id="restoresChance"
+                                                    checked={!!localScene.restoresChanceOnEntry}
+                                                    onChange={e => handleToggle('restoresChanceOnEntry', e.target.checked)}
+                                                    className="custom-checkbox"
+                                                    disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
+                                                />
+                                                <label htmlFor="restoresChance" className={`ml-2 block text-[11px] text-muted-foreground ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
+                                                    Esta cena restaura uma chance.
+                                                </label>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                id="removesChance"
-                                                checked={!!localScene.removesChanceOnEntry}
-                                                onChange={e => handleToggle('removesChanceOnEntry', e.target.checked)}
-                                                className="custom-checkbox"
-                                                disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
-                                            />
-                                            <label htmlFor="removesChance" className={`ml-2 block text-[11px] text-muted-foreground ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
-                                                Esta cena remove uma chance.
+
+                                        <div className="space-y-3 pt-4 border-t border-muted-foreground/50">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                                Vinheta de Conclusão (Pós-Cena)
                                             </label>
-                                        </div>
-                                        <div className="flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                id="restoresChance"
-                                                checked={!!localScene.restoresChanceOnEntry}
-                                                onChange={e => handleToggle('restoresChanceOnEntry', e.target.checked)}
-                                                className="custom-checkbox"
-                                                disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
-                                            />
-                                            <label htmlFor="restoresChance" className={`ml-2 block text-[11px] text-muted-foreground ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
-                                                Esta cena restaura uma chance.
-                                            </label>
+                                            <div className="flex items-center gap-4 h-9">
+                                                <div className="flex items-center w-1/2">
+                                                    <input
+                                                        type="checkbox"
+                                                        id="isEndingScene"
+                                                        checked={!!localScene.isEndingScene}
+                                                        onChange={e => handleToggle('isEndingScene', e.target.checked)}
+                                                        className="custom-checkbox shrink-0"
+                                                        disabled={isAnyCheckboxChecked && !localScene.isEndingScene}
+                                                    />
+                                                    <label htmlFor="isEndingScene" className={`ml-2 block text-[11px] text-muted-foreground ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
+                                                        Esta é uma cena de conclusão
+                                                    </label>
+                                                </div>
+                                                <div className="w-1/2">
+                                                    {localScene.isEndingScene && (
+                                                        <select
+                                                            value={localScene.conclusionVignetteId || ''}
+                                                            onChange={(e) => updateLocalScene('conclusionVignetteId', e.target.value)}
+                                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded p-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50"
+                                                        >
+                                                            <option value="">Selecione uma vinheta...</option>
+                                                            {vignettes.map(v => (
+                                                                <option key={v.id} value={v.id}>
+                                                                    {v.title || v.name || v.id}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 )}
