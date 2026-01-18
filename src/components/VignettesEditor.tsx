@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo, DragEvent } from 'react';
 import { GameData, Vignette, Scene } from '../types';
+import { FONTS } from '../constants';
 import { Upload, Trash2, ImageIcon, MonitorPlay, Save, RotateCcw, Plus, ChevronDown } from 'lucide-react';
+
 
 interface VignettesEditorProps {
     gameData: GameData;
@@ -18,7 +20,7 @@ const VignetteItem: React.FC<{
     canDelete?: boolean;
     allScenes: Scene[];
 }> = ({ vignette, gameData, onUpdate, onDelete, isOpening, canDelete = true, allScenes }) => {
-    const [isOpen, setIsOpen] = useState(isOpening);
+    const [isOpen, setIsOpen] = useState(false);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
 
     const isDark = (gameData.gameTheme || 'dark') === 'dark';
@@ -65,6 +67,7 @@ const VignetteItem: React.FC<{
 
     return (
         <div className={`bg-zinc-900/30 rounded-lg border ${isOpen ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.05)]' : 'border-muted-foreground/50'} overflow-hidden transition-all duration-300 relative`}>
+
             {/* Header */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
@@ -140,30 +143,10 @@ const VignetteItem: React.FC<{
                             )}
 
                             <div className="space-y-4">
-                                <div className="flex gap-4">
-                                    <div className="w-full space-y-2">
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Título Exibido</label>
-                                        <input
-                                            type="text"
-                                            value={vignette.title}
-                                            onChange={(e) => onUpdate(vignette.id, 'title', e.target.value)}
-                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 font-bold placeholder:text-muted-foreground/30"
-                                            placeholder="Título da Vinheta"
-                                        />
-                                    </div>
-                                </div>
+                                {/* SECTION: Title and Visibility Options */}
                                 <div className="space-y-4">
-                                    <div className="space-y-2">
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Descrição / Texto</label>
-                                        <textarea
-                                            value={vignette.description}
-                                            onChange={(e) => onUpdate(vignette.id, 'description', e.target.value)}
-                                            className="w-full h-38 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 resize-none leading-relaxed placeholder:text-muted-foreground/30"
-                                            placeholder="O texto descritivo da vinheta..."
-                                        />
-                                    </div>
-
-                                    <div className="flex items-center gap-6 mt-4">
+                                    {/* Exibir na vinheta (Moved Up) */}
+                                    <div className="flex items-center gap-6">
                                         <label className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider shrink-0">Exibir na vinheta</label>
                                         <div className="flex items-center gap-4">
                                             <label className="flex items-center gap-2 cursor-pointer group select-none">
@@ -193,22 +176,39 @@ const VignetteItem: React.FC<{
                                         </div>
                                     </div>
 
+                                    {/* Separator */}
+                                    <div className="border-t border-muted-foreground/10"></div>
+
+                                    {/* Título Exibido */}
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Texto do Botão</label>
+                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Título Exibido</label>
                                         <input
                                             type="text"
-                                            value={vignette.buttonText || (isOpening ? (gameData.gameSplashButtonText || 'INICIAR') : '')}
-                                            onChange={(e) => onUpdate(vignette.id, 'buttonText', e.target.value)}
+                                            value={vignette.title}
+                                            onChange={(e) => onUpdate(vignette.id, 'title', e.target.value)}
                                             className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 font-bold placeholder:text-muted-foreground/30"
-                                            placeholder={isOpening ? "INICIAR" : "Texto do botão (opcional)"}
+                                            placeholder="Título da Vinheta"
                                         />
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="space-y-4 pt-4 border-t border-muted-foreground/10">
-                                <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Opções de Exibição</h4>
+
                                 <div className="space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Descrição / Texto</label>
+                                        <textarea
+                                            value={vignette.description}
+                                            onChange={(e) => onUpdate(vignette.id, 'description', e.target.value)}
+                                            className="custom-scrollbar w-full h-38 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 resize-none leading-relaxed placeholder:text-muted-foreground/30"
+                                            placeholder="O texto descritivo da vinheta..."
+                                        />
+                                    </div>
+
+                                    {/* Separator */}
+                                    <div className="border-t border-muted-foreground/10"></div>
+
+                                    {/* Opções de Exibição (Moved Below Description) */}
+                                    <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest pt-2">Opções de Exibição</h4>
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
                                             <label className="block text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Alinhamento Horizontal</label>
@@ -234,9 +234,84 @@ const VignetteItem: React.FC<{
                                         </div>
                                     </div>
 
-                                    {/* Deprecated/Redundant omitTitle checkbox removed */}
+                                    {/* Separator */}
+                                    <div className="border-t border-muted-foreground/10"></div>
+
+                                    {/* Text Scale and Button Text Row */}
+                                    <div className="pt-2">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {/* Text Scale (Left) */}
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Tamanho do Texto</label>
+                                                <div className="relative">
+                                                    <select
+                                                        value={vignette.textScale || 'base'}
+                                                        onChange={(e) => onUpdate(vignette.id, 'textScale', e.target.value)}
+                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
+                                                    >
+                                                        <option value="sm">Pequeno</option>
+                                                        <option value="base">Normal</option>
+                                                        <option value="lg">Grande</option>
+                                                    </select>
+                                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                                </div>
+                                            </div>
+
+                                            {/* Button Text (Right) */}
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Texto do Botão</label>
+                                                <input
+                                                    type="text"
+                                                    value={vignette.buttonText || (isOpening ? (gameData.gameSplashButtonText || 'INICIAR') : '')}
+                                                    onChange={(e) => onUpdate(vignette.id, 'buttonText', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 font-bold placeholder:text-muted-foreground/30"
+                                                    placeholder={isOpening ? "INICIAR" : "Texto do botão"}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Separator */}
+                                    <div className="border-t border-muted-foreground/10"></div>
+
+                                    {/* Animation Controls Row */}
+                                    <div className="pt-2">
+                                        <div className="grid grid-cols-2 gap-4">
+                                            {/* Animation Style (Left) */}
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Estilo de Animação</label>
+                                                <div className="relative">
+                                                    <select
+                                                        value={vignette.textAnimationType || 'fade'}
+                                                        onChange={(e) => onUpdate(vignette.id, 'textAnimationType', e.target.value)}
+                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
+                                                    >
+                                                        <option value="fade">Fade (Surgir)</option>
+                                                        <option value="typewriter">Máquina de Escrever</option>
+                                                    </select>
+                                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                                </div>
+                                            </div>
+
+                                            {/* Animation Speed (Right) */}
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">
+                                                    Velocidade: {vignette.textSpeed || 3}
+                                                </label>
+                                                <input
+                                                    type="range"
+                                                    min="1"
+                                                    max="5"
+                                                    value={vignette.textSpeed || 3}
+                                                    onChange={(e) => onUpdate(vignette.id, 'textSpeed', parseInt(e.target.value))}
+                                                    className="w-full h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-primary"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
+
 
                             {/* Sections moved to Right Column */}
                         </div>
@@ -280,12 +355,28 @@ const VignetteItem: React.FC<{
                                 >
                                     <div className={`max-w-[70%] space-y-3 flex flex-col ${vignette.contentAlignment === 'right' ? 'items-end' : 'items-start'}`}>
                                         {(vignette.showTitle ?? !vignette.omitTitle) && (
-                                            <h1 className="text-lg md:text-xl font-black uppercase tracking-tight drop-shadow-lg" style={{ color: titleColor, fontFamily: fontFamily }}>
+                                            <h1
+                                                className="font-black uppercase tracking-tight drop-shadow-lg leading-none transition-all duration-300"
+                                                style={{
+                                                    color: titleColor,
+                                                    fontFamily: fontFamily,
+                                                    fontSize: vignette.textScale === 'sm' ? '12px' :
+                                                        vignette.textScale === 'lg' ? '18px' : '14px' // base
+                                                }}
+                                            >
                                                 {vignette.title || gameData.gameTitle || "Título da Vinheta"}
                                             </h1>
                                         )}
                                         {(vignette.showDescription ?? !vignette.omitTitle) && (
-                                            <p className="text-[9px] md:text-[10px] leading-relaxed line-clamp-3 drop-shadow-md font-medium" style={{ color: textColor, fontFamily: fontFamily }}>
+                                            <p
+                                                className="leading-relaxed line-clamp-4 drop-shadow-md font-medium transition-all duration-300"
+                                                style={{
+                                                    color: textColor,
+                                                    fontFamily: fontFamily,
+                                                    fontSize: vignette.textScale === 'sm' ? '8px' :
+                                                        vignette.textScale === 'lg' ? '11px' : '9px' // base
+                                                }}
+                                            >
                                                 {vignette.description || "Texto descritivo da vinheta..."}
                                             </p>
                                         )}

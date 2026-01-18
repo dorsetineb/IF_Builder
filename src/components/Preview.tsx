@@ -64,6 +64,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, gameData.gameSuggestionsButtonText || 'Sugestões')
             .replace(/__TRACKERS_BUTTON_TEXT__/g, gameData.gameTrackersButtonText || 'Rastreadores')
             .replace(/__SYSTEM_BUTTON_TEXT__/g, gameData.gameSystemButtonText || 'Sistema')
+            .replace(/__DIARY_BUTTON_TEXT__/g, gameData.gameDiaryButtonText || 'Diário')
             .replace('__SAVE_MENU_TITLE__', gameData.gameSaveMenuTitle || 'Salvar Jogo')
             .replace('__LOAD_MENU_TITLE__', gameData.gameLoadMenuTitle || 'Carregar Jogo')
             .replace('__MAIN_MENU_BUTTON_TEXT__', gameData.gameMainMenuButtonText || 'Menu Principal')
@@ -127,6 +128,78 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             /* Common Icon Style */
             .chance-icon svg { width: 24px; height: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); display: block; }
             .chance-icon.lost svg { opacity: 0.3; }
+
+            /* VIGNETTE TEXT PADDING FIX */
+            /* Original CSS has: padding: 5vw 225px - horizontal is too large */
+            /* Fix: Use equal padding on all sides */
+            .splash-content {
+                padding: 10vw !important;
+            }
+            #positive-ending-screen .content,
+            #negative-ending-screen .content {
+                padding: 10vw !important;
+            }
+
+            /* Mobile Responsive Fix */
+            @media (max-width: 768px) {
+                #scene-description { padding: 15px !important; }
+                .scene-paragraph { margin-bottom: 12px; }
+                
+                .splash-content,
+                #positive-ending-screen .content,
+                #negative-ending-screen .content {
+                    padding: 20px !important;
+                }
+            }
+
+            /* 3. Text Scale Dynamic Injection */
+            ${(() => {
+                const vignettes = gameData.vignettes || [];
+                const opening = vignettes.find(v => v.id === 'VNT_OPENING') || vignettes[0];
+                const victory = vignettes.find(v => v.isConclusion && v.id.includes('VICTORY')) || vignettes.find(v => v.isConclusion);
+                const defeat = vignettes.find(v => v.isConclusion && v.id.includes('DEFEAT'));
+
+                const getScaleCss = (scale: string | undefined, selector: string) => {
+                    const s = scale === 'sm' ? { h1: '1.25rem', p: '0.75rem' } :
+                        scale === 'lg' ? { h1: '2rem', p: '1rem' } :
+                            { h1: '1.5rem', p: '0.875rem' }; // Base/Default
+
+                    return `
+                       ${selector} h1 { font-size: ${s.h1} !important; line-height: 1.2 !important; }
+                       ${selector} p, ${selector} .description { font-size: ${s.p} !important; }
+                   `;
+                };
+
+                const getAnimationCss = (vignette: typeof opening, selector: string) => {
+                    if (!vignette) return '';
+                    const speed = vignette.textSpeed || 3;
+                    const duration = Math.max(0.1, 3.0 - (speed * 0.5)) + 's';
+                    const animType = vignette.textAnimationType || 'fade';
+
+                    if (animType === 'typewriter') {
+                        return `
+                            ${selector} h1, ${selector} p, ${selector} .description {
+                                animation: none !important;
+                                opacity: 1 !important;
+                            }
+                        `;
+                    }
+                    return `
+                        ${selector} h1, ${selector} p, ${selector} .description {
+                            animation: fadeIn ${duration} forwards !important;
+                        }
+                    `;
+                };
+
+                return `
+                    ${opening ? getScaleCss(opening.textScale, '#splash-screen .splash-content') : ''}
+                    ${victory ? getScaleCss(victory.textScale, '#positive-ending-screen .content') : ''}
+                    ${defeat ? getScaleCss(defeat.textScale, '#negative-ending-screen .content') : ''}
+                    ${opening ? getAnimationCss(opening, '#splash-screen .splash-content') : ''}
+                    ${victory ? getAnimationCss(victory, '#positive-ending-screen .content') : ''}
+                    ${defeat ? getAnimationCss(defeat, '#negative-ending-screen .content') : ''}
+                `;
+            })()}
         `;
 
         let finalCss = (gameData.gameCSS + cssOverrides)

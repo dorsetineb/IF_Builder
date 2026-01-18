@@ -508,10 +508,10 @@ const SceneMap: React.FC<SceneMapProps> = ({
                 <path d="M 0 0 L 10 5 L 0 10 z" fill="#a855f7" fillOpacity="0.8" />
               </marker>
               <marker id="arrow-vignette" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#f4f4f5" fillOpacity="0.8" />
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#eab308" fillOpacity="0.8" />
               </marker>
               <marker id="arrow-opening" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#0ea5e9" fillOpacity="0.8" />
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#eab308" fillOpacity="0.8" />
               </marker>
             </defs>
             {edges.map((edge, i) => {
@@ -540,8 +540,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
               const isVignetteLink = targetNode.type === 'vignette';
               const isOpeningLink = sourceNode.id === 'VNT_OPENING';
 
-              const strokeColor = isOpeningLink ? '#0ea5e9' : isVignetteLink ? '#f4f4f5' : '#a855f7';
-              const markerEnd = isOpeningLink ? "url(#arrow-opening)" : isVignetteLink ? "url(#arrow-vignette)" : "url(#arrow)";
+              const strokeColor = (isOpeningLink || isVignetteLink) ? '#eab308' : '#a855f7';
+              const markerEnd = (isOpeningLink || isVignetteLink) ? "url(#arrow-vignette)" : "url(#arrow)";
 
               return (
                 <path
@@ -566,21 +566,12 @@ const SceneMap: React.FC<SceneMapProps> = ({
               const isOpening = vig.id === 'VNT_OPENING';
               const isConclusion = vig.isConclusion;
 
-              const borderClass = isOpening
-                ? 'border-sky-500 border-4' // Opening: Thick Sky border
-                : 'border-zinc-100 border-2'; // All Vignettes: White border, standard thickness
+              // All vignettes (opening and conclusion) have yellow borders
+              const borderClass = 'border-yellow-500 border-4';
 
-              const shadowClass = isOpening
-                ? 'hover:shadow-sky-500/10 hover:border-sky-400'
-                : 'hover:shadow-zinc-500/10 hover:border-zinc-300';
+              const shadowClass = 'hover:shadow-yellow-500/10 hover:border-yellow-400';
 
-              // Anchor colors still differentiate for helpfulness, or should they be unified?
-              // User said "All vignettes should have white border". I'll keep anchor cues subtle or matching.
-              // Let's keep specific cues for anchor fills to help distinguishing types when dragging.
-
-              const anchorColorClass = isOpening
-                ? 'bg-sky-500 border-sky-400'
-                : 'bg-zinc-100 border-zinc-300';
+              const anchorColorClass = 'bg-yellow-500 border-yellow-400';
 
               return (
                 <div
@@ -634,7 +625,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
             // --- STANDARD SCENE NODE STYLE ---
             const scene = node.data as Scene;
-            const borderColorClass = node.isStart ? 'border-purple-500' : node.isEnding ? 'border-zinc-100' : scene.removesChanceOnEntry ? 'border-red-500' : scene.restoresChanceOnEntry ? 'border-green-500' : 'border-zinc-800/80';
+            const borderColorClass = node.isStart ? 'border-purple-500' : scene.removesChanceOnEntry ? 'border-red-500' : scene.restoresChanceOnEntry ? 'border-green-500' : 'border-zinc-800/80';
 
             return (
               <div
@@ -662,7 +653,6 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   <h3 className="font-bold text-zinc-100 truncate text-sm">{node.name}</h3>
                   <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">(ID: {node.id})</p>
                   {node.isStart && <p className="text-[10px] font-bold text-purple-400 mt-1 uppercase tracking-widest">Início</p>}
-                  {node.isEnding && <p className="text-[10px] font-bold text-zinc-400 mt-1 uppercase tracking-widest">Fim de Jogo</p>}
                 </div>
 
                 {node.image && (
@@ -719,8 +709,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
           <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Legenda</h4>
           <ul className="space-y-2">
             <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-purple-500 bg-purple-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Cena Inicial</span></li>
-            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-zinc-100 bg-zinc-100/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Vinheta</span></li>
-            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-sky-500 bg-sky-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Abertura</span></li>
+            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-yellow-500 bg-yellow-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Vinheta</span></li>
             <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-green-500 bg-green-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Restaura Chance</span></li>
             <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-red-500 bg-red-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Remove Chance</span></li>
           </ul>

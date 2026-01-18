@@ -96,10 +96,15 @@ export interface Vignette {
   showTitle?: boolean; // Controls visibility of the title
   showDescription?: boolean; // Controls visibility of the description
   buttonText?: string; // Custom button text for this vignette
+  textScale?: string; // Controls size of title and description
+  textAnimationType?: 'fade' | 'typewriter'; // Animation style for this vignette
+  textSpeed?: number; // Animation speed (1-5) for this vignette
   nextSceneId?: string;
+
   isConclusion?: boolean;
   isSystemDefeat?: boolean; // If true, shown when chances run out
 }
+
 
 export interface GameData {
   startScene: string;
