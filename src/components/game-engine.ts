@@ -22,16 +22,9 @@ export const prepareGameDataForEngine = (data: GameData): object => {
             };
         }
     }
-    const vignettesMap: { [id: string]: any } = {};
-    if (data.vignettes) {
-        data.vignettes.forEach(v => {
-            vignettesMap[v.id] = v;
-        });
-    }
     return {
         cena_inicial: data.startScene,
         cenas: translatedCenas,
-        vignettes: vignettesMap,
         globalObjects: data.globalObjects,
         mensagem_falha_padrao: data.defaultFailureMessage,
         nome_jogador_diario: data.gameDiaryPlayerName,
@@ -81,6 +74,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
 };
 
 export const gameJS = `
+document.addEventListener('DOMContentLoaded', () => {
     const ICONS = {
         heart: '<svg fill="%COLOR%" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
         circle: '<svg fill="%COLOR%" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
@@ -97,50 +91,79 @@ export const gameJS = `
         diamond: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2l10 10-10 10L2 12z"/></svg>'
     };
 
-    let gameData;
-    let currentSceneId;
-    let inventory;
-    let visitedScenes; 
-    let actionLog; 
-    let chances;
-    let isGameEnded;
-    let trackers;
-    let removedObjectsFromScenes; 
-    let currentBgmSrc;
-    let isPrinting;
-    let activePopupType;
+    const gameData = window.embeddedGameData;
+    let currentSceneId = gameData.cena_inicial;
+    let inventory = [];
+    let visitedScenes = []; 
+    let actionLog = []; 
+    let chances = gameData.gameMaxChances || 3;
+    let isGameEnded = false;
+    let trackers = {};
+    let removedObjectsFromScenes = {}; 
+    let currentBgmSrc = "";
+    let isPrinting = false;
+    let activePopupType = null;
 
-    let textSpeedVal; 
-    let imgSpeedVal;
-    let typeSpeedBase; 
-    let textAnimDuration;
-    let imageAnimDuration;
+    const textSpeedVal = gameData.gameTextSpeed || 3; 
+    const imgSpeedVal = gameData.gameImageSpeed || 3;
+    const typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
+    const textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
+    const imageAnimDuration = Math.max(0.3, 5.0 - (imgSpeedVal * 0.9)) + 's';
+    
+    document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
+    document.documentElement.style.setProperty('--image-anim-speed', imageAnimDuration);
 
-    function resetGlobals() {
-        gameData = window.embeddedGameData;
-        currentSceneId = gameData.cena_inicial;
-        inventory = [];
-        visitedScenes = []; 
-        actionLog = []; 
-        chances = gameData.gameMaxChances || 3;
-        isGameEnded = false;
-        trackers = {};
-        removedObjectsFromScenes = {}; 
-        currentBgmSrc = "";
-        isPrinting = false;
-        activePopupType = null;
+    (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
 
-        textSpeedVal = gameData.gameTextSpeed || 3; 
-        imgSpeedVal = gameData.gameImageSpeed || 3;
-        typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
-        textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
-        imageAnimDuration = Math.max(0.3, 5.0 - (imgSpeedVal * 0.9)) + 's';
-        
-        document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
-        document.documentElement.style.setProperty('--image-anim-speed', imageAnimDuration);
-
-        (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
-    }
+    const splashScreen = document.getElementById('splash-screen');
+    const positiveEndingScreen = document.getElementById('positive-ending-screen');
+    const negativeEndingScreen = document.getElementById('negative-ending-screen');
+    const splashStartButton = document.getElementById('splash-start-button');
+    const continueButton = document.getElementById('continue-button');
+    const endingRestartButtons = document.querySelectorAll('.ending-restart-button');
+    
+    const gameContainer = document.getElementById('game-container');
+    const imageContainer = document.getElementById('image-container');
+    const sceneImage = document.getElementById('scene-image');
+    const sceneImageBack = document.getElementById('scene-image-back');
+    const sceneDescription = document.getElementById('scene-description');
+    const verbInput = document.getElementById('verb-input');
+    const submitVerb = document.getElementById('submit-verb');
+    const actionPopup = document.getElementById('action-popup');
+    const suggestionsButton = document.getElementById('suggestions-button');
+    const inventoryButton = document.getElementById('inventory-button');
+    const diaryButton = document.getElementById('diary-button');
+    const trackersButton = document.getElementById('trackers-button');
+    const systemButton = document.getElementById('system-button');
+    const sceneNameOverlay = document.getElementById('scene-name-overlay');
+    const soundEffectAudio = document.getElementById('scene-sound-effect');
+    const bgmAudio = document.getElementById('bgm-audio');
+    
+    const standardActionBar = document.getElementById('standard-action-bar');
+    const endingActionBar = document.getElementById('ending-action-bar');
+    const viewEndingButton = document.getElementById('view-ending-button');
+    
+    const diaryModal = document.getElementById('diary-modal');
+    const diaryLog = document.getElementById('diary-log');
+    const trackersModal = document.getElementById('trackers-modal');
+    const trackersContent = document.getElementById('trackers-content');
+    const itemModal = document.getElementById('item-modal');
+    const itemModalName = document.getElementById('item-modal-name');
+    const itemModalImageContainer = document.getElementById('item-modal-image-container');
+    const itemModalImage = document.getElementById('item-modal-image');
+    const itemModalDescription = document.getElementById('item-modal-description');
+    
+    const systemModal = document.getElementById('system-modal');
+    const systemModalTitle = document.getElementById('system-modal-title');
+    const systemMenuMain = document.getElementById('system-menu-main');
+    const systemSlotsContainer = document.getElementById('system-slots-container');
+    const slotsList = document.getElementById('slots-list');
+    const btnSaveMenu = document.getElementById('btn-save-menu');
+    const btnLoadMenu = document.getElementById('btn-load-menu');
+    const btnMainMenu = document.getElementById('btn-main-menu');
+    const btnBackSystem = document.getElementById('btn-back-system');
+    
+    const closeButtons = document.querySelectorAll('.modal-close-button');
 
     const playSound = (src) => { if (src && soundEffectAudio) { soundEffectAudio.src = src; soundEffectAudio.play().catch(e => {}); } };
 
@@ -437,11 +460,7 @@ export const gameJS = `
             if (pIndex >= paragraphs.length) { 
                 isPrinting = false;
                 sceneDescription.classList.remove('typewriting-active');
-                if (chances <= 0) gameOver(); 
-                else if (scene.isEndingScene) {
-                    if (scene.conclusionVignetteId) renderConclusionButton(scene.conclusionVignetteId);
-                    else activateEndingUI('win');
-                }
+                if (chances <= 0) gameOver(); else if (scene.isEndingScene) activateEndingUI('win');
                 return; 
             }
 
@@ -493,15 +512,7 @@ export const gameJS = `
                 isPrinting = false;
                 sceneDescription.classList.remove('typewriting-active');
                 sceneDescription.scrollTop = sceneDescription.scrollHeight; 
-                if (chances <= 0) gameOver(); 
-                else { 
-                    if (scene.isEndingScene) {
-                        if (scene.conclusionVignetteId) renderConclusionButton(scene.conclusionVignetteId);
-                        else activateEndingUI('win');
-                    } else {
-                        verbInput.focus(); 
-                    }
-                }
+                if (chances <= 0) gameOver(); else { verbInput.focus(); if (scene.isEndingScene) activateEndingUI('win'); }
             }
         };
         renderNextParagraph();
@@ -575,34 +586,6 @@ export const gameJS = `
 
     const gameOver = () => { activateEndingUI('lose'); };
     const handleInput = () => { if (isPrinting) return; const input = verbInput.value.trim(); if (input) { processCommand(input); verbInput.value = ''; } };
-    const renderConclusionButton = (vignetteId) => {
-        document.querySelector('.input-area').classList.add('hidden');
-        const container = document.createElement('div');
-        container.style.marginTop = '20px';
-        container.style.textAlign = 'center';
-        
-        const btn = document.createElement('button');
-        btn.textContent = gameData.gameContinueButtonText || 'CONTINUAR';
-        btn.className = 'splash-button'; // Use splash button class if exists, or inline styles
-        // Apply styles to match consistent look
-        btn.style.backgroundColor = gameData.gameSplashButtonColor || '#2ea043';
-        btn.style.color = gameData.gameSplashButtonTextColor || '#ffffff';
-        btn.style.border = 'none';
-        btn.style.borderRadius = '6px';
-        btn.style.padding = '12px 24px';
-        btn.style.fontSize = '1em';
-        btn.style.fontWeight = 'bold';
-        btn.style.cursor = 'pointer';
-        btn.style.fontFamily = gameData.gameFontFamily || 'inherit';
-        btn.onmouseover = () => btn.style.backgroundColor = gameData.gameSplashButtonHoverColor || '#238636';
-        btn.onmouseout = () => btn.style.backgroundColor = gameData.gameSplashButtonColor || '#2ea043';
-
-        btn.onclick = () => showVignette(vignetteId);
-        container.appendChild(btn);
-        sceneDescription.appendChild(container);
-        sceneDescription.scrollTop = sceneDescription.scrollHeight;
-    };
-
     const hasWord = (word, text) => {
         if (!word || !text) return false;
         const normalizedWord = word.toLowerCase().trim();
@@ -667,9 +650,7 @@ export const gameJS = `
             if (objInScene) { addToInventory(objInScene); flagObjectAsRemoved(currentSceneId, objInScene.id); }
         } else if (interaction.removesTargetFromScene && interaction.target) flagObjectAsRemoved(currentSceneId, interaction.target);
         if (interaction.soundEffect) playSound(interaction.soundEffect);
-        if (interaction.vignetteId) {
-            showVignette(interaction.vignetteId, interaction.goToScene);
-        } else if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage);
+        if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage);
         else {
             const scene = gameData.cenas[currentSceneId];
             if (interaction.newSceneDescription) { 
@@ -677,128 +658,6 @@ export const gameJS = `
                 else scene.description = interaction.newSceneDescription;
                 renderScene(scene); 
             } else if (interaction.successMessage) printOutput(interaction.successMessage);
-        }
-    };
-
-    const showVignette = (vignetteId, nextSceneIdFromInteraction) => {
-        const v = gameData.vignettes ? gameData.vignettes[vignetteId] : null;
-        if (!v) return;
-
-        // Use existing splash screen or create new one? Creating new is safer to avoid conflict.
-        let overlay = document.getElementById('vignette-overlay-' + vignetteId);
-        if (overlay) overlay.remove(); 
-
-        overlay = document.createElement('div');
-        overlay.id = 'vignette-overlay-' + vignetteId;
-        overlay.className = 'splash-screen vignette-overlay ' + (v.contentAlignment === 'right' ? 'align-right' : 'align-left') + ' ' + (v.verticalAlignment === 'top' ? 'align-top' : 'align-bottom');
-        // Re-use standard ending-screen styles if possible, but splash-screen is likely best match
-        // We'll inject inline styles for overrides
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.zIndex = '3000'; // Above everything
-        overlay.style.backgroundColor = document.body.style.backgroundColor || '#000';
-        if (v.image) {
-            overlay.style.backgroundImage = 'url("' + v.image + '")';
-            overlay.style.backgroundSize = 'cover';
-            overlay.style.backgroundPosition = 'center';
-        }
-        
-        let contentHtml = '<div class="splash-content">';
-        // Logo logic? generic vignettes don't usually have logo unless specified.
-        
-        const showTitle = v.showTitle !== false; // Default true if undefined/legacy? Actually interface says default false if omitTitle
-        // Checking legacy omitTitle vs new showTitle
-        const titleVisible = v.showTitle === true || (v.showTitle === undefined && !v.omitTitle);
-        const descVisible = v.showDescription === true || (v.showDescription === undefined && !v.omitTitle);
-
-        if (titleVisible && v.title) contentHtml += '<h1>' + v.title + '</h1>';
-        if (descVisible && v.description) contentHtml += '<p>' + formatText(v.description) + '</p>';
-        
-        let buttonText = v.buttonText || (v.isConclusion ? (gameData.gameRestartButtonText || 'REINICIAR') : 'CONTINUAR');
-        // If it's a conclusion, we might want specific buttons?
-        // Actually if isConclusion, it behaves like an ending.
-        
-        contentHtml += '<button id="btn-vignette-' + vignetteId + '">' + buttonText + '</button>';
-        contentHtml += '</div>';
-
-        overlay.innerHTML = contentHtml;
-        document.body.appendChild(overlay);
-
-        // Play Music
-        if (v.backgroundMusic) {
-            playBgm(v.backgroundMusic);
-        }
-
-        // Behavior
-        const btn = document.getElementById('btn-vignette-' + vignetteId);
-        // Apply styles from gameData to match opening button
-        if (btn) {
-            btn.style.backgroundColor = gameData.gameSplashButtonColor || '#2ea043';
-            btn.style.color = gameData.gameSplashButtonTextColor || '#ffffff';
-            btn.style.border = 'none';
-            btn.style.borderRadius = '6px';
-            btn.style.padding = '10px 20px';
-            btn.style.fontSize = '1em';
-            btn.style.fontWeight = 'bold';
-            btn.style.cursor = 'pointer';
-            btn.style.marginTop = '20px';
-            btn.style.fontFamily = gameData.gameFontFamily || 'inherit';
-            btn.onmouseover = () => btn.style.backgroundColor = gameData.gameSplashButtonHoverColor || '#238636';
-            btn.onmouseout = () => btn.style.backgroundColor = gameData.gameSplashButtonColor || '#2ea043';
-        }
-
-        btn.addEventListener('click', () => {
-             if (v.isConclusion) {
-                 if (window.isPreview) {
-                     window.resetGame();
-                 } else {
-                     location.reload();
-                 }
-             } else {
-                 // Continue
-                 overlay.remove();
-                 
-                 // Restore BGM if needed? 
-                 // If vignette had music, we might want to go back to scene music or global music?
-                 // loadScene will handle music if we move scene.
-                 
-                 const nextId = v.nextSceneId || nextSceneIdFromInteraction;
-                 if (nextId) {
-                     loadScene(nextId, true);
-                 } else {
-                     // Just close, stay in current scene.
-                     // Maybe restore scene music?
-                     const scene = gameData.cenas[currentSceneId];
-                     if (scene && scene.backgroundMusic) playBgm(scene.backgroundMusic);
-                     else if (gameData.gameBackgroundMusic) playBgm(gameData.gameBackgroundMusic);
-                 }
-             }
-        });
-        
-        // Add specific CSS for this overlay to match alignment
-        // The classes align-right etc should be handled by global CSS if splash-screen uses them.
-        // Let's ensure flexbox works
-        overlay.style.display = 'flex';
-        overlay.style.flexDirection = 'column';
-        // Defaults
-        // align-left / top handled by CSS?
-        // Let's inject manual flex styles based on props to be safe
-        if (v.verticalAlignment === 'top') overlay.style.justifyContent = 'flex-start';
-        else overlay.style.justifyContent = 'flex-end'; // bottom
-        
-        if (v.contentAlignment === 'right') overlay.style.alignItems = 'flex-end';
-        else overlay.style.alignItems = 'flex-start'; // left
-
-        // Inner content padding
-        const content = overlay.querySelector('.splash-content');
-        if (content) {
-            content.style.padding = '40px';
-            content.style.maxWidth = '600px';
-            if (v.contentAlignment === 'right') content.style.textAlign = 'right';
-            else content.style.textAlign = 'left';
         }
     };
 
