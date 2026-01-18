@@ -12,6 +12,7 @@ import Header from './Header';
 import { WelcomePlaceholder } from './WelcomePlaceholder';
 import { GuideView } from './GuideView';
 import { UIEditor } from './UIEditor';
+import VignettesEditor from './VignettesEditor';
 import Preview from './Preview';
 import SceneMap from './SceneMap';
 import GlobalObjectsEditor from './GlobalObjectsEditor';
@@ -1611,6 +1612,14 @@ DATE:        ${exportDate.toLocaleString()}
                             theme={appTheme}
                         />
                         <main className={`flex-1 overflow-y-auto relative bg-background ${currentView === 'scenes' && !selectedScene ? 'p-0' : 'p-6'}`}>
+                            {currentView === 'vignettes' && (
+                                <VignettesEditor
+                                    gameData={gameData}
+                                    onUpdate={handleUpdateGameData}
+                                    onSetDirty={setIsDirty}
+                                    allScenes={scenesList}
+                                />
+                            )}
                             {currentView === 'interface' && (
                                 <UIEditor
                                     key={importKey}
@@ -1716,6 +1725,7 @@ DATE:        ${exportDate.toLocaleString()}
                                     consequenceTrackers={consequenceTrackers}
                                     isStartScene={selectedScene.id === gameData.startScene}
                                     gameInteractionType={gameData.gameInteractionType || 'parser'}
+                                    vignettes={gameData.vignettes || []}
                                 />
                             ) : currentView === 'scenes' ? (
                                 <WelcomePlaceholder

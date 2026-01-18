@@ -25,6 +25,7 @@ export interface Interaction {
   consumesItem?: boolean; // if requiresInInventory is used, is it consumed?
   removesTargetFromScene?: boolean; // remove the target object from the scene
   goToScene?: string; // ID of the scene to move to
+  vignetteId?: string; // ID of the vignette to play
   newSceneDescription?: string;
   trackerEffects?: TrackerEffect[];
   transitionType?: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom' | 'blur' | 'none';
@@ -79,6 +80,22 @@ export interface ConsequenceTracker {
   barColor?: string;
   invertBar?: boolean;
   hideValue?: boolean;
+}
+
+export interface Vignette {
+  id: string;
+  name: string; // Internal name
+  title: string; // Displayed title
+  description: string;
+  image?: string; // Base64 string
+  backgroundMusic?: string; // Base64 Audio
+  contentAlignment?: 'left' | 'right';
+  verticalAlignment?: 'top' | 'bottom';
+  omitTitle?: boolean; // Deprecated in favor of showTitle/showDescription
+  showTitle?: boolean; // Controls visibility of the title
+  showDescription?: boolean; // Controls visibility of the description
+  buttonText?: string; // Custom button text for this vignette
+  nextSceneId?: string;
 }
 
 export interface GameData {
@@ -169,6 +186,7 @@ export interface GameData {
   gameSceneNameOverlayTextColor?: string;
   fixedVerbs?: FixedVerb[];
   consequenceTrackers?: ConsequenceTracker[];
+  vignettes?: Vignette[]; // All vignettes, including opening (first one)
   gameShowTrackersUI?: boolean;
   gameShowSystemButton?: boolean;
   gameSuggestionsButtonText?: string;
@@ -190,4 +208,4 @@ export interface GameData {
   gameTextReadingFlow?: 'continuous' | 'paused';
 }
 
-export type View = 'scenes' | 'interface' | 'map' | 'global_objects' | 'trackers' | 'settings' | 'about' | 'guide';
+export type View = 'scenes' | 'interface' | 'vignettes' | 'map' | 'global_objects' | 'trackers' | 'settings' | 'about' | 'guide';

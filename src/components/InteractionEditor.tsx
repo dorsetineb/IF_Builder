@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect } from '../types';
+import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect, Vignette } from '../types';
 import { Plus, Trash2, Upload, ChevronDown } from 'lucide-react';
 
 interface InteractionEditorProps {
@@ -11,9 +11,11 @@ interface InteractionEditorProps {
     sceneObjects: GameObject[];
     allTakableObjects: GameObject[];
     consequenceTrackers: ConsequenceTracker[];
+    vignettes: Vignette[];
 }
 
-const getOutcomeType = (inter: Interaction): 'goToScene' | 'newSceneDescription' => {
+const getOutcomeType = (inter: Interaction): 'goToScene' | 'newSceneDescription' | 'playVignette' => {
+    if (inter.vignetteId) return 'playVignette';
     if (inter.newSceneDescription !== undefined) return 'newSceneDescription';
     return 'goToScene';
 };
@@ -28,7 +30,8 @@ const InteractionItem: React.FC<{
     sceneObjects: GameObject[];
     allTakableObjects: GameObject[];
     consequenceTrackers: ConsequenceTracker[];
-}> = ({ interaction, index, onUpdate, onRemove, allScenes, currentSceneId, sceneObjects, allTakableObjects, consequenceTrackers }) => {
+    vignettes: Vignette[];
+}> = ({ interaction, index, onUpdate, onRemove, allScenes, currentSceneId, sceneObjects, allTakableObjects, consequenceTrackers, vignettes }) => {
 
     const [isOpen, setIsOpen] = useState(false);
     const [localVerbs, setLocalVerbs] = useState(interaction.verbs.join(', '));
@@ -93,19 +96,27 @@ const InteractionItem: React.FC<{
         }
     };
 
-    const handleOutcomeChange = (outcome: 'goToScene' | 'newSceneDescription') => {
+    const handleOutcomeChange = (outcome: 'goToScene' | 'newSceneDescription' | 'playVignette') => {
         const newInteraction = { ...interaction };
         const currentNewDescription = newInteraction.newSceneDescription || '';
+
+        // Clean up previous outcome states
         delete newInteraction.goToScene;
         delete newInteraction.newSceneDescription;
+        delete newInteraction.vignetteId;
+
         if (outcome === 'goToScene') {
             newInteraction.goToScene = '';
             newInteraction.transitionType = 'fade';
-            newInteraction.transitionSpeed = 3;
+            newInteraction.transitionSpeed = 5;
+        } else if (outcome === 'playVignette') {
+            newInteraction.vignetteId = '';
+            newInteraction.transitionType = 'fade';
+            newInteraction.transitionSpeed = 5;
         } else {
             newInteraction.newSceneDescription = currentNewDescription || 'A cena mudou...';
             delete newInteraction.transitionType;
-            delete newInteraction.transitionSpeed;
+            delete newInteraction.transitionSpeed; // Text update typically doesn't use the same transition mechanics in this engine
         }
         onUpdate(index, newInteraction);
     };
@@ -228,21 +239,32 @@ const InteractionItem: React.FC<{
                             <div>
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Resultado da Ação</label>
                                 <div className="flex gap-2 mb-3 p-1 bg-muted border border-muted-foreground/50 rounded-lg">
-                                    <button onClick={() => handleOutcomeChange('goToScene')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'goToScene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Mudar de Cena</button>
                                     <button onClick={() => handleOutcomeChange('newSceneDescription')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'newSceneDescription' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Atualizar Texto</button>
+                                    <button onClick={() => handleOutcomeChange('goToScene')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'goToScene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Mudar de Cena</button>
+                                    <button onClick={() => handleOutcomeChange('playVignette')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'playVignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Tocar Vinheta</button>
                                 </div>
-                                {outcomeType === 'goToScene' ? (
+
+                                {outcomeType === 'goToScene' && (
                                     <select value={interaction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className={selectBaseClasses}>
                                         <option value="">Selecione uma cena...</option>
                                         {otherScenes.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                                     </select>
-                                ) : (
+                                )}
+
+                                {outcomeType === 'newSceneDescription' && (
                                     <textarea value={interaction.newSceneDescription || ''} onChange={e => handleInteractionChange('newSceneDescription', e.target.value)} rows={3} placeholder="Nova descrição para esta cena..." className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs focus:ring-0 text-zinc-300" />
+                                )}
+
+                                {outcomeType === 'playVignette' && (
+                                    <select value={interaction.vignetteId || ''} onChange={e => handleInteractionChange('vignetteId', e.target.value)} className={selectBaseClasses}>
+                                        <option value="">Selecione uma vinheta...</option>
+                                        {vignettes.map(v => <option key={v.id} value={v.id}>{v.name || v.title || 'Vinheta sem nome'}</option>)}
+                                    </select>
                                 )}
                             </div>
 
-                            {/* Transition */}
-                            {outcomeType === 'goToScene' && (
+                            {/* Transition - For GoToScene AND PlayVignette */}
+                            {(outcomeType === 'goToScene' || outcomeType === 'playVignette') && (
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Transição</label>
@@ -278,10 +300,13 @@ const InteractionItem: React.FC<{
                                 </div>
                             )}
 
-                            <div>
-                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Mensagem de Sucesso (Opcional)</label>
-                                <input type="text" value={interaction.successMessage || ''} onChange={e => handleInteractionChange('successMessage', e.target.value)} placeholder="Ex: Você abriu a porta." className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs focus:ring-0 text-zinc-300" />
-                            </div>
+                            {/* Messages - Hidden for PlayVignette */}
+                            {outcomeType !== 'playVignette' && (
+                                <div>
+                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Mensagem de Sucesso (Opcional)</label>
+                                    <input type="text" value={interaction.successMessage || ''} onChange={e => handleInteractionChange('successMessage', e.target.value)} placeholder="Ex: Você abriu a porta." className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs focus:ring-0 text-zinc-300" />
+                                </div>
+                            )}
                         </div>
 
                         {/* Right Column: Sound Effect, Trackers */}
@@ -329,7 +354,7 @@ const generateUniqueId = (prefix: 'inter', existingIds: string[]): string => {
     return id;
 };
 
-const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions, onUpdateInteractions, allScenes, currentSceneId, sceneObjects, allTakableObjects, consequenceTrackers }) => {
+const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions, onUpdateInteractions, allScenes, currentSceneId, sceneObjects, allTakableObjects, consequenceTrackers, vignettes }) => {
     const handleUpdate = (index: number, updatedInteraction: Interaction) => {
         const newInteractions = [...interactions];
         newInteractions[index] = updatedInteraction;
@@ -355,6 +380,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions, onU
                         sceneObjects={sceneObjects}
                         allTakableObjects={allTakableObjects}
                         consequenceTrackers={consequenceTrackers}
+                        vignettes={vignettes}
                     />
                 ))
             ) : (

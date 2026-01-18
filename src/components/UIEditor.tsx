@@ -314,7 +314,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localLoadMenuTitle, setLocalLoadMenuTitle] = useState(gameLoadMenuTitle);
     const [localMainMenuButtonText, setLocalMainMenuButtonText] = useState(gameMainMenuButtonText);
     const [localViewEndingButtonText, setLocalViewEndingButtonText] = useState(gameViewEndingButtonText);
-    const [activeTab, setActiveTab] = useState('abertura');
+    const [activeTab, setActiveTab] = useState('aparencia');
 
     const [localTextColor, setLocalTextColor] = useState(textColor);
     const [localTitleColor, setLocalTitleColor] = useState(titleColor);
@@ -369,7 +369,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed);
 
     const TABS = {
-        abertura: 'Início',
         aparencia: 'Aparência',
         sistemas: 'Sistemas',
         global: 'Comandos Globais',
@@ -1630,7 +1629,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         </div>
                     )}
 
-                    {activeTab === 'abertura' && (
+                    {false /* abertura moved to Vignettes, activeTab === 'abertura' */ && (
                         <div className="space-y-4"><div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                             {/* LEFT COLUMN: Texts & Audio */}
                             <div className="flex flex-col h-full gap-4">

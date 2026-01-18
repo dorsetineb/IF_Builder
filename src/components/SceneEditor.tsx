@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
-import { Scene, Interaction, GameObject, ConsequenceTracker, Choice } from '../types';
+import { Scene, Interaction, GameObject, ConsequenceTracker, Choice, Vignette } from '../types';
 import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
 import ConnectionsView from './ConnectionsView';
@@ -24,6 +24,7 @@ interface SceneEditorProps {
     consequenceTrackers: ConsequenceTracker[];
     isStartScene: boolean;
     gameInteractionType: 'parser' | 'choice';
+    vignettes: Vignette[];
 }
 
 const getCleanSceneState = (s: Scene): Scene => {
@@ -60,7 +61,8 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     layoutOrientation,
     consequenceTrackers,
     isStartScene,
-    gameInteractionType
+    gameInteractionType,
+    vignettes
 }) => {
     const [localScene, setLocalScene] = useState<Scene>(() => getCleanSceneState(scene));
     const [pendingObjectUpdates, setPendingObjectUpdates] = useState<{ [id: string]: Partial<GameObject> }>({});
@@ -538,6 +540,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                             sceneObjects={currentSceneObjects}
                             allTakableObjects={allAvailableInventoryObjects}
                             consequenceTrackers={consequenceTrackers}
+                            vignettes={vignettes}
                         />
                     )}
 
