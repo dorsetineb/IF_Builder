@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo, DragEvent } from 'react';
 import { GameData, Vignette, Scene } from '../types';
 import { FONTS } from '../constants';
-import { Upload, Trash2, ImageIcon, MonitorPlay, Save, RotateCcw, Plus, ChevronDown } from 'lucide-react';
+import { Upload, Trash2, ImageIcon, MonitorPlay, Save, RotateCcw, Plus, ChevronDown, GripVertical } from 'lucide-react';
 
 
 interface VignettesEditorProps {
@@ -19,7 +19,11 @@ const VignetteItem: React.FC<{
     isOpening?: boolean;
     canDelete?: boolean;
     allScenes: Scene[];
-}> = ({ vignette, gameData, onUpdate, onDelete, isOpening, canDelete = true, allScenes }) => {
+    enableDrag?: boolean;
+    onDragStart?: (e: DragEvent<HTMLDivElement>) => void;
+    onDragOver?: (e: DragEvent<HTMLDivElement>) => void;
+    onDrop?: (e: DragEvent<HTMLDivElement>) => void;
+}> = ({ vignette, gameData, onUpdate, onDelete, isOpening, canDelete = true, allScenes, enableDrag, onDragStart, onDragOver, onDrop }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
 
@@ -71,8 +75,19 @@ const VignetteItem: React.FC<{
             {/* Header */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className={`relative flex items-center h-16 cursor-pointer hover:bg-zinc-800/50 transition-all overflow-hidden group ${isOpen ? 'bg-purple-500/5 border-b border-purple-500/10' : ''}`}
+                className={`relative flex items-center h-16 cursor-pointers transition-all overflow-hidden group ${isOpen ? 'bg-purple-500/5 border-b border-purple-500/10' : ''}`}
+                draggable={enableDrag}
+                onDragStart={onDragStart}
+                onDragOver={onDragOver}
+                onDrop={onDrop}
             >
+                {/* Drag Handle */}
+                {enableDrag && (
+                    <div className="w-12 h-full cursor-grab active:cursor-grabbing text-zinc-600 hover:text-zinc-400 flex items-center justify-center shrink-0 border-r border-zinc-800/50 bg-black/20">
+                        <GripVertical className="w-4 h-4" />
+                    </div>
+                )}
+
                 {/* Sliding Trash Button (Only if can delete) */}
                 {canDelete && !isOpening && (
                     <button
@@ -83,13 +98,6 @@ const VignetteItem: React.FC<{
                         <Trash2 className="w-5 h-5" />
                     </button>
                 )}
-
-                {/* Expansion Arrow */}
-                <div className="px-4 shrink-0">
-                    <ChevronDown className={`w-4 h-4 text-zinc-600 transition-transform duration-300 ${isOpen ? '-rotate-90' : 'rotate-0'}`} />
-                </div>
-
-                {/* Thumbnail */}
                 {vignette.image ? (
                     <div className="w-16 h-16 shrink-0 bg-zinc-950 border-r border-muted-foreground/50 overflow-hidden flex items-center justify-center">
                         <img src={vignette.image} alt="" className="w-full h-full object-cover" />
@@ -498,6 +506,40 @@ const VignetteItem: React.FC<{
 const VignettesEditor: React.FC<VignettesEditorProps> = ({ gameData, onUpdate, onSetDirty, allScenes }) => {
     // 1. Initialize logic to sync old root properties to the first vignette if no vignettes exist
     const [vignettes, setVignettes] = useState<Vignette[]>([]);
+    const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+    const handleDragStart = (e: DragEvent<HTMLDivElement>, index: number) => {
+        setDraggedIndex(index);
+        // Required for Firefox
+        e.dataTransfer.effectAllowed = 'move';
+    };
+
+    const handleDragOver = (e: DragEvent<HTMLDivElement>, index: number) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+    };
+
+    const handleDrop = (e: DragEvent<HTMLDivElement>, targetIndex: number) => {
+        e.preventDefault();
+
+        // Don't do anything if we dropped on the same item or if drag source is invalid
+        if (draggedIndex === null || draggedIndex === targetIndex) return;
+
+        // Logic: Opening (index 0) is pinned. Cannot drag it, cannot drop above it/on it.
+        // Actually, we disable drag for index 0 in the render loop.
+        // But we must also ensure we don't displace index 0.
+        // If targetIndex is 0, we should probably correcting to 1?
+        // Let's just block dropping on index 0 effectively by checking.
+
+        if (targetIndex === 0) return; // Cannot drop into slot 0
+
+        const newVignettes = [...vignettes];
+        const [movedItem] = newVignettes.splice(draggedIndex, 1);
+        newVignettes.splice(targetIndex, 0, movedItem);
+
+        setVignettes(newVignettes);
+        setDraggedIndex(null);
+    };
 
     useEffect(() => {
         if (!gameData.vignettes || gameData.vignettes.length === 0) {
@@ -681,6 +723,10 @@ const VignettesEditor: React.FC<VignettesEditorProps> = ({ gameData, onUpdate, o
                             isOpening={isOpening}
                             canDelete={canDelete}
                             allScenes={allScenes}
+                            enableDrag={!isOpening} // Disable drag for the first item (Opening)
+                            onDragStart={(e) => handleDragStart(e, index)}
+                            onDragOver={(e) => handleDragOver(e, index)}
+                            onDrop={(e) => handleDrop(e, index)}
                         />
                     );
                 })}

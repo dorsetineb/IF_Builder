@@ -4,7 +4,7 @@ import { useUser } from '../components/UserContext';
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const [showPixModal, setShowPixModal] = useState(false);
-    const [activeTab, setActiveTab] = useState<'what_is' | 'about_project' | 'support' | 'dev'>('what_is');
+    const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
 
     const handleCopyPix = () => {
         navigator.clipboard.writeText("rodbertes@gmail.com");
@@ -54,15 +54,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         {/* Tabs Navigation */}
                         <div className="flex border-b border-muted-foreground/50 mb-6">
                             <div className="flex space-x-6">
-                                <button
-                                    onClick={() => setActiveTab('what_is')}
-                                    className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'what_is'
-                                        ? 'text-primary border-b-4 border-primary'
-                                        : 'text-muted-foreground hover:text-foreground'
-                                        }`}
-                                >
-                                    O que é
-                                </button>
+
                                 <button
                                     onClick={() => setActiveTab('about_project')}
                                     className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'about_project'
@@ -93,57 +85,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             </div>
                         </div>
 
-                        {/* TAB: O QUE É */}
-                        {activeTab === 'what_is' && (
-                            <div className="space-y-8 animate-in slide-in-from-left-4 duration-300">
-                                {/* O que é Ficção Interativa */}
-                                <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="p-3 bg-blue-500/10 rounded-lg">
-                                            <Workflow className="w-6 h-6 text-blue-500" />
-                                        </div>
-                                        <h2 className="text-lg font-bold text-foreground">
-                                            O que é uma ficção interativa?
-                                        </h2>
-                                    </div>
-                                    <div className="space-y-6 text-muted-foreground leading-relaxed font-light text-sm">
-                                        <p>
-                                            <b className="text-foreground">Ficções interativas</b> são narrativas onde o leitor toma decisões que alteram o rumo da história. Talvez você já tenha folheado um livro-jogo em que, ao chegar no fim da página, o livro sugere: Caso você queira A, vá para a página 11; Se quiser B, vá para a página 34. Ficções Interativas são uma mistura de literatura tradicional e o design de jogos. Se você assistiu o episódio Bandersnatch de Black Mirror, já teve contato com uma ficção interativa.
-                                        </p>
-                                    </div>
-                                </div>
 
-                                {/* Contextos de Uso */}
-                                <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
-                                    <div className="flex items-center gap-3 mb-6">
-                                        <div className="p-3 bg-indigo-500/10 rounded-lg">
-                                            <Crop className="w-6 h-6 text-indigo-500" />
-                                        </div>
-                                        <h2 className="text-lg font-bold text-foreground">
-                                            Em que contexto ficções interativas podem ser utilizadas?
-                                        </h2>
-                                    </div>
-                                    <div className="space-y-8 text-muted-foreground leading-relaxed font-light text-sm">
-                                        <div className="space-y-2">
-                                            <h3 className="font-bold text-foreground text-base">1. Educação e Treinamento</h3>
-                                            <p>Educadores podem colocar estudantes e profissionais diante de dilemas éticos, históricos ou técnicos. Em vez de apenas ler sobre um conceito, precisam aplicar o conhecimento para avançar. Ajuda no desenvolvimento da lógica de causa e efeito, onde cada escolha gera uma consequência clara no sistema.</p>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <h3 className="font-bold text-foreground text-base">2. Prototipagem Narrativa</h3>
-                                            <p>Escritores e desenvolvedores utilizam ficções interativas para testar estrutura de diálogos e árvores de decisão antes de investir em produções complexas (como jogos 3D ou filmes interativos). É uma forma rápida de verificar se um enredo complexo possui furos de roteiro ou becos sem saída.</p>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <h3 className="font-bold text-foreground text-base">3. Entretenimento</h3>
-                                            <p>Artistas e autores podem experimentar uma formato narrativo diferente para contar suas histórias, e desenvolvedores podem criar pequenos jogos. Fanfics, simuladores de relacionamento, dramas de um apocalipse zumbi (ou robótico). Diversão é sempre um bom contexto!</p>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <h3 className="font-bold text-foreground text-base">4. Terapia e Saúde</h3>
-                                            <p>Profissionais da saúde podem criar situações interativas para ajudar no tratamento de fobias, com a exposição controlada de cenários desafiadores, em um ambiente virtual e seguro.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
 
 
                         {/* TAB: SOBRE O PROJETO (NOVO) */}
@@ -160,7 +102,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     </div>
                                     <div className="space-y-6 text-muted-foreground leading-relaxed font-light text-sm">
                                         <p>
-                                            O IF Builder é uma ferramenta gratuita que ajuda a criar histórias interativas e não-lineares. Sua lógica funciona a partir de cenas, que são interligadas entre si através de interações definidas pelo usuário.
+                                            O IF Builder é uma ferramenta gratuita que ajuda a criar histórias interativas e não-lineares. Sua lógica funciona a partir de cenas que são interligadas entre si por interações definidas pelo usuário.
                                         </p>
                                         <p>
                                             Todas as ficções interativas criadas aqui são exportadas em um arquivo .zip autossuficiente. Ele não precisa de internet nem do editor para funcionar - apenas um navegador. Pense nesse arquivo como um pendrive: você pode guardá-lo em uma gaveta, ou entregá-lo a alguém. Quem receber o seu arquivo .zip pode rodar a ficção, e também pode importá-lo no IF Builder para ver exatamente como você encaixou cada peça da narrativa.
@@ -244,7 +186,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             </div>
 
                             <p className="text-[10px] text-zinc-400 leading-relaxed mb-4">
-                                este site é mantido com amor e com doações. Se ele é útil pra voce, considere contribuir! Aceitamos PIX pelo QR Code e pela Chave Aleatória.
+                                Este site é mantido com amor e com doações. Se ele é útil pra voce, considere contribuir! Aceitamos PIX pelo QR Code e pela Chave Aleatória.
                             </p>
 
                             <div className="bg-white p-2 rounded-lg flex justify-center mb-6">
@@ -255,21 +197,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 />
                             </div>
 
-                            <div className="space-y-3 mb-6">
-                                {/* Key Points */}
-                                <div className="flex items-start gap-2 text-xs text-zinc-400">
-                                    <Check className="w-3 h-3 text-primary mt-0.5 shrink-0" />
-                                    <span>100% para infraestrutura</span>
-                                </div>
-                                <div className="flex items-start gap-2 text-xs text-zinc-400">
-                                    <Check className="w-3 h-3 text-primary mt-0.5 shrink-0" />
-                                    <span>Plataforma livre de ads</span>
-                                </div>
-                                <div className="flex items-start gap-2 text-xs text-zinc-400">
-                                    <Check className="w-3 h-3 text-primary mt-0.5 shrink-0" />
-                                    <span>Recursos experimentais</span>
-                                </div>
-                            </div>
+
 
                             <button
                                 onClick={() => setShowPixModal(true)}

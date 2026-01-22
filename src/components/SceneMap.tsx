@@ -504,14 +504,14 @@ const SceneMap: React.FC<SceneMapProps> = ({
         >
           <svg className="absolute" width={Math.max(1000, bounds.maxX + 1000)} height={Math.max(1000, bounds.maxY + 1000)} style={{ transform: `translate(0px, 0px)`, zIndex: 0, overflow: 'visible' }}>
             <defs>
-              <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#a855f7" fillOpacity="0.8" />
+              <marker id="arrow-blue" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6" fillOpacity="0.8" />
               </marker>
-              <marker id="arrow-vignette" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#eab308" fillOpacity="0.8" />
+              <marker id="arrow-amber" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b" fillOpacity="0.8" />
               </marker>
-              <marker id="arrow-opening" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#eab308" fillOpacity="0.8" />
+              <marker id="arrow-green" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#22c55e" fillOpacity="0.8" />
               </marker>
             </defs>
             {edges.map((edge, i) => {
@@ -537,11 +537,19 @@ const SceneMap: React.FC<SceneMapProps> = ({
               const cx1 = realX1 + (offset * edge.sDir);
               const cx2 = realX2 + (offset * edge.tDir);
 
-              const isVignetteLink = targetNode.type === 'vignette';
               const isOpeningLink = sourceNode.id === 'VNT_OPENING';
 
-              const strokeColor = (isOpeningLink || isVignetteLink) ? '#eab308' : '#a855f7';
-              const markerEnd = (isOpeningLink || isVignetteLink) ? "url(#arrow-vignette)" : "url(#arrow)";
+              // Determine Arrow Color based on Source
+              let strokeColor = '#f59e0b'; // Default Amber
+              let markerEnd = "url(#arrow-amber)";
+
+              if (isOpeningLink) {
+                strokeColor = '#3b82f6'; // Blue
+                markerEnd = "url(#arrow-blue)";
+              } else if (sourceNode.isEnding) { // Should rarely happen for user flows, but technially possible
+                strokeColor = '#22c55e'; // Green
+                markerEnd = "url(#arrow-green)";
+              }
 
               return (
                 <path
@@ -566,12 +574,14 @@ const SceneMap: React.FC<SceneMapProps> = ({
               const isOpening = vig.id === 'VNT_OPENING';
               const isConclusion = vig.isConclusion;
 
-              // All vignettes (opening and conclusion) have yellow borders
-              const borderClass = 'border-yellow-500 border-4';
+              // Color Logic: Blue (Opening), Green (Conclusion), Amber (Others)
+              let colorBase = 'amber';
+              if (isOpening) colorBase = 'blue';
+              else if (isConclusion) colorBase = 'green';
 
-              const shadowClass = 'hover:shadow-yellow-500/10 hover:border-yellow-400';
-
-              const anchorColorClass = 'bg-yellow-500 border-yellow-400';
+              const borderClass = `border-${colorBase}-500 border-4`;
+              const shadowClass = `hover:shadow-${colorBase}-500/10 hover:border-${colorBase}-400`;
+              const anchorColorClass = `bg-${colorBase}-500 border-${colorBase}-400`;
 
               return (
                 <div
@@ -625,7 +635,12 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
             // --- STANDARD SCENE NODE STYLE ---
             const scene = node.data as Scene;
-            const borderColorClass = node.isStart ? 'border-purple-500' : scene.removesChanceOnEntry ? 'border-red-500' : scene.restoresChanceOnEntry ? 'border-green-500' : 'border-zinc-800/80';
+
+            // User Rules: Scene = Yellow(Amber), Ending = Green.
+            const isEnding = scene.isEndingScene;
+            const colorBase = isEnding ? 'green' : 'amber';
+
+            const borderColorClass = `border-${colorBase}-500`;
 
             return (
               <div
@@ -640,19 +655,19 @@ const SceneMap: React.FC<SceneMapProps> = ({
                 onClick={(e) => {
                   if (Math.sqrt(Math.pow(e.clientX - dragStartPos.current.x, 2) + Math.pow(e.clientY - dragStartPos.current.y, 2)) < 5) onSelectScene(node.id);
                 }}
-                className={`absolute bg-zinc-900 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex flex-col transition-all duration-300 border-2 ${borderColorClass} cursor-pointer hover:border-purple-400 hover:shadow-purple-500/10 overflow-hidden group`}
+                className={`absolute bg-zinc-900 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex flex-col transition-all duration-300 border-2 ${borderColorClass} cursor-pointer hover:border-${colorBase}-400 hover:shadow-${colorBase}-500/10 overflow-hidden group`}
                 style={{ width: NODE_WIDTH, transform: `translate(${node.x}px, ${node.y}px)`, height: node.height, userSelect: 'none' }}
               >
                 <div className="p-3 relative flex-shrink-0 text-center bg-zinc-900/50" style={{ height: NODE_HEADER_HEIGHT }}>
                   {/* Anchor Points Visualization */}
                   {!node.isStart && (
-                    <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${node.id}-L`) ? 'bg-purple-500 border-purple-400' : 'bg-zinc-950 border-zinc-700'}`} />
+                    <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${node.id}-L`) ? `bg-${colorBase}-500 border-${colorBase}-400` : 'bg-zinc-950 border-zinc-700'}`} />
                   )}
                   {/* Although anchors are strictly computed, we show right anchor visually if there are inputs from right? No, inputs always Left. Outputs always Right. */}
 
                   <h3 className="font-bold text-zinc-100 truncate text-sm">{node.name}</h3>
                   <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">(ID: {node.id})</p>
-                  {node.isStart && <p className="text-[10px] font-bold text-purple-400 mt-1 uppercase tracking-widest">Início</p>}
+                  {isEnding && <p className="text-[10px] font-bold text-green-400 mt-1 uppercase tracking-widest">Final</p>}
                 </div>
 
                 {node.image && (
@@ -683,8 +698,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
                       }
 
                       const isVignetteLink = item.type === 'vignette';
-                      const linkColor = isVignetteLink ? 'text-amber-500 bg-amber-500/5' : 'text-purple-400 bg-purple-500/5';
-                      const anchorColor = isVignetteLink ? 'bg-amber-500 border-amber-400' : 'bg-purple-500 border-purple-400';
+                      // Use Amber for generic links, or specific logic if needed
+                      const linkColor = isVignetteLink ? 'text-amber-500 bg-amber-500/5' : `text-${colorBase}-400 bg-${colorBase}-500/5`;
+                      const anchorColor = isVignetteLink ? 'bg-amber-500 border-amber-400' : `bg-${colorBase}-500 border-${colorBase}-400`;
 
                       return (
                         <div key={item.id} className={`relative ${linkColor} font-bold py-1 flex items-center w-full`} style={{ height: INTERACTION_ITEM_HEIGHT }}>
@@ -708,10 +724,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
         <div className="bg-zinc-950/80 backdrop-blur-md p-4 rounded-xl border border-zinc-800 shadow-xl pointer-events-auto">
           <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">Legenda</h4>
           <ul className="space-y-2">
-            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-purple-500 bg-purple-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Cena Inicial</span></li>
-            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-yellow-500 bg-yellow-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Vinheta</span></li>
-            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-green-500 bg-green-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Restaura Chance</span></li>
-            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-red-500 bg-red-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Remove Chance</span></li>
+            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-blue-500 bg-blue-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Abertura</span></li>
+            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-amber-500 bg-amber-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Cena / Vinheta</span></li>
+            <li className="flex items-center gap-2"><div className="w-2.5 h-2.5 rounded-full border-2 border-green-500 bg-green-500/20"></div><span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Final</span></li>
           </ul>
         </div>
         <div className="flex bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden shadow-xl pointer-events-auto">
