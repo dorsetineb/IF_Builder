@@ -68,7 +68,7 @@ export const GuideView: React.FC = () => {
                             <div className="bg-muted/30 p-4 rounded-lg text-xs italic border border-muted-foreground/10">
                                 <p className="font-bold not-italic mb-2 text-foreground">Exemplo:</p>
                                 <p className="mb-1">"Destrancar porta com a chave"</p>
-                                <div className="grid grid-cols-2 gap-2 mt-2 opacity-80">
+                                <div className="grid grid-cols-3 gap-2 py-4 opacity-80 text-center">
                                     <span>Verbo: Destrancar</span>
                                     <span>Alvo: Porta</span>
                                     <span>Requisito: Chave</span>
