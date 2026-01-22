@@ -65,7 +65,11 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             if (error) throw error;
             setMessage('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
         } catch (err: any) {
-            setError(err.message || 'Erro ao enviar e-mail de recuperação.');
+            let msg = err.message;
+            if (msg?.includes('security purposes')) {
+                msg = 'Por segurança, aguarde alguns segundos antes de tentar novamente.';
+            }
+            setError(msg || 'Erro ao enviar e-mail de recuperação.');
         } finally {
             setLoading(false);
         }

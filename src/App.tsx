@@ -24,17 +24,9 @@ import AboutProject from './pages/AboutProject';
 const App: React.FC = () => {
     const [session, setSession] = useState<any>(null);
     const [loading, setLoading] = useState(true);
-    const [isRecoveryMode, setIsRecoveryMode] = useState(() => {
-        const hash = window.location.hash;
-        const path = window.location.pathname;
-        return hash.includes('type=recovery') ||
-            hash.includes('type%3Drecovery') ||
-            path === '/reset-password';
-    });
+    const [isRecoveryMode, setIsRecoveryMode] = useState(false);
 
     useEffect(() => {
-        // Redundant check removed since we init state directly, 
-        // but we keep the listener for runtime events below
 
         const initSession = async () => {
             // Safety timeout to prevent infinite loading
