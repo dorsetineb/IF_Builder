@@ -3,11 +3,16 @@ import { supabase } from '@/lib/supabase';
 import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, User, MapPin, Eye, EyeOff, ArrowLeft, KeyRound } from 'lucide-react';
 import { DitherShader } from '@/components/ui/dither-shader';
 
-export function Auth() {
+interface AuthProps {
+    isRecoveryMode?: boolean;
+    onRecoveryComplete?: () => void;
+}
+
+export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) {
     const [loading, setLoading] = useState(false);
     const [isSignUp, setIsSignUp] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
-    const [isResetPassword, setIsResetPassword] = useState(false);
+    const [isResetPassword, setIsResetPassword] = useState(isRecoveryMode);
 
     // Form States
     const [email, setEmail] = useState('');
@@ -24,10 +29,10 @@ export function Auth() {
     // Check if user is coming from a password reset link
     useEffect(() => {
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        if (hashParams.get('type') === 'recovery') {
+        if (hashParams.get('type') === 'recovery' || isRecoveryMode) {
             setIsResetPassword(true);
         }
-    }, []);
+    }, [isRecoveryMode]);
 
     // Handle password reset request (send email)
     const handleForgotPassword = async (e: React.FormEvent) => {
@@ -38,7 +43,7 @@ export function Auth() {
 
         try {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/#type=recovery`,
+                redirectTo: `${window.location.origin}/reset-password`,
             });
             if (error) throw error;
             setMessage('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
@@ -69,6 +74,7 @@ export function Auth() {
 
             setMessage('Senha redefinida com sucesso! Redirecionando...');
             setTimeout(() => {
+                if (onRecoveryComplete) onRecoveryComplete();
                 window.location.href = window.location.origin;
             }, 2000);
         } catch (err: any) {
@@ -127,6 +133,7 @@ export function Auth() {
             console.error('Auth error:', err);
             let msg = err.message;
             if (msg === 'User already registered') msg = 'Este usuário já está cadastrado.';
+            if (msg === 'Invalid login credentials') msg = 'Dados incorretos. Tente novamente.';
             setError(msg || 'Ocorreu um erro na autenticação.');
         } finally {
             setLoading(false);
@@ -452,7 +459,7 @@ export function Auth() {
                         )}
 
                         {error && (
-                            <div className="flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
+                            <div className="flex items-center justify-center gap-2 p-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
                                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                                 <p>{error}</p>
                             </div>

@@ -24,8 +24,18 @@ import AboutProject from './pages/AboutProject';
 const App: React.FC = () => {
     const [session, setSession] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+    const [isRecoveryMode, setIsRecoveryMode] = useState(() => {
+        const hash = window.location.hash;
+        const path = window.location.pathname;
+        return hash.includes('type=recovery') ||
+            hash.includes('type%3Drecovery') ||
+            path === '/reset-password';
+    });
 
     useEffect(() => {
+        // Redundant check removed since we init state directly, 
+        // but we keep the listener for runtime events below
+
         const initSession = async () => {
             // Safety timeout to prevent infinite loading
             const timeoutPromise = new Promise((_, reject) => {
@@ -50,7 +60,11 @@ const App: React.FC = () => {
 
         const {
             data: { subscription },
-        } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        } = supabase.auth.onAuthStateChange(async (event, session) => {
+            // Detect password recovery event
+            if (event === 'PASSWORD_RECOVERY') {
+                setIsRecoveryMode(true);
+            }
             setSession(session);
             setLoading(false);
         });
@@ -85,8 +99,9 @@ const App: React.FC = () => {
         );
     }
 
-    if (!session) {
-        return <Auth />;
+    // Show Auth for password recovery OR when not logged in
+    if (!session || isRecoveryMode) {
+        return <Auth isRecoveryMode={isRecoveryMode} onRecoveryComplete={() => setIsRecoveryMode(false)} />;
     }
 
     return (
@@ -115,8 +130,12 @@ const App: React.FC = () => {
                                 <Route path="/about" element={<AboutProject />} />
                                 <Route path="/projects" element={<div className="p-8 text-white">Página de Projetos (Em construção)</div>} />
                             </Route>
-                            {/* Editor Route (Standalone) */}
                             <Route path="/editor" element={<Editor />} />
+                            {/* Reset Password Route */}
+                            <Route path="/reset-password" element={<Auth isRecoveryMode={true} onRecoveryComplete={() => {
+                                setIsRecoveryMode(false);
+                                window.location.href = '/';
+                            }} />} />
                             {/* Catch all */}
                             <Route path="*" element={<Navigate to="/editor" replace />} />
                         </Routes>
