@@ -13,6 +13,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
     const [isSignUp, setIsSignUp] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [isResetPassword, setIsResetPassword] = useState(isRecoveryMode);
+    const [sessionReady, setSessionReady] = useState(false);
 
     // Form States
     const [email, setEmail] = useState('');
@@ -26,12 +27,28 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
     const [error, setError] = useState<string | null>(null);
     const [message, setMessage] = useState<string | null>(null);
 
-    // Check if user is coming from a password reset link
+    // Check if user is coming from a password reset link and wait for session
     useEffect(() => {
         const hashParams = new URLSearchParams(window.location.hash.substring(1));
         if (hashParams.get('type') === 'recovery' || isRecoveryMode) {
             setIsResetPassword(true);
         }
+
+        // Listen for auth state changes to know when session is ready
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'PASSWORD_RECOVERY' || (session && isRecoveryMode)) {
+                setSessionReady(true);
+            }
+        });
+
+        // Also check if session already exists
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            if (session) {
+                setSessionReady(true);
+            }
+        });
+
+        return () => subscription.unsubscribe();
     }, [isRecoveryMode]);
 
     // Handle password reset request (send email)
@@ -67,6 +84,12 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             }
             if (password.length < 6) {
                 throw new Error('A senha deve ter pelo menos 6 caracteres.');
+            }
+
+            // Ensure we have a valid session before updating password
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                throw new Error('Sessão expirada. Por favor, solicite um novo link de recuperação.');
             }
 
             const { error } = await supabase.auth.updateUser({ password });
