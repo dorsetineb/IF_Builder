@@ -34,12 +34,14 @@ create policy "Users can update own profile."
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, full_name, avatar_url, username)
+  insert into public.profiles (id, full_name, avatar_url, username, location, is_approved)
   values (
     new.id, 
     new.raw_user_meta_data->>'full_name', 
     new.raw_user_meta_data->>'avatar_url',
-    split_part(new.email, '@', 1) -- Default username from email
+    coalesce(new.raw_user_meta_data->>'username', split_part(new.email, '@', 1)),
+    new.raw_user_meta_data->>'location',
+    true
   );
   return new;
 end;

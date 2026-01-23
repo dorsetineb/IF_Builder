@@ -141,7 +141,10 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                         data: {
                             full_name: fullName,
                             location: location,
-                            username: email.split('@')[0] // Default username
+                            username: (() => {
+                                const base = email.split('@')[0];
+                                return base.length < 3 ? `${base}${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}` : base;
+                            })()
                         }
                     }
                 });
