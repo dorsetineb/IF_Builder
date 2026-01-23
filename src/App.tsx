@@ -1,24 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { supabase } from './lib/supabase';
 import { Auth } from './components/Auth';
 import PlatformLayout from './components/layouts/PlatformLayout';
-import Dashboard from './pages/Dashboard';
-import Community from './pages/Community';
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
-import PostDetail from './pages/PostDetail';
-import CreatePost from './pages/CreatePost';
-import Authors from './pages/Authors';
-import AuthorProfile from './pages/AuthorProfile';
-import MyPosts from './pages/MyPosts';
-import Favorites from './pages/Favorites';
 import Editor from './components/Editor';
 import { ThemeProvider } from './components/ThemeProvider';
 import { ToastProvider } from './components/ToastContext';
 import { UserProvider } from './components/UserContext';
-import { FeedProvider } from './components/FeedContext';
 import AboutProject from './pages/AboutProject';
 
 const App: React.FC = () => {
@@ -105,18 +95,6 @@ const App: React.FC = () => {
                             {/* Platform Routes */}
                             <Route element={<PlatformLayout />}>
                                 <Route path="/" element={<Navigate to="/editor" replace />} />
-                                {/* Dashboard route removed */}
-
-                                {/* Community Routes - HIDDEN AS REQUESTED
-                                <Route path="/community" element={<Community />} />
-                                <Route path="/community/authors" element={<Authors />} />
-                                <Route path="/community/author/:id" element={<AuthorProfile />} />
-                                <Route path="/community/my-posts" element={<MyPosts />} />
-                                <Route path="/community/favorites" element={<Favorites />} />
-                                <Route path="/community/create" element={<CreatePost />} />
-                                <Route path="/community/edit/:id" element={<CreatePost />} />
-                                <Route path="/community/post/:id" element={<PostDetail />} />
-                                */}
                                 <Route path="/profile" element={<Profile />} />
                                 <Route path="/settings" element={<Settings />} />
                                 <Route path="/about" element={<AboutProject />} />

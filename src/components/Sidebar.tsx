@@ -2,8 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SceneList from './SceneList';
 import { Scene, View, GameData } from '../types';
-import { Code, BookOpen, Map, Box, SlidersHorizontal, Settings, Info, CircleHelp, ChevronLeft, ChevronRight, MessageSquare, Gamepad2, ChevronDown, Unlock, MonitorPlay } from 'lucide-react';
-import { AltamiraModal } from './AltamiraModal';
+import { Code, BookOpen, Map, Box, SlidersHorizontal, Settings, Info, CircleHelp, ChevronLeft, ChevronRight, MessageSquare, Gamepad2, ChevronDown, MonitorPlay } from 'lucide-react';
 
 interface SidebarProps {
   scenes: Scene[];
@@ -29,26 +28,7 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = (props) => {
   const { onExit, onNavigate, currentView, onSetView, scenes, gameData, isCollapsed, onToggleCollapse, onOpenManual, isDirty, theme = 'dark', ...sceneListProps } = props;
   const [isScenesExpanded, setIsScenesExpanded] = useState(false);
-  const [showAltamiraModal, setShowAltamiraModal] = useState(false);
 
-  // Altamira State
-  const [isAltamiraVisible, setIsAltamiraVisible] = useState(false);
-  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
-
-  const handleMouseEnterTrigger = () => {
-    if (isAltamiraVisible) return;
-    hoverTimerRef.current = setTimeout(() => {
-      setIsAltamiraVisible(true);
-    }, 2000); // 2 seconds to reveal
-  };
-
-  const handleMouseLeaveTrigger = () => {
-    if (hoverTimerRef.current) {
-      clearTimeout(hoverTimerRef.current);
-      hoverTimerRef.current = null;
-    }
-    setIsAltamiraVisible(false);
-  };
 
   // Sync accordion state with current view
   useEffect(() => {
@@ -204,35 +184,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       {/* Bottom Menu Items - Pinned to Bottom */}
       <div className="mt-auto pt-2 pb-4 px-3 flex flex-col gap-1 relative border-t border-muted-foreground/20 bg-card z-20 flex-shrink-0">
 
-        {/* Altamira Trigger Zone & Button */}
-        <div
-          className="relative z-10"
-          onMouseLeave={handleMouseLeaveTrigger}
-        >
-          {/* Hidden Button that slides up */}
-          <div className={`overflow-hidden transition-all duration-500 ease-out ${isAltamiraVisible ? 'max-h-12 opacity-100 mb-1' : 'max-h-0 opacity-0'}`}>
-            <button
-              onClick={() => setShowAltamiraModal(true)}
-              className={`w-full flex items-center justify-center gap-3 px-4 py-2 rounded-lg transition-all text-xs font-bold uppercase tracking-widest shadow-lg ${isCollapsed ? 'px-0' : ''} ${theme === 'cream'
-                ? 'bg-primary text-amber-50 hover:bg-primary/90 border border-amber-900/20' // Cream: Brown Button
-                : theme === 'light'
-                  ? 'bg-zinc-800 text-white hover:bg-black border border-zinc-600' // Light: Dark Button
-                  : 'bg-zinc-900 border border-primary/30 text-primary hover:text-primary-foreground hover:bg-primary hover:border-primary' // Dark/Terminal
-                }`}
-            >
-              <Unlock size={14} />
-              {!isCollapsed && <span>Altamira</span>}
-            </button>
-          </div>
 
-          {/* Invisible Trigger Area above separator */}
-          {!isAltamiraVisible && (
-            <div
-              className="h-20 w-full absolute -top-20 left-0 z-50 pointer-events-auto"
-              onMouseEnter={handleMouseEnterTrigger}
-            />
-          )}
-        </div>
 
         <button
           onClick={() => handleSetView('about')}
@@ -255,12 +207,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         </button>
       </div>
 
-      {/* Altamira Modal */}
-      {
-        showAltamiraModal && (
-          <AltamiraModal onClose={() => setShowAltamiraModal(false)} />
-        )
-      }
+
     </aside >
   );
 };
