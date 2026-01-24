@@ -93,8 +93,8 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             <div className="space-y-8 animate-in slide-in-from-left-4 duration-300">
                                 <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <div className="p-3 bg-emerald-500/10 rounded-lg">
-                                            <Activity className="w-6 h-6 text-emerald-500" />
+                                        <div className="p-3 bg-purple-500/10 rounded-lg">
+                                            <Activity className="w-6 h-6 text-purple-500" />
                                         </div>
                                         <h2 className="text-lg font-bold text-foreground">
                                             Sobre o IF Builder
@@ -102,16 +102,16 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     </div>
                                     <div className="space-y-6 text-muted-foreground leading-relaxed font-light text-sm">
                                         <p>
-                                            O IF Builder é uma ferramenta gratuita que ajuda a criar histórias interativas e não-lineares. Sua lógica funciona a partir de cenas que são interligadas entre si por interações definidas pelo usuário.
+                                            O IF Builder é uma ferramenta gratuita que ajuda a criar histórias interativas. Crie cenas e objetos, e defina quais interações avançam a história.
                                         </p>
                                         <p>
-                                            Todas as ficções interativas criadas aqui são exportadas em um arquivo .zip autossuficiente. Ele não precisa de internet nem do editor para funcionar - apenas um navegador. Pense nesse arquivo como um pendrive: você pode guardá-lo em uma gaveta, ou entregá-lo a alguém. Quem receber o seu arquivo .zip pode rodar a ficção, e também pode importá-lo no IF Builder para ver exatamente como você encaixou cada peça da narrativa.
+                                            Todas as ficções interativas criadas aqui são exportadas em um arquivo .zip. Ele não precisa de internet nem do editor para funcionar - apenas um navegador. Pense nesse arquivo como um pendrive: você pode guardá-lo em uma gaveta, ou entregá-lo a alguém.
                                         </p>
                                         <p>
-                                            Este site foi criado com o auxílio de inteligência artificial generativa — seria hipocrisia esconder isso. Mas o IF Builder não foi feito para gerar histórias automáticas. Ele é uma ferramenta mecânica, que exige atenção, e foi desenhada para que você possa fazer o trabalho humano de contar uma história que pareça real.
+                                            Este site foi criado com o auxílio de inteligência artificial generativa — seria hipocrisia esconder isso. Mas o IF Builder não gera histórias automaticamente. Ele é uma ferramenta mecânica, que exige atenção, e foi desenhada para que você possa fazer o trabalho humano de contar uma história que pareça real.
                                         </p>
                                         <p>
-                                            <b className="text-foreground">Sua intenção é que controla esta máquina.</b>
+                                            <b className="text-foreground font-bold">É a sua intenção que controla esta máquina.</b>
                                         </p>
                                     </div>
                                 </div>

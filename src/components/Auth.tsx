@@ -190,7 +190,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
     const showLandingLayout = !isRecoveryMode && !isResetPassword;
 
     // Sidebar Component (Left)
-    const Sidebar = () => (
+    const renderSidebar = () => (
         <div className="w-72 bg-zinc-950/90 backdrop-blur-2xl border-r border-zinc-800 flex flex-col h-full relative z-20 transition-all duration-300 hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-900/10">
             <div className="flex-1 flex flex-col justify-center w-full px-6 space-y-12">
                 {/* Tagline */}
@@ -267,7 +267,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
     );
 
     // Auth Form Component (Login or Register)
-    const AuthForm = () => {
+    const renderAuthForm = () => {
         const isSignUp = currentView === 'register';
 
         return (
@@ -513,7 +513,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
         );
     };
 
-    const AboutPanel = () => (
+    const renderAboutPanel = () => (
         <div
             className={`w-full max-w-2xl bg-zinc-900/80 border border-zinc-800 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl ${isClosing
                 ? 'animate-out fade-out zoom-out-95 duration-300'
@@ -545,7 +545,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
     );
 
     // Game Popup Component (Fake Browser)
-    const GamePopup = () => (
+    const renderGamePopup = () => (
         <div
             className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all duration-300 ${isClosing
                 ? 'animate-out fade-out duration-300'
@@ -587,7 +587,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
     );
 
     // Password Reset Form (for recovery mode)
-    const ResetPasswordForm = () => (
+    const renderResetPasswordForm = () => (
         <div className="w-full max-w-md bg-zinc-900/50 border border-zinc-800 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-50" />
 
@@ -693,7 +693,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                 </div>
 
                 <div className="relative z-10">
-                    <ResetPasswordForm />
+                    {renderResetPasswordForm()}
                 </div>
 
                 {/* IF Logo */}
@@ -710,7 +710,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
 
             {/* Left Sidebar */}
-            <Sidebar />
+            {renderSidebar()}
 
             {/* Main Content Area - Click to reset/close forms */}
             <div className="flex-1 flex items-center justify-center p-8 pr-32 relative z-10 bg-zinc-950 cursor-pointer" onClick={resetToLanding}>
@@ -734,9 +734,9 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                 </div>
 
                 <div className="relative z-10 w-full max-w-sm cursor-default">
-                    {currentView === 'login' && <AuthForm />}
-                    {currentView === 'register' && <AuthForm />}
-                    {currentView === 'about' && <AboutPanel />}
+                    {currentView === 'login' && renderAuthForm()}
+                    {currentView === 'register' && renderAuthForm()}
+                    {currentView === 'about' && renderAboutPanel()}
                     {currentView === 'landing' && (
                         <div className="text-center animate-in fade-in duration-500">
                             {/* Content empty - nice clean look */}
@@ -746,7 +746,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             </div>
 
             {/* Game Popup (overlay) */}
-            {currentView === 'play' && <GamePopup />}
+            {currentView === 'play' && renderGamePopup()}
 
             {/* IF Logo & Status - Bottom Right Group */}
             <div className="fixed bottom-12 right-12 z-10 flex flex-col gap-0 select-none pointer-events-none opacity-20 items-end">

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SceneList from './SceneList';
 import { Scene, View, GameData } from '../types';
-import { Code, BookOpen, Map, Box, SlidersHorizontal, Settings, Info, CircleHelp, ChevronLeft, ChevronRight, MessageSquare, Gamepad2, ChevronDown, MonitorPlay } from 'lucide-react';
+import { Code, BookOpen, Map, Box, SlidersHorizontal, Settings, Info, CircleHelp, ChevronLeft, ChevronRight, MessageSquare, Gamepad2, ChevronDown, MonitorPlay, Activity } from 'lucide-react';
 
 interface SidebarProps {
   scenes: Scene[];
@@ -69,18 +69,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
 
 
-        {/* Informações e Interface - Moved to top as requested */}
-        <button
-          className={getButtonClass('interface')}
-          onClick={() => handleSetView('interface')}
-          title={isCollapsed ? "Informações e Interface" : undefined}
-        >
-          {/* Hover Glow Effect */}
-          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`} />
 
-          <Code className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">Informações e Interface</span>}
-        </button>
 
         {/* Scene Editor - Accordion */}
         <div className="flex flex-col">
@@ -169,6 +158,22 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           {!isCollapsed && <span className="truncate relative z-10">Rastreadores</span>}
         </button>
 
+        {/* Informações e Interface */}
+        <button
+          className={getButtonClass('interface')}
+          onClick={() => handleSetView('interface')}
+          title={isCollapsed ? "Informações e Interface" : undefined}
+        >
+          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`} />
+          <Code className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && <span className="truncate relative z-10">Informações e Interface</span>}
+        </button>
+
+      </nav>
+
+      {/* Bottom Menu Items - Pinned to Bottom */}
+      <div className="mt-auto pt-2 pb-4 px-3 flex flex-col gap-1 relative border-t border-muted-foreground/20 bg-card z-20 flex-shrink-0">
+
         <button
           onClick={() => onSetView('guide')}
           className={getButtonClass('guide')}
@@ -179,20 +184,13 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           {!isCollapsed && <span className="truncate relative z-10">Guia Rápido</span>}
         </button>
 
-      </nav>
-
-      {/* Bottom Menu Items - Pinned to Bottom */}
-      <div className="mt-auto pt-2 pb-4 px-3 flex flex-col gap-1 relative border-t border-muted-foreground/20 bg-card z-20 flex-shrink-0">
-
-
-
         <button
           onClick={() => handleSetView('about')}
           className={getButtonClass('about')}
           title={isCollapsed ? "Sobre o Projeto" : undefined}
         >
           <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'about' ? 'translate-x-0' : ''}`} />
-          <Info className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          <Activity className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && <span className="truncate relative z-10">Sobre o Projeto</span>}
         </button>
 
