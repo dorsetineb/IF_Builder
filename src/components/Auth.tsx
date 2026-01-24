@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, User, MapPin, Eye, EyeOff, ArrowLeft, KeyRound } from 'lucide-react';
+import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, User, MapPin, Eye, EyeOff, ArrowLeft, KeyRound, Gamepad2, Info, X, Activity } from 'lucide-react';
 import { DitherShader } from '@/components/ui/dither-shader';
 
 interface AuthProps {
@@ -8,12 +8,17 @@ interface AuthProps {
     onRecoveryComplete?: () => void;
 }
 
+type LandingView = 'landing' | 'login' | 'register' | 'about' | 'play';
+
 export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) {
     const [loading, setLoading] = useState(false);
-    const [isSignUp, setIsSignUp] = useState(false);
+    const [isClosing, setIsClosing] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
     const [isResetPassword, setIsResetPassword] = useState(isRecoveryMode);
     const [sessionReady, setSessionReady] = useState(false);
+
+    // Landing page view state
+    const [currentView, setCurrentView] = useState<LandingView>('landing');
 
     // Form States
     const [email, setEmail] = useState('');
@@ -111,19 +116,16 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
         }
     };
 
-
-
     const handleAuth = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
         setMessage(null);
 
+        const isSignUp = currentView === 'register';
+
         try {
             if (isSignUp) {
-                // Direct registration (invite code step removed)
-
-                // Step 2: Final Registration
                 // Validation
                 if (password !== confirmPassword) {
                     throw new Error("As senhas não coincidem.");
@@ -170,360 +172,592 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
         }
     };
 
-    const toggleMode = () => {
-        setIsSignUp(!isSignUp);
-        setError(null);
-        setMessage(null);
+    const resetToLanding = (e?: React.MouseEvent) => {
+        if (e) e.stopPropagation();
+        if (currentView === 'landing' || isClosing) return;
+
+        setIsClosing(true);
+        setTimeout(() => {
+            setCurrentView('landing');
+            setIsClosing(false);
+            setError(null);
+            setMessage(null);
+            setIsForgotPassword(false);
+        }, 300);
     };
 
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-4 font-sans relative">
-            <div className="absolute inset-0 z-0 bg-neutral-950">
-                <DitherShader
-                    src="/background.png"
-                    gridSize={2}
-                    ditherMode="bayer"
-                    colorMode="duotone"
-                    primaryColor="#000000"
-                    secondaryColor="#581c87"
-                    invert={false}
-                    animated={true}
-                    animationSpeed={0.005}
-                    className="w-full h-full"
-                    objectFit="cover"
-                    enableHover={true}
-                    hoverRadius={433}
-                />
-            </div>
+    // Determine if we should show the new landing layout
+    const showLandingLayout = !isRecoveryMode && !isResetPassword;
 
-            <div className="w-full max-w-md bg-zinc-900/50 border border-zinc-800 backdrop-blur-xl relative z-10 overflow-hidden rounded-2xl shadow-2xl transition-all duration-500 ease-in-out">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-50" />
+    // Sidebar Component (Left)
+    const Sidebar = () => (
+        <div className="w-72 bg-zinc-950/90 backdrop-blur-2xl border-r border-zinc-800 flex flex-col h-full relative z-20 transition-all duration-300 hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-900/10">
+            <div className="flex-1 flex flex-col justify-center w-full px-6 space-y-12">
+                {/* Tagline */}
+                <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1">
+                    <p>Uma caverna escura.</p>
+                    <p>Nas paredes, registros do passado.</p>
+                    <p>Monitores CRT iluminam o mofo.</p>
+                    <br></br>
+                    <p className="text-purple-400 font-bold mt-2">&gt; O QUE VOCÊ FAZ?</p>
+                </div>
 
-                <div>
+                {/* Navigation Buttons */}
+                <div className="space-y-4 w-full">
+                    {/* Acessar - Primary */}
+                    <button
+                        onClick={() => { setCurrentView('login'); setError(null); setMessage(null); }}
+                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group ${currentView === 'login'
+                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 scale-[1.02]'
+                            : 'bg-zinc-900/50 hover:bg-purple-600 hover:text-white text-zinc-300 border border-zinc-800 hover:border-purple-500 hover:shadow-lg hover:shadow-purple-600/20'
+                            }`}
+                    >
+                        <LogIn size={18} className="group-hover:translate-x-1 transition-transform" />
+                        <span className="uppercase tracking-wider">Acessar</span>
+                    </button>
 
-                    <div className="p-8 space-y-6">
-                        <div className="space-y-2 text-center">
-                            <h1 className="text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
-                                {isResetPassword ? (
-                                    <><KeyRound className="w-6 h-6 text-purple-400" /> Redefinir Senha</>
-                                ) : isForgotPassword ? (
-                                    <><Mail className="w-6 h-6 text-purple-400" /> Recuperar Senha</>
-                                ) : isSignUp ? (
-                                    <><UserPlus className="w-6 h-6 text-purple-400" /> Criar Conta</>
-                                ) : (
-                                    <><LogIn className="w-6 h-6 text-purple-400" /> Acessar IF Builder</>
-                                )}
-                            </h1>
-                            <p className="text-zinc-400 text-sm">
-                                {isResetPassword
-                                    ? 'Digite sua nova senha abaixo.'
-                                    : isForgotPassword
-                                        ? 'Digite seu e-mail para receber o link de recuperação.'
-                                        : isSignUp
-                                            ? 'Preencha seus dados para criar sua conta.'
-                                            : <>Você acorda em uma caverna escura.<br />Um computador espera seu login e senha.</>}
-                            </p>
-                        </div>
+                    {/* Criar Conta - Secondary */}
+                    <button
+                        onClick={() => { setCurrentView('register'); setError(null); setMessage(null); }}
+                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group ${currentView === 'register'
+                            ? 'bg-zinc-100 text-black shadow-lg scale-[1.02]'
+                            : 'bg-transparent border border-zinc-700 text-zinc-400 hover:bg-zinc-100 hover:text-black hover:border-white'
+                            }`}
+                    >
+                        <UserPlus size={18} className="group-hover:translate-x-1 transition-transform" />
+                        <span className="uppercase tracking-wider">Criar Conta</span>
+                    </button>
 
-                        {/* RESET PASSWORD FORM (when coming from email link) */}
-                        {isResetPassword && (
-                            <form onSubmit={handleResetPassword} className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                                <div className="space-y-2">
-                                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Nova Senha</label>
-                                    <div className="relative">
-                                        <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            placeholder="Mínimo 6 caracteres"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                            className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
-                                        >
-                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                        </button>
-                                    </div>
-                                </div>
+                    <div className="flex gap-3">
+                        {/* Jogar - Demo */}
+                        <button
+                            onClick={() => setCurrentView('play')}
+                            className={`flex-1 flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs transition-all border ${currentView === 'play'
+                                ? 'bg-zinc-800 text-white border-zinc-600'
+                                : 'text-zinc-500 border-zinc-800 hover:text-zinc-300 hover:bg-zinc-900 hover:border-zinc-700'
+                                }`}
+                        >
+                            <Gamepad2 size={20} className="mb-1" />
+                            <span>Jogar Demo</span>
+                        </button>
 
-                                <div className="space-y-2">
-                                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Confirmar Nova Senha</label>
-                                    <div className="relative">
-                                        <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                        <input
-                                            type={showConfirmPassword ? "text" : "password"}
-                                            placeholder="Repita a senha"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                            className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                            className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
-                                        >
-                                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-white/5"
-                                    disabled={loading}
-                                >
-                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Redefinir Senha <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
-                                </button>
-                            </form>
-                        )}
-
-                        {/* FORGOT PASSWORD FORM */}
-                        {isForgotPassword && !isResetPassword && (
-                            <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                                {message ? (
-                                    <div className="flex flex-col items-center gap-2 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-lg text-sm text-center">
-                                        <CheckCircle2 className="w-6 h-6" />
-                                        <p>E-mail de recuperação enviado!<br />Verifique sua caixa de entrada.</p>
-                                    </div>
-                                ) : (
-                                    <form onSubmit={handleForgotPassword} className="space-y-4">
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">E-mail</label>
-                                            <div className="relative">
-                                                <Mail className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                                <input
-                                                    type="email"
-                                                    placeholder="seu@email.com"
-                                                    value={email}
-                                                    onChange={(e) => setEmail(e.target.value)}
-                                                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <button
-                                            type="submit"
-                                            className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-white/5"
-                                            disabled={loading}
-                                        >
-                                            {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Enviar Link <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
-                                        </button>
-                                    </form>
-                                )}
-
-                                <button
-                                    type="button"
-                                    onClick={() => { setIsForgotPassword(false); setError(null); setMessage(null); }}
-                                    className="w-full text-zinc-500 hover:text-white py-2 transition-colors text-xs flex items-center justify-center gap-1"
-                                >
-                                    <ArrowLeft size={12} /> Voltar para o login
-                                </button>
-                            </div>
-                        )}
-
-                        {/* NORMAL AUTH FORM (Login/SignUp) */}
-                        {!isForgotPassword && !isResetPassword && (
-                            <form onSubmit={handleAuth} className="space-y-4">
-
-
-                                {/* REGISTRATION FORM or LOGIN */}
-                                {(isSignUp || !isSignUp) && (
-                                    <div className="animate-in fade-in slide-in-from-right-4 duration-300 space-y-4">
-                                        {isSignUp && (
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Nome e Sobrenome</label>
-                                                <div className="relative">
-                                                    <User className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Ex: João Silva"
-                                                        value={fullName}
-                                                        onChange={(e) => setFullName(e.target.value)}
-                                                        className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                                        required
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        <div className="space-y-2">
-                                            <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">E-mail</label>
-                                            <div className="relative">
-                                                <Mail className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                                <input
-                                                    type="email"
-                                                    placeholder="seu@email.com"
-                                                    value={email}
-                                                    onChange={(e) => setEmail(e.target.value)}
-                                                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                                    required
-                                                />
-                                            </div>
-                                        </div>
-
-                                        {isSignUp && (
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Local (Opcional)</label>
-                                                <div className="relative">
-                                                    <MapPin className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                                    <input
-                                                        type="text"
-                                                        placeholder="Ex: São Paulo, SP"
-                                                        value={location}
-                                                        onChange={(e) => setLocation(e.target.value)}
-                                                        className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {!isSignUp ? (
-                                            <div className="space-y-2">
-                                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Senha</label>
-                                                <div className="relative">
-                                                    <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                                    <input
-                                                        type={showPassword ? "text" : "password"}
-                                                        placeholder="Sua senha"
-                                                        value={password}
-                                                        onChange={(e) => setPassword(e.target.value)}
-                                                        className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                                        required
-                                                    />
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => setShowPassword(!showPassword)}
-                                                        className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
-                                                    >
-                                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="space-y-2">
-                                                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Senha</label>
-                                                    <div className="relative">
-                                                        <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                                        <input
-                                                            type={showPassword ? "text" : "password"}
-                                                            placeholder="Mínimo de 6"
-                                                            value={password}
-                                                            onChange={(e) => setPassword(e.target.value)}
-                                                            className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                                            required
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setShowPassword(!showPassword)}
-                                                            className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
-                                                        >
-                                                            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-2">
-                                                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Confirmar</label>
-                                                    <div className="relative">
-                                                        <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
-                                                        <input
-                                                            type={showConfirmPassword ? "text" : "password"}
-                                                            placeholder="Repita senha"
-                                                            value={confirmPassword}
-                                                            onChange={(e) => setConfirmPassword(e.target.value)}
-                                                            className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
-                                                            required
-                                                        />
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                            className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
-                                                        >
-                                                            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {isSignUp ? (
-                                            <div className="pt-2 space-y-4">
-                                                <button
-                                                    type="submit"
-                                                    className="w-full bg-white text-black hover:bg-zinc-200 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-white/5"
-                                                    disabled={loading}
-                                                >
-                                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Criar Conta <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <button
-                                                type="submit"
-                                                className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-4 shadow-xl shadow-white/5"
-                                                disabled={loading}
-                                            >
-                                                {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Entrar <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
-                                            </button>
-                                        )}
-                                    </div>
-                                )}
-
-                                {/* Forgot Password Link - only on login */}
-                                {!isSignUp && (
-                                    <button
-                                        type="button"
-                                        onClick={() => { setIsForgotPassword(true); setError(null); setMessage(null); }}
-                                        className="w-full text-zinc-500 hover:text-purple-400 py-1 transition-colors text-xs text-center"
-                                    >
-                                        Esqueceu sua senha?
-                                    </button>
-                                )}
-                            </form>
-                        )}
-
-                        {error && (
-                            <div className="flex items-center justify-center gap-2 p-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
-                                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                <p>{error}</p>
-                            </div>
-                        )}
-
-                        {message && !isForgotPassword && (
-                            <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
-                                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                                <p>{message}</p>
-                            </div>
-                        )}
-
-                        {/* Toggle Login/Sign Up - hide on forgot/reset password */}
-                        {!isForgotPassword && !isResetPassword && (
-                            <div className="pt-4 border-t border-zinc-800/50">
-                                <p className="text-xs text-zinc-500 text-center">
-                                    {isSignUp ? 'Já tem uma conta?' : 'Ainda não tem conta?'}
-                                    <button
-                                        onClick={toggleMode}
-                                        className="ml-1 text-white hover:text-purple-400 underline underline-offset-4 transition-colors font-medium"
-                                    >
-                                        {isSignUp ? 'Fazer login' : 'Cadastre-se'}
-                                    </button>
-                                </p>
-                            </div>
-                        )}
+                        {/* Sobre o Projeto */}
+                        <button
+                            onClick={() => setCurrentView('about')}
+                            className={`flex-1 flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs transition-all border ${currentView === 'about'
+                                ? 'bg-zinc-800 text-white border-zinc-600'
+                                : 'text-zinc-500 border-zinc-800 hover:text-zinc-300 hover:bg-zinc-900 hover:border-zinc-700'
+                                }`}
+                        >
+                            <Activity size={20} className="mb-1" />
+                            <span>Sobre</span>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            {/* Decorative elements */}
-            <div className="fixed bottom-10 right-24 hidden lg:block select-none pointer-events-none z-0 opacity-20">
-                <h1 className="text-9xl font-black text-white tracking-tighter italic" style={{ fontFamily: 'Inter, sans-serif' }}>IF</h1>
+            {/* Footer */}
+            <div className="p-8 border-t border-zinc-900/50 bg-black/20">
+                <div className="font-mono text-[10px] text-zinc-600 leading-relaxed text-left">
+                    <p>© 2026 IF Builder.</p>
+                    <p>Todos os direitos reservados.</p>
+                </div>
             </div>
-        </div >
+        </div>
+    );
+
+    // Auth Form Component (Login or Register)
+    const AuthForm = () => {
+        const isSignUp = currentView === 'register';
+
+        return (
+            <div
+                className={`w-full max-w-sm bg-zinc-900/50 border border-zinc-800 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl ${isClosing
+                    ? 'animate-out fade-out zoom-out-95 duration-300'
+                    : 'animate-in fade-in zoom-in-95 duration-300'
+                    }`}
+                onClick={(e) => e.stopPropagation()}
+            >
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-50" />
+
+                <div className="p-8 space-y-6">
+                    <div className="flex items-center justify-center">
+                        <div className="space-y-1 text-center">
+                            <h1 className="text-xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
+                                {isSignUp ? (
+                                    <><UserPlus className="w-5 h-5 text-purple-400" /> Criar Conta</>
+                                ) : (
+                                    <><LogIn className="w-5 h-5 text-purple-400" /> Acessar IF Builder</>
+                                )}
+                            </h1>
+                        </div>
+                    </div>
+
+                    {/* FORGOT PASSWORD FORM */}
+                    {isForgotPassword && (
+                        <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                            {message ? (
+                                <div className="flex flex-col items-center gap-2 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-lg text-sm text-center">
+                                    <CheckCircle2 className="w-6 h-6" />
+                                    <p>E-mail de recuperação enviado!<br />Verifique sua caixa de entrada.</p>
+                                </div>
+                            ) : (
+                                <form onSubmit={handleForgotPassword} className="space-y-4">
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">E-mail</label>
+                                        <div className="relative">
+                                            <Mail className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                            <input
+                                                type="email"
+                                                placeholder="seu@email.com"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-white/5"
+                                        disabled={loading}
+                                    >
+                                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Enviar Link <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
+                                    </button>
+                                </form>
+                            )}
+
+                            <button
+                                type="button"
+                                onClick={() => { setIsForgotPassword(false); setError(null); setMessage(null); }}
+                                className="w-full text-zinc-500 hover:text-white py-2 transition-colors text-xs flex items-center justify-center gap-1"
+                            >
+                                <ArrowLeft size={12} /> Voltar para o login
+                            </button>
+                        </div>
+                    )}
+
+                    {/* NORMAL AUTH FORM (Login/SignUp) */}
+                    {!isForgotPassword && (
+                        <form onSubmit={handleAuth} className="space-y-4">
+                            <div className="animate-in fade-in slide-in-from-right-4 duration-300 space-y-4">
+                                {isSignUp && (
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Nome e Sobrenome</label>
+                                        <div className="relative">
+                                            <User className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                            <input
+                                                type="text"
+                                                placeholder="Ex: João Silva"
+                                                value={fullName}
+                                                onChange={(e) => setFullName(e.target.value)}
+                                                className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                <div className="space-y-2">
+                                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">E-mail</label>
+                                    <div className="relative">
+                                        <Mail className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                        <input
+                                            type="email"
+                                            placeholder="seu@email.com"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+
+                                {isSignUp && (
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Local (Opcional)</label>
+                                        <div className="relative">
+                                            <MapPin className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                            <input
+                                                type="text"
+                                                placeholder="Ex: São Paulo, SP"
+                                                value={location}
+                                                onChange={(e) => setLocation(e.target.value)}
+                                                className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                            />
+                                        </div>
+                                    </div>
+                                )}
+
+                                {!isSignUp ? (
+                                    <div className="space-y-2">
+                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Senha</label>
+                                        <div className="relative">
+                                            <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                placeholder="Sua senha"
+                                                value={password}
+                                                onChange={(e) => setPassword(e.target.value)}
+                                                className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                required
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                                className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                                            >
+                                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                            </button>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Senha</label>
+                                            <div className="relative">
+                                                <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                                <input
+                                                    type={showPassword ? "text" : "password"}
+                                                    placeholder="Mínimo de 6"
+                                                    value={password}
+                                                    onChange={(e) => setPassword(e.target.value)}
+                                                    className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                    required
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                    className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                                                >
+                                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Confirmar</label>
+                                            <div className="relative">
+                                                <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                                                <input
+                                                    type={showConfirmPassword ? "text" : "password"}
+                                                    placeholder="Repita senha"
+                                                    value={confirmPassword}
+                                                    onChange={(e) => setConfirmPassword(e.target.value)}
+                                                    className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                    required
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                    className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                                                >
+                                                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <button
+                                    type="submit"
+                                    className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-2 shadow-xl shadow-white/5"
+                                    disabled={loading}
+                                >
+                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{isSignUp ? 'Criar Conta' : 'Entrar'} <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
+                                </button>
+                            </div>
+
+                            {/* Forgot Password Link - only on login */}
+                            {!isSignUp && (
+                                <button
+                                    type="button"
+                                    onClick={() => { setIsForgotPassword(true); setError(null); setMessage(null); }}
+                                    className="w-full text-zinc-500 hover:text-purple-400 py-1 transition-colors text-xs text-center"
+                                >
+                                    Esqueceu sua senha?
+                                </button>
+                            )}
+                        </form>
+                    )}
+
+                    {error && (
+                        <div className="flex items-center justify-center gap-2 p-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
+                            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                            <p>{error}</p>
+                        </div>
+                    )}
+
+                    {message && (
+                        <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
+                            <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                            <p>{message}</p>
+                        </div>
+                    )}
+
+                    {/* Toggle Login/Sign Up */}
+                    <div className="pt-4 border-t border-zinc-800/50">
+                        <p className="text-xs text-zinc-500 text-center">
+                            {isSignUp ? 'Já tem uma conta?' : 'Ainda não tem conta?'}
+                            <button
+                                onClick={() => { setCurrentView(isSignUp ? 'login' : 'register'); setError(null); setMessage(null); }}
+                                className="ml-1 text-white hover:text-purple-400 underline underline-offset-4 transition-colors font-medium"
+                            >
+                                {isSignUp ? 'Fazer login' : 'Cadastre-se'}
+                            </button>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const AboutPanel = () => (
+        <div
+            className={`w-full max-w-2xl bg-zinc-900/80 border border-zinc-800 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl ${isClosing
+                ? 'animate-out fade-out zoom-out-95 duration-300'
+                : 'animate-in fade-in zoom-in-95 duration-300'
+                }`}
+            onClick={(e) => e.stopPropagation()}
+        >
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-50" />
+            <div className="p-8">
+                <div className="flex items-center justify-center mb-6">
+                    <div className="space-y-1 text-center">
+                        <h2 className="text-xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
+                            <Activity className="w-5 h-5 text-purple-400" /> Sobre o IF Builder
+                        </h2>
+                    </div>
+                </div>
+
+                <div className="space-y-4 text-zinc-400 leading-relaxed text-sm">
+                    <p>
+                        O IF Builder é uma ferramenta gratuita que ajuda a criar histórias interativas. Crie cenas e objetos, e defina quais interações avançam a história.
+                    </p>
+                    <p>
+                        Todas as ficções interativas criadas aqui são exportadas em um arquivo .zip. Ele não precisa de internet nem do editor para funcionar - apenas um navegador. Pense nesse arquivo como um pendrive: você pode guardá-lo em uma gaveta, ou entregá-lo a alguém.
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    );
+
+    // Game Popup Component (Fake Browser)
+    const GamePopup = () => (
+        <div
+            className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all duration-300 ${isClosing
+                ? 'animate-out fade-out duration-300'
+                : 'animate-in fade-in duration-300'
+                }`}
+            onClick={resetToLanding}
+        >
+            <div
+                className={`w-full max-w-lg bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden ${isClosing
+                    ? 'animate-out zoom-out-95 duration-300'
+                    : 'animate-in zoom-in-95 duration-300'
+                    }`}
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Fake Browser Header */}
+                <div className="bg-zinc-800 border-b border-zinc-700 px-4 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <span className="font-mono text-xs text-zinc-500 uppercase tracking-widest">
+                            TERM.V2.EXE - REMOTE CONNECTION
+                        </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 rounded-full bg-red-500 cursor-pointer hover:bg-red-400 transition-colors" onClick={resetToLanding} />
+                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
+                        <div className="w-3 h-3 rounded-full bg-green-500" />
+                    </div>
+                </div>
+
+                {/* Game iframe */}
+                <div className="relative" style={{ height: '80vh' }}>
+                    <iframe
+                        src="/fuja_da_masmorra/index.html"
+                        className="w-full h-full border-0"
+                        title="Fuja da Masmorra Demo"
+                    />
+                </div>
+            </div>
+        </div>
+    );
+
+    // Password Reset Form (for recovery mode)
+    const ResetPasswordForm = () => (
+        <div className="w-full max-w-md bg-zinc-900/50 border border-zinc-800 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-50" />
+
+            <div className="p-8 space-y-6">
+                <div className="space-y-2 text-center">
+                    <h1 className="text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
+                        <KeyRound className="w-6 h-6 text-purple-400" /> Redefinir Senha
+                    </h1>
+                    <p className="text-zinc-400 text-sm">Digite sua nova senha abaixo.</p>
+                </div>
+
+                <form onSubmit={handleResetPassword} className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                    <div className="space-y-2">
+                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Nova Senha</label>
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Mínimo 6 caracteres"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                            >
+                                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="space-y-2">
+                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Confirmar Nova Senha</label>
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
+                            <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                placeholder="Repita a senha"
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-3 top-3 text-zinc-500 hover:text-zinc-300 transition-colors focus:outline-none"
+                            >
+                                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </button>
+                        </div>
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-white/5"
+                        disabled={loading}
+                    >
+                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Redefinir Senha <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
+                    </button>
+                </form>
+
+                {error && (
+                    <div className="flex items-center justify-center gap-2 p-3 bg-red-500/10 border border-red-500/20 text-red-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
+                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                        <p>{error}</p>
+                    </div>
+                )}
+
+                {message && (
+                    <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                        <p>{message}</p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+
+    // If in recovery mode, show simplified layout
+    if (!showLandingLayout) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-zinc-950 p-4 font-sans relative">
+                <div className="absolute inset-0 z-0 bg-neutral-950">
+                    <DitherShader
+                        src="/background.png"
+                        gridSize={2}
+                        ditherMode="bayer"
+                        colorMode="duotone"
+                        primaryColor="#000000"
+                        secondaryColor="#581c87"
+                        invert={false}
+                        animated={true}
+                        animationSpeed={0.005}
+                        className="w-full h-full"
+                        objectFit="cover"
+                        enableHover={true}
+                        hoverRadius={433}
+                    />
+                </div>
+
+                <div className="relative z-10">
+                    <ResetPasswordForm />
+                </div>
+
+                {/* IF Logo */}
+                <div className="fixed bottom-10 right-24 hidden lg:block select-none pointer-events-none z-0 opacity-20">
+                    <h1 className="text-9xl font-black text-white tracking-tighter italic" style={{ fontFamily: 'Inter, sans-serif' }}>IF</h1>
+                </div>
+            </div>
+        );
+    }
+
+    // Main landing layout with sidebar
+    return (
+        <div className="h-screen w-screen flex bg-zinc-950 font-sans relative overflow-hidden">
+
+
+            {/* Left Sidebar */}
+            <Sidebar />
+
+            {/* Main Content Area - Click to reset/close forms */}
+            <div className="flex-1 flex items-center justify-center p-8 pr-32 relative z-10 bg-zinc-950 cursor-pointer" onClick={resetToLanding}>
+                {/* Dither Background (Now relative to main content) */}
+                <div className="absolute inset-0 z-0 bg-neutral-950 overflow-hidden cursor-default">
+                    <DitherShader
+                        src="/background.png"
+                        gridSize={2}
+                        ditherMode="bayer"
+                        colorMode="duotone"
+                        primaryColor="#000000"
+                        secondaryColor="#581c87"
+                        invert={false}
+                        animated={true}
+                        animationSpeed={0.005}
+                        className="w-full h-full"
+                        objectFit="cover"
+                        enableHover={true}
+                        hoverRadius={433}
+                    />
+                </div>
+
+                <div className="relative z-10 w-full max-w-sm cursor-default">
+                    {currentView === 'login' && <AuthForm />}
+                    {currentView === 'register' && <AuthForm />}
+                    {currentView === 'about' && <AboutPanel />}
+                    {currentView === 'landing' && (
+                        <div className="text-center animate-in fade-in duration-500">
+                            {/* Content empty - nice clean look */}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Game Popup (overlay) */}
+            {currentView === 'play' && <GamePopup />}
+
+            {/* IF Logo & Status - Bottom Right Group */}
+            <div className="fixed bottom-12 right-12 z-10 flex flex-col gap-0 select-none pointer-events-none opacity-20 items-end">
+                <h1 className="text-[120px] font-black text-white tracking-tighter italic leading-[0.8]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                    IF
+                </h1>
+                <div className="font-mono text-[10px] text-zinc-500 tracking-wider pr-2 mt-2 border-r-2 border-zinc-800 text-right">
+                    <p>SYS.STATUS: ONLINE</p>
+                    <p>NODE: ALPHA-7</p>
+                </div>
+            </div>
+        </div>
     );
 }
