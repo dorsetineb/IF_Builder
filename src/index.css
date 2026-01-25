@@ -411,23 +411,23 @@
 }
 
 /* Forced Frame Styles to override global * { border-radius: 0 !important } */
-.frame-preview-portal {
+#root .frame-preview-portal {
   border-radius: 40px 40px 4px 4px !important;
 }
 
-.frame-preview-portal-container {
+#root .frame-preview-portal-container {
   border-radius: 35px 35px 0 0 !important;
 }
 
-.frame-preview-trading {
+#root .frame-preview-trading {
   border-radius: 12px !important;
 }
 
-.frame-preview-trading-container {
+#root .frame-preview-trading-container {
   border-radius: 8px !important;
 }
 
-.frame-preview-book {
+#root .frame-preview-book {
   border-radius: 0 !important;
 }
 

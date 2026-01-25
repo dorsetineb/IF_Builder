@@ -363,7 +363,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const TABS = {
         aparencia: 'Aparência',
         sistemas: 'Sistemas',
-        global: 'Comandos Globais',
         textos: 'Textos'
     };
 
@@ -855,7 +854,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     };
 
     const getFramePreviewStyles = (frame: GameData['gameImageFrame']) => {
-        const panelStyles: React.CSSProperties = { boxSizing: 'border-box' };
+        const panelStyles: React.CSSProperties = { boxSizing: 'border-box', overflow: 'hidden' };
         const containerStyles: React.CSSProperties = {
             backgroundColor: localGameTheme === 'dark' ? '#1a202c' : '#e2e8f0',
             color: localGameTheme === 'dark' ? '#a0aec0' : '#4a5568',
@@ -865,6 +864,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
             alignItems: 'center',
             justifyContent: 'center',
             boxSizing: 'border-box',
+            overflow: 'hidden'
         };
         let panelClass = '';
         let containerClass = '';
@@ -872,7 +872,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         switch (frame) {
             case 'rounded-top':
                 panelStyles.padding = '5px';
-                panelStyles.backgroundColor = localFrameRoundedTopColor;
+                panelStyles.backgroundColor = localFrameRoundedTopColor || '#FFFFFF';
                 panelStyles.border = 'none';
                 panelStyles.borderRadius = '40px 40px 4px 4px';
                 containerStyles.borderRadius = '35px 35px 0 0';
@@ -881,12 +881,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 break;
             case 'book-cover':
                 panelStyles.padding = '5px';
-                panelStyles.backgroundColor = localFrameBookColor;
+                panelStyles.backgroundColor = localFrameBookColor || '#FFFFFF';
                 panelStyles.border = 'none';
                 panelClass = 'frame-preview-book';
                 break;
             case 'trading-card':
-                panelStyles.backgroundColor = localFrameTradingCardColor;
+                panelStyles.backgroundColor = localFrameTradingCardColor || '#FFFFFF';
                 panelStyles.borderRadius = '12px';
                 panelStyles.padding = '4px';
                 containerStyles.border = 'none';
@@ -902,7 +902,35 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     };
 
     return (
-        <div className="space-y-6 pb-24">
+        <div className="space-y-6 pb-8">
+            {/* Header with Save/Undo actions */}
+            <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
+                <p className="text-zinc-500 text-xs font-medium max-w-lg">
+                    Personalize a interface do jogo, configure menus e textos.
+                </p>
+                <div className="flex items-center gap-3">
+                    {isDirty && (
+                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
+                            <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
+                            Alterações não salvas
+                        </div>
+                    )}
+                    <button
+                        onClick={handleUndo}
+                        disabled={!isDirty}
+                        className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
+                    >
+                        Desfazer
+                    </button>
+                    <button
+                        onClick={handleSave}
+                        disabled={!isDirty}
+                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-lg shadow-yellow-900/10"
+                    >
+                        Salvar Alterações
+                    </button>
+                </div>
+            </div>
             <div>
                 <div className="border-b border-muted-foreground/50 flex items-center justify-between pr-4">
                     <div className="flex space-x-1 overflow-x-auto">
@@ -921,12 +949,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             );
                         })}
                     </div>
-                    {isDirty && (
-                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20">
-                            <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            <span>Alterações não salvas</span>
-                        </div>
-                    )}
                 </div>
 
                 <div className={`bg-muted/10 -mt-px py-8 grid grid-cols-1 ${activeTab === 'cores' ? 'xl:grid-cols-[1fr_450px]' : ''} gap-8 items-start px-6`}>
@@ -1081,7 +1103,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div>
                                 <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest flex items-center gap-2">
-                                    <Grid className="w-4 h-4 text-primary" /> Sistemas Ativos
+                                    <Grid className="w-4 h-4 text-muted-foreground" /> Sistemas Ativos
                                 </h3>
                                 <p className="text-xs text-muted-foreground mb-6 max-w-2xl">
                                     Habilite e configure os sistemas que estarão disponíveis no seu jogo. Você pode combinar múltiplos sistemas.
@@ -1113,19 +1135,22 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     <Type className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <span className="text-xs font-bold uppercase block">Parser (Digite Comandos)</span>
+                                                    <span className="text-xs font-bold uppercase block">Parser (Descreva Comandos)</span>
                                                     <span className="text-[10px] opacity-70 mt-0.5">O jogador digita ações como "pegar chave" ou "olhar mesa"</span>
                                                 </div>
                                             </button>
                                             <button
-                                                onClick={() => setLocalGameInteractionType('choice')}
+                                                onClick={() => {
+                                                    setLocalGameInteractionType('choice');
+                                                    setLocalEnableInventory(false);
+                                                }}
                                                 className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-primary bg-primary/5 text-primary' : 'border-muted-foreground/20 bg-zinc-900 text-muted-foreground hover:border-primary/30'}`}
                                             >
                                                 <div className={`p-3 rounded-lg ${localGameInteractionType === 'choice' ? 'bg-primary/20' : 'bg-black/40'}`}>
                                                     <List className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <span className="text-xs font-bold uppercase block">Decisão (Árvore de Opções)</span>
+                                                    <span className="text-xs font-bold uppercase block">IF (Escolha uma opção)</span>
                                                     <span className="text-[10px] opacity-70 mt-0.5">O jogador escolhe entre opções pré-definidas na tela</span>
                                                 </div>
                                             </button>
@@ -1148,8 +1173,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Gestão de itens pegos pelo jogador</p>
                                                             </div>
                                                         </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={localEnableInventory} onChange={(e) => setLocalEnableInventory(e.target.checked)} className="sr-only peer" />
+                                                        <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={localEnableInventory}
+                                                                onChange={(e) => setLocalEnableInventory(e.target.checked)}
+                                                                disabled={localGameInteractionType === 'choice'}
+                                                                className="sr-only peer"
+                                                            />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                                                 <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
                                                             </div>
@@ -1438,63 +1469,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         </div>
                     )}
 
-                    {activeTab === 'global' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                            <div>
-                                <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest flex items-center gap-2">
-                                    <Command className="w-4 h-4 text-primary" /> Comandos Globais
-                                </h3>
-                                <p className="text-xs text-muted-foreground mb-6 max-w-2xl">
-                                    Configure verbos, palavras e descrições que estarão sempre disponíveis para o jogador, independente da cena em que o jogador está (por exemplo, ajuda ou tutorial).
-                                </p>
-
-                                <div className={`p-6 bg-card border ${localEnableFixedVerbs ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
-                                    <div className="flex justify-between items-start">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableFixedVerbs ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
-                                                <Command className="w-5 h-5" />
-                                            </div>
-                                            <div>
-                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableFixedVerbs ? 'text-foreground' : 'text-muted-foreground'}`}>Habilitar Comandos Globais</h4>
-                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Ativa o processamento de verbos globais</p>
-                                            </div>
-                                        </div>
-                                        <label className="relative inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" checked={localEnableFixedVerbs} onChange={(e) => setLocalEnableFixedVerbs(e.target.checked)} className="sr-only peer" />
-                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
-                                            </div>
-                                        </label>
-                                    </div>
-                                    {localEnableFixedVerbs && (
-                                        <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
-                                            <div className="grid grid-cols-1 gap-2">
-                                                {localFixedVerbs.map(verb => (
-                                                    <FixedVerbItem
-                                                        key={verb.id}
-                                                        verb={verb}
-                                                        onUpdate={handleFixedVerbChange}
-                                                        onRemove={handleRemoveFixedVerb}
-                                                    />
-                                                ))}
-                                            </div>
-                                            {localFixedVerbs.length > 0 && (
-                                                <div className="text-[10px] text-muted-foreground text-center mt-2 mb-2">
-                                                    {localFixedVerbs.length} comando(s) configurado(s)
-                                                </div>
-                                            )}
-                                            <button
-                                                onClick={() => handleAddFixedVerb()}
-                                                className="w-full py-2 bg-white text-zinc-950 border border-muted-foreground/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-200 transition-all active:scale-95 flex items-center justify-center gap-2 shadow-sm"
-                                            >
-                                                <Plus className="w-4 h-4" /> Adicionar novo comando
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
 
                     {false /* abertura moved to Vignettes, activeTab === 'abertura' */ && (
@@ -1734,19 +1708,19 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="col-span-1 lg:col-span-5 space-y-8 pr-2 custom-scrollbar pb-20">
 
                                     {/* SECTION: ESTRUTURA */}
-                                    <div className="space-y-4">
+                                    <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
                                         <button
                                             onClick={() => toggleSection('estrutura')}
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <LayoutTemplate className="w-4 h-4 text-primary" /> ESTRUTURA
+                                                <LayoutTemplate className="w-4 h-4 text-muted-foreground" /> ESTRUTURA
                                             </h3>
                                             {activeSections.estrutura ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
 
                                         {activeSections.estrutura && (
-                                            <div className="space-y-6 pl-2 border-l-2 border-muted-foreground/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                                            <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
                                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Orientação</label>
                                                     <div className="relative">
@@ -1807,19 +1781,19 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     </div>
 
                                     {/* SECTION: ESTILO & TEMA */}
-                                    <div className="space-y-4">
+                                    <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
                                         <button
                                             onClick={() => toggleSection('estilo')}
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <Palette className="w-4 h-4 text-primary" /> ESTILO & TEMA
+                                                <Palette className="w-4 h-4 text-muted-foreground" /> ESTILO & TEMA
                                             </h3>
                                             {activeSections.estilo ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
 
                                         {activeSections.estilo && (
-                                            <div className="space-y-6 pl-2 border-l-2 border-muted-foreground/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                                            <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
                                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Cor da Interface</label>
                                                     <div className="flex bg-input rounded-lg p-1 border border-input">
@@ -1910,19 +1884,19 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     </div>
 
                                     {/* SECTION: UI TEXT */}
-                                    <div className="space-y-4">
+                                    <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
                                         <button
                                             onClick={() => toggleSection('texto')}
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <Type className="w-4 h-4 text-primary" /> FONTES & TEXTO
+                                                <Type className="w-4 h-4 text-muted-foreground" /> FONTES & TEXTO
                                             </h3>
                                             {activeSections.texto ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
 
                                         {activeSections.texto && (
-                                            <div className="space-y-6 pl-2 border-l-2 border-muted-foreground/50 ml-1.5 animate-in fade-in slide-in-from-top-2 duration-200">
+                                            <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
                                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Botão de Ação</label>
                                                     <input
@@ -2020,8 +1994,26 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         };
 
                                                         return (
-                                                            <div style={adaptedPanelStyles} className={panelClass}>
-                                                                <div style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }} className={containerClass}>
+                                                            <div
+                                                                ref={el => {
+                                                                    if (el) {
+                                                                        if (panelStyles.borderRadius) el.style.setProperty('border-radius', panelStyles.borderRadius as string, 'important');
+                                                                        if (panelStyles.overflow) el.style.setProperty('overflow', panelStyles.overflow as string, 'important');
+                                                                    }
+                                                                }}
+                                                                style={adaptedPanelStyles}
+                                                                className={panelClass}
+                                                            >
+                                                                <div
+                                                                    ref={el => {
+                                                                        if (el) {
+                                                                            if (containerStyles.borderRadius) el.style.setProperty('border-radius', containerStyles.borderRadius as string, 'important');
+                                                                            if (containerStyles.overflow) el.style.setProperty('overflow', containerStyles.overflow as string, 'important');
+                                                                        }
+                                                                    }}
+                                                                    style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
+                                                                    className={containerClass}
+                                                                >
                                                                     <ImageIcon className="w-12 h-12 text-zinc-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50" />
                                                                     {/* Scene Name Overlay inside the inner container */}
                                                                     <div className="absolute bottom-4 left-0 right-0 flex justify-center z-20">
@@ -2082,28 +2074,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 </div >
             </div >
 
-            {/* Fixed Action Footer to match SceneEditor */}
-            < div className="fixed bottom-6 right-10 z-50 flex gap-2" >
-                <button
-                    onClick={handleUndo}
-                    disabled={!isDirty}
-                    className={`px-4 py-2 font-bold rounded-lg transition-all text-xs border ${isDirty
-                        ? 'bg-primary hover:bg-primary/90 text-primary-foreground border-primary shadow-lg shadow-primary/20'
-                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed'
-                        }`}
-                >
-                    Desfazer
-                </button>
-                <button
-                    onClick={handleSave}
-                    disabled={!isDirty}
-                    className="px-4 py-2 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
-                >
-                    Salvar Alterações
-                </button>
-            </div >
+            {/* Footer buttons removed */}
         </div >
     );
 };
 
 export default UIEditor;
+

@@ -275,26 +275,50 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     const isAnyCheckboxChecked = !!localScene.isEndingScene || !!localScene.removesChanceOnEntry || !!localScene.restoresChanceOnEntry;
 
     return (
-        <div className="space-y-6 pb-24">
-            <div className="flex justify-between items-start">
-                <div>
-                    <p className="text-zinc-500 mt-1 text-xs font-medium">
-                        Defina a imagem, descrição, objetos e interações para esta cena.
-                    </p>
-                </div>
-                <div className="flex items-center gap-4 flex-shrink-0 mt-1">
+        <div className="space-y-6">
+            <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
+                <p className="text-zinc-500 text-xs font-medium max-w-lg">
+                    Defina a imagem, descrição, objetos e interações para esta cena.
+                </p>
+                <div className="flex items-center gap-3">
                     {isDirty && (
-                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20">
+                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
                             <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            <span>Alterações não salvas</span>
+                            Alterações não salvas
                         </div>
                     )}
+
+                    <button
+                        onClick={handlePreview}
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 rounded-lg"
+                        title="Testar apenas esta cena"
+                    >
+                        <Eye className="w-3.5 h-3.5" />
+                        Testar
+                    </button>
+
                     <button
                         onClick={() => onCopyScene(localScene)}
-                        className="flex items-center px-3 py-2 bg-muted border border-muted-foreground/50 text-foreground font-semibold rounded-md hover:bg-muted/80 transition-colors text-xs"
+                        className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors"
                         title="Copiar Cena"
                     >
-                        Copiar Cena
+                        Copiar
+                    </button>
+
+                    <button
+                        onClick={handleUndo}
+                        disabled={!isDirty}
+                        className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
+                    >
+                        Desfazer
+                    </button>
+
+                    <button
+                        onClick={handleSave}
+                        disabled={!isDirty}
+                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-lg shadow-yellow-900/10"
+                    >
+                        Salvar Alterações
                     </button>
                 </div>
             </div>
@@ -715,32 +739,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                         </div>
                     )}
                 </div>
-            </div>
-            <div className="fixed bottom-6 right-10 z-10 flex gap-2">
-                <button
-                    onClick={handlePreview}
-                    className="px-4 py-2 bg-muted border border-muted-foreground/50 text-foreground font-semibold rounded-lg hover:bg-muted/80 transition-all text-xs"
-                >
-                    <Eye className="w-4 h-4 inline-block mr-2" />
-                    Testar Cena
-                </button>
-                <button
-                    onClick={handleUndo}
-                    disabled={!isDirty}
-                    className={`px-4 py-2 font-bold rounded-lg transition-all text-xs border ${isDirty
-                        ? 'bg-purple-600 hover:bg-purple-700 text-white border-purple-500 shadow-lg shadow-purple-900/20'
-                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed'
-                        }`}
-                >
-                    Desfazer
-                </button>
-                <button
-                    onClick={handleSave}
-                    disabled={!isDirty}
-                    className="px-4 py-2 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
-                >
-                    Salvar Alterações
-                </button>
             </div>
         </div >
     );

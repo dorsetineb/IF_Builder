@@ -17,6 +17,7 @@ import Preview from './Preview';
 import SceneMap from './SceneMap';
 import GlobalObjectsEditor from './GlobalObjectsEditor';
 import TrackersEditor from './TrackersEditor';
+import GlobalCommandsEditor from './GlobalCommandsEditor';
 import { ConfirmationModal } from './ConfirmationModal';
 import { TransitionScreen } from './TransitionScreen';
 import UserManualModal from './UserManualModal';
@@ -1952,6 +1953,15 @@ DATE:        ${exportDate.toLocaleString()}
                                     isDirty={isDirty}
                                     onSetDirty={setIsDirty}
                                     onSelectScene={handleSelectScene}
+                                />
+                            )}
+
+                            {currentView === 'global_commands' && (
+                                <GlobalCommandsEditor
+                                    fixedVerbs={gameData.fixedVerbs || []}
+                                    onUpdate={handleUpdateGameData}
+                                    isDirty={isDirty}
+                                    onSetDirty={setIsDirty}
                                 />
                             )}
 

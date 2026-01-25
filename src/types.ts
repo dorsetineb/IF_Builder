@@ -84,6 +84,7 @@ export interface ConsequenceTracker {
   barColor?: string;
   invertBar?: boolean;
   hideValue?: boolean;
+  icon?: string;
 }
 
 export interface Vignette {
@@ -223,4 +224,4 @@ export interface GameData {
   gameTextReadingFlow?: 'continuous' | 'paused';
 }
 
-export type View = 'scenes' | 'interface' | 'vignettes' | 'map' | 'global_objects' | 'trackers' | 'settings' | 'about' | 'guide';
+export type View = 'scenes' | 'interface' | 'vignettes' | 'map' | 'global_objects' | 'global_commands' | 'trackers' | 'settings' | 'about' | 'guide';

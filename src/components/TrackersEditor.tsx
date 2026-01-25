@@ -1,6 +1,26 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ConsequenceTracker, Scene, Interaction, TrackerEffect } from '../types';
-import { Plus, Trash2, Search, Activity, ArrowRightLeft } from 'lucide-react';
+import { Plus, Trash2, Search, Activity, ArrowLeft, ArrowRight, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
+
+const TRACKER_ICONS = [
+    { name: 'activity', component: Activity },
+    { name: 'heart', component: Heart },
+    { name: 'zap', component: Zap },
+    { name: 'shield', component: Shield },
+    { name: 'coins', component: Coins },
+    { name: 'clock', component: Clock },
+    { name: 'skull', component: Skull },
+    { name: 'star', component: Star },
+    { name: 'user', component: User },
+    { name: 'trophy', component: Trophy },
+    { name: 'alert', component: AlertTriangle },
+    { name: 'book', component: Book },
+    { name: 'crown', component: Crown },
+    { name: 'flame', component: Flame },
+    { name: 'droplet', component: Droplet },
+    { name: 'sun', component: Sun },
+    { name: 'moon', component: Moon },
+];
 
 interface TrackersEditorProps {
     trackers: ConsequenceTracker[];
@@ -191,6 +211,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                             filteredTrackers.map(tracker => {
                                 const percentage = Math.min(100, Math.max(0, (tracker.initialValue / (tracker.maxValue || 100)) * 100));
                                 const barWidth = `${percentage}%`;
+                                const IconComponent = TRACKER_ICONS.find(i => i.name === tracker.icon)?.component || Activity;
 
                                 return (
                                     <button
@@ -199,7 +220,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                         className={`relative w-full flex items-start gap-3 p-3 rounded-xl border transition-all text-left group ${selectedTrackerId === tracker.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
                                     >
                                         <div className={`w-10 h-10 rounded-lg bg-zinc-900 border flex items-center justify-center overflow-hidden shrink-0 shadow-sm ${selectedTrackerId === tracker.id ? 'border-purple-500/30' : 'border-zinc-800 group-hover:border-zinc-700'}`}>
-                                            <Activity
+                                            <IconComponent
                                                 className="w-5 h-5 shadow-sm"
                                                 style={{ color: tracker.barColor || '#a855f7' }}
                                                 fill={tracker.barColor ? `${tracker.barColor}30` : '#a855f730'}
@@ -210,7 +231,9 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                 <div className={`text-xs font-bold truncate ${selectedTrackerId === tracker.id ? 'text-purple-100' : 'text-zinc-300'}`} style={{ textShadow: selectedTrackerId === tracker.id ? `0 0 10px ${tracker.barColor}40` : 'none' }}>
                                                     {tracker.name || 'Sem nome'}
                                                 </div>
-                                                <div className="text-[10px] text-zinc-600 font-mono truncate opacity-60">#{tracker.id}</div>
+                                                <div className="text-[10px] text-zinc-500 font-mono truncate opacity-60">
+                                                    {tracker.initialValue}/{tracker.maxValue || 100}
+                                                </div>
                                             </div>
 
                                             {/* Progress Bar Preview */}
@@ -226,11 +249,13 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                             </div>
                                         </div>
 
-                                        {tracker.invertBar && (
-                                            <div className="absolute -top-1 -right-1 p-1 bg-zinc-950 rounded-full border border-zinc-800 shadow-sm z-10" title="Barra Invertida">
-                                                <ArrowRightLeft className="w-2.5 h-2.5 text-zinc-500" />
-                                            </div>
-                                        )}
+                                        <div className="absolute -top-1 -right-1 p-1 bg-zinc-950 rounded-full border border-zinc-800 shadow-sm z-10" title={tracker.invertBar ? "Barra Invertida" : "Barra Normal"}>
+                                            {tracker.invertBar ? (
+                                                <ArrowLeft className="w-2.5 h-2.5 text-zinc-500" />
+                                            ) : (
+                                                <ArrowRight className="w-2.5 h-2.5 text-zinc-600 opacity-50" />
+                                            )}
+                                        </div>
                                     </button>
                                 );
                             })
@@ -272,7 +297,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
-                                        Excluir Rastreador
+                                        Excluir
                                     </button>
                                 </div>
                             </div>
@@ -281,10 +306,10 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                             <div className="flex-1 overflow-y-auto p-6">
                                 <div className="max-w-4xl mx-auto space-y-10">
                                     {/* Main Grid */}
-                                    <div className="grid grid-cols-3 gap-x-8 gap-y-6">
+                                    <div className="grid grid-cols-4 gap-x-4 gap-y-6">
 
                                         {/* Name field */}
-                                        <div className="col-span-2 space-y-1.5">
+                                        <div className="col-span-3 space-y-1.5">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nome do Rastreador</label>
                                             <input
                                                 type="text"
@@ -328,57 +353,86 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                             />
                                         </div>
 
-                                        {/* Bar Color */}
-                                        <div className="col-span-1 space-y-1.5">
-                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cor da Barra</label>
+                                        {/* Bar Color & Icon */}
+                                        <div className="col-span-2 space-y-1.5">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cor e Ícone</label>
                                             <div className="flex items-center gap-2">
-                                                <input
-                                                    type="text"
-                                                    value={selectedTracker.barColor || '#a855f7'}
-                                                    onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
-                                                    className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 font-mono"
-                                                    placeholder="#a855f7"
-                                                />
-                                                <input
-                                                    type="color"
-                                                    value={selectedTracker.barColor || '#a855f7'}
-                                                    onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
-                                                    className="w-9 h-9 p-1 bg-zinc-950 border border-muted-foreground/30 rounded-lg cursor-pointer"
-                                                />
+                                                <div className="flex-1 flex items-center bg-zinc-950 border border-muted-foreground/30 rounded-lg px-2 py-1.5">
+                                                    <input
+                                                        type="color"
+                                                        value={selectedTracker.barColor || '#a855f7'}
+                                                        onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
+                                                        className="w-5 h-5 bg-transparent border-none p-0 cursor-pointer mr-2"
+                                                    />
+                                                    <input
+                                                        type="text"
+                                                        value={selectedTracker.barColor || '#a855f7'}
+                                                        onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
+                                                        className="flex-1 bg-transparent border-none text-xs text-zinc-300 focus:ring-0 font-mono p-0 uppercase"
+                                                        placeholder="#a855f7"
+                                                    />
+                                                </div>
+
+                                                {/* Icon Picker */}
+                                                <div className="relative group">
+                                                    <button className="w-9 h-9 flex items-center justify-center bg-zinc-950 border border-muted-foreground/30 rounded-lg text-zinc-400 hover:text-white hover:border-purple-500/50 transition-all">
+                                                        {(() => {
+                                                            const Icon = TRACKER_ICONS.find(i => i.name === selectedTracker.icon)?.component || Activity;
+                                                            return <Icon className="w-4 h-4" />;
+                                                        })()}
+                                                    </button>
+                                                    <div className="absolute right-0 top-full mt-2 w-64 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-20 hidden group-hover:grid grid-cols-6 gap-1">
+                                                        {TRACKER_ICONS.map(icon => (
+                                                            <button
+                                                                key={icon.name}
+                                                                onClick={() => handleTrackerChange(selectedTracker.id, 'icon', icon.name)}
+                                                                className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedTracker.icon === icon.name ? 'bg-purple-500/20 text-purple-400' : 'text-zinc-500'}`}
+                                                                title={icon.name}
+                                                            >
+                                                                <icon.component className="w-4 h-4" />
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
                                         {/* Flags */}
-                                        <div className="col-span-3 grid grid-cols-2 gap-4 pt-2">
-                                            <label className="flex items-center p-3 rounded-lg border border-muted-foreground/20 bg-zinc-950/30 hover:bg-zinc-900 transition-colors cursor-pointer group">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={!!selectedTracker.invertBar}
-                                                    onChange={e => handleTrackerChange(selectedTracker.id, 'invertBar', e.target.checked)}
-                                                    className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-0"
-                                                />
+                                        <div className="col-span-4 grid grid-cols-2 gap-4 pt-2">
+                                            <label className="flex items-start p-3 rounded-lg border border-muted-foreground/10 bg-zinc-900/20 hover:bg-zinc-900/40 transition-colors cursor-pointer group">
+                                                <div className="flex items-center h-5">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!selectedTracker.invertBar}
+                                                        onChange={e => handleTrackerChange(selectedTracker.id, 'invertBar', e.target.checked)}
+                                                        className="w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-0 transition-all"
+                                                    />
+                                                </div>
                                                 <div className="ml-3">
                                                     <span className="block text-xs font-bold text-zinc-300 group-hover:text-white">Inverter Preenchimento</span>
-                                                    <span className="block text-[10px] text-zinc-500">A barra diminui ao invés de crescer (ex: contagem regressiva).</span>
+                                                    <span className="block text-[10px] text-zinc-500 mt-0.5">A barra diminui da direita para a esquerda.</span>
                                                 </div>
+                                                <ArrowLeft className={`ml-auto w-4 h-4 text-zinc-600 ${selectedTracker.invertBar ? 'text-purple-500' : ''}`} />
                                             </label>
 
-                                            <label className="flex items-center p-3 rounded-lg border border-muted-foreground/20 bg-zinc-950/30 hover:bg-zinc-900 transition-colors cursor-pointer group">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={!!selectedTracker.hideValue}
-                                                    onChange={e => handleTrackerChange(selectedTracker.id, 'hideValue', e.target.checked)}
-                                                    className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-0"
-                                                />
+                                            <label className="flex items-start p-3 rounded-lg border border-muted-foreground/10 bg-zinc-900/20 hover:bg-zinc-900/40 transition-colors cursor-pointer group">
+                                                <div className="flex items-center h-5">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!selectedTracker.hideValue}
+                                                        onChange={e => handleTrackerChange(selectedTracker.id, 'hideValue', e.target.checked)}
+                                                        className="w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-0 transition-all"
+                                                    />
+                                                </div>
                                                 <div className="ml-3">
                                                     <span className="block text-xs font-bold text-zinc-300 group-hover:text-white">Ocultar Valores</span>
-                                                    <span className="block text-[10px] text-zinc-500">Não mostra os números (X/Y) na interface do jogo.</span>
+                                                    <span className="block text-[10px] text-zinc-500 mt-0.5">Não mostra os números (X/Y) na interface.</span>
                                                 </div>
                                             </label>
                                         </div>
 
                                         {/* Consequence Scene */}
-                                        <div className="col-span-3 space-y-1.5 pt-4 border-t border-muted-foreground/10">
+                                        <div className="col-span-4 space-y-1.5 pt-4 border-t border-muted-foreground/10">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Consequência ao atingir máximo</label>
                                             <select
                                                 value={selectedTracker.consequenceSceneId || ''}

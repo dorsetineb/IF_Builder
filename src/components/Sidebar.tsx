@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SceneList from './SceneList';
 import { Scene, View, GameData } from '../types';
-import { Code, BookOpen, Map, Box, SlidersHorizontal, Settings, Info, CircleHelp, ChevronLeft, ChevronRight, MessageSquare, Gamepad2, ChevronDown, MonitorPlay, Activity } from 'lucide-react';
+import { Code, BookOpen, Map, Box, SlidersHorizontal, Settings, Info, CircleHelp, ChevronLeft, ChevronRight, MessageSquare, Gamepad2, ChevronDown, MonitorPlay, Activity, Command } from 'lucide-react';
 
 interface SidebarProps {
   scenes: Scene[];
@@ -149,6 +149,18 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           <SlidersHorizontal className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && <span className="truncate relative z-10">Rastreadores</span>}
         </button>
+
+        {(gameData.gameInteractionType || 'parser') !== 'choice' && (
+          <button
+            className={getButtonClass('global_commands')}
+            onClick={() => handleSetView('global_commands')}
+            title={isCollapsed ? "Comandos Globais" : undefined}
+          >
+            <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'global_commands' ? 'translate-x-0' : ''}`} />
+            <Command className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+            {!isCollapsed && <span className="truncate relative z-10">Comandos Globais</span>}
+          </button>
+        )}
 
         {/* Informações e Interface */}
         <button
