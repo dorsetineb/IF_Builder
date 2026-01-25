@@ -1,6 +1,6 @@
 import React, { useState, DragEvent, useMemo } from 'react';
 import { GameObject } from '../types';
-import { Plus, Trash2, Upload, Search, Package, Link as LinkIcon, Unlink, Box } from 'lucide-react';
+import { Plus, Trash2, Upload, Search, Link as LinkIcon, Unlink, Box } from 'lucide-react';
 
 interface ObjectEditorProps {
     sceneId: string;
@@ -204,12 +204,9 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                     <div className="flex flex-col h-full">
                         {/* Header */}
                         <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30">
-                            <div>
-                                <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
-                                    <Package className="w-4 h-4 text-purple-500" />
-                                    {selectedObject.name}
-                                </h3>
-                                <p className="text-[10px] text-zinc-500 font-mono mt-0.5">ID: {selectedObject.id}</p>
+                            <div className="flex items-center gap-2">
+                                <Box className="w-4 h-4 text-purple-500" />
+                                <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Propriedades do Objeto</span>
                             </div>
 
                             {/* Context Actions */}
@@ -241,11 +238,11 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
 
                         {/* Edit Form */}
                         <div className="flex-1 overflow-y-auto p-6">
-                            <div className="max-w-xl mx-auto space-y-6">
-                                {/* Basic Info */}
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="col-span-2">
-                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Nome do Objeto</label>
+                            <div className="max-w-2xl mx-auto space-y-10">
+                                <div className="grid grid-cols-3 gap-x-6 gap-y-4">
+                                    {/* Basic Info */}
+                                    <div className="col-span-2 space-y-1.5">
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nome do Objeto</label>
                                         <input
                                             type="text"
                                             value={selectedObject.name}
@@ -253,45 +250,57 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                             className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
                                         />
                                     </div>
-                                    <div className="col-span-2">
-                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Descrição (Examinar)</label>
+                                    <div className="col-span-1 space-y-1.5">
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">ID Único</label>
+                                        <input
+                                            type="text"
+                                            value={selectedObject.id}
+                                            readOnly
+                                            className="w-full bg-zinc-950/50 border border-muted-foreground/20 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono cursor-not-allowed h-[38px]"
+                                            title="O ID é gerado automaticamente e não pode ser alterado."
+                                        />
+                                    </div>
+
+                                    {/* Description field */}
+                                    <div className="col-span-2 space-y-1.5 flex flex-col">
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Descrição ao Examinar</label>
                                         <textarea
-                                            rows={4}
+                                            rows={6}
                                             value={selectedObject.examineDescription}
                                             onChange={(e) => onUpdateGlobalObject(selectedObject.id, { examineDescription: e.target.value })}
-                                            className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 resize-y"
+                                            className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-zinc-300 focus:ring-1 focus:ring-purple-500/50 resize-none flex-1 min-h-[150px]"
                                             placeholder="O que o jogador vê ao examinar este objeto?"
                                         />
                                     </div>
-                                </div>
 
-                                {/* Image Preview & Upload */}
-                                <div>
-                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Imagem de Referência</label>
-                                    <div className="relative w-full aspect-square max-w-[200px] mx-auto bg-zinc-950 rounded-lg overflow-hidden border border-muted-foreground/30 group">
-                                        {selectedObject.image ? (
-                                            <>
-                                                <img src={selectedObject.image} alt={selectedObject.name} className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-2">
-                                                    <label className="p-2 bg-white/20 rounded-full cursor-pointer hover:bg-white/40 text-white transition-all">
-                                                        <Upload className="w-4 h-4" />
-                                                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                                    </label>
-                                                    <button onClick={() => onUpdateGlobalObject(selectedObject.id, { image: '' })} className="p-2 bg-red-500/20 rounded-full cursor-pointer hover:bg-red-500/40 text-red-400 transition-all">
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-900 transition-colors">
-                                                <Upload className="w-6 h-6 text-zinc-700 mb-2" />
-                                                <span className="text-[10px] text-zinc-600">Carregar</span>
-                                                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                            </label>
-                                        )}
+                                    {/* Image Preview & Upload */}
+                                    <div className="col-span-1 space-y-1.5">
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem do Objeto</label>
+                                        <div className="relative w-full aspect-square bg-zinc-950 rounded-lg overflow-hidden border border-muted-foreground/30 group">
+                                            {selectedObject.image ? (
+                                                <>
+                                                    <img src={selectedObject.image} alt={selectedObject.name} className="w-full h-full object-cover" />
+                                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-2">
+                                                        <label className="p-2 bg-white/20 rounded-full cursor-pointer hover:bg-white/40 text-white transition-all">
+                                                            <Upload className="w-4 h-4" />
+                                                            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                                        </label>
+                                                        <button onClick={() => onUpdateGlobalObject(selectedObject.id, { image: '' })} className="p-2 bg-red-500/20 rounded-full cursor-pointer hover:bg-red-500/40 text-red-400 transition-all">
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                </>
+                                            ) : (
+                                                <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-900 transition-colors">
+                                                    <Upload className="w-6 h-6 text-zinc-700 mb-2" />
+                                                    <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">Carregar</span>
+                                                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                                </label>
+                                            )}
+                                        </div>
                                     </div>
-                                    <p className="text-[10px] text-zinc-600 text-center mt-2 italic">Objetos aparecem no inventário ou na lista de 'coisas aqui'.</p>
                                 </div>
+                                <p className="text-[10px] text-zinc-600 text-center mt-6 italic">Objetos aparecem no inventário ou na lista de 'coisas aqui'.</p>
                             </div>
                         </div>
                     </div>

@@ -1,7 +1,6 @@
-
-import React, { useState, useEffect, useMemo, DragEvent } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { GameData, GameObject, Scene } from '../types';
-import { Plus, Trash2, Upload, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, Upload, Search, Box, Unlink } from 'lucide-react';
 
 interface GlobalObjectsEditorProps {
     scenes: GameData['scenes'];
@@ -22,207 +21,6 @@ const generateUniqueId = (prefix: 'obj', existingIds: string[]): string => {
     return id;
 };
 
-const GlobalObjectItem: React.FC<{
-    obj: GameObject;
-    onUpdate: (id: string, field: keyof GameObject, value: any) => void;
-    onDelete: (id: string) => void;
-    onSelectScene: (sceneId: string) => void;
-    scenes: GameData['scenes'];
-}> = ({ obj, onUpdate, onDelete, onSelectScene, scenes }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [isDraggingOver, setIsDraggingOver] = useState(false);
-
-    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if (event.target && typeof event.target.result === 'string') {
-                    onUpdate(obj.id, 'image', event.target.result);
-                }
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-        if (e.target) {
-            (e.target as HTMLInputElement).value = '';
-        }
-    };
-
-    const handleDrop = (e: DragEvent<HTMLLabelElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        setIsDraggingOver(false);
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            const event = { target: { files: e.dataTransfer.files } } as unknown as React.ChangeEvent<HTMLInputElement>;
-            handleImageUpload(event);
-        }
-    };
-
-    const usages = useMemo(() => {
-        const result: { id: string, name: string }[] = [];
-        Object.values(scenes).forEach((scene: Scene) => {
-            if (scene.objectIds && scene.objectIds.includes(obj.id)) {
-                result.push({ id: scene.id, name: scene.name });
-            }
-        });
-        return result;
-    }, [scenes, obj.id]);
-
-    return (
-        <div className={`bg-zinc-900/30 rounded-lg border ${isOpen ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.05)]' : 'border-muted-foreground/50'} overflow-hidden transition-all duration-300 relative`}>
-            {/* Header - Fixed height to allow full-height image */}
-            <div
-                onClick={() => setIsOpen(!isOpen)}
-                className={`relative flex items-center h-14 cursor-pointer hover:bg-zinc-800/50 transition-all overflow-hidden group ${isOpen ? 'bg-purple-500/5 border-b border-purple-500/10' : ''}`}
-            >
-                {/* Sliding Trash Button */}
-                <button
-                    onClick={(e) => { e.stopPropagation(); onDelete(obj.id); }}
-                    className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20"
-                    title="Excluir objeto do jogo"
-                >
-                    <Trash2 className="w-5 h-5" />
-                </button>
-
-                {/* Expansion Arrow */}
-                <div className="px-4 shrink-0">
-                    <ChevronDown
-                        className={`w-4 h-4 text-zinc-600 transition-transform duration-300 ${isOpen ? '-rotate-90' : 'rotate-0'}`}
-                    />
-                </div>
-
-                {/* Larger Thumbnail - Only rendered if image exists, otherwise no space occupied */}
-                {obj.image && (
-                    <div className="w-14 h-14 shrink-0 bg-zinc-950 border-r border-muted-foreground/50 overflow-hidden flex items-center justify-center">
-                        <img src={obj.image} alt="" className="w-full h-full object-cover" />
-                    </div>
-                )}
-
-                <div className="flex flex-1 items-center px-6 overflow-hidden">
-                    <div className="flex items-center min-w-0">
-                        <span className="text-xs font-bold text-zinc-200 truncate">{obj.name || '(Sem nome)'}</span>
-                        <span className="ml-2 text-[10px] text-zinc-400 font-mono shrink-0 uppercase tracking-tighter">({obj.id})</span>
-                    </div>
-
-                    {usages.length > 0 && (
-                        <>
-                            <div className="mx-6 h-4 border-r border-muted-foreground/50 shrink-0"></div>
-                            <div className="flex items-center gap-2 overflow-hidden text-[9px]">
-                                <span className="uppercase font-bold text-zinc-600 tracking-wider shrink-0">Cenas:</span>
-                                <div className="flex gap-1 overflow-hidden truncate">
-                                    {usages.map((u, i) => (
-                                        <span key={u.id} className="text-purple-400 font-bold whitespace-nowrap">
-                                            {u.name}{i < usages.length - 1 ? ',' : ''}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        </>
-                    )}
-                </div>
-            </div>
-
-            {/* Collapsible Content */}
-            {isOpen && (
-                <div className="p-6 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                        <div className="space-y-4">
-                            <div className="grid grid-cols-3 gap-4">
-                                <div className="col-span-2">
-                                    <label htmlFor={`obj-name-${obj.id}`} className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Nome do Objeto</label>
-                                    <input
-                                        id={`obj-name-${obj.id}`}
-                                        type="text"
-                                        value={obj.name}
-                                        onChange={e => onUpdate(obj.id, 'name', e.target.value)}
-                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
-                                    />
-                                </div>
-                                <div className="col-span-1">
-                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">ID</label>
-                                    <p
-                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all truncate"
-                                        title="Use este ID para referência interna."
-                                    >
-                                        {obj.id}
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="flex flex-col flex-grow">
-                                <label htmlFor={`obj-desc-${obj.id}`} className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Descrição ao examinar</label>
-                                <textarea
-                                    id={`obj-desc-${obj.id}`}
-                                    value={obj.examineDescription}
-                                    onChange={e => onUpdate(obj.id, 'examineDescription', e.target.value)}
-                                    rows={4}
-                                    className="w-full h-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Cenas vinculadas</label>
-                                {usages.length > 0 ? (
-                                    <div className="flex flex-wrap gap-2">
-                                        {usages.map(usage => (
-                                            <button
-                                                key={usage.id}
-                                                onClick={() => onSelectScene(usage.id)}
-                                                className="px-2 py-1 bg-purple-500/10 border border-purple-500/20 text-purple-400 font-bold rounded text-[10px] uppercase tracking-tighter hover:bg-purple-500/20 transition-all"
-                                                title={`Ir para cena ${usage.name}`}
-                                            >
-                                                {usage.name}
-                                            </button>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <p className="text-[10px] text-zinc-600 italic">Não vinculado a nenhuma cena.</p>
-                                )}
-                            </div>
-                        </div>
-                        <div className="flex flex-col space-y-3 h-full">
-                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Imagem do Objeto</label>
-                            <div className="relative flex-grow w-full min-h-[150px]">
-                                {obj.image ? (
-                                    <div className="absolute inset-0 w-full h-full border border-muted-foreground/50 rounded-lg overflow-hidden bg-zinc-950 group/img">
-                                        <img src={obj.image} alt={obj.name} className="w-full h-full object-cover bg-zinc-950" />
-                                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover/img:opacity-100 transition-opacity gap-2">
-                                            <label htmlFor={`image-upload-${obj.id}`} className="px-4 py-2 bg-white text-black rounded-lg cursor-pointer hover:bg-zinc-200 transition-all flex items-center gap-2 font-bold text-xs uppercase tracking-widest">
-                                                <Upload className="w-4 h-4" />
-                                                <span className="hidden sm:inline">Alterar</span>
-                                                <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                            </label>
-                                            <button
-                                                onClick={() => onUpdate(obj.id, 'image', '')}
-                                                className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                                                title="Remover Imagem"
-                                            >
-                                                <Trash2 className="w-5 h-5" />
-                                            </button>
-                                        </div>
-                                    </div>
-                                ) : (
-                                    <label
-                                        htmlFor={`image-upload-${obj.id}`}
-                                        className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-zinc-950 rounded-lg cursor-pointer hover:bg-zinc-900 transition-all ${isDraggingOver ? 'border-purple-500 bg-purple-500/5' : 'border-muted-foreground/50'}`}
-                                        onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
-                                        onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
-                                        onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
-                                        onDrop={handleDrop}
-                                    >
-                                        <Upload className="w-6 h-6 text-zinc-700 mb-2" />
-                                        <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Clique para Enviar</span>
-                                        <span className="text-[10px] text-zinc-700 mt-1">ou arraste para aqui</span>
-                                        <input id={`image-upload-${obj.id}`} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                    </label>
-                                )}
-                            </div>
-                            <p className="text-[10px] text-zinc-600 text-center uppercase tracking-tight">Imagem que aparece ao inspecionar o item.<br />Recomendado: 1:1 (quadrado), ex: 512x512 pixels.</p>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-}
-
 const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     scenes,
     globalObjects,
@@ -238,10 +36,28 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     }, [globalObjects]);
 
     const [localObjects, setLocalObjects] = useState<GameObject[]>(sortedObjects);
+    const [selectedObjectId, setSelectedObjectId] = useState<string | null>(sortedObjects.length > 0 ? sortedObjects[0].id : null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
         setLocalObjects(sortedObjects);
+        // If selected object was deleted or doesn't exist, select first or null
+        if (selectedObjectId && !sortedObjects.find(o => o.id === selectedObjectId)) {
+            setSelectedObjectId(sortedObjects.length > 0 ? sortedObjects[0].id : null);
+        } else if (!selectedObjectId && sortedObjects.length > 0) {
+            setSelectedObjectId(sortedObjects[0].id);
+        }
     }, [sortedObjects]);
+
+    // Comparison for dirty state (simplified for this editor context as we are editing localObjects directly? 
+    // Actually the pattern here seems to be: 
+    // 1. localObjects tracks local state
+    // 2. handleSave pushes to parent
+    // However, in the previous code, GlobalObjectItem updated parent directly via onUpdate prop passed to it?
+    // Wait, the previous code had `localObjects` state and `handleObjectChange` updating it, then `handleSave` pushing up.
+    // I should maintain that "Save to Apply" pattern to be consistent with the app's apparent logic? 
+    // OR create a more direct experience. The ObjectEditor usually updates directly. 
+    // Let's stick to the previous pattern: Local edits -> Save button.
 
     useEffect(() => {
         const isDifferent = JSON.stringify(localObjects) !== JSON.stringify(sortedObjects);
@@ -259,7 +75,8 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     const handleSave = () => {
         localObjects.forEach(localObj => {
             const originalObj = globalObjects[localObj.id];
-            if (originalObj && JSON.stringify(localObj) !== JSON.stringify(originalObj)) {
+            // Update if changed or if it's new (not in original)
+            if (!originalObj || JSON.stringify(localObj) !== JSON.stringify(originalObj)) {
                 onUpdateObject(localObj.id, {
                     name: localObj.name,
                     examineDescription: localObj.examineDescription,
@@ -275,93 +92,290 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
 
     const handleCreate = () => {
         const allIds = Object.keys(globalObjects);
+        // Also check local Ids to prevent collision if unsaved objects exist
+        const allLocalIds = localObjects.map(o => o.id);
+        const combinedIds = Array.from(new Set([...allIds, ...allLocalIds]));
+
+        const newId = generateUniqueId('obj', combinedIds);
         const newObject: GameObject = {
-            id: generateUniqueId('obj', allIds),
+            id: newId,
             name: 'Novo Objeto',
             examineDescription: 'Descrição do novo objeto.',
         };
+
+        // For this specific editor, creation might need to happen immediately in parent 
+        // to simplify ID tracking, OR we add to localObjects. 
+        // The prop `onCreateObject` implies immediate creation in parent. 
+        // If we call onCreateObject, it updates parent state, which updates `sortedObjects`, which triggers useEffect `setLocalObjects`.
+        // So let's call prop directly.
         onCreateObject(newObject);
+        setSelectedObjectId(newId);
     };
 
+    const handleDelete = (id: string) => {
+        if (window.confirm('Tem certeza? Isso excluirá o objeto de todo o jogo.')) {
+            onDeleteObject(id);
+            if (selectedObjectId === id) {
+                setSelectedObjectId(null);
+            }
+        }
+    };
+
+    const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0] && selectedObjectId) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target && typeof event.target.result === 'string') {
+                    handleObjectChange(selectedObjectId, 'image', event.target.result);
+                }
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+    };
+
+    const filteredObjects = useMemo(() => {
+        return localObjects.filter(obj =>
+            obj.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            obj.id.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [localObjects, searchTerm]);
+
+    const selectedObject = useMemo(() =>
+        localObjects.find(o => o.id === selectedObjectId),
+        [localObjects, selectedObjectId]);
+
+    const usages = useMemo(() => {
+        if (!selectedObject) return [];
+        const result: { id: string, name: string }[] = [];
+        Object.values(scenes).forEach((scene: Scene) => {
+            if (scene.objectIds && scene.objectIds.includes(selectedObject.id)) {
+                result.push({ id: scene.id, name: scene.name });
+            }
+        });
+        return result;
+    }, [scenes, selectedObject]);
+
     return (
-        <div className="space-y-6 pb-24">
-            <div className="flex justify-between items-start">
-                <div>
-                    <p className="text-zinc-500 mt-1 text-xs font-medium">
-                        Aqui você gerencia todos os objetos do jogo. Vincule-os às cenas através do Editor de Cenas.
-                    </p>
-                </div>
-                <div className="flex items-center gap-4 flex-shrink-0 mt-1">
+        <div className="space-y-4">
+            {/* Header with Save/Undo actions */}
+            <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
+                <p className="text-zinc-500 text-xs font-medium max-w-lg">
+                    Gerenciador Global: Objetos criados aqui podem ser usados em qualquer cena.
+                </p>
+                <div className="flex items-center gap-3">
                     {isDirty && (
-                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20">
+                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
                             <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            <span>Alterações não salvas</span>
+                            Alterações não salvas
+                        </div>
+                    )}
+                    <button
+                        onClick={handleUndo}
+                        disabled={!isDirty}
+                        className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
+                    >
+                        Desfazer
+                    </button>
+                    <button
+                        onClick={handleSave}
+                        disabled={!isDirty}
+                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-lg shadow-yellow-900/10"
+                    >
+                        Salvar Alterações
+                    </button>
+                </div>
+            </div>
+
+            <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
+                {/* LEFT SIDEBAR */}
+                <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
+                    {/* Sidebar Header */}
+                    <div className="p-4 border-b border-muted-foreground/10 space-y-4">
+                        <div className="relative">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                            <input
+                                type="text"
+                                placeholder="Buscar objetos globais..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-200 focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 placeholder:text-zinc-600"
+                            />
+                        </div>
+                        <div className="flex justify-between items-center text-[10px] text-zinc-500 font-bold uppercase tracking-wider px-1">
+                            <span>Lista de Objetos</span>
+                            <span>{filteredObjects.length}</span>
+                        </div>
+                    </div>
+
+                    {/* Object List */}
+                    <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                        {filteredObjects.length > 0 ? (
+                            filteredObjects.map(obj => (
+                                <button
+                                    key={obj.id}
+                                    onClick={() => setSelectedObjectId(obj.id)}
+                                    className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedObjectId === obj.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
+                                >
+                                    <div className="w-10 h-10 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0">
+                                        {obj.image ? (
+                                            <img src={obj.image} alt="" className="w-full h-full object-cover" />
+                                        ) : (
+                                            <Box className="w-4 h-4 text-zinc-600" />
+                                        )}
+                                    </div>
+                                    <div className="min-w-0 flex-1">
+                                        <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-purple-300' : 'text-zinc-300'}`}>{obj.name}</div>
+                                        <div className="text-[10px] text-zinc-500 font-mono truncate">#{obj.id}</div>
+                                    </div>
+                                    {/* Small indicator if it's dirty/unsaved could go here */}
+                                </button>
+                            ))
+                        ) : (
+                            <div className="text-center py-12 text-muted-foreground">
+                                <Box className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                                <p className="text-xs italic">Nenhum objeto encontrado.</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="p-3 border-t border-muted-foreground/10 bg-zinc-900/50">
+                        <button
+                            onClick={handleCreate}
+                            className="w-full py-2 bg-zinc-100 hover:bg-white text-zinc-900 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow"
+                        >
+                            <Plus className="w-3.5 h-3.5 mr-2" />
+                            Criar Novo Objeto
+                        </button>
+                    </div>
+                </div>
+
+                {/* RIGHT MAIN PANEL */}
+                <div className="flex-1 flex flex-col bg-zinc-950/10 min-w-0">
+                    {selectedObject ? (
+                        <div className="flex flex-col h-full">
+                            {/* Header - Minimalist */}
+                            <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30">
+                                <div className="flex items-center gap-2">
+                                    <Box className="w-4 h-4 text-purple-500" />
+                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Propriedades do Objeto</span>
+                                </div>
+
+                                {/* Context Actions */}
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handleDelete(selectedObject.id)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                        Excluir Objeto
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Edit Form */}
+                            <div className="flex-1 overflow-y-auto p-6">
+                                <div className="max-w-4xl mx-auto space-y-10">
+                                    <div className="grid grid-cols-3 gap-x-8 gap-y-6">
+                                        {/* Name field */}
+                                        <div className="col-span-2 space-y-1.5">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nome do Objeto</label>
+                                            <input
+                                                type="text"
+                                                value={selectedObject.name}
+                                                onChange={(e) => handleObjectChange(selectedObject.id, 'name', e.target.value)}
+                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
+                                            />
+                                        </div>
+
+                                        {/* ID field */}
+                                        <div className="col-span-1 space-y-1.5">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">ID Único</label>
+                                            <input
+                                                type="text"
+                                                value={selectedObject.id}
+                                                readOnly
+                                                className="w-full bg-zinc-950/50 border border-muted-foreground/20 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono cursor-not-allowed h-[38px]"
+                                                title="O ID é gerado automaticamente e não pode ser alterado."
+                                            />
+                                        </div>
+
+                                        {/* Description field */}
+                                        <div className="col-span-2 space-y-1.5 flex flex-col">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Descrição ao Examinar</label>
+                                            <textarea
+                                                rows={10}
+                                                value={selectedObject.examineDescription}
+                                                onChange={(e) => handleObjectChange(selectedObject.id, 'examineDescription', e.target.value)}
+                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-zinc-300 focus:ring-1 focus:ring-purple-500/50 resize-none flex-1 min-h-[250px]"
+                                                placeholder="O que o jogador vê ao examinar este objeto?"
+                                            />
+                                        </div>
+
+                                        {/* Image field */}
+                                        <div className="col-span-1 space-y-1.5">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem do Objeto</label>
+                                            <div className="relative w-full aspect-square bg-zinc-950 rounded-lg overflow-hidden border border-muted-foreground/30 group">
+                                                {selectedObject.image ? (
+                                                    <>
+                                                        <img src={selectedObject.image} alt={selectedObject.name} className="w-full h-full object-cover" />
+                                                        <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-2">
+                                                            <label className="p-2 bg-white/20 rounded-full cursor-pointer hover:bg-white/40 text-white transition-all">
+                                                                <Upload className="w-4 h-4" />
+                                                                <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                                            </label>
+                                                            <button
+                                                                onClick={() => handleObjectChange(selectedObject.id, 'image', '')}
+                                                                className="p-2 bg-red-500/20 rounded-full cursor-pointer hover:bg-red-500/40 text-red-400 transition-all"
+                                                            >
+                                                                <Trash2 className="w-4 h-4" />
+                                                            </button>
+                                                        </div>
+                                                    </>
+                                                ) : (
+                                                    <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-900 transition-colors">
+                                                        <Upload className="w-6 h-6 text-zinc-700 mb-2" />
+                                                        <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">Carregar</span>
+                                                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                                    </label>
+                                                )}
+                                            </div>
+                                            <p className="text-[9px] text-zinc-600 italic leading-tight">Esta imagem aparece no pop-up de detalhes do objeto durante o jogo.</p>
+                                        </div>
+                                    </div>
+
+
+                                    {/* Usage Info */}
+                                    <div className="pt-4 border-t border-muted-foreground/10">
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Usado nas cenas</label>
+                                        <div className="flex flex-wrap gap-2">
+                                            {usages.length > 0 ? (
+                                                usages.map(u => (
+                                                    <button
+                                                        key={u.id}
+                                                        onClick={() => onSelectScene(u.id)}
+                                                        className="px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-md text-[10px] text-zinc-400 font-bold uppercase hover:bg-zinc-800 hover:text-purple-400 hover:border-purple-500/30 transition-all flex items-center gap-1.5"
+                                                    >
+                                                        <Unlink className="w-3 h-3 opacity-50" /> {/* Just an icon for visual context */}
+                                                        {u.name}
+                                                    </button>
+                                                ))
+                                            ) : (
+                                                <p className="text-[10px] text-zinc-600 italic">Este objeto ainda não foi adicionado a nenhuma cena.</p>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
+                            <Box className="w-12 h-12 mb-4 opacity-20" />
+                            <h4 className="text-sm font-bold text-zinc-400 mb-1">Nenhum objeto selecionado</h4>
+                            <p className="text-xs max-w-xs opacity-60">Selecione um objeto da lista ao lado para editar suas propriedades globais.</p>
                         </div>
                     )}
                 </div>
-            </div>
-
-            <div className="space-y-4">
-                {localObjects.length > 0 ? (
-                    <>
-                        {localObjects.map(obj => (
-                            <GlobalObjectItem
-                                key={obj.id}
-                                obj={obj}
-                                onUpdate={handleObjectChange}
-                                onDelete={onDeleteObject}
-                                scenes={scenes}
-                                onSelectScene={onSelectScene}
-                            />
-                        ))}
-                        <div className="flex justify-start pt-4">
-                            <button
-                                onClick={handleCreate}
-                                className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
-                            >
-                                <Plus className="w-4 h-4 mr-2" />
-                                Novo Objeto
-                            </button>
-                        </div>
-                        <div className="w-full border-b border-muted-foreground/50 mt-6"></div>
-                    </>
-                ) : (
-                    <>
-                        <div className="w-full py-8 flex flex-col items-center gap-4">
-                            <p className="text-xs italic text-muted-foreground w-full text-center">Nenhum objeto na biblioteca.</p>
-                            <button
-                                onClick={handleCreate}
-                                className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
-                            >
-                                <Plus className="w-4 h-4 mr-2" />
-                                Novo Objeto
-                            </button>
-                        </div>
-                        <div className="w-full border-b border-muted-foreground/50 mb-6"></div>
-                    </>
-                )}
-            </div>
-
-
-
-            <div className="fixed bottom-6 right-10 z-10 flex gap-2">
-                <button
-                    onClick={handleUndo}
-                    disabled={!isDirty}
-                    className={`px-4 py-2 font-bold rounded-lg transition-all text-xs border ${isDirty
-                        ? 'bg-purple-600 hover:bg-purple-700 text-white border-purple-500 shadow-lg shadow-purple-900/20'
-                        : 'bg-zinc-900 border-muted-foreground/50 text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed'
-                        }`}
-                >
-                    Desfazer
-                </button>
-                <button
-                    onClick={handleSave}
-                    disabled={!isDirty}
-                    className="px-4 py-2 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed"
-                >
-                    Salvar Alterações
-                </button>
             </div>
         </div>
     );

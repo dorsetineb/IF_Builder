@@ -254,8 +254,8 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
                     {/* Secret Hint Text */}
                     <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1 pt-8 opacity-50">
-                        <p>Se clicar nos computadores.</p>
-                        <p className="text-purple-400 font-bold mt-2">Algo pode acontecer...</p>
+                        <p>Algo pode acontecer.</p>
+                        <p className="text-purple-400 font-bold">Se você clicar nos computadores.</p>
                     </div>
 
                     {/* Jogar Button removed (Secret Trigger now) */}

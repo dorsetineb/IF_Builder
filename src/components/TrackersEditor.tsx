@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { ConsequenceTracker, Scene, Interaction, TrackerEffect } from '../types';
-import { Plus, Trash2, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, Search, Activity, ArrowRightLeft } from 'lucide-react';
 
 interface TrackersEditorProps {
     trackers: ConsequenceTracker[];
@@ -27,265 +26,54 @@ const selectStyle = { backgroundImage: `url("${whiteChevron}")`, backgroundPosit
 const optionBaseClasses = "bg-zinc-950 text-zinc-300";
 const optionDimClasses = "bg-zinc-950 text-zinc-500";
 
-const TrackerItem: React.FC<{
-    tracker: ConsequenceTracker;
-    onUpdate: (id: string, field: keyof ConsequenceTracker, value: any) => void;
-    onRemove: (id: string) => void;
-    onSelectScene: (sceneId: string) => void;
-    allScenes: Scene[];
-    usages: { scene: Scene; interaction: Interaction; effect: TrackerEffect }[];
-}> = ({ tracker, onUpdate, onRemove, onSelectScene, allScenes, usages }) => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    const consequenceSceneName = useMemo(() => {
-        if (!tracker.consequenceSceneId) return '(Nenhuma)';
-        return allScenes.find(s => s.id === tracker.consequenceSceneId)?.name || tracker.consequenceSceneId;
-    }, [tracker.consequenceSceneId, allScenes]);
-
-    return (
-        <div className={`bg-zinc-900/30 rounded-lg border ${isOpen ? 'border-purple-500/50 shadow-[0_0_20px_rgba(168,85,247,0.05)]' : 'border-muted-foreground/50'} overflow-hidden transition-all duration-300 relative`}>
-            {/* Header - Always visible summary */}
-            <div
-                onClick={() => setIsOpen(!isOpen)}
-                className={`relative flex items-center p-4 cursor-pointer hover:bg-zinc-800/50 transition-all overflow-hidden group ${isOpen ? 'bg-purple-500/5 border-b border-purple-500/10' : ''}`}
-            >
-                {/* Sliding Trash Button */}
-                <button
-                    onClick={(e) => { e.stopPropagation(); onRemove(tracker.id); }}
-                    className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20"
-                    title="Excluir rastreador"
-                >
-                    <Trash2 className="w-5 h-5" />
-                </button>
-
-                {/* Expansion Arrow */}
-                <ChevronDown
-                    className={`w-4 h-4 text-zinc-600 transition-transform duration-300 mr-4 shrink-0 ${isOpen ? '-rotate-90' : 'rotate-0'}`}
-                />
-
-                <div className="flex flex-1 items-center overflow-hidden h-6">
-                    {/* Nome & ID */}
-                    <div className="flex items-center gap-2 min-w-0 pr-6 border-r border-muted-foreground/50 h-full">
-                        <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Nome:</span>
-                        <div className="flex items-center truncate">
-                            <span className="text-xs font-bold text-white truncate">{tracker.name || '(Sem nome)'}</span>
-                            <span className="ml-2 text-[10px] text-zinc-400 font-mono shrink-0">({tracker.id})</span>
-                        </div>
-                    </div>
-
-                    {/* Alcance */}
-                    <div className="flex items-center gap-2 min-w-0 px-6 border-r border-muted-foreground/50 h-full">
-                        <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Início / Max:</span>
-                        <span className="text-xs text-purple-400 truncate">{tracker.initialValue} / {tracker.maxValue}</span>
-                    </div>
-
-                    {/* Cena */}
-                    <div className="flex items-center gap-2 min-w-0 px-6 h-full">
-                        <span className="text-[9px] uppercase font-bold text-zinc-600 tracking-wider shrink-0">Cena:</span>
-                        <span className="text-xs text-purple-400 truncate">{consequenceSceneName}</span>
-                    </div>
-
-                    {/* Color Indicator */}
-                    {tracker.barColor && (
-                        <div className="ml-auto flex items-center gap-2 shrink-0">
-                            <div className="w-2.5 h-2.5 rounded-full border border-white/20 shadow-[0_0_8px_rgba(255,255,255,0.1)]" style={{ backgroundColor: tracker.barColor }}></div>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Collapsible Content */}
-            {isOpen && (
-                <div className="p-6 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-3 gap-4">
-                            <div className="col-span-2">
-                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Nome do Rastreador</label>
-                                <input
-                                    type="text"
-                                    value={tracker.name}
-                                    onChange={e => onUpdate(tracker.id, 'name', e.target.value)}
-                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
-                                    placeholder="Nome do Rastreador"
-                                />
-                            </div>
-                            <div className="col-span-1">
-                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">ID</label>
-                                <p className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all truncate">
-                                    {tracker.id}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Valor Inicial</label>
-                                <input
-                                    type="number"
-                                    value={tracker.initialValue}
-                                    onChange={e => onUpdate(tracker.id, 'initialValue', parseInt(e.target.value, 10) || 0)}
-                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Valor Máximo</label>
-                                <input
-                                    type="number"
-                                    value={tracker.maxValue}
-                                    onChange={e => onUpdate(tracker.id, 'maxValue', parseInt(e.target.value, 10) || 0)}
-                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
-                                />
-                            </div>
-                        </div>
-                        <div>
-                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Cor da Barra (Opcional)</label>
-                            <div className="flex items-center gap-2">
-                                <input
-                                    type="text"
-                                    value={tracker.barColor || ''}
-                                    onChange={e => onUpdate(tracker.id, 'barColor', e.target.value)}
-                                    placeholder="Hex: #ffffff"
-                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
-                                />
-                                <input
-                                    type="color"
-                                    value={tracker.barColor || '#a855f7'}
-                                    onChange={e => onUpdate(tracker.id, 'barColor', e.target.value)}
-                                    className="w-8 h-8 p-1 bg-transparent border-none rounded-lg cursor-pointer"
-                                />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="space-y-4">
-                        <div>
-                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Consequência</label>
-                            <select
-                                value={tracker.consequenceSceneId}
-                                onChange={e => onUpdate(tracker.id, 'consequenceSceneId', e.target.value)}
-                                className={selectBaseClasses}
-                                style={selectStyle}
-                            >
-                                <option value="" className={optionDimClasses}>Selecione uma cena...</option>
-                                {allScenes.map(scene => (
-                                    <option key={scene.id} value={scene.id} className={optionBaseClasses}>
-                                        {scene.name}
-                                    </option>
-                                ))}
-                            </select>
-                            <p className="text-[10px] text-zinc-600 mt-2 italic">
-                                O jogador irá para esta cena quando o valor máximo for atingido.
-                            </p>
-                        </div>
-
-                        <div className="flex flex-col space-y-3 pt-2">
-                            <div className="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    id={`invertBar-${tracker.id}`}
-                                    checked={!!tracker.invertBar}
-                                    onChange={e => onUpdate(tracker.id, 'invertBar', e.target.checked)}
-                                    className="custom-checkbox"
-                                />
-                                <label htmlFor={`invertBar-${tracker.id}`} className="ml-2 block text-[11px] text-muted-foreground">
-                                    Inverter preenchimento da barra
-                                </label>
-                            </div>
-                            <div className="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    id={`hideValue-${tracker.id}`}
-                                    checked={!!tracker.hideValue}
-                                    onChange={e => onUpdate(tracker.id, 'hideValue', e.target.checked)}
-                                    className="custom-checkbox"
-                                />
-                                <label htmlFor={`hideValue-${tracker.id}`} className="ml-2 block text-[11px] text-muted-foreground">
-                                    Ocultar valores numéricos no jogo
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div className="mt-8 pt-6 border-t border-zinc-900">
-                        <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-4">Uso do Rastreador</h4>
-                        {usages.length > 0 ? (
-                            <ul className="space-y-2">
-                                {usages.map(({ scene, interaction, effect }, index) => {
-                                    const interactionDesc = `${interaction.verbs[0] || 'Ação'}${interaction.target ? ' em ' + interaction.target : ''}`;
-
-                                    return (
-                                        <li key={`${interaction.id}-${index}`}>
-                                            <button
-                                                onClick={() => onSelectScene(scene.id)}
-                                                className="w-full flex justify-between items-center text-left p-3 bg-zinc-950/50 rounded-lg border border-zinc-900 hover:border-muted-foreground/50 transition-all shadow-sm"
-                                                title={`Ir para a cena: ${scene.name}`}
-                                            >
-                                                <div className="flex-1 min-w-0">
-                                                    <p className="text-xs font-bold text-zinc-200 truncate" title={scene.name}>{scene.name}</p>
-                                                    <p className="text-xs text-zinc-600 truncate italic" title={interactionDesc}>{interactionDesc}</p>
-                                                </div>
-                                                <div className="flex-shrink-0 ml-4 text-center">
-                                                    <span className={`font-mono font-bold text-xs px-2 py-1 rounded-md ${effect.valueChange >= 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
-                                                        {effect.valueChange >= 0 ? '+' : ''}{effect.valueChange}
-                                                    </span>
-                                                </div>
-                                            </button>
-                                        </li>
-                                    );
-                                })}
-                            </ul>
-                        ) : (
-                            <div className="text-center p-8 bg-zinc-950/20 border-2 border-dashed border-zinc-900/50 rounded-xl">
-                                <p className="text-zinc-600 text-xs italic">Este rastreador ainda não é modificado por nenhuma interação.</p>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )
-            }
-        </div >
-    );
-};
-
 const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrackers, allScenes, allTrackerIds, isDirty, onSetDirty, onSelectScene }) => {
-    const [localTrackers, setLocalTrackers] = useState(trackers);
+    const sortedTrackers = useMemo(() => {
+        return [...trackers].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    }, [trackers]);
 
-    const allTrackerUsages = useMemo(() => {
-        const usageMap = new Map<string, { scene: Scene; interaction: Interaction; effect: TrackerEffect }[]>();
-        trackers.forEach(tracker => usageMap.set(tracker.id, []));
-        allScenes.forEach(scene => {
-            scene.interactions?.forEach(interaction => {
-                interaction.trackerEffects?.forEach(effect => {
-                    if (usageMap.has(effect.trackerId)) {
-                        usageMap.get(effect.trackerId)!.push({ scene, interaction, effect });
-                    }
-                });
-            });
-        });
-        return usageMap;
-    }, [allScenes, trackers]);
-
+    const [localTrackers, setLocalTrackers] = useState<ConsequenceTracker[]>(sortedTrackers);
+    const [selectedTrackerId, setSelectedTrackerId] = useState<string | null>(sortedTrackers.length > 0 ? sortedTrackers[0].id : null);
+    const [searchTerm, setSearchTerm] = useState('');
 
     useEffect(() => {
-        setLocalTrackers(trackers);
-    }, [trackers]);
+        setLocalTrackers(sortedTrackers);
+        // If selected tracker was deleted or doesn't exist, select first or null
+        if (selectedTrackerId && !sortedTrackers.find(t => t.id === selectedTrackerId)) {
+            setSelectedTrackerId(sortedTrackers.length > 0 ? sortedTrackers[0].id : null);
+        } else if (!selectedTrackerId && sortedTrackers.length > 0) {
+            setSelectedTrackerId(sortedTrackers[0].id);
+        }
+    }, [sortedTrackers]);
 
     useEffect(() => {
         onSetDirty(JSON.stringify(localTrackers) !== JSON.stringify(trackers));
     }, [localTrackers, trackers, onSetDirty]);
 
     const handleAddTracker = () => {
+        // Prevent ID collision with existing trackers and potentially unsaved local ones
+        const allIds = [...allTrackerIds, ...localTrackers.map(t => t.id)];
         const newTracker: ConsequenceTracker = {
-            id: generateUniqueId('trk', allTrackerIds),
+            id: generateUniqueId('trk', allIds),
             name: 'Novo Rastreador',
             initialValue: 0,
             maxValue: 100,
             consequenceSceneId: '',
         };
-        setLocalTrackers([...localTrackers, newTracker]);
+        const updatedTrackers = [...localTrackers, newTracker];
+        setLocalTrackers(updatedTrackers);
+        setSelectedTrackerId(newTracker.id);
+
+        // Immediate save for creation to simplify ID management, or follow "Save Changes" pattern?
+        // Pattern here seems to be "Save Changes" for everything.
     };
 
     const handleRemoveTracker = (id: string) => {
-        setLocalTrackers(localTrackers.filter(t => t.id !== id));
+        if (window.confirm('Tem certeza? Isso excluirá o rastreador. Interações que o usam podem quebrar.')) {
+            setLocalTrackers(localTrackers.filter(t => t.id !== id));
+            if (selectedTrackerId === id) {
+                setSelectedTrackerId(null);
+            }
+        }
     };
 
     const handleTrackerChange = (id: string, field: keyof ConsequenceTracker, value: any) => {
@@ -310,87 +98,348 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
         setLocalTrackers(trackers);
     };
 
+    const filteredTrackers = useMemo(() => {
+        return localTrackers.filter(t =>
+            (t.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+            t.id.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+    }, [localTrackers, searchTerm]);
+
+    const selectedTracker = useMemo(() =>
+        localTrackers.find(t => t.id === selectedTrackerId),
+        [localTrackers, selectedTrackerId]);
+
+    const allTrackerUsages = useMemo(() => {
+        const usageMap = new Map<string, { scene: Scene; interaction: Interaction; effect: TrackerEffect }[]>();
+        localTrackers.forEach(tracker => usageMap.set(tracker.id, []));
+        allScenes.forEach(scene => {
+            scene.interactions?.forEach(interaction => {
+                interaction.trackerEffects?.forEach(effect => {
+                    if (usageMap.has(effect.trackerId)) {
+                        usageMap.get(effect.trackerId)!.push({ scene, interaction, effect });
+                    }
+                });
+            });
+        });
+        return usageMap;
+    }, [allScenes, localTrackers]);
+
+    const usages = selectedTracker ? (allTrackerUsages.get(selectedTracker.id) || []) : [];
+
+    // Determine consequence scene name for display
+    const consequenceSceneName = useMemo(() => {
+        if (!selectedTracker?.consequenceSceneId) return null;
+        return allScenes.find(s => s.id === selectedTracker.consequenceSceneId)?.name || selectedTracker.consequenceSceneId;
+    }, [selectedTracker?.consequenceSceneId, allScenes]);
+
+
     return (
-        <div className="space-y-6 pb-24">
-            <div className="flex justify-between items-start">
-                <div>
-                    <p className="text-zinc-500 mt-1 text-xs font-medium">
-                        Crie e gerencie variáveis que mudam com as ações do jogador (ex: Vida, Dinheiro, Sanidade).
-                    </p>
-                </div>
-                <div className="flex items-center gap-4 flex-shrink-0 mt-1">
+        <div className="space-y-4">
+            {/* Header with Save/Undo actions */}
+            <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
+                <p className="text-zinc-500 text-xs font-medium max-w-lg">
+                    Crie e gerencie variáveis que mudam com as ações do jogador (ex: Vida, Dinheiro, Sanidade).
+                </p>
+                <div className="flex items-center gap-3">
                     {isDirty && (
-                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20">
+                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
                             <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            <span>Alterações não salvas</span>
+                            Alterações não salvas
+                        </div>
+                    )}
+                    <button
+                        onClick={handleUndo}
+                        disabled={!isDirty}
+                        className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
+                    >
+                        Desfazer
+                    </button>
+                    <button
+                        onClick={handleSave}
+                        disabled={!isDirty}
+                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-lg shadow-yellow-900/10"
+                    >
+                        Salvar Alterações
+                    </button>
+                </div>
+            </div>
+
+            <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
+                {/* LEFT SIDEBAR */}
+                <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
+                    {/* Sidebar Header */}
+                    <div className="p-4 border-b border-muted-foreground/10 space-y-4">
+                        <div className="relative">
+                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                            <input
+                                type="text"
+                                placeholder="Buscar rastreadores..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-200 focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 placeholder:text-zinc-600"
+                            />
+                        </div>
+                        <div className="flex justify-between items-center text-[10px] text-zinc-500 font-bold uppercase tracking-wider px-1">
+                            <span>Lista de Rastreadores</span>
+                            <span>{filteredTrackers.length}</span>
+                        </div>
+                    </div>
+
+                    {/* Tracker List */}
+                    <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                        {filteredTrackers.length > 0 ? (
+                            filteredTrackers.map(tracker => {
+                                const percentage = Math.min(100, Math.max(0, (tracker.initialValue / (tracker.maxValue || 100)) * 100));
+                                const barWidth = `${percentage}%`;
+
+                                return (
+                                    <button
+                                        key={tracker.id}
+                                        onClick={() => setSelectedTrackerId(tracker.id)}
+                                        className={`relative w-full flex items-start gap-3 p-3 rounded-xl border transition-all text-left group ${selectedTrackerId === tracker.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
+                                    >
+                                        <div className={`w-10 h-10 rounded-lg bg-zinc-900 border flex items-center justify-center overflow-hidden shrink-0 shadow-sm ${selectedTrackerId === tracker.id ? 'border-purple-500/30' : 'border-zinc-800 group-hover:border-zinc-700'}`}>
+                                            <Activity
+                                                className="w-5 h-5 shadow-sm"
+                                                style={{ color: tracker.barColor || '#a855f7' }}
+                                                fill={tracker.barColor ? `${tracker.barColor}30` : '#a855f730'}
+                                            />
+                                        </div>
+                                        <div className="min-w-0 flex-1 flex flex-col gap-1.5 pt-0.5">
+                                            <div className="flex justify-between items-center w-full">
+                                                <div className={`text-xs font-bold truncate ${selectedTrackerId === tracker.id ? 'text-purple-100' : 'text-zinc-300'}`} style={{ textShadow: selectedTrackerId === tracker.id ? `0 0 10px ${tracker.barColor}40` : 'none' }}>
+                                                    {tracker.name || 'Sem nome'}
+                                                </div>
+                                                <div className="text-[10px] text-zinc-600 font-mono truncate opacity-60">#{tracker.id}</div>
+                                            </div>
+
+                                            {/* Progress Bar Preview */}
+                                            <div className="w-full h-1.5 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800/60 shadow-inner">
+                                                <div
+                                                    className="h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(0,0,0,0.5)]"
+                                                    style={{
+                                                        width: barWidth,
+                                                        backgroundColor: tracker.barColor || '#a855f7',
+                                                        boxShadow: `0 0 8px ${tracker.barColor || '#a855f7'}60`
+                                                    }}
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {tracker.invertBar && (
+                                            <div className="absolute -top-1 -right-1 p-1 bg-zinc-950 rounded-full border border-zinc-800 shadow-sm z-10" title="Barra Invertida">
+                                                <ArrowRightLeft className="w-2.5 h-2.5 text-zinc-500" />
+                                            </div>
+                                        )}
+                                    </button>
+                                );
+                            })
+                        ) : (
+                            <div className="text-center py-12 text-muted-foreground">
+                                <Activity className="w-8 h-8 mx-auto mb-2 opacity-20" />
+                                <p className="text-xs italic">Nenhum rastreador encontrado.</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Footer Actions */}
+                    <div className="p-3 border-t border-muted-foreground/10 bg-zinc-900/50">
+                        <button
+                            onClick={handleAddTracker}
+                            className="w-full py-2 bg-zinc-100 hover:bg-white text-zinc-900 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow"
+                        >
+                            <Plus className="w-3.5 h-3.5 mr-2" />
+                            Novo Rastreador
+                        </button>
+                    </div>
+                </div>
+
+                {/* RIGHT MAIN PANEL */}
+                <div className="flex-1 flex flex-col bg-zinc-950/10 min-w-0">
+                    {selectedTracker ? (
+                        <div className="flex flex-col h-full">
+                            {/* Header */}
+                            <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30">
+                                <div className="flex items-center gap-2">
+                                    <Activity className="w-4 h-4 text-purple-500" />
+                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Propriedades do Rastreador</span>
+                                </div>
+
+                                {/* Context Actions */}
+                                <div className="flex items-center gap-2">
+                                    <button
+                                        onClick={() => handleRemoveTracker(selectedTracker.id)}
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
+                                    >
+                                        <Trash2 className="w-3.5 h-3.5" />
+                                        Excluir Rastreador
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* Edit Form */}
+                            <div className="flex-1 overflow-y-auto p-6">
+                                <div className="max-w-4xl mx-auto space-y-10">
+                                    {/* Main Grid */}
+                                    <div className="grid grid-cols-3 gap-x-8 gap-y-6">
+
+                                        {/* Name field */}
+                                        <div className="col-span-2 space-y-1.5">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nome do Rastreador</label>
+                                            <input
+                                                type="text"
+                                                value={selectedTracker.name}
+                                                onChange={(e) => handleTrackerChange(selectedTracker.id, 'name', e.target.value)}
+                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
+                                            />
+                                        </div>
+
+                                        {/* ID field */}
+                                        <div className="col-span-1 space-y-1.5">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">ID Único</label>
+                                            <input
+                                                type="text"
+                                                value={selectedTracker.id}
+                                                readOnly
+                                                className="w-full bg-zinc-950/50 border border-muted-foreground/20 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono cursor-not-allowed h-[38px]"
+                                                title="O ID é gerado automaticamente e não pode ser alterado."
+                                            />
+                                        </div>
+
+                                        {/* Initial Value */}
+                                        <div className="col-span-1 space-y-1.5">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Valor Inicial</label>
+                                            <input
+                                                type="number"
+                                                value={selectedTracker.initialValue}
+                                                onChange={e => handleTrackerChange(selectedTracker.id, 'initialValue', parseInt(e.target.value, 10) || 0)}
+                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-zinc-300 focus:ring-1 focus:ring-purple-500/50"
+                                            />
+                                        </div>
+
+                                        {/* Max Value */}
+                                        <div className="col-span-1 space-y-1.5">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Valor Máximo</label>
+                                            <input
+                                                type="number"
+                                                value={selectedTracker.maxValue}
+                                                onChange={e => handleTrackerChange(selectedTracker.id, 'maxValue', parseInt(e.target.value, 10) || 0)}
+                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-zinc-300 focus:ring-1 focus:ring-purple-500/50"
+                                            />
+                                        </div>
+
+                                        {/* Bar Color */}
+                                        <div className="col-span-1 space-y-1.5">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cor da Barra</label>
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={selectedTracker.barColor || '#a855f7'}
+                                                    onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 font-mono"
+                                                    placeholder="#a855f7"
+                                                />
+                                                <input
+                                                    type="color"
+                                                    value={selectedTracker.barColor || '#a855f7'}
+                                                    onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
+                                                    className="w-9 h-9 p-1 bg-zinc-950 border border-muted-foreground/30 rounded-lg cursor-pointer"
+                                                />
+                                            </div>
+                                        </div>
+
+                                        {/* Flags */}
+                                        <div className="col-span-3 grid grid-cols-2 gap-4 pt-2">
+                                            <label className="flex items-center p-3 rounded-lg border border-muted-foreground/20 bg-zinc-950/30 hover:bg-zinc-900 transition-colors cursor-pointer group">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={!!selectedTracker.invertBar}
+                                                    onChange={e => handleTrackerChange(selectedTracker.id, 'invertBar', e.target.checked)}
+                                                    className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-0"
+                                                />
+                                                <div className="ml-3">
+                                                    <span className="block text-xs font-bold text-zinc-300 group-hover:text-white">Inverter Preenchimento</span>
+                                                    <span className="block text-[10px] text-zinc-500">A barra diminui ao invés de crescer (ex: contagem regressiva).</span>
+                                                </div>
+                                            </label>
+
+                                            <label className="flex items-center p-3 rounded-lg border border-muted-foreground/20 bg-zinc-950/30 hover:bg-zinc-900 transition-colors cursor-pointer group">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={!!selectedTracker.hideValue}
+                                                    onChange={e => handleTrackerChange(selectedTracker.id, 'hideValue', e.target.checked)}
+                                                    className="w-4 h-4 rounded border-zinc-700 bg-zinc-900 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-0"
+                                                />
+                                                <div className="ml-3">
+                                                    <span className="block text-xs font-bold text-zinc-300 group-hover:text-white">Ocultar Valores</span>
+                                                    <span className="block text-[10px] text-zinc-500">Não mostra os números (X/Y) na interface do jogo.</span>
+                                                </div>
+                                            </label>
+                                        </div>
+
+                                        {/* Consequence Scene */}
+                                        <div className="col-span-3 space-y-1.5 pt-4 border-t border-muted-foreground/10">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Consequência ao atingir máximo</label>
+                                            <select
+                                                value={selectedTracker.consequenceSceneId || ''}
+                                                onChange={e => handleTrackerChange(selectedTracker.id, 'consequenceSceneId', e.target.value)}
+                                                className={selectBaseClasses}
+                                                style={selectStyle}
+                                            >
+                                                <option value="" className={optionDimClasses}>Nenhuma (Nada acontece)</option>
+                                                {allScenes.map(scene => (
+                                                    <option key={scene.id} value={scene.id} className={optionBaseClasses}>
+                                                        {scene.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <p className="text-[10px] text-zinc-600 italic">
+                                                O jogador será enviado para esta cena quando o valor do rastreador for maior ou igual ao máximo.
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Usages List */}
+                                    <div className="pt-6 border-t border-muted-foreground/10 space-y-4">
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Interações que alteram este rastreador</label>
+                                        {usages.length > 0 ? (
+                                            <div className="grid grid-cols-2 gap-3">
+                                                {usages.map(({ scene, interaction, effect }, index) => {
+                                                    const interactionDesc = `${interaction.verbs[0] || 'Ação'}${interaction.target ? ' em ' + interaction.target : ''}`;
+                                                    return (
+                                                        <button
+                                                            key={`${interaction.id}-${index}`}
+                                                            onClick={() => onSelectScene(scene.id)}
+                                                            className="flex flex-col items-start p-3 bg-zinc-950 border border-zinc-800 rounded-lg hover:border-purple-500/30 hover:bg-zinc-900 transition-all text-left group"
+                                                        >
+                                                            <div className="w-full flex justify-between items-start mb-1">
+                                                                <span className="text-xs font-bold text-zinc-300 group-hover:text-purple-300 truncate">{scene.name}</span>
+                                                                <span className={`font-mono text-[10px] px-1.5 py-0.5 rounded ${effect.valueChange >= 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                                                                    {effect.valueChange >= 0 ? '+' : ''}{effect.valueChange}
+                                                                </span>
+                                                            </div>
+                                                            <span className="text-[10px] text-zinc-500 truncate w-full">{interactionDesc}</span>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        ) : (
+                                            <div className="flex flex-col items-center justify-center p-6 bg-zinc-950/30 border border-dashed border-zinc-800 rounded-lg text-center">
+                                                <p className="text-zinc-600 text-xs italic">Nenhuma interação altera este rastreador ainda.</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
+                            <Activity className="w-12 h-12 mb-4 opacity-20" />
+                            <h4 className="text-sm font-bold text-zinc-400 mb-1">Nenhum rastreador selecionado</h4>
+                            <p className="text-xs max-w-xs opacity-60">Selecione um rastreador da lista ao lado para editar suas propriedades.</p>
                         </div>
                     )}
                 </div>
-            </div>
-
-            <div className="space-y-4">
-                {localTrackers.length > 0 ? (
-                    <>
-                        {localTrackers.map((tracker) => (
-                            <TrackerItem
-                                key={tracker.id}
-                                tracker={tracker}
-                                onUpdate={handleTrackerChange}
-                                onRemove={handleRemoveTracker}
-                                onSelectScene={onSelectScene}
-                                allScenes={allScenes}
-                                usages={allTrackerUsages.get(tracker.id) || []}
-                            />
-                        ))}
-                        <div className="flex justify-start pt-4">
-                            <button
-                                onClick={handleAddTracker}
-                                className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
-                            >
-                                <Plus className="w-4 h-4 mr-2" />
-                                Novo Rastreador
-                            </button>
-                        </div>
-                        <div className="w-full border-b border-muted-foreground/50 mt-6"></div>
-                    </>
-                ) : (
-                    <>
-                        <div className="w-full py-8 flex flex-col items-center gap-4">
-                            <p className="text-xs italic text-muted-foreground w-full text-center">Nenhum rastreador criado.</p>
-                            <button
-                                onClick={handleAddTracker}
-                                className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"
-                            >
-                                <Plus className="w-4 h-4 mr-2" />
-                                Novo Rastreador
-                            </button>
-                        </div>
-                        <div className="w-full border-b border-muted-foreground/50 mb-6"></div>
-                    </>
-                )}
-            </div>
-
-
-
-            <div className="fixed bottom-6 right-10 z-10 flex gap-2">
-                <button
-                    onClick={handleUndo}
-                    disabled={!isDirty}
-                    className={`px-4 py-2 font-bold rounded-lg transition-all text-xs border ${isDirty
-                        ? 'bg-purple-600 hover:bg-purple-700 text-white border-purple-500 shadow-lg shadow-purple-900/20'
-                        : 'bg-zinc-900 border-muted-foreground/50 text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed'
-                        }`}
-                >
-                    Desfazer
-                </button>
-                <button
-                    onClick={handleSave}
-                    disabled={!isDirty}
-                    className="px-4 py-2 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed"
-                    title="Salvar"
-                >
-                    Salvar Alterações
-                </button>
             </div>
         </div>
     );
