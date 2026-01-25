@@ -6,6 +6,7 @@ import { LoadingOverlay } from '../components/LoadingOverlay';
 import { useTheme } from '../components/ThemeProvider';
 import { useToast } from '../components/ToastContext';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../components/UserContext';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -31,6 +32,8 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
     const [pageLoading, setPageLoading] = useState(true);
 
+    const { user, profile, refreshProfile } = useUser();
+
     // Revert theme on unmount if not saved
     useEffect(() => {
         return () => {
@@ -41,60 +44,33 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     }, []);
 
     useEffect(() => {
-        getProfile();
-    }, []);
+        if (profile) {
+            setDisplayName(profile.full_name || '');
+            setUsername(profile.username || '');
+            setWebsite(profile.website || '');
+            setBio(profile.bio || '');
 
-    const getProfile = async () => {
-        setPageLoading(true);
-
-        const fetchProfilePromise = async () => {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (user) {
-                    setEmail(user.email || '');
-                    const { data, error } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-
-                    if (data) {
-                        setDisplayName(data.full_name || '');
-                        setUsername(data.username || '');
-                        setWebsite(data.website || '');
-                        setBio(data.bio || '');
-
-                        setInitialProfile({
-                            full_name: data.full_name,
-                            username: data.username,
-                            website: data.website,
-                            bio: data.bio,
-                            location: data.location
-                        });
-                        setLocation(data.location || user.user_metadata.location || '');
-                    } else {
-                        const meta = user.user_metadata || {};
-                        setDisplayName(meta.full_name || meta.name || '');
-                        setUsername(meta.username || '');
-                        setLocation(meta.location || '');
-
-                        setInitialProfile({});
-                    }
-                }
-            } catch (error) {
-                console.error('Critical error in Settings:', error);
-                toast("Erro", "Falha ao carregar perfil.", "error");
-            }
-        };
-
-        const timeoutPromise = new Promise((_, reject) => {
-            setTimeout(() => reject(new Error('Timeout')), 5000);
-        });
-
-        try {
-            await Promise.race([fetchProfilePromise(), timeoutPromise]);
-        } catch (err) {
-            console.error('Profile loading timed out:', err);
-        } finally {
+            setInitialProfile({
+                full_name: profile.full_name,
+                username: profile.username,
+                website: profile.website,
+                bio: profile.bio,
+                location: profile.location
+            });
+            setLocation(profile.location || '');
+            if (user) setEmail(user.email || '');
+            setPageLoading(false);
+        } else if (user) {
+            // Fallback if profile row is missing but user exists
+            const meta = user.user_metadata || {};
+            setDisplayName(meta.full_name || meta.name || '');
+            setUsername(meta.username || '');
+            setLocation(meta.location || '');
+            setEmail(user.email || '');
+            setInitialProfile({});
             setPageLoading(false);
         }
-    };
+    }, [profile, user]);
 
     const handleThemeChange = (newTheme: typeof theme) => {
         setTheme(newTheme);
@@ -143,6 +119,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     bio,
                     location
                 });
+                await refreshProfile(); // Update global context
                 setOriginalTheme(theme); // Update original theme to current to plain dirty state
             }
         } catch (err) {
@@ -199,7 +176,16 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 </div>
             )}
 
-            <div className="p-8 max-w-4xl mx-0">
+            <div className="px-8 pt-4 pb-8 max-w-4xl mx-0">
+                <div className="flex justify-end mb-6 -mt-2">
+                    <button
+                        onClick={handleSave}
+                        disabled={loading || !isDirty}
+                        className="bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold py-2 px-6 rounded-lg flex items-center gap-2 transition-all disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed text-xs shadow-md"
+                    >
+                        {loading ? 'Salvando...' : 'Salvar Alterações'}
+                    </button>
+                </div>
 
                 {/* Theme Section */}
                 <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
@@ -251,8 +237,8 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     </div>
 
                     <div className="space-y-4">
-                        <div className="space-y-1 text-left">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Nome e Sobrenome</label>
+                        <div className="space-y-2 text-left">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Nome e Sobrenome</label>
                             <input
                                 type="text"
                                 value={displayName}
@@ -262,8 +248,8 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             />
                         </div>
 
-                        <div className="space-y-1 text-left">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">E-mail</label>
+                        <div className="space-y-2 text-left">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">E-mail</label>
                             <div className="flex gap-2 items-center">
                                 <div className="relative flex-1">
                                     <Mail className="absolute left-3 top-2.5 text-muted-foreground w-4 h-4" />
@@ -293,8 +279,8 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             </div>
                         </div>
 
-                        <div className="space-y-1 text-left">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Local (Opcional)</label>
+                        <div className="space-y-2 text-left">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Local (Opcional)</label>
                             <div className="relative">
                                 <span className="absolute left-2.5 top-1.5 text-muted-foreground text-[10px] font-bold"><User size={12} className="opacity-0" /></span> {/* Spacer if needed or icon */}
                                 <input
@@ -309,66 +295,9 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     </div>
                 </div>
 
-                {/* Public Profile Section */}
-                <div className="bg-card border border-border rounded-lg p-4 mb-6 shadow-sm">
-                    <div className="flex items-center gap-2 mb-4 text-primary">
-                        <User size={16} /> {/* Can use a different icon like Globe or Share */}
-                        <h2 className="text-sm font-bold text-card-foreground">Perfil Público</h2>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <div className="space-y-1 text-left">
-                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Username</label>
-                                <div className="relative">
-                                    <span className="absolute left-2.5 top-1.5 text-muted-foreground text-[10px] font-bold">@</span>
-                                    <input
-                                        type="text"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        className="w-full bg-input border border-input rounded pl-6 pr-3 py-1.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
-                                        placeholder="username"
-                                    />
-                                </div>
-                            </div>
-                            <div className="space-y-1 text-left">
-                                <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Website</label>
-                                <div className="relative">
-                                    <span className="absolute left-2.5 top-1.5 text-muted-foreground"><LinkIcon size={12} /></span>
-                                    <input
-                                        type="text"
-                                        value={website}
-                                        onChange={(e) => setWebsite(e.target.value)}
-                                        className="w-full bg-input border border-input rounded pl-7 pr-3 py-1.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
-                                        placeholder="https://"
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="space-y-1 text-left">
-                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Sobre mim</label>
-                            <textarea
-                                value={bio}
-                                onChange={(e) => setBio(e.target.value)}
-                                className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none h-20"
-                                placeholder="Conte um pouco sobre você..."
-                            ></textarea>
-                        </div>
-                    </div>
-                </div>
 
 
 
-                <div className="flex justify-end pt-2">
-                    <button
-                        onClick={handleSave}
-                        disabled={loading || !isDirty}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold py-2 px-6 rounded-lg flex items-center gap-2 transition-all disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed text-xs"
-                    >
-                        {loading ? 'Salvando...' : 'Salvar Alterações'}
-                    </button>
-                </div>
             </div>
         </div>
     );

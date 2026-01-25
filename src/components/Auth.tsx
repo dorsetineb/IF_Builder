@@ -254,8 +254,8 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
                     {/* Secret Hint Text */}
                     <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1 pt-8 opacity-50">
-                        <p>Algo pode acontecer.</p>
-                        <p className="text-purple-400 font-bold">Se você clicar nos computadores.</p>
+                        <p>Algo pode acontecer,</p>
+                        <p>Se você clicar nos computadores.</p>
                     </div>
 
                     {/* Jogar Button removed (Secret Trigger now) */}
@@ -732,13 +732,15 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             </div>
 
             {/* Secret "Jogar" Trigger - Invisible area over computers */}
-            <div
-                className="absolute top-1/2 right-[20%] w-64 h-64 -translate-y-[40%] z-30 cursor-pointer hidden md:block"
-                onClick={(e) => {
-                    e.stopPropagation();
-                    setCurrentView('play');
-                }}
-            />
+            {currentView === 'landing' && (
+                <div
+                    className="absolute top-1/2 right-[20%] w-64 h-64 -translate-y-[40%] z-30 cursor-pointer hidden md:block"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setCurrentView('play');
+                    }}
+                />
+            )}
 
             {/* Left Sidebar */}
             {renderSidebar()}

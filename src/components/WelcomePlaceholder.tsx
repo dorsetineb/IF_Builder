@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { DitherShader } from '@/components/ui/dither-shader';
 import { Plus, Download, Heart, X, Gamepad2 } from 'lucide-react';
+import { NewProjectModal } from './NewProjectModal';
+import { GameData } from '../types';
 
 interface WelcomePlaceholderProps {
-    onCreateScene: () => void;
+    onCreateScene: (data?: Partial<GameData>) => void;
     onDownloadExample: () => void;
     onMeetProject: () => void;
     theme?: string;
@@ -12,6 +14,7 @@ interface WelcomePlaceholderProps {
 export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreateScene, onDownloadExample, onMeetProject, theme = 'dark' }) => {
     const [isFlashing, setIsFlashing] = useState(false);
     const [showDownloadHelp, setShowDownloadHelp] = useState(false);
+    const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
 
     const handleDownloadClick = () => {
         setIsFlashing(true);
@@ -34,6 +37,11 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
     };
 
     const ditherColors = getDitherColors();
+
+    const handleCreateProject = (data: Partial<GameData>) => {
+        setIsNewProjectModalOpen(false);
+        onCreateScene(data);
+    };
 
     return (
         <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden bg-zinc-950">
@@ -64,7 +72,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
                     {/* Botão 1: Começar a Criar */}
                     <button
-                        onClick={onCreateScene}
+                        onClick={() => setIsNewProjectModalOpen(true)}
                         className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-zinc-600 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20"
                     >
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'bg-primary/10 group-hover:bg-primary' : 'bg-white/10 group-hover:bg-white'}`}>
@@ -152,6 +160,13 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     </div>
                 </div>
             )}
+
+            {/* NEW PROJECT MODAL */}
+            <NewProjectModal
+                isOpen={isNewProjectModalOpen}
+                onClose={() => setIsNewProjectModalOpen(false)}
+                onCreate={handleCreateProject}
+            />
         </div>
     );
 };
