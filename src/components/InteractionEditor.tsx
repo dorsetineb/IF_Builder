@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect, Vignette } from '../types';
-import { Plus, Trash2, Upload, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, Upload, Search, MousePointer2, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2 } from 'lucide-react';
 
 interface InteractionEditorProps {
     interactions: Interaction[];
@@ -20,400 +19,391 @@ const getOutcomeType = (inter: Interaction): 'goToScene' | 'newSceneDescription'
     return 'goToScene';
 };
 
-const InteractionItem: React.FC<{
-    interaction: Interaction;
-    index: number;
-    onUpdate: (index: number, interaction: Interaction) => void;
-    onRemove: (index: number) => void;
-    allScenes: Scene[];
-    currentSceneId: string;
-    sceneObjects: GameObject[];
-    allTakableObjects: GameObject[];
-    consequenceTrackers: ConsequenceTracker[];
-    vignettes: Vignette[];
-}> = ({ interaction, index, onUpdate, onRemove, allScenes, currentSceneId, sceneObjects, allTakableObjects, consequenceTrackers, vignettes }) => {
-
-    const [isOpen, setIsOpen] = useState(false);
-    const [localVerbs, setLocalVerbs] = useState(interaction.verbs.join(', '));
-    const [localTrackerValues, setLocalTrackerValues] = useState(() =>
-        (interaction.trackerEffects || []).map(e => e.valueChange.toString())
-    );
-    const verbInputId = `verbs-input-${interaction.id}`;
-
-    useEffect(() => {
-        if (document.activeElement?.id !== verbInputId) {
-            setLocalVerbs(interaction.verbs.join(', '));
-        }
-    }, [interaction.verbs, verbInputId]);
-
-    useEffect(() => {
-        setLocalTrackerValues((interaction.trackerEffects || []).map(e => e.valueChange.toString()));
-    }, [interaction.trackerEffects]);
-
-    const handleInteractionChange = (field: keyof Interaction, value: any) => {
-        onUpdate(index, { ...interaction, [field]: value });
-    };
-
-    const handleTrackerEffectChange = (effectIndex: number, field: keyof TrackerEffect, value: any) => {
-        const newEffects = [...(interaction.trackerEffects || [])];
-        newEffects[effectIndex] = { ...newEffects[effectIndex], [field]: value };
-        handleInteractionChange('trackerEffects', newEffects);
-    };
-
-    const handleLocalTrackerValueChange = (effectIndex: number, stringValue: string) => {
-        const newValues = [...localTrackerValues];
-        newValues[effectIndex] = stringValue;
-        setLocalTrackerValues(newValues);
-    };
-
-    const handleLocalTrackerValueBlur = (effectIndex: number) => {
-        const stringValue = localTrackerValues[effectIndex];
-        const numericValue = parseInt(stringValue, 10);
-        const originalValue = (interaction.trackerEffects || [])[effectIndex]?.valueChange;
-
-        if (!isNaN(numericValue) && numericValue !== originalValue) {
-            handleTrackerEffectChange(effectIndex, 'valueChange', numericValue);
-        } else {
-            const newValues = [...localTrackerValues];
-            newValues[effectIndex] = (originalValue ?? 0).toString();
-            setLocalTrackerValues(newValues);
-        }
-    };
-
-    const handleAddTrackerEffect = () => {
-        const newEffect: TrackerEffect = { trackerId: '', valueChange: 10 };
-        handleInteractionChange('trackerEffects', [...(interaction.trackerEffects || []), newEffect]);
-    };
-
-    const handleRemoveTrackerEffect = (effectIndex: number) => {
-        handleInteractionChange('trackerEffects', (interaction.trackerEffects || []).filter((_, i) => i !== effectIndex));
-    };
-
-    const handleVerbsBlur = () => {
-        const cleanedVerbs = localVerbs.split(',').map(v => v.trim()).filter(Boolean);
-        if (JSON.stringify(cleanedVerbs) !== JSON.stringify(interaction.verbs)) {
-            handleInteractionChange('verbs', cleanedVerbs);
-        }
-    };
-
-    const handleOutcomeChange = (outcome: 'goToScene' | 'newSceneDescription' | 'playVignette') => {
-        const newInteraction = { ...interaction };
-        const currentNewDescription = newInteraction.newSceneDescription || '';
-
-        // Clean up previous outcome states
-        delete newInteraction.goToScene;
-        delete newInteraction.newSceneDescription;
-        delete newInteraction.vignetteId;
-
-        if (outcome === 'goToScene') {
-            newInteraction.goToScene = '';
-            newInteraction.transitionType = 'fade';
-            newInteraction.transitionSpeed = 5;
-        } else if (outcome === 'playVignette') {
-            newInteraction.vignetteId = '';
-            newInteraction.transitionType = 'fade';
-            newInteraction.transitionSpeed = 5;
-        } else {
-            newInteraction.newSceneDescription = currentNewDescription || 'A cena mudou...';
-            delete newInteraction.transitionType;
-            delete newInteraction.transitionSpeed; // Text update typically doesn't use the same transition mechanics in this engine
-        }
-        onUpdate(index, newInteraction);
-    };
-
-    const handleSoundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if (event.target && typeof event.target.result === 'string') {
-                    handleInteractionChange('soundEffect', event.target.result);
-                }
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    };
-
-    const otherScenes = allScenes.filter(s => s.id !== currentSceneId);
-    const selectBaseClasses = "w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 [&>option]:bg-zinc-950 [&>option]:text-zinc-300";
-    const outcomeType = getOutcomeType(interaction);
-
-    const requiredItemName = useMemo(() => {
-        if (!interaction.requiresInInventory) return '';
-        return allTakableObjects.find(o => o.id === interaction.requiresInInventory)?.name || '';
-    }, [interaction.requiresInInventory, allTakableObjects]);
-
-    const targetName = useMemo(() => {
-        if (!interaction.target) return '';
-        return sceneObjects.find(o => o.id === interaction.target)?.name || '';
-    }, [interaction.target, sceneObjects]);
-
-    return (
-        <div className={`bg-card rounded-lg border ${isOpen ? 'border-primary/50 shadow-[0_0_20px_rgba(var(--primary),0.05)]' : 'border-muted-foreground/50'} overflow-hidden transition-all duration-300 relative`}>
-            {/* Header - Always visible summary */}
-            <div
-                onClick={() => setIsOpen(!isOpen)}
-                className={`relative flex items-center p-4 cursor-pointer hover:bg-muted/50 transition-all overflow-hidden group ${isOpen ? 'bg-primary/5 border-b border-primary/10' : ''}`}
-            >
-                {/* Sliding Trash Button */}
-                <button
-                    onClick={(e) => { e.stopPropagation(); onRemove(index); }}
-                    className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20"
-                    title="Remover interação"
-                >
-                    <Trash2 className="w-5 h-5" />
-                </button>
-
-                {/* Expansion Arrow on the Left */}
-                <ChevronDown
-                    className={`w-4 h-4 text-muted-foreground transition-transform duration-300 mr-4 shrink-0 ${isOpen ? '-rotate-90' : 'rotate-0'}`}
-                />
-
-                <div className="flex flex-1 items-center overflow-hidden h-6">
-                    {/* Verbos */}
-                    <div className="flex items-center gap-2 min-w-0 pr-6 border-r border-muted-foreground/50 h-full">
-                        <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider shrink-0">Verbos:</span>
-                        <span className="text-xs text-purple-400 truncate">{localVerbs || '(Vazio)'}</span>
-                    </div>
-
-                    {/* Item */}
-                    <div className="flex items-center gap-2 min-w-0 px-6 border-r border-muted-foreground/50 h-full">
-                        <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider shrink-0">Item:</span>
-                        <span className="text-xs text-purple-400 truncate">{requiredItemName || '(Não requer item)'}</span>
-                    </div>
-
-                    {/* Alvo */}
-                    <div className="flex items-center gap-2 min-w-0 px-6 h-full">
-                        <span className="text-[9px] uppercase font-bold text-muted-foreground tracking-wider shrink-0">Alvo:</span>
-                        <span className="text-xs text-purple-400 truncate">{targetName || '(Nenhum)'}</span>
-                    </div>
-                </div>
-            </div>
-
-            {/* Collapsible Content - Full Editor */}
-            {isOpen && (
-                <div className="p-6 space-y-8 animate-in fade-in slide-in-from-top-2 duration-300">
-                    {/* Top Row: 3 Columns */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
-                        <div>
-                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Verbos (separados por vírgula)</label>
-                            <input id={verbInputId} type="text" value={localVerbs} onChange={e => setLocalVerbs(e.target.value)} onBlur={handleVerbsBlur} placeholder="ex: usar, mover, abrir" className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs focus:ring-0 text-zinc-300" />
-                        </div>
-
-                        <div>
-                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Requer Item (opcional)</label>
-                            <select value={interaction.requiresInInventory || ''} onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)} className={selectBaseClasses}>
-                                <option value="">Não requer item</option>
-                                {allTakableObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name} ({obj.id})</option>)}
-                            </select>
-                            <div className="flex items-center mt-3">
-                                <input type="checkbox" id={`consumesItem-${index}`} checked={!!interaction.consumesItem} onChange={e => handleInteractionChange('consumesItem', e.target.checked)} disabled={!interaction.requiresInInventory} className="custom-checkbox" />
-                                <label htmlFor={`consumesItem-${index}`} className={`ml-2 block text-[11px] text-muted-foreground ${!interaction.requiresInInventory ? 'opacity-30' : ''}`}>Consome item após uso</label>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Alvo da Interação</label>
-                            <select value={interaction.target} onChange={e => handleInteractionChange('target', e.target.value)} className={selectBaseClasses}>
-                                <option value="">Nenhum / Ação Geral</option>
-                                {sceneObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
-                            </select>
-                            {interaction.target && (
-                                <div className="space-y-3 mt-3">
-                                    <div className="flex items-center">
-                                        <input type="checkbox" id={`removesTarget-${index}`} checked={!!interaction.removesTargetFromScene} onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)} className="custom-checkbox" />
-                                        <label htmlFor={`removesTarget-${index}`} className="ml-2 block text-[11px] text-muted-foreground">Remove objeto da cena</label>
-                                    </div>
-                                    <div className="flex items-center">
-                                        <input type="checkbox" id={`addsToInventory-${index}`} checked={!!interaction.addsToInventory} onChange={e => handleInteractionChange('addsToInventory', e.target.checked)} className="custom-checkbox" />
-                                        <label htmlFor={`addsToInventory-${index}`} className="ml-2 block text-[11px] text-purple-400">Adiciona ao Inventário</label>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Bottom Row: 2 Columns */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6 mt-6 pt-6 border-t border-brand-border/20">
-                        {/* Left Column: Outcome, Transition, Success Message */}
-                        <div className="space-y-6">
-                            <div>
-                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Resultado da Ação</label>
-                                <div className="flex gap-2 mb-3 p-1 bg-muted border border-muted-foreground/50 rounded-lg">
-                                    <button onClick={() => handleOutcomeChange('newSceneDescription')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'newSceneDescription' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Atualizar Texto</button>
-                                    <button onClick={() => handleOutcomeChange('goToScene')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'goToScene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Mudar de Cena</button>
-                                    <button onClick={() => handleOutcomeChange('playVignette')} className={`flex-1 py-1.5 px-2 text-[10px] uppercase font-bold tracking-widest rounded transition-all ${outcomeType === 'playVignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}>Tocar Vinheta</button>
-                                </div>
-
-                                {outcomeType === 'goToScene' && (
-                                    <select value={interaction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className={selectBaseClasses}>
-                                        <option value="">Selecione uma cena...</option>
-                                        {otherScenes.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                                    </select>
-                                )}
-
-                                {outcomeType === 'newSceneDescription' && (
-                                    <textarea value={interaction.newSceneDescription || ''} onChange={e => handleInteractionChange('newSceneDescription', e.target.value)} rows={3} placeholder="Nova descrição para esta cena..." className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs focus:ring-0 text-zinc-300" />
-                                )}
-
-                                {outcomeType === 'playVignette' && (
-                                    <select value={interaction.vignetteId || ''} onChange={e => handleInteractionChange('vignetteId', e.target.value)} className={selectBaseClasses}>
-                                        <option value="">Selecione uma vinheta...</option>
-                                        {vignettes.map(v => <option key={v.id} value={v.id}>{v.name || v.title || 'Vinheta sem nome'}</option>)}
-                                    </select>
-                                )}
-                            </div>
-
-                            {/* Transition - For GoToScene AND PlayVignette */}
-                            {(outcomeType === 'goToScene' || outcomeType === 'playVignette') && (
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Transição</label>
-                                        <select
-                                            value={interaction.transitionType || 'fade'}
-                                            onChange={e => handleInteractionChange('transitionType', e.target.value)}
-                                            className={selectBaseClasses}
-                                        >
-                                            <option value="fade">Esmaecer</option>
-                                            <option value="slide-left">Deslizar Esq.</option>
-                                            <option value="slide-right">Deslizar Dir.</option>
-                                            <option value="slide-up">Deslizar Cima</option>
-                                            <option value="slide-down">Deslizar Baixo</option>
-                                            <option value="zoom">Zoom</option>
-                                            <option value="blur">Desfoque</option>
-                                            <option value="none">Nenhuma</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Velocidade</label>
-                                        <div className="flex items-center gap-3 h-[34px]">
-                                            <input
-                                                type="range" min="1" max="5"
-                                                value={interaction.transitionSpeed || 3}
-                                                onChange={e => handleInteractionChange('transitionSpeed', parseInt(e.target.value, 10))}
-                                                className="flex-grow h-1 bg-zinc-950 rounded-lg appearance-none cursor-pointer border border-muted-foreground/50 accent-primary"
-                                            />
-                                            <span className="font-mono font-bold text-purple-400 w-6 text-center text-xs shrink-0">
-                                                {interaction.transitionSpeed || 3}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Messages - Hidden for PlayVignette */}
-                            {outcomeType !== 'playVignette' && (
-                                <div>
-                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Mensagem de Sucesso (Opcional)</label>
-                                    <input type="text" value={interaction.successMessage || ''} onChange={e => handleInteractionChange('successMessage', e.target.value)} placeholder="Ex: Você abriu a porta." className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs focus:ring-0 text-zinc-300" />
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Right Column: Sound Effect, Trackers */}
-                        <div className="space-y-6">
-                            <div className="flex flex-col space-y-2">
-                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Efeito Sonoro (Opcional)</label>
-                                <div className="flex items-center gap-2">
-                                    <label className="flex-grow flex items-center justify-center px-3 py-2 bg-muted border border-muted-foreground/50 text-foreground font-bold rounded-lg hover:bg-muted/80 transition-all cursor-pointer text-xs">
-                                        <Upload className="w-4 h-4 mr-2 text-primary" /> {interaction.soundEffect ? 'Alterar Som' : 'Carregar Som'}
-                                        <input type="file" accept="audio/*" onChange={handleSoundUpload} className="hidden" />
-                                    </label>
-                                    {interaction.soundEffect && <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="p-2 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500/20 transition-all" title="Remover Som"><Trash2 className="w-3 h-3" /></button>}
-                                </div>
-                            </div>
-
-                            <div>
-                                <div className="flex justify-between items-center mb-3">
-                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Rastreadores</label>
-                                    <button onClick={handleAddTrackerEffect} className="text-[10px] text-purple-400 font-bold uppercase tracking-widest hover:text-purple-300 transition-all flex items-center"><Plus className="w-3 h-3 mr-1" /> Adicionar</button>
-                                </div>
-                                <div className="space-y-2">
-                                    {interaction.trackerEffects && interaction.trackerEffects.length > 0 ? interaction.trackerEffects.map((effect, i) => (
-                                        <div key={i} className="flex gap-2 items-center">
-                                            <select value={effect.trackerId} onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)} className="flex-grow bg-zinc-950 border border-muted-foreground/50 rounded-lg px-2 py-1.5 text-xs text-zinc-300 focus:ring-0">
-                                                <option value="">Selecione...</option>
-                                                {consequenceTrackers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
-                                            </select>
-                                            <input type="number" value={localTrackerValues[i]} onChange={e => handleLocalTrackerValueChange(i, e.target.value)} onBlur={() => handleLocalTrackerValueBlur(i)} className="w-20 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-2 py-1.5 text-xs focus:ring-0 text-zinc-300 font-mono" />
-                                            <button onClick={() => handleRemoveTrackerEffect(i)} className="text-muted-foreground hover:text-destructive transition-all"><Trash2 className="w-4 h-4" /></button>
-                                        </div>
-                                    )) : <p className="text-[10px] text-muted-foreground italic py-2">Nenhum efeito definido.</p>}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
-        </div>
-    );
-};
-
 const generateUniqueId = (prefix: 'inter', existingIds: string[]): string => {
     let id;
     do { id = `${prefix}_${Math.random().toString(36).substring(2, 5)}`; } while (existingIds.includes(id));
     return id;
 };
 
-const InteractionEditor: React.FC<InteractionEditorProps> = ({ interactions, onUpdateInteractions, allScenes, currentSceneId, sceneObjects, allTakableObjects, consequenceTrackers, vignettes }) => {
+const InteractionEditor: React.FC<InteractionEditorProps> = ({
+    interactions,
+    onUpdateInteractions,
+    allScenes,
+    currentSceneId,
+    sceneObjects,
+    allTakableObjects,
+    consequenceTrackers,
+    vignettes
+}) => {
+    const [selectedIndex, setSelectedIndex] = useState<number | null>(interactions.length > 0 ? 0 : null);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const handleAdd = () => {
+        const newInteraction: Interaction = {
+            id: generateUniqueId('inter', interactions.map(i => i.id)),
+            verbs: ['usar'],
+            target: ''
+        };
+        const newInteractions = [...interactions, newInteraction];
+        onUpdateInteractions(newInteractions);
+        setSelectedIndex(newInteractions.length - 1);
+    };
+
+    const handleRemove = (index: number) => {
+        if (window.confirm('Tem certeza que deseja remover esta interação?')) {
+            const newInteractions = interactions.filter((_, i) => i !== index);
+            onUpdateInteractions(newInteractions);
+            if (selectedIndex === index) {
+                setSelectedIndex(null);
+            } else if (selectedIndex !== null && selectedIndex > index) {
+                setSelectedIndex(selectedIndex - 1);
+            }
+        }
+    };
+
     const handleUpdate = (index: number, updatedInteraction: Interaction) => {
         const newInteractions = [...interactions];
         newInteractions[index] = updatedInteraction;
         onUpdateInteractions(newInteractions);
     };
-    const handleRemove = (index: number) => onUpdateInteractions(interactions.filter((_, i) => i !== index));
-    const handleAdd = () => {
-        const newInteraction: Interaction = { id: generateUniqueId('inter', interactions.map(i => i.id)), verbs: [], target: '' };
-        onUpdateInteractions([...interactions, newInteraction]);
-    };
-    return (
-        <div className="space-y-3">
-            {interactions.length > 0 ? (
-                interactions.map((interaction, index) => (
-                    <InteractionItem
-                        key={interaction.id}
-                        index={index}
-                        interaction={interaction}
-                        onUpdate={handleUpdate}
-                        onRemove={handleRemove}
-                        allScenes={allScenes}
-                        currentSceneId={currentSceneId}
-                        sceneObjects={sceneObjects}
-                        allTakableObjects={allTakableObjects}
-                        consequenceTrackers={consequenceTrackers}
-                        vignettes={vignettes}
-                    />
-                ))
-            ) : (
-                <>
-                    <div className="w-full py-8 flex flex-col items-center gap-4">
-                        <p className="text-xs italic text-muted-foreground text-center">Nenhuma interação definida para esta cena.</p>
+
+    // Filter logic
+    const filteredInteractions = useMemo(() => {
+        return interactions.map((inter, index) => ({ inter, index })).filter(({ inter }) => {
+            const searchLower = searchTerm.toLowerCase();
+            return (
+                inter.verbs.join(' ').toLowerCase().includes(searchLower) ||
+                (inter.target && sceneObjects.find(o => o.id === inter.target)?.name.toLowerCase().includes(searchLower))
+            );
+        });
+    }, [interactions, searchTerm, sceneObjects]);
+
+    const selectedInteraction = selectedIndex !== null ? interactions[selectedIndex] : null;
+
+    // Helper to render interaction editor (reused logic from previous component, adapted)
+    const renderEditor = () => {
+        if (!selectedInteraction || selectedIndex === null) return null;
+
+        const outcomeType = getOutcomeType(selectedInteraction);
+
+        const handleInteractionChange = (field: keyof Interaction, value: any) => {
+            handleUpdate(selectedIndex, { ...selectedInteraction, [field]: value });
+        };
+
+        const handleOutcomeChange = (type: 'goToScene' | 'newSceneDescription' | 'playVignette') => {
+            const newInteraction = { ...selectedInteraction };
+            const currentNewDescription = newInteraction.newSceneDescription || '';
+
+            // Reset outcome fields
+            delete newInteraction.goToScene;
+            delete newInteraction.newSceneDescription;
+            delete newInteraction.vignetteId;
+
+            if (type === 'goToScene') {
+                newInteraction.goToScene = '';
+                newInteraction.transitionType = 'fade';
+                newInteraction.transitionSpeed = 5;
+            } else if (type === 'playVignette') {
+                newInteraction.vignetteId = '';
+                newInteraction.transitionType = 'fade';
+                newInteraction.transitionSpeed = 5;
+            } else {
+                newInteraction.newSceneDescription = currentNewDescription || 'A cena mudou...';
+                delete newInteraction.transitionType;
+                delete newInteraction.transitionSpeed;
+            }
+            handleUpdate(selectedIndex, newInteraction);
+        };
+
+        const handleSoundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    if (event.target && typeof event.target.result === 'string') {
+                        handleInteractionChange('soundEffect', event.target.result);
+                    }
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        };
+
+        const handleTrackerEffectChange = (effectIndex: number, field: keyof TrackerEffect, value: any) => {
+            const newEffects = [...(selectedInteraction.trackerEffects || [])];
+            newEffects[effectIndex] = { ...newEffects[effectIndex], [field]: value };
+            handleInteractionChange('trackerEffects', newEffects);
+        };
+
+        const handleAddTrackerEffect = () => {
+            const newEffect: TrackerEffect = { trackerId: '', valueChange: 10 };
+            handleInteractionChange('trackerEffects', [...(selectedInteraction.trackerEffects || []), newEffect]);
+        };
+
+        const handleRemoveTrackerEffect = (effectIndex: number) => {
+            handleInteractionChange('trackerEffects', (selectedInteraction.trackerEffects || []).filter((_, i) => i !== effectIndex));
+        };
+
+
+        return (
+            <div className="flex flex-col h-full">
+                {/* Header */}
+                <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30 shrink-0">
+                    <div>
+                        <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
+                            <MousePointer2 className="w-4 h-4 text-green-500" />
+                            Editando Interação #{selectedIndex + 1}
+                        </h3>
+                    </div>
+                    <div>
                         <button
-                            onClick={handleAdd}
-                            className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all text-xs shadow-sm"
+                            onClick={() => handleRemove(selectedIndex)}
+                            className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md transition-all"
+                            title="Remover Interação"
                         >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Nova Interação
+                            <Trash2 className="w-4 h-4" />
                         </button>
                     </div>
-                    <div className="w-full border-b border-muted-foreground/50 mb-6"></div>
-                </>
-            )}
+                </div>
 
-            {/* Floating Add Button for Non-Empty State */
-                interactions.length > 0 && (
-                    <>
-                        <div className="mt-4 pt-4 flex justify-start">
-                            <button
-                                onClick={handleAdd}
-                                className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-sm active:scale-95 text-xs"
-                            >
-                                <Plus className="w-4 h-4 mr-2" />
-                                Nova Interação
-                            </button>
+                {/* Scrollable Content */}
+                <div className="flex-1 overflow-y-auto p-6 space-y-8">
+
+                    {/* GATILHOS (Triggers) */}
+                    <div className="space-y-4">
+                        <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                            <Target className="w-3 h-3" /> Gatilhos & Condições
+                        </h4>
+                        <div className="bg-zinc-950/30 p-4 rounded-lg border border-muted-foreground/10 space-y-4">
+                            <div>
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Verbos (separados por vírgula)</label>
+                                <input
+                                    type="text"
+                                    value={selectedInteraction.verbs.join(', ')}
+                                    onChange={e => handleInteractionChange('verbs', e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
+                                    className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-100 focus:ring-1 focus:ring-green-500/50"
+                                    placeholder="ex: pegar, usar, abrir"
+                                />
+                                <p className="text-[10px] text-zinc-600 mt-1">O jogador deve digitar um destes para iniciar a ação.</p>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Alvo da Ação (Opcional)</label>
+                                    <select
+                                        value={selectedInteraction.target}
+                                        onChange={e => handleInteractionChange('target', e.target.value)}
+                                        className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300"
+                                    >
+                                        <option value="">Nenhum (Ação no ambiente)</option>
+                                        {sceneObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Requer Item (Inventário)</label>
+                                    <select
+                                        value={selectedInteraction.requiresInInventory || ''}
+                                        onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)}
+                                        className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300"
+                                    >
+                                        <option value="">Não requer item</option>
+                                        {allTakableObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
+                                    </select>
+                                </div>
+                            </div>
+
+                            {/* Checkboxes */}
+                            <div className="flex gap-6 pt-2">
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked={!!selectedInteraction.removesTargetFromScene} onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)} className="rounded border-zinc-700 bg-zinc-900 text-green-500 focus:ring-green-500/20" />
+                                    <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Remove Alvo da Cena</span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer">
+                                    <input type="checkbox" checked={!!selectedInteraction.addsToInventory} onChange={e => handleInteractionChange('addsToInventory', e.target.checked)} className="rounded border-zinc-700 bg-zinc-900 text-purple-500 focus:ring-purple-500/20" />
+                                    <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Adiciona ao Inventário</span>
+                                </label>
+                                <label className={`flex items-center gap-2 cursor-pointer ${!selectedInteraction.requiresInInventory && 'opacity-30'}`}>
+                                    <input type="checkbox" checked={!!selectedInteraction.consumesItem} onChange={e => handleInteractionChange('consumesItem', e.target.checked)} disabled={!selectedInteraction.requiresInInventory} className="rounded border-zinc-700 bg-zinc-900 text-red-500 focus:ring-red-500/20" />
+                                    <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Consome Item Usado</span>
+                                </label>
+                            </div>
                         </div>
-                        <div className="w-full border-b border-muted-foreground/50 mt-6"></div>
-                    </>
+                    </div>
+
+                    {/* CONSEQUÊNCIAS (Outcomes) */}
+                    <div className="space-y-4">
+                        <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                            <CheckCircle2 className="w-3 h-3" /> Resultado
+                        </h4>
+                        <div className="bg-zinc-950/30 p-4 rounded-lg border border-muted-foreground/10 space-y-4">
+
+                            {/* Outcome Type Selector */}
+                            <div className="flex gap-2 p-1 bg-zinc-900/50 rounded-lg border border-zinc-800">
+                                <button onClick={() => handleOutcomeChange('newSceneDescription')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-[10px] font-bold uppercase tracking-wide transition-all ${outcomeType === 'newSceneDescription' ? 'bg-zinc-700 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}>
+                                    <MessageSquare className="w-3 h-3" /> Atualizar Texto
+                                </button>
+                                <button onClick={() => handleOutcomeChange('goToScene')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-[10px] font-bold uppercase tracking-wide transition-all ${outcomeType === 'goToScene' ? 'bg-blue-900/40 text-blue-200 border border-blue-500/20 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}>
+                                    <ArrowRight className="w-3 h-3" /> Mudar Cena
+                                </button>
+                                <button onClick={() => handleOutcomeChange('playVignette')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-[10px] font-bold uppercase tracking-wide transition-all ${outcomeType === 'playVignette' ? 'bg-purple-900/40 text-purple-200 border border-purple-500/20 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}>
+                                    <Play className="w-3 h-3" /> Vinheta
+                                </button>
+                            </div>
+
+                            {/* Dynamic Fields based on Type */}
+                            <div className="pt-2 animate-in fade-in slide-in-from-top-1">
+                                {outcomeType === 'newSceneDescription' && (
+                                    <textarea
+                                        value={selectedInteraction.newSceneDescription || ''}
+                                        onChange={e => handleInteractionChange('newSceneDescription', e.target.value)}
+                                        rows={3}
+                                        className="w-full bg-zinc-900 border border-zinc-700 rounded p-3 text-xs text-zinc-300"
+                                        placeholder="Digite o novo texto que descreve a cena após esta ação..."
+                                    />
+                                )}
+                                {outcomeType === 'goToScene' && (
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="col-span-2">
+                                            <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Ir para Cena</label>
+                                            <select value={selectedInteraction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300">
+                                                <option value="">Selecione...</option>
+                                                {allScenes.filter(s => s.id !== currentSceneId).map(s => <option key={s.id} value={s.id}>{s.name} ({s.id})</option>)}
+                                            </select>
+                                        </div>
+                                    </div>
+                                )}
+                                {outcomeType === 'playVignette' && (
+                                    <div>
+                                        <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Tocar Vinheta</label>
+                                        <select value={selectedInteraction.vignetteId || ''} onChange={e => handleInteractionChange('vignetteId', e.target.value)} className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300">
+                                            <option value="">Selecione...</option>
+                                            {vignettes.map(v => <option key={v.id} value={v.id}>{v.title || v.name || v.id}</option>)}
+                                        </select>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Common Feedbacks */}
+                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-zinc-800">
+                                <div className="col-span-2">
+                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Mensagem de Sucesso (Opcional)</label>
+                                    <input type="text" value={selectedInteraction.successMessage || ''} onChange={e => handleInteractionChange('successMessage', e.target.value)} className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300" placeholder="Ex: Você destrancou a porta." />
+                                </div>
+
+                                <div>
+                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Efeito Sonoro (.mp3)</label>
+                                    <div className="flex items-center gap-2">
+                                        <label className="flex-1 flex items-center justify-center px-3 py-2 bg-zinc-900 border border-zinc-800 rounded hover:bg-zinc-800 cursor-pointer text-xs font-medium transition-colors">
+                                            <Upload className="w-3 h-3 mr-2 text-zinc-500" /> {selectedInteraction.soundEffect ? 'Alterar' : 'Upload'}
+                                            <input type="file" accept="audio/*" onChange={handleSoundUpload} className="hidden" />
+                                        </label>
+                                        {selectedInteraction.soundEffect && (
+                                            <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="p-2 bg-red-500/10 text-red-500 rounded border border-red-500/20"><Trash2 className="w-3 h-3" /></button>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div className="flex justify-between items-center mb-1.5">
+                                        <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Rastreadores</label>
+                                        <button onClick={handleAddTrackerEffect} className="text-[10px] text-green-500 font-bold hover:text-green-400"><Plus className="w-3 h-3 inline" /> ADD</button>
+                                    </div>
+                                    <div className="space-y-1">
+                                        {(selectedInteraction.trackerEffects || []).map((effect, i) => (
+                                            <div key={i} className="flex items-center gap-1">
+                                                <select value={effect.trackerId} onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)} className="flex-1 bg-zinc-900 border-none text-[10px] h-6 rounded px-1 text-zinc-300">
+                                                    <option value="">Rastreador...</option>
+                                                    {consequenceTrackers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                                                </select>
+                                                <input type="number" value={effect.valueChange} onChange={e => handleTrackerEffectChange(i, 'valueChange', parseInt(e.target.value))} className="w-10 bg-zinc-900 border-none text-[10px] h-6 rounded px-1 text-right text-zinc-300 font-mono" />
+                                                <button onClick={() => handleRemoveTrackerEffect(i)} className="text-zinc-600 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
+                                            </div>
+                                        ))}
+                                        {(selectedInteraction.trackerEffects || []).length === 0 && <p className="text-[10px] text-zinc-600 italic">Sem efeitos.</p>}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    return (
+        <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
+            {/* LEFT SIDEBAR - List */}
+            <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
+                {/* Header/Search */}
+                <div className="p-4 border-b border-muted-foreground/10 space-y-3">
+                    <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">Interações ({filteredInteractions.length})</span>
+                    </div>
+                    <div className="relative">
+                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                        <input
+                            type="text"
+                            placeholder="Buscar verbos..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-200 focus:ring-1 focus:ring-green-500/50 placeholder:text-zinc-600"
+                        />
+                    </div>
+                </div>
+
+                {/* List */}
+                <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                    {filteredInteractions.length > 0 ? (
+                        filteredInteractions.map(({ inter, index }) => (
+                            <button
+                                key={inter.id}
+                                onClick={() => setSelectedIndex(index)}
+                                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left group ${selectedIndex === index ? 'bg-green-500/10 border-green-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
+                            >
+                                <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${selectedIndex === index ? 'bg-green-500/20 text-green-400' : 'bg-zinc-900 text-zinc-600'}`}>
+                                    {getOutcomeType(inter) === 'goToScene' && <ArrowRight className="w-4 h-4" />}
+                                    {getOutcomeType(inter) === 'newSceneDescription' && <MessageSquare className="w-4 h-4" />}
+                                    {getOutcomeType(inter) === 'playVignette' && <Play className="w-4 h-4" />}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <div className={`text-xs font-bold truncate ${selectedIndex === index ? 'text-green-400' : 'text-zinc-300'}`}>
+                                        {inter.verbs[0] ? inter.verbs[0].toUpperCase() : 'NOVO'} {inter.verbs.length > 1 && `+${inter.verbs.length - 1}`}
+                                    </div>
+                                    <div className="text-[10px] text-zinc-500 truncate flex items-center gap-1">
+                                        {inter.target ? `Alvo: ${sceneObjects.find(o => o.id === inter.target)?.name || '?'}` : 'Geral'}
+                                    </div>
+                                </div>
+                            </button>
+                        ))
+                    ) : (
+                        <div className="text-center py-8 text-muted-foreground">
+                            <p className="text-xs italic">Nenhuma interação.</p>
+                        </div>
+                    )}
+                </div>
+
+                {/* Footer */}
+                <div className="p-3 border-t border-muted-foreground/10 bg-zinc-900/50">
+                    <button
+                        onClick={handleAdd}
+                        className="w-full py-2 bg-zinc-100 hover:bg-white text-zinc-900 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow"
+                    >
+                        <Plus className="w-3.5 h-3.5 mr-2" />
+                        Nova Interação
+                    </button>
+                </div>
+            </div>
+
+            {/* RIGHT MAIN PANEL - Editor */}
+            <div className="flex-1 flex flex-col bg-zinc-950/10 min-w-0">
+                {selectedIndex !== null ? (
+                    renderEditor()
+                ) : (
+                    <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
+                        <MousePointer2 className="w-12 h-12 mb-4 opacity-20" />
+                        <h4 className="text-sm font-bold text-zinc-400 mb-1">Nenhuma interação selecionada</h4>
+                        <p className="text-xs max-w-xs opacity-60">Selecione uma interação da lista para editar ou crie uma nova.</p>
+                    </div>
                 )}
+            </div>
         </div>
     );
 };

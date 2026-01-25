@@ -61,7 +61,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   };
 
   return (
-    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full`}>
+    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full hover:border-r-purple-500/40`}>
 
 
       <nav className="flex flex-col gap-1 flex-grow overflow-y-auto overflow-x-hidden px-3 py-4">
@@ -127,15 +127,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
 
         {/* Vinhetas */}
-        <button
-          className={getButtonClass('vignettes')}
-          onClick={() => handleSetView('vignettes')}
-          title={isCollapsed ? "Vinhetas" : undefined}
-        >
-          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'vignettes' ? 'translate-x-0' : ''}`} />
-          <MonitorPlay className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">Vinhetas</span>}
-        </button>
+        {/* Vignettes button removed */}
 
         {(gameData.gameInteractionType || 'parser') !== 'choice' && (
           <button
@@ -172,7 +164,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       </nav>
 
       {/* Bottom Menu Items - Pinned to Bottom */}
-      <div className="mt-auto pt-2 pb-4 px-3 flex flex-col gap-1 relative border-t border-muted-foreground/20 bg-card z-20 flex-shrink-0">
+      <div className="mt-auto pt-2 pb-4 px-3 flex flex-col gap-1 relative border-t border-muted-foreground/50 bg-card z-20 flex-shrink-0">
 
         <button
           onClick={() => onSetView('guide')}

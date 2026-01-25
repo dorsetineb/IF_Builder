@@ -1,7 +1,7 @@
 
 import React, { useRef } from 'react';
 import { Scene } from '../types';
-import { Plus, Trash2, Menu } from 'lucide-react';
+import { Plus, Trash2, Menu, Play, ArrowRight, Flag } from 'lucide-react';
 
 interface SceneListProps {
   scenes: Scene[];
@@ -51,6 +51,16 @@ const SceneList: React.FC<SceneListProps> = ({
     dragOverItem.current = null;
   };
 
+  const getVignetteIcon = (scene: Scene) => {
+    if (!scene.vignetteType || scene.vignetteType === 'none') return null;
+    switch (scene.vignetteType) {
+      case 'opening': return <Play className="w-3 h-3 text-purple-400" />;
+      case 'transition': return <ArrowRight className="w-3 h-3 text-blue-400" />;
+      case 'conclusion': return <Flag className="w-3 h-3 text-red-400" />;
+      default: return null;
+    }
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <ul className="flex flex-col gap-2">
@@ -74,21 +84,21 @@ const SceneList: React.FC<SceneListProps> = ({
                 <Menu className={`w-4 h-4 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? (isDirty ? 'text-yellow-500' : 'text-primary') : 'text-muted-foreground'}`} />
               ) : null}
 
-              <div
-                className={`flex-1 min-w-0 flex items-center justify-between ${scene.id !== startSceneId ? 'cursor-pointer' : ''}`}
-                onClick={() => onSelectScene(scene.id)}
-              >
+              <div className="flex items-center justify-between w-full min-w-0">
                 <span className="truncate font-medium text-xs">{scene.name}</span>
-                {startSceneId === scene.id && (
-                  <span className={`ml-2 text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${selectedSceneId === scene.id
-                    ? isDirty
-                      ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
-                      : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
-                    : 'bg-primary text-primary-foreground border-primary/50' // Inactive Start
-                    }`}>
-                    Início
-                  </span>
-                )}
+                <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                  {getVignetteIcon(scene)}
+                  {startSceneId === scene.id && (
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${selectedSceneId === scene.id
+                      ? isDirty
+                        ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
+                        : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
+                      : 'bg-primary text-primary-foreground border-primary/50' // Inactive Start
+                      }`}>
+                      Início
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
 

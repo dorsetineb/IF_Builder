@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, Vignette } from '../types';
-import { Plus, Minus, FileImage, Film, MonitorPlay } from 'lucide-react';
+import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle } from 'lucide-react';
 
 interface SceneMapProps {
   allScenesMap: GameData['scenes'];
@@ -10,8 +10,8 @@ interface SceneMapProps {
   vignettes: Vignette[];
   onSelectScene: (sceneId: string) => void;
   onUpdateScenePosition: (sceneId: string, x: number, y: number) => void;
-  onAddScene: () => void;
-  onAddVignette: () => void;
+  onUpdateVignettePosition: (vignetteId: string, x: number, y: number) => void;
+  onReorganizeScenes: () => void;
   gameInteractionType?: 'parser' | 'choice';
 }
 
@@ -47,6 +47,7 @@ type Edge = {
   tSide: 'L' | 'R';
   sDir: number;
   tDir: number;
+  isBackward?: boolean;
 };
 
 const SceneMap: React.FC<SceneMapProps> = ({
@@ -56,8 +57,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
   vignettes,
   onSelectScene,
   onUpdateScenePosition,
-  onAddScene,
-  onAddVignette,
+  onUpdateVignettePosition,
+  onReorganizeScenes,
   gameInteractionType = 'parser'
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -152,7 +153,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
     }
   }, [gameInteractionType, startSceneId]);
 
-  const { initialNodes, edges, bounds, activeAnchors } = useMemo(() => {
+  const { initialNodes, edges, bounds, activeAnchors, orphanIds } = useMemo(() => {
     // 1. Prepare Data Maps
     const allNodesMap = new Map<string, MapNodeData>();
 
@@ -310,10 +311,23 @@ const SceneMap: React.FC<SceneMapProps> = ({
         const rawNode = allNodesMap.get(id);
         if (!rawNode) return;
         const h = nodeHeights.get(id)!;
-        const sceneData = rawNode.type === 'scene' ? (rawNode.data as Scene) : null;
 
-        const x = sceneData?.mapX ?? calculatedX;
-        const y = sceneData?.mapY ?? currentY;
+        // Get saved position from either scene or vignette data
+        let savedX: number | undefined;
+        let savedY: number | undefined;
+
+        if (rawNode.type === 'scene') {
+          const sceneData = rawNode.data as Scene;
+          savedX = sceneData.mapX;
+          savedY = sceneData.mapY;
+        } else {
+          const vigData = rawNode.data as Vignette;
+          savedX = vigData.mapX;
+          savedY = vigData.mapY;
+        }
+
+        const x = savedX ?? calculatedX;
+        const y = savedY ?? currentY;
 
         positionedNodes.push({
           ...rawNode,
@@ -323,7 +337,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
           height: h
         });
 
-        if (sceneData?.mapY === undefined) currentY += h + Y_GAP;
+        if (savedY === undefined) currentY += h + Y_GAP;
 
         minX = Math.min(minX, x);
         maxX = Math.max(maxX, x + NODE_WIDTH);
@@ -332,28 +346,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
       });
     }
 
-    // Force "Conclusion" Vignettes to be at the Far Right (Max Level + 1)
-    // Defensive coding: Explicitly include global victory/defeat IDs in case isConclusion is missing
-    const conclusionNodes = positionedNodes.filter(n => {
-      const vig = n.data as Vignette;
-      return n.type === 'vignette' && (vig.isConclusion || vig.id === 'VNT_VICTORY' || vig.id === 'VNT_DEFEAT');
-    });
-    if (conclusionNodes.length > 0) {
-      const farRightX = maxX + X_GAP;
-      let cY = minY;
-
-      // Remove from current position stats to re-add? No, just overwrite X.
-      // But we need to ensure they align nicely vertically.
-
-      conclusionNodes.forEach((node, idx) => {
-        node.x = farRightX;
-        node.y = minY + (idx * (node.height + Y_GAP));
-        node.level = maxLvl + 1; // Artificially set level high
-
-        maxX = Math.max(maxX, node.x + NODE_WIDTH);
-        maxY = Math.max(maxY, node.y + node.height);
-      });
-    }
+    // Note: Conclusion vignettes are no longer forced to a specific position.
+    // They follow the same layout rules as other nodes. Users can manually
+    // position them, and clicking "Reorganizar" will auto-arrange everything.
 
     // 5. Edges
     const createdEdges: Edge[] = [];
@@ -381,13 +376,12 @@ const SceneMap: React.FC<SceneMapProps> = ({
           { s: sL, t: tL, sSide: 'L' as const, tSide: 'L' as const, sDir: -1, tDir: -1 }
         ];
 
-        const preferred = sourceNode.level < targetNode.level
-          ? combinations[0]
-          : combinations.reduce((prev, curr) => {
-            const dist = Math.sqrt(Math.pow(curr.t.x - curr.s.x, 2) + Math.pow(curr.t.y - curr.s.y, 2));
-            const prevDist = Math.sqrt(Math.pow(prev.t.x - prev.s.x, 2) + Math.pow(prev.t.y - prev.s.y, 2));
-            return dist < prevDist ? curr : prev;
-          });
+        // Determine if this is a backward connection
+        const isBackward = sourceNode.level >= targetNode.level;
+
+        const preferred = isBackward
+          ? combinations[1] // L -> R for backward
+          : combinations[0]; // R -> L for forward
 
         createdEdges.push({
           source: sourceNode.id,
@@ -396,7 +390,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
           sSide: preferred.sSide,
           tSide: preferred.tSide,
           sDir: preferred.sDir,
-          tDir: preferred.tDir
+          tDir: preferred.tDir,
+          isBackward
         });
 
         activeAnchorsSet.add(`${item.id}-${preferred.sSide}`);
@@ -413,11 +408,25 @@ const SceneMap: React.FC<SceneMapProps> = ({
         maxX: maxX === -Infinity ? NODE_WIDTH : maxX,
         maxY: maxY === -Infinity ? NODE_HEADER_HEIGHT : maxY
       },
-      activeAnchors: activeAnchorsSet
+      activeAnchors: activeAnchorsSet,
+      // Compute orphan IDs: nodes that have no incoming or outgoing connections (excluding Opening/Victory/Defeat)
+      orphanIds: new Set(
+        positionedNodes
+          .filter(n => {
+            // Skip special vignettes
+            if (n.id === 'VNT_OPENING' || n.id === 'VNT_VICTORY' || n.id === 'VNT_DEFEAT') return false;
+            // Check if node has any edges
+            const hasOutgoing = createdEdges.some(e => e.source === n.id);
+            const hasIncoming = createdEdges.some(e => e.target === n.id);
+            return !hasOutgoing && !hasIncoming;
+          })
+          .map(n => n.id)
+      )
     };
   }, [allScenesMap, vignettes, startSceneId, getLinkingItems]);
 
   const [nodes, setNodes] = useState(initialNodes);
+  const [highlightOrphans, setHighlightOrphans] = useState(false);
 
   useEffect(() => {
     if (!dragInfo) setNodes(initialNodes);
@@ -473,13 +482,42 @@ const SceneMap: React.FC<SceneMapProps> = ({
   const handleMouseUp = useCallback(() => {
     if (dragInfo) {
       const finalNode = nodes.find(n => n.id === dragInfo.id);
-      if (finalNode && finalNode.type === 'scene') {
-        onUpdateScenePosition(finalNode.id, finalNode.x, finalNode.y);
+      if (finalNode) {
+        if (finalNode.type === 'scene') {
+          onUpdateScenePosition(finalNode.id, finalNode.x, finalNode.y);
+        } else {
+          onUpdateVignettePosition(finalNode.id, finalNode.x, finalNode.y);
+        }
       }
       setDragInfo(null);
     }
     setIsPanning(false);
-  }, [dragInfo, nodes, onUpdateScenePosition]);
+  }, [dragInfo, nodes, onUpdateScenePosition, onUpdateVignettePosition]);
+
+  const handleViewAll = useCallback(() => {
+    if (!containerRef.current || nodes.length === 0) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const padding = 100;
+
+    // Calculate content bounds
+    const contentWidth = bounds.maxX - bounds.minX;
+    const contentHeight = bounds.maxY - bounds.minY;
+
+    // Calculate scale to fit
+    const scaleX = (rect.width - padding * 2) / contentWidth;
+    const scaleY = (rect.height - padding * 2) / contentHeight;
+    const newScale = Math.min(scaleX, scaleY, 1); // Cap at 1x
+
+    // Calculate position to center
+    const newX = (rect.width / 2) - ((bounds.minX + contentWidth / 2) * newScale);
+    const newY = (rect.height / 2) - ((bounds.minY + contentHeight / 2) * newScale);
+
+    setView({ x: newX, y: newY, scale: newScale });
+  }, [nodes, bounds]);
+
+  const handleToggleOrphans = useCallback(() => {
+    setHighlightOrphans(prev => !prev);
+  }, []);
 
   return (
     <div className="h-full flex flex-col relative">
@@ -491,7 +529,6 @@ const SceneMap: React.FC<SceneMapProps> = ({
       <div
         ref={containerRef}
         className={`w-full h-full bg-zinc-950 rounded-2xl border border-zinc-700 overflow-hidden ${isPanning || dragInfo ? 'cursor-grabbing' : 'cursor-grab'} shadow-inner`}
-        style={{ backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px)', backgroundSize: '20px 20px' }}
         onWheel={handleWheel}
         onMouseDown={handleCanvasMouseDown}
         onMouseMove={handleMouseMove}
@@ -504,14 +541,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
         >
           <svg className="absolute" width={Math.max(1000, bounds.maxX + 1000)} height={Math.max(1000, bounds.maxY + 1000)} style={{ transform: `translate(0px, 0px)`, zIndex: 0, overflow: 'visible' }}>
             <defs>
-              <marker id="arrow-blue" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#3b82f6" fillOpacity="0.8" />
-              </marker>
-              <marker id="arrow-amber" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#f59e0b" fillOpacity="0.8" />
-              </marker>
-              <marker id="arrow-green" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#22c55e" fillOpacity="0.8" />
+              <marker id="arrow-white" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffffff" fillOpacity="0.6" />
               </marker>
             </defs>
             {edges.map((edge, i) => {
@@ -537,29 +568,16 @@ const SceneMap: React.FC<SceneMapProps> = ({
               const cx1 = realX1 + (offset * edge.sDir);
               const cx2 = realX2 + (offset * edge.tDir);
 
-              const isOpeningLink = sourceNode.id === 'VNT_OPENING';
-
-              // Determine Arrow Color based on Source
-              let strokeColor = '#f59e0b'; // Default Amber
-              let markerEnd = "url(#arrow-amber)";
-
-              if (isOpeningLink) {
-                strokeColor = '#3b82f6'; // Blue
-                markerEnd = "url(#arrow-blue)";
-              } else if (sourceNode.isEnding) { // Should rarely happen for user flows, but technially possible
-                strokeColor = '#22c55e'; // Green
-                markerEnd = "url(#arrow-green)";
-              }
-
               return (
                 <path
                   key={`${edge.source}-${edge.target}-${i}`}
                   d={`M ${realX1} ${realY1} C ${cx1} ${realY1}, ${cx2} ${realY2}, ${realX2} ${realY2}`}
-                  stroke={strokeColor}
+                  stroke="#ffffff"
                   strokeWidth="2"
                   strokeOpacity="0.4"
+                  strokeDasharray={edge.isBackward ? "6 4" : undefined}
                   fill="none"
-                  markerEnd={markerEnd}
+                  markerEnd="url(#arrow-white)"
                 />
               );
             })}
@@ -593,7 +611,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                     dragStartPos.current = { x: e.clientX, y: e.clientY };
                     setDragInfo({ id: node.id, offsetX: (e.clientX - view.x) / view.scale - nodeRef.x, offsetY: (e.clientY - view.y) / view.scale - nodeRef.y });
                   }}
-                  className={`absolute bg-zinc-900 rounded-xl flex flex-col transition-all duration-300 ${borderClass} cursor-pointer shadow-[0_10px_30px_rgba(0,0,0,0.3)] ${shadowClass} overflow-hidden group`}
+                  className={`absolute bg-zinc-900 rounded-xl flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} ${borderClass} cursor-pointer shadow-[0_10px_30px_rgba(0,0,0,0.3)] ${shadowClass} overflow-hidden group`}
                   style={{ width: NODE_WIDTH, transform: `translate(${node.x}px, ${node.y}px)`, height: node.height, userSelect: 'none' }}
                 >
                   <div className="p-3 relative flex-shrink-0 text-center bg-zinc-900/50" style={{ height: NODE_HEADER_HEIGHT }}>
@@ -638,9 +656,10 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
             // User Rules: Scene = Yellow(Amber), Ending = Green.
             const isEnding = scene.isEndingScene;
-            const colorBase = isEnding ? 'green' : 'amber';
+            const isOrphan = highlightOrphans && orphanIds.has(node.id);
+            const colorBase = isOrphan ? 'red' : isEnding ? 'green' : 'amber';
 
-            const borderColorClass = `border-${colorBase}-500`;
+            const borderColorClass = isOrphan ? 'border-red-500 animate-pulse' : `border-${colorBase}-500`;
 
             return (
               <div
@@ -655,7 +674,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                 onClick={(e) => {
                   if (Math.sqrt(Math.pow(e.clientX - dragStartPos.current.x, 2) + Math.pow(e.clientY - dragStartPos.current.y, 2)) < 5) onSelectScene(node.id);
                 }}
-                className={`absolute bg-zinc-900 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex flex-col transition-all duration-300 border-2 ${borderColorClass} cursor-pointer hover:border-${colorBase}-400 hover:shadow-${colorBase}-500/10 overflow-hidden group`}
+                className={`absolute bg-zinc-900 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} border-2 ${borderColorClass} cursor-pointer hover:border-${colorBase}-400 hover:shadow-${colorBase}-500/10 overflow-hidden group`}
                 style={{ width: NODE_WIDTH, transform: `translate(${node.x}px, ${node.y}px)`, height: node.height, userSelect: 'none' }}
               >
                 <div className="p-3 relative flex-shrink-0 text-center bg-zinc-900/50" style={{ height: NODE_HEADER_HEIGHT }}>
@@ -702,10 +721,19 @@ const SceneMap: React.FC<SceneMapProps> = ({
                       const linkColor = isVignetteLink ? 'text-amber-500 bg-amber-500/5' : `text-${colorBase}-400 bg-${colorBase}-500/5`;
                       const anchorColor = isVignetteLink ? 'bg-amber-500 border-amber-400' : `bg-${colorBase}-500 border-${colorBase}-400`;
 
+                      // Determine anchor side based on which is active
+                      const isLeftActive = activeAnchors.has(`${item.id}-L`);
+                      const isRightActive = activeAnchors.has(`${item.id}-R`);
+
                       return (
                         <div key={item.id} className={`relative ${linkColor} font-bold py-1 flex items-center w-full`} style={{ height: INTERACTION_ITEM_HEIGHT }}>
+                          {isLeftActive && (
+                            <div className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${anchorColor}`} />
+                          )}
                           <span className="truncate px-4 text-center w-full text-[10px] uppercase tracking-wider" title={displayLabel}>{displayLabel}</span>
-                          <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${item.id}-R`) ? anchorColor : 'bg-zinc-950 border-zinc-700'}`} />
+                          {isRightActive && (
+                            <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${anchorColor}`} />
+                          )}
                         </div>
                       );
                     })}
@@ -717,8 +745,21 @@ const SceneMap: React.FC<SceneMapProps> = ({
         </div>
       </div>
       <div className="absolute bottom-6 left-6 z-10 flex items-center gap-3">
-        <button onClick={onAddScene} className="flex items-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-xl active:scale-95 text-xs"><Plus className="w-4 h-4 mr-2" />Nova Cena</button>
-        <button onClick={onAddVignette} className="flex items-center px-4 py-2 bg-zinc-800 text-zinc-200 font-bold rounded-lg hover:bg-zinc-700 transition-all shadow-xl active:scale-95 text-xs border border-zinc-600"><MonitorPlay className="w-4 h-4 mr-2" />Nova Vinheta</button>
+        <button onClick={onReorganizeScenes} className="flex items-center px-4 py-2 bg-zinc-800 text-zinc-200 font-bold rounded-lg hover:bg-zinc-700 transition-all shadow-xl active:scale-95 text-xs border border-zinc-600">
+          <LayoutGrid className="w-4 h-4 mr-2" />Reorganizar
+        </button>
+        <button onClick={handleViewAll} className="flex items-center px-4 py-2 bg-zinc-800 text-zinc-200 font-bold rounded-lg hover:bg-zinc-700 transition-all shadow-xl active:scale-95 text-xs border border-zinc-600">
+          <Maximize2 className="w-4 h-4 mr-2" />Ver Tudo
+        </button>
+        <button
+          onClick={handleToggleOrphans}
+          className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${highlightOrphans
+            ? 'bg-red-600 text-white border-red-500 hover:bg-red-700'
+            : 'bg-zinc-800 text-zinc-200 border-zinc-600 hover:bg-zinc-700'
+            }`}
+        >
+          <AlertTriangle className="w-4 h-4 mr-2" />Órfãs {orphanIds.size > 0 && `(${orphanIds.size})`}
+        </button>
       </div>
       <div className="absolute bottom-6 right-6 z-10 flex flex-col items-end gap-4 pointer-events-none">
         <div className="bg-zinc-950/80 backdrop-blur-md p-4 rounded-xl border border-zinc-800 shadow-xl pointer-events-auto">

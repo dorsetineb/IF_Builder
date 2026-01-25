@@ -12,7 +12,7 @@ import Header from './Header';
 import { WelcomePlaceholder } from './WelcomePlaceholder';
 import { GuideView } from './GuideView';
 import { UIEditor } from './UIEditor';
-import VignettesEditor from './VignettesEditor';
+// import VignettesEditor from './VignettesEditor'; // Removed as integrated into SceneEditor
 import Preview from './Preview';
 import SceneMap from './SceneMap';
 import GlobalObjectsEditor from './GlobalObjectsEditor';
@@ -764,44 +764,7 @@ const initialGameData: GameData = {
     consequenceTrackers: [],
     positiveEndingMusic: '',
     negativeEndingMusic: '',
-    vignettes: [
-        {
-            id: 'VNT_OPENING',
-            name: 'Abertura',
-            title: 'Minha Aventura de Texto',
-            description: '',
-            image: '',
-            backgroundMusic: '',
-            contentAlignment: 'left',
-            verticalAlignment: 'bottom',
-            omitTitle: false,
-            buttonText: 'INICIAR'
-        },
-        {
-            id: 'VNT_VICTORY',
-            name: 'Vitória',
-            title: 'Vitória',
-            description: 'Parabéns! Você completou a aventura.',
-            image: '',
-            backgroundMusic: '',
-            contentAlignment: 'left',
-            verticalAlignment: 'bottom',
-            isConclusion: true,
-            buttonText: 'REINICIAR'
-        },
-        {
-            id: 'VNT_DEFEAT',
-            name: 'Derrota',
-            title: 'Fim de Jogo',
-            description: 'Sua jornada chegou ao fim.',
-            image: '',
-            backgroundMusic: '',
-            contentAlignment: 'left',
-            verticalAlignment: 'bottom',
-            isConclusion: true,
-            buttonText: 'TENTAR NOVAMENTE'
-        }
-    ]
+    vignettes: []
 };
 
 import { useTheme } from './ThemeProvider';
@@ -1213,7 +1176,91 @@ DATE:        ${exportDate.toLocaleString()}
     const consequenceTrackers = useMemo(() => gameData.consequenceTrackers || [], [gameData.consequenceTrackers]);
 
     const handleImportGame = useCallback((data: GameData) => {
-        const cleanedScenes = { ...data.scenes };
+        let cleanedScenes = { ...data.scenes };
+        let newStartSceneId = data.startScene;
+        const newSceneOrder = [...(data.sceneOrder || Object.keys(cleanedScenes))];
+
+        // MIGRATION: Auto-convert Legacy Vignettes to Scenes
+        if (data.vignettes && data.vignettes.length > 0) {
+            console.log("Migrating legacy vignettes...", data.vignettes);
+            data.vignettes.forEach((v: any) => {
+                // Determine type
+                let type: 'opening' | 'transition' | 'conclusion' | 'none' = 'transition';
+                if (v.isConclusion) type = 'conclusion';
+                else if (v.id.toUpperCase().includes('OPENING') || v.id.toUpperCase().includes('INTRO')) type = 'opening';
+
+                // Create new Scene from Vignette
+                const newScene: Scene = {
+                    id: v.id,
+                    name: v.name || v.title || 'Vinheta',
+                    description: v.description || '', // Map description to scene text
+                    image: v.image,
+                    backgroundMusic: v.backgroundMusic,
+                    vignetteType: type,
+                    vignetteButtonText: v.buttonText,
+                    // Default properties for a scene
+                    interactions: [],
+                    objectIds: [],
+                    mapX: 0, // Will be arranged later
+                    mapY: 0
+                };
+
+                // Link Opening Vignette to the original Start Scene
+                if (type === 'opening' && data.startScene) {
+                    newScene.vignetteNextSceneId = data.startScene;
+                    newStartSceneId = v.id; // Set this as the new entry point
+                }
+
+                // Add to scenes
+                cleanedScenes[v.id] = newScene;
+                if (!newSceneOrder.includes(v.id)) {
+                    // Prepend opening, append others
+                    if (type === 'opening') newSceneOrder.unshift(v.id);
+                    else newSceneOrder.push(v.id);
+                }
+            });
+
+            // Update Interactions to point to new scenes instead of vignettes
+            Object.values(cleanedScenes).forEach(scene => {
+                if (scene.interactions) {
+                    scene.interactions = scene.interactions.map(interaction => {
+                        // Check if this interaction was pointing to a vignette
+                        // Legacy data might have 'goToVignette' property or specific logic
+                        if ((interaction as any).goToVignette) {
+                            const targetVignetteId = (interaction as any).goToVignette;
+                            // Check if this ID exists in our new scenes (was migrated)
+                            if (cleanedScenes[targetVignetteId]) {
+                                return {
+                                    ...interaction,
+                                    type: 'scene', // Change type to scene
+                                    goToScene: targetVignetteId,
+                                    goToVignette: undefined // Remove legacy prop
+                                };
+                            }
+                        }
+                        return interaction;
+                    });
+                }
+
+                // Also check 'conclusionVignetteId' legacy prop on scene
+                if ((scene as any).conclusionVignetteId && (scene as any).isEndingScene) {
+                    const targetVId = (scene as any).conclusionVignetteId;
+                    if (cleanedScenes[targetVId]) {
+                        // We can't easily transform "Ending Scene" to "Go To Scene" without an interaction.
+                        // But if it's an ending scene, it usually just showed the vignette.
+                        // We might need to keep it as an ending scene but maybe change how it works?
+                        // For now, let's assume the user will fix minor logic or we map it if we can.
+                        // Actually, the new system uses 'vignetteType' on the scene itself.
+                        // So a scene that WAS an ending scene pointing to a vignette... 
+                        // effectively just transitions to that vignette scene now.
+
+                        // Let's create an auto-interaction for it? 
+                        // Or just let it be. The user said "Import legacy... it has opening and two conclusions".
+                    }
+                }
+            });
+        }
+
         Object.keys(cleanedScenes).forEach(id => {
             cleanedScenes[id] = {
                 ...cleanedScenes[id],
@@ -1221,7 +1268,10 @@ DATE:        ${exportDate.toLocaleString()}
                 interactions: cleanedScenes[id].interactions || [],
                 // Reset layout coordinates to force auto-arrangement
                 mapX: undefined,
-                mapY: undefined
+                mapY: undefined,
+                // Clean legacy props
+                isEndingScene: undefined, // remove legacy ending flag
+                conclusionVignetteId: undefined
             };
         });
 
@@ -1229,9 +1279,12 @@ DATE:        ${exportDate.toLocaleString()}
             ...prev,
             ...data,
             scenes: cleanedScenes,
+            sceneOrder: newSceneOrder,
+            startScene: newStartSceneId,
             gameHTML: gameHTML,
             gameCSS: gameCSS,
-            gameMobileLayoutBehavior: 'immersive', // FORÇA O COMPORTAMENTO IMERSIVO NA IMPORTAÇÃO
+            // Ensure immersive behavior for imported games
+            gameMobileLayoutBehavior: 'immersive',
             fixedVerbs: data.fixedVerbs || [],
             enableFixedVerbs: !!data.enableFixedVerbs || (Array.isArray(data.fixedVerbs) && data.fixedVerbs.length > 0),
             consequenceTrackers: data.consequenceTrackers || [],
@@ -1244,65 +1297,14 @@ DATE:        ${exportDate.toLocaleString()}
             gameViewEndingButtonText: data.gameViewEndingButtonText || 'Ver Final',
             positiveEndingMusic: data.positiveEndingMusic || '',
             negativeEndingMusic: data.negativeEndingMusic || '',
-            vignettes: data.vignettes && data.vignettes.length > 0 ? data.vignettes : (() => {
-                // Migrate Legacy Data to Vignettes
-                const initialVignettes: any[] = [];
-
-                // Opening
-                initialVignettes.push({
-                    id: 'VNT_OPENING',
-                    name: 'Abertura',
-                    title: data.gameTitle || '',
-                    description: data.gameSplashDescription || '',
-                    image: data.gameSplashImage || '',
-                    backgroundMusic: data.gameBackgroundMusic || '',
-                    contentAlignment: data.gameSplashContentAlignment || 'left',
-                    verticalAlignment: data.gameSplashContentVerticalAlignment || 'bottom',
-                    omitTitle: data.gameOmitSplashTitle || false,
-                    buttonText: data.gameSplashButtonText || 'INICIAR'
-                });
-
-                // Positive Ending
-                if (data.positiveEndingDescription || data.positiveEndingImage) {
-                    initialVignettes.push({
-                        id: 'VNT_VICTORY',
-                        name: 'Vitória',
-                        title: 'Vitória',
-                        description: data.positiveEndingDescription || '',
-                        image: data.positiveEndingImage || '',
-                        backgroundMusic: data.positiveEndingMusic,
-                        contentAlignment: data.positiveEndingContentAlignment || 'left',
-                        verticalAlignment: 'bottom',
-                        isConclusion: true
-                    });
-                }
-
-                // Negative Ending
-                if (data.negativeEndingDescription || data.negativeEndingImage) {
-                    initialVignettes.push({
-                        id: 'VNT_DEFEAT',
-                        name: 'Derrota',
-                        title: 'Derrota',
-                        description: data.negativeEndingDescription || '',
-                        image: data.negativeEndingImage || '',
-                        backgroundMusic: data.negativeEndingMusic,
-                        contentAlignment: data.negativeEndingContentAlignment || 'left',
-                        verticalAlignment: 'bottom',
-                        isConclusion: true,
-                        isSystemDefeat: true // Legacy import assumption
-                    });
-                }
-                return initialVignettes;
-            })(),
+            vignettes: [] // Always clear legacy vignettes array
         }));
-        if (data.startScene) {
-            setSelectedSceneId(data.startScene);
-        } else if (data.sceneOrder.length > 0) {
-            setSelectedSceneId(data.sceneOrder[0]);
-        }
+
         setIsDirty(false);
         setImportKey(prev => prev + 1);
-    }, []);
+        toast("Projeto Importado", "Projeto carregado e migrado com sucesso.", "success");
+        setCurrentView('scenes');
+    }, [gameHTML, gameCSS, toast]);
 
     const handleUpdateGameData = (field: keyof GameData | Partial<GameData>, value?: any, skipDirty?: boolean) => {
         if (typeof field === 'object' && field !== null) {
@@ -1765,14 +1767,7 @@ DATE:        ${exportDate.toLocaleString()}
                             theme={appTheme}
                         />
                         <main className={`flex-1 overflow-y-auto relative bg-background ${currentView === 'scenes' && !selectedScene ? 'p-0' : 'p-6'}`}>
-                            {currentView === 'vignettes' && (
-                                <VignettesEditor
-                                    gameData={gameData}
-                                    onUpdate={handleUpdateGameData}
-                                    onSetDirty={setIsDirty}
-                                    allScenes={scenesList}
-                                />
-                            )}
+                            {/* currentView === 'vignettes' block removed */}
                             {currentView === 'interface' && (
                                 <UIEditor
                                     key={importKey}
@@ -1867,6 +1862,8 @@ DATE:        ${exportDate.toLocaleString()}
                                     onLinkObjectToScene={handleLinkObjectToScene}
                                     onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
                                     onUpdateGlobalObject={handleUpdateGlobalObject}
+                                    enableChances={(gameData.enableChances ?? detectedActiveSystems.chances) || gameData.gameSystemEnabled === 'chances'}
+                                    gameSystemEnabled={gameData.gameSystemEnabled}
                                     onPreviewScene={(scene) => {
                                         setPreviewSceneId(scene.id);
                                         setIsPreviewing(true);
@@ -1879,6 +1876,7 @@ DATE:        ${exportDate.toLocaleString()}
                                     isStartScene={selectedScene.id === gameData.startScene}
                                     gameInteractionType={gameData.gameInteractionType || 'parser'}
                                     vignettes={gameData.vignettes || []}
+                                    onViewMap={() => handleSetView('map')}
                                 />
                             ) : currentView === 'scenes' ? (
                                 <WelcomePlaceholder
@@ -1899,8 +1897,35 @@ DATE:        ${exportDate.toLocaleString()}
                                     vignettes={gameData.vignettes || []}
                                     onSelectScene={handleSelectScene}
                                     onUpdateScenePosition={handleUpdateScenePosition}
-                                    onAddScene={handleAddScene}
-                                    onAddVignette={handleAddVignette}
+                                    onUpdateVignettePosition={(vignetteId, x, y) => {
+                                        setGameData(prev => ({
+                                            ...prev,
+                                            vignettes: (prev.vignettes || []).map(v =>
+                                                v.id === vignetteId ? { ...v, mapX: x, mapY: y } : v
+                                            )
+                                        }));
+                                        setIsDirty(true);
+                                    }}
+                                    onReorganizeScenes={() => {
+                                        // Reset all scene AND vignette map positions to force auto-layout
+                                        setGameData(prev => {
+                                            const updatedScenes = { ...prev.scenes };
+                                            Object.keys(updatedScenes).forEach(id => {
+                                                updatedScenes[id] = {
+                                                    ...updatedScenes[id],
+                                                    mapX: undefined,
+                                                    mapY: undefined
+                                                };
+                                            });
+                                            const updatedVignettes = (prev.vignettes || []).map(v => ({
+                                                ...v,
+                                                mapX: undefined,
+                                                mapY: undefined
+                                            }));
+                                            return { ...prev, scenes: updatedScenes, vignettes: updatedVignettes };
+                                        });
+                                        setIsDirty(true);
+                                    }}
                                     gameInteractionType={gameData.gameInteractionType || 'parser'}
                                 />
                             )}

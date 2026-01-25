@@ -191,14 +191,12 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
     // Sidebar Component (Left)
     const renderSidebar = () => (
-        <div className="w-72 bg-zinc-950/90 backdrop-blur-2xl border-r border-zinc-800 flex flex-col h-full relative z-20 transition-all duration-300 hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-900/10">
+        <div className="w-72 bg-zinc-950/10 backdrop-blur-sm border-r border-muted-foreground/50 flex flex-col h-full relative z-20 transition-all duration-300 hover:border-purple-500/40 hover:shadow-2xl hover:shadow-purple-900/10">
             <div className="flex-1 flex flex-col justify-center w-full px-6 space-y-12">
                 {/* Tagline */}
                 <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1">
-                    <p>Uma caverna escura.</p>
-                    <p>Nas paredes, registros do passado.</p>
+                    <p>Em uma caverna escura.</p>
                     <p>Monitores CRT iluminam o mofo.</p>
-                    <br></br>
                     <p className="text-purple-400 font-bold mt-2">&gt; O QUE VOCÊ FAZ?</p>
                 </div>
 
@@ -206,53 +204,78 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                 <div className="space-y-4 w-full">
                     {/* Acessar - Primary */}
                     <button
+                        onMouseMove={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+                            e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+                        }}
                         onClick={() => { setCurrentView('login'); setError(null); setMessage(null); }}
-                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group ${currentView === 'login'
-                            ? 'bg-purple-600 text-white shadow-lg shadow-purple-600/30 scale-[1.02]'
-                            : 'bg-zinc-900/50 hover:bg-purple-600 hover:text-white text-zinc-300 border border-zinc-800 hover:border-purple-500 hover:shadow-lg hover:shadow-purple-600/20'
+                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden ${currentView === 'login'
+                            ? 'bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-600/30 scale-[1.02]'
+                            : 'bg-zinc-900/40 border-muted-foreground/50 text-zinc-400 hover:bg-purple-600 hover:border-purple-400 hover:text-white hover:shadow-lg hover:shadow-purple-600/40'
                             }`}
                     >
-                        <LogIn size={18} className="group-hover:translate-x-1 transition-transform" />
-                        <span className="uppercase tracking-wider">Acessar</span>
+                        <div
+                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                            style={{
+                                background: `radial-gradient(circle 60px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.2) 0%, transparent 100%)`
+                            }}
+                        />
+                        <LogIn size={18} className="group-hover:translate-x-1 transition-transform relative z-10" />
+                        <span className="uppercase tracking-wider relative z-10">Acessar</span>
                     </button>
 
                     {/* Criar Conta - Secondary */}
                     <button
+                        onMouseMove={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+                            e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+                        }}
                         onClick={() => { setCurrentView('register'); setError(null); setMessage(null); }}
-                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group ${currentView === 'register'
-                            ? 'bg-zinc-100 text-black shadow-lg scale-[1.02]'
-                            : 'bg-transparent border border-zinc-700 text-zinc-400 hover:bg-zinc-100 hover:text-black hover:border-white'
+                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden ${currentView === 'register'
+                            ? 'bg-zinc-100 border-white text-black shadow-lg scale-[1.02]'
+                            : 'bg-zinc-900/40 border-muted-foreground/50 text-zinc-400 hover:bg-purple-600 hover:border-purple-400 hover:text-white hover:shadow-lg hover:shadow-purple-600/40'
                             }`}
                     >
-                        <UserPlus size={18} className="group-hover:translate-x-1 transition-transform" />
-                        <span className="uppercase tracking-wider">Criar Conta</span>
+                        <div
+                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                            style={{
+                                background: `radial-gradient(circle 60px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.2) 0%, transparent 100%)`
+                            }}
+                        />
+                        <UserPlus size={18} className="group-hover:translate-x-1 transition-transform relative z-10" />
+                        <span className="uppercase tracking-wider relative z-10">Criar Conta</span>
                     </button>
 
-                    <div className="flex gap-3">
-                        {/* Jogar - Demo */}
-                        <button
-                            onClick={() => setCurrentView('play')}
-                            className={`flex-1 flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs transition-all border ${currentView === 'play'
-                                ? 'bg-zinc-800 text-white border-zinc-600'
-                                : 'text-zinc-500 border-zinc-800 hover:text-zinc-300 hover:bg-zinc-900 hover:border-zinc-700'
-                                }`}
-                        >
-                            <Gamepad2 size={20} className="mb-1" />
-                            <span>Jogar Demo</span>
-                        </button>
-
-                        {/* Sobre o Projeto */}
-                        <button
-                            onClick={() => setCurrentView('about')}
-                            className={`flex-1 flex flex-col items-center justify-center gap-2 px-4 py-3 rounded-xl text-xs transition-all border ${currentView === 'about'
-                                ? 'bg-zinc-800 text-white border-zinc-600'
-                                : 'text-zinc-500 border-zinc-800 hover:text-zinc-300 hover:bg-zinc-900 hover:border-zinc-700'
-                                }`}
-                        >
-                            <Activity size={20} className="mb-1" />
-                            <span>Sobre</span>
-                        </button>
-                    </div>
+                    {/* Jogar - Demo */}
+                    <button
+                        onMouseMove={(e) => {
+                            const rect = e.currentTarget.getBoundingClientRect();
+                            const x = e.clientX - rect.left;
+                            const y = e.clientY - rect.top;
+                            e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+                            e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
+                        }}
+                        onClick={() => setCurrentView('play')}
+                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden ${currentView === 'play'
+                            ? 'bg-zinc-800 text-white border-zinc-600 shadow-lg scale-[1.02]'
+                            : 'bg-zinc-900/40 border-muted-foreground/50 text-zinc-400 hover:bg-purple-600 hover:border-purple-400 hover:text-white hover:shadow-lg hover:shadow-purple-600/40'
+                            }`}
+                    >
+                        <div
+                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                            style={{
+                                background: `radial-gradient(circle 60px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.2) 0%, transparent 100%)`
+                            }}
+                        />
+                        <Gamepad2 size={18} className="group-hover:translate-x-1 transition-transform relative z-10" />
+                        <span className="uppercase tracking-wider relative z-10">Jogar Demo</span>
+                    </button>
                 </div>
             </div>
 
@@ -260,7 +283,6 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             <div className="p-8 border-t border-zinc-900/50 bg-black/20">
                 <div className="font-mono text-[10px] text-zinc-600 leading-relaxed text-left">
                     <p>© 2026 IF Builder.</p>
-                    <p>Todos os direitos reservados.</p>
                 </div>
             </div>
         </div>
@@ -272,7 +294,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
         return (
             <div
-                className={`w-full max-w-sm bg-zinc-900/50 border border-zinc-800 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl ${isClosing
+                className={`w-full max-w-sm bg-zinc-900/50 border border-muted-foreground/50 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl ${isClosing
                     ? 'animate-out fade-out zoom-out-95 duration-300'
                     : 'animate-in fade-in zoom-in-95 duration-300'
                     }`}
@@ -312,7 +334,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                                 placeholder="seu@email.com"
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
-                                                className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
                                                 required
                                             />
                                         </div>
@@ -352,7 +374,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                                 placeholder="Ex: João Silva"
                                                 value={fullName}
                                                 onChange={(e) => setFullName(e.target.value)}
-                                                className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
                                                 required
                                             />
                                         </div>
@@ -368,7 +390,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                             placeholder="seu@email.com"
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
-                                            className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                            className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
                                             required
                                         />
                                     </div>
@@ -384,7 +406,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                                 placeholder="Ex: São Paulo, SP"
                                                 value={location}
                                                 onChange={(e) => setLocation(e.target.value)}
-                                                className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
                                             />
                                         </div>
                                     </div>
@@ -400,7 +422,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                                 placeholder="Sua senha"
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
-                                                className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
                                                 required
                                             />
                                             <button
@@ -423,7 +445,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                                     placeholder="Mínimo de 6"
                                                     value={password}
                                                     onChange={(e) => setPassword(e.target.value)}
-                                                    className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                    className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
                                                     required
                                                 />
                                                 <button
@@ -445,7 +467,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                                     placeholder="Repita senha"
                                                     value={confirmPassword}
                                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                                    className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                                    className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
                                                     required
                                                 />
                                                 <button
@@ -515,7 +537,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
     const renderAboutPanel = () => (
         <div
-            className={`w-full max-w-2xl bg-zinc-900/80 border border-zinc-800 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl ${isClosing
+            className={`w-full max-w-2xl bg-zinc-900/80 border border-muted-foreground/50 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl ${isClosing
                 ? 'animate-out fade-out zoom-out-95 duration-300'
                 : 'animate-in fade-in zoom-in-95 duration-300'
                 }`}
@@ -533,7 +555,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
                 <div className="space-y-4 text-zinc-400 leading-relaxed text-sm">
                     <p>
-                        O IF Builder é uma ferramenta gratuita que ajuda a criar histórias interativas. Crie cenas e objetos, e defina quais interações avançam a história.
+                        Crie cenas, objetos e defina as interações que avançam a sua ficção interativa.
                     </p>
                     <p>
                         Todas as ficções interativas criadas aqui são exportadas em um arquivo .zip. Ele não precisa de internet nem do editor para funcionar - apenas um navegador. Pense nesse arquivo como um pendrive: você pode guardá-lo em uma gaveta, ou entregá-lo a alguém.
@@ -588,7 +610,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
     // Password Reset Form (for recovery mode)
     const renderResetPasswordForm = () => (
-        <div className="w-full max-w-md bg-zinc-900/50 border border-zinc-800 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl">
+        <div className="w-full max-w-md bg-zinc-900/50 border border-muted-foreground/50 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl">
             <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-50" />
 
             <div className="p-8 space-y-6">
@@ -609,7 +631,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                 placeholder="Mínimo 6 caracteres"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
                                 required
                             />
                             <button
@@ -631,7 +653,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                 placeholder="Repita a senha"
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
-                                className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-zinc-800 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
+                                className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
                                 required
                             />
                             <button
@@ -706,32 +728,31 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
     // Main landing layout with sidebar
     return (
-        <div className="h-screen w-screen flex bg-zinc-950 font-sans relative overflow-hidden">
-
+        <div className="h-screen w-screen flex bg-black font-sans relative overflow-hidden">
+            {/* Global Dither Background */}
+            <div className="absolute inset-0 z-0 bg-neutral-950 overflow-hidden pointer-events-none">
+                <DitherShader
+                    src="/background.png"
+                    gridSize={2}
+                    ditherMode="bayer"
+                    colorMode="duotone"
+                    primaryColor="#000000"
+                    secondaryColor="#581c87"
+                    invert={false}
+                    animated={true}
+                    animationSpeed={0.005}
+                    className="w-full h-full"
+                    objectFit="cover"
+                    enableHover={true}
+                    hoverRadius={433}
+                />
+            </div>
 
             {/* Left Sidebar */}
             {renderSidebar()}
 
             {/* Main Content Area - Click to reset/close forms */}
-            <div className="flex-1 flex items-center justify-center p-8 pr-32 relative z-10 bg-zinc-950 cursor-pointer" onClick={resetToLanding}>
-                {/* Dither Background (Now relative to main content) */}
-                <div className="absolute inset-0 z-0 bg-neutral-950 overflow-hidden cursor-default">
-                    <DitherShader
-                        src="/background.png"
-                        gridSize={2}
-                        ditherMode="bayer"
-                        colorMode="duotone"
-                        primaryColor="#000000"
-                        secondaryColor="#581c87"
-                        invert={false}
-                        animated={true}
-                        animationSpeed={0.005}
-                        className="w-full h-full"
-                        objectFit="cover"
-                        enableHover={true}
-                        hoverRadius={433}
-                    />
-                </div>
+            <div className="flex-1 flex items-center justify-center p-8 pr-32 relative z-10 cursor-pointer" onClick={resetToLanding}>
 
                 <div className="relative z-10 w-full max-w-sm cursor-default">
                     {currentView === 'login' && renderAuthForm()}

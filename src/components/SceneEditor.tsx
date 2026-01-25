@@ -3,8 +3,8 @@ import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
 import { Scene, Interaction, GameObject, ConsequenceTracker, Choice, Vignette } from '../types';
 import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
-import ConnectionsView from './ConnectionsView';
-import { Upload, Eye, Trash2, Plus, ArrowRight } from 'lucide-react';
+import BranchingPreview from './BranchingPreview';
+import { Upload, Eye, Trash2, Plus, ArrowRight, Music, Image as ImageIcon, Flag, FileText, Scroll, GitBranch, Play } from 'lucide-react';
 
 interface SceneEditorProps {
     scene: Scene;
@@ -25,6 +25,9 @@ interface SceneEditorProps {
     isStartScene: boolean;
     gameInteractionType: 'parser' | 'choice';
     vignettes: Vignette[];
+    onViewMap?: () => void;
+    enableChances: boolean;
+    gameSystemEnabled?: 'none' | 'chances' | 'trackers';
 }
 
 const getCleanSceneState = (s: Scene): Scene => {
@@ -62,11 +65,14 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     consequenceTrackers,
     isStartScene,
     gameInteractionType,
-    vignettes
+    vignettes,
+    onViewMap,
+    enableChances,
+    gameSystemEnabled,
 }) => {
     const [localScene, setLocalScene] = useState<Scene>(() => getCleanSceneState(scene));
     const [pendingObjectUpdates, setPendingObjectUpdates] = useState<{ [id: string]: Partial<GameObject> }>({});
-    const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions' | 'connections' | 'choices'>('properties');
+    const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions' | 'choices'>('properties');
     const [isDraggingOver, setIsDraggingOver] = useState(false);
     const initialSceneJson = useRef(JSON.stringify(getCleanSceneState(scene)));
 
@@ -119,56 +125,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         return Object.values(mergedGlobalObjects);
     }, [mergedGlobalObjects]);
 
-    const allObjectsMap = useMemo(() => {
-        return new Map(Object.entries(mergedGlobalObjects));
-    }, [mergedGlobalObjects]);
-
-    const connections = useMemo(() => {
-        const sceneMap = new Map(allScenes.map(s => [s.id, s]));
-
-        const inputConnectionsMap = new Map<string, Interaction[]>();
-        for (const otherScene of allScenes) {
-            if (otherScene.id === localScene.id) continue;
-            for (const interaction of otherScene.interactions) {
-                if (interaction.goToScene === localScene.id) {
-                    if (!inputConnectionsMap.has(otherScene.id)) {
-                        inputConnectionsMap.set(otherScene.id, []);
-                    }
-                    inputConnectionsMap.get(otherScene.id)!.push(interaction);
-                }
-            }
-        }
-
-        const outputConnectionsMap = new Map<string, Interaction[]>();
-        for (const interaction of localScene.interactions) {
-            if (interaction.goToScene && sceneMap.has(interaction.goToScene)) {
-                if (!outputConnectionsMap.has(interaction.goToScene)) {
-                    outputConnectionsMap.set(interaction.goToScene, []);
-                }
-                outputConnectionsMap.get(interaction.goToScene)!.push(interaction);
-            }
-        }
-
-        const inputConnections: ConnectionDetail[] = Array.from(inputConnectionsMap.entries()).map(([sceneId, interactions]) => {
-            const scene = sceneMap.get(sceneId);
-            if (scene) {
-                return { scene, interactions };
-            }
-            return null;
-        }).filter((connection): connection is ConnectionDetail => connection !== null);
-
-
-        const outputConnections: ConnectionDetail[] = Array.from(outputConnectionsMap.entries()).map(([sceneId, interactions]) => {
-            const scene = sceneMap.get(sceneId);
-            if (scene) {
-                return { scene, interactions };
-            }
-            return null;
-        }).filter((connection): connection is ConnectionDetail => connection !== null);
-
-
-        return { inputConnections, outputConnections };
-    }, [allScenes, localScene.id, localScene.interactions]);
+    // Connections logic removed as simpler preview is used in BranchingPreview component
 
 
     const updateLocalScene = <K extends keyof Scene,>(key: K, value: Scene[K]) => {
@@ -306,14 +263,12 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
             return {
                 properties: 'Propriedades',
                 choices: 'Decisões',
-                connections: 'Conexões',
             };
         }
         return {
             properties: 'Propriedades',
             objects: 'Objetos',
             interactions: 'Interações',
-            connections: 'Conexões',
         };
     }, [gameInteractionType]);
 
@@ -373,174 +328,277 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
                 <div className="bg-background pt-6">
                     {activeTab === 'properties' && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                            <div className="space-y-4 flex flex-col order-2 md:order-1">
-                                {/* Name and ID Column */}
-                                <div className="space-y-4">
-                                    <div className="grid grid-cols-3 gap-4">
-                                        <div className="col-span-2">
-                                            <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Nome da Cena</label>
-                                            <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all shadow-lg" />
-                                        </div>
-                                        <div className="col-span-1">
-                                            <label htmlFor="sceneId" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">ID</label>
-                                            <p
-                                                id="sceneId"
-                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono select-all"
-                                                title="O ID da cena é único e não pode ser alterado."
-                                            >
-                                                {localScene.id}
-                                            </p>
-                                        </div>
-                                    </div>
-                                </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {/* Left Column: Details & Rules */}
+                            <div className="space-y-6">
+                                {/* Scene Details Card */}
+                                <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
+                                    <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+                                        <FileText className="w-4 h-4 text-muted-foreground" />
+                                        DETALHES DA CENA
+                                    </h3>
 
-                                <div className="flex flex-col flex-1 min-h-0 pt-2">
-                                    <label htmlFor="sceneDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">
-                                        {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição'}
-                                    </label>
-                                    <p className="text-[10px] text-muted-foreground -mt-2 mb-2">Use <code>&lt;palavra&gt;</code> para destacar texto clicável.</p>
-                                    <div className="relative flex-1">
-                                        <textarea id="sceneDescription" value={localScene.description} onChange={handleDescriptionChange} className="w-full h-full min-h-[200px] bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 resize-y focus:ring-1 focus:ring-primary/30 transition-all shadow-lg" />
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col space-y-4 order-1 md:order-2">
-                                <div className="flex flex-col flex-grow min-h-[300px]">
-                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Imagem da Cena</label>
-                                    <div className="relative flex-grow w-full">
-                                        {localScene.image ? (
-                                            <div className="absolute inset-0 w-full h-full border border-muted-foreground/50 rounded-lg overflow-hidden bg-background group">
-                                                <img src={localScene.image} alt={localScene.name} className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity gap-2">
-                                                    <label htmlFor="image-upload-input" className="p-2 bg-secondary text-secondary-foreground rounded-lg cursor-pointer hover:bg-secondary/80 flex items-center gap-2 font-bold text-[10px] uppercase tracking-widest shadow-lg">
-                                                        <Upload className="w-5 h-5" />
-                                                        <span className="hidden sm:inline">Alterar</span>
-                                                        <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                                    </label>
-                                                    <button
-                                                        onClick={() => updateLocalScene('image', '')}
-                                                        className="p-2 bg-red-500 text-white rounded-md hover:bg-red-600 transition-colors"
-                                                        title="Remover Imagem"
-                                                    >
-                                                        <Trash2 className="w-5 h-5" />
-                                                    </button>
+                                    <div className="space-y-4">
+                                        <div className="grid grid-cols-3 gap-4">
+                                            <div className="col-span-2">
+                                                <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Nome da Cena</label>
+                                                <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2.5 text-sm text-zinc-200 focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all placeholder:text-zinc-700" placeholder="Ex: Entrada da Caverna" />
+                                            </div>
+                                            <div className="col-span-1">
+                                                <label htmlFor="sceneId" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">ID Único</label>
+                                                <div className="relative">
+                                                    <input
+                                                        type="text"
+                                                        value={localScene.id}
+                                                        disabled
+                                                        className="w-full bg-zinc-950/50 border border-muted-foreground/20 rounded-lg px-3 py-2.5 text-xs text-zinc-500 font-mono"
+                                                    />
+                                                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-700 text-[10px]">#</span>
                                                 </div>
                                             </div>
+                                        </div>
+
+                                        <div className="pt-2">
+                                            <div className="flex justify-between items-center mb-1.5">
+                                                <label htmlFor="sceneDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                                    {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição Narrativa'}
+                                                </label>
+                                                <span className="text-[9px] text-muted-foreground font-medium tracking-wider">Use &lt;palavra&gt; para destacar</span>
+                                            </div>
+                                            <div className="relative">
+                                                <textarea
+                                                    id="sceneDescription"
+                                                    value={localScene.description}
+                                                    onChange={handleDescriptionChange}
+                                                    className="w-full h-32 md:h-40 bg-zinc-950 border border-muted-foreground/30 rounded-lg px-4 py-3 text-sm text-zinc-300 resize-y focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all leading-relaxed placeholder:text-zinc-700"
+                                                    placeholder="Descreva o que o jogador vê e sente nesta cena..."
+                                                />
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Multimedia Card */}
+                                <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                                            <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                                            MULTIMÍDIA
+                                        </h3>
+                                        <span className="text-[10px] text-muted-foreground">
+                                            {layoutOrientation === 'vertical' ? '720x1280 sugerido' : '1280x720 sugerido'}
+                                        </span>
+                                    </div>
+
+                                    {/* Image Preview Area */}
+                                    <div className="relative w-full aspect-video bg-zinc-950 rounded-lg overflow-hidden border border-muted-foreground/20 group mb-6">
+                                        {localScene.image ? (
+                                            <>
+                                                <img src={localScene.image} alt={localScene.name} className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm">
+                                                    <label htmlFor="image-upload-input" className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-purple-300 transition-colors">
+                                                        <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
+                                                            <Upload className="w-5 h-5" />
+                                                        </div>
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider">Trocar</span>
+                                                        <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                                                    </label>
+                                                    <button onClick={() => updateLocalScene('image', '')} className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors">
+                                                        <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
+                                                            <Trash2 className="w-5 h-5" />
+                                                        </div>
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider">Remover</span>
+                                                    </button>
+                                                </div>
+
+                                            </>
                                         ) : (
-                                            <label
-                                                htmlFor="image-upload-input"
-                                                className={`absolute inset-0 flex flex-col items-center justify-center w-full h-full border-2 border-dashed bg-muted/30 rounded-xl cursor-pointer hover:bg-muted/50 hover:border-primary/50 transition-all ${isDraggingOver ? 'border-primary bg-primary/10' : 'border-muted-foreground/50'}`}
-                                                onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
-                                                onDragEnter={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(true); }}
-                                                onDragLeave={(e) => { e.preventDefault(); e.stopPropagation(); setIsDraggingOver(false); }}
-                                                onDrop={handleDrop}
-                                            >
-                                                <Upload className="w-8 h-8 text-zinc-700 mb-2 transition-colors group-hover:text-purple-400" />
-                                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest group-hover:text-foreground">Clique para Enviar</span>
-                                                <span className="text-[10px] text-muted-foreground mt-1">ou arraste e solte</span>
+                                            <label htmlFor="image-upload-input" className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-900 transition-colors group">
+                                                <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-purple-500/50 transition-all">
+                                                    <ImageIcon className="w-5 h-5 text-zinc-600 group-hover:text-purple-400" />
+                                                </div>
+                                                <span className="text-xs font-medium text-zinc-500 group-hover:text-zinc-300">Carregar Imagem de Fundo</span>
                                                 <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                             </label>
                                         )}
                                     </div>
-                                    {/* MODIFICADO: Recomendação contextual incluindo tamanho em pixels */}
-                                    <p className="text-[10px] text-muted-foreground text-center mt-3 font-medium italic">
-                                        {layoutOrientation === 'vertical'
-                                            ? "Recomendado imagens em pé (ex: 9:16). Sugestão: 720x1280 pixels."
-                                            : "Recomendado imagens deitadas (ex: 16:9). Sugestão: 1280x720 pixels."}
-                                    </p>
-                                </div>
 
-                                <div className="pt-4 border-t border-zinc-800">
-                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Trilha sonora da cena</label>
-                                    <div className="flex items-center gap-2">
-                                        <label className="flex-grow flex items-center justify-center px-3 py-2 bg-muted border border-muted-foreground/50 text-foreground font-bold rounded-lg hover:bg-muted/80 transition-all cursor-pointer text-xs">
-                                            <Upload className="w-4 h-4 mr-2 text-primary" /> {localScene.backgroundMusic ? 'Alterar Trilha' : 'Carregar Trilha (.mp3)'}
-                                            <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={handleMusicUpload} className="hidden" />
-                                        </label>
-                                        {localScene.backgroundMusic && (
-                                            <button
-                                                onClick={() => updateLocalScene('backgroundMusic', undefined)}
-                                                className="p-2 bg-red-500/20 text-red-500 rounded-md hover:bg-red-500/30 transition-colors"
-                                                title="Remover Troca de Música"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        )}
-                                    </div>
-                                    <p className="text-[10px] text-muted-foreground mt-1 italic">Deixe vazio para continuar tocando a música da cena anterior.</p>
-                                </div>
-
-                                {!isStartScene && (
-                                    <div className="space-y-4 pt-4 border-t border-muted-foreground/50">
-                                        <div className="flex gap-4">
-                                            <div className="flex items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    id="removesChance"
-                                                    checked={!!localScene.removesChanceOnEntry}
-                                                    onChange={e => handleToggle('removesChanceOnEntry', e.target.checked)}
-                                                    className="custom-checkbox"
-                                                    disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
-                                                />
-                                                <label htmlFor="removesChance" className={`ml-2 block text-[11px] text-muted-foreground ${isAnyCheckboxChecked && !localScene.removesChanceOnEntry ? 'opacity-50' : ''}`}>
-                                                    Esta cena remove uma chance.
-                                                </label>
+                                    {/* Audio Section */}
+                                    <div className="space-y-2">
+                                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha Sonora (.mp3)</label>
+                                        <div className="flex items-center gap-3 p-3 bg-zinc-950/50 border border-dashed border-muted-foreground/30 rounded-lg hover:border-purple-500/30 transition-colors">
+                                            <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center flex-shrink-0">
+                                                <Music className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-purple-400' : 'text-zinc-600'}`} />
                                             </div>
-                                            <div className="flex items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    id="restoresChance"
-                                                    checked={!!localScene.restoresChanceOnEntry}
-                                                    onChange={e => handleToggle('restoresChanceOnEntry', e.target.checked)}
-                                                    className="custom-checkbox"
-                                                    disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
-                                                />
-                                                <label htmlFor="restoresChance" className={`ml-2 block text-[11px] text-muted-foreground ${isAnyCheckboxChecked && !localScene.restoresChanceOnEntry ? 'opacity-50' : ''}`}>
-                                                    Esta cena restaura uma chance.
-                                                </label>
+                                            <div className="flex-grow min-w-0">
+                                                {localScene.backgroundMusic ? (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs text-zinc-200 truncate">Trilha Personalizada Definida</span>
+                                                        <span className="text-[10px] text-green-500">Áudio carregado com sucesso</span>
+                                                    </div>
+                                                ) : (
+                                                    <div className="flex flex-col">
+                                                        <span className="text-xs text-zinc-400 italic">Nenhuma trilha selecionada</span>
+                                                        <span className="text-[9px] text-zinc-600">Deixe vazio para continuar a música anterior.</span>
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-shrink-0">
+                                                {localScene.backgroundMusic ? (
+                                                    <button onClick={() => updateLocalScene('backgroundMusic', undefined)} className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all" title="Remover">
+                                                        <Trash2 className="w-4 h-4" />
+                                                    </button>
+                                                ) : (
+                                                    <label htmlFor="music-upload" className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-zinc-700">
+                                                        Carregar
+                                                        <input id="music-upload" type="file" accept="audio/*" onChange={handleMusicUpload} className="hidden" />
+                                                    </label>
+                                                )}
                                             </div>
                                         </div>
+                                    </div>
+                                </div>
+                            </div>
 
-                                        <div className="space-y-3 pt-4 border-t border-muted-foreground/50">
-                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                                                Vinheta de Conclusão (Pós-Cena)
+                            {/* Right Column: Rules & Preview */}
+                            <div className="space-y-6">
+                                {/* Narrative Rules Card */}
+                                <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
+                                    <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+                                        <Scroll className="w-4 h-4 text-muted-foreground" />
+                                        REGRAS DE NARRATIVA
+                                    </h3>
+
+                                    <div className="space-y-5">
+                                        {/* Vignette Configuration */}
+                                        <div>
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">
+                                                Esta cena é uma vinheta
                                             </label>
-                                            <div className="flex items-center gap-4 h-9">
-                                                <div className="flex items-center w-1/2">
-                                                    <input
-                                                        type="checkbox"
-                                                        id="isEndingScene"
-                                                        checked={!!localScene.isEndingScene}
-                                                        onChange={e => handleToggle('isEndingScene', e.target.checked)}
-                                                        className="custom-checkbox shrink-0"
-                                                        disabled={isAnyCheckboxChecked && !localScene.isEndingScene}
-                                                    />
-                                                    <label htmlFor="isEndingScene" className={`ml-2 block text-[11px] text-muted-foreground ${isAnyCheckboxChecked && !localScene.isEndingScene ? 'opacity-50' : ''}`}>
-                                                        Esta é uma cena de conclusão
-                                                    </label>
-                                                </div>
-                                                <div className="w-1/2">
-                                                    {localScene.isEndingScene && (
-                                                        <select
-                                                            value={localScene.conclusionVignetteId || ''}
-                                                            onChange={(e) => updateLocalScene('conclusionVignetteId', e.target.value)}
-                                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded p-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50"
-                                                        >
-                                                            <option value="">Selecione uma vinheta...</option>
-                                                            {vignettes.map(v => (
-                                                                <option key={v.id} value={v.id}>
-                                                                    {v.title || v.name || v.id}
-                                                                </option>
-                                                            ))}
-                                                        </select>
+                                            <div className="grid grid-cols-3 gap-2 mb-4">
+                                                {[
+                                                    { id: 'opening', label: 'Abertura', icon: Play },
+                                                    { id: 'transition', label: 'Transição', icon: ArrowRight },
+                                                    { id: 'conclusion', label: 'Conclusão', icon: Flag }
+                                                ].map((type) => (
+                                                    <button
+                                                        key={type.id}
+                                                        onClick={() => {
+                                                            const newType = localScene.vignetteType === type.id ? undefined : (type.id as 'opening' | 'transition' | 'conclusion');
+                                                            updateLocalScene('vignetteType', newType);
+                                                        }}
+                                                        className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border transition-all ${localScene.vignetteType === type.id
+                                                            ? 'bg-purple-500/20 border-purple-500 text-purple-300'
+                                                            : 'bg-zinc-900/50 border-muted-foreground/20 text-muted-foreground hover:bg-muted/10 hover:text-zinc-300'
+                                                            }`}
+                                                    >
+                                                        <type.icon className="w-4 h-4" />
+                                                        <span className="text-[10px] font-bold uppercase">{type.label}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+
+                                            {localScene.vignetteType && (localScene.vignetteType !== 'none') && (
+                                                <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
+                                                    <div>
+                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                                                            Texto do Botão
+                                                        </label>
+                                                        <input
+                                                            type="text"
+                                                            value={localScene.vignetteButtonText || ''}
+                                                            onChange={(e) => updateLocalScene('vignetteButtonText', e.target.value)}
+                                                            placeholder={localScene.vignetteType === 'conclusion' ? 'Reiniciar' : 'Continuar'}
+                                                            className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all placeholder:text-zinc-700"
+                                                        />
+                                                    </div>
+
+                                                    {localScene.vignetteType !== 'conclusion' && (
+                                                        <div>
+                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                                                                Ir Para
+                                                            </label>
+                                                            <select
+                                                                value={localScene.vignetteNextSceneId || ''}
+                                                                onChange={(e) => updateLocalScene('vignetteNextSceneId', e.target.value)}
+                                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all [&>option]:bg-zinc-950"
+                                                            >
+                                                                <option value="">(Basta fechar)</option>
+                                                                <option value="END_GAME">Encerramento (Fim de Jogo)</option>
+                                                                <optgroup label="Cenas">
+                                                                    {allScenes.filter(s => s.id !== localScene.id).map(s => (
+                                                                        <option key={s.id} value={s.id}>
+                                                                            {s.name}
+                                                                        </option>
+                                                                    ))}
+                                                                </optgroup>
+                                                            </select>
+                                                        </div>
                                                     )}
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
+
+                                        {(enableChances || gameSystemEnabled === 'chances') && (
+                                            <div className="space-y-3">
+                                                {/* Chance Removal */}
+                                                <label className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.removesChanceOnEntry ? 'bg-zinc-900/80 border-red-500/30' : 'bg-transparent border-muted-foreground/20 hover:bg-muted/10'}`}>
+                                                    <div className="relative flex items-center mt-0.5">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={!!localScene.removesChanceOnEntry}
+                                                            onChange={e => handleToggle('removesChanceOnEntry', e.target.checked)}
+                                                            className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground accent-red-500"
+                                                            disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <span className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-400' : 'text-zinc-400 group-hover:text-zinc-300'}`}>Esta cena remove uma chance</span>
+                                                        <span className="block text-[10px] text-muted-foreground mt-0.5">O jogador perde uma vida/tentativa ao entrar aqui.</span>
+                                                    </div>
+                                                </label>
+
+                                                {/* Chance Restoration */}
+                                                <label className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.restoresChanceOnEntry ? 'bg-zinc-900/80 border-green-500/30' : 'bg-transparent border-muted-foreground/20 hover:bg-muted/10'}`}>
+                                                    <div className="relative flex items-center mt-0.5">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={!!localScene.restoresChanceOnEntry}
+                                                            onChange={e => handleToggle('restoresChanceOnEntry', e.target.checked)}
+                                                            className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground accent-green-500"
+                                                            disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
+                                                        />
+                                                    </div>
+                                                    <div>
+                                                        <span className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-400' : 'text-zinc-400 group-hover:text-zinc-300'}`}>Esta cena restaura uma chance</span>
+                                                        <span className="block text-[10px] text-muted-foreground mt-0.5">O jogador ganha uma vida extra ou cura.</span>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        )}
                                     </div>
-                                )}
+                                </div>
+
+                                {/* Branching Preview Card */}
+                                <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                                            <GitBranch className="w-4 h-4 text-muted-foreground" />
+                                            CONEXÕES
+                                        </h3>
+                                        {/* Optional: Link to full map if needed, but simplistic for now */}
+                                        <button onClick={() => onViewMap?.()} className="text-[10px] text-purple-400 hover:text-purple-300 font-bold uppercase tracking-widest transition-colors flex items-center gap-1" title="Volte ao mapa para ver completo">
+                                            Ver Mapa Completo
+                                        </button>
+                                    </div>
+
+                                    <BranchingPreview currentScene={localScene} allScenes={allScenes} />
+
+                                    <p className="text-[10px] text-zinc-500 text-center mt-3">
+                                        Visualização rápida das conexões diretas.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -656,16 +714,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                             </div>
                         </div>
                     )}
-
-                    {activeTab === 'connections' && (
-                        <ConnectionsView
-                            currentScene={localScene}
-                            inputConnections={connections.inputConnections}
-                            outputConnections={connections.outputConnections}
-                            allObjectsMap={allObjectsMap}
-                            onSelectScene={onSelectScene}
-                        />
-                    )}
                 </div>
             </div>
             <div className="fixed bottom-6 right-10 z-10 flex gap-2">
@@ -694,7 +742,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                     Salvar Alterações
                 </button>
             </div>
-        </div>
+        </div >
     );
 };
 

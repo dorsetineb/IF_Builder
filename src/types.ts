@@ -64,6 +64,9 @@ export interface Scene {
   restoresChanceOnEntry?: boolean;
   mapX?: number;
   mapY?: number;
+  vignetteType?: 'opening' | 'transition' | 'conclusion' | 'none';
+  vignetteButtonText?: string;
+  vignetteNextSceneId?: string;
 }
 
 export interface FixedVerb {
@@ -103,6 +106,10 @@ export interface Vignette {
 
   isConclusion?: boolean;
   isSystemDefeat?: boolean; // If true, shown when chances run out
+
+  // Map positioning
+  mapX?: number;
+  mapY?: number;
 }
 
 
