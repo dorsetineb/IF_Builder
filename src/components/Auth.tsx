@@ -191,7 +191,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
     // Sidebar Component (Left)
     const renderSidebar = () => (
-        <div className="w-72 bg-zinc-950/10 backdrop-blur-sm border-r border-muted-foreground/50 flex flex-col h-full relative z-20 transition-all duration-300 hover:border-purple-500/40 hover:shadow-2xl hover:shadow-purple-900/10">
+        <div className="w-72 bg-zinc-950/2 backdrop-blur-[2px] border-r border-muted-foreground/50 flex flex-col h-full relative z-20 transition-all duration-300 hover:border-purple-500/40 hover:shadow-2xl hover:shadow-purple-900/10">
             <div className="flex-1 flex flex-col justify-center w-full px-6 space-y-12">
                 {/* Tagline */}
                 <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1">
@@ -252,35 +252,18 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                         <span className="uppercase tracking-wider relative z-10">Criar Conta</span>
                     </button>
 
-                    {/* Jogar - Demo */}
-                    <button
-                        onMouseMove={(e) => {
-                            const rect = e.currentTarget.getBoundingClientRect();
-                            const x = e.clientX - rect.left;
-                            const y = e.clientY - rect.top;
-                            e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
-                            e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
-                        }}
-                        onClick={() => setCurrentView('play')}
-                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden ${currentView === 'play'
-                            ? 'bg-zinc-800 text-white border-zinc-600 shadow-lg scale-[1.02]'
-                            : 'bg-zinc-900/40 border-muted-foreground/50 text-zinc-400 hover:bg-purple-600 hover:border-purple-400 hover:text-white hover:shadow-lg hover:shadow-purple-600/40'
-                            }`}
-                    >
-                        <div
-                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                            style={{
-                                background: `radial-gradient(circle 60px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.2) 0%, transparent 100%)`
-                            }}
-                        />
-                        <Gamepad2 size={18} className="group-hover:translate-x-1 transition-transform relative z-10" />
-                        <span className="uppercase tracking-wider relative z-10">Jogar Demo</span>
-                    </button>
+                    {/* Secret Hint Text */}
+                    <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1 pt-8 opacity-50">
+                        <p>Se clicar nos computadores.</p>
+                        <p className="text-purple-400 font-bold mt-2">Algo pode acontecer...</p>
+                    </div>
+
+                    {/* Jogar Button removed (Secret Trigger now) */}
                 </div>
             </div>
 
             {/* Footer */}
-            <div className="p-8 border-t border-zinc-900/50 bg-black/20">
+            <div className="p-8 border-t border-zinc-900/50 bg-zinc-950/2">
                 <div className="font-mono text-[10px] text-zinc-600 leading-relaxed text-left">
                     <p>© 2026 IF Builder.</p>
                 </div>
@@ -748,11 +731,20 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                 />
             </div>
 
+            {/* Secret "Jogar" Trigger - Invisible area over computers */}
+            <div
+                className="absolute top-1/2 right-[20%] w-64 h-64 -translate-y-[40%] z-30 cursor-pointer hidden md:block"
+                onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentView('play');
+                }}
+            />
+
             {/* Left Sidebar */}
             {renderSidebar()}
 
             {/* Main Content Area - Click to reset/close forms */}
-            <div className="flex-1 flex items-center justify-center p-8 pr-32 relative z-10 cursor-pointer" onClick={resetToLanding}>
+            <div className={`flex-1 flex items-center justify-center p-8 pr-32 relative z-10 ${currentView !== 'landing' ? 'cursor-pointer' : ''}`} onClick={resetToLanding}>
 
                 <div className="relative z-10 w-full max-w-sm cursor-default">
                     {currentView === 'login' && renderAuthForm()}
