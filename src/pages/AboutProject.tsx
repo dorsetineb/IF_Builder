@@ -102,17 +102,21 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     </div>
                                     <div className="space-y-6 text-muted-foreground leading-relaxed font-light text-sm">
                                         <p>
-                                            O IF Builder é uma ferramenta gratuita que ajuda a criar histórias interativas. Crie cenas e objetos, e defina quais interações avançam a história.
+                                            O IF Builder é um editor que desenvolvi para ajudar pessoas a criarem suas próprias ficções interativas. A ideia é simples: permitir que você escreva narrativas onde quem joga decide o que acontece em seguida.
                                         </p>
                                         <p>
-                                            Todas as ficções interativas criadas aqui são exportadas em um arquivo .zip. Ele não precisa de internet nem do editor para funcionar - apenas um navegador. Pense nesse arquivo como um pendrive: você pode guardá-lo em uma gaveta, ou entregá-lo a alguém.
+                                            Contar histórias é algo natural para nós — seja através de desenhos em uma caverna ou de linhas de código. Por isso, tenho criado uma ferramenta que retira a barreira da programação complexa, que permite ao autor focar na estrutura da sua narrativa e nas escolhas do seu jogador.
                                         </p>
                                         <p>
-                                            Este site foi criado com o auxílio de inteligência artificial generativa — seria hipocrisia esconder isso. Mas o IF Builder não gera histórias automaticamente. Ele é uma ferramenta mecânica, que exige atenção, e foi desenhada para que você possa fazer o trabalho humano de contar uma história que pareça real.
+                                            Aqui, as ficções interativas são escritas em cenas. É fácil visualizar para onde cada escolha leva o jogador e como os caminhos se cruzam. Se você quer que algo aconteça apenas se o jogador tiver um item específico ou tiver feito uma escolha anterior, o editor resolve isso com regras simples de "arrastar e soltar".
                                         </p>
                                         <p>
-                                            <b className="text-foreground font-bold">É a sua intenção que controla esta máquina.</b>
+                                            Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa tiver utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?
                                         </p>
+                                        <p>
+                                            Não estou tentando reinventar a roda, apenas oferecendo um espaço organizado para quem gosta de escrever e quer testar um novo formato. O IF Builder é um projeto pessoal, feito de um autor para outros autores, focado em dar vida a histórias de maneira prática e interativa.
+                                        </p>
+
                                     </div>
                                 </div>
                             </div>
