@@ -171,7 +171,10 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                                         <div className="flex-1 space-y-6 text-muted-foreground leading-relaxed font-light text-sm text-left">
                                             <p>
-                                                Sou formado em Artes Visuais e atuo há mais de uma década em projetos de design, inovação educacional e recursos tecnológicos. Entrei no Senac São Paulo como ilustrador, e já trabalhei como diretor de arte, supervisor de demandas audiovisuais, analista de tecnologias aplicadas à educação (foco em Realidade Estendida e IA Generativa). Ainda no Senac, hoje me dedico ao monitoramento estratégico de projetos de tecnologia da informação, e eventualmente me envolvo com projetos freelancer de diagramação de livros e ilustração.
+                                                Sou bacharel em Artes Visuais, pós-graduado em Gestão da Inovação, e atuo há mais de uma década em projetos que envolvem design, educação e tecnologia.
+                                            </p>
+                                            <p>
+                                                Já trabalhei como ilustrador, diretor de arte, articulador de demandas audiovisuais, e analista de tecnologias aplicadas à educação. Hoje me dedico ao monitoramento estratégico de projetos de tecnologia da informação, e eventualmente me envolvo com projetos freelancer de diagramação de livros e ilustração.
                                             </p>
                                             <p>
                                                 Tento escrever com alguma regularidade no <a href="https://substack.com/@dorsetineb" target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80 hover:underline">Substack</a>, e seria muito legal conversar com você por lá também!
