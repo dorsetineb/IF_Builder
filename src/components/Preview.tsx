@@ -200,6 +200,12 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                     ${defeat ? getAnimationCss(defeat, '#negative-ending-screen .content') : ''}
                 `;
             })()}
+
+            /* Safeguard: Force hide parser elements in Choice mode */
+            ${gameData.gameInteractionType === 'choice' ? `
+                .input-area, #standard-action-bar .input-area { display: none !important; }
+                #suggestions-button, #inventory-button { display: none !important; }
+            ` : ''}
         `;
 
         let finalCss = (gameData.gameCSS + cssOverrides)

@@ -197,6 +197,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             title: title || 'Abertura',
             description: description,
             buttonText: startButtonText,
+            image: splashImage,
             showTitle: true,
             showDescription: true,
             textAnimationType: 'fade',
