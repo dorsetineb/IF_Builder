@@ -322,6 +322,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const init = () => {
+        if (gameData.gameInteractionType === 'choice') {
+            if (suggestionsButton) suggestionsButton.classList.add('hidden');
+            if (inventoryButton) inventoryButton.classList.add('hidden');
+        }
+
         if (gameData.gameBackgroundMusic) {
             playBgm(gameData.gameBackgroundMusic);
         }
@@ -628,35 +633,47 @@ document.addEventListener('DOMContentLoaded', () => {
         // CHOICE MODE HANDLING
         if (gameData.gameInteractionType === 'choice') {
             document.querySelector('.input-area').classList.add('hidden');
+            
+            // Remove previous choices container if exists
+            const existingChoices = standardActionBar.querySelector('.choices-container');
+            if (existingChoices) existingChoices.remove();
+
             const choicesContainer = document.createElement('div');
             choicesContainer.className = 'choices-container';
-            choicesContainer.style.marginTop = '20px';
+            choicesContainer.style.marginTop = '10px';
             choicesContainer.style.display = 'flex';
             choicesContainer.style.flexDirection = 'column';
-            choicesContainer.style.gap = '10px';
+            choicesContainer.style.gap = '8px';
+            choicesContainer.style.width = '100%';
             
             if (scene.choices && scene.choices.length > 0) {
                 scene.choices.forEach(choice => {
                     const btn = document.createElement('button');
                     btn.textContent = choice.label;
                     btn.className = 'choice-button';
-                    // Inline styles for basic look, can be moved to CSS later or use existing classes
-                    btn.style.padding = '12px 16px';
-                    btn.style.textAlign = 'left';
-                    btn.style.backgroundColor = 'var(--button-bg, #21262d)';
-                    btn.style.border = '1px solid var(--border-color, rgba(255,255,255,0.2))';
-                    btn.style.borderRadius = '8px';
-                    btn.style.color = 'var(--text-color, #e0e0e0)';
-                    btn.style.cursor = 'pointer';
-                    btn.style.transition = 'all 0.2s';
                     
+                    // Match System Button Styles
+                    btn.style.fontFamily = 'var(--font-family)';
+                    btn.style.padding = '12px 16px'; // Slightly larger for tap targets but matching style
+                    btn.style.textAlign = 'left';
+                    btn.style.backgroundColor = 'var(--panel-bg)'; // Match standard button bg
+                    btn.style.border = '2px solid var(--border-color)'; // Match standard button border
+                    btn.style.color = 'var(--text-color)'; // Match standard button text
+                    btn.style.cursor = 'pointer';
+                    btn.style.transition = 'background-color 0.2s, border-color 0.2s';
+                    btn.style.fontSize = '1em';
+                    btn.style.fontWeight = 'normal';
+                    btn.style.width = '100%';
+                    btn.style.marginBottom = '0'; // Controlled by gap
+
+                    // Hover Effects
                     btn.onmouseover = () => { 
-                         btn.style.borderColor = 'var(--highlight-color, #a855f7)'; 
-                         btn.style.transform = 'translateX(4px)'; 
+                         btn.style.backgroundColor = 'var(--border-color)'; 
+                         btn.style.borderColor = 'var(--text-dim-color)';
                     };
                     btn.onmouseout = () => { 
-                         btn.style.borderColor = 'var(--border-color, rgba(255,255,255,0.2))'; 
-                         btn.style.transform = 'none'; 
+                         btn.style.backgroundColor = 'var(--panel-bg)'; 
+                         btn.style.borderColor = 'var(--border-color)'; 
                     };
 
                     btn.onclick = () => {
@@ -666,9 +683,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     choicesContainer.appendChild(btn);
                 });
             }
-            sceneDescription.appendChild(choicesContainer);
+            // Append to Action Bar (Footer) instead of Description
+            standardActionBar.insertBefore(choicesContainer, standardActionBar.firstChild);
+            // Move action buttons (System/Diary) to bottom if needed, or keep at top?
+            // User request: "Estar ABAIXO dos botões Sugestões, Inventário, Diário e Sistema"
+            // standardActionBar structure:
+            // 1. .action-popup (hidden)
+            // 2. .action-buttons (System, Diary, etc)
+            // 3. .input-area (Hidden in Choice mode)
+            
+            // So if we just append to standardActionBar, it will be at the end, which is AFTER action-buttons.
+            // Let's do appendChild.
+            standardActionBar.appendChild(choicesContainer);
+            
         } else {
             document.querySelector('.input-area').classList.remove('hidden');
+            const existingChoices = standardActionBar.querySelector('.choices-container');
+            if (existingChoices) existingChoices.remove();
         }
 
         actionPopup.classList.add('hidden'); verbInput.value = ''; activePopupType = null;
