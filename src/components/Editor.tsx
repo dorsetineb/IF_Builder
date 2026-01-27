@@ -172,7 +172,7 @@ const Editor: React.FC = () => {
     }, [gameData.scenes, (gameData as any).trackers]);
 
     const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
-    const [previewSceneId, setPreviewSceneId] = useState<string | null>(null);
+    const [previewScene, setPreviewScene] = useState<Scene | null>(null);
     const [currentView, setCurrentView] = useState<View>('scenes');
     const [isPreviewing, setIsPreviewing] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
@@ -930,7 +930,7 @@ DATE:        ${exportDate.toLocaleString()}
                             setSelectedSceneId(null);
                         }}
                     />
-                    <Preview gameData={gameData} testSceneId={previewSceneId} />
+                    <Preview gameData={gameData} testSceneId={previewScene?.id} sceneOverride={previewScene} />
                 </div>
             ) : (
                 <div className="flex flex-col h-full w-full">
@@ -939,7 +939,7 @@ DATE:        ${exportDate.toLocaleString()}
                         gameData={gameData}
                         isPreviewing={isPreviewing}
                         onTogglePreview={() => {
-                            setPreviewSceneId(null);
+                            setPreviewScene(null);
                             setIsPreviewing(true);
                         }}
                         onNewGame={handleNewGame}
@@ -973,7 +973,7 @@ DATE:        ${exportDate.toLocaleString()}
                             onNavigate={handleNavigate}
                             onImportGame={handleImportGame}
                             onTogglePreview={() => {
-                                setPreviewSceneId(null);
+                                setPreviewScene(null);
                                 setIsPreviewing(true);
                             }}
                             isCollapsed={sidebarCollapsed}
@@ -1081,7 +1081,7 @@ DATE:        ${exportDate.toLocaleString()}
                                     enableChances={(gameData.enableChances ?? detectedActiveSystems.chances) || gameData.gameSystemEnabled === 'chances'}
                                     gameSystemEnabled={gameData.gameSystemEnabled}
                                     onPreviewScene={(scene) => {
-                                        setPreviewSceneId(scene.id);
+                                        setPreviewScene(scene);
                                         setIsPreviewing(true);
                                     }}
                                     onSelectScene={handleSelectScene}

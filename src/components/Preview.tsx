@@ -20,7 +20,7 @@ const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
     }
 }
 
-const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = ({ gameData, testSceneId }) => {
+const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, sceneOverride?: any }> = ({ gameData, testSceneId, sceneOverride }) => {
     const srcDoc = useMemo(() => {
         const enableChances = gameData.enableChances || gameData.gameSystemEnabled === 'chances';
         const enableTrackers = gameData.enableTrackers || gameData.gameSystemEnabled === 'trackers';
@@ -53,7 +53,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('__LAYOUT_ORIENTATION_CLASS__', gameData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : '')
             .replace('__LAYOUT_ORDER_CLASS__', gameData.gameLayoutOrder === 'image-last' ? 'layout-image-last' : '')
             .replace('__FRAME_CLASS__', getFrameClass(gameData.gameImageFrame))
-            .replace('__MOBILE_BEHAVIOR_CLASS__', 'behavior-immersive') // FIXO: COMPORTAMENTO IMERSIVO
+            .replace('__MOBILE_BEHAVIOR_CLASS__', 'behavior-immersive')
             .replace('__FONT_STYLESHEET__', fontStylesheet)
             .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
             .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
@@ -86,8 +86,6 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('__NEGATIVE_ENDING_ALIGN_CLASS__', gameData.negativeEndingContentAlignment === 'left' ? 'align-left' : '')
             .replace('__NEGATIVE_ENDING_DESCRIPTION__', gameData.negativeEndingDescription || '');
 
-
-        // CSS Overrides to fix legacy/stale gameCSS state
         const cssOverrides = `
             body.frame-rounded-top .game-container .image-panel { padding: 5px; background: __FRAME_ROUNDED_TOP_COLOR__; border: none; border-radius: 40px 40px 4px 4px; box-shadow: none; }
             body.frame-rounded-top .game-container .image-container { border-radius: 35px 35px 0 0; }
@@ -100,7 +98,6 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             #scene-image { border-radius: 0px; }
             #scene-image-back { border-radius: 0px; }
             
-            /* Life System Fixes */
             @media (min-width: 769px) {
                 .chances-container {
                     display: flex;
@@ -108,7 +105,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                     align-items: center;
                     width: 100%;
                     gap: 8px;
-                    padding-bottom: 10px; /* Space above separator */
+                    padding-bottom: 10px;
                     position: relative;
                     z-index: 5;
                 }
@@ -125,34 +122,19 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                     gap: 6px;
                 }
             }
-            /* Common Icon Style */
             .chance-icon svg { width: 24px; height: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); display: block; }
             .chance-icon.lost svg { opacity: 0.3; }
 
-            /* VIGNETTE TEXT PADDING FIX */
-            /* Original CSS has: padding: 5vw 225px - horizontal is too large */
-            /* Fix: Use equal padding on all sides */
-            .splash-content {
-                padding: 10vw !important;
-            }
+            .splash-content { padding: 10vw !important; }
             #positive-ending-screen .content,
-            #negative-ending-screen .content {
-                padding: 10vw !important;
-            }
+            #negative-ending-screen .content { padding: 10vw !important; }
 
-            /* Mobile Responsive Fix */
             @media (max-width: 768px) {
                 #scene-description { padding: 15px !important; }
                 .scene-paragraph { margin-bottom: 12px; }
-                
-                .splash-content,
-                #positive-ending-screen .content,
-                #negative-ending-screen .content {
-                    padding: 20px !important;
-                }
+                .splash-content, #positive-ending-screen .content, #negative-ending-screen .content { padding: 20px !important; }
             }
 
-            /* 3. Text Scale Dynamic Injection */
             ${(() => {
                 const vignettes = gameData.vignettes || [];
                 const opening = vignettes.find(v => v.id === 'VNT_OPENING') || vignettes[0];
@@ -162,8 +144,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                 const getScaleCss = (scale: string | undefined, selector: string) => {
                     const s = scale === 'sm' ? { h1: '1.25rem', p: '0.75rem' } :
                         scale === 'lg' ? { h1: '2rem', p: '1rem' } :
-                            { h1: '1.5rem', p: '0.875rem' }; // Base/Default
-
+                            { h1: '1.5rem', p: '0.875rem' };
                     return `
                        ${selector} h1 { font-size: ${s.h1} !important; line-height: 1.2 !important; }
                        ${selector} p, ${selector} .description { font-size: ${s.p} !important; }
@@ -175,7 +156,6 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                     const speed = vignette.textSpeed || 3;
                     const duration = Math.max(0.1, 3.0 - (speed * 0.5)) + 's';
                     const animType = vignette.textAnimationType || 'fade';
-
                     if (animType === 'typewriter') {
                         return `
                             ${selector} h1, ${selector} p, ${selector} .description {
@@ -190,7 +170,6 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                         }
                     `;
                 };
-
                 return `
                     ${opening ? getScaleCss(opening.textScale, '#splash-screen .splash-content') : ''}
                     ${victory ? getScaleCss(victory.textScale, '#positive-ending-screen .content') : ''}
@@ -201,7 +180,6 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                 `;
             })()}
 
-            /* Safeguard: Force hide parser elements in Choice mode */
             ${gameData.gameInteractionType === 'choice' ? `
                 .input-area, #standard-action-bar .input-area { display: none !important; }
                 #suggestions-button, #inventory-button { display: none !important; }
@@ -209,7 +187,6 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
         `;
 
         let finalCss = (gameData.gameCSS + cssOverrides)
-            // Hotfix for legacy typo
             .replace('__FRAME_ROUND_TOP_COLOR__', '__FRAME_ROUNDED_TOP_COLOR__')
             .replace(/__FONT_FAMILY__/g, fontFamily)
             .replace(/__GAME_FONT_SIZE__/g, (() => {
@@ -235,9 +212,25 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace(/__CONTINUE_INDICATOR_COLOR__/g, gameData.gameContinueIndicatorColor || gameData.gameTitleColor || '#58a6ff');
 
         const engineData = prepareGameDataForEngine(gameData);
-        if (testSceneId) {
-            (engineData as any).cena_inicial = testSceneId;
+        if (sceneOverride && testSceneId && sceneOverride.id === testSceneId) {
+            const translatedOverride = {
+                id: sceneOverride.id,
+                name: sceneOverride.name,
+                image: sceneOverride.image,
+                description: sceneOverride.description,
+                backgroundMusic: sceneOverride.backgroundMusic,
+                interactions: sceneOverride.interactions,
+                exits: sceneOverride.exits,
+                isEndingScene: sceneOverride.isEndingScene,
+                removesChanceOnEntry: sceneOverride.removesChanceOnEntry,
+                restoresChanceOnEntry: sceneOverride.restoresChanceOnEntry,
+                objectIds: sceneOverride.objectIds || [],
+                choices: sceneOverride.choices || []
+            };
+            (engineData as any).cenas[testSceneId] = translatedOverride;
         }
+
+        if (testSceneId) { (engineData as any).cena_inicial = testSceneId; }
 
         const safeJson = JSON.stringify(engineData).replace(/<\/script/g, '<\\/script>');
 
