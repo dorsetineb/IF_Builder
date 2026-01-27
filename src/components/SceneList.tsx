@@ -72,12 +72,13 @@ const SceneList: React.FC<SceneListProps> = ({
                 ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold'
                 : 'bg-primary/20 text-primary border border-primary/30'
               : 'hover:bg-muted/50'
-              } ${scene.id === startSceneId ? 'cursor-default' : ''}`}
+              } ${scene.id === startSceneId ? 'cursor-default' : 'cursor-pointer'}`}
             onDragStart={(e) => scene.id !== startSceneId && handleDragStart(e, index)}
             onDragEnter={(e) => scene.id !== startSceneId && handleDragEnter(e, index)}
             onDragEnd={handleDragEnd}
             onDragOver={(e) => e.preventDefault()}
             draggable={scene.id !== startSceneId}
+            onClick={() => onSelectScene(scene.id)}
           >
             <div className={`flex items-center flex-grow p-2`}>
               {scene.id !== startSceneId ? (

@@ -1,5 +1,102 @@
+import { GameData, Scene, Vignette, Interaction } from '../types';
 
-import { GameData } from '../types';
+export const migrateLegacyProject = (data: GameData): GameData => {
+    let cleanedScenes = { ...data.scenes };
+    let newStartSceneId = data.startScene;
+    const newSceneOrder = [...(data.sceneOrder || Object.keys(cleanedScenes))];
+    let vignettes = data.vignettes || [];
+
+    // MIGRATION: Auto-convert Legacy Vignettes to Scenes
+    if (vignettes.length > 0) {
+        console.log("Migrating legacy vignettes...", vignettes);
+        vignettes.forEach((v: any) => {
+            // Determine type
+            let type: 'opening' | 'transition' | 'conclusion' | 'none' = 'transition';
+            if (v.isConclusion) type = 'conclusion';
+            else if (v.id.toUpperCase().includes('OPENING') || v.id.toUpperCase().includes('INTRO')) type = 'opening';
+
+            // Check if scene already exists (idempotency)
+            if (cleanedScenes[v.id]) return;
+
+            // Create new Scene from Vignette
+            const newScene: Scene = {
+                id: v.id,
+                name: v.name || v.title || 'Vinheta',
+                description: v.description || '', // Map description to scene text
+                image: v.image,
+                backgroundMusic: v.backgroundMusic,
+                vignetteType: type,
+                vignetteButtonText: v.buttonText,
+                // Default properties for a scene
+                interactions: [],
+                objectIds: [],
+                mapX: 0, // Will be arranged later
+                mapY: 0
+            };
+
+            // Link Opening Vignette to the original Start Scene
+            if (type === 'opening' && data.startScene) {
+                newScene.vignetteNextSceneId = data.startScene;
+                newStartSceneId = v.id; // Set this as the new entry point
+            }
+
+            // Add to scenes
+            cleanedScenes[v.id] = newScene;
+            if (!newSceneOrder.includes(v.id)) {
+                // Prepend opening, append others
+                if (type === 'opening') newSceneOrder.unshift(v.id);
+                else newSceneOrder.push(v.id);
+            }
+        });
+
+        // Update Interactions to point to new scenes instead of vignettes
+        Object.values(cleanedScenes).forEach(scene => {
+            if (scene.interactions) {
+                scene.interactions = scene.interactions.map(interaction => {
+                    // Check if this interaction was pointing to a vignette
+                    // Legacy data might have 'goToVignette' property or specific logic
+                    if ((interaction as any).goToVignette) {
+                        const targetVignetteId = (interaction as any).goToVignette;
+                        // Check if this ID exists in our new scenes (was migrated)
+                        if (cleanedScenes[targetVignetteId]) {
+                            return {
+                                ...interaction,
+                                type: 'scene', // Change type to scene
+                                goToScene: targetVignetteId,
+                                goToVignette: undefined // Remove legacy prop
+                            } as Interaction;
+                        }
+                    }
+                    return interaction;
+                });
+            }
+        });
+
+        // Clear vignettes array after successful migration
+        vignettes = [];
+    }
+
+    // Ensure all scenes have required fields
+    Object.keys(cleanedScenes).forEach(id => {
+        cleanedScenes[id] = {
+            ...cleanedScenes[id],
+            objectIds: cleanedScenes[id].objectIds || [],
+            interactions: cleanedScenes[id].interactions || [],
+            // We don't reset mapX/Y here to preserve if they exist, but Editor handles auto-layout if missing
+            // Clean legacy props
+            isEndingScene: undefined,
+            conclusionVignetteId: undefined
+        };
+    });
+
+    return {
+        ...data,
+        scenes: cleanedScenes,
+        sceneOrder: newSceneOrder,
+        startScene: newStartSceneId,
+        vignettes: vignettes
+    };
+};
 
 export const prepareGameDataForEngine = (data: GameData): object => {
     const translatedCenas: { [id: string]: any } = {};

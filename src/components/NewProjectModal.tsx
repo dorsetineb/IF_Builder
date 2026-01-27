@@ -604,7 +604,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     return { panelStyles, containerStyles, panelClass, containerClass };
                                 };
 
-                                if (tab !== 'appearance') {
+                                if (true) {
                                     return (
                                         <div className="absolute inset-0 transform scale-[0.85] origin-center pointer-events-none select-none">
                                             <Preview gameData={previewGameData} testSceneId={null} />
@@ -691,25 +691,57 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             </div>
                                         </div>
 
-                                        {/* Preview Footer (Input) */}
+                                        {/* Preview Footer (Input or Choices) */}
                                         <div className={`p-3 border-t backdrop-blur-sm flex-shrink-0 space-y-2 ${theme === 'dark' ? 'border-zinc-900 bg-zinc-950/80' : 'border-zinc-200 bg-white/80'}`}>
-                                            <div className="flex gap-2">
-                                                <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${theme === 'dark' ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
-                                                    <span className="font-mono truncate" style={{ fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily, color: theme === 'dark' ? '#52525b' : '#a1a1aa' }}>{verbInputPlaceholder}</span>
+                                            {interactionType === 'parser' ? (
+                                                <div className="flex gap-2">
+                                                    <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${theme === 'dark' ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
+                                                        <span className="font-mono truncate" style={{ fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily, color: theme === 'dark' ? '#52525b' : '#a1a1aa' }}>{verbInputPlaceholder}</span>
+                                                    </div>
+                                                    <button
+                                                        className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
+                                                        style={{ backgroundColor: colors.actionButtonColor, color: colors.actionButtonTextColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily }}
+                                                    >
+                                                        {actionButtonText || 'AÇÃO'}
+                                                    </button>
                                                 </div>
+                                            ) : (
+                                                <div className="flex flex-col gap-2">
+                                                    <button
+                                                        className="w-full h-8 rounded-md text-left px-3 border transition-all truncate"
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
+                                                            color: colors.textColor,
+                                                            fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize,
+                                                            fontFamily: fontFamily
+                                                        }}
+                                                    >
+                                                        1. Opção de Exemplo (Escolha)
+                                                    </button>
+                                                    <button
+                                                        className="w-full h-8 rounded-md text-left px-3 border transition-all truncate"
+                                                        style={{
+                                                            backgroundColor: 'transparent',
+                                                            borderColor: theme === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
+                                                            color: colors.textColor,
+                                                            fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize,
+                                                            fontFamily: fontFamily
+                                                        }}
+                                                    >
+                                                        2. Outra Opção
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            <div className="pt-2 border-t border-dashed border-zinc-700/50">
                                                 <button
-                                                    className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
-                                                    style={{ backgroundColor: colors.actionButtonColor, color: colors.actionButtonTextColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily }}
+                                                    className="w-full h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center transition-colors hover:opacity-90 truncate"
+                                                    style={{ backgroundColor: colors.splashButtonColor, color: colors.splashButtonTextColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily }}
                                                 >
-                                                    {actionButtonText || 'AÇÃO'}
+                                                    {startButtonText || 'BOTÃO DE INÍCIO'}
                                                 </button>
                                             </div>
-                                            <button
-                                                className="w-full h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center transition-colors hover:opacity-90 truncate"
-                                                style={{ backgroundColor: colors.splashButtonColor, color: colors.splashButtonTextColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily }}
-                                            >
-                                                {startButtonText || 'BOTÃO DE INÍCIO'}
-                                            </button>
                                         </div>
                                     </div>
                                 );

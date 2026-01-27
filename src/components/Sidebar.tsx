@@ -47,12 +47,10 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     } ${isCollapsed ? 'justify-center px-0 py-3' : ''}`;
 
   const handleToggleScenes = () => {
-    if (currentView !== 'scenes' && currentView !== 'map') {
-      onSetView('scenes');
-      setIsScenesExpanded(true);
-    } else {
-      setIsScenesExpanded(!isScenesExpanded);
-    }
+    // FIX: Do not force switch to 'scenes' view when toggling. Just expand/collapse.
+    // If user wants to see scene list, they just expand it.
+    // If they click a specific scene, THAT switches the view (handled in SceneList).
+    setIsScenesExpanded(!isScenesExpanded);
   };
 
   const handleSetView = (view: View) => {
