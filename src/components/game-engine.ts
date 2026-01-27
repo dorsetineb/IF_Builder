@@ -35,8 +35,10 @@ export const migrateLegacyProject = (data: GameData): GameData => {
             };
 
             // Link Opening Vignette to the original Start Scene
-            if (type === 'opening' && data.startScene) {
-                newScene.vignetteNextSceneId = data.startScene;
+            if (type === 'opening') {
+                if (data.startScene) {
+                    newScene.vignetteNextSceneId = data.startScene;
+                }
                 newStartSceneId = v.id; // Set this as the new entry point
             }
 
