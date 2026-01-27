@@ -117,7 +117,10 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 removesChanceOnEntry: scene.removesChanceOnEntry,
                 restoresChanceOnEntry: scene.restoresChanceOnEntry,
                 objectIds: scene.objectIds || [],
-                choices: scene.choices || []
+                choices: scene.choices || [],
+                vignetteType: scene.vignetteType,
+                vignetteNextSceneId: scene.vignetteNextSceneId,
+                vignetteButtonText: scene.vignetteButtonText
             };
         }
     }
@@ -503,6 +506,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
         const scene = gameData.cenas[sceneId]; if (!scene) return;
+        
+        // VIGNETTE HANDLING: If this is an opening vignette, immediately skip to next scene
+        if (scene.vignetteType === 'opening' && scene.vignetteNextSceneId && gameData.cenas[scene.vignetteNextSceneId]) {
+            loadScene(scene.vignetteNextSceneId, transition, transitionType, transitionSpeed, successPrefix);
+            return;
+        }
         if (scene.backgroundMusic) playBgm(scene.backgroundMusic);
         if (scene.removesChanceOnEntry && gameData.enableChances) chances--; 
         if (scene.restoresChanceOnEntry && gameData.enableChances) chances = Math.min(chances + 1, gameData.gameMaxChances);
