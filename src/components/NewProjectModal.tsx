@@ -38,7 +38,7 @@ const ColorInput: React.FC<{ label: string, id: string, value: string, onChange:
 );
 
 export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClose, onCreate }) => {
-    const [tab, setTab] = useState<Tab>('system');
+    const [tab, setTab] = useState<Tab>('info');
 
     // Info State
     const [title, setTitle] = useState('Minha Nova Aventura');
@@ -213,8 +213,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     };
 
     const handleNext = () => {
-        if (tab === 'system') setTab('info');
-        else if (tab === 'info') setTab('appearance');
+        if (tab === 'info') setTab('appearance');
+        else if (tab === 'appearance') setTab('system');
     };
 
     if (!isOpen) return null;
@@ -244,14 +244,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
                     {/* Left Column: FormTabs */}
                     <div className="w-full lg:w-1/2 flex flex-col border-r border-zinc-800 bg-zinc-900/30">
-                        {/* Tabs Navigation */}
                         <div className="flex border-b border-zinc-800">
-                            <button
-                                onClick={() => setTab('system')}
-                                className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'system' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
-                            >
-                                Sistema
-                            </button>
                             <button
                                 onClick={() => setTab('info')}
                                 className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'info' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
@@ -263,6 +256,12 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                 className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'appearance' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
                             >
                                 Aparência
+                            </button>
+                            <button
+                                onClick={() => setTab('system')}
+                                className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'system' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
+                            >
+                                Sistema
                             </button>
                         </div>
 
@@ -726,7 +725,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                 Cancelar
                             </button>
 
-                            {tab === 'appearance' ? (
+                            {tab === 'system' ? (
                                 <button
                                     onClick={handleCreate}
                                     disabled={!title}
