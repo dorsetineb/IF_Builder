@@ -504,14 +504,73 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const def of definitions) { if (trackers[def.id] >= def.maxValue && def.consequenceSceneId) { setTimeout(() => { loadScene(def.consequenceSceneId, true, 'fade'); }, 500); return; } }
     };
 
+    // VIGNETTE RENDERER: Creates a fullscreen splash overlay for opening/transition/conclusion vignettes
+    const renderVignette = (scene) => {
+        // Get or create vignette overlay
+        let vignetteOverlay = document.getElementById('vignette-overlay');
+        if (!vignetteOverlay) {
+            vignetteOverlay = document.createElement('div');
+            vignetteOverlay.id = 'vignette-overlay';
+            vignetteOverlay.className = 'splash-screen';
+            vignetteOverlay.innerHTML = '<div class="splash-content"><p class="splash-description"></p><button class="splash-start-button vignette-advance-btn"></button></div>';
+            document.body.appendChild(vignetteOverlay);
+        }
+        
+        // Configure overlay
+        if (scene.image) {
+            vignetteOverlay.style.backgroundImage = 'url(' + scene.image + ')';
+            vignetteOverlay.style.backgroundSize = 'cover';
+            vignetteOverlay.style.backgroundPosition = 'center';
+        } else {
+            vignetteOverlay.style.backgroundImage = 'none';
+        }
+        
+        const descEl = vignetteOverlay.querySelector('.splash-description');
+        const btnEl = vignetteOverlay.querySelector('.vignette-advance-btn');
+        
+        if (descEl) descEl.textContent = scene.description || '';
+        if (btnEl) {
+            btnEl.textContent = scene.vignetteButtonText || 'Continuar';
+            // Remove old listeners by cloning
+            const newBtn = btnEl.cloneNode(true);
+            btnEl.parentNode.replaceChild(newBtn, btnEl);
+            newBtn.addEventListener('click', () => {
+                vignetteOverlay.classList.add('fade-out');
+                setTimeout(() => {
+                    vignetteOverlay.classList.add('hidden');
+                    vignetteOverlay.classList.remove('fade-out');
+                    // Transition to next scene
+                    if (scene.vignetteNextSceneId) {
+                        currentSceneId = scene.vignetteNextSceneId;
+                        loadScene(scene.vignetteNextSceneId, true);
+                    }
+                }, 1000);
+            });
+        }
+        
+        // Play BGM if defined
+        if (scene.backgroundMusic) playBgm(scene.backgroundMusic);
+        
+        // Show the overlay
+        vignetteOverlay.classList.remove('hidden');
+        vignetteOverlay.classList.remove('fade-out');
+        
+        // Hide the game container while showing vignette
+        if (gameContainer) gameContainer.classList.add('hidden');
+    };
+
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
         const scene = gameData.cenas[sceneId]; if (!scene) return;
         
-        // VIGNETTE HANDLING: If this is an opening vignette, immediately skip to next scene
-        if (scene.vignetteType === 'opening' && scene.vignetteNextSceneId && gameData.cenas[scene.vignetteNextSceneId]) {
-            loadScene(scene.vignetteNextSceneId, transition, transitionType, transitionSpeed, successPrefix);
+        // VIGNETTE HANDLING: All vignette types render as fullscreen splash with button
+        if (scene.vignetteType && scene.vignetteType !== 'none' && scene.vignetteNextSceneId) {
+            renderVignette(scene);
             return;
         }
+        
+        // Ensure game container is visible when loading a regular scene
+        if (gameContainer) gameContainer.classList.remove('hidden');
+        
         if (scene.backgroundMusic) playBgm(scene.backgroundMusic);
         if (scene.removesChanceOnEntry && gameData.enableChances) chances--; 
         if (scene.restoresChanceOnEntry && gameData.enableChances) chances = Math.min(chances + 1, gameData.gameMaxChances);
