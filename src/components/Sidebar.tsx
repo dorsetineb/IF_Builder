@@ -47,10 +47,12 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     } ${isCollapsed ? 'justify-center px-0 py-3' : ''}`;
 
   const handleToggleScenes = () => {
-    // FIX: Do not force switch to 'scenes' view when toggling. Just expand/collapse.
-    // If user wants to see scene list, they just expand it.
-    // If they click a specific scene, THAT switches the view (handled in SceneList).
-    setIsScenesExpanded(!isScenesExpanded);
+    if (currentView !== 'scenes' && currentView !== 'map') {
+      onSetView('scenes');
+      setIsScenesExpanded(true);
+    } else {
+      setIsScenesExpanded(!isScenesExpanded);
+    }
   };
 
   const handleSetView = (view: View) => {
@@ -68,17 +70,6 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
 
 
-
-        {/* Informações e Interface */}
-        <button
-          className={getButtonClass('interface')}
-          onClick={() => handleSetView('interface')}
-          title={isCollapsed ? "Informações e Interface" : undefined}
-        >
-          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`} />
-          <Code className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">Informações e Interface</span>}
-        </button>
 
         {/* Scene Editor - Accordion */}
         <div className="flex flex-col">
@@ -171,7 +162,16 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           </button>
         )}
 
-
+        {/* Informações e Interface */}
+        <button
+          className={getButtonClass('interface')}
+          onClick={() => handleSetView('interface')}
+          title={isCollapsed ? "Informações e Interface" : undefined}
+        >
+          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`} />
+          <Code className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && <span className="truncate relative z-10">Informações e Interface</span>}
+        </button>
 
       </nav>
 

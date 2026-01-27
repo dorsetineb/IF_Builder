@@ -1,104 +1,5 @@
-import { GameData, Scene, Vignette, Interaction } from '../types';
 
-export const migrateLegacyProject = (data: GameData): GameData => {
-    let cleanedScenes = { ...data.scenes };
-    let newStartSceneId = data.startScene;
-    const newSceneOrder = [...(data.sceneOrder || Object.keys(cleanedScenes))];
-    let vignettes = data.vignettes || [];
-
-    // MIGRATION: Auto-convert Legacy Vignettes to Scenes
-    if (vignettes.length > 0) {
-        console.log("Migrating legacy vignettes...", vignettes);
-        vignettes.forEach((v: any) => {
-            // Determine type
-            let type: 'opening' | 'transition' | 'conclusion' | 'none' = 'transition';
-            if (v.isConclusion) type = 'conclusion';
-            else if (v.id.toUpperCase().includes('OPENING') || v.id.toUpperCase().includes('INTRO')) type = 'opening';
-
-            // Check if scene already exists (idempotency)
-            if (cleanedScenes[v.id]) return;
-
-            // Create new Scene from Vignette
-            const newScene: Scene = {
-                id: v.id,
-                name: v.name || v.title || 'Vinheta',
-                description: v.description || '', // Map description to scene text
-                image: v.image,
-                backgroundMusic: v.backgroundMusic,
-                vignetteType: type,
-                vignetteButtonText: v.buttonText,
-                // Default properties for a scene
-                interactions: [],
-                objectIds: [],
-                mapX: 0, // Will be arranged later
-                mapY: 0
-            };
-
-            // Link Opening Vignette to the original Start Scene
-            if (type === 'opening') {
-                if (data.startScene) {
-                    newScene.vignetteNextSceneId = data.startScene;
-                }
-                newStartSceneId = v.id; // Set this as the new entry point
-            }
-
-            // Add to scenes
-            cleanedScenes[v.id] = newScene;
-            if (!newSceneOrder.includes(v.id)) {
-                // Prepend opening, append others
-                if (type === 'opening') newSceneOrder.unshift(v.id);
-                else newSceneOrder.push(v.id);
-            }
-        });
-
-        // Update Interactions to point to new scenes instead of vignettes
-        Object.values(cleanedScenes).forEach(scene => {
-            if (scene.interactions) {
-                scene.interactions = scene.interactions.map(interaction => {
-                    // Check if this interaction was pointing to a vignette
-                    // Legacy data might have 'goToVignette' property or specific logic
-                    if ((interaction as any).goToVignette) {
-                        const targetVignetteId = (interaction as any).goToVignette;
-                        // Check if this ID exists in our new scenes (was migrated)
-                        if (cleanedScenes[targetVignetteId]) {
-                            return {
-                                ...interaction,
-                                type: 'scene', // Change type to scene
-                                goToScene: targetVignetteId,
-                                goToVignette: undefined // Remove legacy prop
-                            } as Interaction;
-                        }
-                    }
-                    return interaction;
-                });
-            }
-        });
-
-        // Clear vignettes array after successful migration
-        vignettes = [];
-    }
-
-    // Ensure all scenes have required fields
-    Object.keys(cleanedScenes).forEach(id => {
-        cleanedScenes[id] = {
-            ...cleanedScenes[id],
-            objectIds: cleanedScenes[id].objectIds || [],
-            interactions: cleanedScenes[id].interactions || [],
-            // We don't reset mapX/Y here to preserve if they exist, but Editor handles auto-layout if missing
-            // Clean legacy props
-            isEndingScene: undefined,
-            conclusionVignetteId: undefined
-        };
-    });
-
-    return {
-        ...data,
-        scenes: cleanedScenes,
-        sceneOrder: newSceneOrder,
-        startScene: newStartSceneId,
-        vignettes: vignettes
-    };
-};
+import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
     const translatedCenas: { [id: string]: any } = {};
@@ -117,10 +18,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 removesChanceOnEntry: scene.removesChanceOnEntry,
                 restoresChanceOnEntry: scene.restoresChanceOnEntry,
                 objectIds: scene.objectIds || [],
-                choices: scene.choices || [],
-                vignetteType: scene.vignetteType,
-                vignetteNextSceneId: scene.vignetteNextSceneId,
-                vignetteButtonText: scene.vignetteButtonText
+                choices: scene.choices || []
             };
         }
     }
@@ -327,11 +225,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const init = () => {
-        if (gameData.gameInteractionType === 'choice') {
-            if (suggestionsButton) suggestionsButton.classList.add('hidden');
-            if (inventoryButton) inventoryButton.classList.add('hidden');
-        }
-
         if (gameData.gameBackgroundMusic) {
             playBgm(gameData.gameBackgroundMusic);
         }
@@ -504,73 +397,8 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const def of definitions) { if (trackers[def.id] >= def.maxValue && def.consequenceSceneId) { setTimeout(() => { loadScene(def.consequenceSceneId, true, 'fade'); }, 500); return; } }
     };
 
-    // VIGNETTE RENDERER: Creates a fullscreen splash overlay for opening/transition/conclusion vignettes
-    const renderVignette = (scene) => {
-        // Get or create vignette overlay
-        let vignetteOverlay = document.getElementById('vignette-overlay');
-        if (!vignetteOverlay) {
-            vignetteOverlay = document.createElement('div');
-            vignetteOverlay.id = 'vignette-overlay';
-            vignetteOverlay.className = 'splash-screen';
-            vignetteOverlay.innerHTML = '<div class="splash-content"><p class="splash-description"></p><button class="splash-start-button vignette-advance-btn"></button></div>';
-            document.body.appendChild(vignetteOverlay);
-        }
-        
-        // Configure overlay
-        if (scene.image) {
-            vignetteOverlay.style.backgroundImage = 'url(' + scene.image + ')';
-            vignetteOverlay.style.backgroundSize = 'cover';
-            vignetteOverlay.style.backgroundPosition = 'center';
-        } else {
-            vignetteOverlay.style.backgroundImage = 'none';
-        }
-        
-        const descEl = vignetteOverlay.querySelector('.splash-description');
-        const btnEl = vignetteOverlay.querySelector('.vignette-advance-btn');
-        
-        if (descEl) descEl.textContent = scene.description || '';
-        if (btnEl) {
-            btnEl.textContent = scene.vignetteButtonText || 'Continuar';
-            // Remove old listeners by cloning
-            const newBtn = btnEl.cloneNode(true);
-            btnEl.parentNode.replaceChild(newBtn, btnEl);
-            newBtn.addEventListener('click', () => {
-                vignetteOverlay.classList.add('fade-out');
-                setTimeout(() => {
-                    vignetteOverlay.classList.add('hidden');
-                    vignetteOverlay.classList.remove('fade-out');
-                    // Transition to next scene
-                    if (scene.vignetteNextSceneId) {
-                        currentSceneId = scene.vignetteNextSceneId;
-                        loadScene(scene.vignetteNextSceneId, true);
-                    }
-                }, 1000);
-            });
-        }
-        
-        // Play BGM if defined
-        if (scene.backgroundMusic) playBgm(scene.backgroundMusic);
-        
-        // Show the overlay
-        vignetteOverlay.classList.remove('hidden');
-        vignetteOverlay.classList.remove('fade-out');
-        
-        // Hide the game container while showing vignette
-        if (gameContainer) gameContainer.classList.add('hidden');
-    };
-
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
         const scene = gameData.cenas[sceneId]; if (!scene) return;
-        
-        // VIGNETTE HANDLING: All vignette types render as fullscreen splash with button
-        if (scene.vignetteType && scene.vignetteType !== 'none' && scene.vignetteNextSceneId) {
-            renderVignette(scene);
-            return;
-        }
-        
-        // Ensure game container is visible when loading a regular scene
-        if (gameContainer) gameContainer.classList.remove('hidden');
-        
         if (scene.backgroundMusic) playBgm(scene.backgroundMusic);
         if (scene.removesChanceOnEntry && gameData.enableChances) chances--; 
         if (scene.restoresChanceOnEntry && gameData.enableChances) chances = Math.min(chances + 1, gameData.gameMaxChances);
@@ -703,47 +531,35 @@ document.addEventListener('DOMContentLoaded', () => {
         // CHOICE MODE HANDLING
         if (gameData.gameInteractionType === 'choice') {
             document.querySelector('.input-area').classList.add('hidden');
-            
-            // Remove previous choices container if exists
-            const existingChoices = standardActionBar.querySelector('.choices-container');
-            if (existingChoices) existingChoices.remove();
-
             const choicesContainer = document.createElement('div');
             choicesContainer.className = 'choices-container';
-            choicesContainer.style.marginTop = '10px';
+            choicesContainer.style.marginTop = '20px';
             choicesContainer.style.display = 'flex';
             choicesContainer.style.flexDirection = 'column';
-            choicesContainer.style.gap = '8px';
-            choicesContainer.style.width = '100%';
+            choicesContainer.style.gap = '10px';
             
             if (scene.choices && scene.choices.length > 0) {
                 scene.choices.forEach(choice => {
                     const btn = document.createElement('button');
                     btn.textContent = choice.label;
                     btn.className = 'choice-button';
-                    
-                    // Match System Button Styles
-                    btn.style.fontFamily = 'var(--font-family)';
-                    btn.style.padding = '12px 16px'; // Slightly larger for tap targets but matching style
+                    // Inline styles for basic look, can be moved to CSS later or use existing classes
+                    btn.style.padding = '12px 16px';
                     btn.style.textAlign = 'left';
-                    btn.style.backgroundColor = 'var(--panel-bg)'; // Match standard button bg
-                    btn.style.border = '2px solid var(--border-color)'; // Match standard button border
-                    btn.style.color = 'var(--text-color)'; // Match standard button text
+                    btn.style.backgroundColor = 'var(--button-bg, #21262d)';
+                    btn.style.border = '1px solid var(--border-color, rgba(255,255,255,0.2))';
+                    btn.style.borderRadius = '8px';
+                    btn.style.color = 'var(--text-color, #e0e0e0)';
                     btn.style.cursor = 'pointer';
-                    btn.style.transition = 'background-color 0.2s, border-color 0.2s';
-                    btn.style.fontSize = '1em';
-                    btn.style.fontWeight = 'normal';
-                    btn.style.width = '100%';
-                    btn.style.marginBottom = '0'; // Controlled by gap
-
-                    // Hover Effects
+                    btn.style.transition = 'all 0.2s';
+                    
                     btn.onmouseover = () => { 
-                         btn.style.backgroundColor = 'var(--border-color)'; 
-                         btn.style.borderColor = 'var(--text-dim-color)';
+                         btn.style.borderColor = 'var(--highlight-color, #a855f7)'; 
+                         btn.style.transform = 'translateX(4px)'; 
                     };
                     btn.onmouseout = () => { 
-                         btn.style.backgroundColor = 'var(--panel-bg)'; 
-                         btn.style.borderColor = 'var(--border-color)'; 
+                         btn.style.borderColor = 'var(--border-color, rgba(255,255,255,0.2))'; 
+                         btn.style.transform = 'none'; 
                     };
 
                     btn.onclick = () => {
@@ -753,23 +569,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     choicesContainer.appendChild(btn);
                 });
             }
-            // Append to Action Bar (Footer) instead of Description
-            standardActionBar.insertBefore(choicesContainer, standardActionBar.firstChild);
-            // Move action buttons (System/Diary) to bottom if needed, or keep at top?
-            // User request: "Estar ABAIXO dos botões Sugestões, Inventário, Diário e Sistema"
-            // standardActionBar structure:
-            // 1. .action-popup (hidden)
-            // 2. .action-buttons (System, Diary, etc)
-            // 3. .input-area (Hidden in Choice mode)
-            
-            // So if we just append to standardActionBar, it will be at the end, which is AFTER action-buttons.
-            // Let's do appendChild.
-            standardActionBar.appendChild(choicesContainer);
-            
+            sceneDescription.appendChild(choicesContainer);
         } else {
             document.querySelector('.input-area').classList.remove('hidden');
-            const existingChoices = standardActionBar.querySelector('.choices-container');
-            if (existingChoices) existingChoices.remove();
         }
 
         actionPopup.classList.add('hidden'); verbInput.value = ''; activePopupType = null;

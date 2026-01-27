@@ -21,7 +21,7 @@ import GlobalCommandsEditor from './GlobalCommandsEditor';
 import { ConfirmationModal } from './ConfirmationModal';
 import { TransitionScreen } from './TransitionScreen';
 import UserManualModal from './UserManualModal';
-import { gameJS, prepareGameDataForEngine, migrateLegacyProject } from './game-engine';
+import { gameJS, prepareGameDataForEngine } from './game-engine';
 import { gameHTML, gameCSS, initialGameData } from '../lib/gameDefaults';
 import { Info, Settings as SettingsIcon, CircleHelp } from 'lucide-react';
 import Settings from '../pages/Settings';
@@ -172,7 +172,7 @@ const Editor: React.FC = () => {
     }, [gameData.scenes, (gameData as any).trackers]);
 
     const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
-    const [previewScene, setPreviewScene] = useState<Scene | null>(null);
+    const [previewSceneId, setPreviewSceneId] = useState<string | null>(null);
     const [currentView, setCurrentView] = useState<View>('scenes');
     const [isPreviewing, setIsPreviewing] = useState(false);
     const [isDirty, setIsDirty] = useState(false);
@@ -487,27 +487,128 @@ DATE:        ${exportDate.toLocaleString()}
     const consequenceTrackers = useMemo(() => gameData.consequenceTrackers || [], [gameData.consequenceTrackers]);
 
     const handleImportGame = useCallback((data: GameData) => {
-        const migratedData = migrateLegacyProject(data);
+        let cleanedScenes = { ...data.scenes };
+        let newStartSceneId = data.startScene;
+        const newSceneOrder = [...(data.sceneOrder || Object.keys(cleanedScenes))];
+
+        // MIGRATION: Auto-convert Legacy Vignettes to Scenes
+        if (data.vignettes && data.vignettes.length > 0) {
+            console.log("Migrating legacy vignettes...", data.vignettes);
+            data.vignettes.forEach((v: any) => {
+                // Determine type
+                let type: 'opening' | 'transition' | 'conclusion' | 'none' = 'transition';
+                if (v.isConclusion) type = 'conclusion';
+                else if (v.id.toUpperCase().includes('OPENING') || v.id.toUpperCase().includes('INTRO')) type = 'opening';
+
+                // Create new Scene from Vignette
+                const newScene: Scene = {
+                    id: v.id,
+                    name: v.name || v.title || 'Vinheta',
+                    description: v.description || '', // Map description to scene text
+                    image: v.image,
+                    backgroundMusic: v.backgroundMusic,
+                    vignetteType: type,
+                    vignetteButtonText: v.buttonText,
+                    // Default properties for a scene
+                    interactions: [],
+                    objectIds: [],
+                    mapX: 0, // Will be arranged later
+                    mapY: 0
+                };
+
+                // Link Opening Vignette to the original Start Scene
+                if (type === 'opening' && data.startScene) {
+                    newScene.vignetteNextSceneId = data.startScene;
+                    newStartSceneId = v.id; // Set this as the new entry point
+                }
+
+                // Add to scenes
+                cleanedScenes[v.id] = newScene;
+                if (!newSceneOrder.includes(v.id)) {
+                    // Prepend opening, append others
+                    if (type === 'opening') newSceneOrder.unshift(v.id);
+                    else newSceneOrder.push(v.id);
+                }
+            });
+
+            // Update Interactions to point to new scenes instead of vignettes
+            Object.values(cleanedScenes).forEach(scene => {
+                if (scene.interactions) {
+                    scene.interactions = scene.interactions.map(interaction => {
+                        // Check if this interaction was pointing to a vignette
+                        // Legacy data might have 'goToVignette' property or specific logic
+                        if ((interaction as any).goToVignette) {
+                            const targetVignetteId = (interaction as any).goToVignette;
+                            // Check if this ID exists in our new scenes (was migrated)
+                            if (cleanedScenes[targetVignetteId]) {
+                                return {
+                                    ...interaction,
+                                    type: 'scene', // Change type to scene
+                                    goToScene: targetVignetteId,
+                                    goToVignette: undefined // Remove legacy prop
+                                };
+                            }
+                        }
+                        return interaction;
+                    });
+                }
+
+                // Also check 'conclusionVignetteId' legacy prop on scene
+                if ((scene as any).conclusionVignetteId && (scene as any).isEndingScene) {
+                    const targetVId = (scene as any).conclusionVignetteId;
+                    if (cleanedScenes[targetVId]) {
+                        // We can't easily transform "Ending Scene" to "Go To Scene" without an interaction.
+                        // But if it's an ending scene, it usually just showed the vignette.
+                        // We might need to keep it as an ending scene but maybe change how it works?
+                        // For now, let's assume the user will fix minor logic or we map it if we can.
+                        // Actually, the new system uses 'vignetteType' on the scene itself.
+                        // So a scene that WAS an ending scene pointing to a vignette...
+                        // effectively just transitions to that vignette scene now.
+
+                        // Let's create an auto-interaction for it?
+                        // Or just let it be. The user said "Import legacy... it has opening and two conclusions".
+                    }
+                }
+            });
+        }
+
+        Object.keys(cleanedScenes).forEach(id => {
+            cleanedScenes[id] = {
+                ...cleanedScenes[id],
+                objectIds: cleanedScenes[id].objectIds || [],
+                interactions: cleanedScenes[id].interactions || [],
+                // Reset layout coordinates to force auto-arrangement
+                mapX: undefined,
+                mapY: undefined,
+                // Clean legacy props
+                isEndingScene: undefined, // remove legacy ending flag
+                conclusionVignetteId: undefined
+            };
+        });
 
         setGameData(prev => ({
             ...prev,
-            ...migratedData,
-            // Ensure immersive behavior and defaults
+            ...data,
+            scenes: cleanedScenes,
+            sceneOrder: newSceneOrder,
+            startScene: newStartSceneId,
             gameHTML: gameHTML,
             gameCSS: gameCSS,
+            // Ensure immersive behavior for imported games
             gameMobileLayoutBehavior: 'immersive',
-            fixedVerbs: migratedData.fixedVerbs || [],
-            enableFixedVerbs: !!migratedData.enableFixedVerbs || (Array.isArray(migratedData.fixedVerbs) && migratedData.fixedVerbs.length > 0),
-            consequenceTrackers: migratedData.consequenceTrackers || [],
-            gameTextAnimationType: migratedData.gameTextAnimationType || 'fade',
-            gameTextSpeed: migratedData.gameTextSpeed || 5,
-            gameImageTransitionType: migratedData.gameImageTransitionType || 'fade',
-            gameImageSpeed: migratedData.gameImageSpeed || 5,
-            gameShowTrackersUI: migratedData.gameShowTrackersUI ?? true,
-            gameShowSystemButton: migratedData.gameShowSystemButton ?? true,
-            gameViewEndingButtonText: migratedData.gameViewEndingButtonText || 'Ver Final',
-            positiveEndingMusic: migratedData.positiveEndingMusic || '',
-            negativeEndingMusic: migratedData.negativeEndingMusic || '',
+            fixedVerbs: data.fixedVerbs || [],
+            enableFixedVerbs: !!data.enableFixedVerbs || (Array.isArray(data.fixedVerbs) && data.fixedVerbs.length > 0),
+            consequenceTrackers: data.consequenceTrackers || [],
+            gameTextAnimationType: data.gameTextAnimationType || 'fade',
+            gameTextSpeed: data.gameTextSpeed || 5,
+            gameImageTransitionType: data.gameImageTransitionType || 'fade',
+            gameImageSpeed: data.gameImageSpeed || 5,
+            gameShowTrackersUI: data.gameShowTrackersUI ?? true,
+            gameShowSystemButton: data.gameShowSystemButton ?? true,
+            gameViewEndingButtonText: data.gameViewEndingButtonText || 'Ver Final',
+            positiveEndingMusic: data.positiveEndingMusic || '',
+            negativeEndingMusic: data.negativeEndingMusic || '',
+            vignettes: [] // Always clear legacy vignettes array
         }));
 
         setIsDirty(false);
@@ -732,14 +833,18 @@ DATE:        ${exportDate.toLocaleString()}
         const hasScenes = Object.keys(gameData.scenes).length > 0;
 
         const createProject = () => {
-            const baseData = {
+            setGameData({
                 ...initialGameData,
                 ...overrideData,
-            };
-            const finalData = migrateLegacyProject(baseData);
-            setGameData(finalData);
+                // Ensure unique ID for start scene if not provided (though initialData serves base)
+                // But we usually want fresh state.
+            });
             setIsDirty(false);
             setImportKey(prev => prev + 1);
+            // If vignettes are created, switch to vignettes view? Or just interface?
+            // User said: "generate at least one opening vignette".
+            // So if vignettes exist, maybe show them? Or show Interface (UIEditor) as requested "decisions... reflected there".
+            // Interface view allows configuring Appearance.
             setCurrentView('interface');
         };
 
@@ -930,7 +1035,7 @@ DATE:        ${exportDate.toLocaleString()}
                             setSelectedSceneId(null);
                         }}
                     />
-                    <Preview gameData={gameData} testSceneId={previewScene?.id} sceneOverride={previewScene} />
+                    <Preview gameData={gameData} testSceneId={previewSceneId} />
                 </div>
             ) : (
                 <div className="flex flex-col h-full w-full">
@@ -939,7 +1044,7 @@ DATE:        ${exportDate.toLocaleString()}
                         gameData={gameData}
                         isPreviewing={isPreviewing}
                         onTogglePreview={() => {
-                            setPreviewScene(null);
+                            setPreviewSceneId(null);
                             setIsPreviewing(true);
                         }}
                         onNewGame={handleNewGame}
@@ -973,7 +1078,7 @@ DATE:        ${exportDate.toLocaleString()}
                             onNavigate={handleNavigate}
                             onImportGame={handleImportGame}
                             onTogglePreview={() => {
-                                setPreviewScene(null);
+                                setPreviewSceneId(null);
                                 setIsPreviewing(true);
                             }}
                             isCollapsed={sidebarCollapsed}
@@ -1081,7 +1186,7 @@ DATE:        ${exportDate.toLocaleString()}
                                     enableChances={(gameData.enableChances ?? detectedActiveSystems.chances) || gameData.gameSystemEnabled === 'chances'}
                                     gameSystemEnabled={gameData.gameSystemEnabled}
                                     onPreviewScene={(scene) => {
-                                        setPreviewScene(scene);
+                                        setPreviewSceneId(scene.id);
                                         setIsPreviewing(true);
                                     }}
                                     onSelectScene={handleSelectScene}
