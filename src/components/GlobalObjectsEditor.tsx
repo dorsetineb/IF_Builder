@@ -1,6 +1,26 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { GameData, GameObject, Scene } from '../types';
-import { Plus, Trash2, Upload, Search, Box, Unlink } from 'lucide-react';
+import { Plus, Trash2, Upload, Search, Box, Unlink, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
+
+const TRACKER_ICONS = [
+    { name: 'activity', component: Activity },
+    { name: 'heart', component: Heart },
+    { name: 'zap', component: Zap },
+    { name: 'shield', component: Shield },
+    { name: 'coins', component: Coins },
+    { name: 'clock', component: Clock },
+    { name: 'skull', component: Skull },
+    { name: 'star', component: Star },
+    { name: 'user', component: User },
+    { name: 'trophy', component: Trophy },
+    { name: 'alert', component: AlertTriangle },
+    { name: 'book', component: Book },
+    { name: 'crown', component: Crown },
+    { name: 'flame', component: Flame },
+    { name: 'droplet', component: Droplet },
+    { name: 'sun', component: Sun },
+    { name: 'moon', component: Moon },
+];
 
 interface GlobalObjectsEditorProps {
     scenes: GameData['scenes'];
@@ -38,6 +58,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     const [localObjects, setLocalObjects] = useState<GameObject[]>(sortedObjects);
     const [selectedObjectId, setSelectedObjectId] = useState<string | null>(sortedObjects.length > 0 ? sortedObjects[0].id : null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
 
     useEffect(() => {
         setLocalObjects(sortedObjects);
@@ -49,16 +70,11 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         }
     }, [sortedObjects]);
 
-    // Comparison for dirty state (simplified for this editor context as we are editing localObjects directly? 
-    // Actually the pattern here seems to be: 
-    // 1. localObjects tracks local state
-    // 2. handleSave pushes to parent
-    // However, in the previous code, GlobalObjectItem updated parent directly via onUpdate prop passed to it?
-    // Wait, the previous code had `localObjects` state and `handleObjectChange` updating it, then `handleSave` pushing up.
-    // I should maintain that "Save to Apply" pattern to be consistent with the app's apparent logic? 
-    // OR create a more direct experience. The ObjectEditor usually updates directly. 
-    // Let's stick to the previous pattern: Local edits -> Save button.
+    useEffect(() => {
+        setIsIconPickerOpen(false);
+    }, [selectedObjectId]);
 
+    // Comparison for dirty state
     useEffect(() => {
         const isDifferent = JSON.stringify(localObjects) !== JSON.stringify(sortedObjects);
         onSetDirty(isDifferent);
@@ -81,6 +97,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     name: localObj.name,
                     examineDescription: localObj.examineDescription,
                     image: localObj.image,
+                    icon: localObj.icon,
                 });
             }
         });
@@ -92,7 +109,6 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
 
     const handleCreate = () => {
         const allIds = Object.keys(globalObjects);
-        // Also check local Ids to prevent collision if unsaved objects exist
         const allLocalIds = localObjects.map(o => o.id);
         const combinedIds = Array.from(new Set([...allIds, ...allLocalIds]));
 
@@ -103,11 +119,6 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
             examineDescription: 'Descrição do novo objeto.',
         };
 
-        // For this specific editor, creation might need to happen immediately in parent 
-        // to simplify ID tracking, OR we add to localObjects. 
-        // The prop `onCreateObject` implies immediate creation in parent. 
-        // If we call onCreateObject, it updates parent state, which updates `sortedObjects`, which triggers useEffect `setLocalObjects`.
-        // So let's call prop directly.
         onCreateObject(newObject);
         setSelectedObjectId(newId);
     };
@@ -156,7 +167,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     }, [scenes, selectedObject]);
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* Header with Save/Undo actions */}
             <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
                 <p className="text-zinc-500 text-xs font-medium max-w-lg">
@@ -210,26 +221,28 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     {/* Object List */}
                     <div className="flex-1 overflow-y-auto p-2 space-y-1">
                         {filteredObjects.length > 0 ? (
-                            filteredObjects.map(obj => (
-                                <button
-                                    key={obj.id}
-                                    onClick={() => setSelectedObjectId(obj.id)}
-                                    className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedObjectId === obj.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
-                                >
-                                    <div className="w-10 h-10 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0">
-                                        {obj.image ? (
-                                            <img src={obj.image} alt="" className="w-full h-full object-cover" />
-                                        ) : (
-                                            <Box className="w-4 h-4 text-zinc-600" />
-                                        )}
-                                    </div>
-                                    <div className="min-w-0 flex-1">
-                                        <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-purple-300' : 'text-zinc-300'}`}>{obj.name}</div>
-                                        <div className="text-[10px] text-zinc-500 font-mono truncate">#{obj.id}</div>
-                                    </div>
-                                    {/* Small indicator if it's dirty/unsaved could go here */}
-                                </button>
-                            ))
+                            filteredObjects.map(obj => {
+                                const IconComponent = TRACKER_ICONS.find(i => i.name === obj.icon)?.component || Box;
+                                return (
+                                    <button
+                                        key={obj.id}
+                                        onClick={() => setSelectedObjectId(obj.id)}
+                                        className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedObjectId === obj.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
+                                    >
+                                        <div className="w-10 h-10 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0">
+                                            {obj.image ? (
+                                                <img src={obj.image} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <IconComponent className="w-4 h-4 text-zinc-600" />
+                                            )}
+                                        </div>
+                                        <div className="min-w-0 flex-1">
+                                            <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-purple-300' : 'text-zinc-300'}`}>{obj.name}</div>
+                                            <div className="text-[10px] text-zinc-500 font-mono truncate">#{obj.id}</div>
+                                        </div>
+                                    </button>
+                                );
+                            })
                         ) : (
                             <div className="text-center py-12 text-muted-foreground">
                                 <Box className="w-8 h-8 mx-auto mb-2 opacity-20" />
@@ -280,12 +293,43 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                         {/* Name field */}
                                         <div className="col-span-2 space-y-1.5">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nome do Objeto</label>
-                                            <input
-                                                type="text"
-                                                value={selectedObject.name}
-                                                onChange={(e) => handleObjectChange(selectedObject.id, 'name', e.target.value)}
-                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
-                                            />
+                                            <div className="flex gap-2">
+                                                {/* Icon Picker */}
+                                                <div className="relative group shrink-0">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setIsIconPickerOpen(!isIconPickerOpen);
+                                                        }}
+                                                        className="w-10 h-10 flex items-center justify-center bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-400 hover:text-white hover:border-purple-500/50 transition-all"
+                                                    >
+                                                        {(() => {
+                                                            const Icon = TRACKER_ICONS.find(i => i.name === selectedObject.icon)?.component || Box;
+                                                            return <Icon className="w-5 h-5" />;
+                                                        })()}
+                                                    </button>
+                                                    {isIconPickerOpen && (
+                                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                                            {TRACKER_ICONS.map(icon => (
+                                                                <button
+                                                                    key={icon.name}
+                                                                    onClick={() => { handleObjectChange(selectedObject.id, 'icon', icon.name); setIsIconPickerOpen(false); }}
+                                                                    className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedObject.icon === icon.name ? 'bg-purple-500/20 text-purple-400' : 'text-zinc-500'}`}
+                                                                    title={icon.name}
+                                                                >
+                                                                    <icon.component className="w-4 h-4" />
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    value={selectedObject.name}
+                                                    onChange={(e) => handleObjectChange(selectedObject.id, 'name', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
+                                                />
+                                            </div>
                                         </div>
 
                                         {/* ID field */}

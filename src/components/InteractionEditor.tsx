@@ -275,45 +275,43 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 </div>
 
                                 {/* Checkboxes */}
-                                <div className="flex-1 flex flex-col justify-center gap-3 pt-6">
+                                <div className="flex-1 flex flex-row items-center gap-4 pt-6 flex-wrap">
                                     <label className="flex items-center gap-2 cursor-pointer group">
                                         <div className="relative flex items-center">
                                             <input
                                                 type="checkbox"
                                                 checked={!!selectedInteraction.removesTargetFromScene}
                                                 onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)}
-                                                className="peer w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-green-500 focus:ring-green-500/20 focus:ring-offset-0 transition-all"
+                                                className="peer w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 transition-all"
                                             />
                                         </div>
                                         <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">Remove Alvo da Cena</span>
                                     </label>
 
-                                    <div className="flex items-center gap-6">
-                                        <label className="flex items-center gap-2 cursor-pointer group">
-                                            <div className="relative flex items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={!!selectedInteraction.addsToInventory}
-                                                    onChange={e => handleInteractionChange('addsToInventory', e.target.checked)}
-                                                    className="peer w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 transition-all"
-                                                />
-                                            </div>
-                                            <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">Adiciona ao Inventário</span>
-                                        </label>
+                                    <label className="flex items-center gap-2 cursor-pointer group">
+                                        <div className="relative flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={!!selectedInteraction.addsToInventory}
+                                                onChange={e => handleInteractionChange('addsToInventory', e.target.checked)}
+                                                className="peer w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 transition-all"
+                                            />
+                                        </div>
+                                        <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">Adiciona ao Inventário</span>
+                                    </label>
 
-                                        <label className={`flex items-center gap-2 cursor-pointer group ${!selectedInteraction.requiresInInventory && 'opacity-30 pointer-events-none'}`}>
-                                            <div className="relative flex items-center">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={!!selectedInteraction.consumesItem}
-                                                    onChange={e => handleInteractionChange('consumesItem', e.target.checked)}
-                                                    disabled={!selectedInteraction.requiresInInventory}
-                                                    className="peer w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-red-500 focus:ring-red-500/20 focus:ring-offset-0 transition-all"
-                                                />
-                                            </div>
-                                            <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">Consome Item Usado</span>
-                                        </label>
-                                    </div>
+                                    <label className={`flex items-center gap-2 cursor-pointer group ${!selectedInteraction.requiresInInventory && 'opacity-30 pointer-events-none'}`}>
+                                        <div className="relative flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={!!selectedInteraction.consumesItem}
+                                                onChange={e => handleInteractionChange('consumesItem', e.target.checked)}
+                                                disabled={!selectedInteraction.requiresInInventory}
+                                                className="peer w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 transition-all"
+                                            />
+                                        </div>
+                                        <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">Consome Item Usado</span>
+                                    </label>
                                 </div>
                             </div>
                         </div>
