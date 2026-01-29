@@ -343,9 +343,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 <Terminal className="w-8 h-8" />
                                             </div>
                                             <div>
-                                                <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'parser' ? 'text-white' : 'text-zinc-300'}`}>Parser (Texto)</h3>
+                                                <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'parser' ? 'text-white' : 'text-zinc-300'}`}>Parser (Descreva comandos)</h3>
                                                 <p className="text-xs text-zinc-400 leading-relaxed">
-                                                    Jogabilidade clássica baseada em comandos de texto (ex: "pegar chave", "ir norte"). Maior liberdade de interação e quebra-cabeças complexos.
+                                                    O jogador digita ações como "pegar chave" ou "olhar mesa".
                                                 </p>
                                             </div>
                                         </button>
@@ -358,9 +358,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 <MousePointerClick className="w-8 h-8" />
                                             </div>
                                             <div>
-                                                <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'choice' ? 'text-white' : 'text-zinc-300'}`}>Interactive Fiction (IF)</h3>
+                                                <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'choice' ? 'text-white' : 'text-zinc-300'}`}>IF (Escolha uma opção)</h3>
                                                 <p className="text-xs text-zinc-400 leading-relaxed">
-                                                    Jogabilidade baseada em escolhas e cliques. Ideal para narrativas ramificadas, visual novels e aventuras "Choose Your Own Adventure".
+                                                    O jogador escolhe entre opções pré-definidas para avançar na história.
                                                 </p>
                                             </div>
                                         </button>
