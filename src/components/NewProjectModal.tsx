@@ -247,7 +247,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         // Create the Opening Vignette as a Scene
         const openingScene: Scene = {
             id: startSceneId,
-            name: 'Abertura',
+            name: title || 'Abertura',
             description: description || '',
             image: splashImage, // Use the splash image for the scene background if desired, or keep generic/empty
             interactions: [],
@@ -384,7 +384,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 disabled={interactionType === 'choice'}
                                                 className={`w-12 h-6 rounded-full relative transition-all ${enableInventory ? 'bg-primary' : 'bg-zinc-700'} ${interactionType === 'choice' ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm ${enableInventory ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableInventory ? 'translateX(24px)' : 'translateX(0)' }} />
                                             </button>
                                         </div>
 
@@ -402,7 +402,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 onClick={() => setEnableDiary(!enableDiary)}
                                                 className={`w-12 h-6 rounded-full relative transition-all ${enableDiary ? 'bg-primary' : 'bg-zinc-700'}`}
                                             >
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm ${enableDiary ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableDiary ? 'translateX(24px)' : 'translateX(0)' }} />
                                             </button>
                                         </div>
 
@@ -420,7 +420,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 onClick={() => setEnableChances(!enableChances)}
                                                 className={`w-12 h-6 rounded-full relative transition-all ${enableChances ? 'bg-primary' : 'bg-zinc-700'}`}
                                             >
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm ${enableChances ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableChances ? 'translateX(24px)' : 'translateX(0)' }} />
                                             </button>
                                         </div>
 
@@ -438,7 +438,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 onClick={() => setEnableTrackers(!enableTrackers)}
                                                 className={`w-12 h-6 rounded-full relative transition-all ${enableTrackers ? 'bg-primary' : 'bg-zinc-700'}`}
                                             >
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm ${enableTrackers ? 'translate-x-6' : 'translate-x-0'}`} />
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableTrackers ? 'translateX(24px)' : 'translateX(0)' }} />
                                             </button>
                                         </div>
                                     </div>

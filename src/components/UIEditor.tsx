@@ -1133,7 +1133,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 className="sr-only peer"
                                                             />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableInventory ? 'translateX(16px)' : 'translateX(0)' }}></div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -1156,7 +1156,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableTextControl} onChange={(e) => setLocalEnableTextControl(e.target.checked)} className="sr-only peer" />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableTextControl ? 'translateX(16px)' : 'translateX(0)' }}></div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -1223,7 +1223,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableChances} onChange={(e) => setLocalEnableChances(e.target.checked)} className="sr-only peer" />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableChances ? 'translateX(16px)' : 'translateX(0)' }}></div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -1302,7 +1302,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableDiary} onChange={(e) => setLocalEnableDiary(e.target.checked)} className="sr-only peer" />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableDiary ? 'translateX(16px)' : 'translateX(0)' }}></div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -1339,7 +1339,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableImages} onChange={(e) => setLocalEnableImages(e.target.checked)} className="sr-only peer" />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableImages ? 'translateX(16px)' : 'translateX(0)' }}></div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -1394,7 +1394,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableTrackers} onChange={(e) => setLocalEnableTrackers(e.target.checked)} className="sr-only peer" />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:translate-x-4 peer-checked:bg-white"></div>
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableTrackers ? 'translateX(16px)' : 'translateX(0)' }}></div>
                                                             </div>
                                                         </label>
                                                     </div>
