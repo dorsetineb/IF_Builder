@@ -612,17 +612,21 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // CHOICE MODE HANDLING
         if (gameData.gameInteractionType === 'choice') {
-            document.querySelector('.input-area').classList.add('hidden');
+            const inputArea = document.querySelector('.input-area');
+            if (inputArea) inputArea.classList.add('hidden');
             // Hide Suggestions and Inventory in IF/Choice mode
             if (suggestionsButton) suggestionsButton.classList.add('hidden');
             if (inventoryButton) inventoryButton.classList.add('hidden');
             
+            // Create choices container and append to action-bar (same location as input-area)
             const choicesContainer = document.createElement('div');
             choicesContainer.className = 'choices-container';
-            choicesContainer.style.marginTop = '20px';
+            choicesContainer.id = 'choices-container'; // For easy removal on scene change
+            choicesContainer.style.width = '100%';
             choicesContainer.style.display = 'flex';
             choicesContainer.style.flexDirection = 'column';
             choicesContainer.style.gap = '10px';
+            choicesContainer.style.marginTop = '10px';
             
             if (scene.choices && scene.choices.length > 0) {
                 scene.choices.forEach(choice => {
@@ -662,9 +666,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     choicesContainer.appendChild(btn);
                 });
             }
-            sceneDescription.appendChild(choicesContainer);
+            // Insert choices container into standard-action-bar after action-buttons div
+            const actionBar = document.getElementById('standard-action-bar');
+            if (actionBar) {
+                // Remove old choices if present
+                const oldChoices = actionBar.querySelector('#choices-container');
+                if (oldChoices) oldChoices.remove();
+                // Append new choices
+                actionBar.appendChild(choicesContainer);
+            }
         } else {
-            document.querySelector('.input-area').classList.remove('hidden');
+            const inputArea = document.querySelector('.input-area');
+            if (inputArea) inputArea.classList.remove('hidden');
+            // Remove any leftover choices container
+            const oldChoices = document.getElementById('choices-container');
+            if (oldChoices) oldChoices.remove();
         }
 
         actionPopup.classList.add('hidden'); verbInput.value = ''; activePopupType = null;

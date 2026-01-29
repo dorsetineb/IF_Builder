@@ -612,7 +612,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
           {nodes.map(node => {
             const linkingItems = getLinkingItems(node);
 
-            // --- VIGNETTE NODE STYLE ---
+            // --- VIGNETTE NODE STYLE (Legacy Vignettes in vignettes array) ---
             if (node.type === 'vignette') {
               const vig = node.data as Vignette;
               const isOpening = vig.id === 'VNT_OPENING';
@@ -680,12 +680,19 @@ const SceneMap: React.FC<SceneMapProps> = ({
             // --- STANDARD SCENE NODE STYLE ---
             const scene = node.data as Scene;
 
-            // User Rules: Scene = Yellow(Amber), Ending = Green.
+            // Color Rules: Opening = Blue, Conclusion = Green, Ending = Green, Normal = Amber
+            const isVignetteOpening = scene.vignetteType === 'opening';
+            const isVignetteConclusion = scene.vignetteType === 'conclusion';
             const isEnding = scene.isEndingScene;
             const isOrphan = highlightOrphans && orphanIds.has(node.id);
-            const colorBase = isOrphan ? 'red' : isEnding ? 'green' : 'amber';
 
-            const borderColorClass = isOrphan ? 'border-red-500 animate-pulse' : `border-${colorBase}-500`;
+            // Determine color base
+            let colorBase = 'amber';
+            if (isOrphan) colorBase = 'red';
+            else if (isVignetteOpening) colorBase = 'blue';
+            else if (isVignetteConclusion || isEnding) colorBase = 'green';
+
+            const borderColorClass = isOrphan ? 'border-red-500 animate-pulse' : isVignetteOpening ? 'border-blue-500 border-4' : isVignetteConclusion ? 'border-green-500 border-4' : isEnding ? 'border-green-500' : `border-${colorBase}-500`;
 
             return (
               <div
