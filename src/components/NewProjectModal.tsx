@@ -862,10 +862,12 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
                                             {/* System Buttons Row */}
                                             <div className="flex gap-2 pb-1">
-                                                {/* Suggestions Button */}
-                                                <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
-                                                    Sugestões
-                                                </button>
+                                                {/* Suggestions Button - Only show in Parser mode */}
+                                                {interactionType === 'parser' && (
+                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
+                                                        Sugestões
+                                                    </button>
+                                                )}
 
                                                 {enableInventory && (
                                                     <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>

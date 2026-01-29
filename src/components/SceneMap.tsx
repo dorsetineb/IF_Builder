@@ -72,15 +72,69 @@ const SceneMap: React.FC<SceneMapProps> = ({
   const getLinkingItems = useCallback((node: MapNodeData) => {
     if (node.type === 'scene') {
       const scene = node.data as Scene;
+      const items: { id: string, targetId: string, label: string, type: MapNodeType, original?: any }[] = [];
+
+      // 1. Unified Vignette Links (Opening, etc) - Applies to BOTH modes
+      if (scene.vignetteNextSceneId) {
+        if (scene.vignetteNextSceneId === 'END_GAME') {
+          const victoryVig = vignettes.find(v => v.id === 'VNT_VICTORY');
+          if (victoryVig) {
+            items.push({
+              id: `link-endgame-${scene.id}`,
+              targetId: 'VNT_VICTORY',
+              label: scene.vignetteButtonText || 'Fim',
+              type: 'vignette'
+            });
+          }
+        } else {
+          items.push({
+            id: `link-vignette-${scene.id}`,
+            targetId: scene.vignetteNextSceneId,
+            label: scene.vignetteButtonText || 'Continuar',
+            type: 'scene'
+          });
+        }
+      }
+
+      // 2. System Links (Defeat, link to victory from ending scene)
+      if (scene.isEndingScene) {
+        const victoryVig = vignettes.find(v => v.id === 'VNT_VICTORY');
+        if (victoryVig) {
+          items.push({
+            id: `link-ending-${scene.id}`,
+            targetId: 'VNT_VICTORY',
+            label: 'Vitória',
+            type: 'vignette'
+          });
+        }
+      }
+
+      if (scene.removesChanceOnEntry) {
+        const defeatVig = vignettes.find(v => v.id === 'VNT_DEFEAT');
+        if (defeatVig) {
+          items.push({
+            id: `link-defeat-${scene.id}`,
+            targetId: 'VNT_DEFEAT',
+            label: '(-1 Vida)',
+            type: 'vignette'
+          });
+        }
+      }
+
+      // 3. Mode Specific Links
       if (gameInteractionType === 'choice') {
-        return scene.choices?.filter(c => c.targetSceneId).map(c => ({
-          id: c.id,
-          targetId: c.targetSceneId,
-          label: c.label,
-          type: 'scene' as MapNodeType
-        })) || [];
+        if (scene.choices) {
+          scene.choices.filter(c => c.targetSceneId).forEach(c => {
+            items.push({
+              id: c.id,
+              targetId: c.targetSceneId,
+              label: c.label,
+              type: 'scene' as MapNodeType
+            });
+          });
+        }
       } else {
-        const items: { id: string, targetId: string, label: string, type: MapNodeType, original?: any }[] = [];
+        // Parser Mode Interactions
         scene.interactions?.forEach(i => {
           if (i.vignetteId) {
             items.push({
@@ -100,61 +154,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
             });
           }
         });
-
-        // Link Ending Scenes to Victory Vignette
-        if (scene.isEndingScene) {
-          const victoryVig = vignettes.find(v => v.id === 'VNT_VICTORY');
-          if (victoryVig) {
-            items.push({
-              id: `link-ending-${scene.id}`,
-              targetId: 'VNT_VICTORY',
-              label: 'Vitória',
-              type: 'vignette'
-            });
-          }
-        }
-
-        // Link Lose-Chance Scenes to Defeat Vignette (Visual Aid)
-        if (scene.removesChanceOnEntry) {
-          const defeatVig = vignettes.find(v => v.id === 'VNT_DEFEAT');
-          if (defeatVig) {
-            items.push({
-              id: `link-defeat-${scene.id}`,
-              targetId: 'VNT_DEFEAT',
-              label: '(-1 Vida)',
-              type: 'vignette'
-            });
-          }
-        }
-
-        // Link Vignette Next Scene (e.g. Opening -> First Scene)
-        if (scene.vignetteNextSceneId) {
-          // Check if it's the End Game
-          if (scene.vignetteNextSceneId === 'END_GAME') {
-            // Determine if positive or negative? Actually End Game in Vignettes usually acts as closure.
-            // We could link to Victory or just leave it.
-            // Let's link to a virtual 'Fim' node or just Victory if implied.
-            const victoryVig = vignettes.find(v => v.id === 'VNT_VICTORY');
-            if (victoryVig) { // Legacy check, might not exist
-              items.push({
-                id: `link-endgame-${scene.id}`,
-                targetId: 'VNT_VICTORY', // Assuming end game is victory for now, or just generic end
-                label: scene.vignetteButtonText || 'Fim',
-                type: 'vignette'
-              });
-            }
-          } else {
-            items.push({
-              id: `link-vignette-${scene.id}`,
-              targetId: scene.vignetteNextSceneId,
-              label: scene.vignetteButtonText || 'Continuar',
-              type: 'scene'
-            });
-          }
-        }
-
-        return items;
       }
+
+      return items;
     } else { // Vignette
       const vig = node.data as Vignette;
       // Opening vignette should link to Start Scene if it's the opening
