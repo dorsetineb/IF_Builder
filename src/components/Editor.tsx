@@ -643,6 +643,13 @@ DATE:        ${exportDate.toLocaleString()}
 
     const handleAddScene = () => {
         const newId = generateUniqueId('scn', Object.keys(gameData.scenes));
+
+        // Calculate position to the right of existing scenes
+        const NODE_WIDTH = 250;
+        const X_GAP = 150;
+        const existingSceneCount = gameData.sceneOrder.length;
+        const initialMapX = existingSceneCount * (NODE_WIDTH + X_GAP);
+
         const newScene: Scene = {
             id: newId,
             name: 'Nova Cena',
@@ -650,13 +657,28 @@ DATE:        ${exportDate.toLocaleString()}
             description: 'Descrição da nova cena.',
             objectIds: [],
             interactions: [],
-            vignetteType: 'none'
+            vignetteType: 'none',
+            mapX: initialMapX,
+            mapY: 0
         };
 
         setGameData(prev => {
             const newScenes = { ...prev.scenes, [newId]: newScene };
             const updatedOrder = [...prev.sceneOrder, newId];
             const isFirst = updatedOrder.length === 1;
+
+            // Auto-link: If there's an opening vignette without vignetteNextSceneId, link it to this new scene
+            if (existingSceneCount === 1) {
+                const firstSceneId = prev.sceneOrder[0];
+                const firstScene = prev.scenes[firstSceneId];
+                if (firstScene && firstScene.vignetteType === 'opening' && !firstScene.vignetteNextSceneId) {
+                    newScenes[firstSceneId] = {
+                        ...firstScene,
+                        vignetteNextSceneId: newId
+                    };
+                }
+            }
+
             return {
                 ...prev,
                 scenes: newScenes,
