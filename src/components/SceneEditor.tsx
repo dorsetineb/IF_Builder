@@ -398,6 +398,89 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                     placeholder="Descreva o que o jogador vê e sente nesta cena..."
                                                 />
 
+                                                <div className="pt-4 border-t border-muted-foreground/10 mt-4">
+                                                    <label className="flex items-center gap-2 cursor-pointer mb-4">
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={localScene.vignetteType && localScene.vignetteType !== 'none'}
+                                                            onChange={(e) => {
+                                                                if (e.target.checked) {
+                                                                    updateLocalScene('vignetteType', 'opening');
+                                                                } else {
+                                                                    updateLocalScene('vignetteType', 'none');
+                                                                }
+                                                            }}
+                                                            className="w-4 h-4 rounded border-muted-foreground/30 bg-zinc-950 text-purple-600 focus:ring-purple-500/50"
+                                                        />
+                                                        <span className="text-xs font-bold text-zinc-300 uppercase tracking-wide">Esta cena é uma vinheta?</span>
+                                                    </label>
+
+                                                    {localScene.vignetteType && localScene.vignetteType !== 'none' && (
+                                                        <div className="animate-in fade-in slide-in-from-top-2 space-y-4">
+                                                            <div className="grid grid-cols-3 gap-2">
+                                                                {[
+                                                                    { id: 'opening', label: 'Abertura', icon: Play },
+                                                                    { id: 'transition', label: 'Transição', icon: ArrowRight },
+                                                                    { id: 'conclusion', label: 'Conclusão', icon: Flag }
+                                                                ].map((type) => (
+                                                                    <button
+                                                                        key={type.id}
+                                                                        onClick={() => {
+                                                                            const newType = localScene.vignetteType === type.id ? undefined : (type.id as 'opening' | 'transition' | 'conclusion');
+                                                                            updateLocalScene('vignetteType', newType);
+                                                                        }}
+                                                                        className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border transition-all ${localScene.vignetteType === type.id
+                                                                            ? 'bg-purple-500/20 border-purple-500 text-purple-300'
+                                                                            : 'bg-zinc-900/50 border-muted-foreground/20 text-muted-foreground hover:bg-muted/10 hover:text-zinc-300'
+                                                                            }`}
+                                                                    >
+                                                                        <type.icon className="w-4 h-4" />
+                                                                        <span className="text-[10px] font-bold uppercase">{type.label}</span>
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+
+                                                            <div className="grid grid-cols-2 gap-4">
+                                                                <div>
+                                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                                                                        Texto do Botão
+                                                                    </label>
+                                                                    <input
+                                                                        type="text"
+                                                                        value={localScene.vignetteButtonText || ''}
+                                                                        onChange={(e) => updateLocalScene('vignetteButtonText', e.target.value)}
+                                                                        placeholder={localScene.vignetteType === 'conclusion' ? 'Reiniciar' : 'Continuar'}
+                                                                        className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all placeholder:text-zinc-700"
+                                                                    />
+                                                                </div>
+
+                                                                {localScene.vignetteType !== 'conclusion' && (
+                                                                    <div>
+                                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                                                                            Ir Para
+                                                                        </label>
+                                                                        <select
+                                                                            value={localScene.vignetteNextSceneId || ''}
+                                                                            onChange={(e) => updateLocalScene('vignetteNextSceneId', e.target.value)}
+                                                                            className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all [&>option]:bg-zinc-950"
+                                                                        >
+                                                                            <option value="">(Basta fechar)</option>
+                                                                            <option value="END_GAME">Encerramento (Fim de Jogo)</option>
+                                                                            <optgroup label="Cenas">
+                                                                                {allScenes.filter(s => s.id !== localScene.id).map(s => (
+                                                                                    <option key={s.id} value={s.id}>
+                                                                                        {s.name}
+                                                                                    </option>
+                                                                                ))}
+                                                                            </optgroup>
+                                                                        </select>
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+
                                             </div>
                                         </div>
                                     </div>
@@ -487,122 +570,52 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
                             {/* Right Column: Rules & Preview */}
                             <div className="space-y-6">
-                                {/* Narrative Rules Card */}
-                                <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
-                                    <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-                                        <Scroll className="w-4 h-4 text-muted-foreground" />
-                                        REGRAS DE NARRATIVA
-                                    </h3>
 
-                                    <div className="space-y-5">
-                                        {/* Vignette Configuration */}
-                                        <div>
-                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">
-                                                Esta cena é uma vinheta
-                                            </label>
-                                            <div className="grid grid-cols-3 gap-2 mb-4">
-                                                {[
-                                                    { id: 'opening', label: 'Abertura', icon: Play },
-                                                    { id: 'transition', label: 'Transição', icon: ArrowRight },
-                                                    { id: 'conclusion', label: 'Conclusão', icon: Flag }
-                                                ].map((type) => (
-                                                    <button
-                                                        key={type.id}
-                                                        onClick={() => {
-                                                            const newType = localScene.vignetteType === type.id ? undefined : (type.id as 'opening' | 'transition' | 'conclusion');
-                                                            updateLocalScene('vignetteType', newType);
-                                                        }}
-                                                        className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border transition-all ${localScene.vignetteType === type.id
-                                                            ? 'bg-purple-500/20 border-purple-500 text-purple-300'
-                                                            : 'bg-zinc-900/50 border-muted-foreground/20 text-muted-foreground hover:bg-muted/10 hover:text-zinc-300'
-                                                            }`}
-                                                    >
-                                                        <type.icon className="w-4 h-4" />
-                                                        <span className="text-[10px] font-bold uppercase">{type.label}</span>
-                                                    </button>
-                                                ))}
-                                            </div>
 
-                                            {localScene.vignetteType && (localScene.vignetteType !== 'none') && (
-                                                <div className="grid grid-cols-2 gap-4 animate-in fade-in slide-in-from-top-2">
-                                                    <div>
-                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                                                            Texto do Botão
-                                                        </label>
-                                                        <input
-                                                            type="text"
-                                                            value={localScene.vignetteButtonText || ''}
-                                                            onChange={(e) => updateLocalScene('vignetteButtonText', e.target.value)}
-                                                            placeholder={localScene.vignetteType === 'conclusion' ? 'Reiniciar' : 'Continuar'}
-                                                            className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all placeholder:text-zinc-700"
-                                                        />
-                                                    </div>
-
-                                                    {localScene.vignetteType !== 'conclusion' && (
-                                                        <div>
-                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                                                                Ir Para
-                                                            </label>
-                                                            <select
-                                                                value={localScene.vignetteNextSceneId || ''}
-                                                                onChange={(e) => updateLocalScene('vignetteNextSceneId', e.target.value)}
-                                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all [&>option]:bg-zinc-950"
-                                                            >
-                                                                <option value="">(Basta fechar)</option>
-                                                                <option value="END_GAME">Encerramento (Fim de Jogo)</option>
-                                                                <optgroup label="Cenas">
-                                                                    {allScenes.filter(s => s.id !== localScene.id).map(s => (
-                                                                        <option key={s.id} value={s.id}>
-                                                                            {s.name}
-                                                                        </option>
-                                                                    ))}
-                                                                </optgroup>
-                                                            </select>
-                                                        </div>
-                                                    )}
+                                {/* Narrative Rules Card - Renamed to Chance Rules */}
+                                {(enableChances || gameSystemEnabled === 'chances') && (
+                                    <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
+                                        <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+                                            <Scroll className="w-4 h-4 text-muted-foreground" />
+                                            REGRAS DE CHANCES
+                                        </h3>
+                                        <div className="space-y-3">
+                                            {/* Chance Removal */}
+                                            <label className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.removesChanceOnEntry ? 'bg-zinc-900/80 border-red-500/30' : 'bg-transparent border-muted-foreground/20 hover:bg-muted/10'}`}>
+                                                <div className="relative flex items-center mt-0.5">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!localScene.removesChanceOnEntry}
+                                                        onChange={e => handleToggle('removesChanceOnEntry', e.target.checked)}
+                                                        className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground accent-red-500"
+                                                        disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
+                                                    />
                                                 </div>
-                                            )}
+                                                <div>
+                                                    <span className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-400' : 'text-zinc-400 group-hover:text-zinc-300'}`}>Esta cena remove uma chance</span>
+                                                    <span className="block text-[10px] text-muted-foreground mt-0.5">O jogador perde uma vida/tentativa ao entrar aqui.</span>
+                                                </div>
+                                            </label>
+
+                                            {/* Chance Restoration */}
+                                            <label className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.restoresChanceOnEntry ? 'bg-zinc-900/80 border-green-500/30' : 'bg-transparent border-muted-foreground/20 hover:bg-muted/10'}`}>
+                                                <div className="relative flex items-center mt-0.5">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={!!localScene.restoresChanceOnEntry}
+                                                        onChange={e => handleToggle('restoresChanceOnEntry', e.target.checked)}
+                                                        className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground accent-green-500"
+                                                        disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
+                                                    />
+                                                </div>
+                                                <div>
+                                                    <span className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-400' : 'text-zinc-400 group-hover:text-zinc-300'}`}>Esta cena restaura uma chance</span>
+                                                    <span className="block text-[10px] text-muted-foreground mt-0.5">O jogador ganha uma vida extra ou cura.</span>
+                                                </div>
+                                            </label>
                                         </div>
-
-                                        {(enableChances || gameSystemEnabled === 'chances') && (
-                                            <div className="space-y-3">
-                                                {/* Chance Removal */}
-                                                <label className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.removesChanceOnEntry ? 'bg-zinc-900/80 border-red-500/30' : 'bg-transparent border-muted-foreground/20 hover:bg-muted/10'}`}>
-                                                    <div className="relative flex items-center mt-0.5">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={!!localScene.removesChanceOnEntry}
-                                                            onChange={e => handleToggle('removesChanceOnEntry', e.target.checked)}
-                                                            className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground accent-red-500"
-                                                            disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <span className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-400' : 'text-zinc-400 group-hover:text-zinc-300'}`}>Esta cena remove uma chance</span>
-                                                        <span className="block text-[10px] text-muted-foreground mt-0.5">O jogador perde uma vida/tentativa ao entrar aqui.</span>
-                                                    </div>
-                                                </label>
-
-                                                {/* Chance Restoration */}
-                                                <label className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.restoresChanceOnEntry ? 'bg-zinc-900/80 border-green-500/30' : 'bg-transparent border-muted-foreground/20 hover:bg-muted/10'}`}>
-                                                    <div className="relative flex items-center mt-0.5">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={!!localScene.restoresChanceOnEntry}
-                                                            onChange={e => handleToggle('restoresChanceOnEntry', e.target.checked)}
-                                                            className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground accent-green-500"
-                                                            disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
-                                                        />
-                                                    </div>
-                                                    <div>
-                                                        <span className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-400' : 'text-zinc-400 group-hover:text-zinc-300'}`}>Esta cena restaura uma chance</span>
-                                                        <span className="block text-[10px] text-muted-foreground mt-0.5">O jogador ganha uma vida extra ou cura.</span>
-                                                    </div>
-                                                </label>
-                                            </div>
-                                        )}
                                     </div>
-                                </div>
+                                )}
 
                                 {/* Branching Preview Card */}
                                 <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
