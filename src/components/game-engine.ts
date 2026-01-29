@@ -636,7 +636,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.style.backgroundColor = 'var(--action-button-bg, #ffffff)';
                     btn.style.color = 'var(--action-button-text-color, #0d1117)';
                     btn.style.border = '2px solid var(--border-color, rgba(255,255,255,0.2))';
-                    btn.style.borderRadius = '8px'; // Keep rounded or match action button preference? Action button is usually standard box.
+                    btn.style.borderRadius = '0px'; // Square as requested
                     // Actually action button usually inherits standard border radius.
                     btn.style.fontFamily = 'var(--font-family)';
                     btn.style.fontSize = '1em';

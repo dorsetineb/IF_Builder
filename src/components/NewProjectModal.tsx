@@ -11,7 +11,7 @@ interface NewProjectModalProps {
     onCreate: (data: Partial<GameData>) => void;
 }
 
-type Tab = 'system' | 'info' | 'appearance';
+type Tab = 'info' | 'system' | 'appearance';
 
 // Local helper component for Color Input
 const ColorInput: React.FC<{ label: string, id: string, value: string, onChange: (val: string) => void, placeholder?: string }> = ({ label, id, value, onChange, placeholder }) => (
@@ -52,6 +52,15 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     const [enableDiary, setEnableDiary] = useState(true);
     const [enableChances, setEnableChances] = useState(false);
     const [enableTrackers, setEnableTrackers] = useState(true);
+
+    // Effect to disable inventory if Interaction Type is Choice (IF)
+    React.useEffect(() => {
+        if (interactionType === 'choice') {
+            setEnableInventory(false);
+        } else {
+            setEnableInventory(true); // Build default expectation, parser usually has inventory
+        }
+    }, [interactionType]);
 
     // Appearance State - Structure
     const [layoutOrientation, setLayoutOrientation] = useState<'vertical' | 'horizontal'>('vertical');
@@ -176,7 +185,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         enableChances,
         enableTrackers,
         // Since we are toggling them, we also need to make sure the UI reflect it
-        gameShowSystemButton: true, // Always show system button
+        gameShowSystemButton: false, // User requested REMOVAL of system button
         gameShowTrackersUI: true, // Always show trackers UI if enabled
 
         // Appearance
@@ -256,8 +265,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     };
 
     const handleNext = () => {
-        if (tab === 'info') setTab('appearance');
-        else if (tab === 'appearance') setTab('system');
+        if (tab === 'info') setTab('system'); // Info -> System
+        else if (tab === 'system') setTab('appearance'); // System -> Appearance
     };
 
     if (!isOpen) return null;
@@ -296,16 +305,16 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                 Informações
                             </button>
                             <button
-                                onClick={() => setTab('appearance')}
-                                className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'appearance' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
-                            >
-                                Aparência
-                            </button>
-                            <button
                                 onClick={() => setTab('system')}
                                 className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'system' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
                             >
                                 Sistema
+                            </button>
+                            <button
+                                onClick={() => setTab('appearance')}
+                                className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'appearance' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
+                            >
+                                Aparência
                             </button>
                         </div>
 
@@ -360,8 +369,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 </div>
                                             </div>
                                             <button
-                                                onClick={() => setEnableInventory(!enableInventory)}
-                                                className={`w-12 h-6 rounded-full relative transition-all ${enableInventory ? 'bg-primary' : 'bg-zinc-700'}`}
+                                                onClick={() => interactionType !== 'choice' && setEnableInventory(!enableInventory)}
+                                                disabled={interactionType === 'choice'}
+                                                className={`w-12 h-6 rounded-full relative transition-all ${enableInventory ? 'bg-primary' : 'bg-zinc-700'} ${interactionType === 'choice' ? 'opacity-50 cursor-not-allowed' : ''}`}
                                             >
                                                 <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm ${enableInventory ? 'translate-x-6' : 'translate-x-0'}`} />
                                             </button>
@@ -735,7 +745,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     return { panelStyles, containerStyles, panelClass, containerClass };
                                 };
 
-                                if (tab !== 'appearance') {
+                                if (tab === 'info') {
                                     return (
                                         <div className="absolute inset-0 transform scale-[0.85] origin-center pointer-events-none select-none">
                                             <Preview gameData={previewGameData} testSceneId={null} />
@@ -805,6 +815,14 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                                         Nome da Cena
                                                                     </div>
                                                                 </div>
+                                                                {/* Chances Overlay */}
+                                                                {enableChances && (
+                                                                    <div className="absolute top-4 right-4 flex gap-1 z-20">
+                                                                        {[1, 2, 3].map(i => (
+                                                                            <Heart key={i} className="w-4 h-4 fill-current" style={{ color: colors.chanceIconColor || '#ff4d4d' }} />
+                                                                        ))}
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     );
@@ -822,21 +840,90 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             </div>
                                         </div>
 
-                                        {/* Preview Footer (Input) */}
+                                        {/* Preview Footer (Input OR Choices) */}
                                         <div className={`p-3 border-t backdrop-blur-sm flex-shrink-0 space-y-2 ${theme === 'dark' ? 'border-zinc-900 bg-zinc-950/80' : 'border-zinc-200 bg-white/80'}`}>
-                                            <div className="flex gap-2">
-                                                <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${theme === 'dark' ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
-                                                    <span className="font-mono truncate" style={{ fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily, color: theme === 'dark' ? '#52525b' : '#a1a1aa' }}>{verbInputPlaceholder}</span>
+
+                                            {/* Logic for Interaction Type: Parser vs Choice */}
+                                            {interactionType === 'parser' ? (
+                                                <div className="flex gap-2">
+                                                    <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${theme === 'dark' ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
+                                                        <span className="font-mono truncate" style={{ fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily, color: theme === 'dark' ? '#52525b' : '#a1a1aa' }}>{verbInputPlaceholder}</span>
+                                                    </div>
+                                                    <button
+                                                        className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
+                                                        style={{ backgroundColor: colors.actionButtonColor, color: colors.actionButtonTextColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily }}
+                                                    >
+                                                        {actionButtonText || 'AÇÃO'}
+                                                    </button>
                                                 </div>
-                                                <button
-                                                    className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
-                                                    style={{ backgroundColor: colors.actionButtonColor, color: colors.actionButtonTextColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily }}
-                                                >
-                                                    {actionButtonText || 'AÇÃO'}
-                                                </button>
+                                            ) : (
+                                                <div className="space-y-2">
+                                                    <button
+                                                        className="w-full h-8 border-2 font-bold uppercase tracking-widest transition-all truncate"
+                                                        style={{
+                                                            borderColor: colors.actionButtonColor || 'rgba(255,255,255,0.2)',
+                                                            backgroundColor: colors.actionButtonColor || '#ffffff',
+                                                            color: colors.actionButtonTextColor || '#000000',
+                                                            fontFamily: fontFamily,
+                                                            fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize,
+                                                            borderRadius: '0px' // Square
+                                                        }}
+                                                    >
+                                                        Opção de Exemplo 1
+                                                    </button>
+                                                    <button
+                                                        className="w-full h-8 border-2 font-bold uppercase tracking-widest transition-all truncate"
+                                                        style={{
+                                                            borderColor: colors.actionButtonColor || 'rgba(255,255,255,0.2)',
+                                                            backgroundColor: colors.actionButtonColor || '#ffffff',
+                                                            color: colors.actionButtonTextColor || '#000000',
+                                                            fontFamily: fontFamily,
+                                                            fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize,
+                                                            borderRadius: '0px' // Square
+                                                        }}
+                                                    >
+                                                        Opção de Exemplo 2
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {/* System Buttons Row */}
+                                            <div className="flex gap-2 pt-1">
+                                                {enableInventory && (
+                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
+                                                        Inventário
+                                                    </button>
+                                                )}
+                                                {enableTrackers && (
+                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
+                                                        Rastreadores
+                                                    </button>
+                                                )}
+                                                {enableDiary && (
+                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
+                                                        Diário
+                                                    </button>
+                                                )}
+                                                {/* Removed System Button as requested */}
                                             </div>
+
+                                            {/* Start Button Visualization (Optional? Usually mostly for Splash but user has it there in preview)
+                                                Actually lines 838-843 show 'Botão de Início'. 
+                                                If it's game preview, we usually don't show the splash button in the action bar, 
+                                                but the code had it: 'startButtonText || BOTÃO DE INÍCIO'.
+                                                This seems to be mimicking the Start Screen logic OR just demonstrating button style.
+                                                However, standard game doesn't have this in footer. 
+                                                Wait, looking at line 838-843 in previous code... it WAS showing startButtonText.
+                                                If this is 'Game Interface' preview, start button shouldn't be there.
+                                                But maybe it's to preview the Splash Button Color?
+                                                I'll leave it but maybe conditionally? No, let's keep it for color preview consistency unless user asked to remove.
+                                                User didn't ask to remove start button from preview, just System Button.
+                                                actually, user said "a pre-visualização da vinheta deve ser exibido apenas na aba informações".
+                                                This Start Button here is likely using the Splash Button styles, which are relevant.
+                                                I'll keep it but properly styled.
+                                            */}
                                             <button
-                                                className="w-full h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center transition-colors hover:opacity-90 truncate"
+                                                className="w-full h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center transition-colors hover:opacity-90 truncate mt-2"
                                                 style={{ backgroundColor: colors.splashButtonColor, color: colors.splashButtonTextColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily }}
                                             >
                                                 {startButtonText || 'BOTÃO DE INÍCIO'}
@@ -856,7 +943,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                 Cancelar
                             </button>
 
-                            {tab === 'system' ? (
+                            {tab === 'appearance' ? (
                                 <button
                                     onClick={handleCreate}
                                     disabled={!title}
