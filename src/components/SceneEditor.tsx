@@ -73,6 +73,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     const [localScene, setLocalScene] = useState<Scene>(() => getCleanSceneState(scene));
     const [pendingObjectUpdates, setPendingObjectUpdates] = useState<{ [id: string]: Partial<GameObject> }>({});
     const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions' | 'choices'>('properties');
+    const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
     const [isDraggingOver, setIsDraggingOver] = useState(false);
     const initialSceneJson = useRef(JSON.stringify(getCleanSceneState(scene)));
 
@@ -666,88 +667,145 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                     )}
 
                     {activeTab === 'choices' && (
-                        <div className="space-y-4">
-                            <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-sm font-bold text-foreground">Escolhas da Cena</h3>
-                                <button
-                                    onClick={() => {
-                                        const newChoice: Choice = {
-                                            id: `choice_${Date.now()}`,
-                                            label: 'Nova Escolha',
-                                            targetSceneId: ''
-                                        };
-                                        updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
-                                    }}
-                                    className="flex items-center px-3 py-2 bg-purple-600 text-white text-xs font-bold rounded-md hover:bg-purple-700 transition"
-                                >
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    Adicionar Escolha
-                                </button>
+                        <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
+                            {/* LEFT LIST PANEL */}
+                            <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
+                                <div className="p-4 border-b border-muted-foreground/10 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
+                                            Escolhas ({localScene.choices?.length || 0})
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                                    {(localScene.choices || []).length === 0 ? (
+                                        <div className="text-center py-8 text-muted-foreground">
+                                            <p className="text-xs italic">Nenhuma escolha definida.</p>
+                                        </div>
+                                    ) : (
+                                        (localScene.choices || []).map((choice, index) => (
+                                            <button
+                                                key={choice.id}
+                                                onClick={() => setSelectedChoiceId(choice.id)}
+                                                className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedChoiceId === choice.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
+                                            >
+                                                <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0">
+                                                    <ArrowRight className={`w-4 h-4 ${selectedChoiceId === choice.id ? 'text-purple-400' : 'text-zinc-600'}`} />
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className={`text-xs font-bold truncate ${selectedChoiceId === choice.id ? 'text-purple-300' : 'text-zinc-300'}`}>
+                                                        {choice.label || 'Nova Escolha'}
+                                                    </div>
+                                                    <div className="text-[10px] text-zinc-500 font-mono truncate">
+                                                        {choice.targetSceneId ? `-> ${allScenes.find(s => s.id === choice.targetSceneId)?.name || choice.targetSceneId}` : '(Sem destino)'}
+                                                    </div>
+                                                </div>
+                                            </button>
+                                        ))
+                                    )}
+                                </div>
+
+                                <div className="p-3 border-t border-muted-foreground/10 bg-zinc-900/50">
+                                    <button
+                                        onClick={() => {
+                                            const newId = `choice_${Date.now()}`;
+                                            const newChoice: Choice = {
+                                                id: newId,
+                                                label: 'Nova Escolha',
+                                                targetSceneId: ''
+                                            };
+                                            updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
+                                            setSelectedChoiceId(newId);
+                                        }}
+                                        className="w-full py-2 bg-zinc-100 hover:bg-white text-zinc-900 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow"
+                                    >
+                                        <Plus className="w-3.5 h-3.5 mr-2" />
+                                        Criar Nova Escolha
+                                    </button>
+                                </div>
                             </div>
 
-                            <div className="space-y-3">
-                                {(localScene.choices || []).length === 0 && (
-                                    <div className="text-center py-8 text-muted-foreground bg-muted/30 rounded-lg border border-muted-foreground/50 border-dashed">
-                                        <p className="text-xs">Nenhuma escolha definida.</p>
-                                        <p className="text-[10px] opacity-70">Adicione escolhas para que o jogador possa navegar para outras cenas.</p>
-                                    </div>
-                                )}
-                                {(localScene.choices || []).map((choice, index) => (
-                                    <div key={choice.id} className="bg-card border border-muted-foreground/50 p-4 rounded-lg flex flex-col gap-4">
-                                        <div className="flex items-start gap-4">
-                                            <div className="flex-1">
-                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
-                                                    Texto da Escolha
-                                                </label>
-                                                <input
-                                                    type="text"
-                                                    value={choice.label}
-                                                    onChange={(e) => {
-                                                        const newChoices = [...(localScene.choices || [])];
-                                                        newChoices[index] = { ...choice, label: e.target.value };
-                                                        updateLocalScene('choices', newChoices);
-                                                    }}
-                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded p-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50"
-                                                    placeholder="Ex: Abrir a porta..."
-                                                />
-                                            </div>
-                                            <div className="w-1/3 min-w-[200px]">
-                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">
-                                                    Cena de Destino
-                                                </label>
-                                                <div className="relative">
-                                                    <select
-                                                        value={choice.targetSceneId}
-                                                        onChange={(e) => {
-                                                            const newChoices = [...(localScene.choices || [])];
-                                                            newChoices[index] = { ...choice, targetSceneId: e.target.value };
-                                                            updateLocalScene('choices', newChoices);
+                            {/* RIGHT DETAIL PANEL */}
+                            <div className="flex-1 flex flex-col bg-zinc-950/10 min-w-0">
+                                {selectedChoiceId && localScene.choices?.find(c => c.id === selectedChoiceId) ? (
+                                    (() => {
+                                        const choiceIndex = localScene.choices!.findIndex(c => c.id === selectedChoiceId);
+                                        const choice = localScene.choices![choiceIndex];
+                                        return (
+                                            <div className="flex flex-col h-full">
+                                                <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30">
+                                                    <div className="flex items-center gap-2">
+                                                        <ArrowRight className="w-4 h-4 text-purple-500" />
+                                                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Detalhes da Escolha</span>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => {
+                                                            if (window.confirm('Tem certeza que deseja remover esta escolha?')) {
+                                                                const newChoices = localScene.choices!.filter(c => c.id !== selectedChoiceId);
+                                                                updateLocalScene('choices', newChoices);
+                                                                setSelectedChoiceId(null);
+                                                            }
                                                         }}
-                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded p-2 text-xs text-zinc-300 pr-8 appearance-none focus:ring-1 focus:ring-purple-500/50 [&>option]:bg-zinc-950"
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
                                                     >
-                                                        <option value="">Selecione uma cena...</option>
-                                                        {allScenes.map(s => (
-                                                            <option key={s.id} value={s.id}>
-                                                                {s.name} ({s.id})
-                                                            </option>
-                                                        ))}
-                                                    </select>
-                                                    <ArrowRight className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                                        <Trash2 className="w-3.5 h-3.5" />
+                                                        Remover
+                                                    </button>
+                                                </div>
+
+                                                <div className="flex-1 overflow-y-auto p-6">
+                                                    <div className="max-w-2xl mx-auto space-y-6">
+                                                        <div className="space-y-1.5">
+                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Texto do Botão</label>
+                                                            <input
+                                                                type="text"
+                                                                value={choice.label}
+                                                                onChange={(e) => {
+                                                                    const newChoices = [...localScene.choices!];
+                                                                    newChoices[choiceIndex] = { ...choice, label: e.target.value };
+                                                                    updateLocalScene('choices', newChoices);
+                                                                }}
+                                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
+                                                                placeholder="Ex: Tentar abrir a porta..."
+                                                            />
+                                                        </div>
+
+                                                        <div className="space-y-1.5">
+                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cena de Destino</label>
+                                                            <div className="relative">
+                                                                <select
+                                                                    value={choice.targetSceneId}
+                                                                    onChange={(e) => {
+                                                                        const newChoices = [...localScene.choices!];
+                                                                        newChoices[choiceIndex] = { ...choice, targetSceneId: e.target.value };
+                                                                        updateLocalScene('choices', newChoices);
+                                                                    }}
+                                                                    className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-zinc-300 pr-8 appearance-none focus:ring-1 focus:ring-purple-500/50 [&>option]:bg-zinc-950"
+                                                                >
+                                                                    <option value="">Selecione...</option>
+                                                                    {allScenes.map(s => (
+                                                                        <option key={s.id} value={s.id}>
+                                                                            {s.name}
+                                                                        </option>
+                                                                    ))}
+                                                                </select>
+                                                                <ArrowRight className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                                            </div>
+                                                            <p className="text-[10px] text-muted-foreground mt-1">Para onde o jogador irá ao clicar neste botão.</p>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <button
-                                                onClick={() => {
-                                                    const newChoices = (localScene.choices || []).filter((_, i) => i !== index);
-                                                    updateLocalScene('choices', newChoices);
-                                                }}
-                                                className="mt-6 p-2 text-muted-foreground hover:text-red-500 transition-colors"
-                                                title="Remover Escolha"
-                                            >
-                                                <Trash2 className="w-4 h-4" />
-                                            </button>
-                                        </div>
+                                        );
+                                    })()
+                                ) : (
+                                    <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
+                                        <ArrowRight className="w-12 h-12 mb-4 opacity-20" />
+                                        <h4 className="text-sm font-bold text-zinc-400 mb-1">Nenhuma escolha selecionada</h4>
+                                        <p className="text-xs max-w-xs opacity-60">Selecione uma escolha da lista para editar seus detalhes ou crie uma nova.</p>
                                     </div>
-                                ))}
+                                )}
                             </div>
                         </div>
                     )}
