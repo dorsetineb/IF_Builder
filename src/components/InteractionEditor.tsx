@@ -1,6 +1,31 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect, Vignette } from '../types';
-import { Plus, Trash2, Upload, Search, MousePointer2, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2 } from 'lucide-react';
+import { Plus, Trash2, Upload, Search, MousePointer2, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
+
+const TRACKER_ICONS = [
+    { name: 'activity', component: Activity },
+    { name: 'heart', component: Heart },
+    { name: 'zap', component: Zap },
+    { name: 'shield', component: Shield },
+    { name: 'coins', component: Coins },
+    { name: 'clock', component: Clock },
+    { name: 'skull', component: Skull },
+    { name: 'star', component: Star },
+    { name: 'user', component: User },
+    { name: 'trophy', component: Trophy },
+    { name: 'alert', component: AlertTriangle },
+    { name: 'book', component: Book },
+    { name: 'crown', component: Crown },
+    { name: 'flame', component: Flame },
+    { name: 'droplet', component: Droplet },
+    { name: 'sun', component: Sun },
+    { name: 'moon', component: Moon },
+];
+
+const INTERACTION_ICONS = [
+    { name: 'mouse', component: MousePointer2 },
+    ...TRACKER_ICONS
+];
 
 interface InteractionEditorProps {
     interactions: Interaction[];
@@ -12,12 +37,6 @@ interface InteractionEditorProps {
     consequenceTrackers: ConsequenceTracker[];
     vignettes: Vignette[];
 }
-
-const getOutcomeType = (inter: Interaction): 'goToScene' | 'newSceneDescription' | 'playVignette' => {
-    if (inter.vignetteId !== undefined) return 'playVignette';
-    if (inter.newSceneDescription !== undefined) return 'newSceneDescription';
-    return 'goToScene';
-};
 
 const generateUniqueId = (prefix: 'inter', existingIds: string[]): string => {
     let id;
@@ -84,35 +103,8 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
     const renderEditor = () => {
         if (!selectedInteraction || selectedIndex === null) return null;
 
-        const outcomeType = getOutcomeType(selectedInteraction);
-
         const handleInteractionChange = (field: keyof Interaction, value: any) => {
             handleUpdate(selectedIndex, { ...selectedInteraction, [field]: value });
-        };
-
-        const handleOutcomeChange = (type: 'goToScene' | 'newSceneDescription' | 'playVignette') => {
-            const newInteraction = { ...selectedInteraction };
-            const currentNewDescription = newInteraction.newSceneDescription || '';
-
-            // Reset outcome fields
-            delete newInteraction.goToScene;
-            delete newInteraction.newSceneDescription;
-            delete newInteraction.vignetteId;
-
-            if (type === 'goToScene') {
-                newInteraction.goToScene = '';
-                newInteraction.transitionType = 'fade';
-                newInteraction.transitionSpeed = 5;
-            } else if (type === 'playVignette') {
-                newInteraction.vignetteId = '';
-                newInteraction.transitionType = 'fade';
-                newInteraction.transitionSpeed = 5;
-            } else {
-                newInteraction.newSceneDescription = currentNewDescription || 'A cena mudou...';
-                delete newInteraction.transitionType;
-                delete newInteraction.transitionSpeed;
-            }
-            handleUpdate(selectedIndex, newInteraction);
         };
 
         const handleSoundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -149,7 +141,10 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                 <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30 shrink-0">
                     <div>
                         <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
-                            <MousePointer2 className="w-4 h-4 text-green-500" />
+                            {(() => {
+                                const Icon = INTERACTION_ICONS.find(i => i.name === selectedInteraction.icon)?.component || MousePointer2;
+                                return <Icon className="w-4 h-4 text-green-500" />;
+                            })()}
                             Editando Interação #{selectedIndex + 1}
                         </h3>
                     </div>
@@ -175,13 +170,43 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                         <div className="bg-zinc-950/30 p-4 rounded-lg border border-muted-foreground/10 space-y-4">
                             <div>
                                 <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Verbos (separados por vírgula)</label>
-                                <input
-                                    type="text"
-                                    value={selectedInteraction.verbs.join(', ')}
-                                    onChange={e => handleInteractionChange('verbs', e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
-                                    className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-100 focus:ring-1 focus:ring-green-500/50"
-                                    placeholder="ex: pegar, usar, abrir"
-                                />
+                                <div className="flex gap-2">
+                                    {/* Icon Picker */}
+                                    <div className="relative group shrink-0">
+                                        <button className="w-9 h-9 flex items-center justify-center bg-zinc-900 border border-zinc-700 rounded text-zinc-400 hover:text-white hover:border-green-500/50 transition-all">
+                                            {(() => {
+                                                const Icon = INTERACTION_ICONS.find(i => i.name === selectedInteraction.icon)?.component || MousePointer2;
+                                                return <Icon className="w-4 h-4" />;
+                                            })()}
+                                        </button>
+                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-20 hidden group-hover:grid grid-cols-6 gap-1">
+                                            <button
+                                                onClick={() => handleInteractionChange('icon', undefined)}
+                                                className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${!selectedInteraction.icon ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
+                                                title="Padrão"
+                                            >
+                                                <MousePointer2 className="w-4 h-4" />
+                                            </button>
+                                            {TRACKER_ICONS.map(icon => (
+                                                <button
+                                                    key={icon.name}
+                                                    onClick={() => handleInteractionChange('icon', icon.name)}
+                                                    className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedInteraction.icon === icon.name ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
+                                                    title={icon.name}
+                                                >
+                                                    <icon.component className="w-4 h-4" />
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                    <input
+                                        type="text"
+                                        value={selectedInteraction.verbs.join(', ')}
+                                        onChange={e => handleInteractionChange('verbs', e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
+                                        className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-100 focus:ring-1 focus:ring-green-500/50"
+                                        placeholder="ex: pegar, usar, abrir"
+                                    />
+                                </div>
                                 <p className="text-[10px] text-zinc-600 mt-1">O jogador deve digitar um destes para iniciar a ação.</p>
                             </div>
 
@@ -235,89 +260,69 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                         </h4>
                         <div className="bg-zinc-950/30 p-4 rounded-lg border border-muted-foreground/10 space-y-4">
 
-                            {/* Outcome Type Selector */}
-                            <div className="flex gap-2 p-1 bg-zinc-900/50 rounded-lg border border-zinc-800">
-                                <button onClick={() => handleOutcomeChange('newSceneDescription')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-[10px] font-bold uppercase tracking-wide transition-all ${outcomeType === 'newSceneDescription' ? 'bg-zinc-700 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}>
-                                    <MessageSquare className="w-3 h-3" /> Atualizar Texto
-                                </button>
-                                <button onClick={() => handleOutcomeChange('goToScene')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-[10px] font-bold uppercase tracking-wide transition-all ${outcomeType === 'goToScene' ? 'bg-blue-900/40 text-blue-200 border border-blue-500/20 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}>
-                                    <ArrowRight className="w-3 h-3" /> Mudar Cena
-                                </button>
-                                <button onClick={() => handleOutcomeChange('playVignette')} className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-md text-[10px] font-bold uppercase tracking-wide transition-all ${outcomeType === 'playVignette' ? 'bg-purple-900/40 text-purple-200 border border-purple-500/20 shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}>
-                                    <Play className="w-3 h-3" /> Vinheta
-                                </button>
-                            </div>
-
-                            {/* Dynamic Fields based on Type */}
-                            <div className="pt-2 animate-in fade-in slide-in-from-top-1">
-                                {outcomeType === 'newSceneDescription' && (
-                                    <textarea
-                                        value={selectedInteraction.newSceneDescription || ''}
-                                        onChange={e => handleInteractionChange('newSceneDescription', e.target.value)}
-                                        rows={3}
-                                        className="w-full bg-zinc-900 border border-zinc-700 rounded p-3 text-xs text-zinc-300"
-                                        placeholder="Digite o novo texto que descreve a cena após esta ação..."
-                                    />
-                                )}
-                                {outcomeType === 'goToScene' && (
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div className="col-span-2">
-                                            <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Ir para Cena</label>
-                                            <select value={selectedInteraction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300">
-                                                <option value="">Selecione...</option>
-                                                {allScenes.filter(s => s.id !== currentSceneId).map(s => <option key={s.id} value={s.id}>{s.name} ({s.id})</option>)}
-                                            </select>
-                                        </div>
-                                    </div>
-                                )}
-                                {outcomeType === 'playVignette' && (
-                                    <div>
-                                        <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Tocar Vinheta</label>
-                                        <select value={selectedInteraction.vignetteId || ''} onChange={e => handleInteractionChange('vignetteId', e.target.value)} className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300">
-                                            <option value="">Selecione...</option>
-                                            {vignettes.map(v => <option key={v.id} value={v.id}>{v.title || v.name || v.id}</option>)}
-                                        </select>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Common Feedbacks */}
-                            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-zinc-800">
+                            <div className="grid grid-cols-2 gap-4">
                                 <div className="col-span-2">
-                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Mensagem de Sucesso (Opcional)</label>
-                                    <input type="text" value={selectedInteraction.successMessage || ''} onChange={e => handleInteractionChange('successMessage', e.target.value)} className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300" placeholder="Ex: Você destrancou a porta." />
+                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Ir para Cena</label>
+                                    <select value={selectedInteraction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300">
+                                        <option value="">(Permanecer na cena)</option>
+                                        {allScenes.filter(s => s.id !== currentSceneId).map(s => <option key={s.id} value={s.id}>{s.name} ({s.id})</option>)}
+                                    </select>
                                 </div>
 
-                                <div>
+                                {/* Success Message aka Update Description */}
+                                <div className="col-span-1">
+                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Atualizar descrição da cena</label>
+                                    <textarea
+                                        value={selectedInteraction.successMessage || ''} // Using legacy field for backward compatibility, UI says "Description"
+                                        onChange={e => handleInteractionChange('successMessage', e.target.value)}
+                                        rows={2}
+                                        className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300 resize-none"
+                                        placeholder="Descreve o que acontece..."
+                                    />
+                                </div>
+
+                                {/* Sound Effect - Moved Next to Description */}
+                                <div className="col-span-1">
                                     <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Efeito Sonoro (.mp3)</label>
-                                    <div className="flex items-center gap-2">
-                                        <label className="flex-1 flex items-center justify-center px-3 py-2 bg-zinc-900 border border-zinc-800 rounded hover:bg-zinc-800 cursor-pointer text-xs font-medium transition-colors">
+                                    <div className="flex items-center gap-2 h-[50px]">
+                                        <label className="flex-1 h-full flex items-center justify-center px-3 py-2 bg-zinc-900 border border-zinc-800 rounded hover:bg-zinc-800 cursor-pointer text-xs font-medium transition-colors">
                                             <Upload className="w-3 h-3 mr-2 text-zinc-500" /> {selectedInteraction.soundEffect ? 'Alterar' : 'Upload'}
                                             <input type="file" accept="audio/*" onChange={handleSoundUpload} className="hidden" />
                                         </label>
                                         {selectedInteraction.soundEffect && (
-                                            <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="p-2 bg-red-500/10 text-red-500 rounded border border-red-500/20"><Trash2 className="w-3 h-3" /></button>
+                                            <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="h-full px-3 bg-red-500/10 text-red-500 rounded border border-red-500/20 hover:bg-red-500/20"><Trash2 className="w-4 h-4" /></button>
                                         )}
                                     </div>
                                 </div>
 
-                                <div>
-                                    <div className="flex justify-between items-center mb-1.5">
+                                {/* Trackers - Full Width */}
+                                <div className="col-span-2 pt-2 border-t border-zinc-800/50">
+                                    <div className="flex justify-between items-center mb-2">
                                         <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Rastreadores</label>
-                                        <button onClick={handleAddTrackerEffect} className="text-[10px] text-green-500 font-bold hover:text-green-400"><Plus className="w-3 h-3 inline" /> ADD</button>
+                                        <button onClick={handleAddTrackerEffect} className="flex items-center gap-1.5 px-2 py-1 bg-green-500/10 text-green-500 rounded text-[10px] font-bold hover:bg-green-500/20 hover:text-green-400 transition-colors uppercase">
+                                            <Plus className="w-3 h-3" /> Adicionar
+                                        </button>
                                     </div>
-                                    <div className="space-y-1">
+                                    <div className="space-y-2">
                                         {(selectedInteraction.trackerEffects || []).map((effect, i) => (
-                                            <div key={i} className="flex items-center gap-1">
-                                                <select value={effect.trackerId} onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)} className="flex-1 bg-zinc-900 border-none text-[10px] h-6 rounded px-1 text-zinc-300">
-                                                    <option value="">Rastreador...</option>
+                                            <div key={i} className="flex items-center gap-2 bg-zinc-900 p-2 rounded border border-zinc-800">
+                                                <Activity className="w-3 h-3 text-zinc-600" />
+                                                <select value={effect.trackerId} onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)} className="flex-1 bg-transparent border-none text-xs text-zinc-200 focus:ring-0 p-0">
+                                                    <option value="">Selecione um rastreador...</option>
                                                     {consequenceTrackers.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
                                                 </select>
-                                                <input type="number" value={effect.valueChange} onChange={e => handleTrackerEffectChange(i, 'valueChange', parseInt(e.target.value))} className="w-10 bg-zinc-900 border-none text-[10px] h-6 rounded px-1 text-right text-zinc-300 font-mono" />
-                                                <button onClick={() => handleRemoveTrackerEffect(i)} className="text-zinc-600 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
+                                                <div className="flex items-center gap-1 bg-zinc-950 px-2 py-1 rounded border border-zinc-800">
+                                                    <span className="text-[10px] text-zinc-500">Valor:</span>
+                                                    <input type="number" value={effect.valueChange} onChange={e => handleTrackerEffectChange(i, 'valueChange', parseInt(e.target.value))} className="w-12 bg-transparent border-none text-xs h-auto p-0 text-right text-zinc-300 font-mono focus:ring-0" />
+                                                </div>
+                                                <button onClick={() => handleRemoveTrackerEffect(i)} className="p-1 text-zinc-500 hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                                             </div>
                                         ))}
-                                        {(selectedInteraction.trackerEffects || []).length === 0 && <p className="text-[10px] text-zinc-600 italic">Sem efeitos.</p>}
+                                        {(selectedInteraction.trackerEffects || []).length === 0 && (
+                                            <div className="text-center py-4 border border-dashed border-zinc-800 rounded bg-zinc-900/30">
+                                                <p className="text-[10px] text-zinc-600 italic">Nenhum efeito em rastreadores configurado.</p>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -359,13 +364,14 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left group ${selectedIndex === index ? 'bg-green-500/10 border-green-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
                             >
                                 <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${selectedIndex === index ? 'bg-green-500/20 text-green-400' : 'bg-zinc-900 text-zinc-600'}`}>
-                                    {getOutcomeType(inter) === 'goToScene' && <ArrowRight className="w-4 h-4" />}
-                                    {getOutcomeType(inter) === 'newSceneDescription' && <MessageSquare className="w-4 h-4" />}
-                                    {getOutcomeType(inter) === 'playVignette' && <Play className="w-4 h-4" />}
+                                    {(() => {
+                                        const Icon = INTERACTION_ICONS.find(i => i.name === inter.icon)?.component || MousePointer2;
+                                        return <Icon className="w-4 h-4" />;
+                                    })()}
                                 </div>
                                 <div className="min-w-0 flex-1">
                                     <div className={`text-xs font-bold truncate ${selectedIndex === index ? 'text-green-400' : 'text-zinc-300'}`}>
-                                        {inter.verbs[0] ? inter.verbs[0].toUpperCase() : 'NOVO'} {inter.verbs.length > 1 && `+${inter.verbs.length - 1}`}
+                                        {inter.verbs.join(', ')}
                                     </div>
                                     <div className="text-[10px] text-zinc-500 truncate flex items-center gap-1">
                                         {inter.target ? `Alvo: ${sceneObjects.find(o => o.id === inter.target)?.name || '?'}` : 'Geral'}

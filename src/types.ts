@@ -30,6 +30,7 @@ export interface Interaction {
   trackerEffects?: TrackerEffect[];
   transitionType?: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom' | 'blur' | 'none';
   transitionSpeed?: number;
+  icon?: string; // Icon name from Lucide
 }
 
 export interface Choice {
