@@ -187,7 +187,18 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         scenes: {
             ...initialGameData.scenes,
             [previewScene.id]: previewScene
-        }
+        },
+        vignettes: [{
+            id: 'VNT_OPENING',
+            name: 'Abertura',
+            title: title || 'Abertura',
+            description: description,
+            buttonText: startButtonText,
+            showTitle: true,
+            showDescription: true,
+            textAnimationType: 'fade',
+            textSpeed: 3
+        }]
     }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, theme, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewScene]);
 
     const handleCreate = () => {
@@ -325,6 +336,17 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             onChange={(e) => setDescription(e.target.value)}
                                             className="w-full h-32 bg-black/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all resize-none placeholder:text-zinc-700 leading-relaxed"
                                             placeholder="Uma breve descrição da sua história..."
+                                        />
+                                    </div>
+
+                                    <div className="space-y-2">
+                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Texto do Botão de Início</label>
+                                        <input
+                                            type="text"
+                                            value={startButtonText}
+                                            onChange={(e) => setStartButtonText(e.target.value)}
+                                            className="w-full bg-black/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-700 font-bold"
+                                            placeholder="Ex: Iniciar Aventura"
                                         />
                                     </div>
 
