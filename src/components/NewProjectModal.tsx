@@ -38,7 +38,7 @@ const ColorInput: React.FC<{ label: string, id: string, value: string, onChange:
 );
 
 export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClose, onCreate }) => {
-    const [tab, setTab] = useState<Tab>('system');
+    const [tab, setTab] = useState<Tab>('info');
 
     // Info State
     const [title, setTitle] = useState('Minha Nova Aventura');
@@ -47,7 +47,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     const [splashImage, setSplashImage] = useState('');
 
     // System State
-    const [interactionType, setInteractionType] = useState<'parser' | 'choice'>('choice');
+    const [interactionType, setInteractionType] = useState<'parser' | 'choice'>('parser');
 
     // Appearance State - Structure
     const [layoutOrientation, setLayoutOrientation] = useState<'vertical' | 'horizontal'>('vertical');
@@ -213,8 +213,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     };
 
     const handleNext = () => {
-        if (tab === 'system') setTab('info');
-        else if (tab === 'info') setTab('appearance');
+        if (tab === 'info') setTab('appearance');
+        else if (tab === 'appearance') setTab('system');
     };
 
     if (!isOpen) return null;
@@ -247,12 +247,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                         {/* Tabs Navigation */}
                         <div className="flex border-b border-zinc-800">
                             <button
-                                onClick={() => setTab('system')}
-                                className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'system' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
-                            >
-                                Sistema
-                            </button>
-                            <button
                                 onClick={() => setTab('info')}
                                 className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'info' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
                             >
@@ -264,6 +258,12 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                             >
                                 Aparência
                             </button>
+                            <button
+                                onClick={() => setTab('system')}
+                                className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'system' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
+                            >
+                                Sistema
+                            </button>
                         </div>
 
                         {/* Tab Content */}
@@ -272,21 +272,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                             {tab === 'system' && (
                                 <div className="space-y-6 animate-in slide-in-from-left-4 duration-300">
                                     <div className="grid grid-cols-1 gap-4">
-                                        <button
-                                            onClick={() => setInteractionType('choice')}
-                                            className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'choice' ? 'bg-primary/10 border-primary ring-1 ring-primary/50' : 'bg-black/30 border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900'}`}
-                                        >
-                                            <div className={`p-4 rounded-xl ${interactionType === 'choice' ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-300'}`}>
-                                                <MousePointerClick className="w-8 h-8" />
-                                            </div>
-                                            <div>
-                                                <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'choice' ? 'text-white' : 'text-zinc-300'}`}>Interactive Fiction (IF)</h3>
-                                                <p className="text-xs text-zinc-400 leading-relaxed">
-                                                    Jogabilidade baseada em escolhas e cliques. Ideal para narrativas ramificadas, visual novels e aventuras "Choose Your Own Adventure".
-                                                </p>
-                                            </div>
-                                        </button>
-
                                         <button
                                             onClick={() => setInteractionType('parser')}
                                             className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'parser' ? 'bg-primary/10 border-primary ring-1 ring-primary/50' : 'bg-black/30 border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900'}`}
@@ -298,6 +283,21 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'parser' ? 'text-white' : 'text-zinc-300'}`}>Parser (Texto)</h3>
                                                 <p className="text-xs text-zinc-400 leading-relaxed">
                                                     Jogabilidade clássica baseada em comandos de texto (ex: "pegar chave", "ir norte"). Maior liberdade de interação e quebra-cabeças complexos.
+                                                </p>
+                                            </div>
+                                        </button>
+
+                                        <button
+                                            onClick={() => setInteractionType('choice')}
+                                            className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'choice' ? 'bg-primary/10 border-primary ring-1 ring-primary/50' : 'bg-black/30 border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900'}`}
+                                        >
+                                            <div className={`p-4 rounded-xl ${interactionType === 'choice' ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-300'}`}>
+                                                <MousePointerClick className="w-8 h-8" />
+                                            </div>
+                                            <div>
+                                                <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'choice' ? 'text-white' : 'text-zinc-300'}`}>Interactive Fiction (IF)</h3>
+                                                <p className="text-xs text-zinc-400 leading-relaxed">
+                                                    Jogabilidade baseada em escolhas e cliques. Ideal para narrativas ramificadas, visual novels e aventuras "Choose Your Own Adventure".
                                                 </p>
                                             </div>
                                         </button>
@@ -726,7 +726,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                 Cancelar
                             </button>
 
-                            {tab === 'appearance' ? (
+                            {tab === 'system' ? (
                                 <button
                                     onClick={handleCreate}
                                     disabled={!title}
