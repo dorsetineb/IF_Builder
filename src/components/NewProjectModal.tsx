@@ -129,8 +129,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         }));
     };
 
-    // Helper for preview scene
-    const previewScene: Scene = useMemo(() => ({
+    // Helper for preview scene (Standard Scene)
+    const previewStandardScene: Scene = useMemo(() => ({
         id: 'preview_scene',
         name: 'Exemplo de Visualização',
         image: splashImage || '', // Use splash image if available for context
@@ -142,7 +142,21 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         ],
         objectIds: [],
         exits: {}
-    }), [splashImage]); // Re-create if splash image changes to show something
+    }), [splashImage]);
+
+    // Helper for preview vignette (Splash Screen)
+    const previewVignetteScene: Scene = useMemo(() => ({
+        id: 'VNT_OPENING',
+        name: 'Abertura',
+        image: splashImage || '',
+        description: description,
+        interactions: [],
+        objectIds: [],
+        // Explicitly set vignetteType for the engine to render it as a vignette
+        vignetteType: 'opening',
+        vignetteButtonText: startButtonText,
+        vignetteNextSceneId: 'preview_scene'
+    }), [splashImage, description, startButtonText]);
 
     const previewGameData: GameData = useMemo(() => ({
         ...initialGameData,
@@ -186,8 +200,12 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         // Inject Preview Scene
         scenes: {
             ...initialGameData.scenes,
-            [previewScene.id]: previewScene
+            [previewStandardScene.id]: previewStandardScene,
+            [previewVignetteScene.id]: previewVignetteScene
         },
+        // Force start scene to be the vignette if we want to preview the splash
+        startScene: tab === 'info' ? previewVignetteScene.id : previewStandardScene.id,
+
         vignettes: [{
             id: 'VNT_OPENING',
             name: 'Abertura',
@@ -199,7 +217,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             textAnimationType: 'fade',
             textSpeed: 3
         }]
-    }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, theme, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewScene]);
+    }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, theme, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewStandardScene, previewVignetteScene, tab]);
 
     const handleCreate = () => {
         const initialVignette: Vignette = {
