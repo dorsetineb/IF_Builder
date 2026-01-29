@@ -822,25 +822,28 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 })()}
                                             </div>
 
-                                            {/* Text Area */}
-                                            <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
-                                                <p className="leading-relaxed" style={{ color: colors.textColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize }}>
-                                                    Esta é uma descrição de exemplo para a cena. O texto flui conforme as <span style={{ color: colors.titleColor, fontWeight: 'bold' }}>CONFIGURAÇÕES</span> escolhidas.
-                                                </p>
-                                                <p className="mt-4 opacity-70" style={{ color: colors.textColor, fontFamily: fontFamily, fontSize: '0.85em' }}>
-                                                    {'>'} COMANDO DE EXEMPLO
-                                                </p>
-                                            </div>
-                                            {/* Footer inside Text Area for Chances */}
-                                            {enableChances && (
-                                                <div className="flex justify-end pt-2 mt-2">
-                                                    <div className="flex gap-1">
-                                                        {[1, 2, 3].map(i => (
-                                                            <Heart key={i} className="w-4 h-4 fill-current" style={{ color: colors.chanceIconColor || '#ff4d4d' }} />
-                                                        ))}
-                                                    </div>
+                                            {/* Right Column: Text & Chances */}
+                                            <div className="flex-1 flex flex-col overflow-hidden relative">
+                                                <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar pr-2">
+                                                    <p className="leading-relaxed" style={{ color: colors.textColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize }}>
+                                                        Esta é uma descrição de exemplo para a cena. O texto flui conforme as <span style={{ color: colors.titleColor, fontWeight: 'bold' }}>CONFIGURAÇÕES</span> escolhidas.
+                                                    </p>
+                                                    <p className="mt-4 opacity-70" style={{ color: colors.textColor, fontFamily: fontFamily, fontSize: '0.85em' }}>
+                                                        {'>'} COMANDO DE EXEMPLO
+                                                    </p>
                                                 </div>
-                                            )}
+
+                                                {/* Chances Footer (Anchored Bottom Right) */}
+                                                {enableChances && (
+                                                    <div className="flex-shrink-0 flex justify-end pt-2 z-10">
+                                                        <div className="flex gap-1">
+                                                            {[1, 2, 3].map(i => (
+                                                                <Heart key={i} className="w-4 h-4 fill-current" style={{ color: colors.chanceIconColor || '#ff4d4d' }} />
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
 
                                         {/* Preview Footer (Input OR Choices) */}
