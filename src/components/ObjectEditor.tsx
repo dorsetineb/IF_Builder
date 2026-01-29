@@ -1,6 +1,26 @@
-import React, { useState, DragEvent, useMemo } from 'react';
+import React, { useState, DragEvent, useMemo, useEffect } from 'react';
 import { GameObject } from '../types';
-import { Plus, Trash2, Upload, Search, Link as LinkIcon, Unlink, Box } from 'lucide-react';
+import { Plus, Trash2, Upload, Search, Link as LinkIcon, Unlink, Box, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
+
+const TRACKER_ICONS = [
+    { name: 'activity', component: Activity },
+    { name: 'heart', component: Heart },
+    { name: 'zap', component: Zap },
+    { name: 'shield', component: Shield },
+    { name: 'coins', component: Coins },
+    { name: 'clock', component: Clock },
+    { name: 'skull', component: Skull },
+    { name: 'star', component: Star },
+    { name: 'user', component: User },
+    { name: 'trophy', component: Trophy },
+    { name: 'alert', component: AlertTriangle },
+    { name: 'book', component: Book },
+    { name: 'crown', component: Crown },
+    { name: 'flame', component: Flame },
+    { name: 'droplet', component: Droplet },
+    { name: 'sun', component: Sun },
+    { name: 'moon', component: Moon },
+];
 
 interface ObjectEditorProps {
     sceneId: string;
@@ -32,6 +52,11 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
     const [selectedObjectId, setSelectedObjectId] = useState<string | null>(objects.length > 0 ? objects[0].id : null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isLinkMode, setIsLinkMode] = useState(false); // Toggle between "My Objects" and "Link Existing"
+    const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+
+    useEffect(() => {
+        setIsIconPickerOpen(false);
+    }, [selectedObjectId]);
 
     const handleCreateNewObject = () => {
         const allIds = allGlobalObjects.map(o => o.id);
@@ -90,7 +115,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
     };
 
     return (
-        <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
+        <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* LEFT SIDEBAR */}
             <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
                 {/* Sidebar Header */}
@@ -127,25 +152,28 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                     {!isLinkMode ? (
                         /* CURRENT SCENE OBJECTS */
                         filteredSceneObjects.length > 0 ? (
-                            filteredSceneObjects.map(obj => (
-                                <button
-                                    key={obj.id}
-                                    onClick={() => setSelectedObjectId(obj.id)}
-                                    className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedObjectId === obj.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
-                                >
-                                    <div className="w-10 h-10 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0">
-                                        {obj.image ? (
-                                            <img src={obj.image} alt="" className="w-full h-full object-cover" />
-                                        ) : (
-                                            <Box className="w-4 h-4 text-zinc-600" />
-                                        )}
-                                    </div>
-                                    <div className="min-w-0">
-                                        <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-purple-300' : 'text-zinc-300'}`}>{obj.name}</div>
-                                        <div className="text-[10px] text-zinc-500 font-mono truncate">#{obj.id}</div>
-                                    </div>
-                                </button>
-                            ))
+                            filteredSceneObjects.map(obj => {
+                                const IconComponent = TRACKER_ICONS.find(i => i.name === obj.icon)?.component || Box;
+                                return (
+                                    <button
+                                        key={obj.id}
+                                        onClick={() => setSelectedObjectId(obj.id)}
+                                        className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedObjectId === obj.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
+                                    >
+                                        <div className="w-10 h-10 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0">
+                                            {obj.image ? (
+                                                <img src={obj.image} alt="" className="w-full h-full object-cover" />
+                                            ) : (
+                                                <IconComponent className="w-4 h-4 text-zinc-600" />
+                                            )}
+                                        </div>
+                                        <div className="min-w-0">
+                                            <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-purple-300' : 'text-zinc-300'}`}>{obj.name}</div>
+                                            <div className="text-[10px] text-zinc-500 font-mono truncate">#{obj.id}</div>
+                                        </div>
+                                    </button>
+                                );
+                            })
                         ) : (
                             <div className="text-center py-8 text-muted-foreground">
                                 <p className="text-xs italic">Nenhum objeto encontrado.</p>
@@ -154,28 +182,35 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                     ) : (
                         /* AVAILABLE TO LINK OBJECTS */
                         availableObjectsToLink.length > 0 ? (
-                            availableObjectsToLink.map(obj => (
-                                <div
-                                    key={obj.id}
-                                    className="w-full flex items-center justify-between gap-2 p-2 rounded-lg border border-dashed border-zinc-800 hover:bg-zinc-900 transition-all text-left group"
-                                >
-                                    <div className="flex items-center gap-3 min-w-0" onClick={() => setSelectedObjectId(obj.id)}>
-                                        <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0 opacity-50">
-                                            {obj.image ? <img src={obj.image} alt="" className="w-full h-full object-cover" /> : <Box className="w-3 h-3 text-zinc-600" />}
-                                        </div>
-                                        <div className="min-w-0">
-                                            <div className="text-xs font-medium text-zinc-400 truncate">{obj.name}</div>
-                                        </div>
-                                    </div>
-                                    <button
-                                        onClick={() => handleLinkExistingObject(obj.id)}
-                                        className="p-1.5 bg-purple-900/30 text-purple-400 rounded hover:bg-purple-600 hover:text-white transition-colors"
-                                        title="Vincular à cena"
+                            availableObjectsToLink.map(obj => {
+                                const IconComponent = TRACKER_ICONS.find(i => i.name === obj.icon)?.component || Box;
+                                return (
+                                    <div
+                                        key={obj.id}
+                                        className="w-full flex items-center justify-between gap-2 p-2 rounded-lg border border-dashed border-zinc-800 hover:bg-zinc-900 transition-all text-left group"
                                     >
-                                        <Plus className="w-4 h-4" />
-                                    </button>
-                                </div>
-                            ))
+                                        <div className="flex items-center gap-3 min-w-0" onClick={() => setSelectedObjectId(obj.id)}>
+                                            <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0 opacity-50">
+                                                {obj.image ? (
+                                                    <img src={obj.image} alt="" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <IconComponent className="w-3 h-3 text-zinc-600" />
+                                                )}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <div className="text-xs font-medium text-zinc-400 truncate">{obj.name}</div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => handleLinkExistingObject(obj.id)}
+                                            className="p-1.5 bg-purple-900/30 text-purple-400 rounded hover:bg-purple-600 hover:text-white transition-colors"
+                                            title="Vincular à cena"
+                                        >
+                                            <Plus className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                );
+                            })
                         ) : (
                             <div className="text-center py-8 text-muted-foreground">
                                 <p className="text-xs italic">Todos os objetos já estão vinculados ou nenhum encontrado.</p>
@@ -243,14 +278,44 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                     {/* Basic Info */}
                                     <div className="col-span-2 space-y-1.5">
                                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nome do Objeto</label>
-                                        <input
-                                            type="text"
-                                            value={selectedObject.name}
-                                            onChange={(e) => onUpdateGlobalObject(selectedObject.id, { name: e.target.value })}
-                                            className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
-                                        />
-                                    </div>
-                                    <div className="col-span-1 space-y-1.5">
+                                        <div className="flex gap-2">
+                                            {/* Icon Picker */}
+                                            <div className="relative group shrink-0">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setIsIconPickerOpen(!isIconPickerOpen);
+                                                    }}
+                                                    className="w-10 h-10 flex items-center justify-center bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-400 hover:text-white hover:border-purple-500/50 transition-all"
+                                                >
+                                                    {(() => {
+                                                        const Icon = TRACKER_ICONS.find(i => i.name === selectedObject.icon)?.component || Box;
+                                                        return <Icon className="w-5 h-5" />;
+                                                    })()}
+                                                </button>
+                                                {isIconPickerOpen && (
+                                                    <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                                        {TRACKER_ICONS.map(icon => (
+                                                            <button
+                                                                key={icon.name}
+                                                                onClick={() => { onUpdateGlobalObject(selectedObject.id, { icon: icon.name }); setIsIconPickerOpen(false); }}
+                                                                className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedObject.icon === icon.name ? 'bg-purple-500/20 text-purple-400' : 'text-zinc-500'}`}
+                                                                title={icon.name}
+                                                            >
+                                                                <icon.component className="w-4 h-4" />
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <input
+                                                type="text"
+                                                value={selectedObject.name}
+                                                onChange={(e) => onUpdateGlobalObject(selectedObject.id, { name: e.target.value })}
+                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
+                                            />
+                                        </div>
+                                    </div>                                    <div className="col-span-1 space-y-1.5">
                                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">ID Único</label>
                                         <input
                                             type="text"

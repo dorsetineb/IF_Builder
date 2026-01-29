@@ -6,6 +6,7 @@ export interface GameObject {
   image?: string; // Base64 string for the object's image
   // FIX: Added isTakable property to resolve type error in SceneEditor.tsx
   isTakable?: boolean;
+  icon?: string;
 }
 
 export interface TrackerEffect {

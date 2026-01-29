@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect, Vignette } from '../types';
 import { Plus, Trash2, Upload, Search, MousePointer2, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
 
@@ -99,12 +99,33 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
 
     const selectedInteraction = selectedIndex !== null ? interactions[selectedIndex] : null;
 
+    const [verbsInput, setVerbsInput] = useState('');
+    const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+
+    // Sync local input state when selection changes
+    useEffect(() => {
+        if (selectedInteraction) {
+            setVerbsInput(selectedInteraction.verbs.join(', '));
+        }
+        setIsIconPickerOpen(false);
+    }, [selectedInteraction]);
+
     // Helper to render interaction editor (reused logic from previous component, adapted)
     const renderEditor = () => {
         if (!selectedInteraction || selectedIndex === null) return null;
 
         const handleInteractionChange = (field: keyof Interaction, value: any) => {
             handleUpdate(selectedIndex, { ...selectedInteraction, [field]: value });
+        };
+
+        const handleVerbsBlur = () => {
+            const newVerbs = verbsInput.split(',').map(v => v.trim()).filter(Boolean);
+            // Only update if different to avoid cycles if we were doing this in effect
+            if (JSON.stringify(newVerbs) !== JSON.stringify(selectedInteraction.verbs)) {
+                handleInteractionChange('verbs', newVerbs);
+            }
+            // Optional: Re-format input formatting on blur
+            setVerbsInput(newVerbs.join(', '));
         };
 
         const handleSoundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,7 +157,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
 
 
         return (
-            <div className="flex flex-col h-full">
+            <div className="flex flex-col h-full" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
                 {/* Header */}
                 <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30 shrink-0">
                     <div>
@@ -167,21 +188,30 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                         <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                             <Target className="w-3 h-3" /> Gatilhos & Condições
                         </h4>
-                        <div className="bg-zinc-950/30 p-4 rounded-lg border border-muted-foreground/10 space-y-4">
-                            <div>
-                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Verbos (separados por vírgula)</label>
-                                <div className="flex gap-2">
-                                    {/* Icon Picker */}
-                                    <div className="relative group shrink-0">
-                                        <button className="w-9 h-9 flex items-center justify-center bg-zinc-900 border border-zinc-700 rounded text-zinc-400 hover:text-white hover:border-green-500/50 transition-all">
-                                            {(() => {
-                                                const Icon = INTERACTION_ICONS.find(i => i.name === selectedInteraction.icon)?.component || MousePointer2;
-                                                return <Icon className="w-4 h-4" />;
-                                            })()}
-                                        </button>
-                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-20 hidden group-hover:grid grid-cols-6 gap-1">
+                        <div className="bg-zinc-950/30 p-4 rounded-lg border border-muted-foreground/10 space-y-6">
+
+                            {/* Row 1: Icon, Verbs, Target */}
+                            <div className="flex gap-4 items-start">
+                                {/* Icon Picker */}
+                                <div className="space-y-1.5 shrink-0 relative">
+                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Ícone</label>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setIsIconPickerOpen(!isIconPickerOpen);
+                                        }}
+                                        className="w-10 h-10 flex items-center justify-center bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-400 hover:text-white hover:border-green-500/50 transition-all"
+                                    >
+                                        {(() => {
+                                            const Icon = INTERACTION_ICONS.find(i => i.name === selectedInteraction.icon)?.component || MousePointer2;
+                                            return <Icon className="w-5 h-5" />;
+                                        })()}
+                                    </button>
+
+                                    {isIconPickerOpen && (
+                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
                                             <button
-                                                onClick={() => handleInteractionChange('icon', undefined)}
+                                                onClick={() => { handleInteractionChange('icon', undefined); setIsIconPickerOpen(false); }}
                                                 className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${!selectedInteraction.icon ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
                                                 title="Padrão"
                                             >
@@ -190,7 +220,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                             {TRACKER_ICONS.map(icon => (
                                                 <button
                                                     key={icon.name}
-                                                    onClick={() => handleInteractionChange('icon', icon.name)}
+                                                    onClick={() => { handleInteractionChange('icon', icon.name); setIsIconPickerOpen(false); }}
                                                     className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedInteraction.icon === icon.name ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
                                                     title={icon.name}
                                                 >
@@ -198,57 +228,93 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                                 </button>
                                             ))}
                                         </div>
-                                    </div>
+                                    )}
+                                </div>
+
+                                {/* Verbs */}
+                                <div className="flex-1 space-y-1.5">
+                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Verbos (separados por vírgula)</label>
                                     <input
                                         type="text"
-                                        value={selectedInteraction.verbs.join(', ')}
-                                        onChange={e => handleInteractionChange('verbs', e.target.value.split(',').map(v => v.trim()).filter(Boolean))}
-                                        className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-100 focus:ring-1 focus:ring-green-500/50"
+                                        value={verbsInput}
+                                        onChange={e => setVerbsInput(e.target.value)}
+                                        onBlur={handleVerbsBlur}
+                                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-xs text-zinc-100 focus:ring-1 focus:ring-green-500/50 placeholder:text-zinc-600"
                                         placeholder="ex: pegar, usar, abrir"
                                     />
+                                    <p className="text-[10px] text-zinc-600">O jogador deve digitar um destes para iniciar a ação.</p>
                                 </div>
-                                <p className="text-[10px] text-zinc-600 mt-1">O jogador deve digitar um destes para iniciar a ação.</p>
-                            </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Alvo da Ação (Opcional)</label>
+                                {/* Target */}
+                                <div className="w-[30%] space-y-1.5">
+                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Alvo da Ação (Opcional)</label>
                                     <select
                                         value={selectedInteraction.target}
                                         onChange={e => handleInteractionChange('target', e.target.value)}
-                                        className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300"
+                                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-xs text-zinc-300"
                                     >
                                         <option value="">Nenhum (Ação no ambiente)</option>
                                         {sceneObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
                                     </select>
                                 </div>
-                                <div>
-                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">Requer Item (Inventário)</label>
+                            </div>
+
+                            {/* Row 2: Requirements & Consequences Checkboxes */}
+                            <div className="flex gap-4 items-start pt-2 border-t border-zinc-800/50">
+                                {/* Require Item */}
+                                <div className="w-[45%] space-y-1.5">
+                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">Requer Item (Inventário)</label>
                                     <select
                                         value={selectedInteraction.requiresInInventory || ''}
                                         onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)}
-                                        className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300"
+                                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-xs text-zinc-300"
                                     >
                                         <option value="">Não requer item</option>
                                         {allTakableObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
                                     </select>
                                 </div>
-                            </div>
 
-                            {/* Checkboxes */}
-                            <div className="flex gap-6 pt-2">
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked={!!selectedInteraction.removesTargetFromScene} onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)} className="rounded border-zinc-700 bg-zinc-900 text-green-500 focus:ring-green-500/20" />
-                                    <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Remove Alvo da Cena</span>
-                                </label>
-                                <label className="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" checked={!!selectedInteraction.addsToInventory} onChange={e => handleInteractionChange('addsToInventory', e.target.checked)} className="rounded border-zinc-700 bg-zinc-900 text-purple-500 focus:ring-purple-500/20" />
-                                    <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Adiciona ao Inventário</span>
-                                </label>
-                                <label className={`flex items-center gap-2 cursor-pointer ${!selectedInteraction.requiresInInventory && 'opacity-30'}`}>
-                                    <input type="checkbox" checked={!!selectedInteraction.consumesItem} onChange={e => handleInteractionChange('consumesItem', e.target.checked)} disabled={!selectedInteraction.requiresInInventory} className="rounded border-zinc-700 bg-zinc-900 text-red-500 focus:ring-red-500/20" />
-                                    <span className="text-[10px] text-zinc-400 uppercase font-bold tracking-wide">Consome Item Usado</span>
-                                </label>
+                                {/* Checkboxes */}
+                                <div className="flex-1 flex flex-col justify-center gap-3 pt-6">
+                                    <label className="flex items-center gap-2 cursor-pointer group">
+                                        <div className="relative flex items-center">
+                                            <input
+                                                type="checkbox"
+                                                checked={!!selectedInteraction.removesTargetFromScene}
+                                                onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)}
+                                                className="peer w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-green-500 focus:ring-green-500/20 focus:ring-offset-0 transition-all"
+                                            />
+                                        </div>
+                                        <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">Remove Alvo da Cena</span>
+                                    </label>
+
+                                    <div className="flex items-center gap-6">
+                                        <label className="flex items-center gap-2 cursor-pointer group">
+                                            <div className="relative flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={!!selectedInteraction.addsToInventory}
+                                                    onChange={e => handleInteractionChange('addsToInventory', e.target.checked)}
+                                                    className="peer w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 transition-all"
+                                                />
+                                            </div>
+                                            <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">Adiciona ao Inventário</span>
+                                        </label>
+
+                                        <label className={`flex items-center gap-2 cursor-pointer group ${!selectedInteraction.requiresInInventory && 'opacity-30 pointer-events-none'}`}>
+                                            <div className="relative flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={!!selectedInteraction.consumesItem}
+                                                    onChange={e => handleInteractionChange('consumesItem', e.target.checked)}
+                                                    disabled={!selectedInteraction.requiresInInventory}
+                                                    className="peer w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-red-500 focus:ring-red-500/20 focus:ring-offset-0 transition-all"
+                                                />
+                                            </div>
+                                            <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">Consome Item Usado</span>
+                                        </label>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

@@ -55,6 +55,9 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
     const [selectedTrackerId, setSelectedTrackerId] = useState<string | null>(sortedTrackers.length > 0 ? sortedTrackers[0].id : null);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const [verbsInput, setVerbsInput] = useState(''); // Unused here, skip
+    const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+
     useEffect(() => {
         setLocalTrackers(sortedTrackers);
         // If selected tracker was deleted or doesn't exist, select first or null
@@ -64,6 +67,10 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
             setSelectedTrackerId(sortedTrackers[0].id);
         }
     }, [sortedTrackers]);
+
+    useEffect(() => {
+        setIsIconPickerOpen(false);
+    }, [selectedTrackerId]);
 
     useEffect(() => {
         onSetDirty(JSON.stringify(localTrackers) !== JSON.stringify(trackers));
@@ -154,7 +161,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
 
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* Header with Save/Undo actions */}
             <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
                 <p className="text-zinc-500 text-xs font-medium max-w-lg">
@@ -308,15 +315,46 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                     {/* Main Grid */}
                                     <div className="grid grid-cols-4 gap-x-4 gap-y-6">
 
-                                        {/* Name field */}
-                                        <div className="col-span-3 space-y-1.5">
+                                        {/* Name field & Icon */}
+                                        <div className="col-span-4 space-y-1.5">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nome do Rastreador</label>
-                                            <input
-                                                type="text"
-                                                value={selectedTracker.name}
-                                                onChange={(e) => handleTrackerChange(selectedTracker.id, 'name', e.target.value)}
-                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
-                                            />
+                                            <div className="flex gap-2">
+                                                {/* Icon Picker */}
+                                                <div className="relative group shrink-0">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setIsIconPickerOpen(!isIconPickerOpen);
+                                                        }}
+                                                        className="w-10 h-10 flex items-center justify-center bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-400 hover:text-white hover:border-purple-500/50 transition-all"
+                                                    >
+                                                        {(() => {
+                                                            const Icon = TRACKER_ICONS.find(i => i.name === selectedTracker.icon)?.component || Activity;
+                                                            return <Icon className="w-5 h-5" />;
+                                                        })()}
+                                                    </button>
+                                                    {isIconPickerOpen && (
+                                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                                            {TRACKER_ICONS.map(icon => (
+                                                                <button
+                                                                    key={icon.name}
+                                                                    onClick={() => { handleTrackerChange(selectedTracker.id, 'icon', icon.name); setIsIconPickerOpen(false); }}
+                                                                    className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedTracker.icon === icon.name ? 'bg-purple-500/20 text-purple-400' : 'text-zinc-500'}`}
+                                                                    title={icon.name}
+                                                                >
+                                                                    <icon.component className="w-4 h-4" />
+                                                                </button>
+                                                            ))}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    value={selectedTracker.name}
+                                                    onChange={(e) => handleTrackerChange(selectedTracker.id, 'name', e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
+                                                />
+                                            </div>
                                         </div>
 
                                         {/* ID field */}
@@ -353,11 +391,11 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                             />
                                         </div>
 
-                                        {/* Bar Color & Icon */}
-                                        <div className="col-span-2 space-y-1.5">
-                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cor e Ícone</label>
+                                        {/* Bar Color */}
+                                        <div className="col-span-1 space-y-1.5">
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cor da Barra</label>
                                             <div className="flex items-center gap-2">
-                                                <div className="flex-1 flex items-center bg-zinc-950 border border-muted-foreground/30 rounded-lg px-2 py-1.5">
+                                                <div className="flex-1 flex items-center bg-zinc-950 border border-muted-foreground/30 rounded-lg px-2 py-1.5 h-[38px]">
                                                     <input
                                                         type="color"
                                                         value={selectedTracker.barColor || '#a855f7'}
@@ -372,30 +410,9 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                         placeholder="#a855f7"
                                                     />
                                                 </div>
-
-                                                {/* Icon Picker */}
-                                                <div className="relative group">
-                                                    <button className="w-9 h-9 flex items-center justify-center bg-zinc-950 border border-muted-foreground/30 rounded-lg text-zinc-400 hover:text-white hover:border-purple-500/50 transition-all">
-                                                        {(() => {
-                                                            const Icon = TRACKER_ICONS.find(i => i.name === selectedTracker.icon)?.component || Activity;
-                                                            return <Icon className="w-4 h-4" />;
-                                                        })()}
-                                                    </button>
-                                                    <div className="absolute right-0 top-full mt-2 w-64 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-20 hidden group-hover:grid grid-cols-6 gap-1">
-                                                        {TRACKER_ICONS.map(icon => (
-                                                            <button
-                                                                key={icon.name}
-                                                                onClick={() => handleTrackerChange(selectedTracker.id, 'icon', icon.name)}
-                                                                className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedTracker.icon === icon.name ? 'bg-purple-500/20 text-purple-400' : 'text-zinc-500'}`}
-                                                                title={icon.name}
-                                                            >
-                                                                <icon.component className="w-4 h-4" />
-                                                            </button>
-                                                        ))}
-                                                    </div>
-                                                </div>
                                             </div>
                                         </div>
+
 
                                         {/* Flags */}
                                         <div className="col-span-4 grid grid-cols-2 gap-4 pt-2">
