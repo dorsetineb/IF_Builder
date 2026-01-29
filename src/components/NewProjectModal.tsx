@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { X, Layout, Type, Palette, Play, Upload, Image as ImageIcon, Trash2, ChevronDown, ChevronUp, LayoutTemplate, BookOpen, ArrowRight, Terminal, MousePointerClick } from 'lucide-react';
+import { X, Layout, Type, Palette, Play, Upload, Image as ImageIcon, Trash2, ChevronDown, ChevronUp, LayoutTemplate, BookOpen, ArrowRight, Terminal, MousePointerClick, Package, BookText, Heart, SlidersHorizontal } from 'lucide-react';
 import { GameData, Vignette, Scene } from '../types';
 import { initialGameData } from '../lib/gameDefaults';
 import { FONTS, PREDEFINED_THEMES } from '../constants';
@@ -48,6 +48,10 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
     // System State
     const [interactionType, setInteractionType] = useState<'parser' | 'choice'>('parser');
+    const [enableInventory, setEnableInventory] = useState(true);
+    const [enableDiary, setEnableDiary] = useState(true);
+    const [enableChances, setEnableChances] = useState(false);
+    const [enableTrackers, setEnableTrackers] = useState(true);
 
     // Appearance State - Structure
     const [layoutOrientation, setLayoutOrientation] = useState<'vertical' | 'horizontal'>('vertical');
@@ -147,7 +151,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     // Helper for preview vignette (Splash Screen)
     const previewVignetteScene: Scene = useMemo(() => ({
         id: 'VNT_OPENING',
-        name: 'Abertura',
+        name: title || 'Abertura', // Map title here
         image: splashImage || '',
         description: description,
         interactions: [],
@@ -156,7 +160,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         vignetteType: 'opening',
         vignetteButtonText: startButtonText,
         vignetteNextSceneId: 'preview_scene'
-    }), [splashImage, description, startButtonText]);
+    }), [splashImage, description, startButtonText, title]);
 
     const previewGameData: GameData = useMemo(() => ({
         ...initialGameData,
@@ -165,6 +169,15 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         gameSplashButtonText: startButtonText,
         gameSplashImage: splashImage,
         gameInteractionType: interactionType,
+
+        // System Settings
+        enableInventory,
+        enableDiary,
+        enableChances,
+        enableTrackers,
+        // Since we are toggling them, we also need to make sure the UI reflect it
+        gameShowSystemButton: true, // Always show system button
+        gameShowTrackersUI: true, // Always show trackers UI if enabled
 
         // Appearance
         gameLayoutOrientation: layoutOrientation,
@@ -217,7 +230,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             textAnimationType: 'fade',
             textSpeed: 3
         }]
-    }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, theme, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewStandardScene, previewVignetteScene, tab]);
+    }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, theme, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewStandardScene, previewVignetteScene, tab, enableInventory, enableDiary, enableChances, enableTrackers]);
 
     const handleCreate = () => {
         const initialVignette: Vignette = {
@@ -234,6 +247,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
         const newGameData: Partial<GameData> = {
             ...previewGameData,
+            gameSplashButtonText: startButtonText, // Explicitly save to gameSplashButtonText
             vignettes: [initialVignette],
             // id is not in GameData type, managed externally or implicitly
         };
@@ -330,6 +344,82 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 </p>
                                             </div>
                                         </button>
+                                    </div>
+
+                                    <div className="w-full h-px bg-zinc-800 my-2"></div>
+
+                                    <div className="grid grid-cols-1 gap-4">
+                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-zinc-800 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-lg ${enableInventory ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <Package className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableInventory ? 'text-white' : 'text-zinc-400'}`}>Inventário</h4>
+                                                    <p className="text-xs text-zinc-500">Gestão de itens pegos pelo jogador</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setEnableInventory(!enableInventory)}
+                                                className={`w-12 h-6 rounded-full relative transition-all ${enableInventory ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm ${enableInventory ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+
+                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-zinc-800 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-lg ${enableDiary ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <BookText className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableDiary ? 'text-white' : 'text-zinc-400'}`}>Diário de Bordo</h4>
+                                                    <p className="text-xs text-zinc-500">Registro automático de eventos</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setEnableDiary(!enableDiary)}
+                                                className={`w-12 h-6 rounded-full relative transition-all ${enableDiary ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm ${enableDiary ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+
+                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-zinc-800 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-lg ${enableChances ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <Heart className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableChances ? 'text-white' : 'text-zinc-400'}`}>Sistema de Vidas</h4>
+                                                    <p className="text-xs text-zinc-500">Limitar tentativas e chances</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setEnableChances(!enableChances)}
+                                                className={`w-12 h-6 rounded-full relative transition-all ${enableChances ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm ${enableChances ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
+
+                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-zinc-800 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                            <div className="flex items-center gap-4">
+                                                <div className={`p-3 rounded-lg ${enableTrackers ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
+                                                    <SlidersHorizontal className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableTrackers ? 'text-white' : 'text-zinc-400'}`}>Rastreadores</h4>
+                                                    <p className="text-xs text-zinc-500">Variáveis numéricas (saúde, dinheiro, sanidade)</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setEnableTrackers(!enableTrackers)}
+                                                className={`w-12 h-6 rounded-full relative transition-all ${enableTrackers ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm ${enableTrackers ? 'translate-x-6' : 'translate-x-0'}`} />
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             )}

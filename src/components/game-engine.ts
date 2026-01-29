@@ -613,6 +613,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // CHOICE MODE HANDLING
         if (gameData.gameInteractionType === 'choice') {
             document.querySelector('.input-area').classList.add('hidden');
+            // Hide Suggestions and Inventory in IF/Choice mode
+            if (suggestionsButton) suggestionsButton.classList.add('hidden');
+            if (inventoryButton) inventoryButton.classList.add('hidden');
+            
             const choicesContainer = document.createElement('div');
             choicesContainer.className = 'choices-container';
             choicesContainer.style.marginTop = '20px';
@@ -626,18 +630,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.textContent = choice.label;
                     btn.className = 'choice-button';
                     // Inline styles for basic look, can be moved to CSS later or use existing classes
+                    // Updated styling to match Action Button
                     btn.style.padding = '12px 16px';
-                    btn.style.textAlign = 'left';
-                    btn.style.backgroundColor = 'var(--button-bg, #21262d)';
-                    btn.style.border = '1px solid var(--border-color, rgba(255,255,255,0.2))';
-                    btn.style.borderRadius = '8px';
-                    btn.style.color = 'var(--text-color, #e0e0e0)';
+                    btn.style.textAlign = 'center'; // Center text like action button
+                    btn.style.backgroundColor = 'var(--action-button-bg, #ffffff)';
+                    btn.style.color = 'var(--action-button-text-color, #0d1117)';
+                    btn.style.border = '2px solid var(--border-color, rgba(255,255,255,0.2))';
+                    btn.style.borderRadius = '8px'; // Keep rounded or match action button preference? Action button is usually standard box.
+                    // Actually action button usually inherits standard border radius.
+                    btn.style.fontFamily = 'var(--font-family)';
+                    btn.style.fontSize = '1em';
+                    btn.style.fontWeight = 'bold';
                     btn.style.cursor = 'pointer';
                     btn.style.transition = 'all 0.2s';
-                    
-                    btn.onmouseover = () => { 
-                         btn.style.borderColor = 'var(--highlight-color, #a855f7)'; 
-                         btn.style.transform = 'translateX(4px)'; 
+                    btn.style.width = '100%';
+                    btn.style.textTransform = 'uppercase';
+
+                    btn.onmouseover = () => {
+                         btn.style.filter = 'brightness(0.9)';
+                         btn.style.transform = 'translateY(-2px)';
                     };
                     btn.onmouseout = () => { 
                          btn.style.borderColor = 'var(--border-color, rgba(255,255,255,0.2))'; 
