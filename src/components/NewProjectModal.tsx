@@ -242,23 +242,34 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, theme, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewStandardScene, previewVignetteScene, tab, enableInventory, enableDiary, enableChances, enableTrackers]);
 
     const handleCreate = () => {
-        const initialVignette: Vignette = {
-            id: 'vignette_opening',
+        const startSceneId = 'SCN_OPENING';
+
+        // Create the Opening Vignette as a Scene
+        const openingScene: Scene = {
+            id: startSceneId,
             name: 'Abertura',
-            title: title || 'Abertura',
-            description: description,
-            buttonText: startButtonText,
-            showTitle: true,
-            showDescription: true,
-            textAnimationType: 'fade',
-            textSpeed: 3
+            description: description || '',
+            image: splashImage, // Use the splash image for the scene background if desired, or keep generic/empty
+            interactions: [],
+            objectIds: [],
+            vignetteType: 'opening',
+            vignetteButtonText: startButtonText,
+            mapX: 0,
+            mapY: 0
         };
 
         const newGameData: Partial<GameData> = {
             ...previewGameData,
-            gameSplashButtonText: startButtonText, // Explicitly save to gameSplashButtonText
-            vignettes: [initialVignette],
-            // id is not in GameData type, managed externally or implicitly
+            gameTitle: title, // Ensure title is synced
+            gameSplashDescription: description,
+            gameSplashButtonText: startButtonText,
+            gameSplashImage: splashImage,
+            startScene: startSceneId,
+            scenes: {
+                [startSceneId]: openingScene
+            },
+            sceneOrder: [startSceneId],
+            vignettes: [] // Clear legacy vignettes to prevent confusion
         };
 
         onCreate(newGameData);

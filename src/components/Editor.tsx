@@ -19,6 +19,7 @@ import GlobalObjectsEditor from './GlobalObjectsEditor';
 import TrackersEditor from './TrackersEditor';
 import GlobalCommandsEditor from './GlobalCommandsEditor';
 import { ConfirmationModal } from './ConfirmationModal';
+import { NewProjectModal } from './NewProjectModal';
 import { TransitionScreen } from './TransitionScreen';
 import UserManualModal from './UserManualModal';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
@@ -184,6 +185,7 @@ const Editor: React.FC = () => {
         onCancel: () => { },
         isDanger: false
     });
+    const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
 
     const closeConfirmationModal = () => {
         setConfirmationModal(prev => ({ ...prev, isOpen: false }));
@@ -803,27 +805,35 @@ DATE:        ${exportDate.toLocaleString()}
     };
 
     const handleNewGame = () => {
-        if (isDirty) {
+        const hasScenes = Object.keys(gameData.scenes).length > 0;
+
+        if (hasScenes) {
             setConfirmationModal({
                 isOpen: true,
                 title: "Novo Jogo",
-                message: "Existem alterações não salvas. Deseja iniciar um novo jogo e perder as alterações atuais?",
+                message: "Existem cenas criadas neste projeto. Ao criar uma nova ficção, todas as alterações não salvas serão perdidas. Deseja continuar?",
                 isDanger: true,
                 onConfirm: () => {
                     closeConfirmationModal();
-                    setGameData(initialGameData);
-                    setSelectedSceneId(null);
-                    setCurrentView('interface'); // Redirect to Interface
-                    setIsDirty(false);
+                    setIsNewProjectModalOpen(true);
                 },
                 onCancel: closeConfirmationModal
             });
-            return;
+        } else {
+            setIsNewProjectModalOpen(true);
         }
-        setGameData(initialGameData);
+    };
 
+    const handleProjectCreated = (newGameData: Partial<GameData>) => {
+        setIsNewProjectModalOpen(false);
+        setGameData({
+            ...initialGameData,
+            ...newGameData
+        });
         setIsDirty(false);
         setImportKey(prev => prev + 1);
+        setCurrentView('scenes'); // Or 'interface' if you prefer to land on settings
+        toast("Nova Ficção Criada", "Projeto iniciado com sucesso!", "success");
     };
 
     const handleStartCreating = () => {
@@ -1300,6 +1310,11 @@ DATE:        ${exportDate.toLocaleString()}
                 onConfirm={confirmationModal.onConfirm}
                 onCancel={confirmationModal.onCancel}
                 isDanger={confirmationModal.isDanger}
+            />
+            <NewProjectModal
+                isOpen={isNewProjectModalOpen}
+                onClose={() => setIsNewProjectModalOpen(false)}
+                onCreate={handleProjectCreated}
             />
             <UserManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
         </div>
