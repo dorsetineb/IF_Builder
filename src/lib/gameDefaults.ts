@@ -48,6 +48,18 @@ export const gameHTML = `
             </div>
         </div>
 
+        <div id="vignette-screen" class="splash-screen hidden">
+            <div class="splash-content">
+                <div class="splash-text">
+                    <h1 id="vignette-title"></h1>
+                    <p id="vignette-description"></p>
+                </div>
+                <div class="splash-buttons">
+                    <button id="vignette-continue-button" class="ending-restart-button">Continuar</button>
+                </div>
+            </div>
+        </div>
+
         <div class="game-container __LAYOUT_ORIENTATION_CLASS__ __LAYOUT_ORDER_CLASS__" id="game-container">
             <div class="image-panel">
                 <div id="image-container" class="image-container">
@@ -163,8 +175,8 @@ body.with-spacing .main-wrapper { height: 100%; }
 .splash-text h1 { font-size: 2em; color: var(--accent-color); margin: 0; text-shadow: none; }
 .splash-text p { font-size: 0.95em; margin-top: 10px; color: var(--text-color); max-width: 60ch; white-space: pre-wrap; }
 .splash-buttons { display: flex; flex-direction: column; gap: 15px; width: 100%; align-items: var(--splash-content-align-items); }
-#splash-start-button, .ending-restart-button, #continue-button { font-family: var(--font-family); padding: 12px 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; }
-#splash-start-button, .ending-restart-button { background-color: var(--splash-button-bg); }
+#splash-start-button, .ending-restart-button, #continue-button, #vignette-continue-button { font-family: var(--font-family); padding: 12px 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; }
+#splash-start-button, .ending-restart-button, #vignette-continue-button { background-color: var(--splash-button-bg); }
 #continue-button { background-color: #1d4ed8; }
 #splash-start-button:hover, .ending-restart-button:hover, #continue-button:hover { transform: translateY(-3px); box-shadow: 0 3px 0px rgba(0, 0, 0, 0.4); }
 #splash-start-button:hover, .ending-restart-button:hover { background-color: var(--splash-button-hover-bg); }

@@ -67,12 +67,13 @@ const SceneList: React.FC<SceneListProps> = ({
         {scenes.map((scene, index) => (
           <li
             key={scene.id}
-            className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-lg transition-all overflow-hidden ${selectedSceneId === scene.id
+            onClick={() => onSelectScene(scene.id)}
+            className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-lg transition-all overflow-hidden cursor-pointer ${selectedSceneId === scene.id
               ? isDirty
                 ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold'
                 : 'bg-primary/20 text-primary border border-primary/30'
               : 'hover:bg-muted/50'
-              } ${scene.id === startSceneId ? 'cursor-default' : ''}`}
+              }`}
             onDragStart={(e) => scene.id !== startSceneId && handleDragStart(e, index)}
             onDragEnter={(e) => scene.id !== startSceneId && handleDragEnter(e, index)}
             onDragEnd={handleDragEnd}

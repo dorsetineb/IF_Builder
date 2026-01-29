@@ -661,6 +661,7 @@ DATE:        ${exportDate.toLocaleString()}
                 startScene: isFirst ? newId : prev.startScene
             };
         });
+        setCurrentView('scenes');
         setSelectedSceneId(newId);
         setIsDirty(true);
     };
@@ -757,6 +758,7 @@ DATE:        ${exportDate.toLocaleString()}
                 sceneOrder: orderWithNew
             };
         });
+        setCurrentView('scenes');
         setSelectedSceneId(newId);
         setIsDirty(true);
     };

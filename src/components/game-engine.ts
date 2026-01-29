@@ -18,7 +18,10 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 removesChanceOnEntry: scene.removesChanceOnEntry,
                 restoresChanceOnEntry: scene.restoresChanceOnEntry,
                 objectIds: scene.objectIds || [],
-                choices: scene.choices || []
+                choices: scene.choices || [],
+                vignetteType: scene.vignetteType,
+                vignetteButtonText: scene.vignetteButtonText,
+                vignetteNextSceneId: scene.vignetteNextSceneId
             };
         }
     }
@@ -165,6 +168,25 @@ document.addEventListener('DOMContentLoaded', () => {
     
     const closeButtons = document.querySelectorAll('.modal-close-button');
 
+    // Vignette screen elements detection and injection
+    let vignetteScreen = document.getElementById('vignette-screen');
+    // Force remove existing element to ensure updates are applied (fixing stale DOM issues)
+    if (vignetteScreen) vignetteScreen.remove();
+
+    console.log('Injecting Vignette screen...');
+    const vDiv = document.createElement('div');
+    vDiv.id = 'vignette-screen';
+    vDiv.className = 'splash-screen hidden';
+    // Use inline styles as a fallback to guarantee the look matches splash button even if CSS is missing
+    const btnStyle = 'font-family: var(--font-family); padding: 12px 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; background-color: var(--splash-button-bg);';
+    vDiv.innerHTML = '<div class="splash-content"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '">Continuar</button></div></div>';
+    document.body.appendChild(vDiv);
+    vignetteScreen = vDiv;
+
+    const vignetteTitle = document.getElementById('vignette-title');
+    const vignetteDescription = document.getElementById('vignette-description');
+    const vignetteContinueButton = document.getElementById('vignette-continue-button');
+
     const playSound = (src) => { if (src && soundEffectAudio) { soundEffectAudio.src = src; soundEffectAudio.play().catch(e => {}); } };
 
     let bgmFadeInterval = null;
@@ -240,9 +262,8 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('keydown', startAudioOnInteraction);
 
         const hasAutoSave = localStorage.getItem('if_builder_autosave_' + document.title);
-        if (hasAutoSave && !window.isPreview) continueButton.classList.remove('hidden');
-        splashStartButton.addEventListener('click', startGame);
-        continueButton.addEventListener('click', () => loadGameFromData(hasAutoSave));
+        // Auto-start game, bypassing splash screen
+        startGame();
         endingRestartButtons.forEach(btn => btn.addEventListener('click', () => {
              positiveEndingScreen.classList.add('hidden'); 
              negativeEndingScreen.classList.add('hidden'); 
@@ -300,9 +321,10 @@ document.addEventListener('DOMContentLoaded', () => {
         loadScene(currentSceneId, false); 
         standardActionBar.classList.remove('hidden');
         endingActionBar.classList.add('hidden');
-        splashScreen.classList.remove('hidden');
-        splashScreen.classList.add('fade-out');
-        setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
+        splashScreen.classList.add('hidden'); // Force hidden immediately
+        // splashScreen.classList.remove('hidden');
+        // splashScreen.classList.add('fade-out');
+        // setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
     };
 
     const loadGameFromData = (jsonString) => {
@@ -397,6 +419,57 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const def of definitions) { if (trackers[def.id] >= def.maxValue && def.consequenceSceneId) { setTimeout(() => { loadScene(def.consequenceSceneId, true, 'fade'); }, 500); return; } }
     };
 
+    const showVignetteScreen = (scene) => {
+        // Hide game container and show vignette screen
+        gameContainer.classList.add('hidden');
+        
+        // Set vignette content
+        if (vignetteTitle) vignetteTitle.textContent = scene.name || '';
+        if (vignetteDescription) vignetteDescription.textContent = scene.description || '';
+        
+        // Set button text
+        const buttonText = scene.vignetteButtonText || (scene.vignetteType === 'conclusion' ? 'Reiniciar' : 'Continuar');
+        if (vignetteContinueButton) vignetteContinueButton.textContent = buttonText;
+        
+        // Set background image
+        if (scene.image) {
+            vignetteScreen.style.backgroundImage = 'url(' + scene.image + ')';
+        } else {
+            vignetteScreen.style.backgroundImage = 'none';
+        }
+        
+        // Handle button click
+        const handleVignetteClick = () => {
+            vignetteContinueButton.removeEventListener('click', handleVignetteClick);
+            
+            if (scene.vignetteType === 'conclusion') {
+                // Restart game
+                vignetteScreen.classList.add('hidden');
+                splashScreen.classList.remove('hidden');
+                splashScreen.classList.remove('fade-out');
+                if (gameData.gameBackgroundMusic) playBgm(gameData.gameBackgroundMusic);
+            } else if (scene.vignetteNextSceneId) {
+                // Go to next scene
+                vignetteScreen.classList.add('fade-out');
+                setTimeout(() => {
+                    vignetteScreen.classList.add('hidden');
+                    vignetteScreen.classList.remove('fade-out');
+                    gameContainer.classList.remove('hidden');
+                    loadScene(scene.vignetteNextSceneId, false);
+                }, 1000);
+            } else {
+                // No next scene defined, just hide vignette and show game
+                vignetteScreen.classList.add('hidden');
+                gameContainer.classList.remove('hidden');
+            }
+        };
+        
+        vignetteContinueButton.addEventListener('click', handleVignetteClick);
+        
+        // Show the vignette screen
+        vignetteScreen.classList.remove('hidden');
+    };
+
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
         const scene = gameData.cenas[sceneId]; if (!scene) return;
         if (scene.backgroundMusic) playBgm(scene.backgroundMusic);
@@ -405,6 +478,14 @@ document.addEventListener('DOMContentLoaded', () => {
         currentSceneId = sceneId;
         if (!visitedScenes.includes(sceneId)) visitedScenes.push(sceneId);
         actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
+        
+        // Check if this is a vignette scene
+        if (scene.vignetteType && scene.vignetteType !== 'none') {
+            showVignetteScreen(scene);
+            autoSaveGame();
+            return;
+        }
+        
         let effectiveTransition = !transitionType || transitionType === 'none' ? (gameData.gameImageTransitionType || 'fade') : transitionType;
         if (effectiveTransition === 'none') transition = false;
         if (transitionSpeed !== null) {
