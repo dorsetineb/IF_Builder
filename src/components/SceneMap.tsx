@@ -127,6 +127,32 @@ const SceneMap: React.FC<SceneMapProps> = ({
           }
         }
 
+        // Link Vignette Next Scene (e.g. Opening -> First Scene)
+        if (scene.vignetteNextSceneId) {
+          // Check if it's the End Game
+          if (scene.vignetteNextSceneId === 'END_GAME') {
+            // Determine if positive or negative? Actually End Game in Vignettes usually acts as closure.
+            // We could link to Victory or just leave it.
+            // Let's link to a virtual 'Fim' node or just Victory if implied.
+            const victoryVig = vignettes.find(v => v.id === 'VNT_VICTORY');
+            if (victoryVig) { // Legacy check, might not exist
+              items.push({
+                id: `link-endgame-${scene.id}`,
+                targetId: 'VNT_VICTORY', // Assuming end game is victory for now, or just generic end
+                label: scene.vignetteButtonText || 'Fim',
+                type: 'vignette'
+              });
+            }
+          } else {
+            items.push({
+              id: `link-vignette-${scene.id}`,
+              targetId: scene.vignetteNextSceneId,
+              label: scene.vignetteButtonText || 'Continuar',
+              type: 'scene'
+            });
+          }
+        }
+
         return items;
       }
     } else { // Vignette

@@ -649,7 +649,8 @@ DATE:        ${exportDate.toLocaleString()}
             image: '',
             description: 'Descrição da nova cena.',
             objectIds: [],
-            interactions: []
+            interactions: [],
+            vignetteType: 'none'
         };
 
         setGameData(prev => {
@@ -1082,10 +1083,7 @@ DATE:        ${exportDate.toLocaleString()}
                             onAddScene={handleAddScene}
                             onDeleteScene={handleDeleteScene}
                             onReorderScenes={handleReorderScenes}
-                            onSetView={(view) => {
-                                setCurrentView(view);
-                                setIsDirty(false);
-                            }}
+                            onSetView={handleSetView}
                             onExit={handleExit}
                             onNavigate={handleNavigate}
                             onImportGame={handleImportGame}
