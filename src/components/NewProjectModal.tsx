@@ -815,14 +815,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                                         Nome da Cena
                                                                     </div>
                                                                 </div>
-                                                                {/* Chances Overlay */}
-                                                                {enableChances && (
-                                                                    <div className="absolute top-4 right-4 flex gap-1 z-20">
-                                                                        {[1, 2, 3].map(i => (
-                                                                            <Heart key={i} className="w-4 h-4 fill-current" style={{ color: colors.chanceIconColor || '#ff4d4d' }} />
-                                                                        ))}
-                                                                    </div>
-                                                                )}
+
                                                             </div>
                                                         </div>
                                                     );
@@ -838,12 +831,46 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     {'>'} COMANDO DE EXEMPLO
                                                 </p>
                                             </div>
+                                            {/* Footer inside Text Area for Chances */}
+                                            {enableChances && (
+                                                <div className="flex justify-end pt-2 mt-2">
+                                                    <div className="flex gap-1">
+                                                        {[1, 2, 3].map(i => (
+                                                            <Heart key={i} className="w-4 h-4 fill-current" style={{ color: colors.chanceIconColor || '#ff4d4d' }} />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Preview Footer (Input OR Choices) */}
                                         <div className={`p-3 border-t backdrop-blur-sm flex-shrink-0 space-y-2 ${theme === 'dark' ? 'border-zinc-900 bg-zinc-950/80' : 'border-zinc-200 bg-white/80'}`}>
 
-                                            {/* Logic for Interaction Type: Parser vs Choice */}
+                                            {/* System Buttons Row */}
+                                            <div className="flex gap-2 pb-1">
+                                                {/* Suggestions Button */}
+                                                <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
+                                                    Sugestões
+                                                </button>
+
+                                                {enableInventory && (
+                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
+                                                        Inventário
+                                                    </button>
+                                                )}
+                                                {enableDiary && (
+                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
+                                                        Diário
+                                                    </button>
+                                                )}
+                                                {enableTrackers && (
+                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
+                                                        Rastreadores
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            {/* Input Area */}
                                             {interactionType === 'parser' ? (
                                                 <div className="flex gap-2">
                                                     <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${theme === 'dark' ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
@@ -886,48 +913,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     </button>
                                                 </div>
                                             )}
-
-                                            {/* System Buttons Row */}
-                                            <div className="flex gap-2 pt-1">
-                                                {enableInventory && (
-                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
-                                                        Inventário
-                                                    </button>
-                                                )}
-                                                {enableTrackers && (
-                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
-                                                        Rastreadores
-                                                    </button>
-                                                )}
-                                                {enableDiary && (
-                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
-                                                        Diário
-                                                    </button>
-                                                )}
-                                                {/* Removed System Button as requested */}
-                                            </div>
-
-                                            {/* Start Button Visualization (Optional? Usually mostly for Splash but user has it there in preview)
-                                                Actually lines 838-843 show 'Botão de Início'. 
-                                                If it's game preview, we usually don't show the splash button in the action bar, 
-                                                but the code had it: 'startButtonText || BOTÃO DE INÍCIO'.
-                                                This seems to be mimicking the Start Screen logic OR just demonstrating button style.
-                                                However, standard game doesn't have this in footer. 
-                                                Wait, looking at line 838-843 in previous code... it WAS showing startButtonText.
-                                                If this is 'Game Interface' preview, start button shouldn't be there.
-                                                But maybe it's to preview the Splash Button Color?
-                                                I'll leave it but maybe conditionally? No, let's keep it for color preview consistency unless user asked to remove.
-                                                User didn't ask to remove start button from preview, just System Button.
-                                                actually, user said "a pre-visualização da vinheta deve ser exibido apenas na aba informações".
-                                                This Start Button here is likely using the Splash Button styles, which are relevant.
-                                                I'll keep it but properly styled.
-                                            */}
-                                            <button
-                                                className="w-full h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center transition-colors hover:opacity-90 truncate mt-2"
-                                                style={{ backgroundColor: colors.splashButtonColor, color: colors.splashButtonTextColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily }}
-                                            >
-                                                {startButtonText || 'BOTÃO DE INÍCIO'}
-                                            </button>
                                         </div>
                                     </div>
                                 );
