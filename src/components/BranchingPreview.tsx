@@ -22,8 +22,12 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                     if (choice.targetSceneId === currentScene.id) sources.add(scene.name);
                 });
             }
+            // Check vignette
+            if (scene.vignetteNextSceneId === currentScene.id) {
+                sources.add(scene.name);
+            }
         });
-        return Array.from(sources).slice(0, 3); // Limit to 3 for display
+        return Array.from(sources).slice(0, 5); // Limit to 5 for display
     }, [allScenes, currentScene.id]);
 
     // Calculate Outputs (Scenes linked FROM this scene)
@@ -45,11 +49,20 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                 }
             });
         }
-        return Array.from(targets).slice(0, 3); // Limit to 3 for display
+        // Vignette
+        if (currentScene.vignetteNextSceneId) {
+            if (currentScene.vignetteNextSceneId === 'END_GAME') {
+                targets.add('Fim de Jogo');
+            } else {
+                const targetScene = allScenes.find(s => s.id === currentScene.vignetteNextSceneId);
+                if (targetScene) targets.add(targetScene.name);
+            }
+        }
+        return Array.from(targets).slice(0, 5); // Limit to 5 for display
     }, [currentScene, allScenes]);
 
     return (
-        <div className="relative w-full h-[200px] bg-zinc-950/50 rounded-lg border border-zinc-800 flex items-center justify-center overflow-hidden">
+        <div className="relative w-full min-h-[240px] bg-zinc-950/50 rounded-lg border border-zinc-800 flex items-center justify-center overflow-hidden py-4">
             {/* Background Grid Pattern */}
             <div className="absolute inset-0" style={{
                 backgroundImage: 'radial-gradient(circle, #3f3f46 1px, transparent 1px)',
@@ -63,16 +76,16 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                 <div className="flex flex-col gap-2 items-end w-1/4">
                     {incomingConnections.length > 0 ? (
                         incomingConnections.map((name, i) => (
-                            <div key={i} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-[10px] text-zinc-400 truncate max-w-full text-center shadow-lg">
+                            <div key={i} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-[10px] text-zinc-400 truncate max-w-full text-center shadow-lg w-full">
                                 {name}
                             </div>
                         ))
                     ) : (
-                        <div className="px-3 py-2 bg-zinc-900/50 border border-zinc-800 border-dashed rounded text-[10px] text-zinc-600 italic">
+                        <div className="px-3 py-2 bg-zinc-900/50 border border-zinc-800 border-dashed rounded text-[10px] text-zinc-600 italic w-full text-center">
                             Sem origem
                         </div>
                     )}
-                    {incomingConnections.length >= 3 && <div className="text-[9px] text-zinc-600 text-center">...</div>}
+                    {incomingConnections.length >= 5 && <div className="text-[9px] text-zinc-600 text-center">...</div>}
                 </div>
 
                 {/* Connection Lines (Simplified SVG) */}
@@ -88,7 +101,6 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                 <div className="w-1/4 flex-shrink-0 z-20">
                     <div className="px-4 py-3 bg-zinc-900 border-2 border-purple-500/50 rounded-lg shadow-[0_0_15px_rgba(168,85,247,0.15)] flex flex-col items-center">
                         <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest whitespace-nowrap">Esta Cena</span>
-
                     </div>
                 </div>
 
@@ -104,16 +116,16 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                 <div className="flex flex-col gap-2 items-start w-1/4">
                     {outgoingConnections.length > 0 ? (
                         outgoingConnections.map((name, i) => (
-                            <div key={i} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-[10px] text-zinc-400 truncate max-w-full text-center shadow-lg">
+                            <div key={i} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-[10px] text-zinc-400 truncate max-w-full text-center shadow-lg w-full">
                                 {name}
                             </div>
                         ))
                     ) : (
-                        <div className="px-3 py-2 bg-zinc-900/50 border border-zinc-800 border-dashed rounded text-[10px] text-zinc-600 italic">
+                        <div className="px-3 py-2 bg-zinc-900/50 border border-zinc-800 border-dashed rounded text-[10px] text-zinc-600 italic w-full text-center">
                             Sem destino
                         </div>
                     )}
-                    {outgoingConnections.length >= 3 && <div className="text-[9px] text-zinc-600 text-center">...</div>}
+                    {outgoingConnections.length >= 5 && <div className="text-[9px] text-zinc-600 text-center">...</div>}
                 </div>
             </div>
         </div>
