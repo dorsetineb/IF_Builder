@@ -449,13 +449,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 splashScreen.classList.remove('fade-out');
                 if (gameData.gameBackgroundMusic) playBgm(gameData.gameBackgroundMusic);
             } else if (scene.vignetteNextSceneId) {
-                // Go to next scene
+                // Go to next scene: Load it FIRST (behind the vignette), then fade out
+                gameContainer.classList.remove('hidden');
+                loadScene(scene.vignetteNextSceneId, false);
+                
                 vignetteScreen.classList.add('fade-out');
                 setTimeout(() => {
                     vignetteScreen.classList.add('hidden');
                     vignetteScreen.classList.remove('fade-out');
-                    gameContainer.classList.remove('hidden');
-                    loadScene(scene.vignetteNextSceneId, false);
                 }, 1000);
             } else {
                 // No next scene defined, just hide vignette and show game
