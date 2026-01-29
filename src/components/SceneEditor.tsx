@@ -487,6 +487,30 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                     </div>
                                 </div>
 
+                                {/* Branching Preview Card */}
+                                <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                                            <GitBranch className="w-4 h-4 text-muted-foreground" />
+                                            CONEXÕES
+                                        </h3>
+                                        {/* Optional: Link to full map if needed, but simplistic for now */}
+                                        <button onClick={() => onViewMap?.()} className="text-[10px] text-purple-400 hover:text-purple-300 font-bold uppercase tracking-widest transition-colors flex items-center gap-1" title="Volte ao mapa para ver completo">
+                                            Ver Mapa Completo
+                                        </button>
+                                    </div>
+
+                                    <BranchingPreview currentScene={localScene} allScenes={allScenes} />
+
+                                    <p className="text-[10px] text-zinc-500 text-center mt-3">
+                                        Visualização rápida das conexões diretas.
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Right Column: Rules & Preview */}
+                            <div className="space-y-6">
+
                                 {/* Multimedia Card */}
                                 <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
                                     <div className="flex justify-between items-center mb-4">
@@ -567,10 +591,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                         </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Right Column: Rules & Preview */}
-                            <div className="space-y-6">
 
 
                                 {/* Narrative Rules Card - Renamed to Chance Rules */}
@@ -618,25 +639,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                     </div>
                                 )}
 
-                                {/* Branching Preview Card */}
-                                <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
-                                    <div className="flex justify-between items-center mb-4">
-                                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                                            <GitBranch className="w-4 h-4 text-muted-foreground" />
-                                            CONEXÕES
-                                        </h3>
-                                        {/* Optional: Link to full map if needed, but simplistic for now */}
-                                        <button onClick={() => onViewMap?.()} className="text-[10px] text-purple-400 hover:text-purple-300 font-bold uppercase tracking-widest transition-colors flex items-center gap-1" title="Volte ao mapa para ver completo">
-                                            Ver Mapa Completo
-                                        </button>
-                                    </div>
 
-                                    <BranchingPreview currentScene={localScene} allScenes={allScenes} />
-
-                                    <p className="text-[10px] text-zinc-500 text-center mt-3">
-                                        Visualização rápida das conexões diretas.
-                                    </p>
-                                </div>
                             </div>
                         </div>
                     )}
