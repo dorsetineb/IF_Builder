@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { User, Lock, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, Terminal, Mail, Check, Languages } from 'lucide-react';
+import { User, Lock, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, Terminal, Mail, Check } from 'lucide-react';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { useTheme } from '../components/ThemeProvider';
 import { useToast } from '../components/ToastContext';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../components/UserContext';
-import { useTranslation } from 'react-i18next';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -17,7 +16,6 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState('');
-    const { t, i18n } = useTranslation();
 
     // Form States
     const [displayName, setDisplayName] = useState('');
@@ -78,10 +76,6 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         setTheme(newTheme);
     };
 
-    const changeLanguage = (lng: string) => {
-        i18n.changeLanguage(lng);
-    };
-
     // Calculate isDirty
     const isDirty = (
         theme !== originalTheme ||
@@ -114,10 +108,10 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
             const { error } = await supabase.from('profiles').upsert(updates);
 
             if (error) {
-                toast(t('settings.saveError'), error.message, "error");
+                toast("Erro ao salvar perfil", error.message, "error");
                 savedRef.current = false; // Reset if failed
             } else {
-                toast(t('common.success'), t('settings.saveSuccess'), "success");
+                toast("Sucesso!", "Configurações atualizadas.", "success");
                 setInitialProfile({
                     full_name: displayName,
                     username,
@@ -130,7 +124,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
             }
         } catch (err) {
             console.error("Unexpected error saving profile:", err);
-            toast(t('common.error'), t('common.unexpectedError'), "error");
+            toast("Erro", "Ocorreu um erro inesperado.", "error");
         } finally {
             setLoading(false);
         }
@@ -169,15 +163,15 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
             {!hideHeader && (
                 <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
                     <div className="flex flex-col justify-center h-full">
-                        <h1 className="text-xl font-bold text-foreground">{t('settings.title')}</h1>
-                        <p className="text-[10px] text-muted-foreground hidden md:block">{t('settings.subtitle')}</p>
+                        <h1 className="text-xl font-bold text-foreground">Configurações</h1>
+                        <p className="text-[10px] text-muted-foreground hidden md:block">Gerencie suas preferências e perfil.</p>
                     </div>
                     <button
                         type="button"
                         onClick={(e) => handleLogout(e)}
                         className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white border border-red-500/20 text-xs font-bold transition-all shadow-sm"
                     >
-                        <LogOut size={14} /> {t('settings.logout')}
+                        <LogOut size={14} /> Sair da Conta
                     </button>
                 </div>
             )}
@@ -189,7 +183,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         disabled={loading || !isDirty}
                         className="bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold py-2 px-6 rounded-lg flex items-center gap-2 transition-all disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed text-xs shadow-md"
                     >
-                        {loading ? t('common.saving') : t('common.save')}
+                        {loading ? 'Salvando...' : 'Salvar Alterações'}
                     </button>
                 </div>
 
@@ -197,7 +191,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
                     <div className="flex items-center gap-2 mb-3 text-primary">
                         <Sun size={16} />
-                        <h2 className="text-sm font-bold text-card-foreground">{t('settings.sectionAppearance')}</h2>
+                        <h2 className="text-sm font-bold text-card-foreground">Aparência</h2>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -206,7 +200,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Moon size={16} className={theme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themeDark')}</span>
+                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>Escuro</span>
                         </button>
 
                         <button
@@ -214,7 +208,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Sun size={16} className={theme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themeLight')}</span>
+                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>Claro</span>
                         </button>
 
                         <button
@@ -222,7 +216,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Coffee size={16} className={theme === 'cream' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themeCream')}</span>
+                            <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>Creme</span>
                         </button>
 
                         <button
@@ -230,7 +224,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Terminal size={16} className={theme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themeTerminal')}</span>
+                            <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>Terminal</span>
                         </button>
                     </div>
                 </div>
@@ -239,23 +233,23 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
                     <div className="flex items-center gap-2 mb-4 text-primary">
                         <User size={16} />
-                        <h2 className="text-sm font-bold text-card-foreground">{t('settings.sectionAccount')}</h2>
+                        <h2 className="text-sm font-bold text-card-foreground">Dados da Conta</h2>
                     </div>
 
                     <div className="space-y-4">
                         <div className="space-y-2 text-left">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">{t('settings.labelName')}</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Nome e Sobrenome</label>
                             <input
                                 type="text"
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
                                 className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium placeholder:text-muted-foreground/50"
-                                placeholder={t('settings.placeholderName')}
+                                placeholder="Ex: João Silva"
                             />
                         </div>
 
                         <div className="space-y-2 text-left">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">{t('settings.labelEmail')}</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">E-mail</label>
                             <div className="flex gap-2 items-center">
                                 <div className="relative flex-1">
                                     <Mail className="absolute left-3 top-2.5 text-muted-foreground w-4 h-4" />
@@ -274,19 +268,19 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                         const { error } = await supabase.auth.resetPasswordForEmail(email, {
                                             redirectTo: window.location.origin + '/settings',
                                         });
-                                        if (error) toast(t('common.error'), error.message, "error");
-                                        else toast(t('common.success'), t('settings.resetSent'), "success");
+                                        if (error) toast("Erro", error.message, "error");
+                                        else toast("Sucesso", "Email de redefinição enviado!", "success");
                                         setLoading(false);
                                     }}
                                     disabled={loading}
                                 >
-                                    {t('settings.resetPassword')}
+                                    Redefinir senha
                                 </button>
                             </div>
                         </div>
 
                         <div className="space-y-2 text-left">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">{t('settings.labelLocation')}</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Local (Opcional)</label>
                             <div className="relative">
                                 <span className="absolute left-2.5 top-1.5 text-muted-foreground text-[10px] font-bold"><User size={12} className="opacity-0" /></span> {/* Spacer if needed or icon */}
                                 <input
@@ -294,36 +288,10 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     value={location}
                                     onChange={(e) => setLocation(e.target.value)}
                                     className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium placeholder:text-muted-foreground/50"
-                                    placeholder={t('settings.placeholderLocation')}
+                                    placeholder="Ex: São Paulo, SP"
                                 />
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                {/* Language Section */}
-                <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
-                    <div className="flex items-center gap-2 mb-3 text-primary">
-                        <Languages size={16} />
-                        <h2 className="text-sm font-bold text-card-foreground">{t('settings.sectionLanguage')}</h2>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 max-w-md">
-                        <button
-                            onClick={() => changeLanguage('pt')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${i18n.language.startsWith('pt') ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
-                        >
-                            <span className={`font-medium text-xs ${i18n.language.startsWith('pt') ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.languagePt')}</span>
-                            {i18n.language.startsWith('pt') && <Check size={14} className="text-primary" />}
-                        </button>
-
-                        <button
-                            onClick={() => changeLanguage('en')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${i18n.language.startsWith('en') ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
-                        >
-                            <span className={`font-medium text-xs ${i18n.language.startsWith('en') ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.languageEn')}</span>
-                            {i18n.language.startsWith('en') && <Check size={14} className="text-primary" />}
-                        </button>
                     </div>
                 </div>
 

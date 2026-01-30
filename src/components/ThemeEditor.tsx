@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import { GameData } from '../types';
 
 interface ThemeEditorProps {
@@ -99,36 +98,32 @@ const ColorInput: React.FC<{
     value: string;
     onChange: (value: string) => void;
     placeholder: string;
-}> = ({ label, id, value, onChange, placeholder }) => {
-    const { t } = useTranslation();
-    return (
-        <div>
-            <label htmlFor={id} className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">{label}</label>
-            <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-zinc-700 transition-all">
-                <input
-                    type="color"
-                    id={`${id}-picker`}
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    className="w-8 h-8 p-0 border-none rounded-md cursor-pointer bg-transparent overflow-hidden"
-                    aria-label={t('themeEditor.colorPickerLabel', { label })}
-                />
-                <input
-                    type="text"
-                    id={id}
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    className="w-full bg-transparent font-mono text-xs text-zinc-300 focus:outline-none focus:ring-0"
-                    placeholder={placeholder}
-                />
-            </div>
+}> = ({ label, id, value, onChange, placeholder }) => (
+    <div>
+        <label htmlFor={id} className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">{label}</label>
+        <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-zinc-700 transition-all">
+            <input
+                type="color"
+                id={`${id}-picker`}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-8 h-8 p-0 border-none rounded-md cursor-pointer bg-transparent overflow-hidden"
+                aria-label={`Seletor de cor para ${label}`}
+            />
+            <input
+                type="text"
+                id={id}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full bg-transparent font-mono text-xs text-zinc-300 focus:outline-none focus:ring-0"
+                placeholder={placeholder}
+            />
         </div>
-    );
-};
+    </div>
+);
 
 
 const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
-    const { t } = useTranslation();
     const {
         textColor, titleColor, splashButtonColor, splashButtonHoverColor,
         splashButtonTextColor, actionButtonColor, actionButtonTextColor,
@@ -286,14 +281,14 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
             <div className="flex justify-between items-start">
                 <div>
                     <p className="text-zinc-500 mt-1 text-sm font-medium">
-                        {t('themeEditor.description')}
+                        Gerencie a paleta de cores, fonte e outros elementos visuais do seu jogo.
                     </p>
                 </div>
                 <div className="flex items-center gap-4 flex-shrink-0 mt-1">
                     {isDirty && (
                         <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20">
                             <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            <span>{t('themeEditor.unsavedChanges')}</span>
+                            <span>Alterações não salvas</span>
                         </div>
                     )}
                 </div>
@@ -301,26 +296,26 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="bg-zinc-900/40 border border-muted-foreground/50 rounded-xl p-6 space-y-8">
                     <div className="space-y-4">
-                        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{t('themeEditor.interfaceTheme')}</h3>
+                        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Tema da Interface</h3>
                         <div className="flex gap-2 rounded-lg bg-zinc-950 p-1 border border-muted-foreground/50">
                             <button
                                 onClick={() => setLocalGameTheme('dark')}
                                 className={`w-full py-2 px-4 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all ${localGameTheme === 'dark' ? 'bg-white text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-zinc-300'
                                     }`}
                             >
-                                {t('themeEditor.dark')}
+                                Escuro
                             </button>
                             <button
                                 onClick={() => setLocalGameTheme('light')}
                                 className={`w-full py-2 px-4 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all ${localGameTheme === 'light' ? 'bg-white text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-zinc-300'
                                     }`}
                             >
-                                {t('themeEditor.light')}
+                                Claro
                             </button>
                         </div>
                     </div>
                     <div className="pt-6 border-t border-muted-foreground/50">
-                        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">{t('themeEditor.gameFont')}</h3>
+                        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">Fonte do Jogo</h3>
                         <div>
                             <select
                                 id="font-select"
@@ -339,14 +334,14 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                     </div>
 
                     <div className="pt-6 border-t border-muted-foreground/50">
-                        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">{t('themeEditor.predefinedThemes')}</h3>
+                        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">Temas Pré-definidos</h3>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {PREDEFINED_THEMES.map(theme => (
                                 <button
                                     key={theme.name}
                                     onClick={() => applyTheme(theme)}
                                     className="text-left p-3 rounded-lg border border-muted-foreground/50 hover:border-purple-500/50 hover:bg-zinc-800/50 transition-all bg-zinc-950/50 group"
-                                    title={t('themeEditor.applyThemeHover', { name: theme.name })}
+                                    title={`Aplicar tema ${theme.name}`}
                                 >
                                     <span className="font-bold text-[10px] uppercase tracking-wider text-zinc-400 group-hover:text-zinc-200 transition-colors">{theme.name}</span>
                                     <div className="flex mt-2 gap-1.5">
@@ -365,7 +360,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                 onClick={() => setIsCustomizing(true)}
                                 className="w-full py-3 px-4 rounded-lg text-xs font-bold uppercase tracking-widest transition-all bg-purple-500/10 text-purple-400 border border-purple-500/20 hover:bg-purple-500/20"
                             >
-                                {t('themeEditor.customizeColors')}
+                                Customizar Cores
                             </button>
                         </div>
                     )}
@@ -374,65 +369,65 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                         <>
                             {localGameTheme === 'dark' && (
                                 <div className="pt-6 border-t border-muted-foreground/50">
-                                    <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">{t('themeEditor.colorsDark')}</h3>
+                                    <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Cores (Tema Escuro)</h3>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        <ColorInput label={t('themeEditor.textColor')} id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#c9d1d9" />
-                                        <ColorInput label={t('themeEditor.titleColor')} id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58a6ff" />
-                                        <ColorInput label={t('themeEditor.focusColor')} id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#58a6ff" />
+                                        <ColorInput label="Texto Padrão" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#c9d1d9" />
+                                        <ColorInput label="Título / Destaque" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58a6ff" />
+                                        <ColorInput label="Destaque (Foco)" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#58a6ff" />
                                     </div>
                                 </div>
                             )}
 
                             {localGameTheme === 'light' && (
                                 <div className="pt-6 border-t border-muted-foreground/50">
-                                    <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">{t('themeEditor.colorsLight')}</h3>
+                                    <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Cores (Tema Claro)</h3>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        <ColorInput label={t('themeEditor.textColor')} id="textColorLight" value={localTextColorLight} onChange={setLocalTextColorLight} placeholder="#24292f" />
-                                        <ColorInput label={t('themeEditor.titleColor')} id="titleColorLight" value={localTitleColorLight} onChange={setLocalTitleColorLight} placeholder="#0969da" />
-                                        <ColorInput label={t('themeEditor.focusColor')} id="focusColorLight" value={localFocusColorLight} onChange={setLocalFocusColorLight} placeholder="#0969da" />
+                                        <ColorInput label="Texto Padrão" id="textColorLight" value={localTextColorLight} onChange={setLocalTextColorLight} placeholder="#24292f" />
+                                        <ColorInput label="Título / Destaque" id="titleColorLight" value={localTitleColorLight} onChange={setLocalTitleColorLight} placeholder="#0969da" />
+                                        <ColorInput label="Destaque (Foco)" id="focusColorLight" value={localFocusColorLight} onChange={setLocalFocusColorLight} placeholder="#0969da" />
                                     </div>
                                 </div>
                             )}
 
 
                             <div className="pt-6 border-t border-muted-foreground/50">
-                                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">{t('themeEditor.buttonsGeneral')}</h3>
-                                <p className="text-[10px] text-zinc-600 mb-6 italic">{t('themeEditor.buttonsHelper')}</p>
+                                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-2">Botões (Geral)</h3>
+                                <p className="text-[10px] text-zinc-600 mb-6 italic">Estas cores são aplicadas a ambos os temas.</p>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <ColorInput label={t('themeEditor.splashButton')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#2ea043" />
-                                    <ColorInput label={t('themeEditor.splashButtonText')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#ffffff" />
-                                    <ColorInput label={t('themeEditor.splashButtonHover')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#238636" />
-                                    <ColorInput label={t('themeEditor.actionButton')} id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#ffffff" />
-                                    <ColorInput label={t('themeEditor.actionButtonText')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#0d1117" />
+                                    <ColorInput label="Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#2ea043" />
+                                    <ColorInput label="Texto Botão de Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#ffffff" />
+                                    <ColorInput label="Botão Início (Hover)" id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#238636" />
+                                    <ColorInput label="Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#ffffff" />
+                                    <ColorInput label="Texto Botão de Ação" id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#0d1117" />
                                 </div>
                             </div>
                         </>
                     )}
                     {enableChances && (
                         <div className="pt-6 border-t border-muted-foreground/50">
-                            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">{t('themeEditor.chancesSystem')}</h3>
+                            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">Sistema de Chances (Vidas)</h3>
                             <div className="space-y-6 mt-4">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                                     {isCustomizing && (
-                                        <ColorInput label={t('themeEditor.iconColor')} id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
+                                        <ColorInput label="Cor dos Ícones" id="chanceIconColor" value={localChanceIconColor} onChange={setLocalChanceIconColor} placeholder="#ff4d4d" />
                                     )}
                                     <div>
-                                        <label htmlFor="chanceIcon" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('themeEditor.iconShape')}</label>
+                                        <label htmlFor="chanceIcon" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Formato do Ícone</label>
                                         <select
                                             id="chanceIcon"
                                             value={localChanceIcon}
                                             onChange={(e) => setLocalChanceIcon(e.target.value as any)}
                                             className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 [&>option]:bg-zinc-950"
                                         >
-                                            <option value="heart">{t('themeEditor.heart')}</option>
-                                            <option value="circle">{t('themeEditor.circle')}</option>
-                                            <option value="square">{t('themeEditor.square')}</option>
-                                            <option value="diamond">{t('themeEditor.diamond')}</option>
+                                            <option value="heart">Corações</option>
+                                            <option value="circle">Círculos</option>
+                                            <option value="square">Quadrados</option>
+                                            <option value="diamond">Losangos</option>
                                         </select>
                                     </div>
                                 </div>
                                 <div>
-                                    <label htmlFor="chanceLossMessage" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('themeEditor.lossMessage')}</label>
+                                    <label htmlFor="chanceLossMessage" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Mensagem de Perda</label>
                                     <input
                                         type="text"
                                         id="chanceLossMessage"
@@ -440,10 +435,10 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                         onChange={(e) => setLocalChanceLossMessage(e.target.value)}
                                         className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0"
                                     />
-                                    <p className="text-[10px] text-zinc-600 mt-2 italic">{t('themeEditor.lossMessageHelper', { chances: '{chances}' })}</p>
+                                    <p className="text-[10px] text-zinc-600 mt-2 italic">Use {'{chances}'} para mostrar as chances restantes.</p>
                                 </div>
                                 <div>
-                                    <label htmlFor="chanceRestoreMessage" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('themeEditor.restoreMessage')}</label>
+                                    <label htmlFor="chanceRestoreMessage" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Mensagem de Recuperação</label>
                                     <input
                                         type="text"
                                         id="chanceRestoreMessage"
@@ -453,7 +448,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                     />
                                 </div>
                                 <div>
-                                    <label htmlFor="chanceReturnButton" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('themeEditor.returnButtonText')}</label>
+                                    <label htmlFor="chanceReturnButton" className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">Texto Botão de Retorno</label>
                                     <input
                                         type="text"
                                         id="chanceReturnButton"
@@ -468,13 +463,13 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                 </div>
 
                 <div className="flex flex-col">
-                    <p className="text-[10px] text-zinc-600 mb-4 text-center font-bold uppercase tracking-widest">{t('themeEditor.livePreview')}</p>
+                    <p className="text-[10px] text-zinc-600 mb-4 text-center font-bold uppercase tracking-widest">Pré-visualização ao vivo</p>
                     <div
                         className={`flex-1 border p-6 flex flex-col justify-between transition-colors shadow-2xl rounded-xl ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-muted-foreground/50' : 'bg-white border-zinc-200'}`}
                         style={{ fontFamily: localFontFamily }}
                     >
                         <div className="flex justify-between items-start">
-                            <h1 className="text-xl" style={{ color: localGameTheme === 'dark' ? localTitleColor : localTitleColorLight }}>{t('themeEditor.previewTitle')}</h1>
+                            <h1 className="text-xl" style={{ color: localGameTheme === 'dark' ? localTitleColor : localTitleColorLight }}>Título do Jogo</h1>
                             {enableChances && (
                                 <div className="flex gap-1">
                                     <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
@@ -484,14 +479,14 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                             )}
                         </div>
                         <div className="my-4">
-                            <p className="text-sm" style={{ color: localGameTheme === 'dark' ? localTextColor : localTextColorLight }}>{t('themeEditor.previewDescription')}</p>
-                            <p className="mt-2 text-sm italic" style={{ color: localGameTheme === 'dark' ? '#8b949e' : '#57606a' }}>&gt; {t('themeEditor.previewCommand')}</p>
+                            <p className="text-sm" style={{ color: localGameTheme === 'dark' ? localTextColor : localTextColorLight }}>Esta é uma descrição de exemplo para a cena. Ela usa a cor de texto padrão que você definir.</p>
+                            <p className="mt-2 text-sm italic" style={{ color: localGameTheme === 'dark' ? '#8b949e' : '#57606a' }}>&gt; comando de exemplo</p>
                         </div>
                         <div className="space-y-4">
                             <div className="flex items-center gap-4">
                                 <input
                                     type="text"
-                                    placeholder={t('themeEditor.previewInput')}
+                                    placeholder="Campo de comando"
                                     className="flex-1 border-2 rounded p-2 text-sm transition-colors focus:ring-0"
                                     style={{
                                         backgroundColor: localGameTheme === 'dark' ? '#010409' : '#f6f8fa',
@@ -504,7 +499,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                     onFocus={() => setFocusPreview(true)}
                                     onBlur={() => setFocusPreview(false)}
                                 />
-                                <button className="font-bold py-2 px-4 rounded" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily }}>{t('themeEditor.previewAction')}</button>
+                                <button className="font-bold py-2 px-4 rounded" style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily }}>Ação</button>
                             </div>
                             <button
                                 className="w-full font-bold transition-all duration-200 ease-in-out text-lg py-3"
@@ -516,7 +511,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                 onMouseEnter={e => e.currentTarget.style.backgroundColor = localSplashButtonHoverColor}
                                 onMouseLeave={e => e.currentTarget.style.backgroundColor = localSplashButtonColor}
                             >
-                                {t('themeEditor.splashButton')}
+                                Botão de Início
                             </button>
                         </div>
                     </div>
@@ -531,17 +526,17 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                         ? 'bg-purple-600 hover:bg-purple-700 text-white border-purple-500 shadow-lg shadow-purple-900/20'
                         : 'bg-zinc-900 border-muted-foreground/50 text-zinc-400 disabled:opacity-50 disabled:cursor-not-allowed'
                         }`}
-                    title={isDirty ? t('themeEditor.undoTooltip') : t('themeEditor.undoDisabledTooltip')}
+                    title={isDirty ? "Desfazer alterações" : "Nenhuma alteração para desfazer"}
                 >
-                    {t('themeEditor.undo')}
+                    Desfazer
                 </button>
                 <button
                     onClick={handleSave}
                     disabled={!isDirty}
                     className="px-6 py-2 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-sm disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed"
-                    title={isDirty ? t('themeEditor.saveTooltip') : t('themeEditor.saveDisabledTooltip')}
+                    title={isDirty ? "Salvar alterações no tema" : "Nenhuma alteração para salvar"}
                 >
-                    {t('themeEditor.save')}
+                    Salvar
                 </button>
             </div>
         </div>

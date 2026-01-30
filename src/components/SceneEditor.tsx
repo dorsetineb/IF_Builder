@@ -5,7 +5,6 @@ import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
 import BranchingPreview from './BranchingPreview';
 import { Upload, Eye, Trash2, Plus, ArrowRight, Music, Image as ImageIcon, Flag, FileText, Scroll, GitBranch, Play } from 'lucide-react';
-import { useTranslation } from 'react-i18next';
 
 interface SceneEditorProps {
     scene: Scene;
@@ -71,7 +70,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     enableChances,
     gameSystemEnabled,
 }) => {
-    const { t } = useTranslation();
     const [localScene, setLocalScene] = useState<Scene>(() => getCleanSceneState(scene));
     const [pendingObjectUpdates, setPendingObjectUpdates] = useState<{ [id: string]: Partial<GameObject> }>({});
     const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions' | 'choices'>('properties');
@@ -264,16 +262,16 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
     const TABS = useMemo(() => {
         if (gameInteractionType === 'choice') {
             return {
-                properties: t('sceneEditor.properties'),
-                choices: t('sceneEditor.choices'),
+                properties: 'Propriedades',
+                choices: 'Decisões',
             };
         }
         return {
-            properties: t('sceneEditor.properties'),
-            objects: t('sceneEditor.objects'),
-            interactions: t('sceneEditor.interactions'),
+            properties: 'Propriedades',
+            objects: 'Objetos',
+            interactions: 'Interações',
         };
-    }, [gameInteractionType, t]);
+    }, [gameInteractionType]);
 
     const isAnyCheckboxChecked = !!localScene.isEndingScene || !!localScene.removesChanceOnEntry || !!localScene.restoresChanceOnEntry;
 
@@ -281,31 +279,31 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
         <div className="space-y-6">
             <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
                 <p className="text-zinc-500 text-xs font-medium max-w-lg">
-                    {t('sceneEditor.title')}
+                    Defina a imagem, descrição, objetos e interações para esta cena.
                 </p>
                 <div className="flex items-center gap-3">
                     {isDirty && (
                         <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
                             <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            {t('sceneEditor.unsavedChanges')}
+                            Alterações não salvas
                         </div>
                     )}
 
                     <button
                         onClick={handlePreview}
                         className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 rounded-lg"
-                        title={t('sceneEditor.test')}
+                        title="Testar apenas esta cena"
                     >
                         <Eye className="w-3.5 h-3.5" />
-                        {t('sceneEditor.test')}
+                        Testar
                     </button>
 
                     <button
                         onClick={() => onCopyScene(localScene)}
                         className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors"
-                        title={t('sceneEditor.copy')}
+                        title="Copiar Cena"
                     >
-                        {t('sceneEditor.copy')}
+                        Copiar
                     </button>
 
                     <button
@@ -313,7 +311,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                         disabled={!isDirty}
                         className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
                     >
-                        {t('sceneEditor.undo')}
+                        Desfazer
                     </button>
 
                     <button
@@ -321,7 +319,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                         disabled={!isDirty}
                         className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-lg shadow-yellow-900/10"
                     >
-                        {t('sceneEditor.save')}
+                        Salvar Alterações
                     </button>
                 </div>
             </div>
@@ -348,7 +346,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                     </div>
                     {activeTab === 'objects' && (
                         <span className="text-xs text-yellow-400 mb-2 italic">
-                            {t('sceneEditor.objectsWarning')}
+                            Alterações feitas aqui afetam o mesmo objeto caso utilizado em outras cenas.
                         </span>
                     )}
                 </div>
@@ -362,17 +360,17 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                 <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
                                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                                         <FileText className="w-4 h-4 text-muted-foreground" />
-                                        {t('sceneEditor.detailsTitle')}
+                                        DETALHES DA CENA
                                     </h3>
 
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-3 gap-4">
                                             <div className="col-span-2">
-                                                <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">{t('sceneEditor.name')}</label>
-                                                <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2.5 text-sm text-zinc-200 focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all placeholder:text-zinc-700" placeholder={t('sceneEditor.namePlaceholder')} />
+                                                <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Nome da Cena</label>
+                                                <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2.5 text-sm text-zinc-200 focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all placeholder:text-zinc-700" placeholder="Ex: Entrada da Caverna" />
                                             </div>
                                             <div className="col-span-1">
-                                                <label htmlFor="sceneId" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">{t('sceneEditor.id')}</label>
+                                                <label htmlFor="sceneId" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">ID Único</label>
                                                 <div className="relative">
                                                     <input
                                                         type="text"
@@ -388,9 +386,9 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                         <div className="pt-2">
                                             <div className="flex justify-between items-center mb-1.5">
                                                 <label htmlFor="sceneDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                                                    {localScene.isEndingScene ? t('sceneEditor.endGameMessage') : t('sceneEditor.narrativeDescription')}
+                                                    {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição Narrativa'}
                                                 </label>
-                                                <span className="text-[9px] text-muted-foreground font-medium tracking-wider">{t('sceneEditor.descriptionHelper')}</span>
+                                                <span className="text-[9px] text-muted-foreground font-medium tracking-wider">Use &lt;palavra&gt; para destacar</span>
                                             </div>
                                             <div className="relative">
                                                 <textarea
@@ -398,7 +396,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                     value={localScene.description}
                                                     onChange={handleDescriptionChange}
                                                     className="w-full h-32 md:h-40 bg-zinc-950 border border-muted-foreground/30 rounded-lg px-4 py-3 text-sm text-zinc-300 resize-y focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all leading-relaxed placeholder:text-zinc-700"
-                                                    placeholder={t('sceneEditor.descriptionPlaceholder')}
+                                                    placeholder="Descreva o que o jogador vê e sente nesta cena..."
                                                 />
 
                                                 <div className="pt-4 border-t border-muted-foreground/10 mt-4">
@@ -415,16 +413,16 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                             }}
                                                             className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground accent-purple-500"
                                                         />
-                                                        <span className="text-xs font-bold text-zinc-300 uppercase tracking-wide">{t('sceneEditor.isVignette')}</span>
+                                                        <span className="text-xs font-bold text-zinc-300 uppercase tracking-wide">Esta cena é uma vinheta?</span>
                                                     </label>
 
                                                     {localScene.vignetteType && localScene.vignetteType !== 'none' && (
                                                         <div className="animate-in fade-in slide-in-from-top-2 space-y-4">
                                                             <div className="grid grid-cols-3 gap-2">
                                                                 {[
-                                                                    { id: 'opening', label: t('sceneEditor.vignetteOpening'), icon: Play },
-                                                                    { id: 'transition', label: t('sceneEditor.vignetteTransition'), icon: ArrowRight },
-                                                                    { id: 'conclusion', label: t('sceneEditor.vignetteConclusion'), icon: Flag }
+                                                                    { id: 'opening', label: 'Abertura', icon: Play },
+                                                                    { id: 'transition', label: 'Transição', icon: ArrowRight },
+                                                                    { id: 'conclusion', label: 'Conclusão', icon: Flag }
                                                                 ].map((type) => (
                                                                     <button
                                                                         key={type.id}
@@ -446,7 +444,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                             <div className="grid grid-cols-2 gap-4">
                                                                 <div>
                                                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                                                                        {t('sceneEditor.buttonText')}
+                                                                        Texto do Botão
                                                                     </label>
                                                                     <input
                                                                         type="text"
@@ -460,15 +458,15 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                                 {localScene.vignetteType !== 'conclusion' && (
                                                                     <div>
                                                                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                                                                            {t('sceneEditor.goTo')}
+                                                                            Ir Para
                                                                         </label>
                                                                         <select
                                                                             value={localScene.vignetteNextSceneId || ''}
                                                                             onChange={(e) => updateLocalScene('vignetteNextSceneId', e.target.value)}
                                                                             className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all [&>option]:bg-zinc-950"
                                                                         >
-                                                                            <option value="">{t('sceneEditor.justClose')}</option>
-                                                                            <option value="END_GAME">{t('sceneEditor.endGame')}</option>
+                                                                            <option value="">(Basta fechar)</option>
+                                                                            <option value="END_GAME">Encerramento (Fim de Jogo)</option>
                                                                             <optgroup label="Cenas">
                                                                                 {allScenes.filter(s => s.id !== localScene.id).map(s => (
                                                                                     <option key={s.id} value={s.id}>
@@ -494,18 +492,18 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                                             <GitBranch className="w-4 h-4 text-muted-foreground" />
-                                            {t('sceneEditor.connectionsTitle')}
+                                            CONEXÕES
                                         </h3>
                                         {/* Optional: Link to full map if needed, but simplistic for now */}
-                                        <button onClick={() => onViewMap?.()} className="text-[10px] text-purple-400 hover:text-purple-300 font-bold uppercase tracking-widest transition-colors flex items-center gap-1" title={t('sceneEditor.viewMap')}>
-                                            {t('sceneEditor.viewMap')}
+                                        <button onClick={() => onViewMap?.()} className="text-[10px] text-purple-400 hover:text-purple-300 font-bold uppercase tracking-widest transition-colors flex items-center gap-1" title="Volte ao mapa para ver completo">
+                                            Ver Mapa Completo
                                         </button>
                                     </div>
 
                                     <BranchingPreview currentScene={localScene} allScenes={allScenes} />
 
                                     <p className="text-[10px] text-zinc-500 text-center mt-3">
-                                        {t('sceneEditor.connectionsHelper')}
+                                        Visualização rápida das conexões diretas.
                                     </p>
                                 </div>
                             </div>
@@ -518,10 +516,10 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                                             <ImageIcon className="w-4 h-4 text-muted-foreground" />
-                                            {t('sceneEditor.multimediaTitle')}
+                                            MULTIMÍDIA
                                         </h3>
                                         <span className="text-[10px] text-muted-foreground">
-                                            {layoutOrientation === 'vertical' ? t('sceneEditor.multimediaHelperVertical') : t('sceneEditor.multimediaHelperHorizontal')}
+                                            {layoutOrientation === 'vertical' ? '720x1280 sugerido' : '1280x720 sugerido'}
                                         </span>
                                     </div>
 
@@ -535,14 +533,14 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                         <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
                                                             <Upload className="w-5 h-5" />
                                                         </div>
-                                                        <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.change')}</span>
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider">Trocar</span>
                                                         <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                                     </label>
                                                     <button onClick={() => updateLocalScene('image', '')} className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors">
                                                         <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
                                                             <Trash2 className="w-5 h-5" />
                                                         </div>
-                                                        <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.remove')}</span>
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider">Remover</span>
                                                     </button>
                                                 </div>
 
@@ -552,7 +550,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                 <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-purple-500/50 transition-all">
                                                     <ImageIcon className="w-5 h-5 text-zinc-600 group-hover:text-purple-400" />
                                                 </div>
-                                                <span className="text-xs font-medium text-zinc-500 group-hover:text-zinc-300">{t('sceneEditor.uploadImage')}</span>
+                                                <span className="text-xs font-medium text-zinc-500 group-hover:text-zinc-300">Carregar Imagem de Fundo</span>
                                                 <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                             </label>
                                         )}
@@ -560,7 +558,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
                                     {/* Audio Section */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.soundtrack')}</label>
+                                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha Sonora (.mp3)</label>
                                         <div className="flex items-center gap-3 p-3 bg-zinc-950/50 border border-dashed border-muted-foreground/30 rounded-lg hover:border-purple-500/30 transition-colors">
                                             <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center flex-shrink-0">
                                                 <Music className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-purple-400' : 'text-zinc-600'}`} />
@@ -568,24 +566,24 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                             <div className="flex-grow min-w-0">
                                                 {localScene.backgroundMusic ? (
                                                     <div className="flex flex-col">
-                                                        <span className="text-xs text-zinc-200 truncate">{t('sceneEditor.soundtrackDefined')}</span>
-                                                        <span className="text-[10px] text-green-500">{t('sceneEditor.soundtrackSuccess')}</span>
+                                                        <span className="text-xs text-zinc-200 truncate">Trilha Personalizada Definida</span>
+                                                        <span className="text-[10px] text-green-500">Áudio carregado com sucesso</span>
                                                     </div>
                                                 ) : (
                                                     <div className="flex flex-col">
-                                                        <span className="text-xs text-zinc-400 italic">{t('sceneEditor.noSoundtrack')}</span>
-                                                        <span className="text-[9px] text-zinc-600">{t('sceneEditor.soundtrackHelper')}</span>
+                                                        <span className="text-xs text-zinc-400 italic">Nenhuma trilha selecionada</span>
+                                                        <span className="text-[9px] text-zinc-600">Deixe vazio para continuar a música anterior.</span>
                                                     </div>
                                                 )}
                                             </div>
                                             <div className="flex-shrink-0">
                                                 {localScene.backgroundMusic ? (
-                                                    <button onClick={() => updateLocalScene('backgroundMusic', undefined)} className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all" title={t('sceneEditor.remove')}>
+                                                    <button onClick={() => updateLocalScene('backgroundMusic', undefined)} className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all" title="Remover">
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 ) : (
                                                     <label htmlFor="music-upload" className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-zinc-700">
-                                                        {t('sceneEditor.upload')}
+                                                        Carregar
                                                         <input id="music-upload" type="file" accept="audio/*" onChange={handleMusicUpload} className="hidden" />
                                                     </label>
                                                 )}
@@ -601,7 +599,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                     <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
                                         <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                                             <Scroll className="w-4 h-4 text-muted-foreground" />
-                                            {t('sceneEditor.rulesTitle')}
+                                            REGRAS DE CHANCES
                                         </h3>
                                         <div className="space-y-3">
                                             {/* Chance Removal */}
@@ -616,8 +614,8 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                     />
                                                 </div>
                                                 <div>
-                                                    <span className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-400' : 'text-zinc-400 group-hover:text-zinc-300'}`}>{t('sceneEditor.removesChance')}</span>
-                                                    <span className="block text-[10px] text-muted-foreground mt-0.5">{t('sceneEditor.removesChanceDesc')}</span>
+                                                    <span className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-400' : 'text-zinc-400 group-hover:text-zinc-300'}`}>Esta cena remove uma chance</span>
+                                                    <span className="block text-[10px] text-muted-foreground mt-0.5">O jogador perde uma vida/tentativa ao entrar aqui.</span>
                                                 </div>
                                             </label>
 
@@ -633,8 +631,8 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                     />
                                                 </div>
                                                 <div>
-                                                    <span className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-400' : 'text-zinc-400 group-hover:text-zinc-300'}`}>{t('sceneEditor.restoresChance')}</span>
-                                                    <span className="block text-[10px] text-muted-foreground mt-0.5">{t('sceneEditor.restoresChanceDesc')}</span>
+                                                    <span className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-400' : 'text-zinc-400 group-hover:text-zinc-300'}`}>Esta cena restaura uma chance</span>
+                                                    <span className="block text-[10px] text-muted-foreground mt-0.5">O jogador ganha uma vida extra ou cura.</span>
                                                 </div>
                                             </label>
                                         </div>
@@ -678,7 +676,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                 <div className="p-4 border-b border-muted-foreground/10 space-y-4">
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                                            {t('sceneEditor.choicesTitle', { count: localScene.choices?.length || 0 })}
+                                            Escolhas ({localScene.choices?.length || 0})
                                         </span>
                                     </div>
                                 </div>
@@ -686,7 +684,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
                                     {(localScene.choices || []).length === 0 ? (
                                         <div className="text-center py-8 text-muted-foreground">
-                                            <p className="text-xs italic">{t('sceneEditor.noChoices')}</p>
+                                            <p className="text-xs italic">Nenhuma escolha definida.</p>
                                         </div>
                                     ) : (
                                         (localScene.choices || []).map((choice, index) => (
@@ -700,10 +698,10 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                 </div>
                                                 <div className="min-w-0">
                                                     <div className={`text-xs font-bold truncate ${selectedChoiceId === choice.id ? 'text-purple-300' : 'text-zinc-300'}`}>
-                                                        {choice.label || t('sceneEditor.newChoice')}
+                                                        {choice.label || 'Nova Escolha'}
                                                     </div>
                                                     <div className="text-[10px] text-zinc-500 font-mono truncate">
-                                                        {choice.targetSceneId ? `-> ${allScenes.find(s => s.id === choice.targetSceneId)?.name || choice.targetSceneId}` : t('sceneEditor.unknownTarget')}
+                                                        {choice.targetSceneId ? `-> ${allScenes.find(s => s.id === choice.targetSceneId)?.name || choice.targetSceneId}` : '(Sem destino)'}
                                                     </div>
                                                 </div>
                                             </button>
@@ -717,7 +715,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                             const newId = `choice_${Date.now()}`;
                                             const newChoice: Choice = {
                                                 id: newId,
-                                                label: t('sceneEditor.newChoice'),
+                                                label: 'Nova Escolha',
                                                 targetSceneId: ''
                                             };
                                             updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
@@ -726,7 +724,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                         className="w-full py-2 bg-zinc-100 hover:bg-white text-zinc-900 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow"
                                     >
                                         <Plus className="w-3.5 h-3.5 mr-2" />
-                                        {t('sceneEditor.createChoice')}
+                                        Criar Nova Escolha
                                     </button>
                                 </div>
                             </div>
@@ -742,11 +740,11 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                 <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30">
                                                     <div className="flex items-center gap-2">
                                                         <ArrowRight className="w-4 h-4 text-purple-500" />
-                                                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">{t('sceneEditor.choiceDetails')}</span>
+                                                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Detalhes da Escolha</span>
                                                     </div>
                                                     <button
                                                         onClick={() => {
-                                                            if (window.confirm(t('sceneEditor.confirmRemoveChoice'))) {
+                                                            if (window.confirm('Tem certeza que deseja remover esta escolha?')) {
                                                                 const newChoices = localScene.choices!.filter(c => c.id !== selectedChoiceId);
                                                                 updateLocalScene('choices', newChoices);
                                                                 setSelectedChoiceId(null);
@@ -755,14 +753,14 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
                                                     >
                                                         <Trash2 className="w-3.5 h-3.5" />
-                                                        {t('sceneEditor.remove')}
+                                                        Remover
                                                     </button>
                                                 </div>
 
                                                 <div className="flex-1 overflow-y-auto p-6">
                                                     <div className="max-w-2xl mx-auto space-y-6">
                                                         <div className="space-y-1.5">
-                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.choiceLabel')}</label>
+                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Texto do Botão</label>
                                                             <input
                                                                 type="text"
                                                                 value={choice.label}
@@ -772,12 +770,12 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                                     updateLocalScene('choices', newChoices);
                                                                 }}
                                                                 className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
-                                                                placeholder={t('sceneEditor.choiceLabelPlaceholder')}
+                                                                placeholder="Ex: Tentar abrir a porta..."
                                                             />
                                                         </div>
 
                                                         <div className="space-y-1.5">
-                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.targetScene')}</label>
+                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cena de Destino</label>
                                                             <div className="relative">
                                                                 <select
                                                                     value={choice.targetSceneId}
@@ -788,7 +786,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                                     }}
                                                                     className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-zinc-300 pr-8 appearance-none focus:ring-1 focus:ring-purple-500/50 [&>option]:bg-zinc-950"
                                                                 >
-                                                                    <option value="">{t('sceneEditor.select')}</option>
+                                                                    <option value="">Selecione...</option>
                                                                     {allScenes.map(s => (
                                                                         <option key={s.id} value={s.id}>
                                                                             {s.name}
@@ -797,7 +795,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                                 </select>
                                                                 <ArrowRight className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                                                             </div>
-                                                            <p className="text-[10px] text-muted-foreground mt-1">{t('sceneEditor.targetSceneHelper')}</p>
+                                                            <p className="text-[10px] text-muted-foreground mt-1">Para onde o jogador irá ao clicar neste botão.</p>
                                                         </div>
                                                     </div>
                                                 </div>

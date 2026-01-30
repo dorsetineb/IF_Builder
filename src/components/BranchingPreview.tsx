@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 import { Scene, Interaction } from '../types';
 
 interface BranchingPreviewProps {
@@ -8,7 +7,6 @@ interface BranchingPreviewProps {
 }
 
 const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allScenes }) => {
-    const { t } = useTranslation();
     // Calculate Inputs (Scenes that link TO this scene)
     const incomingConnections = useMemo(() => {
         const sources = new Set<string>();
@@ -54,7 +52,7 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
         // Vignette
         if (currentScene.vignetteNextSceneId) {
             if (currentScene.vignetteNextSceneId === 'END_GAME') {
-                targets.add(t('branching.endGame'));
+                targets.add('Fim de Jogo');
             } else {
                 const targetScene = allScenes.find(s => s.id === currentScene.vignetteNextSceneId);
                 if (targetScene) targets.add(targetScene.name);
@@ -84,7 +82,7 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                         ))
                     ) : (
                         <div className="px-3 py-2 bg-zinc-900/50 border border-zinc-800 border-dashed rounded text-[10px] text-zinc-600 italic w-full text-center">
-                            {t('branching.noIncoming')}
+                            Sem origem
                         </div>
                     )}
                     {incomingConnections.length >= 5 && <div className="text-[9px] text-zinc-600 text-center">...</div>}
@@ -102,7 +100,7 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                 {/* Current Scene Node - Center Stage */}
                 <div className="w-1/4 flex-shrink-0 z-20">
                     <div className="px-4 py-3 bg-zinc-900 border-2 border-purple-500/50 rounded-lg shadow-[0_0_15px_rgba(168,85,247,0.15)] flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest whitespace-nowrap">{t('branching.thisScene')}</span>
+                        <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest whitespace-nowrap">Esta Cena</span>
                     </div>
                 </div>
 
@@ -124,7 +122,7 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                         ))
                     ) : (
                         <div className="px-3 py-2 bg-zinc-900/50 border border-zinc-800 border-dashed rounded text-[10px] text-zinc-600 italic w-full text-center">
-                            {t('branching.noOutgoing')}
+                            Sem destino
                         </div>
                     )}
                     {outgoingConnections.length >= 5 && <div className="text-[9px] text-zinc-600 text-center">...</div>}
