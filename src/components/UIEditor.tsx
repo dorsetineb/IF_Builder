@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { GameData, FixedVerb } from '../types';
-import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List } from 'lucide-react';
+import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, TerminalSquare, MousePointerClick } from 'lucide-react';
 
 interface UIEditorProps {
     html: string;
@@ -112,35 +113,39 @@ const ColorInput: React.FC<{
     value: string;
     onChange: (value: string) => void;
     placeholder: string;
-}> = ({ label, id, value, onChange, placeholder }) => (
-    <div>
-        <label htmlFor={id} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{label}</label>
-        <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all">
-            <input
-                type="color"
-                id={`${id}-picker`}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="w-10 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
-                aria-label={`Seletor de cor para ${label}`}
-            />
-            <input
-                type="text"
-                id={id}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase"
-                placeholder={placeholder}
-            />
+}> = ({ label, id, value, onChange, placeholder }) => {
+    const { t } = useTranslation();
+    return (
+        <div>
+            <label htmlFor={id} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{label}</label>
+            <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all">
+                <input
+                    type="color"
+                    id={`${id}-picker`}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="w-10 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
+                    aria-label={t('uiEditor.labels.colorPickerLabel', { label })}
+                />
+                <input
+                    type="text"
+                    id={id}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase"
+                    placeholder={placeholder}
+                />
+            </div>
         </div>
-    </div>
-);
+    );
+};
 
 const FixedVerbItem: React.FC<{
     verb: FixedVerb;
     onUpdate: (id: string, field: 'verbs' | 'description', value: any) => void;
     onRemove: (id: string) => void;
 }> = ({ verb, onUpdate, onRemove }) => {
+    const { t } = useTranslation();
     const [localVerbs, setLocalVerbs] = useState(verb.verbs.join(', '));
     const inputId = `verb-words-${verb.id}`;
 
@@ -162,30 +167,30 @@ const FixedVerbItem: React.FC<{
             <button
                 onClick={() => onRemove(verb.id)}
                 className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                title="Remover verbo"
+                title={t('uiEditor.labels.removeVerb')}
             >
                 <Trash2 className="w-5 h-5" />
             </button>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
                 <div>
-                    <label htmlFor={inputId} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Verbos (separados por vírgula)</label>
+                    <label htmlFor={inputId} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('uiEditor.labels.verbsComma')}</label>
                     <input
                         id={inputId}
                         type="text"
                         value={localVerbs}
                         onChange={e => setLocalVerbs(e.target.value)}
                         onBlur={handleVerbsBlur}
-                        placeholder="ex: ajuda, help, ?"
+                        placeholder={t('uiEditor.placeholders.exHelp')}
                         className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all"
                     />
                 </div>
                 <div className="flex flex-col h-full">
-                    <label htmlFor={`verb-desc-${verb.id}`} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Descrição / Resposta</label>
+                    <label htmlFor={`verb-desc-${verb.id}`} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('uiEditor.labels.verbDescription')}</label>
                     <textarea
                         id={`verb-desc-${verb.id}`}
                         value={verb.description}
                         onChange={e => onUpdate(verb.id, 'description', e.target.value)}
-                        placeholder="Texto que será exibido para o jogador."
+                        placeholder={t('uiEditor.placeholders.textForPlayer')}
                         rows={3}
                         className="w-full flex-grow bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all resize-none"
                     />
@@ -233,6 +238,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         diaryAutoScroll, diaryAllowExport, diaryMaxMessages, diaryShowSceneImage, diaryShowPlayerAction,
         gameInteractionType
     } = props;
+
+    const { t } = useTranslation();
+
 
     const [localLayoutOrientation, setLocalLayoutOrientation] = useState(layoutOrientation);
     const [localLayoutOrder, setLocalLayoutOrder] = useState(layoutOrder);
@@ -305,17 +313,17 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localNegativeEndingMusic, setLocalNegativeEndingMusic] = useState(negativeEndingMusic);
     const [localFixedVerbs, setLocalFixedVerbs] = useState(fixedVerbs);
 
-    const [localTextAnimationType, setLocalTextAnimationType] = useState<'fade' | 'typewriter'>(props.textAnimationType || 'typewriter');
-    const [localTextSpeed, setLocalTextSpeed] = useState<number>(props.textSpeed || 3);
+    const [localTextAnimationType, setLocalTextAnimationType] = useState<'fade' | 'typewriter'>(textAnimationType || 'typewriter');
+    const [localTextSpeed, setLocalTextSpeed] = useState<number>(textSpeed || 3);
     const [localTextReadingFlow, setLocalTextReadingFlow] = useState<'continuous' | 'paused'>(textReadingFlow || 'paused');
-    const [localImageTransitionType, setLocalImageTransitionType] = useState<GameData['gameImageTransitionType']>(props.imageTransitionType || 'fade');
+    const [localImageTransitionType, setLocalImageTransitionType] = useState<GameData['gameImageTransitionType']>(imageTransitionType || 'fade');
     const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed);
 
-    const TABS = {
-        aparencia: 'Aparência',
-        sistemas: 'Sistemas',
-        textos: 'Textos'
-    };
+    const TABS = [
+        { id: 'aparencia', label: t('uiEditor.tabs.appearance'), icon: LayoutTemplate },
+        { id: 'sistemas', label: t('uiEditor.tabs.systems'), icon: Package },
+        { id: 'textos', label: t('uiEditor.tabs.texts'), icon: Type },
+    ];
 
     const [activeSections, setActiveSections] = useState({
         estrutura: true,
@@ -388,7 +396,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalTrackersButtonText(trackersButtonText); }, [trackersButtonText]);
     useEffect(() => { setLocalSystemButtonText(gameSystemButtonText); }, [gameSystemButtonText]);
     useEffect(() => { setLocalMainMenuButtonText(gameMainMenuButtonText); }, [gameMainMenuButtonText]);
-    useEffect(() => { setLocalViewEndingButtonText(gameViewEndingButtonText || 'Ver Final'); }, [gameViewEndingButtonText]);
+    useEffect(() => { setLocalViewEndingButtonText(gameViewEndingButtonText || t('uiEditor.placeholders.viewEnding')); }, [gameViewEndingButtonText, t]);
     useEffect(() => { setLocalSaveMenuTitle(gameSaveMenuTitle); }, [gameSaveMenuTitle]);
     useEffect(() => { setLocalLoadMenuTitle(gameLoadMenuTitle); }, [gameLoadMenuTitle]);
     useEffect(() => { setLocalChanceReturnButtonText(chanceReturnButtonText); }, [chanceReturnButtonText]);
@@ -506,11 +514,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
     // Store the initial state on mount
     const initialStateRef = React.useRef<ReturnType<typeof getCurrentState> | null>(null);
+    const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
     // Initialize snapshot on mount
     useEffect(() => {
         initialStateRef.current = getCurrentState();
-        onSetDirty(false);
+        setHasUnsavedChanges(false);
     }, []); // Run ONCE on mount
 
     // Check dirty status against the SNAPSHOT
@@ -523,8 +532,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         const isStateDirty =
             JSON.stringify(currentState) !== JSON.stringify(initialState);
 
-        if (isStateDirty !== isDirty) {
-            onSetDirty(isStateDirty);
+        if (isStateDirty !== hasUnsavedChanges) {
+            setHasUnsavedChanges(isStateDirty);
         }
     }, [
         localLayoutOrientation, localLayoutOrder, localImageFrame, localSplashButtonText,
@@ -549,94 +558,112 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localEnableTrackers, localEnableInventory, localEnableDiary, localEnableFixedVerbs,
         localEnableChances, localEnableImages, localEnableTextControl, localInventoryCapacity,
         localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
-        localDiaryShowSceneImage, localDiaryShowPlayerAction
+        localDiaryShowSceneImage, localDiaryShowPlayerAction, hasUnsavedChanges
     ]);
 
 
+    const updateGameData = (updates: Partial<GameData>) => {
+        Object.entries(updates).forEach(([key, value]) => {
+            onUpdate(key as keyof GameData, value);
+        });
+    };
+
     const handleSave = () => {
-        if (localLayoutOrientation !== layoutOrientation) onUpdate('gameLayoutOrientation', localLayoutOrientation, true);
-        if (localLayoutOrder !== layoutOrder) onUpdate('gameLayoutOrder', localLayoutOrder, true);
-        if (localImageFrame !== imageFrame) onUpdate('gameImageFrame', localImageFrame, true);
-        if (localSplashButtonText !== splashButtonText) onUpdate('gameSplashButtonText', localSplashButtonText, true);
-        if (localContinueButtonText !== continueButtonText) onUpdate('gameContinueButtonText', localContinueButtonText, true);
-        if (localRestartButtonText !== restartButtonText) onUpdate('gameRestartButtonText', localRestartButtonText, true);
-        if (localActionButtonText !== actionButtonText) onUpdate('gameActionButtonText', localActionButtonText, true);
-        if (localVerbInputPlaceholder !== verbInputPlaceholder) onUpdate('gameVerbInputPlaceholder', localVerbInputPlaceholder, true);
-        if (localDiaryPlayerName !== diaryPlayerName) onUpdate('gameDiaryPlayerName', localDiaryPlayerName, true);
-        if (localGameSystemEnabled !== gameSystemEnabled) onUpdate('gameSystemEnabled', localGameSystemEnabled, true);
-        if (localMaxChances !== maxChances) onUpdate('gameMaxChances', localMaxChances, true);
-        if (localGameShowTrackersUI !== gameShowTrackersUI) onUpdate('gameShowTrackersUI', localGameShowTrackersUI, true);
-        if (localGameShowSystemButton !== gameShowSystemButton) onUpdate('gameShowSystemButton', localGameShowSystemButton, true);
-        if (localSuggestionsButtonText !== suggestionsButtonText) onUpdate('gameSuggestionsButtonText', localSuggestionsButtonText, true);
-        if (localInventoryButtonText !== inventoryButtonText) onUpdate('gameInventoryButtonText', localInventoryButtonText, true);
-        if (localDiaryButtonText !== diaryButtonText) onUpdate('gameDiaryButtonText', localDiaryButtonText, true);
-        if (localTrackersButtonText !== trackersButtonText) onUpdate('gameTrackersButtonText', localTrackersButtonText, true);
-        if (localSystemButtonText !== gameSystemButtonText) onUpdate('gameSystemButtonText', localSystemButtonText, true);
-        if (localSaveMenuTitle !== gameSaveMenuTitle) onUpdate('gameSaveMenuTitle', localSaveMenuTitle, true);
-        if (localLoadMenuTitle !== gameLoadMenuTitle) onUpdate('gameLoadMenuTitle', localLoadMenuTitle, true);
-        if (localMainMenuButtonText !== gameMainMenuButtonText) onUpdate('gameMainMenuButtonText', localMainMenuButtonText, true);
-        if (localViewEndingButtonText !== gameViewEndingButtonText) onUpdate('gameViewEndingButtonText', localViewEndingButtonText, true);
-        if (localTextColor !== textColor) onUpdate('gameTextColor', localTextColor, true);
-        if (localTitleColor !== titleColor) onUpdate('gameTitleColor', localTitleColor, true);
-        if (localSplashButtonColor !== splashButtonColor) onUpdate('gameSplashButtonColor', localSplashButtonColor, true);
-        if (localSplashButtonHoverColor !== splashButtonHoverColor) onUpdate('gameSplashButtonHoverColor', localSplashButtonHoverColor, true);
-        if (localSplashButtonTextColor !== splashButtonTextColor) onUpdate('gameSplashButtonTextColor', localSplashButtonTextColor, true);
-        if (localActionButtonColor !== actionButtonColor) onUpdate('gameActionButtonColor', localActionButtonColor, true);
-        if (localActionButtonTextColor !== actionButtonTextColor) onUpdate('gameActionButtonTextColor', localActionButtonTextColor, true);
-        if (localFocusColor !== focusColor) onUpdate('gameFocusColor', localFocusColor, true);
-        if (localChanceIconColor !== chanceIconColor) onUpdate('gameChanceIconColor', localChanceIconColor, true);
-        if (localFontFamily !== gameFontFamily) onUpdate('gameFontFamily', localFontFamily, true);
-        if (localGameFontSize !== gameFontSize) onUpdate('gameFontSize', localGameFontSize, true);
-        if (localChanceIcon !== chanceIcon) onUpdate('gameChanceIcon', localChanceIcon, true);
-        if (localChanceLossMessage !== chanceLossMessage) onUpdate('gameChanceLossMessage', localChanceLossMessage, true);
-        if (localChanceRestoreMessage !== chanceRestoreMessage) onUpdate('gameChanceRestoreMessage', localChanceRestoreMessage, true);
-        if (localChanceReturnButtonText !== chanceReturnButtonText) onUpdate('gameChanceReturnButtonText', localChanceReturnButtonText, true);
-        if (localGameTheme !== gameTheme) onUpdate('gameTheme', localGameTheme, true);
-        if (localTextColorLight !== textColorLight) onUpdate('textColorLight', localTextColorLight, true);
-        if (localTitleColorLight !== titleColorLight) onUpdate('titleColorLight', localTitleColorLight, true);
-        if (localFocusColorLight !== focusColorLight) onUpdate('focusColorLight', localFocusColorLight, true);
-        if (localFrameBookColor !== frameBookColor) onUpdate('frameBookColor', localFrameBookColor, true);
-        if (localFrameTradingCardColor !== frameTradingCardColor) onUpdate('frameTradingCardColor', localFrameTradingCardColor, true);
-        if (localFrameRoundedTopColor !== frameRoundedTopColor) onUpdate('frameRoundedTopColor', localFrameRoundedTopColor, true);
-        if (localGameSceneNameOverlayBg !== gameSceneNameOverlayBg) onUpdate('gameSceneNameOverlayBg', localGameSceneNameOverlayBg, true);
-        if (localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor) onUpdate('gameSceneNameOverlayTextColor', localGameSceneNameOverlayTextColor, true);
-        if (localGameContinueIndicatorColor !== gameContinueIndicatorColor) onUpdate('gameContinueIndicatorColor', localGameContinueIndicatorColor, true);
-        if (localTitle !== title) onUpdate('gameTitle', localTitle, true);
-        if (localLogo !== logo) onUpdate('gameLogo', localLogo, true);
-        if (localOmitSplashTitle !== omitSplashTitle) onUpdate('gameOmitSplashTitle', localOmitSplashTitle, true);
-        if (localSplashImage !== splashImage) onUpdate('gameSplashImage', localSplashImage, true);
-        if (localSplashContentAlignment !== splashContentAlignment) onUpdate('gameSplashContentAlignment', localSplashContentAlignment, true);
-        if (localSplashContentVerticalAlignment !== splashContentVerticalAlignment) onUpdate('gameSplashContentVerticalAlignment', localSplashContentVerticalAlignment, true);
-        if (localSplashDescription !== splashDescription) onUpdate('gameSplashDescription', localSplashDescription, true);
-        if (localBackgroundMusic !== backgroundMusic) onUpdate('gameBackgroundMusic', localBackgroundMusic, true);
-        if (localPositiveEndingImage !== positiveEndingImage) onUpdate('positiveEndingImage', localPositiveEndingImage, true);
-        if (localPositiveEndingContentAlignment !== positiveEndingContentAlignment) onUpdate('positiveEndingContentAlignment', localPositiveEndingContentAlignment, true);
-        if (localPositiveEndingDescription !== positiveEndingDescription) onUpdate('positiveEndingDescription', localPositiveEndingDescription, true);
-        if (localPositiveEndingMusic !== positiveEndingMusic) onUpdate('positiveEndingMusic', localPositiveEndingMusic, true);
-        if (localNegativeEndingImage !== negativeEndingImage) onUpdate('negativeEndingImage', localNegativeEndingImage, true);
-        if (localNegativeEndingContentAlignment !== negativeEndingContentAlignment) onUpdate('negativeEndingContentAlignment', localNegativeEndingContentAlignment, true);
-        if (localNegativeEndingDescription !== negativeEndingDescription) onUpdate('negativeEndingDescription', localNegativeEndingDescription, true);
-        if (localNegativeEndingMusic !== negativeEndingMusic) onUpdate('negativeEndingMusic', localNegativeEndingMusic, true);
-        if (JSON.stringify(localFixedVerbs) !== JSON.stringify(fixedVerbs)) onUpdate('fixedVerbs', localFixedVerbs, true);
-        if (localTextAnimationType !== textAnimationType) onUpdate('gameTextAnimationType', localTextAnimationType, true);
-        if (localTextSpeed !== textSpeed) onUpdate('gameTextSpeed', localTextSpeed, true);
-        if (localImageTransitionType !== imageTransitionType) onUpdate('gameImageTransitionType', localImageTransitionType, true);
-        if (localImageSpeed !== imageSpeed) onUpdate('gameImageSpeed', localImageSpeed, true);
-        if (localEnableImages !== (enableImages ?? true)) onUpdate('enableImages', localEnableImages, true);
-        if (localEnableTextControl !== (enableTextControl ?? true)) onUpdate('enableTextControl', localEnableTextControl, true);
-        if (localTextReadingFlow !== (textReadingFlow || 'paused')) onUpdate('gameTextReadingFlow', localTextReadingFlow, true);
-        if (localGameInteractionType !== (gameInteractionType || 'parser')) onUpdate('gameInteractionType', localGameInteractionType, true);
+        const updatedGameData: Partial<GameData> = {};
+
+        if (localLayoutOrientation !== layoutOrientation) updatedGameData.gameLayoutOrientation = localLayoutOrientation;
+        if (localLayoutOrder !== layoutOrder) updatedGameData.gameLayoutOrder = localLayoutOrder;
+        if (localImageFrame !== imageFrame) updatedGameData.gameImageFrame = localImageFrame;
+        if (localSplashButtonText !== splashButtonText) updatedGameData.gameSplashButtonText = localSplashButtonText;
+        if (localContinueButtonText !== continueButtonText) updatedGameData.gameContinueButtonText = localContinueButtonText;
+        if (localRestartButtonText !== restartButtonText) updatedGameData.gameRestartButtonText = localRestartButtonText;
+        if (localActionButtonText !== actionButtonText) updatedGameData.gameActionButtonText = localActionButtonText;
+        if (localVerbInputPlaceholder !== verbInputPlaceholder) updatedGameData.gameVerbInputPlaceholder = localVerbInputPlaceholder;
+        if (localDiaryPlayerName !== diaryPlayerName) updatedGameData.gameDiaryPlayerName = localDiaryPlayerName;
+        if (localGameSystemEnabled !== gameSystemEnabled) updatedGameData.gameSystemEnabled = localGameSystemEnabled;
+        if (localMaxChances !== maxChances) updatedGameData.gameMaxChances = localMaxChances;
+        if (localGameShowTrackersUI !== gameShowTrackersUI) updatedGameData.gameShowTrackersUI = localGameShowTrackersUI;
+        if (localGameShowSystemButton !== gameShowSystemButton) updatedGameData.gameShowSystemButton = localGameShowSystemButton;
+        if (localSuggestionsButtonText !== suggestionsButtonText) updatedGameData.gameSuggestionsButtonText = localSuggestionsButtonText;
+        if (localInventoryButtonText !== inventoryButtonText) updatedGameData.gameInventoryButtonText = localInventoryButtonText;
+        if (localDiaryButtonText !== diaryButtonText) updatedGameData.gameDiaryButtonText = localDiaryButtonText;
+        if (localTrackersButtonText !== trackersButtonText) updatedGameData.gameTrackersButtonText = localTrackersButtonText;
+        if (localSystemButtonText !== gameSystemButtonText) updatedGameData.gameSystemButtonText = localSystemButtonText;
+        if (localSaveMenuTitle !== gameSaveMenuTitle) updatedGameData.gameSaveMenuTitle = localSaveMenuTitle;
+        if (localLoadMenuTitle !== gameLoadMenuTitle) updatedGameData.gameLoadMenuTitle = localLoadMenuTitle;
+        if (localMainMenuButtonText !== gameMainMenuButtonText) updatedGameData.gameMainMenuButtonText = localMainMenuButtonText;
+        if (localViewEndingButtonText !== gameViewEndingButtonText) updatedGameData.gameViewEndingButtonText = localViewEndingButtonText;
+        if (localTextColor !== textColor) updatedGameData.gameTextColor = localTextColor;
+        if (localTitleColor !== titleColor) updatedGameData.gameTitleColor = localTitleColor;
+        if (localSplashButtonColor !== splashButtonColor) updatedGameData.gameSplashButtonColor = localSplashButtonColor;
+        if (localSplashButtonHoverColor !== splashButtonHoverColor) updatedGameData.gameSplashButtonHoverColor = localSplashButtonHoverColor;
+        if (localSplashButtonTextColor !== splashButtonTextColor) updatedGameData.gameSplashButtonTextColor = localSplashButtonTextColor;
+        if (localActionButtonColor !== actionButtonColor) updatedGameData.gameActionButtonColor = localActionButtonColor;
+        if (localActionButtonTextColor !== actionButtonTextColor) updatedGameData.gameActionButtonTextColor = localActionButtonTextColor;
+        if (localFocusColor !== focusColor) updatedGameData.gameFocusColor = localFocusColor;
+        if (localChanceIconColor !== chanceIconColor) updatedGameData.gameChanceIconColor = localChanceIconColor;
+        if (localFontFamily !== gameFontFamily) updatedGameData.gameFontFamily = localFontFamily;
+        if (localGameFontSize !== gameFontSize) updatedGameData.gameFontSize = localGameFontSize;
+        if (localChanceIcon !== chanceIcon) updatedGameData.gameChanceIcon = localChanceIcon;
+        if (localChanceLossMessage !== chanceLossMessage) updatedGameData.gameChanceLossMessage = localChanceLossMessage;
+        if (localChanceRestoreMessage !== chanceRestoreMessage) updatedGameData.gameChanceRestoreMessage = localChanceRestoreMessage;
+        if (localChanceReturnButtonText !== chanceReturnButtonText) updatedGameData.gameChanceReturnButtonText = localChanceReturnButtonText;
+        if (localGameTheme !== gameTheme) updatedGameData.gameTheme = localGameTheme;
+        if (localTextColorLight !== textColorLight) updatedGameData.textColorLight = localTextColorLight;
+        if (localTitleColorLight !== titleColorLight) updatedGameData.titleColorLight = localTitleColorLight;
+        if (localFocusColorLight !== focusColorLight) updatedGameData.focusColorLight = localFocusColorLight;
+        if (localFrameBookColor !== frameBookColor) updatedGameData.frameBookColor = localFrameBookColor;
+        if (localFrameTradingCardColor !== frameTradingCardColor) updatedGameData.frameTradingCardColor = localFrameTradingCardColor;
+        if (localFrameRoundedTopColor !== frameRoundedTopColor) updatedGameData.frameRoundedTopColor = localFrameRoundedTopColor;
+        if (localGameSceneNameOverlayBg !== gameSceneNameOverlayBg) updatedGameData.gameSceneNameOverlayBg = localGameSceneNameOverlayBg;
+        if (localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor) updatedGameData.gameSceneNameOverlayTextColor = localGameSceneNameOverlayTextColor;
+        if (localGameContinueIndicatorColor !== gameContinueIndicatorColor) updatedGameData.gameContinueIndicatorColor = localGameContinueIndicatorColor;
+        if (localTitle !== title) updatedGameData.gameTitle = localTitle;
+        if (localLogo !== logo) updatedGameData.gameLogo = localLogo;
+        if (localOmitSplashTitle !== omitSplashTitle) updatedGameData.gameOmitSplashTitle = localOmitSplashTitle;
+        if (localSplashImage !== splashImage) updatedGameData.gameSplashImage = localSplashImage;
+        if (localSplashContentAlignment !== splashContentAlignment) updatedGameData.gameSplashContentAlignment = localSplashContentAlignment;
+        if (localSplashContentVerticalAlignment !== splashContentVerticalAlignment) updatedGameData.gameSplashContentVerticalAlignment = localSplashContentVerticalAlignment;
+        if (localSplashDescription !== splashDescription) updatedGameData.gameSplashDescription = localSplashDescription;
+        if (localBackgroundMusic !== backgroundMusic) updatedGameData.gameBackgroundMusic = localBackgroundMusic;
+        if (localPositiveEndingImage !== positiveEndingImage) updatedGameData.positiveEndingImage = localPositiveEndingImage;
+        if (localPositiveEndingContentAlignment !== positiveEndingContentAlignment) updatedGameData.positiveEndingContentAlignment = localPositiveEndingContentAlignment;
+        if (localPositiveEndingDescription !== positiveEndingDescription) updatedGameData.positiveEndingDescription = localPositiveEndingDescription;
+        if (localPositiveEndingMusic !== positiveEndingMusic) updatedGameData.positiveEndingMusic = localPositiveEndingMusic;
+        if (localNegativeEndingImage !== negativeEndingImage) updatedGameData.negativeEndingImage = localNegativeEndingImage;
+        if (localNegativeEndingContentAlignment !== negativeEndingContentAlignment) updatedGameData.negativeEndingContentAlignment = localNegativeEndingContentAlignment;
+        if (localNegativeEndingDescription !== negativeEndingDescription) updatedGameData.negativeEndingDescription = localNegativeEndingDescription;
+        if (localNegativeEndingMusic !== negativeEndingMusic) updatedGameData.negativeEndingMusic = localNegativeEndingMusic;
+        if (JSON.stringify(localFixedVerbs) !== JSON.stringify(fixedVerbs)) updatedGameData.fixedVerbs = localFixedVerbs;
+        if (localTextAnimationType !== textAnimationType) updatedGameData.gameTextAnimationType = localTextAnimationType;
+        if (localTextSpeed !== textSpeed) updatedGameData.gameTextSpeed = localTextSpeed;
+        if (localImageTransitionType !== imageTransitionType) updatedGameData.gameImageTransitionType = localImageTransitionType;
+        if (localImageSpeed !== imageSpeed) updatedGameData.gameImageSpeed = localImageSpeed;
+        if (localEnableImages !== (enableImages ?? true)) updatedGameData.enableImages = localEnableImages;
+        if (localEnableTextControl !== (enableTextControl ?? true)) updatedGameData.enableTextControl = localEnableTextControl;
+        if (localTextReadingFlow !== (textReadingFlow || 'paused')) updatedGameData.gameTextReadingFlow = localTextReadingFlow;
+        if (localGameInteractionType !== (gameInteractionType || 'parser')) updatedGameData.gameInteractionType = localGameInteractionType;
 
         // Sync new systems
-        if (localEnableTrackers !== (enableTrackers ?? (gameSystemEnabled === 'trackers'))) onUpdate('enableTrackers', localEnableTrackers, true);
-        if (localEnableInventory !== (enableInventory ?? true)) onUpdate('enableInventory', localEnableInventory, true);
-        if (localEnableDiary !== (enableDiary ?? true)) onUpdate('enableDiary', localEnableDiary, true);
-        if (localEnableFixedVerbs !== (enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0))) onUpdate('enableFixedVerbs', localEnableFixedVerbs, true);
-        if (localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances'))) onUpdate('enableChances', localEnableChances, true);
+        if (localEnableTrackers !== (enableTrackers ?? (gameSystemEnabled === 'trackers'))) updatedGameData.enableTrackers = localEnableTrackers;
+        if (localEnableInventory !== (enableInventory ?? true)) updatedGameData.enableInventory = localEnableInventory;
+        if (localEnableDiary !== (enableDiary ?? true)) updatedGameData.enableDiary = localEnableDiary;
+        if (localEnableFixedVerbs !== (enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0))) updatedGameData.enableFixedVerbs = localEnableFixedVerbs;
+        if (localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances'))) updatedGameData.enableChances = localEnableChances;
+
+        if (localInventoryCapacity !== (inventoryCapacity ?? 10)) updatedGameData.inventoryCapacity = localInventoryCapacity;
+        if (localInventoryMaxWeight !== (inventoryMaxWeight ?? 0)) updatedGameData.inventoryMaxWeight = localInventoryMaxWeight;
+        if (localDiaryAutoScroll !== (diaryAutoScroll ?? true)) updatedGameData.diaryAutoScroll = localDiaryAutoScroll;
+        if (localDiaryAllowExport !== (diaryAllowExport ?? false)) updatedGameData.diaryAllowExport = localDiaryAllowExport;
+        if (localDiaryMaxMessages !== (diaryMaxMessages ?? 100)) updatedGameData.diaryMaxMessages = localDiaryMaxMessages;
+        if (localDiaryShowSceneImage !== (diaryShowSceneImage ?? false)) updatedGameData.diaryShowSceneImage = localDiaryShowSceneImage;
+        if (localDiaryShowPlayerAction !== (diaryShowPlayerAction ?? true)) updatedGameData.diaryShowPlayerAction = localDiaryShowPlayerAction;
+
+        updateGameData(updatedGameData);
 
         // Update snapshot to current state to prevent dirty flag from persisting
         initialStateRef.current = getCurrentState();
-        onSetDirty(false);
+        setHasUnsavedChanges(false);
     };
 
 
@@ -664,7 +691,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalSaveMenuTitle(gameSaveMenuTitle);
         setLocalLoadMenuTitle(gameLoadMenuTitle);
         setLocalMainMenuButtonText(gameMainMenuButtonText);
-        setLocalViewEndingButtonText(gameViewEndingButtonText || 'Ver Final');
+        setLocalViewEndingButtonText(gameViewEndingButtonText || t('uiEditor.placeholders.viewEnding'));
         setLocalTextColor(textColor);
         setLocalTitleColor(titleColor);
         setLocalSplashButtonColor(splashButtonColor);
@@ -729,6 +756,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalDiaryMaxMessages(diaryMaxMessages ?? 100);
         setLocalDiaryShowSceneImage(diaryShowSceneImage ?? false);
         setLocalDiaryShowPlayerAction(diaryShowPlayerAction ?? true);
+
+        initialStateRef.current = getCurrentState();
+        setHasUnsavedChanges(false);
     };
 
     const handleThemeChange = (theme: 'dark' | 'light') => {
@@ -856,46 +886,55 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         <div className="space-y-6 pb-8">
             {/* Header with Save/Undo actions */}
             <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
-                <p className="text-zinc-500 text-xs font-medium max-w-lg">
-                    Personalize a interface do jogo, configure menus e textos.
-                </p>
+                <div className="flex flex-col">
+                    <h2 className="text-xl font-bold text-foreground tracking-tight">UI Editor</h2>
+                    <p className="text-xs text-muted-foreground">{t('uiEditor.messages.personalizeInterface')}</p>
+                </div>
                 <div className="flex items-center gap-3">
-                    {isDirty && (
-                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
-                            <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            Alterações não salvas
+                    {hasUnsavedChanges && (
+                        <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-4">
+                            <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest flex items-center gap-1">
+                                <TriangleAlert className="w-3 h-3" /> {t('uiEditor.messages.unsavedChanges')}
+                            </span>
+                            <button
+                                onClick={handleUndo}
+                                className="p-1.5 hover:bg-muted rounded-md text-muted-foreground transition-colors"
+                                title={t('uiEditor.messages.undo')}
+                            >
+                                <RotateCcw className="w-3.5 h-3.5" />
+                            </button>
                         </div>
                     )}
                     <button
-                        onClick={handleUndo}
-                        disabled={!isDirty}
-                        className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
-                    >
-                        Desfazer
-                    </button>
-                    <button
                         onClick={handleSave}
-                        disabled={!isDirty}
-                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-lg shadow-yellow-900/10"
+                        disabled={!hasUnsavedChanges}
+                        className={`
+                        flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all shadow-sm
+                        ${hasUnsavedChanges
+                                ? 'bg-primary text-primary-foreground hover:bg-primary/90 hover:shadow-md hover:scale-105'
+                                : 'bg-muted text-muted-foreground opacity-50 cursor-not-allowed'}
+                    `}
                     >
-                        Salvar Alterações
+                        <Save className="w-3.5 h-3.5" />
+                        {t('uiEditor.messages.saveChanges')}
                     </button>
                 </div>
             </div>
             <div>
                 <div className="border-b border-muted-foreground/50 flex items-center justify-between pr-4">
                     <div className="flex space-x-1 overflow-x-auto">
-                        {Object.entries(TABS).map(([key, name]) => {
+                        {TABS.map((tab) => {
+                            const Icon = tab.icon;
                             return (
                                 <button
-                                    key={key}
-                                    onClick={() => setActiveTab(key as any)}
-                                    className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 ${activeTab === key
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(tab.id)}
+                                    className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 flex items-center gap-2 ${activeTab === tab.id
                                         ? 'border-primary text-primary bg-primary/5'
                                         : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
                                         }`}
                                 >
-                                    {name}
+                                    <Icon className="w-4 h-4" /> {tab.label}
                                 </button>
                             );
                         })}
@@ -903,23 +942,23 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 </div>
 
                 <div className={`bg-muted/10 -mt-px py-8 grid grid-cols-1 ${activeTab === 'cores' ? 'xl:grid-cols-[1fr_450px]' : ''} gap-8 items-start px-6`}>
-                    {activeTab === 'layout' && (
+                    {activeTab === 'aparencia' && (
                         <div className="space-y-6">
                             <div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
                                     <div className="space-y-8 col-span-1">
-                                        <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Tela de Abertura</h3>
+                                        <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">{t('uiEditor.sections.splashScreen')}</h3>
                                         <div className="space-y-8">
                                             <div>
-                                                <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
+                                                <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.contentAlignment')}</label>
                                                 <select
                                                     id="splashContentAlignment"
                                                     value={localSplashContentAlignment}
                                                     onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
                                                     className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-zinc-950 shadow-lg"
                                                 >
-                                                    <option value="right">Direita</option>
-                                                    <option value="left">Esquerda</option>
+                                                    <option value="right">{t('uiEditor.options.right')}</option>
+                                                    <option value="left">{t('uiEditor.options.left')}</option>
                                                 </select>
                                             </div>
                                             <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}>
@@ -930,13 +969,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
                                                     className="custom-checkbox"
                                                 />
-                                                <label htmlFor="omitSplashTitle" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">Ocultar título e descrição</label>
+                                                <label htmlFor="omitSplashTitle" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('uiEditor.labels.omitTitleDescription')}</label>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="space-y-4 col-span-1 md:mt-0">
-                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">Pré-visualização</p>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">{t('uiEditor.labels.preview')}</p>
                                         <div className="bg-card border border-muted-foreground/50 rounded-2xl p-4 flex items-center justify-center shadow-inner h-fit aspect-video">
                                             <div
                                                 className="relative w-full max-w-full aspect-video bg-muted border border-muted-foreground/50 rounded-xl flex shadow-2xl overflow-hidden"
@@ -946,13 +985,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 }}
                                             >
                                                 <div className="absolute inset-0 flex items-center justify-center -translate-y-4">
-                                                    <div className="text-secondary-foreground font-black text-[8px] uppercase tracking-[0.2em] border-2 border-secondary-foreground/20 px-3 py-1 rounded">Imagem de Fundo</div>
+                                                    <div className="text-secondary-foreground font-black text-[8px] uppercase tracking-[0.2em] border-2 border-secondary-foreground/20 px-3 py-1 rounded">{t('uiEditor.labels.backgroundImage')}</div>
                                                 </div>
                                                 {!localOmitSplashTitle && (
                                                     <div
                                                         className="w-2/3 h-1/3 m-6 bg-primary/5 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center justify-center text-center text-[8px] p-2 text-primary font-bold uppercase tracking-widest shadow-xl"
                                                     >
-                                                        Título e Descrição
+                                                        {t('uiEditor.labels.titleDescription')}
                                                     </div>
                                                 )}
                                             </div>
@@ -964,62 +1003,62 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             <div className="pt-6 border-t border-zinc-800/50">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
                                     <div className="space-y-8 col-span-1">
-                                        <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Layout do Jogo</h3>
+                                        <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">{t('uiEditor.sections.gameLayout')}</h3>
                                         <div className="space-y-4">
                                             <div>
-                                                <label htmlFor="orientation-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Orientação</label>
+                                                <label htmlFor="orientation-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.orientation')}</label>
                                                 <select
                                                     id="orientation-select"
                                                     value={localLayoutOrientation}
                                                     onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
                                                     className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-zinc-950"
                                                 >
-                                                    <option value="vertical">Vertical</option>
-                                                    <option value="horizontal">Horizontal</option>
+                                                    <option value="vertical">{t('uiEditor.options.vertical')}</option>
+                                                    <option value="horizontal">{t('uiEditor.options.horizontal')}</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label htmlFor="order-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posição da Imagem</label>
+                                                <label htmlFor="order-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.imagePosition')}</label>
                                                 <select
                                                     id="order-select"
                                                     value={localLayoutOrder}
                                                     onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
                                                     className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-zinc-950"
                                                 >
-                                                    <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
-                                                    <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
+                                                    <option value="image-first">{localLayoutOrientation === 'vertical' ? t('uiEditor.options.left') : t('uiEditor.options.above')}</option>
+                                                    <option value="image-last">{localLayoutOrientation === 'vertical' ? t('uiEditor.options.right') : t('uiEditor.options.below')}</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label htmlFor="frame-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Tipo de Moldura</label>
+                                                <label htmlFor="frame-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.frameType')}</label>
                                                 <select
                                                     id="frame-select"
                                                     value={localImageFrame}
                                                     onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
                                                     className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-zinc-950"
                                                 >
-                                                    <option value="none">Sem moldura</option>
-                                                    <option value="rounded-top">Portal</option>
-                                                    <option value="book-cover">Quadrada</option>
-                                                    <option value="trading-card">Arredondada</option>
+                                                    <option value="none">{t('uiEditor.options.noFrame')}</option>
+                                                    <option value="rounded-top">{t('uiEditor.options.portal')}</option>
+                                                    <option value="book-cover">{t('uiEditor.options.square')}</option>
+                                                    <option value="trading-card">{t('uiEditor.options.rounded')}</option>
                                                 </select>
                                             </div>
                                             <div>
                                                 {localImageFrame === 'rounded-top' && (
-                                                    <ColorInput label="Cor da Moldura" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
+                                                    <ColorInput label={t('uiEditor.labels.frameColor')} id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
                                                 )}
                                                 {localImageFrame === 'book-cover' && (
-                                                    <ColorInput label="Cor da Moldura" id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
+                                                    <ColorInput label={t('uiEditor.labels.frameColor')} id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
                                                 )}
                                                 {localImageFrame === 'trading-card' && (
-                                                    <ColorInput label="Cor da Moldura" id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
+                                                    <ColorInput label={t('uiEditor.labels.frameColor')} id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
                                                 )}
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="flex flex-col col-span-1 md:mt-0">
-                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">Pré-visualização do Layout</p>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">{t('uiEditor.labels.layoutPreview')}</p>
                                         <div className="bg-card border border-muted-foreground/50 rounded-2xl p-4 flex items-center justify-center h-fit aspect-video shadow-inner">
                                             <div
                                                 className="w-full max-w-[400px] aspect-video border border-muted-foreground/50 bg-muted rounded-xl flex p-3 gap-3 transition-all shadow-2xl overflow-hidden"
@@ -1036,11 +1075,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             backgroundColor: undefined
                                                         }}
                                                     >
-                                                        FOTO
+                                                        {t('uiEditor.labels.photo')}
                                                     </div>
                                                 </div>
                                                 <div className={`flex-1 bg-primary/5 border border-primary/20 rounded-lg flex items-center justify-center text-center text-[7px] p-2 text-primary font-black uppercase tracking-[0.2em] shadow-lg ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}>
-                                                    TEXTO
+                                                    {t('uiEditor.labels.text')}
                                                 </div>
                                             </div>
                                         </div>
@@ -1054,10 +1093,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div>
                                 <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest flex items-center gap-2">
-                                    <Grid className="w-4 h-4 text-muted-foreground" /> Sistemas Ativos
+                                    <Grid className="w-4 h-4 text-muted-foreground" /> {t('uiEditor.sections.activeSystems')}
                                 </h3>
                                 <p className="text-xs text-muted-foreground mb-6 max-w-2xl">
-                                    Habilite e configure os sistemas que estarão disponíveis no seu jogo. Você pode combinar múltiplos sistemas.
+                                    {t('uiEditor.messages.enableConfigureSystems')}
                                 </p>
 
                                 {/* --- BENTO BOX LAYOUT: FULL WIDTH HEADER + 2 INDEPENDENT COLUMNS + FOOTER --- */}
@@ -1071,351 +1110,383 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     <LayoutTemplate className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-sm font-bold uppercase tracking-wide text-foreground">Estilo de Jogo</h4>
-                                                    <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Define a interação principal do jogador</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <button
-                                                onClick={() => setLocalGameInteractionType('parser')}
-                                                className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/5 text-primary' : 'border-muted-foreground/20 bg-zinc-900 text-muted-foreground hover:border-primary/30'}`}
-                                            >
-                                                <div className={`p-3 rounded-lg ${localGameInteractionType === 'parser' ? 'bg-primary/20' : 'bg-black/40'}`}>
-                                                    <Type className="w-6 h-6" />
-                                                </div>
-                                                <div>
-                                                    <span className="text-xs font-bold uppercase block">Parser (Descreva Comandos)</span>
-                                                    <span className="text-[10px] opacity-70 mt-0.5">O jogador digita ações como "pegar chave" ou "olhar mesa"</span>
-                                                </div>
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    setLocalGameInteractionType('choice');
-                                                    setLocalEnableInventory(false);
-                                                }}
-                                                className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-primary bg-primary/5 text-primary' : 'border-muted-foreground/20 bg-zinc-900 text-muted-foreground hover:border-primary/30'}`}
-                                            >
-                                                <div className={`p-3 rounded-lg ${localGameInteractionType === 'choice' ? 'bg-primary/20' : 'bg-black/40'}`}>
-                                                    <List className="w-6 h-6" />
-                                                </div>
-                                                <div>
-                                                    <span className="text-xs font-bold uppercase block">IF (Escolha uma opção)</span>
-                                                    <span className="text-[10px] opacity-70 mt-0.5">O jogador escolhe entre opções pré-definidas na tela</span>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="flex flex-col md:flex-row gap-6 items-start">
-                                        {/* --- LEFT COLUMN --- */}
-                                        <div className="flex-1 w-full space-y-6">
-                                            {/* INVENTORY */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableInventory ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableInventory ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
-                                                                <Package className="w-5 h-5" />
-                                                            </div>
-                                                            <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>Inventário</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Gestão de itens pegos pelo jogador</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={localEnableInventory}
-                                                                onChange={(e) => setLocalEnableInventory(e.target.checked)}
-                                                                disabled={localGameInteractionType === 'choice'}
-                                                                className="sr-only peer"
-                                                            />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableInventory ? 'translateX(16px)' : 'translateX(0)' }}></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* TEXT CONTROL */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableTextControl ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableTextControl ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
-                                                                <Type className="w-5 h-5" />
-                                                            </div>
-                                                            <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>Controle de Texto</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Animação e fluxo da descrição de cena</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={localEnableTextControl} onChange={(e) => setLocalEnableTextControl(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableTextControl ? 'translateX(16px)' : 'translateX(0)' }}></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                    {localEnableTextControl && (
-                                                        <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                            <div className="grid grid-cols-2 gap-4">
-                                                                <div className="space-y-2">
-                                                                    <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Estilo de Animação</label>
-                                                                    <select
-                                                                        id="textAnimationType"
-                                                                        value={localTextAnimationType}
-                                                                        onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
-                                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
-                                                                    >
-                                                                        <option value="fade">Esmaecer (Fade In)</option>
-                                                                        <option value="typewriter">Máquina de Escrever</option>
-                                                                    </select>
-                                                                </div>
-                                                                <div className="space-y-2">
-                                                                    <label htmlFor="textReadingFlow" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Fluxo de Leitura</label>
-                                                                    <select
-                                                                        id="textReadingFlow"
-                                                                        value={localTextReadingFlow}
-                                                                        onChange={(e) => setLocalTextReadingFlow(e.target.value as 'continuous' | 'paused')}
-                                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
-                                                                    >
-                                                                        <option value="paused">Pausado (Por Parágrafo)</option>
-                                                                        <option value="continuous">Contínuo (Texto Completo)</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                            <div className="space-y-2">
-                                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Velocidade</label>
-                                                                <div className="flex items-center gap-4">
-                                                                    <input
-                                                                        type="range"
-                                                                        min="1"
-                                                                        max="5"
-                                                                        value={localTextSpeed}
-                                                                        onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
-                                                                        className="flex-grow h-1.5 bg-zinc-950 rounded-lg appearance-none cursor-pointer accent-primary"
-                                                                    />
-                                                                    <span className="text-xl font-mono font-bold w-6 text-center">{localTextSpeed}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* LIFE SYSTEM */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableChances ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableChances ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
-                                                                <Heart className="w-5 h-5" />
-                                                            </div>
-                                                            <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>Sistema de Vidas</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Limitar tentativas</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={localEnableChances} onChange={(e) => setLocalEnableChances(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableChances ? 'translateX(16px)' : 'translateX(0)' }}></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                    {localEnableChances && (
-                                                        <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                            <div className="flex items-end gap-3 w-full">
-                                                                <div className="space-y-1 flex-1 min-w-0">
-                                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Ícone</label>
-                                                                    <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-muted-foreground/50 h-9 w-full">
-                                                                        {['heart', 'circle', 'diamond', 'cross'].map((icon) => (
-                                                                            <button
-                                                                                key={icon}
-                                                                                onClick={() => setLocalChanceIcon(icon as any)}
-                                                                                className={`flex-1 h-full flex items-center justify-center rounded-md transition-all ${localChanceIcon === icon ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
-                                                                                title={icon}
-                                                                            >
-                                                                                <ChanceIcon type={icon as any} color={localChanceIcon === icon ? '#ffffff' : 'currentColor'} className="w-4 h-4" />
-                                                                            </button>
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
-                                                                <div className="space-y-1 flex-1 min-w-0">
-                                                                    <label htmlFor="chanceColor" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cor</label>
-                                                                    <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all h-9 w-full">
-                                                                        <input
-                                                                            type="color"
-                                                                            id="chanceColor-picker"
-                                                                            value={localChanceIconColor}
-                                                                            onChange={(e) => setLocalChanceIconColor(e.target.value)}
-                                                                            className="w-8 h-full p-0 border-none rounded cursor-pointer bg-transparent shrink-0"
-                                                                            aria-label="Seletor de cor"
-                                                                        />
-                                                                        <input
-                                                                            type="text"
-                                                                            id="chanceColor"
-                                                                            value={localChanceIconColor}
-                                                                            onChange={(e) => setLocalChanceIconColor(e.target.value)}
-                                                                            className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase truncate"
-                                                                            placeholder="#FF0000"
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                                <div className="space-y-1 w-20 shrink-0">
-                                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Vidas</label>
-                                                                    <input
-                                                                        type="number"
-                                                                        value={localMaxChances}
-                                                                        onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
-                                                                        min="1"
-                                                                        max="10"
-                                                                        className="w-full h-9 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-2 text-sm font-bold text-center text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* --- RIGHT COLUMN --- */}
-                                        <div className="flex-1 w-full space-y-6">
-                                            {/* DIARY */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableDiary ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableDiary ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
-                                                                <Book className="w-5 h-5" />
-                                                            </div>
-                                                            <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>Diário de Bordo</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Registro de eventos</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={localEnableDiary} onChange={(e) => setLocalEnableDiary(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableDiary ? 'translateX(16px)' : 'translateX(0)' }}></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                    {localEnableDiary && (
-                                                        <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                            <div className="space-y-3">
-                                                                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-muted-foreground/50">
-                                                                    <span className="text-[11px] text-muted-foreground">Mostrar Imagem da Cena</span>
-                                                                    <input type="checkbox" checked={localDiaryShowSceneImage} onChange={(e) => setLocalDiaryShowSceneImage(e.target.checked)} className="custom-checkbox" />
-                                                                </div>
-                                                                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-muted-foreground/50">
-                                                                    <span className="text-[11px] text-muted-foreground">Mostrar Ação do Jogador</span>
-                                                                    <input type="checkbox" checked={localDiaryShowPlayerAction} onChange={(e) => setLocalDiaryShowPlayerAction(e.target.checked)} className="custom-checkbox" />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* IMAGES */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableImages ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableImages ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
-                                                                <ImageIcon className="w-5 h-5" />
-                                                            </div>
-                                                            <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>Imagens nas Cenas</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Cenas ilustradas por imagens</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={localEnableImages} onChange={(e) => setLocalEnableImages(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableImages ? 'translateX(16px)' : 'translateX(0)' }}></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                    {localEnableImages && (
-                                                        <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                            <div className="space-y-2">
-                                                                <label htmlFor="imageTransitionType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Transição de Imagem</label>
-                                                                <select
-                                                                    id="imageTransitionType"
-                                                                    value={localImageTransitionType}
-                                                                    onChange={(e) => setLocalImageTransitionType(e.target.value as any)}
-                                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                    <div className="space-y-4">
+                                                        <div className="space-y-3">
+                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('uiEditor.labels.gameStyle')}</label>
+                                                            <p className="text-[10px] text-muted-foreground mb-3">{t('uiEditor.labels.gameStyleDesc')}</p>
+                                                            <div className="grid grid-cols-1 gap-3">
+                                                                <button
+                                                                    onClick={() => setLocalGameInteractionType('parser')}
+                                                                    className={`flex items-start gap-3 p-3 rounded-xl border text-left transition-all ${localGameInteractionType === 'parser' ? 'bg-primary/10 border-primary ring-1 ring-primary/20' : 'bg-muted/30 border-muted-foreground/30 hover:bg-muted/50'}`}
                                                                 >
-                                                                    <option value="fade">Esmaecer (Fade)</option>
-                                                                    <option value="slide">Deslizar (Slide)</option>
-                                                                    <option value="none">Nenhuma</option>
-                                                                </select>
-                                                            </div>
-                                                            <div className="space-y-2">
-                                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Velocidade</label>
-                                                                <div className="flex items-center gap-4">
-                                                                    <input
-                                                                        type="range"
-                                                                        min="0.1"
-                                                                        max="3"
-                                                                        step="0.1"
-                                                                        value={localImageSpeed}
-                                                                        onChange={(e) => setLocalImageSpeed(parseFloat(e.target.value))}
-                                                                        className="flex-grow h-1.5 bg-zinc-950 rounded-lg appearance-none cursor-pointer accent-primary"
-                                                                    />
-                                                                    <span className="text-xl font-mono font-bold w-6 text-center">{localImageSpeed}s</span>
-                                                                </div>
+                                                                    <TerminalSquare className={`w-5 h-5 mt-0.5 ${localGameInteractionType === 'parser' ? 'text-primary' : 'text-muted-foreground'}`} />
+                                                                    <div>
+                                                                        <span className={`block text-xs font-bold uppercase tracking-wider mb-1 ${localGameInteractionType === 'parser' ? 'text-primary' : 'text-foreground'}`}>{t('uiEditor.labels.parser')}</span>
+                                                                        <span className="text-[10px] text-muted-foreground leading-relaxed">{t('uiEditor.labels.parserDesc')}</span>
+                                                                    </div>
+                                                                </button>
+                                                                <button
+                                                                    onClick={() => {
+                                                                        setLocalGameInteractionType('choice');
+                                                                        setLocalEnableInventory(false);
+                                                                    }}
+                                                                    className={`flex items-start gap-3 p-3 rounded-xl border text-left transition-all ${localGameInteractionType === 'choice' ? 'bg-primary/10 border-primary ring-1 ring-primary/20' : 'bg-muted/30 border-muted-foreground/30 hover:bg-muted/50'}`}
+                                                                >
+                                                                    <MousePointerClick className={`w-5 h-5 mt-0.5 ${localGameInteractionType === 'choice' ? 'text-primary' : 'text-muted-foreground'}`} />
+                                                                    <div>
+                                                                        <span className={`block text-xs font-bold uppercase tracking-wider mb-1 ${localGameInteractionType === 'choice' ? 'text-primary' : 'text-foreground'}`}>{t('uiEditor.labels.choice')}</span>
+                                                                        <span className="text-[10px] text-muted-foreground leading-relaxed">{t('uiEditor.labels.choiceDesc')}</span>
+                                                                    </div>
+                                                                </button>
                                                             </div>
                                                         </div>
-                                                    )}
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <button
+                                                        onClick={() => setLocalGameInteractionType('parser')}
+                                                        className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/5 text-primary' : 'border-muted-foreground/20 bg-zinc-900 text-muted-foreground hover:border-primary/30'}`}
+                                                    >
+                                                        <div className={`p-3 rounded-lg ${localGameInteractionType === 'parser' ? 'bg-primary/20' : 'bg-black/40'}`}>
+                                                            <Type className="w-6 h-6" />
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-xs font-bold uppercase block">{t('uiEditor.options.parserDescribeCommands')}</span>
+                                                            <span className="text-[10px] opacity-70 mt-0.5">{t('uiEditor.messages.playerTypesActions')}</span>
+                                                        </div>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            setLocalGameInteractionType('choice');
+                                                            setLocalEnableInventory(false);
+                                                        }}
+                                                        className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-primary bg-primary/5 text-primary' : 'border-muted-foreground/20 bg-zinc-900 text-muted-foreground hover:border-primary/30'}`}
+                                                    >
+                                                        <div className={`p-3 rounded-lg ${localGameInteractionType === 'choice' ? 'bg-primary/20' : 'bg-black/40'}`}>
+                                                            <List className="w-6 h-6" />
+                                                        </div>
+                                                        <div>
+                                                            <span className="text-xs font-bold uppercase block">{t('uiEditor.options.ifChooseOption')}</span>
+                                                            <span className="text-[10px] opacity-70 mt-0.5">{t('uiEditor.messages.playerChoosesOptions')}</span>
+                                                        </div>
+                                                    </button>
                                                 </div>
                                             </div>
 
-                                            {/* TRACKERS */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableTrackers ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className={`p-2.5 rounded-xl transition-colors ${localEnableTrackers ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}>
-                                                                <SlidersHorizontal className="w-5 h-5" />
-                                                            </div>
-                                                            <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>Rastreadores</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Variáveis Numéricas</p>
+                                            <div className="flex flex-col md:flex-row gap-6 items-start">
+                                                {/* --- LEFT COLUMN --- */}
+                                                <div className="flex-1 w-full space-y-6">
+                                                    {/* INVENTORY */}
+                                                    <div className="w-full">
+                                                        <div className={`w-full p-6 bg-card border ${localEnableInventory ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
+                                                            <div className="flex justify-between items-center">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className={`p-2.5 rounded-xl transition-colors ${localEnableInventory ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
+                                                                        <Package className="w-5 h-5" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('uiEditor.labels.inventory')}</h4>
+                                                                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('uiEditor.messages.itemManagement')}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
+                                                                    <input
+                                                                        type="checkbox"
+                                                                        checked={localEnableInventory}
+                                                                        onChange={(e) => setLocalEnableInventory(e.target.checked)}
+                                                                        disabled={localGameInteractionType === 'choice'}
+                                                                        className="sr-only peer"
+                                                                    />
+                                                                    <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                                                        <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableInventory ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                    </div>
+                                                                </label>
                                                             </div>
                                                         </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={localEnableTrackers} onChange={(e) => setLocalEnableTrackers(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableTrackers ? 'translateX(16px)' : 'translateX(0)' }}></div>
-                                                            </div>
-                                                        </label>
                                                     </div>
-                                                    {localEnableTrackers && (
-                                                        <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                            <p className="text-[11px] text-muted-foreground leading-relaxed">
-                                                                Rastreadores são variáveis para pontos de vida alternativos, dinheiro, sanidade, etc.
-                                                            </p>
-                                                            <button
-                                                                onClick={() => props.onNavigateToTrackers?.()}
-                                                                className="w-full py-3 bg-primary/10 text-primary border border-primary/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all active:scale-95 flex items-center justify-center gap-2"
-                                                            >
-                                                                <SlidersHorizontal className="w-4 h-4" /> Configurar Rastreadores
-                                                            </button>
+
+                                                    {/* TEXT CONTROL */}
+                                                    <div className="w-full">
+                                                        <div className={`w-full p-6 bg-card border ${localEnableTextControl ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                                            <div className="flex justify-between items-center">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className={`p-2.5 rounded-xl transition-colors ${localEnableTextControl ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
+                                                                        <Type className="w-5 h-5" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>{t('uiEditor.labels.textControl')}</h4>
+                                                                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('uiEditor.messages.animationSceneDescription')}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <label className="relative inline-flex items-center cursor-pointer">
+                                                                    <input type="checkbox" checked={localEnableTextControl} onChange={(e) => setLocalEnableTextControl(e.target.checked)} className="sr-only peer" />
+                                                                    <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                                                        <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableTextControl ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                    </div>
+                                                                </label>
+                                                            </div>
+                                                            {localEnableTextControl && (
+                                                                <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                                    <div className="grid grid-cols-2 gap-4">
+                                                                        <div className="space-y-2">
+                                                                            <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.animationStyle')}</label>
+                                                                            <select
+                                                                                id="textAnimationType"
+                                                                                value={localTextAnimationType}
+                                                                                onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
+                                                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                                            >
+                                                                                <option value="fade">{t('uiEditor.options.fadeIn')}</option>
+                                                                                <option value="typewriter">{t('uiEditor.options.typewriter')}</option>
+                                                                            </select>
+                                                                        </div>
+                                                                        <div className="space-y-2">
+                                                                            <label htmlFor="textReadingFlow" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.readingFlow')}</label>
+                                                                            <select
+                                                                                id="textReadingFlow"
+                                                                                value={localTextReadingFlow}
+                                                                                onChange={(e) => setLocalTextReadingFlow(e.target.value as 'continuous' | 'paused')}
+                                                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                                            >
+                                                                                <option value="paused">{t('uiEditor.options.pausedByParagraph')}</option>
+                                                                                <option value="continuous">{t('uiEditor.options.continuousFullText')}</option>
+                                                                            </select>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="space-y-2">
+                                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.speed')}</label>
+                                                                        <div className="flex items-center gap-4">
+                                                                            <input
+                                                                                type="range"
+                                                                                min="1"
+                                                                                max="5"
+                                                                                value={localTextSpeed}
+                                                                                onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
+                                                                                className="flex-grow h-1.5 bg-zinc-950 rounded-lg appearance-none cursor-pointer accent-primary"
+                                                                            />
+                                                                            <span className="text-xl font-mono font-bold w-6 text-center">{localTextSpeed}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                    )}
+                                                    </div>
+
+                                                    {/* LIFE SYSTEM */}
+                                                    <div className="w-full">
+                                                        <div className={`w-full p-6 bg-card border ${localEnableChances ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
+                                                            <div className="flex justify-between items-center">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className={`p-2.5 rounded-xl transition-colors ${localEnableChances ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
+                                                                        <Heart className="w-5 h-5" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>{t('uiEditor.sections.lifeSystem')}</h4>
+                                                                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('uiEditor.sections.lifeSystemDesc')}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <label className="relative inline-flex items-center cursor-pointer">
+                                                                    <input type="checkbox" checked={localEnableChances} onChange={(e) => setLocalEnableChances(e.target.checked)} className="sr-only peer" />
+                                                                    <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                                                        <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableChances ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                    </div>
+                                                                </label>
+                                                            </div>
+                                                            {localEnableChances && (
+                                                                <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                                    <div className="flex items-end gap-3 w-full">
+                                                                        <div className="space-y-1 flex-1 min-w-0">
+                                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('uiEditor.labels.icon')}</label>
+                                                                            <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-muted-foreground/50 h-9 w-full">
+                                                                                {['heart', 'circle', 'diamond', 'cross'].map((icon) => (
+                                                                                    <button
+                                                                                        key={icon}
+                                                                                        onClick={() => setLocalChanceIcon(icon as any)}
+                                                                                        className={`flex-1 h-full flex items-center justify-center rounded-md transition-all ${localChanceIcon === icon ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+                                                                                        title={icon}
+                                                                                    >
+                                                                                        <ChanceIcon type={icon as any} color={localChanceIcon === icon ? '#ffffff' : 'currentColor'} className="w-4 h-4" />
+                                                                                    </button>
+                                                                                ))}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="space-y-1 flex-1 min-w-0">
+                                                                            <label htmlFor="chanceColor" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('uiEditor.labels.color')}</label>
+                                                                            <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all h-9 w-full">
+                                                                                <input
+                                                                                    type="color"
+                                                                                    id="chanceColor-picker"
+                                                                                    value={localChanceIconColor}
+                                                                                    onChange={(e) => setLocalChanceIconColor(e.target.value)}
+                                                                                    className="w-8 h-full p-0 border-none rounded cursor-pointer bg-transparent shrink-0"
+                                                                                    aria-label="Seletor de cor"
+                                                                                />
+                                                                                <input
+                                                                                    type="text"
+                                                                                    id="chanceColor"
+                                                                                    value={localChanceIconColor}
+                                                                                    onChange={(e) => setLocalChanceIconColor(e.target.value)}
+                                                                                    className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase truncate"
+                                                                                    placeholder="#FF0000"
+                                                                                />
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className="space-y-1 w-20 shrink-0">
+                                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('uiEditor.labels.lives')}</label>
+                                                                            <input
+                                                                                type="number"
+                                                                                value={localMaxChances}
+                                                                                onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
+                                                                                min="1"
+                                                                                max="10"
+                                                                                className="w-full h-9 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-2 text-sm font-bold text-center text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* --- RIGHT COLUMN --- */}
+                                                <div className="flex-1 w-full space-y-6">
+                                                    {/* DIARY */}
+                                                    <div className="w-full">
+                                                        <div className={`w-full p-6 bg-card border ${localEnableDiary ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                                            <div className="flex justify-between items-center">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className={`p-2.5 rounded-xl transition-colors ${localEnableDiary ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
+                                                                        <Book className="w-5 h-5" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>{t('uiEditor.sections.diary')}</h4>
+                                                                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('uiEditor.sections.diaryDesc')}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <label className="relative inline-flex items-center cursor-pointer">
+                                                                    <input type="checkbox" checked={localEnableDiary} onChange={(e) => setLocalEnableDiary(e.target.checked)} className="sr-only peer" />
+                                                                    <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                                                        <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableDiary ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                    </div>
+                                                                </label>
+                                                            </div>
+                                                            {localEnableDiary && (
+                                                                <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                                    <div className="space-y-3">
+                                                                        <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-muted-foreground/50">
+                                                                            <div className="flex flex-col">
+                                                                                <span className="text-[11px] text-muted-foreground font-medium">{t('uiEditor.labels.hideTitleDesc')}</span>
+                                                                            </div>
+                                                                            <input type="checkbox" checked={localDiaryShowSceneImage} onChange={(e) => setLocalDiaryShowSceneImage(e.target.checked)} className="custom-checkbox" />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-muted-foreground/50">
+                                                                        <span className="text-[11px] text-muted-foreground">{t('uiEditor.labels.showPlayerAction')}</span>
+                                                                        <input type="checkbox" checked={localDiaryShowPlayerAction} onChange={(e) => setLocalDiaryShowPlayerAction(e.target.checked)} className="custom-checkbox" />
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* IMAGES */}
+                                                    <div className="w-full">
+                                                        <div className={`w-full p-6 bg-card border ${localEnableImages ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                                            <div className="flex justify-between items-center">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className={`p-2.5 rounded-xl transition-colors ${localEnableImages ? 'bg-primary text-primary-foreground shadow-md' : 'bg-zinc-900 text-muted-foreground'}`}>
+                                                                        <ImageIcon className="w-5 h-5" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>{t('uiEditor.sections.sceneImages')}</h4>
+                                                                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('uiEditor.sections.sceneImagesDesc')}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <label className="relative inline-flex items-center cursor-pointer">
+                                                                    <input type="checkbox" checked={localEnableImages} onChange={(e) => setLocalEnableImages(e.target.checked)} className="sr-only peer" />
+                                                                    <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                                                        <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableImages ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                    </div>
+                                                                </label>
+                                                            </div>
+                                                            {localEnableImages && (
+                                                                <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                                    <div className="space-y-2">
+                                                                        <label htmlFor="imageTransitionType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.imageTransition')}</label>
+                                                                        <select
+                                                                            id="imageTransitionType"
+                                                                            value={localImageTransitionType}
+                                                                            onChange={(e) => setLocalImageTransitionType(e.target.value as any)}
+                                                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                                        >
+                                                                            <option value="fade">{t('uiEditor.options.fade')}</option>
+                                                                            <option value="slide">{t('uiEditor.options.slide')}</option>
+                                                                            <option value="none">{t('uiEditor.options.none')}</option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div className="space-y-2">
+                                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.speed')}</label>
+                                                                        <div className="flex items-center gap-4">
+                                                                            <input
+                                                                                type="range"
+                                                                                min="0.1"
+                                                                                max="3"
+                                                                                step="0.1"
+                                                                                value={localImageSpeed}
+                                                                                onChange={(e) => setLocalImageSpeed(parseFloat(e.target.value))}
+                                                                                className="flex-grow h-1.5 bg-zinc-950 rounded-lg appearance-none cursor-pointer accent-primary"
+                                                                            />
+                                                                            <span className="text-xl font-mono font-bold w-6 text-center">{localImageSpeed}s</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
+
+                                                    {/* TRACKERS */}
+                                                    <div className="w-full">
+                                                        <div className={`w-full p-6 bg-card border ${localEnableTrackers ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
+                                                            <div className="flex justify-between items-center">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className={`p-2.5 rounded-xl transition-colors ${localEnableTrackers ? 'bg-primary text-primary-foreground shadow-md' : 'bg-muted text-muted-foreground'}`}>
+                                                                        <SlidersHorizontal className="w-5 h-5" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>{t('uiEditor.sections.trackers')}</h4>
+                                                                        <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('uiEditor.sections.trackersDesc')}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <label className="relative inline-flex items-center cursor-pointer">
+                                                                    <input type="checkbox" checked={localEnableTrackers} onChange={(e) => setLocalEnableTrackers(e.target.checked)} className="sr-only peer" />
+                                                                    <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                                                        <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableTrackers ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                    </div>
+                                                                </label>
+                                                            </div>
+                                                            {localEnableTrackers && (
+                                                                <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
+                                                                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                                                                        {t('uiEditor.messages.trackersExplanation')}
+                                                                    </p>
+                                                                    <button
+                                                                        onClick={() => props.onNavigateToTrackers?.()}
+                                                                        className="w-full py-3 bg-primary/10 text-primary border border-primary/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all active:scale-95 flex items-center justify-center gap-2"
+                                                                    >
+                                                                        <SlidersHorizontal className="w-4 h-4" /> {t('uiEditor.labels.configureTrackers')}
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     )}
@@ -1583,66 +1654,66 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         activeTab === 'textos' && (
                             <div className="space-y-6">
                                 <div>
-                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Textos da Interface</h3>
+                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">{t('uiEditor.sections.interfaceTexts')}</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                         <div className="space-y-2">
-                                            <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Ação</label>
+                                            <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.actionButtonText')}</label>
                                             <input type="text" id="actionButtonText" value={localActionButtonText} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Campo de Comando</label>
+                                            <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.commandFieldText')}</label>
                                             <input type="text" id="verbInputPlaceholder" value={localVerbInputPlaceholder} onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="viewEndingButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão "Ver Final"</label>
-                                            <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText} onChange={(e) => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg placeholder:text-muted-foreground" placeholder="Ver Final" />
-                                            <p className="text-[10px] text-muted-foreground mt-2 italic">Aparece quando o jogo termina, para levar às telas de final.</p>
+                                            <label htmlFor="viewEndingButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.viewEndingButtonText')}</label>
+                                            <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText} onChange={(e) => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg placeholder:text-muted-foreground" placeholder={t('uiEditor.placeholders.viewEnding')} />
+                                            <p className="text-[10px] text-muted-foreground mt-2 italic">{t('uiEditor.messages.viewEndingTextHelp')}</p>
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Nome do Jogador no Diário</label>
+                                            <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.diaryPlayerName')}</label>
                                             <input type="text" id="diaryPlayerName" value={localDiaryPlayerName} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="splashButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Início</label>
-                                            <input type="text" id="splashButtonText" value={localSplashButtonText} onChange={(e) => setLocalSplashButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="INICIAR" />
+                                            <label htmlFor="splashButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.startButtonText')}</label>
+                                            <input type="text" id="splashButtonText" value={localSplashButtonText} onChange={(e) => setLocalSplashButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder={t('uiEditor.placeholders.start')} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="continueButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Continuar</label>
-                                            <input type="text" id="continueButtonText" value={localContinueButtonText} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Continuar Aventura" />
+                                            <label htmlFor="continueButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.continueButtonText')}</label>
+                                            <input type="text" id="continueButtonText" value={localContinueButtonText} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder={t('uiEditor.placeholders.continueAdventure')} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Reiniciar</label>
-                                            <input type="text" id="restartButtonText" value={localRestartButtonText} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Reiniciar Aventura" />
+                                            <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.restartButtonText')}</label>
+                                            <input type="text" id="restartButtonText" value={localRestartButtonText} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder={t('uiEditor.placeholders.restartAdventure')} />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="pt-6 border-t border-muted-foreground/50">
-                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Botões de Navegação</h3>
+                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">{t('uiEditor.sections.navButtons')}</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                         <div className="space-y-2">
-                                            <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Sugestões</label>
+                                            <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.suggestionsButton')}</label>
                                             <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Inventário</label>
+                                            <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.inventoryButton')}</label>
                                             <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Diário</label>
+                                            <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.diaryButton')}</label>
                                             <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="trackersButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Rastreadores</label>
-                                            <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed" placeholder="Rastreadores" disabled={localGameSystemEnabled !== 'trackers'} />
+                                            <label htmlFor="trackersButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.trackersButton')}</label>
+                                            <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('uiEditor.placeholders.trackers')} disabled={localGameSystemEnabled !== 'trackers'} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="systemButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Sistema</label>
-                                            <input type="text" id="systemButtonText" value={localSystemButtonText} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder="Sistema" />
+                                            <label htmlFor="systemButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.systemMenuButton')}</label>
+                                            <input type="text" id="systemButtonText" value={localSystemButtonText} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/30 transition-all shadow-lg" placeholder={t('uiEditor.placeholders.system')} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Principal</label>
-                                            <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all shadow-lg" placeholder="Menu Principal" />
+                                            <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('uiEditor.labels.mainMenuButton')}</label>
+                                            <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30 transition-all shadow-lg" placeholder={t('uiEditor.placeholders.mainMenu')} />
                                         </div>
                                     </div>
                                 </div>
@@ -1665,7 +1736,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <LayoutTemplate className="w-4 h-4 text-muted-foreground" /> ESTRUTURA
+                                                <LayoutTemplate className="w-4 h-4 text-muted-foreground" /> {t('uiEditor.sections.structure')}
                                             </h3>
                                             {activeSections.estrutura ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
@@ -1673,22 +1744,22 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         {activeSections.estrutura && (
                                             <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Orientação</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('uiEditor.labels.orientation')}</label>
                                                     <div className="relative">
                                                         <select
                                                             value={localLayoutOrientation}
                                                             onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
                                                             className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
                                                         >
-                                                            <option value="vertical">Vertical</option>
-                                                            <option value="horizontal">Horizontal</option>
+                                                            <option value="vertical">{t('uiEditor.options.vertical')}</option>
+                                                            <option value="horizontal">{t('uiEditor.options.horizontal')}</option>
                                                         </select>
                                                         <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                                                     </div>
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Posição da Imagem</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('uiEditor.labels.imagePosition')}</label>
                                                     <div className="relative">
                                                         <select
                                                             value={localLayoutOrder}
@@ -1697,13 +1768,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         >
                                                             {localLayoutOrientation === 'vertical' ? (
                                                                 <>
-                                                                    <option value="image-first">Esquerda</option>
-                                                                    <option value="image-last">Direita</option>
+                                                                    <option value="image-first">{t('uiEditor.options.left')}</option>
+                                                                    <option value="image-last">{t('uiEditor.options.right')}</option>
                                                                 </>
                                                             ) : (
                                                                 <>
-                                                                    <option value="image-first">Acima do Texto</option>
-                                                                    <option value="image-last">Abaixo do Texto</option>
+                                                                    <option value="image-first">{t('uiEditor.options.above')}</option>
+                                                                    <option value="image-last">{t('uiEditor.options.below')}</option>
                                                                 </>
                                                             )}
                                                         </select>
@@ -1712,17 +1783,17 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Tipo de Moldura</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('uiEditor.labels.frameType')}</label>
                                                     <div className="relative">
                                                         <select
                                                             value={localImageFrame}
                                                             onChange={(e) => setLocalImageFrame(e.target.value as any)}
                                                             className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
                                                         >
-                                                            <option value="none">Sem moldura</option>
-                                                            <option value="rounded-top">Portal</option>
-                                                            <option value="book-cover">Quadrada</option>
-                                                            <option value="trading-card">Arredondada</option>
+                                                            <option value="none">{t('uiEditor.options.noFrame')}</option>
+                                                            <option value="rounded-top">{t('uiEditor.options.portal')}</option>
+                                                            <option value="book-cover">{t('uiEditor.options.square')}</option>
+                                                            <option value="trading-card">{t('uiEditor.options.rounded')}</option>
                                                         </select>
                                                         <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                                                     </div>
@@ -1731,6 +1802,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         )}
                                     </div>
 
+
                                     {/* SECTION: ESTILO & TEMA */}
                                     <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
                                         <button
@@ -1738,7 +1810,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <Palette className="w-4 h-4 text-muted-foreground" /> ESTILO & TEMA
+                                                <Palette className="w-4 h-4 text-muted-foreground" /> {t('uiEditor.sections.styleTheme')}
                                             </h3>
                                             {activeSections.estilo ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
@@ -1746,25 +1818,40 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         {activeSections.estilo && (
                                             <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Cor da Interface</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('uiEditor.labels.interfaceColor')}</label>
                                                     <div className="flex bg-input rounded-lg p-1 border border-input">
                                                         <button
                                                             onClick={() => handleThemeChange('dark')}
                                                             className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                                         >
-                                                            Escuro
+                                                            {t('uiEditor.options.dark')}
                                                         </button>
                                                         <button
                                                             onClick={() => handleThemeChange('light')}
                                                             className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'light' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                                         >
-                                                            Claro
+                                                            {t('uiEditor.options.light')}
                                                         </button>
                                                     </div>
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Temas Predefinidos</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('uiEditor.labels.contentPosition')}</label>
+                                                    <div className="flex bg-zinc-950 p-1 rounded-lg border border-muted-foreground/30">
+                                                        {(['left', 'right'] as const).map(align => (
+                                                            <button
+                                                                key={align}
+                                                                onClick={() => setLocalSplashContentAlignment(align)}
+                                                                className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${localSplashContentAlignment === align ? 'bg-muted text-foreground shadow-sm' : 'text-muted-foreground hover:text-zinc-300'}`}
+                                                            >
+                                                                {align === 'left' ? t('uiEditor.options.left') : t('uiEditor.options.right')}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('uiEditor.labels.predefinedThemes')}</label>
                                                     <div className="grid grid-cols-3 gap-2">
                                                         {PREDEFINED_THEMES.map((theme) => (
                                                             <button
@@ -1787,44 +1874,37 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         onClick={() => toggleSection('cores')}
                                                         className="flex items-center justify-between w-full text-left bg-muted/30 p-3 rounded-lg hover:bg-muted/50 transition-all"
                                                     >
-                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Personalização de Cores</span>
+                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('uiEditor.sections.colorCustomization')}</span>
                                                         {activeSections.cores ? <ChevronUp className="w-3 h-3 text-muted-foreground" /> : <ChevronDown className="w-3 h-3 text-muted-foreground" />}
                                                     </button>
                                                     {activeSections.cores && (
                                                         <div className="mt-3 space-y-6 animate-in fade-in slide-in-from-top-1 px-1">
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">Descrição de Cena</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('uiEditor.sections.sceneDescription')}</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label="Texto Padrão" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label="Título / Destaque" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
-                                                                    <ColorInput label="Destaque (Foco)" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label="Seta Indicação" id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('uiEditor.labels.defaultText')} id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('uiEditor.labels.titleHighlight')} id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
+                                                                    <ColorInput label={t('uiEditor.labels.highlightFocus')} id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('uiEditor.labels.indicatorArrow')} id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
                                                                 </div>
                                                             </div>
 
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">Botões da interface</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('uiEditor.sections.interfaceButtons')}</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label="Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label="Texto Botão de Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label="Botão Início (Hover)" id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label="Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label="Texto Botão de Ação" id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('uiEditor.labels.startButton')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('uiEditor.labels.startButtonTextLabel')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('uiEditor.labels.startButtonHover')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('uiEditor.labels.actionButton')} id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('uiEditor.labels.actionButtonTextLabel')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
                                                                 </div>
                                                             </div>
 
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">Box de Nome da Cena</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('uiEditor.sections.others')}</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label="Cor de fundo" id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
-                                                                    <ColorInput label="Texto" id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">Outros</h4>
-                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label="Fundo Principal" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#000000" />
+                                                                    <ColorInput label={t('uiEditor.labels.sceneNameBox')} id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
+                                                                    <ColorInput label={t('uiEditor.labels.backgroundColor')} id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#000000" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1834,6 +1914,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         )}
                                     </div>
 
+
                                     {/* SECTION: UI TEXT */}
                                     <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
                                         <button
@@ -1841,15 +1922,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <Type className="w-4 h-4 text-muted-foreground" /> FONTES & TEXTO
+                                                <Type className="w-4 h-4 text-muted-foreground" /> {t('uiEditor.sections.fontsText')}
                                             </h3>
                                             {activeSections.texto ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
-
                                         {activeSections.texto && (
                                             <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Botão de Ação</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('uiEditor.labels.actionButton')}</label>
                                                     <input
                                                         type="text"
                                                         value={localActionButtonText}
@@ -1858,7 +1938,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Input do jogador</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('uiEditor.placeholders.playerInput')}</label>
                                                     <input
                                                         type="text"
                                                         value={localVerbInputPlaceholder}
@@ -1866,36 +1946,28 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground"
                                                     />
                                                 </div>
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div className="space-y-2">
-                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Fonte</label>
-                                                        <div className="relative">
-                                                            <select
-                                                                value={localFontFamily}
-                                                                onChange={(e) => setLocalFontFamily(e.target.value)}
-                                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
-                                                            >
-                                                                {FONTS.map(font => (
-                                                                    <option key={font.name} value={font.family}>{font.name}</option>
-                                                                ))}
-                                                            </select>
-                                                            <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Tamanho</label>
-                                                        <div className="relative">
-                                                            <select
-                                                                value={localGameFontSize}
-                                                                onChange={(e) => setLocalGameFontSize(e.target.value)}
-                                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
-                                                            >
-                                                                <option value="12">Pequeno</option>
-                                                                <option value="14">Médio</option>
-                                                                <option value="16">Grande</option>
-                                                            </select>
-                                                            <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-                                                        </div>
+                                                <div className="space-y-2">
+                                                    <label htmlFor="fontFamily" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">{t('uiEditor.labels.font')}</label>
+                                                    <select
+                                                        id="fontFamily"
+                                                        value={localFontFamily}
+                                                        onChange={(e) => setLocalFontFamily(e.target.value)}
+                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all"
+                                                    >
+                                                        <option value="Inter, sans-serif">Inter ({t('uiEditor.options.default')})</option>
+                                                        <option value="Merriweather, serif">Merriweather (Serif)</option>
+                                                        <option value="Roboto Mono, monospace">Roboto Mono (Code)</option>
+                                                        <option value="Comic Sans MS, cursive">Comic Sans (Comic)</option>
+                                                    </select>
+                                                </div>
+
+                                                <div className="space-y-2">
+                                                    <label htmlFor="baseFontSize" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1">{t('uiEditor.labels.size')}</label>
+                                                    <div className="flex items-center gap-2">
+                                                        <button onClick={() => setLocalGameFontSize('14px')} className={`flex-1 py-1.5 rounded border text-xs font-bold ${localGameFontSize === '14px' ? 'bg-primary/10 border-primary text-primary' : 'bg-muted/30 border-muted-foreground/30 text-muted-foreground'}`}>{t('uiEditor.options.small')}</button>
+                                                        <button onClick={() => setLocalGameFontSize('16px')} className={`flex-1 py-1.5 rounded border text-xs font-bold ${localGameFontSize === '16px' ? 'bg-primary/10 border-primary text-primary' : 'bg-muted/30 border-muted-foreground/30 text-muted-foreground'}`}>{t('uiEditor.options.medium')}</button>
+                                                        <button onClick={() => setLocalGameFontSize('18px')} className={`flex-1 py-1.5 rounded border text-xs font-bold ${localGameFontSize === '18px' ? 'bg-primary/10 border-primary text-primary' : 'bg-muted/30 border-muted-foreground/30 text-muted-foreground'}`}>{t('uiEditor.options.large')}</button>
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -1904,7 +1976,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                 </div>
 
-                                {/* Right Column: Preview (Expanded width) */}
                                 <div className="col-span-1 lg:col-span-7 relative">
                                     <div className="sticky top-4 space-y-2 h-[calc(100vh-100px)] flex flex-col">
 
@@ -1924,99 +1995,103 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                                 {/* Image Area - Dynamic Order & Frame */}
                                                 {/* Image Area - Dynamic Order & Frame using getFramePreviewStyles Logic */}
-                                                <div
-                                                    className={`
+
+
+                                                <div className={`flex flex-col h-full ${localLayoutOrder === 'image-first' ? 'flex-col' : 'flex-col-reverse'}`}>
+                                                    <div
+                                                        className={`
                                                         relative flex items-center justify-center flex-shrink-0 transition-all duration-300
                                                         ${localLayoutOrientation === 'vertical' ? 'w-1/2 h-full' : 'w-full h-1/2 min-h-[50%]'}
                                                         ${localLayoutOrder === 'image-first' ? 'order-first' : 'order-last'}
                                                     `}
-                                                >
-                                                    {(() => {
-                                                        const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(localImageFrame as any);
+                                                    >
+                                                        {(() => {
+                                                            const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(localImageFrame as any);
 
-                                                        // Ensure the panel takes full size of the flex item
-                                                        const adaptedPanelStyles = {
-                                                            ...panelStyles,
-                                                            width: '100%',
-                                                            height: '100%',
-                                                            display: 'flex',
-                                                            alignItems: 'center',
-                                                            justifyContent: 'center'
-                                                        };
+                                                            // Ensure the panel takes full size of the flex item
+                                                            const adaptedPanelStyles = {
+                                                                ...panelStyles,
+                                                                width: '100%',
+                                                                height: '100%',
+                                                                display: 'flex',
+                                                                alignItems: 'center',
+                                                                justifyContent: 'center'
+                                                            };
 
-                                                        return (
-                                                            <div
-                                                                ref={el => {
-                                                                    if (el) {
-                                                                        if (panelStyles.borderRadius) el.style.setProperty('border-radius', panelStyles.borderRadius as string, 'important');
-                                                                        if (panelStyles.overflow) el.style.setProperty('overflow', panelStyles.overflow as string, 'important');
-                                                                    }
-                                                                }}
-                                                                style={adaptedPanelStyles}
-                                                                className={panelClass}
-                                                            >
+                                                            return (
                                                                 <div
                                                                     ref={el => {
                                                                         if (el) {
-                                                                            if (containerStyles.borderRadius) el.style.setProperty('border-radius', containerStyles.borderRadius as string, 'important');
-                                                                            if (containerStyles.overflow) el.style.setProperty('overflow', containerStyles.overflow as string, 'important');
+                                                                            if (panelStyles.borderRadius) el.style.setProperty('border-radius', panelStyles.borderRadius as string, 'important');
+                                                                            if (panelStyles.overflow) el.style.setProperty('overflow', panelStyles.overflow as string, 'important');
                                                                         }
                                                                     }}
-                                                                    style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
-                                                                    className={containerClass}
+                                                                    style={adaptedPanelStyles}
+                                                                    className={panelClass}
                                                                 >
-                                                                    <ImageIcon className="w-12 h-12 text-zinc-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50" />
-                                                                    {/* Scene Name Overlay inside the inner container */}
-                                                                    <div className="absolute bottom-4 left-0 right-0 flex justify-center z-20">
-                                                                        <div
-                                                                            className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest"
-                                                                            style={{ backgroundColor: localGameSceneNameOverlayBg, color: localGameSceneNameOverlayTextColor }}
-                                                                        >
-                                                                            Nome da Cena
+                                                                    <div
+                                                                        ref={el => {
+                                                                            if (el) {
+                                                                                if (containerStyles.borderRadius) el.style.setProperty('border-radius', containerStyles.borderRadius as string, 'important');
+                                                                                if (containerStyles.overflow) el.style.setProperty('overflow', containerStyles.overflow as string, 'important');
+                                                                            }
+                                                                        }}
+                                                                        style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
+                                                                        className={containerClass}
+                                                                    >
+                                                                        <ImageIcon className="w-12 h-12 text-zinc-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50" />
+                                                                        {/* Scene Name Overlay inside the inner container */}
+                                                                        <div className="absolute bottom-4 left-0 right-0 flex justify-center z-20">
+                                                                            <div
+                                                                                className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest"
+                                                                                style={{ backgroundColor: localGameSceneNameOverlayBg, color: localGameSceneNameOverlayTextColor }}
+                                                                            >
+                                                                                Nome da Cena
+                                                                            </div>
                                                                         </div>
                                                                     </div>
                                                                 </div>
-                                                            </div>
-                                                        );
-                                                    })()}
+                                                            );
+                                                        })()}
+                                                    </div>
+
+
+                                                    {/* Text Area */}
+                                                    <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
+                                                        <p className="leading-relaxed" style={{ color: localTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize }}>
+                                                            Esta é uma descrição de exemplo para a cena. O texto flui conforme as <span style={{ color: localTitleColor, fontWeight: 'bold' }}>CONFIGURAÇÕES</span> escolhidas.
+                                                        </p>
+                                                        <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: '0.85em' }}>
+                                                            {'>'} COMANDO DE EXEMPLO
+                                                        </p>
+                                                    </div>
                                                 </div>
 
 
-                                                {/* Text Area */}
-                                                <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
-                                                    <p className="leading-relaxed" style={{ color: localTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize }}>
-                                                        Esta é uma descrição de exemplo para a cena. O texto flui conforme as <span style={{ color: localTitleColor, fontWeight: 'bold' }}>CONFIGURAÇÕES</span> escolhidas.
-                                                    </p>
-                                                    <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: '0.85em' }}>
-                                                        {'>'} COMANDO DE EXEMPLO
-                                                    </p>
-                                                </div>
-                                            </div>
-
-
-                                            {/* Preview Footer (Input) */}
-                                            <div className={`p-3 border-t backdrop-blur-sm flex-shrink-0 space-y-2 ${localGameTheme === 'dark' ? 'border-zinc-900 bg-zinc-950/80' : 'border-zinc-200 bg-white/80'}`}>
-                                                <div className="flex gap-2">
-                                                    <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${localGameTheme === 'dark' ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
-                                                        <span className="font-mono truncate" style={{ fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily, color: localGameTheme === 'dark' ? '#52525b' : '#a1a1aa' }}>{localVerbInputPlaceholder}</span>
+                                                {/* Preview Footer (Input) */}
+                                                <div className={`p-3 border-t backdrop-blur-sm flex-shrink-0 space-y-2 ${localGameTheme === 'dark' ? 'border-zinc-900 bg-zinc-950/80' : 'border-zinc-200 bg-white/80'}`}>
+                                                    <div className="flex gap-2">
+                                                        <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${localGameTheme === 'dark' ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
+                                                            <span className="font-mono truncate" style={{ fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily, color: localGameTheme === 'dark' ? '#52525b' : '#a1a1aa' }}>{localVerbInputPlaceholder}</span>
+                                                        </div>
+                                                        <button
+                                                            className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
+                                                            style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}
+                                                        >
+                                                            {localActionButtonText || 'AÇÃO'}
+                                                        </button>
                                                     </div>
                                                     <button
-                                                        className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
-                                                        style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}
+                                                        className="w-full h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center transition-colors hover:opacity-90 truncate"
+                                                        style={{ backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}
                                                     >
-                                                        {localActionButtonText || 'AÇÃO'}
+                                                        {localSplashButtonText || 'BOTÃO DE INÍCIO'}
                                                     </button>
                                                 </div>
-                                                <button
-                                                    className="w-full h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center transition-colors hover:opacity-90 truncate"
-                                                    style={{ backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}
-                                                >
-                                                    {localSplashButtonText || 'BOTÃO DE INÍCIO'}
-                                                </button>
                                             </div>
-                                        </div>
 
-                                        {/* Footer text removed as per request */}
+                                            {/* Footer text removed as per request */}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

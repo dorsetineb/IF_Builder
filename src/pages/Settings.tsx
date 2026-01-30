@@ -193,32 +193,6 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     </button>
                 </div>
 
-                {/* Language Section */}
-                <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
-                    <div className="flex items-center gap-2 mb-3 text-primary">
-                        <Languages size={16} />
-                        <h2 className="text-sm font-bold text-card-foreground">{t('settings.sectionLanguage')}</h2>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 max-w-md">
-                        <button
-                            onClick={() => changeLanguage('pt')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${i18n.language.startsWith('pt') ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
-                        >
-                            <span className={`font-medium text-xs ${i18n.language.startsWith('pt') ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.languagePt')}</span>
-                            {i18n.language.startsWith('pt') && <Check size={14} className="text-primary" />}
-                        </button>
-
-                        <button
-                            onClick={() => changeLanguage('en')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${i18n.language.startsWith('en') ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
-                        >
-                            <span className={`font-medium text-xs ${i18n.language.startsWith('en') ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.languageEn')}</span>
-                            {i18n.language.startsWith('en') && <Check size={14} className="text-primary" />}
-                        </button>
-                    </div>
-                </div>
-
                 {/* Theme Section */}
                 <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
                     <div className="flex items-center gap-2 mb-3 text-primary">
@@ -324,6 +298,32 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 />
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                {/* Language Section */}
+                <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
+                    <div className="flex items-center gap-2 mb-3 text-primary">
+                        <Languages size={16} />
+                        <h2 className="text-sm font-bold text-card-foreground">{t('settings.sectionLanguage')}</h2>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 max-w-md">
+                        <button
+                            onClick={() => changeLanguage('pt')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${i18n.language.startsWith('pt') ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                        >
+                            <span className={`font-medium text-xs ${i18n.language.startsWith('pt') ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.languagePt')}</span>
+                            {i18n.language.startsWith('pt') && <Check size={14} className="text-primary" />}
+                        </button>
+
+                        <button
+                            onClick={() => changeLanguage('en')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${i18n.language.startsWith('en') ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                        >
+                            <span className={`font-medium text-xs ${i18n.language.startsWith('en') ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.languageEn')}</span>
+                            {i18n.language.startsWith('en') && <Check size={14} className="text-primary" />}
+                        </button>
                     </div>
                 </div>
 

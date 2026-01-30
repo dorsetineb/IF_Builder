@@ -1,5 +1,6 @@
 
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { GameData } from '../types';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 
@@ -21,6 +22,7 @@ const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
 }
 
 const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = ({ gameData, testSceneId }) => {
+    const { t } = useTranslation();
     const srcDoc = useMemo(() => {
         const enableChances = gameData.enableChances || gameData.gameSystemEnabled === 'chances';
         const enableTrackers = gameData.enableTrackers || gameData.gameSystemEnabled === 'trackers';
@@ -40,15 +42,15 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
         const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
 
         const inventoryButtonHTML = (gameData.enableInventory ?? true)
-            ? `<button id="inventory-button">${gameData.gameInventoryButtonText || 'Inventário'}</button>`
+            ? `<button id="inventory-button">${gameData.gameInventoryButtonText || t('preview.inventory')}</button>`
             : '';
 
         const diaryButtonHTML = (gameData.enableDiary ?? true)
-            ? `<button id="diary-button">${gameData.gameDiaryButtonText || 'Diário'}</button>`
+            ? `<button id="diary-button">${gameData.gameDiaryButtonText || t('preview.diary')}</button>`
             : '';
 
         let finalHtml = gameData.gameHTML
-            .replace(/__GAME_TITLE__/g, gameData.gameTitle || 'IF Builder Game')
+            .replace(/__GAME_TITLE__/g, gameData.gameTitle || t('preview.defaultTitle'))
             .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme with-spacing`)
             .replace('__LAYOUT_ORIENTATION_CLASS__', gameData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : '')
             .replace('__LAYOUT_ORDER_CLASS__', gameData.gameLayoutOrder === 'image-last' ? 'layout-image-last' : '')
@@ -60,25 +62,25 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('__SYSTEM_BUTTON__', systemButtonHTML)
             .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
             .replace('__DIARY_BUTTON__', diaryButtonHTML)
-            .replace(/__INVENTORY_BUTTON_TEXT__/g, gameData.gameInventoryButtonText || 'Inventário')
-            .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, gameData.gameSuggestionsButtonText || 'Sugestões')
-            .replace(/__TRACKERS_BUTTON_TEXT__/g, gameData.gameTrackersButtonText || 'Rastreadores')
-            .replace(/__SYSTEM_BUTTON_TEXT__/g, gameData.gameSystemButtonText || 'Sistema')
-            .replace(/__DIARY_BUTTON_TEXT__/g, gameData.gameDiaryButtonText || 'Diário')
-            .replace('__SAVE_MENU_TITLE__', gameData.gameSaveMenuTitle || 'Salvar Jogo')
-            .replace('__LOAD_MENU_TITLE__', gameData.gameLoadMenuTitle || 'Carregar Jogo')
-            .replace('__MAIN_MENU_BUTTON_TEXT__', gameData.gameMainMenuButtonText || 'Menu Principal')
-            .replace('__VIEW_ENDING_BUTTON_TEXT__', gameData.gameViewEndingButtonText || 'Ver Final')
+            .replace(/__INVENTORY_BUTTON_TEXT__/g, gameData.gameInventoryButtonText || t('preview.inventory'))
+            .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, gameData.gameSuggestionsButtonText || t('preview.suggestions'))
+            .replace(/__TRACKERS_BUTTON_TEXT__/g, gameData.gameTrackersButtonText || t('preview.trackers'))
+            .replace(/__SYSTEM_BUTTON_TEXT__/g, gameData.gameSystemButtonText || t('preview.system'))
+            .replace(/__DIARY_BUTTON_TEXT__/g, gameData.gameDiaryButtonText || t('preview.diary'))
+            .replace('__SAVE_MENU_TITLE__', gameData.gameSaveMenuTitle || t('preview.saveGame'))
+            .replace('__LOAD_MENU_TITLE__', gameData.gameLoadMenuTitle || t('preview.loadGame'))
+            .replace('__MAIN_MENU_BUTTON_TEXT__', gameData.gameMainMenuButtonText || t('preview.mainMenu'))
+            .replace('__VIEW_ENDING_BUTTON_TEXT__', gameData.gameViewEndingButtonText || t('preview.viewEnding'))
             .replace('__SPLASH_BG_STYLE__', gameData.gameSplashImage ? `style="background-image: url('${gameData.gameSplashImage}')"` : '')
             .replace('__SPLASH_ALIGN_CLASS__', gameData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
             .replace('__SPLASH_LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="splash-logo">` : '')
             .replace('__SPLASH_TITLE_H1_TAG__', !gameData.gameOmitSplashTitle ? `<h1>${gameData.gameTitle}</h1>` : '')
             .replace('__SPLASH_DESCRIPTION__', gameData.gameSplashDescription || '')
-            .replace('__SPLASH_BUTTON_TEXT__', gameData.gameSplashButtonText || 'Start')
-            .replace('__CONTINUE_BUTTON_TEXT__', gameData.gameContinueButtonText || 'Continue')
-            .replace(/__RESTART_BUTTON_TEXT__/g, gameData.gameRestartButtonText || 'Reiniciar Aventura')
-            .replace('__ACTION_BUTTON_TEXT__', gameData.gameActionButtonText || 'Action')
-            .replace('__VERB_INPUT_PLACEHOLDER__', gameData.gameVerbInputPlaceholder || 'What do you do?')
+            .replace('__SPLASH_BUTTON_TEXT__', gameData.gameSplashButtonText || t('preview.start'))
+            .replace('__CONTINUE_BUTTON_TEXT__', gameData.gameContinueButtonText || t('preview.continue'))
+            .replace(/__RESTART_BUTTON_TEXT__/g, gameData.gameRestartButtonText || t('preview.restart'))
+            .replace('__ACTION_BUTTON_TEXT__', gameData.gameActionButtonText || t('preview.action'))
+            .replace('__VERB_INPUT_PLACEHOLDER__', gameData.gameVerbInputPlaceholder || t('preview.verbPlaceholder'))
             .replace('__POSITIVE_ENDING_BG_STYLE__', gameData.positiveEndingImage ? `style="background-image: url('${gameData.positiveEndingImage}')"` : '')
             .replace('__POSITIVE_ENDING_ALIGN_CLASS__', gameData.positiveEndingContentAlignment === 'left' ? 'align-left' : '')
             .replace('__POSITIVE_ENDING_DESCRIPTION__', gameData.positiveEndingDescription || '')
@@ -247,13 +249,13 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('</head>', `${styleTag}</head>`)
             .replace('</body>', `${dataScript}${gameScriptTag}</body>`);
 
-    }, [gameData, testSceneId]);
+    }, [gameData, testSceneId, t]); // 4. Add t to useMemo dependency array
 
     return (
         <div className="w-full h-full bg-brand-bg">
             <iframe
                 srcDoc={srcDoc}
-                title="Pré-visualização do Jogo"
+                title={t('preview.title')} // 3. Replace hardcoded string with t('preview.key')
                 className="w-full h-full border-none"
                 sandbox="allow-scripts allow-same-origin"
             />
