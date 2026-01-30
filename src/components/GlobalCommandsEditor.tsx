@@ -143,9 +143,10 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
         <div className="space-y-4" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* Header with Save/Undo actions */}
             <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
-                <p className="text-zinc-500 text-xs font-medium w-full">
-                    Configure verbos e comandos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).
-                </p>
+                <div className="text-zinc-500 text-xs font-medium w-full space-y-1">
+                    <p>Configure verbos e comandos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).</p>
+                    <p>Os verbos "olhar", "examinar", "ver" e "ler" possuem funcionalidade automática: o sistema verifica se um objeto foi mencionado (ex: "olhar caixa").</p>
+                </div>
                 <div className="flex items-center gap-3 shrink-0">
                     {isDirty && (
                         <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
