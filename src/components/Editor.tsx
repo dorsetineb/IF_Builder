@@ -475,6 +475,14 @@ DATE:        ${exportDate.toLocaleString()}
                         }
                     }
 
+                    // RESTORE VIGNETTES ASSETS (Legacy Support)
+                    if (data.vignettes && Array.isArray(data.vignettes)) {
+                        for (const vignette of data.vignettes) {
+                            vignette.image = await restoreAsset(vignette.image);
+                            vignette.backgroundMusic = await restoreAsset(vignette.backgroundMusic);
+                        }
+                    }
+
                     if (data.globalObjects) {
                         for (const oId in data.globalObjects) {
                             const obj = data.globalObjects[oId];
