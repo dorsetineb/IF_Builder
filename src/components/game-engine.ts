@@ -252,12 +252,15 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const startAudioOnInteraction = () => {
-            if (gameData.gameBackgroundMusic && bgmAudio.paused && !isGameEnded) {
-                playBgm(gameData.gameBackgroundMusic);
+            const targetSrc = currentBgmSrc || gameData.gameBackgroundMusic;
+            if (targetSrc && bgmAudio.paused && !isGameEnded) {
+                playBgm(targetSrc);
             }
             document.removeEventListener('mousedown', startAudioOnInteraction);
             document.removeEventListener('keydown', startAudioOnInteraction);
+            document.removeEventListener('click', startAudioOnInteraction);
         };
+        document.addEventListener('click', startAudioOnInteraction);
         document.addEventListener('mousedown', startAudioOnInteraction);
         document.addEventListener('keydown', startAudioOnInteraction);
 
