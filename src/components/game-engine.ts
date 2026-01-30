@@ -26,10 +26,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         }
     }
     return {
-        gameTitle: data.gameTitle,
-        gameSplashDescription: data.gameSplashDescription,
         cena_inicial: data.startScene,
-
         cenas: translatedCenas,
         globalObjects: data.globalObjects,
         mensagem_falha_padrao: data.defaultFailureMessage,
@@ -427,23 +424,8 @@ document.addEventListener('DOMContentLoaded', () => {
         gameContainer.classList.add('hidden');
         
         // Set vignette content
-        // Set vignette content
-        if (vignetteTitle) {
-            if (scene.vignetteType === 'opening' && gameData.gameTitle) {
-                 vignetteTitle.textContent = gameData.gameTitle;
-                 // Keep overrides for color/font if needed, but text is strictly Game Title
-            } else {
-                 vignetteTitle.textContent = scene.name || '';
-            }
-        }
-        if (vignetteDescription) {
-             if (scene.vignetteType === 'opening' && (gameData.gameSplashDescription || scene.description)) {
-                 // Prefer gameSplashDescription if available, else scene description
-                 vignetteDescription.textContent = gameData.gameSplashDescription || scene.description || '';
-             } else {
-                 vignetteDescription.textContent = scene.description || '';
-             }
-        }
+        if (vignetteTitle) vignetteTitle.textContent = scene.name || '';
+        if (vignetteDescription) vignetteDescription.textContent = scene.description || '';
         
         // Set button text
         const buttonText = scene.vignetteButtonText || (scene.vignetteType === 'conclusion' ? 'Reiniciar' : 'Continuar');
