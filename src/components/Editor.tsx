@@ -588,6 +588,22 @@ DATE:        ${exportDate.toLocaleString()}
             };
         });
 
+        // BUG FIX: Override Opening Scene Name with Game Title if it is generic
+        // This prevents the issue where importing a project reverts the title to "Abertura"
+        // because the engine uses the scene name.
+        if (newStartSceneId && cleanedScenes[newStartSceneId]) {
+            const startScene = cleanedScenes[newStartSceneId];
+            const isGenericName = startScene.name === 'Abertura' || startScene.name === 'Vinheta';
+
+            if (isGenericName && data.gameTitle && data.gameTitle.trim() !== '') {
+                console.log(`Auto-correcting scene name from '${startScene.name}' to '${data.gameTitle}'`);
+                cleanedScenes[newStartSceneId] = {
+                    ...startScene,
+                    name: data.gameTitle
+                };
+            }
+        }
+
         setGameData(prev => ({
             ...prev,
             ...data,
