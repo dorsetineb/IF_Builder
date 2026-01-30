@@ -145,7 +145,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
             <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
                 <div className="text-zinc-500 text-xs font-medium w-full space-y-1">
                     <p>Configure verbos e comandos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).</p>
-                    <p>Os verbos "olhar", "examinar", "ver" e "ler" possuem funcionalidade automática: o sistema verifica se um objeto foi mencionado (ex: "olhar caixa").</p>
+                    <p>Os verbos <strong>"olhar", "examinar", "ver"</strong> e <strong>"ler"</strong> possuem funcionalidade automática: o sistema verifica se um objeto foi mencionado (ex: "olhar caixa").</p>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                     {isDirty && (
