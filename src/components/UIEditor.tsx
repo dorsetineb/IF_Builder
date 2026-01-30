@@ -1197,7 +1197,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         max="5"
                                                                         value={localTextSpeed}
                                                                         onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
-                                                                        className="flex-grow h-1.5 bg-zinc-950 rounded-lg appearance-none cursor-pointer accent-primary"
+                                                                        style={{
+                                                                            background: `linear-gradient(to right, ${localGameTheme === 'dark' ? localFocusColor : localFocusColorLight} ${((localTextSpeed - 1) / 4) * 100}%, #000 ${((localTextSpeed - 1) / 4) * 100}%)`
+                                                                        }}
+                                                                        className="flex-grow h-1.5 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
                                                                     />
                                                                     <span className="text-xl font-mono font-bold w-6 text-center">{localTextSpeed}</span>
                                                                 </div>
@@ -1368,9 +1371,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         step="0.1"
                                                                         value={localImageSpeed}
                                                                         onChange={(e) => setLocalImageSpeed(parseFloat(e.target.value))}
-                                                                        className="flex-grow h-1.5 bg-zinc-950 rounded-lg appearance-none cursor-pointer accent-primary"
+                                                                        style={{
+                                                                            background: `linear-gradient(to right, ${localGameTheme === 'dark' ? localFocusColor : localFocusColorLight} ${((localImageSpeed - 0.1) / 2.9) * 100}%, #000 ${((localImageSpeed - 0.1) / 2.9) * 100}%)`
+                                                                        }}
+                                                                        className="flex-grow h-1.5 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
                                                                     />
-                                                                    <span className="text-xl font-mono font-bold w-6 text-center">{localImageSpeed}s</span>
+                                                                    <span className="text-xl font-mono font-bold w-6 text-center">{localImageSpeed}</span>
                                                                 </div>
                                                             </div>
                                                         </div>

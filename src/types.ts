@@ -75,6 +75,7 @@ export interface FixedVerb {
   id: string;
   verbs: string[];
   description: string;
+  icon?: string;
 }
 
 export interface ConsequenceTracker {

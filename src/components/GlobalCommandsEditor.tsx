@@ -1,6 +1,27 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { FixedVerb } from '../types';
-import { Plus, Trash2, Search, Command, MessageSquare } from 'lucide-react';
+import { Plus, Trash2, Search, Command, MessageSquare, Box, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
+
+const COMMAND_ICONS = [
+    { name: 'message', component: MessageSquare },
+    { name: 'activity', component: Activity },
+    { name: 'heart', component: Heart },
+    { name: 'zap', component: Zap },
+    { name: 'shield', component: Shield },
+    { name: 'coins', component: Coins },
+    { name: 'clock', component: Clock },
+    { name: 'skull', component: Skull },
+    { name: 'star', component: Star },
+    { name: 'user', component: User },
+    { name: 'trophy', component: Trophy },
+    { name: 'alert', component: AlertTriangle },
+    { name: 'book', component: Book },
+    { name: 'crown', component: Crown },
+    { name: 'flame', component: Flame },
+    { name: 'droplet', component: Droplet },
+    { name: 'sun', component: Sun },
+    { name: 'moon', component: Moon },
+];
 
 interface GlobalCommandsEditorProps {
     fixedVerbs: FixedVerb[];
@@ -26,6 +47,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
     const [localVerbs, setLocalVerbs] = useState<FixedVerb[]>(fixedVerbs);
     const [selectedVerbId, setSelectedVerbId] = useState<string | null>(fixedVerbs.length > 0 ? fixedVerbs[0].id : null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
 
     // Sync from props
     useEffect(() => {
@@ -35,7 +57,30 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
         } else if (!selectedVerbId && fixedVerbs.length > 0) {
             setSelectedVerbId(fixedVerbs[0].id);
         }
+
+        // Initialize default "Ajuda" command if list is completely empty
+        if (fixedVerbs.length === 0 && localVerbs.length === 0) {
+            const helpId = generateUniqueId('verb', []);
+            const helpCommand: FixedVerb = {
+                id: helpId,
+                verbs: ['ajuda', 'help', 'tutorial'],
+                description: 'Bem-vindo ao jogo! Digite "olhar" para ver o ambiente, ou use verbos como "pegar", "usar", "falar" para interagir.',
+                icon: 'book'
+            };
+            // We don't save immediately to avoid dirty state on mount if user doesn't want it,
+            // but technically we should populate it. Let's set it to local state.
+            setLocalVerbs([helpCommand]);
+            setSelectedVerbId(helpId);
+            // We might want to mark it as dirty or just let the user see it.
+            // If we want it to be "pre-populated defaults", we should probably trigger an update
+            // But normally we avoid triggering side effects on mount that change data upstreams without user action.
+            // However, if the list is empty, it's helpful.
+            // Let's NOT call onUpdate yet, so 'isDirty' will be true relative to empty props if we check diff.
+            // But localVerbs is initialized from fixedVerbs. 
+            // If I change localVerbs here, the effect [localVerbs, fixedVerbs] will trigger onSetDirty(true).
+        }
     }, [fixedVerbs]);
+    // ^ Dependency is only fixedVerbs. If fixedVerbs is empty, we handle it.
 
     // Dirty check
     useEffect(() => {
@@ -68,7 +113,8 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
         const newVerb: FixedVerb = {
             id: newId,
             verbs: [],
-            description: ''
+            description: '',
+            icon: 'message'
         };
         setLocalVerbs(prev => [...prev, newVerb]);
         setSelectedVerbId(newId);
@@ -94,13 +140,13 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
     };
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* Header with Save/Undo actions */}
             <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
-                <p className="text-zinc-500 text-xs font-medium max-w-lg">
+                <p className="text-zinc-500 text-xs font-medium w-full">
                     Configure verbos e comandos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).
                 </p>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 shrink-0">
                     {isDirty && (
                         <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
                             <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
@@ -148,25 +194,28 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                     {/* Command List */}
                     <div className="flex-1 overflow-y-auto p-2 space-y-1">
                         {filteredVerbs.length > 0 ? (
-                            filteredVerbs.map(verb => (
-                                <button
-                                    key={verb.id}
-                                    onClick={() => setSelectedVerbId(verb.id)}
-                                    className={`relative w-full flex items-start gap-3 p-3 rounded-xl border transition-all text-left group ${selectedVerbId === verb.id ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
-                                >
-                                    <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${selectedVerbId === verb.id ? 'bg-primary/20 text-primary' : 'bg-zinc-900 text-zinc-500'}`}>
-                                        <MessageSquare className="w-4 h-4" />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <p className={`text-xs font-bold truncate ${selectedVerbId === verb.id ? 'text-primary' : 'text-zinc-300'}`}>
-                                            {verb.verbs.length > 0 ? verb.verbs.join(', ') : '(sem verbos)'}
-                                        </p>
-                                        <p className="text-[10px] text-zinc-500 truncate mt-0.5">
-                                            {verb.description || '(sem descrição)'}
-                                        </p>
-                                    </div>
-                                </button>
-                            ))
+                            filteredVerbs.map(verb => {
+                                const IconComponent = COMMAND_ICONS.find(i => i.name === verb.icon)?.component || MessageSquare;
+                                return (
+                                    <button
+                                        key={verb.id}
+                                        onClick={() => setSelectedVerbId(verb.id)}
+                                        className={`relative w-full flex items-start gap-3 p-3 rounded-xl border transition-all text-left group ${selectedVerbId === verb.id ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
+                                    >
+                                        <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${selectedVerbId === verb.id ? 'bg-primary/20 text-primary' : 'bg-zinc-900 text-zinc-500'}`}>
+                                            <IconComponent className="w-4 h-4" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className={`text-xs font-bold truncate ${selectedVerbId === verb.id ? 'text-primary' : 'text-zinc-300'}`}>
+                                                {verb.verbs.length > 0 ? verb.verbs.join(', ') : '(sem verbos)'}
+                                            </p>
+                                            <p className="text-[10px] text-zinc-500 truncate mt-0.5">
+                                                {verb.description || '(sem descrição)'}
+                                            </p>
+                                        </div>
+                                    </button>
+                                );
+                            })
                         ) : (
                             <div className="flex flex-col items-center justify-center h-full text-center p-4">
                                 <Command className="w-8 h-8 text-zinc-700 mb-2" />
@@ -180,7 +229,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                     <div className="p-3 border-t border-muted-foreground/10">
                         <button
                             onClick={handleCreate}
-                            className="w-full py-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-lg text-xs font-bold text-zinc-300 flex items-center justify-center gap-2 transition-all active:scale-[0.98]"
+                            className="w-full py-2.5 bg-white text-zinc-900 hover:bg-zinc-100 border border-white rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm transform hover:-translate-y-0.5"
                         >
                             <Plus className="w-4 h-4" />
                             Novo Comando
@@ -207,16 +256,48 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                                         Verbos (separados por vírgula)
                                     </label>
-                                    <input
-                                        type="text"
-                                        value={selectedVerb.verbs.join(', ')}
-                                        onChange={(e) => {
-                                            const cleanedVerbs = e.target.value.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
-                                            handleVerbChange(selectedVerb.id, 'verbs', cleanedVerbs);
-                                        }}
-                                        placeholder="ex: ajuda, help, ?"
-                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary/30 transition-all"
-                                    />
+                                    <div className="flex gap-2">
+                                        {/* Icon Picker */}
+                                        <div className="relative group shrink-0">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setIsIconPickerOpen(!isIconPickerOpen);
+                                                }}
+                                                className="w-10 h-10 flex items-center justify-center bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-400 hover:text-white hover:border-primary/50 transition-all"
+                                                title="Escolher ícone"
+                                            >
+                                                {(() => {
+                                                    const Icon = COMMAND_ICONS.find(i => i.name === selectedVerb.icon)?.component || MessageSquare;
+                                                    return <Icon className="w-5 h-5" />;
+                                                })()}
+                                            </button>
+                                            {isIconPickerOpen && (
+                                                <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                                    {COMMAND_ICONS.map(icon => (
+                                                        <button
+                                                            key={icon.name}
+                                                            onClick={() => { handleVerbChange(selectedVerb.id, 'icon', icon.name); setIsIconPickerOpen(false); }}
+                                                            className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedVerb.icon === icon.name ? 'bg-primary/20 text-primary' : 'text-zinc-500'}`}
+                                                            title={icon.name}
+                                                        >
+                                                            <icon.component className="w-4 h-4" />
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <input
+                                            type="text"
+                                            value={selectedVerb.verbs.join(', ')}
+                                            onChange={(e) => {
+                                                const cleanedVerbs = e.target.value.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
+                                                handleVerbChange(selectedVerb.id, 'verbs', cleanedVerbs);
+                                            }}
+                                            placeholder="ex: ajuda, help, ?"
+                                            className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary/30 transition-all"
+                                        />
+                                    </div>
                                     <p className="text-[10px] text-muted-foreground">
                                         Palavras que ativam este comando. Ex: "ajuda" ou "help".
                                     </p>
