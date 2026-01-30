@@ -1,0 +1,43 @@
+{
+    "sidebar": {
+        "interface": "Informações e Interface",
+        "sceneEditor": "Editor de Cenas",
+        "sceneMap": "Mapa de Cenas",
+        "objects": "Objetos",
+        "trackers": "Rastreadores",
+        "globalCommands": "Comandos Globais",
+        "guide": "Guia Rápido",
+        "about": "Sobre o Projeto",
+        "settings": "Configurações"
+    },
+    "common": {
+        "save": "Salvar Alterações",
+        "saving": "Salvando...",
+        "error": "Erro",
+        "success": "Sucesso",
+        "unexpectedError": "Ocorreu um erro inesperado."
+    },
+    "settings": {
+        "title": "Configurações",
+        "subtitle": "Gerencie suas preferências e perfil.",
+        "logout": "Sair da Conta",
+        "saveSuccess": "Configurações atualizadas.",
+        "saveError": "Erro ao salvar perfil",
+        "sectionAppearance": "Aparência",
+        "sectionLanguage": "Idioma",
+        "sectionAccount": "Dados da Conta",
+        "themeDark": "Escuro",
+        "themeLight": "Claro",
+        "themeCream": "Creme",
+        "themeTerminal": "Terminal",
+        "labelName": "Nome e Sobrenome",
+        "labelEmail": "E-mail",
+        "labelLocation": "Local (Opcional)",
+        "placeholderName": "Ex: João Silva",
+        "placeholderLocation": "Ex: São Paulo, SP",
+        "resetPassword": "Redefinir senha",
+        "resetSent": "Email de redefinição enviado!",
+        "languagePt": "Português",
+        "languageEn": "Inglês"
+    }
+}

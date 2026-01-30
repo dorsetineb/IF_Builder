@@ -1,0 +1,43 @@
+{
+    "sidebar": {
+        "interface": "Info & Interface",
+        "sceneEditor": "Scene Editor",
+        "sceneMap": "Scene Map",
+        "objects": "Objects",
+        "trackers": "Trackers",
+        "globalCommands": "Global Commands",
+        "guide": "Quick Guide",
+        "about": "About Project",
+        "settings": "Settings"
+    },
+    "common": {
+        "save": "Save Changes",
+        "saving": "Saving...",
+        "error": "Error",
+        "success": "Success",
+        "unexpectedError": "An unexpected error occurred."
+    },
+    "settings": {
+        "title": "Settings",
+        "subtitle": "Manage your preferences and profile.",
+        "logout": "Sign Out",
+        "saveSuccess": "Settings updated.",
+        "saveError": "Error saving profile",
+        "sectionAppearance": "Appearance",
+        "sectionLanguage": "Language",
+        "sectionAccount": "Account Data",
+        "themeDark": "Dark",
+        "themeLight": "Light",
+        "themeCream": "Cream",
+        "themeTerminal": "Terminal",
+        "labelName": "Full Name",
+        "labelEmail": "E-mail",
+        "labelLocation": "Location (Optional)",
+        "placeholderName": "Ex: John Doe",
+        "placeholderLocation": "Ex: New York, NY",
+        "resetPassword": "Reset Password",
+        "resetSent": "Reset email sent!",
+        "languagePt": "Portuguese",
+        "languageEn": "English"
+    }
+}
