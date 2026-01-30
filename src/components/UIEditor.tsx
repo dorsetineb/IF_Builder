@@ -1198,7 +1198,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         value={localTextSpeed}
                                                                         onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
                                                                         style={{
-                                                                            background: `linear-gradient(to right, ${localGameTheme === 'dark' ? localFocusColor : localFocusColorLight} ${((localTextSpeed - 1) / 4) * 100}%, #000 ${((localTextSpeed - 1) / 4) * 100}%)`
+                                                                            background: `linear-gradient(to right, ${localGameTheme === 'dark' ? localTitleColor : localTitleColorLight} ${((localTextSpeed - 1) / 4) * 100}%, #000 ${((localTextSpeed - 1) / 4) * 100}%)`
                                                                         }}
                                                                         className="flex-grow h-1.5 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
                                                                     />
@@ -1372,7 +1372,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         value={localImageSpeed}
                                                                         onChange={(e) => setLocalImageSpeed(parseFloat(e.target.value))}
                                                                         style={{
-                                                                            background: `linear-gradient(to right, ${localGameTheme === 'dark' ? localFocusColor : localFocusColorLight} ${((localImageSpeed - 0.1) / 2.9) * 100}%, #000 ${((localImageSpeed - 0.1) / 2.9) * 100}%)`
+                                                                            background: `linear-gradient(to right, ${localGameTheme === 'dark' ? localTitleColor : localTitleColorLight} ${((localImageSpeed - 0.1) / 2.9) * 100}%, #000 ${((localImageSpeed - 0.1) / 2.9) * 100}%)`
                                                                         }}
                                                                         className="flex-grow h-1.5 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
                                                                     />
