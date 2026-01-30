@@ -221,8 +221,8 @@ const Editor: React.FC = () => {
             const mimeType = mimeMatch[1];
             let extension = mimeType.split('/')[1]?.split('+')[0] || 'bin';
 
-            const filename = `assets / ${baseName}.${extension} `;
-            assetsFolder.file(`${baseName}.${extension} `, data, { base64: true });
+            const filename = `assets/${baseName}.${extension}`;
+            assetsFolder.file(`${baseName}.${extension}`, data, { base64: true });
             assetMap.set(base64String, filename);
             return filename;
         };
@@ -235,18 +235,18 @@ const Editor: React.FC = () => {
 
         for (const sceneId in exportData.scenes) {
             const scene = exportData.scenes[sceneId];
-            scene.image = processAsset(scene.image, `scene_image_${sceneId} `);
-            scene.backgroundMusic = processAsset(scene.backgroundMusic, `scene_bgm_${sceneId} `);
+            scene.image = processAsset(scene.image, `scene_image_${sceneId}`);
+            scene.backgroundMusic = processAsset(scene.backgroundMusic, `scene_bgm_${sceneId}`);
             if (scene.interactions) {
                 scene.interactions.forEach((inter: any, index: number) => {
-                    inter.soundEffect = processAsset(inter.soundEffect, `sfx_${sceneId}_${index} `);
+                    inter.soundEffect = processAsset(inter.soundEffect, `sfx_${sceneId}_${index}`);
                 });
             }
         }
 
         for (const objId in exportData.globalObjects) {
             const obj = exportData.globalObjects[objId];
-            obj.image = processAsset(obj.image, `obj_image_${objId} `);
+            obj.image = processAsset(obj.image, `obj_image_${objId}`);
         }
 
         // Add Metadata
@@ -426,9 +426,24 @@ DATE:        ${exportDate.toLocaleString()}
                     const data = JSON.parse(editorDataStr);
 
                     const restoreAsset = async (path: string | undefined): Promise<string | undefined> => {
-                        if (!path || !path.startsWith('assets/')) return path;
-                        const zipFile = zip.file(path);
-                        if (!zipFile) return path;
+                        if (!path) return path;
+
+                        // Check for standard or legacy broken format
+                        let entryPath = path;
+                        // Support for legacy broken paths (e.g. "assets / image.png ")
+                        // We need to convert "assets / file.ext " to "assets/file.ext " to match the ZIP entry
+                        if (path.startsWith('assets /')) {
+                            entryPath = path.replace('assets / ', 'assets/');
+                        } else if (!path.startsWith('assets/')) {
+                            // If it doesn't start with any assets prefix, it's not a bundled asset
+                            return path;
+                        }
+
+                        const zipFile = zip.file(entryPath);
+                        if (!zipFile) {
+                            console.warn(`Asset not found in zip: ${path} (tried ${entryPath})`);
+                            return path;
+                        }
 
                         const mimeType = getMimeTypeFromFileName(path);
                         const buffer = await zipFile.async('arraybuffer');
