@@ -139,8 +139,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         fixedVerbs, textAnimationType, textSpeed, textReadingFlow, imageTransitionType, imageSpeed,
         onAnnotate, enableTrackers, enableInventory, enableDiary, enableFixedVerbs, enableChances,
         enableImages, enableTextControl, inventoryCapacity, inventoryMaxWeight, diaryAutoScroll,
-        diaryAllowExport, diaryMaxMessages, diaryShowSceneImage, diaryShowPlayerAction, onNavigateToTrackers
+        diaryAllowExport, diaryMaxMessages, diaryShowSceneImage, diaryShowPlayerAction, onNavigateToTrackers,
+        gameSplashContentVerticalAlignment: splashContentVerticalAlignment
     } = props;
+
 
 
 
