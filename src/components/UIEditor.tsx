@@ -1,5 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTheme } from './ThemeProvider';
+import { FONTS, PREDEFINED_THEMES } from '../constants';
+
+
 import { GameData, FixedVerb } from '../types';
 import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List } from 'lucide-react';
 
@@ -63,6 +67,8 @@ interface UIEditorProps {
     omitSplashTitle: boolean;
     splashImage: string;
     splashContentAlignment: 'left' | 'right';
+    gameSplashContentVerticalAlignment?: 'top' | 'center' | 'bottom';
+
     splashDescription: string;
     backgroundMusic: string;
     positiveEndingImage: string;
@@ -101,138 +107,133 @@ interface UIEditorProps {
     onNavigateToTrackers?: () => void;
 }
 
-import { FONTS, PREDEFINED_THEMES } from '../constants';
-
-
-
-
-const ColorInput: React.FC<{
-    label: string;
-    id: string;
-    value: string;
-    onChange: (value: string) => void;
-    placeholder: string;
-}> = ({ label, id, value, onChange, placeholder }) => (
-    <div>
-        <label htmlFor={id} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{label}</label>
-        <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all">
-            <input
-                type="color"
-                id={`${id}-picker`}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="w-10 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
-                aria-label={`Seletor de cor para ${label}`}
-            />
-            <input
-                type="text"
-                id={id}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase"
-                placeholder={placeholder}
-            />
-        </div>
-    </div>
-);
-
-const FixedVerbItem: React.FC<{
-    verb: FixedVerb;
-    onUpdate: (id: string, field: 'verbs' | 'description', value: any) => void;
-    onRemove: (id: string) => void;
-}> = ({ verb, onUpdate, onRemove }) => {
-    const [localVerbs, setLocalVerbs] = useState(verb.verbs.join(', '));
-    const inputId = `verb-words-${verb.id}`;
-
-    useEffect(() => {
-        if (document.activeElement?.id !== inputId) {
-            setLocalVerbs(verb.verbs.join(', '));
-        }
-    }, [verb.verbs, inputId]);
-
-    const handleVerbsBlur = () => {
-        const cleanedVerbs = localVerbs.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
-        if (JSON.stringify(cleanedVerbs) !== JSON.stringify(verb.verbs)) {
-            onUpdate(verb.id, 'verbs', cleanedVerbs);
-        }
-    };
-
-    return (
-        <div className="relative p-6 bg-muted/30 rounded-xl border border-muted-foreground/50 hover:border-primary/30 transition-all group">
-            <button
-                onClick={() => onRemove(verb.id)}
-                className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                title="Remover verbo"
-            >
-                <Trash2 className="w-5 h-5" />
-            </button>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                <div>
-                    <label htmlFor={inputId} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Verbos (separados por vírgula)</label>
-                    <input
-                        id={inputId}
-                        type="text"
-                        value={localVerbs}
-                        onChange={e => setLocalVerbs(e.target.value)}
-                        onBlur={handleVerbsBlur}
-                        placeholder="ex: ajuda, help, ?"
-                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all"
-                    />
-                </div>
-                <div className="flex flex-col h-full">
-                    <label htmlFor={`verb-desc-${verb.id}`} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Descrição / Resposta</label>
-                    <textarea
-                        id={`verb-desc-${verb.id}`}
-                        value={verb.description}
-                        onChange={e => onUpdate(verb.id, 'description', e.target.value)}
-                        placeholder="Texto que será exibido para o jogador."
-                        rows={3}
-                        className="w-full flex-grow bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all resize-none"
-                    />
-                </div>
-            </div>
-        </div>
-    );
+// Define App Theme Primary Colors based on index.css
+const APP_THEME_COLORS = {
+    dark: '#9D4EDD',      // Vibrant Purple
+    light: '#18181b',     // Zinc-950 (Dark Grey/Black for Light theme as per :root --primary)
+    cream: '#5c4033',     // Approx for warm brown oklch(0.40 0.08 30)
+    terminal: '#4AF626',   // Terminal Green
+    system: '#9D4EDD'     // Default fallback
 };
 
 export const UIEditor: React.FC<UIEditorProps> = (props) => {
+    const { theme } = useTheme(); // Get app theme
+    const currentSliderColor = APP_THEME_COLORS[theme as keyof typeof APP_THEME_COLORS] || APP_THEME_COLORS.dark;
+
     const {
-        layoutOrientation, layoutOrder, imageFrame, splashButtonText, continueButtonText,
-        actionButtonText, verbInputPlaceholder, diaryPlayerName, restartButtonText,
-        gameSystemEnabled, maxChances, onUpdate, isDirty, onSetDirty,
-        textColor, titleColor, splashButtonColor, splashButtonHoverColor,
-        splashButtonTextColor, actionButtonColor, actionButtonTextColor,
-        focusColor, chanceIconColor, gameFontFamily, gameFontSize, chanceIcon,
-        chanceReturnButtonText,
+        html, css, layoutOrientation, layoutOrder, imageFrame, actionButtonText, verbInputPlaceholder, diaryPlayerName,
+        splashButtonText, continueButtonText, restartButtonText, gameSystemEnabled, maxChances,
+        textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor,
+        actionButtonColor, actionButtonTextColor, focusColor, chanceIconColor, gameFontFamily,
+        gameFontSize, chanceIcon, chanceReturnButtonText,
         gameChanceLossMessage: chanceLossMessage,
         gameChanceRestoreMessage: chanceRestoreMessage,
-        gameTheme, textColorLight, titleColorLight, focusColorLight,
-        frameBookColor, frameTradingCardColor,
-        frameRoundedTopColor,
-        gameSceneNameOverlayBg,
-        gameSceneNameOverlayTextColor,
-        gameShowTrackersUI, gameShowSystemButton, suggestionsButtonText, inventoryButtonText, diaryButtonText, trackersButtonText,
-        gameSystemButtonText, gameSaveMenuTitle, gameLoadMenuTitle, gameMainMenuButtonText,
-        gameContinueIndicatorColor, gameViewEndingButtonText,
-
-        title, logo, omitSplashTitle,
-        splashImage, splashContentAlignment, splashDescription,
-        backgroundMusic,
-        positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription,
-        positiveEndingMusic,
-        negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription,
-        negativeEndingMusic,
-        fixedVerbs,
-        textAnimationType, textSpeed, textReadingFlow, imageTransitionType, imageSpeed,
-        onNavigateToTrackers,
-        gameSplashContentVerticalAlignment: splashContentVerticalAlignment,
-        // New System Props
-        enableTrackers, enableInventory, enableDiary, enableFixedVerbs, enableChances,
-        enableImages, enableTextControl,
-        inventoryCapacity, inventoryMaxWeight,
-        diaryAutoScroll, diaryAllowExport, diaryMaxMessages, diaryShowSceneImage, diaryShowPlayerAction,
-        gameInteractionType
+        gameTheme, textColorLight, titleColorLight, focusColorLight, frameBookColor, frameTradingCardColor,
+        frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, onUpdate, isDirty, onSetDirty,
+        gameShowTrackersUI, gameShowSystemButton, gameInteractionType, suggestionsButtonText, inventoryButtonText,
+        diaryButtonText, trackersButtonText, gameSystemButtonText, gameSaveMenuTitle, gameLoadMenuTitle,
+        gameMainMenuButtonText, gameContinueIndicatorColor, gameViewEndingButtonText, title, logo, omitSplashTitle,
+        splashImage, splashContentAlignment, splashDescription, backgroundMusic,
+        positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription, positiveEndingMusic,
+        negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription, negativeEndingMusic,
+        fixedVerbs, textAnimationType, textSpeed, textReadingFlow, imageTransitionType, imageSpeed,
+        onAnnotate, enableTrackers, enableInventory, enableDiary, enableFixedVerbs, enableChances,
+        enableImages, enableTextControl, inventoryCapacity, inventoryMaxWeight, diaryAutoScroll,
+        diaryAllowExport, diaryMaxMessages, diaryShowSceneImage, diaryShowPlayerAction, onNavigateToTrackers
     } = props;
+
+
+
+
+
+    const ColorInput: React.FC<{
+        label: string;
+        id: string;
+        value: string;
+        onChange: (value: string) => void;
+        placeholder: string;
+    }> = ({ label, id, value, onChange, placeholder }) => (
+        <div>
+            <label htmlFor={id} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{label}</label>
+            <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all">
+                <input
+                    type="color"
+                    id={`${id}-picker`}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="w-10 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
+                    aria-label={`Seletor de cor para ${label}`}
+                />
+                <input
+                    type="text"
+                    id={id}
+                    value={value}
+                    onChange={(e) => onChange(e.target.value)}
+                    className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase"
+                    placeholder={placeholder}
+                />
+            </div>
+        </div>
+    );
+
+    const FixedVerbItem: React.FC<{
+        verb: FixedVerb;
+        onUpdate: (id: string, field: 'verbs' | 'description', value: any) => void;
+        onRemove: (id: string) => void;
+    }> = ({ verb, onUpdate, onRemove }) => {
+        const [localVerbs, setLocalVerbs] = useState(verb.verbs.join(', '));
+        const inputId = `verb-words-${verb.id}`;
+
+        useEffect(() => {
+            if (document.activeElement?.id !== inputId) {
+                setLocalVerbs(verb.verbs.join(', '));
+            }
+        }, [verb.verbs, inputId]);
+
+        const handleVerbsBlur = () => {
+            const cleanedVerbs = localVerbs.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
+            if (JSON.stringify(cleanedVerbs) !== JSON.stringify(verb.verbs)) {
+                onUpdate(verb.id, 'verbs', cleanedVerbs);
+            }
+        };
+
+        return (
+            <div className="relative p-6 bg-muted/30 rounded-xl border border-muted-foreground/50 hover:border-primary/30 transition-all group">
+                <button
+                    onClick={() => onRemove(verb.id)}
+                    className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                    title="Remover verbo"
+                >
+                    <Trash2 className="w-5 h-5" />
+                </button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                    <div>
+                        <label htmlFor={inputId} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Verbos (separados por vírgula)</label>
+                        <input
+                            id={inputId}
+                            type="text"
+                            value={localVerbs}
+                            onChange={e => setLocalVerbs(e.target.value)}
+                            onBlur={handleVerbsBlur}
+                            placeholder="ex: ajuda, help, ?"
+                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all"
+                        />
+                    </div>
+                    <div className="flex flex-col h-full">
+                        <label htmlFor={`verb-desc-${verb.id}`} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Descrição / Resposta</label>
+                        <textarea
+                            id={`verb-desc-${verb.id}`}
+                            value={verb.description}
+                            onChange={e => onUpdate(verb.id, 'description', e.target.value)}
+                            placeholder="Texto que será exibido para o jogador."
+                            rows={3}
+                            className="w-full flex-grow bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all resize-none"
+                        />
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     const [localLayoutOrientation, setLocalLayoutOrientation] = useState(layoutOrientation);
     const [localLayoutOrder, setLocalLayoutOrder] = useState(layoutOrder);
@@ -1194,11 +1195,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                     <input
                                                                         type="range"
                                                                         min="1"
-                                                                        max="5"
+                                                                        max="10"
                                                                         value={localTextSpeed}
-                                                                        onChange={(e) => setLocalTextSpeed(parseInt(e.target.value, 10))}
+                                                                        onChange={(e) => setLocalTextSpeed(parseFloat(e.target.value))}
                                                                         style={{
-                                                                            background: `linear-gradient(to right, ${localGameTheme === 'dark' ? localTitleColor : localTitleColorLight} ${((localTextSpeed - 1) / 4) * 100}%, #000 ${((localTextSpeed - 1) / 4) * 100}%)`
+                                                                            background: `linear-gradient(to right, ${currentSliderColor} ${((localTextSpeed - 1) / 9) * 100}%, #000 ${((localTextSpeed - 1) / 9) * 100}%)`
                                                                         }}
                                                                         className="flex-grow h-1.5 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
                                                                     />
@@ -1372,7 +1373,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         value={localImageSpeed}
                                                                         onChange={(e) => setLocalImageSpeed(parseFloat(e.target.value))}
                                                                         style={{
-                                                                            background: `linear-gradient(to right, ${localGameTheme === 'dark' ? localTitleColor : localTitleColorLight} ${((localImageSpeed - 0.1) / 2.9) * 100}%, #000 ${((localImageSpeed - 0.1) / 2.9) * 100}%)`
+                                                                            background: `linear-gradient(to right, ${currentSliderColor} ${((localImageSpeed - 0.1) / 2.9) * 100}%, #000 ${((localImageSpeed - 0.1) / 2.9) * 100}%)`
                                                                         }}
                                                                         className="flex-grow h-1.5 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
                                                                     />
