@@ -567,7 +567,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             onClick={resetToLanding}
         >
             <div
-                className={`w-full max-w-lg bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden ${isClosing
+                className={`w-full max-w-[95vw] h-[80vh] aspect-[4/3] bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col ${isClosing
                     ? 'animate-out zoom-out-95 duration-300'
                     : 'animate-in zoom-in-95 duration-300'
                     }`}
@@ -588,10 +588,10 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                 </div>
 
                 {/* Game iframe */}
-                <div className="relative" style={{ height: '80vh' }}>
+                <div className="relative h-full flex flex-col">
                     <iframe
                         src="/fuja_da_masmorra/index.html"
-                        className="w-full h-full border-0"
+                        className="w-full h-full border-0 flex-1"
                         title="Fuja da Masmorra Demo"
                     />
                 </div>
@@ -742,7 +742,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             {/* Secret "Jogar" Trigger - Invisible area over computers */}
             {currentView === 'landing' && (
                 <div
-                    className="absolute top-1/2 right-[20%] w-64 h-64 -translate-y-[40%] z-30 cursor-pointer hidden md:block"
+                    className="absolute top-1/2 right-[5%] w-[35vw] h-[60vh] -translate-y-1/2 z-30 cursor-pointer hidden md:block" // Expanded trigger area
                     onClick={(e) => {
                         e.stopPropagation();
                         setCurrentView('play');
