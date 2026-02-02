@@ -35,9 +35,9 @@ const PlatformSidebar: React.FC = () => {
             <div className={`flex-shrink-0 bg-card p-4 flex items-center border-b border-border relative h-[61px] ${isCollapsed ? 'justify-center' : 'justify-between'}`}>
                 <div className="absolute top-0 left-0 w-full h-[3px] bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-60" />
                 {isCollapsed ? (
-                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center font-bold text-foreground text-xs">IF</div>
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center font-bold text-foreground text-xs notranslate" translate="no">IF</div>
                 ) : (
-                    <h1 className="text-xl font-bold text-foreground truncate">IF Builder</h1>
+                    <h1 className="text-xl font-bold text-foreground truncate notranslate" translate="no">IF Builder</h1>
                 )}
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}

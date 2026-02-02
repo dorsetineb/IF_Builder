@@ -711,7 +711,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
                 {/* IF Logo */}
                 <div className="fixed bottom-10 right-24 hidden lg:block select-none pointer-events-none z-0 opacity-20">
-                    <h1 className="text-9xl font-black text-white tracking-tighter italic" style={{ fontFamily: 'Inter, sans-serif' }}>IF</h1>
+                    <h1 className="text-9xl font-black text-white tracking-tighter italic notranslate" translate="no" style={{ fontFamily: 'Inter, sans-serif' }}>IF</h1>
                 </div>
             </div>
         );
@@ -773,7 +773,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
             {/* IF Logo & Status - Bottom Right Group */}
             <div className="fixed bottom-12 right-12 z-10 flex flex-col gap-0 select-none pointer-events-none opacity-20 items-end">
-                <h1 className="text-[120px] font-black text-white tracking-tighter italic leading-[0.8]" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <h1 className="text-[120px] font-black text-white tracking-tighter italic leading-[0.8] notranslate" translate="no" style={{ fontFamily: 'Inter, sans-serif' }}>
                     IF
                 </h1>
                 <div className="font-mono text-[10px] text-zinc-500 tracking-wider pr-2 mt-2 border-r-2 border-zinc-800 text-right">
