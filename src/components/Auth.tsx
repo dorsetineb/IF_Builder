@@ -10,6 +10,21 @@ interface AuthProps {
 
 type LandingView = 'landing' | 'login' | 'register' | 'about' | 'play';
 
+const translateAuthError = (originalMessage: string): string => {
+    // Exact matches
+    if (originalMessage === 'User already registered') return 'Este usuário já está cadastrado.';
+    if (originalMessage === 'Invalid login credentials') return 'E-mail ou senha incorretos.';
+    if (originalMessage === 'New password should be different from the old password.') return 'A nova senha deve ser diferente da anterior.';
+    if (originalMessage === 'Failed to fetch') return 'Falha na conexão. Verifique sua internet.';
+
+    // Partial matches
+    if (originalMessage?.includes('security purposes')) return 'Por segurança, aguarde alguns segundos antes de tentar novamente.';
+    if (originalMessage?.includes('rate limit')) return 'Muitas tentativas. Aguarde um momento.';
+    if (originalMessage?.includes('Password should be at least')) return 'A senha deve ter pelo menos 6 caracteres.';
+
+    return originalMessage || 'Ocorreu um erro desconhecido.';
+};
+
 export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) {
     const [loading, setLoading] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
@@ -65,16 +80,12 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
         try {
             const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                redirectTo: `${window.location.origin}/reset-password`,
+                redirectTo: `${window.location.origin}`,
             });
             if (error) throw error;
             setMessage('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
         } catch (err: any) {
-            let msg = err.message;
-            if (msg?.includes('security purposes')) {
-                msg = 'Por segurança, aguarde alguns segundos antes de tentar novamente.';
-            }
-            setError(msg || 'Erro ao enviar e-mail de recuperação.');
+            setError(translateAuthError(err.message));
         } finally {
             setLoading(false);
         }
@@ -110,7 +121,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                 window.location.href = window.location.origin;
             }, 2000);
         } catch (err: any) {
-            setError(err.message || 'Erro ao redefinir senha.');
+            setError(translateAuthError(err.message));
         } finally {
             setLoading(false);
         }
@@ -163,10 +174,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             }
         } catch (err: any) {
             console.error('Auth error:', err);
-            let msg = err.message;
-            if (msg === 'User already registered') msg = 'Este usuário já está cadastrado.';
-            if (msg === 'Invalid login credentials') msg = 'Dados incorretos. Tente novamente.';
-            setError(msg || 'Ocorreu um erro na autenticação.');
+            setError(translateAuthError(err.message));
         } finally {
             setLoading(false);
         }
@@ -494,7 +502,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                         </div>
                     )}
 
-                    {message && (
+                    {message && !isForgotPassword && (
                         <div className="flex items-center gap-2 p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-lg text-xs animate-in fade-in slide-in-from-top-1">
                             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
                             <p>{message}</p>

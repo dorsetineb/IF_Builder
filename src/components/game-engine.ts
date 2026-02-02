@@ -438,6 +438,11 @@ document.addEventListener('DOMContentLoaded', () => {
             vignetteScreen.style.backgroundImage = 'none';
         }
         
+        // Play background music for this vignette scene
+        if (scene.backgroundMusic) {
+            playBgm(scene.backgroundMusic);
+        }
+        
         // Handle button click
         const handleVignetteClick = () => {
             vignetteContinueButton.removeEventListener('click', handleVignetteClick);
