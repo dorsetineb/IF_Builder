@@ -567,7 +567,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             onClick={resetToLanding}
         >
             <div
-                className={`w-full max-w-[95vw] h-[80vh] aspect-[4/3] bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col ${isClosing
+                className={`w-full max-w-[95vw] h-[60vh] aspect-[4/3] bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col ${isClosing
                     ? 'animate-out zoom-out-95 duration-300'
                     : 'animate-in zoom-in-95 duration-300'
                     }`}
