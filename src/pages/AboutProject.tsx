@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Check, Heart, ExternalLink, Activity, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key } from 'lucide-react';
+import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key } from 'lucide-react';
 import { useUser } from '../components/UserContext';
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
@@ -94,7 +94,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
                                     <div className="flex items-center gap-3 mb-6">
                                         <div className="p-3 bg-purple-500/10 rounded-lg">
-                                            <Activity className="w-6 h-6 text-purple-500" />
+                                            <Zap className="w-6 h-6 text-purple-500" />
                                         </div>
                                         <h2 className="text-lg font-bold text-foreground">
                                             Sobre o IF Builder

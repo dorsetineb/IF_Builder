@@ -868,7 +868,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     return (
         <div className="space-y-6 pb-8">
             {/* Header with Save/Undo actions */}
-            <div className="sticky top-4 z-40 backdrop-blur-md shadow-lg bg-zinc-900/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/10">
+            <div className="sticky top-0 z-40 backdrop-blur-md shadow-lg bg-zinc-900/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/10">
                 <p className="text-zinc-500 text-xs font-medium max-w-lg">
                     Personalize a interface do jogo, configure menus e textos.
                 </p>

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import SceneList from './SceneList';
 import { Scene, View, GameData } from '../types';
-import { Code, BookOpen, Map, Box, SlidersHorizontal, Settings, Info, CircleHelp, ChevronLeft, ChevronRight, MessageSquare, Gamepad2, ChevronDown, MonitorPlay, Activity, Command } from 'lucide-react';
+import { Code, BookOpen, Map, Box, SlidersHorizontal, Settings, Info, CircleHelp, ChevronLeft, ChevronRight, MessageSquare, Gamepad2, ChevronDown, MonitorPlay, Zap, Command } from 'lucide-react';
 
 interface SidebarProps {
   scenes: Scene[];
@@ -196,7 +196,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           title={isCollapsed ? "Sobre o Projeto" : undefined}
         >
           <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'about' ? 'translate-x-0' : ''}`} />
-          <Activity className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          <Zap className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
           {!isCollapsed && <span className="truncate relative z-10">Sobre o Projeto</span>}
         </button>
 

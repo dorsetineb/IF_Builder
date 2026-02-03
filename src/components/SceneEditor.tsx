@@ -277,7 +277,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
     return (
         <div className="space-y-6">
-            <div className="sticky top-4 z-40 flex justify-between items-center bg-zinc-900/95 backdrop-blur-md p-4 rounded-xl border border-muted-foreground/10 shadow-lg mb-6">
+            <div className="sticky top-0 z-40 flex justify-between items-center bg-zinc-900/95 backdrop-blur-md p-4 rounded-xl border border-muted-foreground/10 shadow-lg mb-6">
                 <p className="text-zinc-500 text-xs font-medium max-w-lg">
                     Defina a imagem, descrição, objetos e interações para esta cena.
                 </p>
@@ -325,8 +325,8 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
             </div>
 
             <div>
-                <div className="border-b border-muted-foreground/50 flex justify-between items-end">
-                    <div className="flex space-x-6">
+                <div className="border-b border-muted-foreground/50 flex items-center justify-between pr-4">
+                    <div className="flex space-x-1 overflow-x-auto">
                         {Object.entries(TABS).map(([key, name]) => {
                             const isTabDisabled = localScene.isEndingScene && (key === 'objects' || key === 'interactions');
                             return (
@@ -334,9 +334,9 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                     key={key}
                                     onClick={() => !isTabDisabled && setActiveTab(key as any)}
                                     disabled={isTabDisabled}
-                                    className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === key
-                                        ? 'text-purple-400 border-b-4 border-purple-500'
-                                        : 'text-muted-foreground hover:text-foreground'
+                                    className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 ${activeTab === key
+                                        ? 'border-primary text-primary bg-primary/5'
+                                        : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
                                         } ${isTabDisabled ? 'opacity-30 cursor-not-allowed' : ''}`}
                                 >
                                     {name}
@@ -413,7 +413,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
                                                             }}
                                                             className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground accent-purple-500"
                                                         />
-                                                        <span className="text-xs font-bold text-zinc-300 uppercase tracking-wide">Esta cena é uma vinheta?</span>
+                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Esta cena é uma vinheta?</span>
                                                     </label>
 
                                                     {localScene.vignetteType && localScene.vignetteType !== 'none' && (
