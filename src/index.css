@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: "Arimo", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Silkscreen", "DotGothic16", monospace;
   --font-body: "Space Mono", "IBM Plex Mono", monospace;
 
