@@ -43,8 +43,10 @@ interface UIEditorProps {
     frameBookColor: string;
     frameTradingCardColor: string;
     frameRoundedTopColor: string;
+
     gameSceneNameOverlayBg: string;
     gameSceneNameOverlayTextColor: string;
+    gameFrameColor: string;
     onUpdate: (field: keyof GameData, value: any, skipDirty?: boolean) => void;
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
@@ -129,7 +131,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         gameChanceLossMessage: chanceLossMessage,
         gameChanceRestoreMessage: chanceRestoreMessage,
         gameTheme, textColorLight, titleColorLight, focusColorLight, frameBookColor, frameTradingCardColor,
-        frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, onUpdate, isDirty, onSetDirty,
+        frameRoundedTopColor, gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, gameFrameColor, onUpdate, isDirty, onSetDirty,
         gameShowTrackersUI, gameShowSystemButton, gameInteractionType, suggestionsButtonText, inventoryButtonText,
         diaryButtonText, trackersButtonText, gameSystemButtonText, gameSaveMenuTitle, gameLoadMenuTitle,
         gameMainMenuButtonText, gameContinueIndicatorColor, gameViewEndingButtonText, title, logo, omitSplashTitle,
@@ -286,6 +288,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localFrameRoundedTopColor, setLocalFrameRoundedTopColor] = useState(frameRoundedTopColor);
     const [localGameSceneNameOverlayBg, setLocalGameSceneNameOverlayBg] = useState(gameSceneNameOverlayBg);
     const [localGameSceneNameOverlayTextColor, setLocalGameSceneNameOverlayTextColor] = useState(gameSceneNameOverlayTextColor);
+    const [localGameFrameColor, setLocalGameFrameColor] = useState(gameFrameColor);
     const [localGameContinueIndicatorColor, setLocalGameContinueIndicatorColor] = useState(gameContinueIndicatorColor);
     const [focusPreview, setFocusPreview] = useState(false);
     const [isCustomizing, setIsCustomizing] = useState(false);
@@ -414,6 +417,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalFrameRoundedTopColor(frameRoundedTopColor); }, [frameRoundedTopColor]);
     useEffect(() => { setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg); }, [gameSceneNameOverlayBg]);
     useEffect(() => { setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor); }, [gameSceneNameOverlayTextColor]);
+    useEffect(() => { setLocalGameFrameColor(gameFrameColor); }, [gameFrameColor]);
     useEffect(() => { setLocalGameContinueIndicatorColor(gameContinueIndicatorColor); }, [gameContinueIndicatorColor]);
 
     // 4. Game Params (Fonts, Title, etc.)
@@ -603,6 +607,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localFrameRoundedTopColor !== frameRoundedTopColor) onUpdate('frameRoundedTopColor', localFrameRoundedTopColor, true);
         if (localGameSceneNameOverlayBg !== gameSceneNameOverlayBg) onUpdate('gameSceneNameOverlayBg', localGameSceneNameOverlayBg, true);
         if (localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor) onUpdate('gameSceneNameOverlayTextColor', localGameSceneNameOverlayTextColor, true);
+        if (localGameFrameColor !== gameFrameColor) onUpdate('gameFrameColor', localGameFrameColor, true);
         if (localGameContinueIndicatorColor !== gameContinueIndicatorColor) onUpdate('gameContinueIndicatorColor', localGameContinueIndicatorColor, true);
         if (localTitle !== title) onUpdate('gameTitle', localTitle, true);
         if (localLogo !== logo) onUpdate('gameLogo', localLogo, true);
@@ -692,6 +697,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalFrameRoundedTopColor(frameRoundedTopColor);
         setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg);
         setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor);
+        setLocalGameFrameColor(gameFrameColor);
         setLocalGameContinueIndicatorColor(gameContinueIndicatorColor);
         setLocalTitle(title);
         setLocalLogo(logo);
@@ -736,10 +742,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
     const handleThemeChange = (theme: 'dark' | 'light') => {
         setLocalGameTheme(theme);
-        const newFrameColor = theme === 'dark' ? '#FFFFFF' : '#1a202c';
+        const newFrameColor = '#FFFFFF';
         setLocalFrameBookColor(newFrameColor);
         setLocalFrameTradingCardColor(newFrameColor);
         setLocalFrameRoundedTopColor(newFrameColor);
+        setLocalGameFrameColor(newFrameColor);
     };
 
     const applyTheme = (theme: typeof PREDEFINED_THEMES[0]) => {
@@ -760,10 +767,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalGameSceneNameOverlayBg('#000000');
         setLocalGameSceneNameOverlayTextColor('#FFFFFF');
 
-        const newFrameColor = localGameTheme === 'dark' ? '#FFFFFF' : '#1a202c';
+        setLocalGameSceneNameOverlayTextColor('#FFFFFF');
+
+        const newFrameColor = '#FFFFFF';
         setLocalFrameBookColor(newFrameColor);
         setLocalFrameTradingCardColor(newFrameColor);
         setLocalFrameRoundedTopColor(newFrameColor);
+        setLocalGameFrameColor(newFrameColor);
     };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
@@ -826,7 +836,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         switch (frame) {
             case 'rounded-top':
                 panelStyles.padding = '5px';
-                panelStyles.backgroundColor = localFrameRoundedTopColor || '#FFFFFF';
+                panelStyles.backgroundColor = localGameFrameColor || '#FFFFFF';
                 panelStyles.border = 'none';
                 panelStyles.borderRadius = '40px 40px 4px 4px';
                 containerStyles.borderRadius = '35px 35px 0 0';
@@ -835,12 +845,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 break;
             case 'book-cover':
                 panelStyles.padding = '5px';
-                panelStyles.backgroundColor = localFrameBookColor || '#FFFFFF';
+                panelStyles.backgroundColor = localGameFrameColor || '#FFFFFF';
                 panelStyles.border = 'none';
                 panelClass = 'frame-preview-book';
                 break;
             case 'trading-card':
-                panelStyles.backgroundColor = localFrameTradingCardColor || '#FFFFFF';
+                panelStyles.backgroundColor = localGameFrameColor || '#FFFFFF';
                 panelStyles.borderRadius = '12px';
                 panelStyles.padding = '4px';
                 containerStyles.border = 'none';
@@ -858,7 +868,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     return (
         <div className="space-y-6 pb-8">
             {/* Header with Save/Undo actions */}
-            <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
+            <div className="sticky top-4 z-40 backdrop-blur-md shadow-lg bg-zinc-900/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/10">
                 <p className="text-zinc-500 text-xs font-medium max-w-lg">
                     Personalize a interface do jogo, configure menus e textos.
                 </p>

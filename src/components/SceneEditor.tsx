@@ -277,7 +277,7 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
+            <div className="sticky top-4 z-40 flex justify-between items-center bg-zinc-900/95 backdrop-blur-md p-4 rounded-xl border border-muted-foreground/10 shadow-lg mb-6">
                 <p className="text-zinc-500 text-xs font-medium max-w-lg">
                     Defina a imagem, descrição, objetos e interações para esta cena.
                 </p>

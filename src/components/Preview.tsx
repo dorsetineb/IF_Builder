@@ -221,9 +221,9 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace(/__SPLASH_BUTTON_TEXT_COLOR__/g, gameData.gameSplashButtonTextColor || '#ffffff')
             .replace(/__ACTION_BUTTON_COLOR__/g, gameData.gameActionButtonColor || '#ffffff')
             .replace(/__ACTION_BUTTON_TEXT_COLOR__/g, gameData.gameActionButtonTextColor || '#0d1117')
-            .replace(/__FRAME_BOOK_COLOR__/g, gameData.frameBookColor || '#2d2d2d')
-            .replace(/__FRAME_TRADING_CARD_COLOR__/g, gameData.frameTradingCardColor || '#1c1917')
-            .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, gameData.frameRoundedTopColor || '#facc15')
+            .replace(/__FRAME_BOOK_COLOR__/g, gameData.gameFrameColor || '#FFFFFF')
+            .replace(/__FRAME_TRADING_CARD_COLOR__/g, gameData.gameFrameColor || '#FFFFFF')
+            .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, gameData.gameFrameColor || '#FFFFFF')
             .replace(/__SCENE_NAME_OVERLAY_BG__/g, gameData.gameSceneNameOverlayBg || '#0d1117')
             .replace(/__SCENE_NAME_OVERLAY_TEXT_COLOR__/g, gameData.gameSceneNameOverlayTextColor || '#c9d1d9')
             .replace(/__CONTINUE_INDICATOR_COLOR__/g, gameData.gameContinueIndicatorColor || gameData.gameTitleColor || '#58a6ff');

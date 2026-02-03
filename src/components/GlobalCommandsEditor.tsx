@@ -59,26 +59,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
         }
 
         // Initialize default "Ajuda" command if list is completely empty
-        if (fixedVerbs.length === 0 && localVerbs.length === 0) {
-            const helpId = generateUniqueId('verb', []);
-            const helpCommand: FixedVerb = {
-                id: helpId,
-                verbs: ['ajuda', 'help', 'tutorial'],
-                description: 'Bem-vindo ao jogo! Digite "olhar" para ver o ambiente, ou use verbos como "pegar", "usar", "falar" para interagir.',
-                icon: 'book'
-            };
-            // We don't save immediately to avoid dirty state on mount if user doesn't want it,
-            // but technically we should populate it. Let's set it to local state.
-            setLocalVerbs([helpCommand]);
-            setSelectedVerbId(helpId);
-            // We might want to mark it as dirty or just let the user see it.
-            // If we want it to be "pre-populated defaults", we should probably trigger an update
-            // But normally we avoid triggering side effects on mount that change data upstreams without user action.
-            // However, if the list is empty, it's helpful.
-            // Let's NOT call onUpdate yet, so 'isDirty' will be true relative to empty props if we check diff.
-            // But localVerbs is initialized from fixedVerbs. 
-            // If I change localVerbs here, the effect [localVerbs, fixedVerbs] will trigger onSetDirty(true).
-        }
+
     }, [fixedVerbs]);
     // ^ Dependency is only fixedVerbs. If fixedVerbs is empty, we handle it.
 
@@ -142,7 +123,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
     return (
         <div className="space-y-4" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* Header with Save/Undo actions */}
-            <div className="flex justify-between items-center bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/10">
+            <div className="sticky top-4 z-40 backdrop-blur-md shadow-lg bg-zinc-900/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/10">
                 <div className="text-zinc-500 text-xs font-medium w-full space-y-1">
                     <p>Configure verbos e comandos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).</p>
                     <p>Os verbos <strong>"olhar", "examinar", "ver"</strong> e <strong>"ler"</strong> possuem funcionalidade automática: o sistema verifica se um objeto foi mencionado (ex: "olhar caixa").</p>

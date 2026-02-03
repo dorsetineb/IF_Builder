@@ -191,7 +191,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .scene-image { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; }
 #scene-image-back { z-index: 1; }
 #scene-image { z-index: 2; }
-.scene-name-overlay { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 1em; font-weight: bold; z-index: 10; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: center; padding: 6px 12px; box-sizing: border-box; }
+.scene-name-overlay { position: absolute; top: 20px; left: 20px; background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 1em; font-weight: bold; z-index: 10; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: left; padding: 6px 12px; box-sizing: border-box; }
 .text-panel { flex: 1; display: flex; flex-direction: column; padding: 30px; position: relative; }
 .game-container.layout-horizontal { flex-direction: column; }
 .game-container.layout-horizontal .image-panel { flex-basis: 45%; max-width: none; width: 100%; border-right: none; border-bottom: 2px solid var(--border-color); }

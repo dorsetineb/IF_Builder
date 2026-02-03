@@ -203,6 +203,7 @@ export interface GameData {
   frameRoundedTopColor?: string;
   gameSceneNameOverlayBg?: string;
   gameSceneNameOverlayTextColor?: string;
+  gameFrameColor?: string;
   fixedVerbs?: FixedVerb[];
   consequenceTrackers?: ConsequenceTracker[];
   vignettes?: Vignette[]; // All vignettes, including opening (first one)

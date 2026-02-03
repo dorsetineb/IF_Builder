@@ -382,9 +382,9 @@ DATE:        ${exportDate.toLocaleString()}
             .replace(/__ACTION_BUTTON_COLOR__/g, exportData.gameActionButtonColor || '#ffffff')
             .replace(/__SPLASH_BUTTON_TEXT_COLOR__/g, exportData.gameSplashButtonTextColor || '#ffffff')
             .replace(/__ACTION_BUTTON_TEXT_COLOR__/g, exportData.gameActionButtonTextColor || '#0d1117')
-            .replace(/__FRAME_BOOK_COLOR__/g, exportData.frameBookColor || '#FFFFFF')
-            .replace(/__FRAME_TRADING_CARD_COLOR__/g, exportData.frameTradingCardColor || '#1c1917')
-            .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, exportData.frameRoundedTopColor || '#facc15')
+            .replace(/__FRAME_BOOK_COLOR__/g, exportData.gameFrameColor || '#FFFFFF')
+            .replace(/__FRAME_TRADING_CARD_COLOR__/g, exportData.gameFrameColor || '#FFFFFF')
+            .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, exportData.gameFrameColor || '#FFFFFF')
             .replace(/__SCENE_NAME_OVERLAY_BG__/g, exportData.gameSceneNameOverlayBg || '#0d1117')
             .replace(/__SCENE_NAME_OVERLAY_TEXT_COLOR__/g, exportData.gameSceneNameOverlayTextColor || '#c9d1d9')
             .replace(/__CONTINUE_INDICATOR_COLOR__/g, exportData.gameContinueIndicatorColor || exportData.gameTitleColor || '#58a6ff');
@@ -1217,6 +1217,7 @@ DATE:        ${exportDate.toLocaleString()}
                                     frameBookColor={gameData.frameBookColor || '#FFFFFF'}
                                     frameTradingCardColor={gameData.frameTradingCardColor || '#1c1917'}
                                     frameRoundedTopColor={gameData.frameRoundedTopColor || '#facc15'}
+                                    gameFrameColor={gameData.gameFrameColor || '#FFFFFF'}
                                     gameSceneNameOverlayBg={gameData.gameSceneNameOverlayBg || '#0d1117'}
                                     gameSceneNameOverlayTextColor={gameData.gameSceneNameOverlayTextColor || '#c9d1d9'}
                                     gameShowTrackersUI={gameData.gameShowTrackersUI ?? true}

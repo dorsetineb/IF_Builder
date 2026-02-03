@@ -102,21 +102,14 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     </div>
                                     <div className="space-y-6 text-muted-foreground leading-relaxed font-light text-sm">
                                         <p>
-                                            O IF Builder é um editor que desenvolvi para pessoas criarem suas próprias ficções interativas - narrativas textuais onde quem joga decide o que acontecerá em seguida.
-                                        </p>
-                                        <p>
-                                            Contar histórias é natural para nós — seja através de desenhos em uma caverna ou de linhas de código. Por isso, tenho criado uma ferramenta que retira a barreira da programação complexa, que permite ao autor focar na narrativa e nas escolhas.
+                                            O IF Builder é um editor que desenvolvi para criar ficções interativas - narrativas textuais onde quem joga decide o que acontecerá em seguida.
                                         </p>
                                         <p>
                                             Aqui, as ficções interativas são escritas em cenas. É fácil visualizar para onde cada escolha leva o jogador e como os caminhos se cruzam. Se você quer que algo aconteça apenas se o jogador tiver um item específico ou tiver feito uma escolha anterior, o editor resolve isso.
                                         </p>
                                         <p>
-                                            Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa tiver utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?
+                                            Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?
                                         </p>
-                                        <p>
-                                            Não estou tentando reinventar a roda, apenas oferecendo um espaço organizado para quem gosta de escrever e quer testar um novo formato. O IF Builder é um projeto pessoal, feito de um autor para outros autores, focado em dar vida a histórias de maneira prática e interativa.
-                                        </p>
-
                                     </div>
                                 </div>
                             </div>
@@ -174,10 +167,10 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                                 Sou bacharel em Artes Visuais, pós-graduado em Gestão da Inovação, e atuo há mais de uma década em projetos que envolvem design, educação e tecnologia.
                                             </p>
                                             <p>
-                                                Já trabalhei como ilustrador, diretor de arte, articulador de demandas audiovisuais, e analista de tecnologias aplicadas à educação. Hoje me dedico ao monitoramento estratégico de projetos de tecnologia da informação, e eventualmente me envolvo com projetos freelancer de diagramação de livros e ilustração.
+                                                Tive a sorte de trabalhar com desenho e com computadores, e adoro histórias que são contadas de um jeito diferente.
                                             </p>
                                             <p>
-                                                Tento escrever com alguma regularidade no <a href="https://substack.com/@dorsetineb" target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80 hover:underline">Substack</a>, e seria muito legal conversar com você por lá também!
+                                                Escrevo com alguma regularidade no <a href="https://substack.com/@dorsetineb" target="_blank" rel="noreferrer" className="text-primary hover:text-primary/80 hover:underline">Substack</a>, e seria muito legal conversar com você por lá também!
                                             </p>
                                         </div>
                                     </div>
@@ -195,7 +188,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             </div>
 
                             <p className="text-[10px] text-zinc-400 leading-relaxed mb-4">
-                                Este site é mantido com amor e com doações. Se ele é útil pra você, considere contribuir com um PIX!
+                                Este site é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX!
                             </p>
 
                             <div className="bg-white p-2 rounded-lg flex justify-center mb-6">

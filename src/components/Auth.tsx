@@ -557,24 +557,30 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
         </div>
     );
 
-    // Game Popup Component (Fake Browser)
+    // Game Popup Component (Fake Browser) - 4:3 aspect ratio popup
     const renderGamePopup = () => (
         <div
-            className={`fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-all duration-300 ${isClosing
+            className={`fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm transition-all duration-300 ${isClosing
                 ? 'animate-out fade-out duration-300'
                 : 'animate-in fade-in duration-300'
                 }`}
             onClick={resetToLanding}
         >
+            {/* 4:3 Container - scales proportionally with viewport */}
             <div
-                className={`w-full max-w-[95vw] h-[60vh] aspect-[4/3] bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col ${isClosing
+                className={`bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col ${isClosing
                     ? 'animate-out zoom-out-95 duration-300'
                     : 'animate-in zoom-in-95 duration-300'
                     }`}
+                style={{
+                    // Wide popup - fills most of viewport
+                    width: '80vw',
+                    height: '70vh',
+                }}
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Fake Browser Header */}
-                <div className="bg-zinc-800 border-b border-zinc-700 px-4 py-3 flex items-center justify-between">
+                <div className="bg-zinc-800 border-b border-zinc-700 px-4 py-3 flex items-center justify-between flex-shrink-0">
                     <div className="flex items-center gap-3">
                         <span className="font-mono text-xs text-zinc-500 uppercase tracking-widest">
                             TERM.V2.EXE - REMOTE CONNECTION
@@ -588,10 +594,10 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                 </div>
 
                 {/* Game iframe */}
-                <div className="relative h-full flex flex-col">
+                <div className="flex-1 min-h-0">
                     <iframe
                         src="/fuja_da_masmorra/index.html"
-                        className="w-full h-full border-0 flex-1"
+                        className="w-full h-full border-0"
                         title="Fuja da Masmorra Demo"
                     />
                 </div>

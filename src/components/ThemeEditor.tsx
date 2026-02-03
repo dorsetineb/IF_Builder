@@ -22,6 +22,7 @@ interface ThemeEditorProps {
     textColorLight: string;
     titleColorLight: string;
     focusColorLight: string;
+    gameFrameColor: string;
     onUpdate: (field: keyof GameData, value: any) => void;
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
@@ -130,7 +131,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         focusColor, chanceIconColor, gameFontFamily,
         enableChances, chanceIcon, onUpdate, isDirty, onSetDirty,
         chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText,
-        gameTheme, textColorLight, titleColorLight, focusColorLight
+        gameTheme, textColorLight, titleColorLight, focusColorLight, gameFrameColor
     } = props;
 
     const [localTextColor, setLocalTextColor] = useState(textColor);
@@ -151,6 +152,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
     const [localTextColorLight, setLocalTextColorLight] = useState(textColorLight);
     const [localTitleColorLight, setLocalTitleColorLight] = useState(titleColorLight);
     const [localFocusColorLight, setLocalFocusColorLight] = useState(focusColorLight);
+    const [localGameFrameColor, setLocalGameFrameColor] = useState(gameFrameColor);
     const [focusPreview, setFocusPreview] = useState(false);
     const [isCustomizing, setIsCustomizing] = useState(false);
 
@@ -172,9 +174,10 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
             localGameTheme !== gameTheme ||
             localTextColorLight !== textColorLight ||
             localTitleColorLight !== titleColorLight ||
-            localFocusColorLight !== focusColorLight;
+            localFocusColorLight !== focusColorLight ||
+            localGameFrameColor !== gameFrameColor;
         onSetDirty(dirty);
-    }, [localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight, props, onSetDirty]);
+    }, [localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight, localGameFrameColor, props, onSetDirty]);
 
     // FIX: Using correct property names from types.ts (removed 'game' prefix for light theme colors)
     const handleSave = () => {
@@ -196,6 +199,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         if (localTextColorLight !== textColorLight) onUpdate('textColorLight', localTextColorLight);
         if (localTitleColorLight !== titleColorLight) onUpdate('titleColorLight', localTitleColorLight);
         if (localFocusColorLight !== focusColorLight) onUpdate('focusColorLight', localFocusColorLight);
+        if (localGameFrameColor !== gameFrameColor) onUpdate('gameFrameColor', localGameFrameColor);
     };
 
     const handleUndo = () => {
@@ -217,6 +221,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         setLocalTextColorLight(textColorLight);
         setLocalTitleColorLight(titleColorLight);
         setLocalFocusColorLight(focusColorLight);
+        setLocalGameFrameColor(gameFrameColor);
     };
 
     const applyTheme = (theme: typeof PREDEFINED_THEMES[0]) => {
@@ -232,6 +237,8 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         setLocalActionButtonColor(theme.actionButtonColor);
         setLocalActionButtonTextColor(theme.actionButtonTextColor);
         setLocalChanceIconColor(theme.chanceIconColor);
+        // Default frame color to white for all themes
+        setLocalGameFrameColor('#FFFFFF');
     };
 
     const HeartIcon: React.FC<{ color: string; className?: string }> = ({ color, className = "w-7 h-7" }) => (
@@ -399,6 +406,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                     <ColorInput label="Botão Início (Hover)" id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#238636" />
                                     <ColorInput label="Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#ffffff" />
                                     <ColorInput label="Texto Botão de Ação" id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#0d1117" />
+                                    <ColorInput label="Moldura das Imagens" id="gameFrameColor" value={localGameFrameColor} onChange={setLocalGameFrameColor} placeholder="#FFFFFF" />
                                 </div>
                             </div>
                         </>
