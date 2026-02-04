@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useUser } from './UserContext';
@@ -11,14 +11,17 @@ import Sidebar from './Sidebar';
 import SceneEditor from './SceneEditor';
 import Header from './Header';
 import { WelcomePlaceholder } from './WelcomePlaceholder';
-import { GuideView } from './GuideView';
-import { UIEditor } from './UIEditor';
 // import VignettesEditor from './VignettesEditor'; // Removed as integrated into SceneEditor
 import Preview from './Preview';
-import SceneMap from './SceneMap';
-import GlobalObjectsEditor from './GlobalObjectsEditor';
-import TrackersEditor from './TrackersEditor';
-import GlobalCommandsEditor from './GlobalCommandsEditor';
+import { LoadingOverlay } from './LoadingOverlay';
+
+// Lazy Load Heavy Components
+const UIEditor = lazy(() => import('./UIEditor').then(module => ({ default: module.UIEditor })));
+const GuideView = lazy(() => import('./GuideView').then(module => ({ default: module.GuideView })));
+const SceneMap = lazy(() => import('./SceneMap'));
+const GlobalObjectsEditor = lazy(() => import('./GlobalObjectsEditor'));
+const TrackersEditor = lazy(() => import('./TrackersEditor'));
+const GlobalCommandsEditor = lazy(() => import('./GlobalCommandsEditor'));
 import { ConfirmationModal } from './ConfirmationModal';
 import { NewProjectModal } from './NewProjectModal';
 import { TransitionScreen } from './TransitionScreen';
@@ -1184,88 +1187,90 @@ DATE:        ${exportDate.toLocaleString()}
                         <main className={`flex-1 overflow-y-auto relative bg-background ${currentView === 'scenes' && !selectedScene ? 'p-0' : 'p-6'}`}>
                             {/* currentView === 'vignettes' block removed */}
                             {currentView === 'interface' && (
-                                <UIEditor
-                                    key={importKey}
-                                    {...gameData}
-                                    enableInventory={gameData.enableInventory ?? detectedActiveSystems.inventory}
-                                    enableChances={(gameData.enableChances ?? detectedActiveSystems.chances) || gameData.gameSystemEnabled === 'chances'}
-                                    enableTrackers={(gameData.enableTrackers ?? detectedActiveSystems.trackers) || gameData.gameSystemEnabled === 'trackers'}
-                                    html={gameData.gameHTML}
-                                    css={gameData.gameCSS}
-                                    onUpdate={handleUpdateGameData}
-                                    isDirty={isDirty}
-                                    onSetDirty={setIsDirty}
-                                    title={gameData.gameTitle || ''}
-                                    logo={gameData.gameLogo || ''}
-                                    omitSplashTitle={!!gameData.gameOmitSplashTitle}
-                                    splashImage={gameData.gameSplashImage || ''}
-                                    splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
-                                    splashDescription={gameData.gameSplashDescription || ''}
-                                    backgroundMusic={gameData.gameBackgroundMusic || ''}
-                                    positiveEndingImage={gameData.positiveEndingImage || ''}
-                                    positiveEndingContentAlignment={gameData.positiveEndingContentAlignment || 'right'}
-                                    positiveEndingDescription={gameData.positiveEndingDescription || ''}
-                                    positiveEndingMusic={gameData.positiveEndingMusic || ''}
-                                    negativeEndingImage={gameData.negativeEndingImage || ''}
-                                    negativeEndingContentAlignment={gameData.negativeEndingContentAlignment || 'right'}
-                                    negativeEndingDescription={gameData.negativeEndingDescription || ''}
-                                    negativeEndingMusic={gameData.negativeEndingMusic || ''}
-                                    fixedVerbs={fixedVerbs}
-                                    actionButtonText={gameData.gameActionButtonText || 'Ação'}
-                                    verbInputPlaceholder={gameData.gameVerbInputPlaceholder || 'O que você faz?'}
-                                    diaryPlayerName={gameData.gameDiaryPlayerName || 'Jogador'}
-                                    splashButtonText={gameData.gameSplashButtonText || 'INICIAR'}
-                                    continueButtonText={gameData.gameContinueButtonText || 'Continuar'}
-                                    restartButtonText={gameData.gameRestartButtonText || 'Reiniciar'}
-                                    gameInteractionType={gameData.gameInteractionType || 'parser'}
-                                    gameSystemEnabled={gameData.gameSystemEnabled || 'none'}
-                                    maxChances={gameData.gameMaxChances || 3}
-                                    textColor={gameData.gameTextColor || '#c9d1d9'}
-                                    titleColor={gameData.gameTitleColor || '#58a6ff'}
-                                    splashButtonColor={gameData.gameSplashButtonColor || '#2ea043'}
-                                    splashButtonHoverColor={gameData.gameSplashButtonHoverColor || '#238636'}
-                                    splashButtonTextColor={gameData.gameSplashButtonTextColor || '#ffffff'}
-                                    actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
-                                    actionButtonTextColor={gameData.gameActionButtonTextColor || '#0d1117'}
-                                    focusColor={gameData.gameFocusColor || '#58a6ff'}
-                                    chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
-                                    gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
-                                    gameFontSize={gameData.gameFontSize || '0.75em'}
-                                    chanceIcon={gameData.gameChanceIcon || 'heart'}
-                                    chanceReturnButtonText={gameData.gameChanceReturnButtonText || 'Tentar Novamente'}
-                                    gameTheme={gameData.gameTheme || 'dark'}
-                                    textColorLight={gameData.textColorLight || '#24292f'}
-                                    titleColorLight={gameData.titleColorLight || '#0969da'}
-                                    focusColorLight={gameData.focusColorLight || '#0969da'}
-                                    frameBookColor={gameData.frameBookColor || '#FFFFFF'}
-                                    frameTradingCardColor={gameData.frameTradingCardColor || '#1c1917'}
-                                    frameRoundedTopColor={gameData.frameRoundedTopColor || '#facc15'}
-                                    gameFrameColor={gameData.gameFrameColor || '#FFFFFF'}
-                                    gameSceneNameOverlayBg={gameData.gameSceneNameOverlayBg || '#0d1117'}
-                                    gameSceneNameOverlayTextColor={gameData.gameSceneNameOverlayTextColor || '#c9d1d9'}
-                                    gameShowTrackersUI={gameData.gameShowTrackersUI ?? true}
-                                    gameShowSystemButton={gameData.gameShowSystemButton ?? true}
-                                    imageFrame={gameData.gameImageFrame || 'none'}
-                                    layoutOrder={gameData.gameLayoutOrder || 'image-first'}
-                                    layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
-                                    suggestionsButtonText={gameData.gameSuggestionsButtonText}
-                                    inventoryButtonText={gameData.gameInventoryButtonText}
-                                    diaryButtonText={gameData.gameDiaryButtonText}
-                                    diaryShowSceneImage={gameData.diaryShowSceneImage}
-                                    diaryShowPlayerAction={gameData.diaryShowPlayerAction}
-                                    trackersButtonText={gameData.gameTrackersButtonText}
-                                    gameSystemButtonText={gameData.gameSystemButtonText}
-                                    gameSaveMenuTitle={gameData.gameSaveMenuTitle}
-                                    gameLoadMenuTitle={gameData.gameLoadMenuTitle}
-                                    gameMainMenuButtonText={gameData.gameMainMenuButtonText}
-                                    gameContinueIndicatorColor={gameData.gameContinueIndicatorColor || '#58a6ff'}
-                                    gameViewEndingButtonText={gameData.gameViewEndingButtonText || 'Ver Final'}
-                                    textAnimationType={gameData.gameTextAnimationType || 'fade'}
-                                    textSpeed={gameData.gameTextSpeed || 5}
-                                    imageTransitionType={gameData.gameImageTransitionType || 'fade'}
-                                    imageSpeed={gameData.gameImageSpeed || 5}
-                                    onNavigateToTrackers={() => handleSetView('trackers')}
-                                />
+                                <Suspense fallback={<LoadingOverlay message="Carregando Editor de Interface..." />}>
+                                    <UIEditor
+                                        key={importKey}
+                                        {...gameData}
+                                        enableInventory={gameData.enableInventory ?? detectedActiveSystems.inventory}
+                                        enableChances={(gameData.enableChances ?? detectedActiveSystems.chances) || gameData.gameSystemEnabled === 'chances'}
+                                        enableTrackers={(gameData.enableTrackers ?? detectedActiveSystems.trackers) || gameData.gameSystemEnabled === 'trackers'}
+                                        html={gameData.gameHTML}
+                                        css={gameData.gameCSS}
+                                        onUpdate={handleUpdateGameData}
+                                        isDirty={isDirty}
+                                        onSetDirty={setIsDirty}
+                                        title={gameData.gameTitle || ''}
+                                        logo={gameData.gameLogo || ''}
+                                        omitSplashTitle={!!gameData.gameOmitSplashTitle}
+                                        splashImage={gameData.gameSplashImage || ''}
+                                        splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
+                                        splashDescription={gameData.gameSplashDescription || ''}
+                                        backgroundMusic={gameData.gameBackgroundMusic || ''}
+                                        positiveEndingImage={gameData.positiveEndingImage || ''}
+                                        positiveEndingContentAlignment={gameData.positiveEndingContentAlignment || 'right'}
+                                        positiveEndingDescription={gameData.positiveEndingDescription || ''}
+                                        positiveEndingMusic={gameData.positiveEndingMusic || ''}
+                                        negativeEndingImage={gameData.negativeEndingImage || ''}
+                                        negativeEndingContentAlignment={gameData.negativeEndingContentAlignment || 'right'}
+                                        negativeEndingDescription={gameData.negativeEndingDescription || ''}
+                                        negativeEndingMusic={gameData.negativeEndingMusic || ''}
+                                        fixedVerbs={fixedVerbs}
+                                        actionButtonText={gameData.gameActionButtonText || 'Ação'}
+                                        verbInputPlaceholder={gameData.gameVerbInputPlaceholder || 'O que você faz?'}
+                                        diaryPlayerName={gameData.gameDiaryPlayerName || 'Jogador'}
+                                        splashButtonText={gameData.gameSplashButtonText || 'INICIAR'}
+                                        continueButtonText={gameData.gameContinueButtonText || 'Continuar'}
+                                        restartButtonText={gameData.gameRestartButtonText || 'Reiniciar'}
+                                        gameInteractionType={gameData.gameInteractionType || 'parser'}
+                                        gameSystemEnabled={gameData.gameSystemEnabled || 'none'}
+                                        maxChances={gameData.gameMaxChances || 3}
+                                        textColor={gameData.gameTextColor || '#c9d1d9'}
+                                        titleColor={gameData.gameTitleColor || '#58a6ff'}
+                                        splashButtonColor={gameData.gameSplashButtonColor || '#2ea043'}
+                                        splashButtonHoverColor={gameData.gameSplashButtonHoverColor || '#238636'}
+                                        splashButtonTextColor={gameData.gameSplashButtonTextColor || '#ffffff'}
+                                        actionButtonColor={gameData.gameActionButtonColor || '#ffffff'}
+                                        actionButtonTextColor={gameData.gameActionButtonTextColor || '#0d1117'}
+                                        focusColor={gameData.gameFocusColor || '#58a6ff'}
+                                        chanceIconColor={gameData.gameChanceIconColor || '#ff4d4d'}
+                                        gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
+                                        gameFontSize={gameData.gameFontSize || '0.75em'}
+                                        chanceIcon={gameData.gameChanceIcon || 'heart'}
+                                        chanceReturnButtonText={gameData.gameChanceReturnButtonText || 'Tentar Novamente'}
+                                        gameTheme={gameData.gameTheme || 'dark'}
+                                        textColorLight={gameData.textColorLight || '#24292f'}
+                                        titleColorLight={gameData.titleColorLight || '#0969da'}
+                                        focusColorLight={gameData.focusColorLight || '#0969da'}
+                                        frameBookColor={gameData.frameBookColor || '#FFFFFF'}
+                                        frameTradingCardColor={gameData.frameTradingCardColor || '#1c1917'}
+                                        frameRoundedTopColor={gameData.frameRoundedTopColor || '#facc15'}
+                                        gameFrameColor={gameData.gameFrameColor || '#FFFFFF'}
+                                        gameSceneNameOverlayBg={gameData.gameSceneNameOverlayBg || '#0d1117'}
+                                        gameSceneNameOverlayTextColor={gameData.gameSceneNameOverlayTextColor || '#c9d1d9'}
+                                        gameShowTrackersUI={gameData.gameShowTrackersUI ?? true}
+                                        gameShowSystemButton={gameData.gameShowSystemButton ?? true}
+                                        imageFrame={gameData.gameImageFrame || 'none'}
+                                        layoutOrder={gameData.gameLayoutOrder || 'image-first'}
+                                        layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
+                                        suggestionsButtonText={gameData.gameSuggestionsButtonText}
+                                        inventoryButtonText={gameData.gameInventoryButtonText}
+                                        diaryButtonText={gameData.gameDiaryButtonText}
+                                        diaryShowSceneImage={gameData.diaryShowSceneImage}
+                                        diaryShowPlayerAction={gameData.diaryShowPlayerAction}
+                                        trackersButtonText={gameData.gameTrackersButtonText}
+                                        gameSystemButtonText={gameData.gameSystemButtonText}
+                                        gameSaveMenuTitle={gameData.gameSaveMenuTitle}
+                                        gameLoadMenuTitle={gameData.gameLoadMenuTitle}
+                                        gameMainMenuButtonText={gameData.gameMainMenuButtonText}
+                                        gameContinueIndicatorColor={gameData.gameContinueIndicatorColor || '#58a6ff'}
+                                        gameViewEndingButtonText={gameData.gameViewEndingButtonText || 'Ver Final'}
+                                        textAnimationType={gameData.gameTextAnimationType || 'fade'}
+                                        textSpeed={gameData.gameTextSpeed || 5}
+                                        imageTransitionType={gameData.gameImageTransitionType || 'fade'}
+                                        imageSpeed={gameData.gameImageSpeed || 5}
+                                        onNavigateToTrackers={() => handleSetView('trackers')}
+                                    />
+                                </Suspense>
                             )}
                             {currentView === 'scenes' && selectedScene ? (
                                 <SceneEditor
@@ -1302,82 +1307,92 @@ DATE:        ${exportDate.toLocaleString()}
                                     theme={appTheme}
                                 />
                             ) : currentView === 'guide' ? (
-                                <GuideView />
+                                <Suspense fallback={<LoadingOverlay message="Carregando Guia..." />}>
+                                    <GuideView />
+                                </Suspense>
                             ) : null}
 
                             {currentView === 'map' && (
-                                <SceneMap
-                                    allScenesMap={gameData.scenes}
-                                    globalObjects={gameData.globalObjects}
-                                    startSceneId={gameData.startScene}
-                                    vignettes={gameData.vignettes || []}
-                                    onSelectScene={handleSelectScene}
-                                    onUpdateScenePosition={handleUpdateScenePosition}
-                                    onUpdateVignettePosition={(vignetteId, x, y) => {
-                                        setGameData(prev => ({
-                                            ...prev,
-                                            vignettes: (prev.vignettes || []).map(v =>
-                                                v.id === vignetteId ? { ...v, mapX: x, mapY: y } : v
-                                            )
-                                        }));
-                                        setIsDirty(true);
-                                    }}
-                                    onReorganizeScenes={() => {
-                                        // Reset all scene AND vignette map positions to force auto-layout
-                                        setGameData(prev => {
-                                            const updatedScenes = { ...prev.scenes };
-                                            Object.keys(updatedScenes).forEach(id => {
-                                                updatedScenes[id] = {
-                                                    ...updatedScenes[id],
+                                <Suspense fallback={<LoadingOverlay message="Carregando Mapa..." />}>
+                                    <SceneMap
+                                        allScenesMap={gameData.scenes}
+                                        globalObjects={gameData.globalObjects}
+                                        startSceneId={gameData.startScene}
+                                        vignettes={gameData.vignettes || []}
+                                        onSelectScene={handleSelectScene}
+                                        onUpdateScenePosition={handleUpdateScenePosition}
+                                        onUpdateVignettePosition={(vignetteId, x, y) => {
+                                            setGameData(prev => ({
+                                                ...prev,
+                                                vignettes: (prev.vignettes || []).map(v =>
+                                                    v.id === vignetteId ? { ...v, mapX: x, mapY: y } : v
+                                                )
+                                            }));
+                                            setIsDirty(true);
+                                        }}
+                                        onReorganizeScenes={() => {
+                                            // Reset all scene AND vignette map positions to force auto-layout
+                                            setGameData(prev => {
+                                                const updatedScenes = { ...prev.scenes };
+                                                Object.keys(updatedScenes).forEach(id => {
+                                                    updatedScenes[id] = {
+                                                        ...updatedScenes[id],
+                                                        mapX: undefined,
+                                                        mapY: undefined
+                                                    };
+                                                });
+                                                const updatedVignettes = (prev.vignettes || []).map(v => ({
+                                                    ...v,
                                                     mapX: undefined,
                                                     mapY: undefined
-                                                };
+                                                }));
+                                                return { ...prev, scenes: updatedScenes, vignettes: updatedVignettes };
                                             });
-                                            const updatedVignettes = (prev.vignettes || []).map(v => ({
-                                                ...v,
-                                                mapX: undefined,
-                                                mapY: undefined
-                                            }));
-                                            return { ...prev, scenes: updatedScenes, vignettes: updatedVignettes };
-                                        });
-                                        setIsDirty(true);
-                                    }}
-                                    gameInteractionType={gameData.gameInteractionType || 'parser'}
-                                />
+                                            setIsDirty(true);
+                                        }}
+                                        gameInteractionType={gameData.gameInteractionType || 'parser'}
+                                    />
+                                </Suspense>
                             )}
 
                             {currentView === 'global_objects' && (
-                                <GlobalObjectsEditor
-                                    scenes={gameData.scenes}
-                                    globalObjects={gameData.globalObjects}
-                                    onUpdateObject={handleUpdateGlobalObject}
-                                    onDeleteObject={handleDeleteGlobalObject}
-                                    onCreateObject={handleCreateGlobalObject}
-                                    onSelectScene={handleSelectScene}
-                                    isDirty={isDirty}
-                                    onSetDirty={setIsDirty}
-                                />
+                                <Suspense fallback={<LoadingOverlay message="Carregando Objetos..." />}>
+                                    <GlobalObjectsEditor
+                                        scenes={gameData.scenes}
+                                        globalObjects={gameData.globalObjects}
+                                        onUpdateObject={handleUpdateGlobalObject}
+                                        onDeleteObject={handleDeleteGlobalObject}
+                                        onCreateObject={handleCreateGlobalObject}
+                                        onSelectScene={handleSelectScene}
+                                        isDirty={isDirty}
+                                        onSetDirty={setIsDirty}
+                                    />
+                                </Suspense>
                             )}
 
                             {currentView === 'trackers' && (
-                                <TrackersEditor
-                                    trackers={consequenceTrackers}
-                                    onUpdateTrackers={handleUpdateTrackers}
-                                    allScenes={scenesList}
-                                    allTrackerIds={(gameData.consequenceTrackers || []).map(t => t.id)}
-                                    isDirty={isDirty}
-                                    onSetDirty={setIsDirty}
-                                    onSelectScene={handleSelectScene}
-                                />
+                                <Suspense fallback={<LoadingOverlay message="Carregando Rastreadores..." />}>
+                                    <TrackersEditor
+                                        trackers={consequenceTrackers}
+                                        onUpdateTrackers={handleUpdateTrackers}
+                                        allScenes={scenesList}
+                                        allTrackerIds={(gameData.consequenceTrackers || []).map(t => t.id)}
+                                        isDirty={isDirty}
+                                        onSetDirty={setIsDirty}
+                                        onSelectScene={handleSelectScene}
+                                    />
+                                </Suspense>
                             )}
 
                             {currentView === 'global_commands' && (
-                                <GlobalCommandsEditor
-                                    fixedVerbs={gameData.fixedVerbs || []}
-                                    onUpdate={handleUpdateGameData}
-                                    isDirty={isDirty}
-                                    onSetDirty={setIsDirty}
-                                />
+                                <Suspense fallback={<LoadingOverlay message="Carregando Comandos..." />}>
+                                    <GlobalCommandsEditor
+                                        fixedVerbs={gameData.fixedVerbs || []}
+                                        onUpdate={handleUpdateGameData}
+                                        isDirty={isDirty}
+                                        onSetDirty={setIsDirty}
+                                    />
+                                </Suspense>
                             )}
 
                             {currentView === 'settings' && <Settings hideHeader />}
