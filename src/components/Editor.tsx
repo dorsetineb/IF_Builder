@@ -5,6 +5,7 @@ import { supabase } from '../lib/supabase';
 import { useUser } from './UserContext';
 import { Auth } from './Auth';
 import { useToast } from './ToastContext';
+import DOMPurify from 'dompurify';
 import { GameData, Scene, GameObject, Interaction, View, ConsequenceTracker, FixedVerb, Vignette } from '../types';
 import Sidebar from './Sidebar';
 import SceneEditor from './SceneEditor';
@@ -72,7 +73,7 @@ const getMimeTypeFromFileName = (name: string): string => {
 const generateUniqueId = (prefix: 'scn' | 'obj' | 'inter' | 'trk' | 'verb', existingIds: string[]): string => {
     let id;
     do {
-        id = `${prefix}_${Math.random().toString(36).substring(2, 9)} `;
+        id = `${prefix}_${Math.random().toString(36).substring(2, 9)}`;
     } while (existingIds.includes(id));
     return id;
 };
@@ -497,7 +498,17 @@ DATE:        ${exportDate.toLocaleString()}
             };
             reader.readAsArrayBuffer(file);
         } else {
-            reader.onload = (ev) => handleImportGame(JSON.parse(ev.target?.result as string));
+            reader.onload = (ev) => {
+                try {
+                    const content = ev.target?.result as string;
+                    const parsed = JSON.parse(content);
+                    if (!parsed || typeof parsed !== 'object') throw new Error("Arquivo inválido");
+                    handleImportGame(parsed);
+                } catch (error) {
+                    console.error("Erro ao importar:", error);
+                    toast("Erro na Importação", "O arquivo selecionado não é um JSON válido ou está corrompido.", "error");
+                }
+            };
             reader.readAsText(file);
         }
     };
@@ -658,9 +669,16 @@ DATE:        ${exportDate.toLocaleString()}
         setCurrentView('scenes');
     }, [gameHTML, gameCSS, toast]);
 
+
     const handleUpdateGameData = useCallback((field: keyof GameData | Partial<GameData>, value?: any, skipDirty?: boolean) => {
         if (typeof field === 'object' && field !== null) {
             const updates = field as Partial<GameData>;
+
+            // Sanitize HTML if present
+            if (updates.gameHTML) {
+                updates.gameHTML = DOMPurify.sanitize(updates.gameHTML);
+            }
+
             setGameData(prev => ({ ...prev, ...updates }));
             // If called with just one argument (updates object), mark as dirty unless specified (though skipDirty arg position varies)
             // In VignettesEditor call: onUpdate(updates). So value is undefined.
@@ -669,11 +687,18 @@ DATE:        ${exportDate.toLocaleString()}
         }
 
         const key = field as keyof GameData;
+        let finalValue = value;
+
+        // Sanitize individual field update if it is gameHTML
+        if (key === 'gameHTML' && typeof value === 'string') {
+            finalValue = DOMPurify.sanitize(value);
+        }
+
         setGameData(prev => {
-            if (key === 'gameSystemEnabled' && value === 'trackers') {
-                return { ...prev, [key]: value, gameShowTrackersUI: true };
+            if (key === 'gameSystemEnabled' && finalValue === 'trackers') {
+                return { ...prev, [key]: finalValue, gameShowTrackersUI: true };
             }
-            return { ...prev, [key]: value };
+            return { ...prev, [key]: finalValue };
         });
         if (!skipDirty) {
             setIsDirty(true);
