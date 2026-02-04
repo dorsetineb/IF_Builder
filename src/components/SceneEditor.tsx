@@ -1,5 +1,7 @@
 import React, { useState, useEffect, DragEvent, useRef, useMemo, memo } from 'react';
 import { Scene, Interaction, GameObject, ConsequenceTracker, Choice, Vignette } from '../types';
+import { MAX_IMAGE_SIZE, MAX_AUDIO_SIZE } from '../constants';
+import { useToast } from './ToastContext';
 import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
 import BranchingPreview from './BranchingPreview';
@@ -69,6 +71,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
     enableChances,
     gameSystemEnabled,
 }) => {
+    const { toast } = useToast();
     const [localScene, setLocalScene] = useState<Scene>(() => getCleanSceneState(scene));
     const [pendingObjectUpdates, setPendingObjectUpdates] = useState<{ [id: string]: Partial<GameObject> }>({});
     const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions' | 'choices'>('properties');
@@ -191,13 +194,20 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            if (file.size > MAX_IMAGE_SIZE) {
+                toast("Erro no Upload", `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024}MB.`, "error");
+                if (e.target) (e.target as HTMLInputElement).value = '';
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = (event) => {
                 if (event.target && typeof event.target.result === 'string') {
                     updateLocalScene('image', event.target.result);
                 }
             };
-            reader.readAsDataURL(e.target.files[0]);
+            reader.readAsDataURL(file);
         }
         if (e.target) {
             (e.target as HTMLInputElement).value = '';
@@ -206,13 +216,20 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
 
     const handleMusicUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            if (file.size > MAX_AUDIO_SIZE) {
+                toast("Erro no Upload", `O áudio excede o limite de ${MAX_AUDIO_SIZE / 1024 / 1024}MB.`, "error");
+                if (e.target) (e.target as HTMLInputElement).value = '';
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = (event) => {
                 if (event.target && typeof event.target.result === 'string') {
                     updateLocalScene('backgroundMusic', event.target.result);
                 }
             };
-            reader.readAsDataURL(e.target.files[0]);
+            reader.readAsDataURL(file);
         }
         if (e.target) {
             (e.target as HTMLInputElement).value = '';
@@ -224,6 +241,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
         e.stopPropagation();
         setIsDraggingOver(false);
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            const file = e.dataTransfer.files[0];
+            if (file.size > MAX_IMAGE_SIZE) {
+                toast("Erro no Upload", `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024}MB.`, "error");
+                return;
+            }
             const event = { target: { files: e.dataTransfer.files } } as unknown as React.ChangeEvent<HTMLInputElement>;
             handleImageUpload(event);
         }

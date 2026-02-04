@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect, memo } from 'react';
 import { useTheme } from './ThemeProvider';
-import { FONTS, PREDEFINED_THEMES } from '../constants';
+import { useToast } from './ToastContext';
+import { FONTS, PREDEFINED_THEMES, MAX_IMAGE_SIZE, MAX_AUDIO_SIZE } from '../constants';
 
 
 import { GameData, FixedVerb } from '../types';
@@ -776,15 +777,26 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalGameFrameColor(newFrameColor);
     };
 
+    const { toast } = useToast();
+
+    // ... (rest of the code)
+
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
         if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            if (file.size > MAX_IMAGE_SIZE) {
+                toast("Erro no Upload", `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024}MB.`, "error");
+                if (e.target) (e.target as HTMLInputElement).value = '';
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = (event) => {
                 if (event.target && typeof event.target.result === 'string') {
                     setter(event.target.result);
                 }
             };
-            reader.readAsDataURL(e.target.files[0]);
+            reader.readAsDataURL(file);
         }
         if (e.target) {
             (e.target as HTMLInputElement).value = '';
@@ -793,13 +805,20 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
     const handleAudioUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
         if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            if (file.size > MAX_AUDIO_SIZE) {
+                toast("Erro no Upload", `O áudio excede o limite de ${MAX_AUDIO_SIZE / 1024 / 1024}MB.`, "error");
+                if (e.target) (e.target as HTMLInputElement).value = '';
+                return;
+            }
+
             const reader = new FileReader();
             reader.onload = (event) => {
                 if (event.target && typeof event.target.result === 'string') {
                     setter(event.target.result);
                 }
             };
-            reader.readAsDataURL(e.target.files[0]);
+            reader.readAsDataURL(file);
         }
         if (e.target) {
             (e.target as HTMLInputElement).value = '';
