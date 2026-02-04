@@ -6,24 +6,20 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "lint": "eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\""
   },
   "dependencies": {
     "@react-three/fiber": "^9.5.0",
     "@react-three/postprocessing": "^3.0.4",
     "@supabase/supabase-js": "^2.89.0",
-    "@tailwindcss/postcss": "^4.1.18",
-    "@types/node": "^22.14.0",
-    "@types/three": "^0.182.0",
-    "@vitejs/plugin-react": "^5.0.0",
-    "autoprefixer": "^10.4.23",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "express": "^4.22.1",
     "i18next": "^25.8.0",
     "i18next-browser-languagedetector": "^8.2.0",
     "lucide-react": "^0.562.0",
-    "postcss": "^8.5.6",
     "postprocessing": "^6.38.2",
     "qrcode.react": "^4.2.0",
     "quill": "^2.0.3",
@@ -33,9 +29,23 @@
     "react-router-dom": "^7.11.0",
     "shadcn": "^3.6.2",
     "tailwind-merge": "^3.4.0",
-    "tailwindcss": "^4.1.18",
     "tailwindcss-animate": "^1.0.7",
-    "three": "^0.167.1",
+    "three": "^0.167.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/node": "^22.14.0",
+    "@types/three": "^0.182.0",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "@vitejs/plugin-react": "^5.0.0",
+    "autoprefixer": "^10.4.23",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.33.2",
+    "postcss": "^8.5.6",
+    "prettier": "^3.2.5",
+    "tailwindcss": "^4.1.18",
     "typescript": "~5.8.2",
     "vite": "^6.2.0"
   }
