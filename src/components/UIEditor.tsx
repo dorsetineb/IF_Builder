@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, memo } from 'react';
 import { useTheme } from './ThemeProvider';
 import { FONTS, PREDEFINED_THEMES } from '../constants';
 
@@ -118,6 +118,95 @@ const APP_THEME_COLORS = {
     system: '#9D4EDD'     // Default fallback
 };
 
+const ColorInput: React.FC<{
+    label: string;
+    id: string;
+    value: string;
+    onChange: (value: string) => void;
+    placeholder: string;
+}> = memo(({ label, id, value, onChange, placeholder }) => (
+    <div>
+        <label htmlFor={id} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{label}</label>
+        <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all">
+            <input
+                type="color"
+                id={`${id}-picker`}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-10 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
+                aria-label={`Seletor de cor para ${label}`}
+            />
+            <input
+                type="text"
+                id={id}
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase"
+                placeholder={placeholder}
+            />
+        </div>
+    </div>
+));
+
+const FixedVerbItem: React.FC<{
+    verb: FixedVerb;
+    onUpdate: (id: string, field: 'verbs' | 'description', value: any) => void;
+    onRemove: (id: string) => void;
+}> = memo(({ verb, onUpdate, onRemove }) => {
+    const [localVerbs, setLocalVerbs] = useState(verb.verbs.join(', '));
+    const inputId = `verb-words-${verb.id}`;
+
+    useEffect(() => {
+        if (document.activeElement?.id !== inputId) {
+            setLocalVerbs(verb.verbs.join(', '));
+        }
+    }, [verb.verbs, inputId]);
+
+    const handleVerbsBlur = () => {
+        const cleanedVerbs = localVerbs.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
+        if (JSON.stringify(cleanedVerbs) !== JSON.stringify(verb.verbs)) {
+            onUpdate(verb.id, 'verbs', cleanedVerbs);
+        }
+    };
+
+    return (
+        <div className="relative p-6 bg-muted/30 rounded-xl border border-muted-foreground/50 hover:border-primary/30 transition-all group">
+            <button
+                onClick={() => onRemove(verb.id)}
+                className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
+                title="Remover verbo"
+            >
+                <Trash2 className="w-5 h-5" />
+            </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+                <div>
+                    <label htmlFor={inputId} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Verbos (separados por vírgula)</label>
+                    <input
+                        id={inputId}
+                        type="text"
+                        value={localVerbs}
+                        onChange={e => setLocalVerbs(e.target.value)}
+                        onBlur={handleVerbsBlur}
+                        placeholder="ex: ajuda, help, ?"
+                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all"
+                    />
+                </div>
+                <div className="flex flex-col h-full">
+                    <label htmlFor={`verb-desc-${verb.id}`} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Descrição / Resposta</label>
+                    <textarea
+                        id={`verb-desc-${verb.id}`}
+                        value={verb.description}
+                        onChange={e => onUpdate(verb.id, 'description', e.target.value)}
+                        placeholder="Texto que será exibido para o jogador."
+                        rows={3}
+                        className="w-full flex-grow bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all resize-none"
+                    />
+                </div>
+            </div>
+        </div>
+    );
+});
+
 export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const { theme } = useTheme(); // Get app theme
     const currentSliderColor = APP_THEME_COLORS[theme as keyof typeof APP_THEME_COLORS] || APP_THEME_COLORS.dark;
@@ -149,95 +238,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
 
 
-
-    const ColorInput: React.FC<{
-        label: string;
-        id: string;
-        value: string;
-        onChange: (value: string) => void;
-        placeholder: string;
-    }> = ({ label, id, value, onChange, placeholder }) => (
-        <div>
-            <label htmlFor={id} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{label}</label>
-            <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all">
-                <input
-                    type="color"
-                    id={`${id}-picker`}
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    className="w-10 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
-                    aria-label={`Seletor de cor para ${label}`}
-                />
-                <input
-                    type="text"
-                    id={id}
-                    value={value}
-                    onChange={(e) => onChange(e.target.value)}
-                    className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase"
-                    placeholder={placeholder}
-                />
-            </div>
-        </div>
-    );
-
-    const FixedVerbItem: React.FC<{
-        verb: FixedVerb;
-        onUpdate: (id: string, field: 'verbs' | 'description', value: any) => void;
-        onRemove: (id: string) => void;
-    }> = ({ verb, onUpdate, onRemove }) => {
-        const [localVerbs, setLocalVerbs] = useState(verb.verbs.join(', '));
-        const inputId = `verb-words-${verb.id}`;
-
-        useEffect(() => {
-            if (document.activeElement?.id !== inputId) {
-                setLocalVerbs(verb.verbs.join(', '));
-            }
-        }, [verb.verbs, inputId]);
-
-        const handleVerbsBlur = () => {
-            const cleanedVerbs = localVerbs.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
-            if (JSON.stringify(cleanedVerbs) !== JSON.stringify(verb.verbs)) {
-                onUpdate(verb.id, 'verbs', cleanedVerbs);
-            }
-        };
-
-        return (
-            <div className="relative p-6 bg-muted/30 rounded-xl border border-muted-foreground/50 hover:border-primary/30 transition-all group">
-                <button
-                    onClick={() => onRemove(verb.id)}
-                    className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
-                    title="Remover verbo"
-                >
-                    <Trash2 className="w-5 h-5" />
-                </button>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-                    <div>
-                        <label htmlFor={inputId} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Verbos (separados por vírgula)</label>
-                        <input
-                            id={inputId}
-                            type="text"
-                            value={localVerbs}
-                            onChange={e => setLocalVerbs(e.target.value)}
-                            onBlur={handleVerbsBlur}
-                            placeholder="ex: ajuda, help, ?"
-                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all"
-                        />
-                    </div>
-                    <div className="flex flex-col h-full">
-                        <label htmlFor={`verb-desc-${verb.id}`} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Descrição / Resposta</label>
-                        <textarea
-                            id={`verb-desc-${verb.id}`}
-                            value={verb.description}
-                            onChange={e => onUpdate(verb.id, 'description', e.target.value)}
-                            placeholder="Texto que será exibido para o jogador."
-                            rows={3}
-                            className="w-full flex-grow bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 transition-all resize-none"
-                        />
-                    </div>
-                </div>
-            </div>
-        );
-    };
 
     const [localLayoutOrientation, setLocalLayoutOrientation] = useState(layoutOrientation);
     const [localLayoutOrder, setLocalLayoutOrder] = useState(layoutOrder);

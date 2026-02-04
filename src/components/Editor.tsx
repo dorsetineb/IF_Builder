@@ -658,7 +658,7 @@ DATE:        ${exportDate.toLocaleString()}
         setCurrentView('scenes');
     }, [gameHTML, gameCSS, toast]);
 
-    const handleUpdateGameData = (field: keyof GameData | Partial<GameData>, value?: any, skipDirty?: boolean) => {
+    const handleUpdateGameData = useCallback((field: keyof GameData | Partial<GameData>, value?: any, skipDirty?: boolean) => {
         if (typeof field === 'object' && field !== null) {
             const updates = field as Partial<GameData>;
             setGameData(prev => ({ ...prev, ...updates }));
@@ -678,9 +678,9 @@ DATE:        ${exportDate.toLocaleString()}
         if (!skipDirty) {
             setIsDirty(true);
         }
-    };
+    }, []);
 
-    const handleAddScene = () => {
+    const handleAddScene = useCallback(() => {
         const newId = generateUniqueId('scn', Object.keys(gameData.scenes));
 
         // Calculate position to the right of existing scenes
@@ -728,7 +728,7 @@ DATE:        ${exportDate.toLocaleString()}
         setCurrentView('scenes');
         setSelectedSceneId(newId);
         setIsDirty(true);
-    };
+    }, [gameData.scenes, gameData.sceneOrder]);
 
     const handleDownloadExample = () => {
         const element = document.createElement("a");
@@ -739,7 +739,7 @@ DATE:        ${exportDate.toLocaleString()}
         document.body.removeChild(element);
     };
 
-    const handleDeleteScene = (id: string) => {
+    const handleDeleteScene = useCallback((id: string) => {
         if (id === gameData.startScene && Object.keys(gameData.scenes).length > 1) {
             toast("Ação não permitida", "Você não pode deletar a cena inicial. Defina outra cena como inicial antes de excluir esta.", "error");
             return;
@@ -792,20 +792,18 @@ DATE:        ${exportDate.toLocaleString()}
             onConfirm: proceedWithDelete,
             onCancel: closeConfirmationModal
         });
+    }, [gameData.startScene, gameData.scenes, gameData.sceneOrder, selectedSceneId, toast, closeConfirmationModal]);
 
 
-
-    };
-
-    const handleUpdateScene = (updatedScene: Scene) => {
+    const handleUpdateScene = useCallback((updatedScene: Scene) => {
         setGameData(prev => ({
             ...prev,
             scenes: { ...prev.scenes, [updatedScene.id]: updatedScene }
         }));
         setIsDirty(true);
-    };
+    }, []);
 
-    const handleCopyScene = (sceneToCopy: Scene) => {
+    const handleCopyScene = useCallback((sceneToCopy: Scene) => {
         const newId = generateUniqueId('scn', Object.keys(gameData.scenes));
         const newScene: Scene = {
             ...JSON.parse(JSON.stringify(sceneToCopy)),
@@ -825,7 +823,7 @@ DATE:        ${exportDate.toLocaleString()}
         setCurrentView('scenes');
         setSelectedSceneId(newId);
         setIsDirty(true);
-    };
+    }, [gameData.scenes, gameData.sceneOrder]);
 
     const handleAddVignette = useCallback(() => {
         const newId = `VNT_${Math.random().toString(36).substring(2, 9).toUpperCase()}`;

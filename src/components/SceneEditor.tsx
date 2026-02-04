@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, DragEvent, useRef, useMemo } from 'react';
+import React, { useState, useEffect, DragEvent, useRef, useMemo, memo } from 'react';
 import { Scene, Interaction, GameObject, ConsequenceTracker, Choice, Vignette } from '../types';
 import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
@@ -47,7 +46,7 @@ export interface ConnectionDetail {
     interactions: Interaction[];
 }
 
-const SceneEditor: React.FC<SceneEditorProps> = ({
+const SceneEditor: React.FC<SceneEditorProps> = memo(({
     scene,
     allScenes,
     globalObjects,
@@ -816,6 +815,6 @@ const SceneEditor: React.FC<SceneEditorProps> = ({
             </div>
         </div >
     );
-};
+});
 
 export default SceneEditor;
