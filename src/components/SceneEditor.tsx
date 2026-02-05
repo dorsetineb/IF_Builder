@@ -84,7 +84,7 @@ const RainPreview = () => {
     }, []);
 
     return (
-        <div className="overlay-rain">
+        <div className="overlay-rain" style={{ transform: 'scale(0.3)', width: '333%', height: '333%', transformOrigin: 'top left' }}>
             <div className="rain front-row">{drops.frontDrops}</div>
             <div className="rain back-row">{drops.backDrops}</div>
         </div>
@@ -610,7 +610,20 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
 
                                                 {/* Editor Overlay Preview */}
                                                 {localScene.overlayEffect === 'grain' && (
-                                                    <div className="overlay-film-grain" />
+                                                    <div
+                                                        style={{
+                                                            position: 'absolute',
+                                                            inset: '-50%',
+                                                            width: '200%',
+                                                            height: '200%',
+                                                            zIndex: 10,
+                                                            pointerEvents: 'none',
+                                                            mixBlendMode: 'overlay',
+                                                            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                                                            opacity: 0.5,
+                                                            animation: 'grain-flicker 0.2s steps(1) infinite'
+                                                        }}
+                                                    />
                                                 )}
                                                 {localScene.overlayEffect === 'scanlines' && (
                                                     <div className="overlay-scanlines" />

@@ -593,14 +593,26 @@ body.font-adjust-gothic { font-size: 1.1em; }
     transition: opacity 0.5s ease-in-out;
 }
 
-/* Film Grain - NO ANIMATION */
+/* Film Grain */
 .overlay-film-grain {
     position: absolute;
-    inset: 0;
+    inset: -50%;
+    width: 200%;
+    height: 200%;
     pointer-events: none;
     z-index: 5;
     mix-blend-mode: overlay;
-    background: repeating-conic-gradient(#0000 0.000010%, #000 0.00015%);
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    opacity: 0.5;
+    animation: grain-flicker 0.2s steps(1) infinite;
+}
+
+@keyframes grain-flicker {
+    0% { transform: translate(0,0); }
+    25% { transform: translate(-5%, -5%) scaleX(-1); }
+    50% { transform: translate(-10%, 5%) scaleY(-1); }
+    75% { transform: translate(5%, -10%) scale(-1); }
+    100% { transform: translate(0,0); }
 }
 
 /* Scanlines (TV Retro) */
@@ -616,11 +628,11 @@ body.font-adjust-gothic { font-size: 1.1em; }
     content: "";
     position: absolute;
     width: 100%;
-    height: 3px;
+    height: 2px;
     z-index: 2;
     background: rgba(0, 0, 0, 0.2);
-    opacity: 0.6;
-    animation: scanline 12s linear infinite;
+    opacity: 0.4;
+    animation: scanline 8s linear infinite;
 }
 
 .overlay-scanlines::after {
@@ -628,12 +640,17 @@ body.font-adjust-gothic { font-size: 1.1em; }
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.15) 51%);
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.2) 51%);
     background-size: 100% 6px;
+    animation: scanlines-move 1s steps(60) infinite;
 }
 
 @keyframes scanline {
     0% { transform: translate3d(0, 200000%, 0); }
+}
+
+@keyframes scanlines-move {
+    0% { background-position: 0 50%; }
 }
 
 /* Rain Effect */
