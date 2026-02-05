@@ -603,21 +603,131 @@ body.font-adjust-gothic { font-size: 1.1em; }
     z-index: 5;
     mix-blend-mode: overlay;
     background: repeating-conic-gradient(#0000 0.000010%, #000 0.00015%);
-    animation: grain-flicker 8s steps(8) infinite;
+    animation: grain-flicker 2s steps(10) infinite;
 }
 
 @keyframes grain-flicker {
     0% { transform: translate(0, 0); }
-    10% { transform: translate(-1%, 1%); }
-    20% { transform: translate(1.5%, -0.5%); }
-    30% { transform: translate(-0.5%, -1%); }
-    40% { transform: translate(0.5%, 1.5%); }
-    50% { transform: translate(-1.5%, 0.5%); }
-    60% { transform: translate(1%, -1%); }
-    70% { transform: translate(-0.5%, 0); }
-    80% { transform: translate(0, 1%); }
-    90% { transform: translate(1%, 0.5%); }
+    10% { transform: translate(-2%, 2%); }
+    20% { transform: translate(1%, -1%); }
+    30% { transform: translate(-2%, -2%); }
+    40% { transform: translate(2%, 1%); }
+    50% { transform: translate(-1%, 2%); }
+    60% { transform: translate(2%, -1%); }
+    70% { transform: translate(-2%, 1%); }
+    80% { transform: translate(1%, 2%); }
+    90% { transform: translate(2%, 0); }
     100% { transform: translate(0, 0); }
+}
+
+/* Scanlines (TV Retro) */
+.overlay-scanlines {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+}
+
+.overlay-scanlines::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.3);
+    opacity: 0.75;
+    animation: scanline 6s linear infinite;
+}
+
+.overlay-scanlines::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0, 0, 0, 0.3) 51%);
+    background-size: 100% 4px;
+    animation: scanlines-move 1s steps(60) infinite;
+}
+
+@keyframes scanline {
+    0% { transform: translate3d(0, 200000%, 0); }
+}
+
+@keyframes scanlines-move {
+    0% { background-position: 0 50%; }
+}
+
+/* Rain Effect */
+.overlay-rain {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 5;
+    overflow: hidden;
+}
+
+.rain {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+}
+
+.rain.back-row {
+    display: block;
+    z-index: 1;
+    bottom: 60px;
+    opacity: 0.5;
+}
+
+.drop {
+    position: absolute;
+    bottom: 100%;
+    width: 15px;
+    height: 120px;
+    pointer-events: none;
+    animation: drop 0.5s linear infinite;
+}
+
+@keyframes drop {
+    0% { transform: translateY(0vh); }
+    75% { transform: translateY(90vh); }
+    100% { transform: translateY(90vh); }
+}
+
+.stem {
+    width: 1px;
+    height: 60%;
+    margin-left: 7px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.25));
+    animation: stem 0.5s linear infinite;
+}
+
+@keyframes stem {
+    0% { opacity: 1; }
+    65% { opacity: 1; }
+    75% { opacity: 0; }
+    100% { opacity: 0; }
+}
+
+.splat {
+    width: 15px;
+    height: 10px;
+    border-top: 2px dotted rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    opacity: 1;
+    transform: scale(0);
+    animation: splat 0.5s linear infinite;
+    display: block;
+}
+
+@keyframes splat {
+    0% { opacity: 1; transform: scale(0); }
+    80% { opacity: 1; transform: scale(0); }
+    90% { opacity: 0.5; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.5); }
 }
 
 /* Implementação de Layout Full-Bleed (Sem Borda) Desktop */

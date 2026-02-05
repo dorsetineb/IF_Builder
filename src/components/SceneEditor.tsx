@@ -49,6 +49,48 @@ export interface ConnectionDetail {
     interactions: Interaction[];
 }
 
+const RainPreview = () => {
+    // Generate static rain drops for preview
+    const drops = useMemo(() => {
+        const frontDrops: React.ReactNode[] = [];
+        const backDrops: React.ReactNode[] = [];
+        let increment = 0;
+        let key = 0;
+
+        while (increment < 100) {
+            const randoHundo = Math.floor(Math.random() * (98 - 1 + 1) + 1);
+            const randoFiver = Math.floor(Math.random() * (5 - 2 + 1) + 2);
+            increment += randoFiver;
+
+            const animDur = `0.5${randoHundo}s`;
+            const animDel = `0.${randoHundo}s`;
+
+            frontDrops.push(
+                <div key={`front-${key}`} className="drop" style={{ left: `${increment}%`, bottom: `${randoFiver + randoFiver - 1 + 100}%`, animationDelay: animDel, animationDuration: animDur }}>
+                    <div className="stem" style={{ animationDelay: animDel, animationDuration: animDur }}></div>
+                    <div className="splat" style={{ animationDelay: animDel, animationDuration: animDur }}></div>
+                </div>
+            );
+
+            backDrops.push(
+                <div key={`back-${key}`} className="drop" style={{ right: `${increment}%`, bottom: `${randoFiver + randoFiver - 1 + 100}%`, animationDelay: animDel, animationDuration: animDur }}>
+                    <div className="stem" style={{ animationDelay: animDel, animationDuration: animDur }}></div>
+                    <div className="splat" style={{ animationDelay: animDel, animationDuration: animDur }}></div>
+                </div>
+            );
+            key++;
+        }
+        return { frontDrops, backDrops };
+    }, []);
+
+    return (
+        <div className="overlay-rain">
+            <div className="rain front-row">{drops.frontDrops}</div>
+            <div className="rain back-row">{drops.backDrops}</div>
+        </div>
+    );
+};
+
 const SceneEditor: React.FC<SceneEditorProps> = memo(({
     scene,
     allScenes,
@@ -582,6 +624,12 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                         }}
                                                     />
                                                 )}
+                                                {localScene.overlayEffect === 'scanlines' && (
+                                                    <div className="overlay-scanlines" />
+                                                )}
+                                                {localScene.overlayEffect === 'rain' && (
+                                                    <RainPreview />
+                                                )}
 
                                                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm z-20">
                                                     <label htmlFor="image-upload-input" className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-purple-300 transition-colors">
@@ -621,6 +669,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         >
                                             <option value="">Nenhum</option>
                                             <option value="grain">Granulação (Old Film)</option>
+                                            <option value="scanlines">Scanlines (TV Retro)</option>
+                                            <option value="rain">Chuva (Rain Effect)</option>
                                         </select>
                                     </div>
 

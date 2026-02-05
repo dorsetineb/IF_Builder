@@ -435,6 +435,86 @@ document.addEventListener('DOMContentLoaded', () => {
         for (const def of definitions) { if (trackers[def.id] >= def.maxValue && def.consequenceSceneId) { setTimeout(() => { loadScene(def.consequenceSceneId, true, 'fade'); }, 500); return; } }
     };
 
+    const createRain = (container) => {
+        container.innerHTML = '<div class="rain front-row"></div><div class="rain back-row"></div>';
+        const frontRow = container.querySelector('.front-row');
+        const backRow = container.querySelector('.back-row');
+        
+        let increment = 0;
+        while (increment < 100) {
+            const randoHundo = Math.floor(Math.random() * (98 - 1 + 1) + 1);
+            const randoFiver = Math.floor(Math.random() * (5 - 2 + 1) + 2);
+            increment += randoFiver;
+            
+            const animDur = '0.5' + randoHundo + 's';
+            const animDel = '0.' + randoHundo + 's';
+
+            const dropHTML = '<div class="stem" style="animation-delay: ' + animDel + '; animation-duration: ' + animDur + ';"></div><div class="splat" style="animation-delay: ' + animDel + '; animation-duration: ' + animDur + ';"></div>';
+
+            const drop = document.createElement('div');
+            drop.className = 'drop';
+            drop.style.left = increment + '%';
+            drop.style.bottom = (randoFiver + randoFiver - 1 + 100) + '%';
+            drop.style.animationDelay = animDel;
+            drop.style.animationDuration = animDur;
+            drop.innerHTML = dropHTML;
+            frontRow.appendChild(drop);
+
+            const backDrop = document.createElement('div');
+            backDrop.className = 'drop';
+            backDrop.style.right = increment + '%';
+            backDrop.style.bottom = (randoFiver + randoFiver - 1 + 100) + '%';
+            backDrop.style.animationDelay = animDel;
+            backDrop.style.animationDuration = animDur;
+            backDrop.innerHTML = dropHTML;
+            backRow.appendChild(backDrop);
+        }
+    };
+
+    const applyOverlayEffect = (container, effectType, isVignette = false) => {
+         // Clear previous overlays (kept internal logic simple by recreating)
+         // Check if overlay container exists
+         let overlayEl = container.querySelector('.scene-image-overlay');
+         if (!overlayEl) {
+             overlayEl = document.createElement('div');
+             overlayEl.className = 'scene-image-overlay';
+             if (isVignette) overlayEl.id = 'vignette-overlay';
+             else overlayEl.id = 'scene-image-overlay';
+             container.appendChild(overlayEl); // Append to ensure it is on top of background
+             // For vignettes, we might need z-index adjustment if it's not covering
+             if (isVignette) {
+                 overlayEl.style.zIndex = '1'; // Ensure on top of background image
+                 // Ensure vignette content is above overlay if needed?
+                 // Usually text is z-index high. Splash-content is inside vDiv.
+                 // We append overlay to vDiv. vDiv has flex/style. 
+                 // We want overlay to be absolute over vDiv.
+                 overlayEl.style.position = 'absolute';
+                 overlayEl.style.inset = '0';
+                 overlayEl.style.pointerEvents = 'none';
+             }
+         }
+         
+         // Reset
+         overlayEl.className = 'scene-image-overlay';
+         overlayEl.innerHTML = ''; // Clear rain/etc
+         overlayEl.style.opacity = '0';
+
+         if (effectType && effectType !== '') {
+            let effectClass = '';
+            if (effectType === 'grain') effectClass = 'overlay-film-grain';
+            else if (effectType === 'scanlines') effectClass = 'overlay-scanlines';
+            else if (effectType === 'rain') effectClass = 'overlay-rain';
+
+            if (effectClass) {
+                overlayEl.classList.add(effectClass);
+                overlayEl.style.opacity = '1';
+                if (effectType === 'rain') {
+                    createRain(overlayEl);
+                }
+            }
+         }
+    };
+
     const showVignetteScreen = (scene) => {
         // Hide game container and show vignette screen
         gameContainer.classList.add('hidden');
@@ -453,6 +533,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             vignetteScreen.style.backgroundImage = 'none';
         }
+
+        // Apply Overlay for Vignette
+        applyOverlayEffect(vignetteScreen, scene.overlayEffect, true);
         
         // Play background music for this vignette scene
         if (scene.backgroundMusic) {
@@ -547,45 +630,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderScene = (scene, successPrefix = null) => {
         if (scene.image && gameData.enableImages !== false) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
         else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
-        // Apply Image Overlay Effect
-        const overlayEl = document.getElementById('scene-image-overlay');
-        if (overlayEl) {
-             // Reset classes but keep base class
-            overlayEl.className = 'scene-image-overlay';
-            
-            if (scene.overlayEffect && scene.overlayEffect !== '') {
-                // Determine effect class
-                let effectClass = '';
-                if (scene.overlayEffect === 'grain') effectClass = 'overlay-film-grain';
-                // Add more effects here in future
-                
-                if (effectClass) {
-                    overlayEl.classList.add(effectClass);
-                    overlayEl.style.opacity = '1';
-                } else {
-                    overlayEl.style.opacity = '0';
-                }
-            } else {
-                overlayEl.style.opacity = '0';
-            }
-        } else {
-            // Backward compatibility: Create overlay if missing
-            const imgContainer = document.getElementById('image-container');
-            if (imgContainer) {
-                const newOverlay = document.createElement('div');
-                newOverlay.id = 'scene-image-overlay';
-                newOverlay.className = 'scene-image-overlay';
-                imgContainer.appendChild(newOverlay);
-                
-                // Retry application needed? In this frame, no, next frame logic handles it?
-                // Actually easier just to re-run or duplicate logic, but let's keep it simple.
-                // If it was missing, we just added it empty, next scene load will catch it.
-                // OR we can just apply immediately:
-                if (scene.overlayEffect === 'grain') {
-                    newOverlay.classList.add('overlay-film-grain');
-                    newOverlay.style.opacity = '1';
-                }
-            }
+        
+        // Apply Image Overlay Effect using shared helper
+        // First ensure container exists for backward compat (could be implicit but let's be safe)
+        // Usually image-container has overlay.
+        const imgContainer = document.getElementById('image-container');
+        if (imgContainer) {
+            applyOverlayEffect(imgContainer, scene.overlayEffect);
         }
 
         // Apply Text Overlay (Scene Name)
