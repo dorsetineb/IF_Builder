@@ -2,10 +2,7 @@ export const overlaysCSS = `
 /* Common Overlay Base */
 .scene-overlay {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   pointer-events: none;
   z-index: 5;
   opacity: 0.8;

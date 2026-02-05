@@ -9,15 +9,26 @@ interface SceneImageProps {
 }
 
 export const SceneImage: React.FC<SceneImageProps> = ({ src, alt, effect, className = '' }) => {
+    const overlayStyle: React.CSSProperties = {
+        position: 'absolute',
+        inset: 0,
+        pointerEvents: 'none',
+        zIndex: 5,
+    };
+
     return (
-        <div className={`relative w-full h-full overflow-hidden ${className}`}>
+        <div className={`relative ${className}`} style={{ position: 'relative', overflow: 'hidden' }}>
             <img
                 src={src}
                 alt={alt}
-                className={`w-full h-full object-cover ${effect === 'pixel-jitter' ? 'overlay-pixel-jitter' : ''}`}
+                className="w-full h-full object-cover"
+                style={effect === 'pixel-jitter' ? { animation: 'jitter-shake 0.2s infinite' } : undefined}
             />
             {effect && effect !== 'none' && effect !== 'pixel-jitter' && (
-                <div className={`scene-overlay overlay-${effect}`}></div>
+                <div
+                    className={`scene-overlay overlay-${effect}`}
+                    style={overlayStyle}
+                />
             )}
         </div>
     );
