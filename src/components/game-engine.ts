@@ -546,6 +546,22 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderScene = (scene, successPrefix = null) => {
         if (scene.image && gameData.enableImages !== false) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
         else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
+        
+        // Handle Overlay Effects
+        const existingOverlay = imageContainer.querySelector('.scene-overlay');
+        if (existingOverlay) existingOverlay.remove();
+        sceneImage.classList.remove('overlay-pixel-jitter');
+        
+        if (scene.overlayEffect && scene.overlayEffect !== 'none' && gameData.enableImages !== false) {
+             if (scene.overlayEffect === 'pixel-jitter') {
+                 sceneImage.classList.add('overlay-pixel-jitter');
+             } else {
+                 const overlayDiv = document.createElement('div');
+                 overlayDiv.className = 'scene-overlay overlay-' + scene.overlayEffect;
+                 imageContainer.appendChild(overlayDiv);
+             }
+        }
+
         if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
         sceneDescription.innerHTML = '';
         

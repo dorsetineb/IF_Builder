@@ -63,6 +63,7 @@ export interface Scene {
   isEndingScene?: boolean;
   conclusionVignetteId?: string;
   isDefeatOutcome?: boolean;
+  overlayEffect?: string; // Climatic or Texture overlay effect
   removesChanceOnEntry?: boolean;
   restoresChanceOnEntry?: boolean;
   mapX?: number;
