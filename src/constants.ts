@@ -1,12 +1,24 @@
 export const FONTS = [
+    // Monospace - Retro/Tech
     { name: 'Silkscreen', family: "'Silkscreen', sans-serif" },
     { name: 'DotGothic16', family: "'DotGothic16', sans-serif" },
+    { name: 'Press Start 2P', family: "'Press Start 2P', cursive" },
     { name: 'Cutive Mono', family: "'Cutive Mono', monospace" },
     { name: 'Space Mono', family: "'Space Mono', monospace" },
     { name: 'Inconsolata', family: "'Inconsolata', monospace" },
     { name: 'IBM Plex Mono', family: "'IBM Plex Mono', monospace" },
+    { name: 'Roboto Mono', family: "'Roboto Mono', monospace" },
+    // Sans-serif - Modern
     { name: 'Chakra Petch', family: "'Chakra Petch', sans-serif" },
+    { name: 'Orbitron', family: "'Orbitron', sans-serif" },
+    // Serif - Literary
     { name: 'Crimson Text', family: "'Crimson Text', serif" },
+    { name: 'Lora', family: "'Lora', serif" },
+    { name: 'Merriweather', family: "'Merriweather', serif" },
+    { name: 'Playfair Display', family: "'Playfair Display', serif" },
+    { name: 'Cinzel', family: "'Cinzel', serif" },
+    // Special
+    { name: 'Special Elite', family: "'Special Elite', cursive" },
 ];
 
 export const PREDEFINED_THEMES = [
@@ -63,6 +75,61 @@ export const PREDEFINED_THEMES = [
         splashButtonColor: '#dc2626', splashButtonHoverColor: '#b91c1c', splashButtonTextColor: '#ffffff',
         actionButtonColor: '#ef4444', actionButtonTextColor: '#ffffff',
         chanceIconColor: '#fca5a5',
+    },
+    // NEW THEMES
+    {
+        name: 'Cyberpunk',
+        mode: 'dark',
+        textColor: '#e0e7ff', titleColor: '#f0abfc', focusColor: '#22d3ee',
+        textColorLight: '#1e1b4b', titleColorLight: '#a21caf', focusColorLight: '#0891b2',
+        splashButtonColor: '#d946ef', splashButtonHoverColor: '#a21caf', splashButtonTextColor: '#000000',
+        actionButtonColor: '#22d3ee', actionButtonTextColor: '#000000',
+        chanceIconColor: '#f0abfc',
+    },
+    {
+        name: 'Noir',
+        mode: 'dark',
+        textColor: '#a1a1aa', titleColor: '#d4af37', focusColor: '#fbbf24',
+        textColorLight: '#18181b', titleColorLight: '#92400e', focusColorLight: '#b45309',
+        splashButtonColor: '#d4af37', splashButtonHoverColor: '#a16207', splashButtonTextColor: '#000000',
+        actionButtonColor: '#fbbf24', actionButtonTextColor: '#18181b',
+        chanceIconColor: '#d4af37',
+    },
+    {
+        name: 'Fantasma',
+        mode: 'dark',
+        textColor: '#e4e4e7', titleColor: '#a78bfa', focusColor: '#c4b5fd',
+        textColorLight: '#27272a', titleColorLight: '#6d28d9', focusColorLight: '#7c3aed',
+        splashButtonColor: '#7c3aed', splashButtonHoverColor: '#6d28d9', splashButtonTextColor: '#ffffff',
+        actionButtonColor: '#a78bfa', actionButtonTextColor: '#1e1b4b',
+        chanceIconColor: '#c4b5fd',
+    },
+    {
+        name: 'Pergaminho',
+        mode: 'light',
+        textColor: '#44403c', titleColor: '#78350f', focusColor: '#92400e',
+        textColorLight: '#44403c', titleColorLight: '#78350f', focusColorLight: '#92400e',
+        splashButtonColor: '#78350f', splashButtonHoverColor: '#5c4033', splashButtonTextColor: '#fef3c7',
+        actionButtonColor: '#a16207', actionButtonTextColor: '#fef3c7',
+        chanceIconColor: '#dc2626',
+    },
+    {
+        name: 'Neon',
+        mode: 'dark',
+        textColor: '#d4d4d8', titleColor: '#39ff14', focusColor: '#84cc16',
+        textColorLight: '#18181b', titleColorLight: '#15803d', focusColorLight: '#22c55e',
+        splashButtonColor: '#39ff14', splashButtonHoverColor: '#22c55e', splashButtonTextColor: '#000000',
+        actionButtonColor: '#84cc16', actionButtonTextColor: '#000000',
+        chanceIconColor: '#39ff14',
+    },
+    {
+        name: 'Lavanda',
+        mode: 'light',
+        textColor: '#3f3f46', titleColor: '#7c3aed', focusColor: '#8b5cf6',
+        textColorLight: '#3f3f46', titleColorLight: '#7c3aed', focusColorLight: '#8b5cf6',
+        splashButtonColor: '#8b5cf6', splashButtonHoverColor: '#7c3aed', splashButtonTextColor: '#ffffff',
+        actionButtonColor: '#a78bfa', actionButtonTextColor: '#1e1b4b',
+        chanceIconColor: '#ec4899',
     },
 ];
 

@@ -934,7 +934,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     </div>
                 </div>
 
-                <div className={`bg-muted/10 -mt-px py-8 grid grid-cols-1 ${activeTab === 'cores' ? 'xl:grid-cols-[1fr_450px]' : ''} gap-8 items-start px-6`}>
+                <div className={`bg-muted/10 -mt-px py-8 grid grid-cols-1 ${activeTab === 'cores' ? 'xl:grid-cols-[1fr_450px]' : ''} gap-8 items-start`}>
                     {activeTab === 'layout' && (
                         <div className="space-y-6">
                             <div>
@@ -1944,7 +1944,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                 {/* Right Column: Preview (Expanded width) */}
                                 <div className="col-span-1 lg:col-span-7 relative">
-                                    <div className="sticky top-4 space-y-2 h-[calc(100vh-100px)] flex flex-col">
+                                    <div className="sticky top-28 space-y-2 h-[calc(100vh-140px)] flex flex-col">
 
 
                                         <div
