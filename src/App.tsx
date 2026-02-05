@@ -17,10 +17,12 @@ const App: React.FC = () => {
     const [isRecoveryMode, setIsRecoveryMode] = useState(false);
 
     // BIOS Animation State
-    // BIOS Animation State
     const [biosStep, setBiosStep] = useState(0); // 0: Info, 1: Prompt Wait, 2: Typing
     const [typedCommand, setTypedCommand] = useState('');
     const [isBiosFinished, setIsBiosFinished] = useState(false);
+
+    // BIOS helper state to trigger animation only once per session
+    const [authChecked, setAuthChecked] = useState(false);
 
     useEffect(() => {
         const initSession = async () => {
@@ -32,6 +34,7 @@ const App: React.FC = () => {
             const sessionLoadPromise = async () => {
                 const { data: { session } } = await supabase.auth.getSession();
                 setSession(session);
+                setAuthChecked(true); // Mark initial check as done
             };
 
             try {
@@ -51,11 +54,28 @@ const App: React.FC = () => {
             if (event === 'PASSWORD_RECOVERY') {
                 setIsRecoveryMode(true);
             }
+            // If we are logging in (and weren't logged in before), we might want to trigger BIOS?
+            // For now, simple state update:
             setSession(session);
+
+            // If session becomes valid and we haven't run BIOS, it will trigger via the next useEffect
+            if (session) {
+                setAuthChecked(true);
+            }
+
             setLoading(false);
         });
 
-        // BIOS Animation Sequence
+        return () => {
+            subscription.unsubscribe();
+        };
+    }, []);
+
+
+    // BIOS Animation Sequence - Triggered ONLY when we have a session and animation hasn't finished
+    useEffect(() => {
+        if (!session || isBiosFinished || biosStep > 0) return;
+
         const fullCommand = "RUN IF-BUILDER.EXE";
 
         // Step 1: Show prompt A:\> fast (0.5s)
@@ -80,21 +100,37 @@ const App: React.FC = () => {
 
         // Finish: End animation after typing completes
         // 1.5s (start) + ~1s (typing) + 0.5s (pause) = 3s
+        // User requested +1s delay on transition, but maybe they meant BIOS duration too?
+        // Let's keep BIOS at 3s and we will handle the transition screen separately or extend this.
+        // Actually, if BIOS disappears, we show the app. The app likely shows Editor.
+        // If we want a transition screen, we should probably render it here or inside Editor.
+        // Assuming BIOS transitions directly to Editor.
         const timer3 = setTimeout(() => {
             setIsBiosFinished(true);
-        }, 3000);
+        }, 4000); // Extended slightly to 4s as per request for "tela de transição ... 1 segundo a mais" (interpreted as BIOS/Transition phase)
 
         return () => {
-            subscription.unsubscribe();
             clearTimeout(timer1);
             clearTimeout(timer2);
             clearTimeout(timer3);
             if (typingInterval) clearInterval(typingInterval);
         };
-    }, []);
+    }, [session, isBiosFinished, biosStep]);
 
-    // Show BIOS until both data is loaded AND animation is finished
-    if (loading || !isBiosFinished) {
+
+    // 1. Initial Loading State
+    if (loading && !authChecked) {
+        // Can show a spinner or just black screen until we know if user is logged in
+        return <div className="fixed inset-0 bg-black" />;
+    }
+
+    // 2. Auth Screen (No Session)
+    if (!session || isRecoveryMode) {
+        return <Auth isRecoveryMode={isRecoveryMode} onRecoveryComplete={() => setIsRecoveryMode(false)} />;
+    }
+
+    // 3. BIOS Screen (Session Valid, Animation Not Finished)
+    if (!isBiosFinished) {
         return (
             <div className="fixed inset-0 z-[9999] bg-black text-white font-['Silkscreen'] text-sm p-4 sm:p-8 flex flex-col justify-start overflow-hidden selection:bg-white selection:text-black cursor-none">
                 <style>{`
@@ -134,11 +170,6 @@ const App: React.FC = () => {
                 </div>
             </div>
         );
-    }
-
-    // Show Auth for password recovery OR when not logged in
-    if (!session || isRecoveryMode) {
-        return <Auth isRecoveryMode={isRecoveryMode} onRecoveryComplete={() => setIsRecoveryMode(false)} />;
     }
 
     return (
