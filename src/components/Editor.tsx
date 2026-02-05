@@ -392,10 +392,30 @@ const Editor: React.FC = () => {
             {/* Import Loading Popup */}
             {isImporting && (
                 <div className="fixed inset-0 z-[9998] bg-black/80 backdrop-blur-sm flex items-center justify-center">
-                    <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-8 flex flex-col items-center gap-4 shadow-2xl">
-                        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
-                        <p className="text-white text-lg font-medium">Importando projeto...</p>
-                        <p className="text-zinc-400 text-sm">Aguarde enquanto os arquivos são processados</p>
+                    <style>{`
+                        @keyframes sequential-fade {
+                            0%, 100% { opacity: 0.2; background-color: #4c1d95; }
+                            20% { opacity: 1; background-color: #9d4edd; box-shadow: 0 0 10px #9d4edd; }
+                            40% { opacity: 0.2; background-color: #4c1d95; }
+                        }
+                    `}</style>
+                    <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-8 flex flex-col items-center gap-6 shadow-2xl min-w-[300px]">
+                        <div className="flex gap-3">
+                            {[0, 1, 2, 3, 4].map((i) => (
+                                <div
+                                    key={i}
+                                    className="w-4 h-4 rounded-sm bg-purple-900"
+                                    style={{
+                                        animation: `sequential-fade 1.5s infinite ease-in-out`,
+                                        animationDelay: `${i * 0.3}s`
+                                    }}
+                                />
+                            ))}
+                        </div>
+                        <div className="text-center space-y-2">
+                            <p className="text-white text-lg font-medium font-['Silkscreen'] tracking-wide">IMPORTANDO SISTEMA</p>
+                            <p className="text-zinc-500 text-xs uppercase tracking-widest">Processando Dados</p>
+                        </div>
                     </div>
                 </div>
             )}

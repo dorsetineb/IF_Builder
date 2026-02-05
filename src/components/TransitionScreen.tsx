@@ -8,7 +8,7 @@ interface TransitionScreenProps {
 export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible }) => {
     return (
         <div
-            className={`fixed inset-0 z-[9999] flex items-center justify-center bg-zinc-950 transition-opacity duration-700 ease-out ${isVisible ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+            className={`fixed inset-0 z-[9999] flex items-center justify-center bg-zinc-950 transition-opacity duration-1000 ease-out ${isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
                 }`}
         >
             {/* Background Dither */}
