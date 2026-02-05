@@ -571,11 +571,14 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                     <div
                                                         style={{
                                                             position: 'absolute',
-                                                            inset: 0,
+                                                            inset: '-20%',
+                                                            width: '140%',
+                                                            height: '140%',
                                                             zIndex: 10,
                                                             pointerEvents: 'none',
                                                             mixBlendMode: 'overlay',
-                                                            background: 'repeating-conic-gradient(#0000 0.000010%, #000 0.00015%)'
+                                                            background: 'repeating-conic-gradient(#0000 0.000010%, #000 0.00015%)',
+                                                            animation: 'grain-drift 30s linear infinite'
                                                         }}
                                                     />
                                                 )}

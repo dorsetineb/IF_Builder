@@ -596,11 +596,22 @@ body.font-adjust-gothic { font-size: 1.1em; }
 /* Film Grain */
 .overlay-film-grain {
     position: absolute;
-    inset: 0;
+    inset: -20%;
+    width: 140%;
+    height: 140%;
     pointer-events: none;
     z-index: 5;
     mix-blend-mode: overlay;
     background: repeating-conic-gradient(#0000 0.000010%, #000 0.00015%);
+    animation: grain-drift 30s linear infinite;
+}
+
+@keyframes grain-drift {
+    0% { transform: translate(0, 0); }
+    25% { transform: translate(2%, 1%); }
+    50% { transform: translate(0, 2%); }
+    75% { transform: translate(-2%, 1%); }
+    100% { transform: translate(0, 0); }
 }
 
 /* Implementação de Layout Full-Bleed (Sem Borda) Desktop */
