@@ -150,7 +150,6 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                 z-index: 5;
                 mix-blend-mode: overlay;
                 background: repeating-conic-gradient(#0000 0.000010%, #000 0.00015%);
-                opacity: 1;
             }
 
             /* VIGNETTE TEXT PADDING FIX */

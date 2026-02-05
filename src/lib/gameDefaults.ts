@@ -601,7 +601,6 @@ body.font-adjust-gothic { font-size: 1.1em; }
     z-index: 5;
     mix-blend-mode: overlay;
     background: repeating-conic-gradient(#0000 0.000010%, #000 0.00015%);
-    opacity: 1;
 }
 
 /* Implementação de Layout Full-Bleed (Sem Borda) Desktop */

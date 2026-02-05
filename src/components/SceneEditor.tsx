@@ -569,15 +569,13 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                 {/* Editor Overlay Preview */}
                                                 {localScene.overlayEffect === 'grain' && (
                                                     <div
-                                                        className="overlay-film-grain"
                                                         style={{
                                                             position: 'absolute',
                                                             inset: 0,
                                                             zIndex: 10,
                                                             pointerEvents: 'none',
                                                             mixBlendMode: 'overlay',
-                                                            background: 'repeating-conic-gradient(#0000 0.000010%, #000 0.00015%)',
-                                                            opacity: 1
+                                                            background: 'repeating-conic-gradient(#0000 0.000010%, #000 0.00015%)'
                                                         }}
                                                     />
                                                 )}
