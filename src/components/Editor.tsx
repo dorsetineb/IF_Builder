@@ -395,7 +395,7 @@ const Editor: React.FC = () => {
                     <style>{`
                         @keyframes sequential-fade {
                             0%, 100% { opacity: 0.2; background-color: #4c1d95; }
-                            20% { opacity: 1; background-color: #9d4edd; box-shadow: 0 0 10px #9d4edd; }
+                            20% { opacity: 1; background-color: #9d4edd; }
                             40% { opacity: 0.2; background-color: #4c1d95; }
                         }
                     `}</style>

@@ -378,6 +378,7 @@ DATE:        ${exportDate.toLocaleString()}
                     if (!editorDataStr) throw new Error("editor_data.json não encontrado no pacote ZIP.");
                     const data = JSON.parse(editorDataStr);
 
+                    // OPTIMIZED: Read base64 directly to avoid Blob/FileReader overhead
                     const restoreAsset = async (path: string | undefined): Promise<string | undefined> => {
                         if (!path) return path;
                         let entryPath = path;
@@ -388,47 +389,49 @@ DATE:        ${exportDate.toLocaleString()}
                         if (!zipFile) return path;
 
                         const mimeType = getMimeTypeFromFileName(path);
-                        const buffer = await zipFile.async('arraybuffer');
-                        const blob = new Blob([buffer], { type: mimeType });
-
-                        return new Promise((resolve) => {
-                            const readerAsset = new FileReader();
-                            readerAsset.onloadend = () => resolve(readerAsset.result as string);
-                            readerAsset.readAsDataURL(blob);
-                        });
+                        const base64 = await zipFile.async('base64');
+                        return `data:${mimeType};base64,${base64}`;
                     };
 
-                    data.gameLogo = await restoreAsset(data.gameLogo);
-                    data.gameSplashImage = await restoreAsset(data.gameSplashImage);
-                    data.gameBackgroundMusic = await restoreAsset(data.gameBackgroundMusic);
-                    data.positiveEndingImage = await restoreAsset(data.positiveEndingImage);
-                    data.negativeEndingImage = await restoreAsset(data.negativeEndingImage);
+                    // Parallelize global assets
+                    const globalAssetsPromises = [
+                        restoreAsset(data.gameLogo).then(res => data.gameLogo = res),
+                        restoreAsset(data.gameSplashImage).then(res => data.gameSplashImage = res),
+                        restoreAsset(data.gameBackgroundMusic).then(res => data.gameBackgroundMusic = res),
+                        restoreAsset(data.positiveEndingImage).then(res => data.positiveEndingImage = res),
+                        restoreAsset(data.negativeEndingImage).then(res => data.negativeEndingImage = res)
+                    ];
 
+                    await Promise.all(globalAssetsPromises);
+
+                    // Parallelize Scenes
                     if (data.scenes) {
-                        for (const sId in data.scenes) {
-                            const scene = data.scenes[sId];
+                        const scenePromises = Object.values(data.scenes).map(async (scene: any) => {
                             scene.image = await restoreAsset(scene.image);
                             scene.backgroundMusic = await restoreAsset(scene.backgroundMusic);
                             if (scene.interactions) {
-                                for (const inter of scene.interactions) {
+                                // Parallelize interactions within scene
+                                await Promise.all(scene.interactions.map(async (inter: any) => {
                                     inter.soundEffect = await restoreAsset(inter.soundEffect);
-                                }
+                                }));
                             }
-                        }
+                        });
+                        await Promise.all(scenePromises);
                     }
 
+                    // Parallelize Vignettes
                     if (data.vignettes && Array.isArray(data.vignettes)) {
-                        for (const vignette of data.vignettes) {
+                        await Promise.all(data.vignettes.map(async (vignette: any) => {
                             vignette.image = await restoreAsset(vignette.image);
                             vignette.backgroundMusic = await restoreAsset(vignette.backgroundMusic);
-                        }
+                        }));
                     }
 
+                    // Parallelize Global Objects
                     if (data.globalObjects) {
-                        for (const oId in data.globalObjects) {
-                            const obj = data.globalObjects[oId];
+                        await Promise.all(Object.values(data.globalObjects).map(async (obj: any) => {
                             obj.image = await restoreAsset(obj.image);
-                        }
+                        }));
                     }
 
                     handleImportGame(data);
