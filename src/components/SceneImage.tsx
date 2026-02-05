@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { overlaysCSS } from '../lib/overlaysCSS';
 
 interface SceneImageProps {
     src: string;
@@ -9,15 +10,9 @@ interface SceneImageProps {
 }
 
 export const SceneImage: React.FC<SceneImageProps> = ({ src, alt, effect, className = '' }) => {
-    const overlayStyle: React.CSSProperties = {
-        position: 'absolute',
-        inset: 0,
-        pointerEvents: 'none',
-        zIndex: 5,
-    };
-
     return (
         <div className={`relative ${className}`} style={{ position: 'relative', overflow: 'hidden' }}>
+            <style>{overlaysCSS}</style>
             <img
                 src={src}
                 alt={alt}
@@ -27,7 +22,6 @@ export const SceneImage: React.FC<SceneImageProps> = ({ src, alt, effect, classN
             {effect && effect !== 'none' && effect !== 'pixel-jitter' && (
                 <div
                     className={`scene-overlay overlay-${effect}`}
-                    style={overlayStyle}
                 />
             )}
         </div>
