@@ -5,8 +5,7 @@ import { useToast } from './ToastContext';
 import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
 import BranchingPreview from './BranchingPreview';
-import { Upload, Eye, Trash2, Plus, ArrowRight, Music, Image as ImageIcon, Flag, FileText, Scroll, GitBranch, Play, Layout } from 'lucide-react';
-import { SceneImage } from './SceneImage';
+import { Upload, Eye, Trash2, Plus, ArrowRight, Music, Image as ImageIcon, Flag, FileText, Scroll, GitBranch, Play } from 'lucide-react';
 
 interface SceneEditorProps {
     scene: Scene;
@@ -562,11 +561,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                     </div>
 
                                     {/* Image Preview Area */}
-                                    <div className="relative w-full aspect-video bg-zinc-950 rounded-lg overflow-hidden border border-muted-foreground/20 group mb-4">
+                                    <div className="relative w-full aspect-video bg-zinc-950 rounded-lg overflow-hidden border border-muted-foreground/20 group mb-6">
                                         {localScene.image ? (
                                             <>
-                                                <SceneImage src={localScene.image} alt={localScene.name} effect={localScene.overlayEffect} className="w-full h-full" />
-                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm z-10">
+                                                <img src={localScene.image} alt={localScene.name} className="w-full h-full object-cover" />
+                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm">
                                                     <label htmlFor="image-upload-input" className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-purple-300 transition-colors">
                                                         <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
                                                             <Upload className="w-5 h-5" />
@@ -592,43 +591,6 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                 <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                             </label>
                                         )}
-                                    </div>
-
-                                    {/* Overlay Effect Selector */}
-                                    <div className="space-y-2 mb-6">
-                                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Efeito Visual (Overlay)</label>
-                                        <div className="relative">
-                                            <select
-                                                value={localScene.overlayEffect || ''}
-                                                onChange={(e) => updateLocalScene('overlayEffect', e.target.value)}
-                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all appearance-none"
-                                            >
-                                                <option value="">Nenhum</option>
-                                                <optgroup label="Climáticos e Ambientais">
-                                                    <option value="rain">Chuva (Rain)</option>
-                                                    <option value="rain-on-glass">Chuva no Vidro</option>
-                                                    <option value="snow">Neve (Snow)</option>
-                                                    <option value="fog">Neblina (Fog)</option>
-                                                    <option value="smoke">Fumaça (Smoke)</option>
-                                                    <option value="dust">Poeira (Dust)</option>
-                                                    <option value="ash">Cinzas (Ash)</option>
-                                                    <option value="wind-streaks">Vento (Wind Streaks)</option>
-                                                </optgroup>
-                                                <optgroup label="Ruído e Textura">
-                                                    <option value="film-grain">Film Grain</option>
-                                                    <option value="static-noise">Static Noise</option>
-                                                    <option value="white-noise">White Noise</option>
-                                                    <option value="vhs">VHS Noise</option>
-                                                    <option value="crt-scanlines">CRT Scanlines</option>
-                                                    <option value="interference">Interference Lines</option>
-                                                    <option value="compression">Compression Artifacts</option>
-                                                    <option value="pixel-jitter">Pixel Jitter</option>
-                                                </optgroup>
-                                            </select>
-                                            <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-500">
-                                                <Layout className="w-3 h-3" />
-                                            </div>
-                                        </div>
                                     </div>
 
                                     {/* Audio Section */}

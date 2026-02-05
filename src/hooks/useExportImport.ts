@@ -4,7 +4,6 @@ import { GameData, Scene, View } from '../types';
 import { getFontUrl, getFrameClass, getMimeTypeFromFileName } from '../utils/helpers';
 import { prepareGameDataForEngine, gameJS } from '../components/game-engine';
 import { gameHTML, gameCSS, initialGameData } from '../lib/gameDefaults';
-import { overlaysCSS } from '../lib/overlaysCSS';
 import DOMPurify from 'dompurify';
 
 declare var JSZip: any;
@@ -119,7 +118,7 @@ DATE:        ${exportDate.toLocaleString()}
         const fontFamily = exportData.gameFontFamily || "'Silkscreen', sans-serif";
         const fontName = fontFamily.split(',')[0].replace(/'/g, '').trim();
         let fontStylesheet = '';
-        let finalCss = exportData.gameCSS + overlaysCSS;
+        let finalCss = exportData.gameCSS;
 
         if (fontName) {
             const googleFontName = fontName.replace(/ /g, '+');

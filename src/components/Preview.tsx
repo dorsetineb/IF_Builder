@@ -2,7 +2,6 @@
 import React, { useMemo } from 'react';
 import { GameData } from '../types';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
-import { overlaysCSS } from '../lib/overlaysCSS';
 
 // Helper to generate the correct Google Fonts URL from a font-family string.
 const getFontUrl = (fontFamily: string) => {
@@ -203,7 +202,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             })()}
         `;
 
-        let finalCss = (gameData.gameCSS + overlaysCSS + cssOverrides)
+        let finalCss = (gameData.gameCSS + cssOverrides)
             // Hotfix for legacy typo
             .replace('__FRAME_ROUND_TOP_COLOR__', '__FRAME_ROUNDED_TOP_COLOR__')
             .replace(/__FONT_FAMILY__/g, fontFamily)
