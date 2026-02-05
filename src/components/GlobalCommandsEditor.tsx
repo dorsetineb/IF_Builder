@@ -120,10 +120,11 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
         setLocalVerbs(fixedVerbs);
     };
 
+
     return (
-        <div className="space-y-4" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
+        <div className="space-y-6 pb-8" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* Header with Save/Undo actions */}
-            <div className="sticky top-4 z-40 backdrop-blur-md shadow-lg bg-zinc-900/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/10">
+            <div className="sticky top-0 z-40 backdrop-blur-md shadow-lg bg-zinc-900/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/10">
                 <div className="text-zinc-500 text-xs font-medium w-full space-y-1">
                     <p>Configure verbos e comandos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).</p>
                     <p>Os verbos <strong>"olhar", "examinar", "ver"</strong> e <strong>"ler"</strong> sempre estarão disponíveis para o usuário acionar a descrição de um objeto.</p>
