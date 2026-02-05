@@ -556,7 +556,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (scene.overlayEffect && scene.overlayEffect !== '') {
                 // Determine effect class
                 let effectClass = '';
-                if (scene.overlayEffect === 'grain') effectClass = 'overlay-grain';
+                if (scene.overlayEffect === 'grain') effectClass = 'overlay-film-grain';
                 // Add more effects here in future
                 
                 if (effectClass) {
@@ -582,7 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // If it was missing, we just added it empty, next scene load will catch it.
                 // OR we can just apply immediately:
                 if (scene.overlayEffect === 'grain') {
-                    newOverlay.classList.add('overlay-grain');
+                    newOverlay.classList.add('overlay-film-grain');
                     newOverlay.style.opacity = '1';
                 }
             }

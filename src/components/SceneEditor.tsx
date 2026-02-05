@@ -565,7 +565,13 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         {localScene.image ? (
                                             <>
                                                 <img src={localScene.image} alt={localScene.name} className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm">
+
+                                                {/* Editor Overlay Preview */}
+                                                {localScene.overlayEffect === 'grain' && (
+                                                    <div className="scene-image-overlay overlay-grain pointer-events-none absolute inset-0 z-10" />
+                                                )}
+
+                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm z-20">
                                                     <label htmlFor="image-upload-input" className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-purple-300 transition-colors">
                                                         <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
                                                             <Upload className="w-5 h-5" />

@@ -142,29 +142,21 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                 transition: opacity 0.5s ease-in-out;
             }
 
-            .overlay-grain:after {
-              animation: grain 8s steps(10) infinite;
-              background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/9632/paper-pattern.png);
-              content: "";
-              height: 300%;
-              left: -50%;
-              opacity: 0.3;
-              position: absolute;
-              top: -110%;
-              width: 300%;
+            /* Film Grain */
+            .overlay-film-grain {
+              background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)" opactiy="0.5"/%3E%3C/svg%3E');
+              opacity: 0.15;
+              mix-blend-mode: overlay;
+              animation: grain-shift 0.5s steps(5) infinite;
             }
 
-            @keyframes grain {
-              0%, 100% { transform:translate(0, 0) }
-              10% { transform:translate(-5%, -10%) }
-              20% { transform:translate(-15%, 5%) }
-              30% { transform:translate(7%, -25%) }
-              40% { transform:translate(-5%, 25%) }
-              50% { transform:translate(-15%, 10%) }
-              60% { transform:translate(15%, 0%) }
-              70% { transform:translate(0%, 15%) }
-              80% { transform:translate(3%, 35%) }
-              90% { transform:translate(-10%, 10%) }
+            @keyframes grain-shift {
+              0% { transform: translate(0, 0); }
+              20% { transform: translate(-2%, -2%); }
+              40% { transform: translate(2%, 2%); }
+              60% { transform: translate(-2%, 2%); }
+              80% { transform: translate(2%, -2%); }
+              100% { transform: translate(0, 0); }
             }
 
             /* VIGNETTE TEXT PADDING FIX */
