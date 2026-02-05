@@ -21,7 +21,8 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 choices: scene.choices || [],
                 vignetteType: scene.vignetteType,
                 vignetteButtonText: scene.vignetteButtonText,
-                vignetteNextSceneId: scene.vignetteNextSceneId
+                vignetteNextSceneId: scene.vignetteNextSceneId,
+                isDefeatOutcome: scene.isDefeatOutcome
             };
         }
     }
@@ -318,13 +319,27 @@ document.addEventListener('DOMContentLoaded', () => {
         removedObjectsFromScenes = {};
         isGameEnded = false;
         (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
-        loadScene(currentSceneId, false); 
+        
+        // Fix Audio Persistence: If the starting scene has no specific music, 
+        // fallback to Global Music (or silence) to stop any lingering Conclusion music.
+        // If it DOES have music, loadScene will handle it.
+        const startScene = gameData.cenas[currentSceneId];
+        if (startScene) {
+            if (!startScene.backgroundMusic) {
+                playBgm(gameData.gameBackgroundMusic || "");
+            }
+            loadScene(currentSceneId, false);
+        } else {
+             console.error("Start scene not found:", currentSceneId);
+        }
+
         standardActionBar.classList.remove('hidden');
         endingActionBar.classList.add('hidden');
-        splashScreen.classList.add('hidden'); // Force hidden immediately
-        // splashScreen.classList.remove('hidden');
-        // splashScreen.classList.add('fade-out');
-        // setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
+        
+        // Restore smooth transition
+        splashScreen.classList.remove('hidden');
+        splashScreen.classList.add('fade-out');
+        setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
     };
 
     const loadGameFromData = (jsonString) => {
@@ -448,11 +463,12 @@ document.addEventListener('DOMContentLoaded', () => {
             vignetteContinueButton.removeEventListener('click', handleVignetteClick);
             
             if (scene.vignetteType === 'conclusion') {
-                // Restart game
+                // Restart game: Reset music FIRST, hide vignette, show splash
+                playBgm(gameData.gameBackgroundMusic || "");
                 vignetteScreen.classList.add('hidden');
-                splashScreen.classList.remove('hidden');
-                splashScreen.classList.remove('fade-out');
-                if (gameData.gameBackgroundMusic) playBgm(gameData.gameBackgroundMusic);
+                gameContainer.classList.remove('hidden');
+                startGame();
+
             } else if (scene.vignetteNextSceneId) {
                 // Go to next scene: Load it FIRST (behind the vignette), then fade out
                 gameContainer.classList.remove('hidden');
@@ -698,7 +714,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + document.title);
     };
 
-    const gameOver = () => { activateEndingUI('lose'); };
+    const gameOver = () => { 
+        const defeatSceneId = Object.keys(gameData.cenas).find(id => gameData.cenas[id].isDefeatOutcome);
+        if (defeatSceneId) {
+            loadScene(defeatSceneId, true);
+        } else {
+            activateEndingUI('lose'); 
+        }
+    };
     const handleInput = () => { if (isPrinting) return; const input = verbInput.value.trim(); if (input) { processCommand(input); verbInput.value = ''; } };
     const hasWord = (word, text) => {
         if (!word || !text) return false;

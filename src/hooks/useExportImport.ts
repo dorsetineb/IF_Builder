@@ -256,6 +256,7 @@ DATE:        ${exportDate.toLocaleString()}
                 let type: 'opening' | 'transition' | 'conclusion' | 'none' = 'transition';
                 if (v.isConclusion) type = 'conclusion';
                 else if (v.id.toUpperCase().includes('OPENING') || v.id.toUpperCase().includes('INTRO')) type = 'opening';
+                else if (v.id === 'VNT_DEFEAT') type = 'conclusion'; // Defeat is now a conclusion layout
 
                 const newScene: Scene = {
                     id: v.id,
@@ -268,7 +269,8 @@ DATE:        ${exportDate.toLocaleString()}
                     interactions: [],
                     objectIds: [],
                     mapX: 0,
-                    mapY: 0
+                    mapY: 0,
+                    isDefeatOutcome: v.id === 'VNT_DEFEAT' ? true : undefined
                 };
 
                 if (type === 'opening' && data.startScene) {

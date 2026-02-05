@@ -62,6 +62,7 @@ export interface Scene {
   exits?: Exits;
   isEndingScene?: boolean;
   conclusionVignetteId?: string;
+  isDefeatOutcome?: boolean;
   removesChanceOnEntry?: boolean;
   restoresChanceOnEntry?: boolean;
   mapX?: number;

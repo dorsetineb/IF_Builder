@@ -74,7 +74,17 @@ const SceneMap: React.FC<SceneMapProps> = ({
       const scene = node.data as Scene;
       const items: { id: string, targetId: string, label: string, type: MapNodeType, original?: any }[] = [];
 
-      // 1. Unified Vignette Links (Opening, etc) - Applies to BOTH modes
+      // 1. Opening Vignette (as Scene) links to Start Scene
+      if (scene.vignetteType === 'opening' && startSceneId && scene.id !== startSceneId) {
+        items.push({
+          id: `link-opening-${scene.id}`,
+          targetId: startSceneId,
+          label: scene.vignetteButtonText || 'INICIAR',
+          type: 'scene'
+        });
+      }
+
+      // 2. Transition Vignette Links - Applies to BOTH modes
       if (scene.vignetteNextSceneId) {
         if (scene.vignetteNextSceneId === 'END_GAME') {
           const victoryVig = vignettes.find(v => v.id === 'VNT_VICTORY');
@@ -109,14 +119,18 @@ const SceneMap: React.FC<SceneMapProps> = ({
         }
       }
 
+      // 3. Defeat Links - Check allScenesMap first (new system), then legacy vignettes
       if (scene.removesChanceOnEntry) {
+        const defeatScene = Object.values(allScenesMap).find((s) => (s as Scene).isDefeatOutcome) as Scene | undefined;
         const defeatVig = vignettes.find(v => v.id === 'VNT_DEFEAT');
-        if (defeatVig) {
+        const defeatTargetId = defeatScene?.id || defeatVig?.id;
+
+        if (defeatTargetId) {
           items.push({
             id: `link-defeat-${scene.id}`,
-            targetId: 'VNT_DEFEAT',
+            targetId: defeatTargetId,
             label: '(-1 Vida)',
-            type: 'vignette'
+            type: defeatScene ? 'scene' : 'vignette'
           });
         }
       }
@@ -269,16 +283,12 @@ const SceneMap: React.FC<SceneMapProps> = ({
         const current_v_level = levels.get(v) ?? -1;
         const new_v_level = u_level + 1;
 
-        if (new_v_level > current_v_level) {
-          // KEY FIX: Prevent Start Scene from being pushed to higher levels by cycles!
-          if (v === startSceneId && levels.has(v)) {
-            return; // Skip updating start scene
-          }
-
-          if (new_v_level < 20) {
-            levels.set(v, new_v_level);
-            if (!queue.includes(v)) queue.push(v);
-          }
+        // Use SHORTEST PATH logic (First Visit wins) to avoid cycles pushing parents to the right.
+        // If the node already has a level, it means we found a shorter path to it previously.
+        // This keeps "Hub" scenes (like Cela Escura) on the left, and branched interactions on the right.
+        if (!levels.has(v) && new_v_level < 20) {
+          levels.set(v, new_v_level);
+          if (!queue.includes(v)) queue.push(v);
         }
       });
     }
@@ -315,13 +325,17 @@ const SceneMap: React.FC<SceneMapProps> = ({
     const positionedNodes: Node[] = [];
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
 
-    const maxLvl = Math.max(...Array.from(nodeLevels.keys()), 0);
 
-    for (let l = 0; l <= maxLvl; l++) {
+
+    const sortedLevels = Array.from(nodeLevels.keys()).sort((a, b) => a - b);
+
+    sortedLevels.forEach((l, index) => {
       const nodesInLevel = nodeLevels.get(l) || [];
 
-      if (l > 0) {
-        const prevLevelNodes = nodeLevels.get(l - 1) || [];
+      // Sort nodes within level to minimize crossing edges
+      if (index > 0) {
+        const prevLevelIndex = sortedLevels[index - 1];
+        const prevLevelNodes = nodeLevels.get(prevLevelIndex) || [];
         nodesInLevel.sort((a, b) => {
           const parentsA = reverseDeps.get(a) || [];
           const parentsB = reverseDeps.get(b) || [];
@@ -331,7 +345,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
         });
       }
 
-      const calculatedX = l * (NODE_WIDTH + X_GAP);
+      // Use INDEX for X position, ensuring no visual gaps between sparse levels
+      const calculatedX = index * (NODE_WIDTH + X_GAP);
       const levelHeight = nodesInLevel.reduce((sum, id) => sum + (nodeHeights.get(id) || 0) + Y_GAP, 0) - Y_GAP;
       let currentY = -levelHeight / 2;
 
@@ -372,7 +387,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
         minY = Math.min(minY, y);
         maxY = Math.max(maxY, y + h);
       });
-    }
+    });
 
     // Note: Conclusion vignettes are no longer forced to a specific position.
     // They follow the same layout rules as other nodes. Users can manually

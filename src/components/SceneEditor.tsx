@@ -40,6 +40,7 @@ const getCleanSceneState = (s: Scene): Scene => {
         objectIds: s.objectIds || [],
         interactions: s.interactions || [],
         choices: s.choices || [],
+        isDefeatOutcome: !!s.isDefeatOutcome,
     };
 };
 
@@ -475,6 +476,21 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                         className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all placeholder:text-zinc-700"
                                                                     />
                                                                 </div>
+
+                                                                {localScene.vignetteType === 'conclusion' && (
+                                                                    <label className="flex items-center gap-2 cursor-pointer p-2 rounded border border-muted-foreground/10 bg-zinc-900/30 hover:bg-zinc-900/50 transition-colors self-end">
+                                                                        <input
+                                                                            type="checkbox"
+                                                                            checked={!!localScene.isDefeatOutcome}
+                                                                            onChange={(e) => updateLocalScene('isDefeatOutcome', e.target.checked)}
+                                                                            className="peer h-3.5 w-3.5 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground accent-red-500"
+                                                                        />
+                                                                        <div>
+                                                                            <span className="block text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Resultado negativo</span>
+                                                                            <span className="block text-[9px] text-muted-foreground">Exibir quando as chances acabam.</span>
+                                                                        </div>
+                                                                    </label>
+                                                                )}
 
                                                                 {localScene.vignetteType !== 'conclusion' && (
                                                                     <div>
