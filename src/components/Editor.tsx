@@ -331,7 +331,11 @@ const Editor: React.FC = () => {
     };
 
     if (loadingSession) {
-        return <TransitionScreen isVisible={true} />;
+        return (
+            <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
+                {/* Simple loader while checking auth - NOT TransitionScreen */}
+            </div>
+        );
     }
 
     if (!user) {
