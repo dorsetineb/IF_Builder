@@ -16,12 +16,17 @@ const App: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [isRecoveryMode, setIsRecoveryMode] = useState(false);
 
-    useEffect(() => {
+    // BIOS Animation State
+    // BIOS Animation State
+    const [biosStep, setBiosStep] = useState(0); // 0: Info, 1: Prompt Wait, 2: Typing
+    const [typedCommand, setTypedCommand] = useState('');
+    const [isBiosFinished, setIsBiosFinished] = useState(false);
 
+    useEffect(() => {
         const initSession = async () => {
             // Safety timeout to prevent infinite loading
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('Timeout')), 5000);
+                setTimeout(() => reject(new Error('Timeout')), 8000);
             });
 
             const sessionLoadPromise = async () => {
@@ -43,7 +48,6 @@ const App: React.FC = () => {
         const {
             data: { subscription },
         } = supabase.auth.onAuthStateChange(async (event, session) => {
-            // Detect password recovery event
             if (event === 'PASSWORD_RECOVERY') {
                 setIsRecoveryMode(true);
             }
@@ -51,12 +55,57 @@ const App: React.FC = () => {
             setLoading(false);
         });
 
-        return () => subscription.unsubscribe();
+        // BIOS Animation Sequence
+        const fullCommand = "RUN IF-BUILDER.EXE";
+
+        // Step 1: Show prompt A:\> fast (0.5s)
+        const timer1 = setTimeout(() => {
+            setBiosStep(1);
+        }, 500);
+
+        // Step 2: Start typing command after 1.5s
+        let typingInterval: any;
+        const timer2 = setTimeout(() => {
+            setBiosStep(2);
+            let charIndex = 0;
+            typingInterval = setInterval(() => {
+                if (charIndex < fullCommand.length) {
+                    setTypedCommand(fullCommand.slice(0, charIndex + 1));
+                    charIndex++;
+                } else {
+                    clearInterval(typingInterval);
+                }
+            }, 50); // Speed of typing: 50ms per char
+        }, 1500);
+
+        // Finish: End animation after typing completes
+        // 1.5s (start) + ~1s (typing) + 0.5s (pause) = 3s
+        const timer3 = setTimeout(() => {
+            setIsBiosFinished(true);
+        }, 3000);
+
+        return () => {
+            subscription.unsubscribe();
+            clearTimeout(timer1);
+            clearTimeout(timer2);
+            clearTimeout(timer3);
+            if (typingInterval) clearInterval(typingInterval);
+        };
     }, []);
 
-    if (loading) {
+    // Show BIOS until both data is loaded AND animation is finished
+    if (loading || !isBiosFinished) {
         return (
-            <div className="fixed inset-0 z-[9999] bg-black text-white font-['Silkscreen'] text-sm p-4 sm:p-8 flex flex-col justify-start overflow-hidden selection:bg-white selection:text-black">
+            <div className="fixed inset-0 z-[9999] bg-black text-white font-['Silkscreen'] text-sm p-4 sm:p-8 flex flex-col justify-start overflow-hidden selection:bg-white selection:text-black cursor-none">
+                <style>{`
+                    @keyframes hard-blink {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0; }
+                    }
+                    .animate-hard-blink {
+                        animation: hard-blink 0.5s step-end infinite;
+                    }
+                `}</style>
                 <div className="space-y-1 max-w-3xl">
                     <p>IF-BUILDER BIOS v1.0.24</p>
                     <p className="mb-4">Copyright (C) 2026 Deepmind Systems Inc.</p>
@@ -72,9 +121,15 @@ const App: React.FC = () => {
                     <p>Loading interactive_fiction_engine.sys ... OK</p>
                     <p>Mounting file system ... OK</p>
                     <br />
-                    <div className="flex items-center gap-2">
-                        <span>A:\&gt; RUN IF-BUILDER.EXE</span>
-                        <span className="w-2.5 h-5 bg-white animate-pulse"></span>
+
+                    {/* Prompt appears in Step 1 */}
+                    {/* Prompt appears in Step 1 */}
+                    <div className={`flex items-center ${biosStep >= 1 ? 'opacity-100' : 'opacity-0'}`}>
+                        <span className="mr-2">A:\&gt;</span>
+                        {/* Command Typed Character by Character */}
+                        {biosStep >= 2 && <span>{typedCommand}</span>}
+                        {/* Blinking Cursor - Always visible after prompt, moves with text */}
+                        <span className="w-2.5 h-5 bg-white animate-hard-blink"></span>
                     </div>
                 </div>
             </div>

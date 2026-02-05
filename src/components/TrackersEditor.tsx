@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { ConsequenceTracker, Scene, Interaction, TrackerEffect } from '../types';
-import { Plus, Trash2, Search, Activity, ArrowLeft, ArrowRight, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
+import { Plus, Trash2, Search, Activity, ArrowLeft, ArrowRight, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, ExternalLink } from 'lucide-react';
 
 const TRACKER_ICONS = [
     { name: 'activity', component: Activity },
@@ -451,19 +451,30 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                         {/* Consequence Scene */}
                                         <div className="col-span-4 space-y-1.5 pt-4 border-t border-muted-foreground/10">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Consequência ao atingir máximo</label>
-                                            <select
-                                                value={selectedTracker.consequenceSceneId || ''}
-                                                onChange={e => handleTrackerChange(selectedTracker.id, 'consequenceSceneId', e.target.value)}
-                                                className={selectBaseClasses}
-                                                style={selectStyle}
-                                            >
-                                                <option value="" className={optionDimClasses}>Nenhuma (Nada acontece)</option>
-                                                {allScenes.map(scene => (
-                                                    <option key={scene.id} value={scene.id} className={optionBaseClasses}>
-                                                        {scene.name}
-                                                    </option>
-                                                ))}
-                                            </select>
+                                            <div className="flex gap-2">
+                                                <select
+                                                    value={selectedTracker.consequenceSceneId || ''}
+                                                    onChange={e => handleTrackerChange(selectedTracker.id, 'consequenceSceneId', e.target.value)}
+                                                    className={selectBaseClasses}
+                                                    style={selectStyle}
+                                                >
+                                                    <option value="" className={optionDimClasses}>Nenhuma (Nada acontece)</option>
+                                                    {allScenes.map(scene => (
+                                                        <option key={scene.id} value={scene.id} className={optionBaseClasses}>
+                                                            {scene.name}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                                {selectedTracker.consequenceSceneId && (
+                                                    <button
+                                                        onClick={() => onSelectScene(selectedTracker.consequenceSceneId)}
+                                                        className="h-[38px] aspect-square flex items-center justify-center bg-zinc-900 border border-muted-foreground/30 rounded-lg hover:bg-zinc-800 hover:border-purple-500/50 hover:text-purple-400 text-zinc-400 transition-all shrink-0"
+                                                        title="Ir para a cena de consequência"
+                                                    >
+                                                        <ExternalLink className="w-4 h-4" />
+                                                    </button>
+                                                )}
+                                            </div>
                                             <p className="text-[10px] text-zinc-600 italic">
                                                 O jogador será enviado para esta cena quando o valor do rastreador for maior ou igual ao máximo.
                                             </p>
