@@ -22,7 +22,8 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 vignetteType: scene.vignetteType,
                 vignetteButtonText: scene.vignetteButtonText,
                 vignetteNextSceneId: scene.vignetteNextSceneId,
-                isDefeatOutcome: scene.isDefeatOutcome
+                isDefeatOutcome: scene.isDefeatOutcome,
+                overlayEffect: scene.overlayEffect // Mapped for engine use
             };
         }
     }
