@@ -10,19 +10,12 @@ import { ThemeProvider } from './components/ThemeProvider';
 import { ToastProvider } from './components/ToastContext';
 import { UserProvider } from './components/UserContext';
 import AboutProject from './pages/AboutProject';
+import { Loader2 } from 'lucide-react';
 
 const App: React.FC = () => {
     const [session, setSession] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [isRecoveryMode, setIsRecoveryMode] = useState(false);
-
-    // BIOS Animation State
-    const [biosStep, setBiosStep] = useState(0); // 0: Info, 1: Prompt Wait, 2: Typing
-    const [typedCommand, setTypedCommand] = useState('');
-    const [isBiosFinished, setIsBiosFinished] = useState(false);
-
-    // BIOS helper state to trigger animation only once per session
-    const [authChecked, setAuthChecked] = useState(false);
 
     useEffect(() => {
         const initSession = async () => {
@@ -34,7 +27,6 @@ const App: React.FC = () => {
             const sessionLoadPromise = async () => {
                 const { data: { session } } = await supabase.auth.getSession();
                 setSession(session);
-                setAuthChecked(true); // Mark initial check as done
             };
 
             try {
@@ -54,15 +46,7 @@ const App: React.FC = () => {
             if (event === 'PASSWORD_RECOVERY') {
                 setIsRecoveryMode(true);
             }
-            // If we are logging in (and weren't logged in before), we might want to trigger BIOS?
-            // For now, simple state update:
             setSession(session);
-
-            // If session becomes valid and we haven't run BIOS, it will trigger via the next useEffect
-            if (session) {
-                setAuthChecked(true);
-            }
-
             setLoading(false);
         });
 
@@ -71,105 +55,18 @@ const App: React.FC = () => {
         };
     }, []);
 
-
-    // BIOS Animation Sequence - Triggered ONLY when we have a session and animation hasn't finished
-    useEffect(() => {
-        if (!session || isBiosFinished || biosStep > 0) return;
-
-        const fullCommand = "RUN IF-BUILDER.EXE";
-
-        // Step 1: Show prompt A:\> fast (0.5s)
-        const timer1 = setTimeout(() => {
-            setBiosStep(1);
-        }, 500);
-
-        // Step 2: Start typing command after 1.5s
-        let typingInterval: any;
-        const timer2 = setTimeout(() => {
-            setBiosStep(2);
-            let charIndex = 0;
-            typingInterval = setInterval(() => {
-                if (charIndex < fullCommand.length) {
-                    setTypedCommand(fullCommand.slice(0, charIndex + 1));
-                    charIndex++;
-                } else {
-                    clearInterval(typingInterval);
-                }
-            }, 50); // Speed of typing: 50ms per char
-        }, 1500);
-
-        // Finish: End animation after typing completes
-        // 1.5s (start) + ~1s (typing) + 0.5s (pause) = 3s
-        // User requested +1s delay on transition, but maybe they meant BIOS duration too?
-        // Let's keep BIOS at 3s and we will handle the transition screen separately or extend this.
-        // Actually, if BIOS disappears, we show the app. The app likely shows Editor.
-        // If we want a transition screen, we should probably render it here or inside Editor.
-        // Assuming BIOS transitions directly to Editor.
-        const timer3 = setTimeout(() => {
-            setIsBiosFinished(true);
-        }, 4000); // Extended slightly to 4s as per request for "tela de transição ... 1 segundo a mais" (interpreted as BIOS/Transition phase)
-
-        return () => {
-            clearTimeout(timer1);
-            clearTimeout(timer2);
-            clearTimeout(timer3);
-            if (typingInterval) clearInterval(typingInterval);
-        };
-    }, [session, isBiosFinished, biosStep]);
-
-
-    // 1. Initial Loading State
-    if (loading && !authChecked) {
-        // Can show a spinner or just black screen until we know if user is logged in
-        return <div className="fixed inset-0 bg-black" />;
-    }
-
-    // 2. Auth Screen (No Session)
-    if (!session || isRecoveryMode) {
-        return <Auth isRecoveryMode={isRecoveryMode} onRecoveryComplete={() => setIsRecoveryMode(false)} />;
-    }
-
-    // 3. BIOS Screen (Session Valid, Animation Not Finished)
-    if (!isBiosFinished) {
+    // Simple loading screen while checking session
+    if (loading) {
         return (
-            <div className="fixed inset-0 z-[9999] bg-black text-white font-['Silkscreen'] text-sm p-4 sm:p-8 flex flex-col justify-start overflow-hidden selection:bg-white selection:text-black cursor-none">
-                <style>{`
-                    @keyframes hard-blink {
-                        0%, 100% { opacity: 1; }
-                        50% { opacity: 0; }
-                    }
-                    .animate-hard-blink {
-                        animation: hard-blink 0.5s step-end infinite;
-                    }
-                `}</style>
-                <div className="space-y-1 max-w-3xl">
-                    <p>IF-BUILDER BIOS v1.0.24</p>
-                    <p className="mb-4">Copyright (C) 2026 Deepmind Systems Inc.</p>
-
-                    <p>System Memory: 640KB OK</p>
-                    <p>Extended Memory: 32MB OK</p>
-                    <p>Shadow RAM: Cached</p>
-                    <br />
-                    <p>Detecting Primary Master ... IF_BUILDER_CORE</p>
-                    <p>Detecting Primary Slave ... USER_DATA</p>
-                    <br />
-                    <p>Booting from Hard Disk...</p>
-                    <p>Loading interactive_fiction_engine.sys ... OK</p>
-                    <p>Mounting file system ... OK</p>
-                    <br />
-
-                    {/* Prompt appears in Step 1 */}
-                    {/* Prompt appears in Step 1 */}
-                    <div className={`flex items-center ${biosStep >= 1 ? 'opacity-100' : 'opacity-0'}`}>
-                        <span className="mr-2">A:\&gt;</span>
-                        {/* Command Typed Character by Character */}
-                        {biosStep >= 2 && <span>{typedCommand}</span>}
-                        {/* Blinking Cursor - Always visible after prompt, moves with text */}
-                        <span className="w-2.5 h-5 bg-white animate-hard-blink"></span>
-                    </div>
-                </div>
+            <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-purple-500 animate-spin" />
             </div>
         );
+    }
+
+    // Show Auth for password recovery OR when not logged in
+    if (!session || isRecoveryMode) {
+        return <Auth isRecoveryMode={isRecoveryMode} onRecoveryComplete={() => setIsRecoveryMode(false)} />;
     }
 
     return (

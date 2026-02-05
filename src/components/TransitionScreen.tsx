@@ -10,7 +10,7 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
     if (!isVisible) return null;
 
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-zinc-950 cursor-none">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-zinc-950">
             {/* Background Dither - No animations */}
             <div className="absolute inset-0 z-0 bg-neutral-950">
                 <DitherShader

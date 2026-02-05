@@ -56,6 +56,11 @@ const Editor: React.FC = () => {
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
 
+    // BIOS Animation State
+    const [biosStep, setBiosStep] = useState(0); // 0: Info, 1: Prompt Wait, 2: Typing
+    const [typedCommand, setTypedCommand] = useState('');
+    const [isBiosFinished, setIsBiosFinished] = useState(false);
+
     useEffect(() => {
         document.title = "IF Builder / Ficções Interativas";
         return () => {
@@ -65,18 +70,58 @@ const Editor: React.FC = () => {
 
     const [importKey, setImportKey] = useState(0);
 
+    // BIOS Animation Sequence (runs once on mount)
     useEffect(() => {
+        const fullCommand = "RUN IF-BUILDER.EXE";
+
+        // Step 1: Show prompt A:\> fast (0.5s)
+        const timer1 = setTimeout(() => {
+            setBiosStep(1);
+        }, 500);
+
+        // Step 2: Start typing command after 1.5s
+        let typingInterval: ReturnType<typeof setInterval>;
+        const timer2 = setTimeout(() => {
+            setBiosStep(2);
+            let charIndex = 0;
+            typingInterval = setInterval(() => {
+                if (charIndex < fullCommand.length) {
+                    setTypedCommand(fullCommand.slice(0, charIndex + 1));
+                    charIndex++;
+                } else {
+                    clearInterval(typingInterval);
+                }
+            }, 50); // Speed of typing: 50ms per char
+        }, 1500);
+
+        // Finish: End animation after typing completes
+        // 1.5s (start) + ~1s (typing) + 0.5s (pause) = 3s
+        const timer3 = setTimeout(() => {
+            setIsBiosFinished(true);
+        }, 3000);
+
+        return () => {
+            clearTimeout(timer1);
+            clearTimeout(timer2);
+            clearTimeout(timer3);
+            if (typingInterval) clearInterval(typingInterval);
+        };
+    }, []);
+
+    // Transition timer: starts AFTER BIOS is finished, now 3s instead of 2s
+    useEffect(() => {
+        if (!isBiosFinished) return;
         const timer = setTimeout(() => {
             setIsTransitioning(false);
-        }, 2000); // 2s duration
+        }, 3000); // 3s duration (was 2s)
         return () => clearTimeout(timer);
-    }, []);
+    }, [isBiosFinished]);
 
     const handleNavigate = (path: string) => {
         setIsTransitioning(true);
         setTimeout(() => {
             navigate(path);
-        }, 2000); // 2s duration
+        }, 3000); // 3s duration (was 2s)
     };
 
     const handleExit = () => handleNavigate('/dashboard');
@@ -291,6 +336,48 @@ const Editor: React.FC = () => {
 
     if (!user) {
         return <Auth />;
+    }
+
+    // Show BIOS animation first (after authentication)
+    if (!isBiosFinished) {
+        return (
+            <div className="fixed inset-0 z-[9999] bg-black text-white font-['Silkscreen'] text-sm p-4 sm:p-8 flex flex-col justify-start overflow-hidden selection:bg-white selection:text-black cursor-none">
+                <style>{`
+                    @keyframes hard-blink {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0; }
+                    }
+                    .animate-hard-blink {
+                        animation: hard-blink 0.5s step-end infinite;
+                    }
+                `}</style>
+                <div className="space-y-1 max-w-3xl">
+                    <p>IF-BUILDER BIOS v1.0.24</p>
+                    <p className="mb-4">Copyright (C) 2026 Deepmind Systems Inc.</p>
+
+                    <p>System Memory: 640KB OK</p>
+                    <p>Extended Memory: 32MB OK</p>
+                    <p>Shadow RAM: Cached</p>
+                    <br />
+                    <p>Detecting Primary Master ... IF_BUILDER_CORE</p>
+                    <p>Detecting Primary Slave ... USER_DATA</p>
+                    <br />
+                    <p>Booting from Hard Disk...</p>
+                    <p>Loading interactive_fiction_engine.sys ... OK</p>
+                    <p>Mounting file system ... OK</p>
+                    <br />
+
+                    {/* Prompt appears in Step 1 */}
+                    <div className={`flex items-center ${biosStep >= 1 ? 'opacity-100' : 'opacity-0'}`}>
+                        <span className="mr-2">A:\&gt;</span>
+                        {/* Command Typed Character by Character */}
+                        {biosStep >= 2 && <span>{typedCommand}</span>}
+                        {/* Blinking Cursor */}
+                        <span className="w-2.5 h-5 bg-white animate-hard-blink"></span>
+                    </div>
+                </div>
+            </div>
+        );
     }
 
     return (
