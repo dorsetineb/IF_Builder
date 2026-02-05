@@ -129,6 +129,44 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .chance-icon svg { width: 24px; height: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); display: block; }
             .chance-icon.lost svg { opacity: 0.3; }
 
+            /* OVERLAY EFFECTS (Injected for Preview) */
+            .scene-image-overlay {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                pointer-events: none;
+                z-index: 5;
+                opacity: 0;
+                transition: opacity 0.5s ease-in-out;
+            }
+
+            .overlay-grain:after {
+              animation: grain 8s steps(10) infinite;
+              background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/9632/paper-pattern.png);
+              content: "";
+              height: 300%;
+              left: -50%;
+              opacity: 0.3;
+              position: absolute;
+              top: -110%;
+              width: 300%;
+            }
+
+            @keyframes grain {
+              0%, 100% { transform:translate(0, 0) }
+              10% { transform:translate(-5%, -10%) }
+              20% { transform:translate(-15%, 5%) }
+              30% { transform:translate(7%, -25%) }
+              40% { transform:translate(-5%, 25%) }
+              50% { transform:translate(-15%, 10%) }
+              60% { transform:translate(15%, 0%) }
+              70% { transform:translate(0%, 15%) }
+              80% { transform:translate(3%, 35%) }
+              90% { transform:translate(-10%, 10%) }
+            }
+
             /* VIGNETTE TEXT PADDING FIX */
             /* Original CSS has: padding: 5vw 225px - horizontal is too large */
             /* Fix: Use equal padding on all sides */

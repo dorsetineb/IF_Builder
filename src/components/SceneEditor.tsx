@@ -593,6 +593,19 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         )}
                                     </div>
 
+                                    {/* Overlay Effect Selector */}
+                                    <div className="space-y-2 mb-6">
+                                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Efeito de Overlay</label>
+                                        <select
+                                            value={localScene.overlayEffect || ''}
+                                            onChange={(e) => updateLocalScene('overlayEffect', e.target.value)}
+                                            className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all"
+                                        >
+                                            <option value="">Nenhum</option>
+                                            <option value="grain">Granulação (Old Film)</option>
+                                        </select>
+                                    </div>
+
                                     {/* Audio Section */}
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha Sonora (.mp3)</label>

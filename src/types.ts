@@ -57,6 +57,7 @@ export interface Scene {
   backgroundMusic?: string; // Base64 data URL for BGM
   objectIds: string[]; // References to GameData.globalObjects
   objects?: GameObject[]; // Deprecated: Kept for migration types
+  overlayEffect?: string; // e.g., 'grain'
   interactions: Interaction[];
   choices?: Choice[];
   exits?: Exits;

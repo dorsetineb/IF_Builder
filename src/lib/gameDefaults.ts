@@ -67,6 +67,7 @@ export const gameHTML = `
                   <img id="scene-image-back" src="" alt="Cena seguinte" class="scene-image hidden">
                   <!-- Front image: The Current Scene (animates out) -->
                   <img id="scene-image" src="" alt="Cena atual" class="scene-image">
+                  <div id="scene-image-overlay" class="scene-image-overlay"></div>
                   <div id="scene-name-overlay" class="scene-name-overlay"></div>
                 </div>
             </div>
@@ -578,6 +579,44 @@ body.font-adjust-gothic { font-size: 1.1em; }
 .typewriter-cursor::after { content: '|'; animation: blink 1s step-end infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 @keyframes fadeIn { to { opacity: 1; } }
+
+/* OVERLAY EFFECTS */
+.scene-image-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+.overlay-grain:after {
+  animation: grain 8s steps(10) infinite;
+  background-image: url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/9632/paper-pattern.png);
+  content: "";
+  height: 300%;
+  left: -50%;
+  opacity: 0.3;
+  position: absolute;
+  top: -110%;
+  width: 300%;
+}
+
+@keyframes grain {
+  0%, 100% { transform:translate(0, 0) }
+  10% { transform:translate(-5%, -10%) }
+  20% { transform:translate(-15%, 5%) }
+  30% { transform:translate(7%, -25%) }
+  40% { transform:translate(-5%, 25%) }
+  50% { transform:translate(-15%, 10%) }
+  60% { transform:translate(15%, 0%) }
+  70% { transform:translate(0%, 15%) }
+  80% { transform:translate(3%, 35%) }
+  90% { transform:translate(-10%, 10%) }
+}
 
 /* Implementação de Layout Full-Bleed (Sem Borda) Desktop */
 @media (min-width: 769px) {

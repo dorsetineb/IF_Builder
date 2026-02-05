@@ -10,6 +10,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 id: scene.id,
                 name: scene.name,
                 image: scene.image,
+                overlayEffect: scene.overlayEffect,
                 description: scene.description,
                 backgroundMusic: scene.backgroundMusic,
                 interactions: scene.interactions,
@@ -546,6 +547,48 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderScene = (scene, successPrefix = null) => {
         if (scene.image && gameData.enableImages !== false) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
         else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
+        // Apply Image Overlay Effect
+        const overlayEl = document.getElementById('scene-image-overlay');
+        if (overlayEl) {
+             // Reset classes but keep base class
+            overlayEl.className = 'scene-image-overlay';
+            
+            if (scene.overlayEffect && scene.overlayEffect !== '') {
+                // Determine effect class
+                let effectClass = '';
+                if (scene.overlayEffect === 'grain') effectClass = 'overlay-grain';
+                // Add more effects here in future
+                
+                if (effectClass) {
+                    overlayEl.classList.add(effectClass);
+                    overlayEl.style.opacity = '1';
+                } else {
+                    overlayEl.style.opacity = '0';
+                }
+            } else {
+                overlayEl.style.opacity = '0';
+            }
+        } else {
+            // Backward compatibility: Create overlay if missing
+            const imgContainer = document.getElementById('image-container');
+            if (imgContainer) {
+                const newOverlay = document.createElement('div');
+                newOverlay.id = 'scene-image-overlay';
+                newOverlay.className = 'scene-image-overlay';
+                imgContainer.appendChild(newOverlay);
+                
+                // Retry application needed? In this frame, no, next frame logic handles it?
+                // Actually easier just to re-run or duplicate logic, but let's keep it simple.
+                // If it was missing, we just added it empty, next scene load will catch it.
+                // OR we can just apply immediately:
+                if (scene.overlayEffect === 'grain') {
+                    newOverlay.classList.add('overlay-grain');
+                    newOverlay.style.opacity = '1';
+                }
+            }
+        }
+
+        // Apply Text Overlay (Scene Name)
         if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
         sceneDescription.innerHTML = '';
         
