@@ -578,7 +578,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                             pointerEvents: 'none',
                                                             mixBlendMode: 'overlay',
                                                             background: 'repeating-conic-gradient(#0000 0.000010%, #000 0.00015%)',
-                                                            animation: 'grain-drift 30s linear infinite'
+                                                            animation: 'grain-flicker 8s steps(8) infinite'
                                                         }}
                                                     />
                                                 )}

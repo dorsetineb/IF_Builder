@@ -152,14 +152,20 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                 z-index: 5;
                 mix-blend-mode: overlay;
                 background: repeating-conic-gradient(#0000 0.000010%, #000 0.00015%);
-                animation: grain-drift 30s linear infinite;
+                animation: grain-flicker 8s steps(8) infinite;
             }
 
-            @keyframes grain-drift {
+            @keyframes grain-flicker {
                 0% { transform: translate(0, 0); }
-                25% { transform: translate(2%, 1%); }
-                50% { transform: translate(0, 2%); }
-                75% { transform: translate(-2%, 1%); }
+                10% { transform: translate(-1%, 1%); }
+                20% { transform: translate(1.5%, -0.5%); }
+                30% { transform: translate(-0.5%, -1%); }
+                40% { transform: translate(0.5%, 1.5%); }
+                50% { transform: translate(-1.5%, 0.5%); }
+                60% { transform: translate(1%, -1%); }
+                70% { transform: translate(-0.5%, 0); }
+                80% { transform: translate(0, 1%); }
+                90% { transform: translate(1%, 0.5%); }
                 100% { transform: translate(0, 0); }
             }
 
