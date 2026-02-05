@@ -610,19 +610,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
 
                                                 {/* Editor Overlay Preview */}
                                                 {localScene.overlayEffect === 'grain' && (
-                                                    <div
-                                                        style={{
-                                                            position: 'absolute',
-                                                            inset: '-20%',
-                                                            width: '140%',
-                                                            height: '140%',
-                                                            zIndex: 10,
-                                                            pointerEvents: 'none',
-                                                            mixBlendMode: 'overlay',
-                                                            background: 'repeating-conic-gradient(#0000 0.000010%, #000 0.00015%)',
-                                                            animation: 'grain-flicker 8s steps(8) infinite'
-                                                        }}
-                                                    />
+                                                    <div className="overlay-film-grain" />
                                                 )}
                                                 {localScene.overlayEffect === 'scanlines' && (
                                                     <div className="overlay-scanlines" />
