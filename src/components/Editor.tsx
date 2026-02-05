@@ -204,7 +204,8 @@ const Editor: React.FC = () => {
         handleExport,
         handleImportFile,
         handleImportGame,
-        handleDownloadExample
+        handleDownloadExample,
+        isImporting
     } = useExportImport({
         gameData,
         setGameData,
@@ -387,6 +388,18 @@ const Editor: React.FC = () => {
     return (
         <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans selection:bg-primary/30" >
             <TransitionScreen isVisible={isTransitioning} />
+
+            {/* Import Loading Popup */}
+            {isImporting && (
+                <div className="fixed inset-0 z-[9998] bg-black/80 backdrop-blur-sm flex items-center justify-center">
+                    <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-8 flex flex-col items-center gap-4 shadow-2xl">
+                        <div className="w-10 h-10 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-white text-lg font-medium">Importando projeto...</p>
+                        <p className="text-zinc-400 text-sm">Aguarde enquanto os arquivos são processados</p>
+                    </div>
+                </div>
+            )}
+
             {isPreviewing ? (
                 <div className="flex flex-col w-full h-full">
                     <Header

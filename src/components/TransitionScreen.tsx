@@ -6,12 +6,12 @@ interface TransitionScreenProps {
 }
 
 export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible }) => {
-    // If not visible, do not render anything (instant cut)
-    if (!isVisible) return null;
-
     return (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-zinc-950">
-            {/* Background Dither - No animations */}
+        <div
+            className={`fixed inset-0 z-[9999] flex items-center justify-center bg-zinc-950 transition-opacity duration-700 ease-out ${isVisible ? 'opacity-100 visible' : 'opacity-0 invisible pointer-events-none'
+                }`}
+        >
+            {/* Background Dither */}
             <div className="absolute inset-0 z-0 bg-neutral-950">
                 <DitherShader
                     src="/background.png"
@@ -21,7 +21,7 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
                     primaryColor="#000000"
                     secondaryColor="#9d4edd"
                     invert={false}
-                    animated={true} // Shader internal animation (noise) is acceptable/requested ("dither effect")
+                    animated={true}
                     animationSpeed={0.005}
                     className="w-full h-full"
                     objectFit="cover"

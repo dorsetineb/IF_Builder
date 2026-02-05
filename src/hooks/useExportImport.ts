@@ -1,5 +1,5 @@
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { GameData, Scene, View } from '../types';
 import { getFontUrl, getFrameClass, getMimeTypeFromFileName } from '../utils/helpers';
 import { prepareGameDataForEngine, gameJS } from '../components/game-engine';
@@ -27,6 +27,8 @@ export const useExportImport = ({
     toast,
     profile
 }: UseExportImportProps) => {
+
+    const [isImporting, setIsImporting] = useState(false);
 
     const handleExport = async () => {
         if (typeof JSZip === 'undefined') {
@@ -365,6 +367,8 @@ DATE:        ${exportDate.toLocaleString()}
             return;
         }
 
+        setIsImporting(true);
+
         const reader = new FileReader();
         if (file.name.endsWith('.zip')) {
             reader.onload = async (ev) => {
@@ -430,6 +434,8 @@ DATE:        ${exportDate.toLocaleString()}
                     handleImportGame(data);
                 } catch (err) {
                     alert("Erro ao importar ZIP: " + (err as Error).message);
+                } finally {
+                    setIsImporting(false);
                 }
             };
             reader.readAsArrayBuffer(file);
@@ -443,6 +449,8 @@ DATE:        ${exportDate.toLocaleString()}
                 } catch (error) {
                     console.error("Erro ao importar:", error);
                     toast("Erro na Importação", "O arquivo selecionado não é um JSON válido ou está corrompido.", "error");
+                } finally {
+                    setIsImporting(false);
                 }
             };
             reader.readAsText(file);
@@ -462,6 +470,7 @@ DATE:        ${exportDate.toLocaleString()}
         handleExport,
         handleImportFile,
         handleImportGame,
-        handleDownloadExample
+        handleDownloadExample,
+        isImporting
     };
 };
