@@ -1087,6 +1087,7 @@ export const OVERLAY_CSS = `
 
 /* Confetti Effect */
 .scene-overlay.overlay-confetti {
+    display: block;
     position: absolute;
     inset: 0;
     pointer-events: none;
