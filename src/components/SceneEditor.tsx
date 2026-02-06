@@ -572,18 +572,20 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                     <div className="relative w-full aspect-video bg-zinc-950 rounded-lg overflow-hidden border border-muted-foreground/20 group mb-6">
                                         <style>{OVERLAY_CSS}</style>
 
-                                        {/* Overlay Layer - Always rendered but controlled by CSS class */}
-                                        <div className={`scene-overlay ${localScene.overlayEffect ? 'overlay-' + localScene.overlayEffect : ''}`} style={{ zIndex: 10 }}></div>
-                                        {localScene.overlayEffect === 'rain' && <RainOverlay />}
-                                        {localScene.overlayEffect === 'blur' && <BlurOverlay />}
-                                        {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
-                                        {localScene.overlayEffect === 'tv' && <TVOverlay />}
-                                        {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
-
                                         {localScene.image ? (
                                             <>
                                                 <img src={localScene.image} alt={localScene.name} className="w-full h-full object-cover" />
-                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm">
+
+                                                {/* Overlay Layer - Rendered AFTER image for correct layering */}
+                                                <div className={`scene-overlay ${localScene.overlayEffect ? 'overlay-' + localScene.overlayEffect : ''}`} style={{ zIndex: 10 }}></div>
+                                                {localScene.overlayEffect === 'rain' && <RainOverlay />}
+                                                {localScene.overlayEffect === 'blur' && <BlurOverlay />}
+                                                {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
+                                                {localScene.overlayEffect === 'tv' && <TVOverlay />}
+                                                {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
+
+                                                {/* Hover buttons - highest z-index */}
+                                                <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm" style={{ zIndex: 20 }}>
                                                     <label htmlFor="image-upload-input" className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-purple-300 transition-colors">
                                                         <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
                                                             <Upload className="w-5 h-5" />
