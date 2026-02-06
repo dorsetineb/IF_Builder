@@ -22,6 +22,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 vignetteType: scene.vignetteType,
                 vignetteButtonText: scene.vignetteButtonText,
                 vignetteNextSceneId: scene.vignetteNextSceneId,
+                overlayEffect: scene.overlayEffect,
                 isDefeatOutcome: scene.isDefeatOutcome
             };
         }
@@ -140,6 +141,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const trackersButton = document.getElementById('trackers-button');
     const systemButton = document.getElementById('system-button');
     const sceneNameOverlay = document.getElementById('scene-name-overlay');
+    // Overlay Injection if not present
+    let sceneOverlay = document.getElementById('scene-overlay');
+    if (!sceneOverlay && imageContainer) {
+        sceneOverlay = document.createElement('div');
+        sceneOverlay.id = 'scene-overlay';
+        sceneOverlay.className = 'scene-overlay'; // Base class
+        imageContainer.appendChild(sceneOverlay);
+    }
+
     const soundEffectAudio = document.getElementById('scene-sound-effect');
     const bgmAudio = document.getElementById('bgm-audio');
     
@@ -180,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     vDiv.className = 'splash-screen hidden';
     // Use inline styles as a fallback to guarantee the look matches splash button even if CSS is missing
     const btnStyle = 'font-family: var(--font-family); padding: 12px 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; background-color: var(--splash-button-bg);';
-    vDiv.innerHTML = '<div class="splash-content"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '">Continuar</button></div></div>';
+    vDiv.innerHTML = '<div id="vignette-overlay" class="scene-overlay"></div><div class="splash-content" style="z-index: 10;"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '">Continuar</button></div></div>';
     document.body.appendChild(vDiv);
     vignetteScreen = vDiv;
 
@@ -246,6 +256,151 @@ document.addEventListener('DOMContentLoaded', () => {
             fadeIn();
         }
     };
+
+    class RainEffect {
+        constructor() {
+            this.canvas = null;
+            this.ctx = null;
+            this.drops = [];
+            this.animationFrameId = null;
+            this.overlay = null;
+            // Config
+            this.fall_speed = 0.7;
+            this.wind_speed = 5;
+            this.rain_weight = 0.11;
+            this.rain_color = '255,255,255';
+            this.started = false;
+        }
+
+        init(targetId) {
+            this.overlay = document.getElementById(targetId);
+            if (!this.overlay) return;
+            
+            // Check if canvas already exists
+            let canvas = this.overlay.querySelector('.rain-canvas');
+            if (!canvas) {
+                this.canvas = document.createElement('canvas');
+                this.canvas.className = 'rain-canvas';
+                this.overlay.appendChild(this.canvas);
+                
+                // Add Lightning Layer
+                const lightning = document.createElement('div');
+                lightning.className = 'lightning-layer';
+                this.overlay.appendChild(lightning);
+            } else {
+                this.canvas = canvas;
+            }
+            this.ctx = this.canvas.getContext('2d');
+            
+            // Resize immediately
+            this.resizer();
+            window.addEventListener('resize', () => this.resizer());
+        }
+
+        start(targetId = 'scene-overlay') {
+            if (this.started && this.currentTargetId === targetId) return;
+            if (this.started) this.stop();
+            this.currentTargetId = targetId;
+            this.init(targetId);
+            if (!this.ctx) return;
+            this.started = true;
+            this.loop();
+        }
+
+        stop() {
+            this.started = false;
+            if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+            if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+
+        randomFrom(min, max) {
+            return (Math.random() * (max - min) + min);
+        }
+
+        resizer() {
+            if (!this.canvas || !this.overlay) return;
+            const width = this.overlay.clientWidth;
+            const height = this.overlay.clientHeight;
+            this.canvas.width = width;
+            this.canvas.height = height;
+            
+            const drop_count = Math.floor(width * this.rain_weight * 1.5);
+            this.drops = [];
+            for (let i = 0; i < drop_count; i++) {
+                this.drops[i] = new Drop(this);
+            }
+        }
+
+        loop() {
+            if (!this.started || !this.ctx || !this.canvas) return;
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            for (let i = 0; i < this.drops.length; i++) {
+                this.drops[i].fall();
+                this.drops[i].draw();
+            }
+            this.animationFrameId = requestAnimationFrame(() => this.loop());
+        }
+    }
+
+    class Drop {
+        constructor(effect) {
+            this.effect = effect;
+            this.reset();
+        }
+        
+        reset() {
+            const canvas = this.effect.canvas;
+            this.r = this.effect.randomFrom(0.8, 1.6);
+            this.l = (this.r * 250);
+            this.x = this.effect.randomFrom((canvas.width * -0.25), (canvas.width * 1.125));
+            this.y = this.effect.randomFrom((canvas.height * -0.25), (canvas.height * -1));
+            this.dx = this.effect.randomFrom((this.effect.wind_speed - 3), (this.effect.wind_speed + 3));
+            this.dy = (this.r * (100 * this.effect.fall_speed));
+            this.offset = (this.l * (this.dx / this.dy));
+            this.opacity = (this.r * this.effect.randomFrom(0.2, 0.6));
+            this.drip = this.render();
+        }
+
+        render() {
+            const canv = document.createElement('canvas');
+            const ctx = canv.getContext('2d');
+            const width = Math.abs(this.offset) + this.r;
+            if (width <= 0 || this.l <= 0) return null;
+            canv.setAttribute('width', width);
+            canv.setAttribute('height', this.l);
+            
+            ctx.beginPath();
+            const drip = ctx.createLinearGradient(0, 0, 0, this.l);
+            drip.addColorStop(0, 'rgba(' + this.effect.rain_color + ', 0)');
+            drip.addColorStop(1, 'rgba(' + this.effect.rain_color + ', ' + this.opacity + ')');
+            ctx.fillStyle = drip;
+            
+            const startX = (this.offset >= 0) ? 0 : Math.abs(this.offset);
+            ctx.moveTo(startX, 0);
+            ctx.lineTo(startX + this.r, 0);
+            ctx.lineTo(startX + this.r + this.offset, this.l);
+            ctx.lineTo(startX + this.offset, this.l);
+            ctx.closePath();
+            ctx.fill();
+            return canv;
+        }
+
+        draw() {
+            if (this.drip && this.effect.ctx) {
+                this.effect.ctx.drawImage(this.drip, this.x, this.y);
+            }
+        }
+
+        fall() {
+            this.x += this.dx;
+            this.y += this.dy;
+            if (this.y > (this.effect.canvas.height * 1.25)) {
+                this.reset();
+            }
+        }
+    }
+
+    const rainEffect = new RainEffect();
 
     const init = () => {
         if (gameData.gameBackgroundMusic) {
@@ -452,6 +607,16 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             vignetteScreen.style.backgroundImage = 'none';
         }
+
+        // Overlay Effect for Vignette
+        const vOverlay = document.getElementById('vignette-overlay');
+        if (vOverlay) {
+            vOverlay.className = 'scene-overlay'; 
+            if (scene.overlayEffect) {
+                vOverlay.classList.add('overlay-' + scene.overlayEffect);
+            }
+
+        }
         
         // Play background music for this vignette scene
         if (scene.backgroundMusic) {
@@ -461,6 +626,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Handle button click
         const handleVignetteClick = () => {
             vignetteContinueButton.removeEventListener('click', handleVignetteClick);
+            if (typeof rainEffect !== 'undefined') rainEffect.stop();
             
             if (scene.vignetteType === 'conclusion') {
                 // Restart game: Reset music FIRST, hide vignette, show splash
@@ -488,8 +654,51 @@ document.addEventListener('DOMContentLoaded', () => {
         
         vignetteContinueButton.addEventListener('click', handleVignetteClick);
         
-        // Show the vignette screen
+        // Show the vignette screen FIRST, then start rain effect after it's visible
         vignetteScreen.classList.remove('hidden');
+        
+        // Rain Effect Logic for Vignette (deferred to ensure element has dimensions)
+        if (scene.overlayEffect === 'rain') {
+            requestAnimationFrame(() => {
+                if (typeof rainEffect !== 'undefined') rainEffect.start('vignette-overlay');
+            });
+        } else {
+            if (typeof rainEffect !== 'undefined') rainEffect.stop();
+        }
+
+        // Blur Effect Logic for Vignette (deferred to ensure element has dimensions)
+        if (scene.overlayEffect === 'blur') {
+            requestAnimationFrame(() => {
+                const vOverlay = document.getElementById('vignette-overlay');
+                if (vOverlay) {
+                    // Clear any existing blur container first
+                    const existing = vOverlay.querySelector('.blur-overlay-container');
+                    if (existing) existing.remove();
+                    
+                    const blurContainer = document.createElement('div');
+                    blurContainer.className = 'blur-overlay-container';
+                    blurContainer.innerHTML = '<div class="blur-rumble-layer"></div><div class="blur-flicker-layer"></div><div class="blur-grain-layer"></div><div class="blur-vignette-layer"></div>';
+                    vOverlay.appendChild(blurContainer);
+                }
+            });
+        }
+
+        // Chromatic Aberration Effect Logic for Vignette (deferred to ensure element has dimensions)
+        if (scene.overlayEffect === 'chromatic') {
+            requestAnimationFrame(() => {
+                const vOverlay = document.getElementById('vignette-overlay');
+                if (vOverlay) {
+                    // Clear any existing chromatic container first
+                    const existing = vOverlay.querySelector('.chromatic-overlay-container');
+                    if (existing) existing.remove();
+                    
+                    const chromaticContainer = document.createElement('div');
+                    chromaticContainer.className = 'chromatic-overlay-container';
+                    chromaticContainer.innerHTML = '<div class="chromatic-jerk-wrapper"><div class="chromatic-layer chromatic-red"></div><div class="chromatic-layer chromatic-green"></div><div class="chromatic-layer chromatic-blue"></div><div class="chromatic-flicker"></div></div><div class="chromatic-scanlines"></div>';
+                    vOverlay.appendChild(chromaticContainer);
+                }
+            });
+        }
     };
 
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
@@ -547,6 +756,44 @@ document.addEventListener('DOMContentLoaded', () => {
         if (scene.image && gameData.enableImages !== false) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
         else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
         if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
+        
+        // Handle Overlay Effect
+        if (sceneOverlay) {
+            sceneOverlay.className = 'scene-overlay'; // Reset
+            // Clear previous effect DOM
+            const existingBlur = sceneOverlay.querySelector('.blur-overlay-container');
+            if (existingBlur) existingBlur.remove();
+            const existingChromatic = sceneOverlay.querySelector('.chromatic-overlay-container');
+            if (existingChromatic) existingChromatic.remove();
+            
+            if (scene.overlayEffect) {
+                sceneOverlay.classList.add('overlay-' + scene.overlayEffect);
+            }
+
+            // Rain Effect Logic
+            if (scene.overlayEffect === 'rain') {
+                if (typeof rainEffect !== 'undefined') rainEffect.start('scene-overlay');
+            } else {
+                if (typeof rainEffect !== 'undefined') rainEffect.stop();
+            }
+
+            // Blur Effect Logic - Inject DOM structure
+            if (scene.overlayEffect === 'blur') {
+                const blurContainer = document.createElement('div');
+                blurContainer.className = 'blur-overlay-container';
+                blurContainer.innerHTML = '<div class="blur-rumble-layer"></div><div class="blur-flicker-layer"></div><div class="blur-grain-layer"></div><div class="blur-vignette-layer"></div>';
+                sceneOverlay.appendChild(blurContainer);
+            }
+
+            // Chromatic Aberration Effect Logic - Inject DOM structure
+            if (scene.overlayEffect === 'chromatic') {
+                const chromaticContainer = document.createElement('div');
+                chromaticContainer.className = 'chromatic-overlay-container';
+                chromaticContainer.innerHTML = '<div class="chromatic-jerk-wrapper"><div class="chromatic-layer chromatic-red"></div><div class="chromatic-layer chromatic-green"></div><div class="chromatic-layer chromatic-blue"></div><div class="chromatic-flicker"></div></div><div class="chromatic-scanlines"></div>';
+                sceneOverlay.appendChild(chromaticContainer);
+            }
+        }
+
         sceneDescription.innerHTML = '';
         
         let fullDescription = scene.description;

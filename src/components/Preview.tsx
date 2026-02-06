@@ -1,6 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { GameData } from '../types';
+import { gameHTML, initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 
 // Helper to generate the correct Google Fonts URL from a font-family string.
@@ -200,6 +201,9 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                     ${defeat ? getAnimationCss(defeat, '#negative-ending-screen .content') : ''}
                 `;
             })()}
+
+
+            ${OVERLAY_CSS}
         `;
 
         let finalCss = (gameData.gameCSS + cssOverrides)

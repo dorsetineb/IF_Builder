@@ -70,6 +70,7 @@ export interface Scene {
   vignetteType?: 'opening' | 'transition' | 'conclusion' | 'none';
   vignetteButtonText?: string;
   vignetteNextSceneId?: string;
+  overlayEffect?: string;
 }
 
 export interface FixedVerb {
@@ -108,6 +109,7 @@ export interface Vignette {
   textAnimationType?: 'fade' | 'typewriter'; // Animation style for this vignette
   textSpeed?: number; // Animation speed (1-5) for this vignette
   nextSceneId?: string;
+  overlayEffect?: string;
 
   isConclusion?: boolean;
   isSystemDefeat?: boolean; // If true, shown when chances run out

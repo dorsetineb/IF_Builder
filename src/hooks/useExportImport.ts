@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { GameData, Scene, View } from '../types';
 import { getFontUrl, getFrameClass, getMimeTypeFromFileName } from '../utils/helpers';
 import { prepareGameDataForEngine, gameJS } from '../components/game-engine';
-import { gameHTML, gameCSS, initialGameData } from '../lib/gameDefaults';
+import { gameHTML, gameCSS, initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
 import DOMPurify from 'dompurify';
 
 declare var JSZip: any;
@@ -227,7 +227,9 @@ DATE:        ${exportDate.toLocaleString()}
             .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, exportData.gameFrameColor || '#FFFFFF')
             .replace(/__SCENE_NAME_OVERLAY_BG__/g, exportData.gameSceneNameOverlayBg || '#0d1117')
             .replace(/__SCENE_NAME_OVERLAY_TEXT_COLOR__/g, exportData.gameSceneNameOverlayTextColor || '#c9d1d9')
-            .replace(/__CONTINUE_INDICATOR_COLOR__/g, exportData.gameContinueIndicatorColor || exportData.gameTitleColor || '#58a6ff');
+            .replace(/__SCENE_NAME_OVERLAY_TEXT_COLOR__/g, exportData.gameSceneNameOverlayTextColor || '#c9d1d9')
+            .replace(/__CONTINUE_INDICATOR_COLOR__/g, exportData.gameContinueIndicatorColor || exportData.gameTitleColor || '#58a6ff') +
+            OVERLAY_CSS;
 
         zip.file("index.html", htmlContent);
         zip.file("style.css", css);

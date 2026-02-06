@@ -1,11 +1,17 @@
+
 import React, { useState, useEffect, DragEvent, useRef, useMemo, memo } from 'react';
-import { Scene, Interaction, GameObject, ConsequenceTracker, Choice, Vignette } from '../types';
+import { Scene, FixedVerb, Interaction, Vignette, GameObject, ConsequenceTracker, Choice } from '../types';
+import { initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
+import { generateUniqueId } from '../utils/helpers';
 import { MAX_IMAGE_SIZE, MAX_AUDIO_SIZE } from '../constants';
 import { useToast } from './ToastContext';
 import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
 import BranchingPreview from './BranchingPreview';
 import { Upload, Eye, Trash2, Plus, ArrowRight, Music, Image as ImageIcon, Flag, FileText, Scroll, GitBranch, Play } from 'lucide-react';
+import RainOverlay from './effects/RainOverlay';
+import BlurOverlay from './effects/BlurOverlay';
+import ChromaticOverlay from './effects/ChromaticOverlay';
 
 interface SceneEditorProps {
     scene: Scene;
@@ -197,7 +203,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             if (file.size > MAX_IMAGE_SIZE) {
-                toast("Erro no Upload", `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024}MB.`, "error");
+                toast("Erro no Upload", `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024} MB.`, "error");
                 if (e.target) (e.target as HTMLInputElement).value = '';
                 return;
             }
@@ -219,7 +225,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             if (file.size > MAX_AUDIO_SIZE) {
-                toast("Erro no Upload", `O áudio excede o limite de ${MAX_AUDIO_SIZE / 1024 / 1024}MB.`, "error");
+                toast("Erro no Upload", `O áudio excede o limite de ${MAX_AUDIO_SIZE / 1024 / 1024} MB.`, "error");
                 if (e.target) (e.target as HTMLInputElement).value = '';
                 return;
             }
@@ -244,7 +250,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const file = e.dataTransfer.files[0];
             if (file.size > MAX_IMAGE_SIZE) {
-                toast("Erro no Upload", `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024}MB.`, "error");
+                toast("Erro no Upload", `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024} MB.`, "error");
                 return;
             }
             const event = { target: { files: e.dataTransfer.files } } as unknown as React.ChangeEvent<HTMLInputElement>;
@@ -359,7 +365,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                     className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 ${activeTab === key
                                         ? 'border-primary text-primary bg-primary/5'
                                         : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
-                                        } ${isTabDisabled ? 'opacity-30 cursor-not-allowed' : ''}`}
+                                        } ${isTabDisabled ? 'opacity-30 cursor-not-allowed' : ''} `}
                                 >
                                     {name}
                                 </button>
@@ -455,7 +461,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                         className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border transition-all ${localScene.vignetteType === type.id
                                                                             ? 'bg-purple-500/20 border-purple-500 text-purple-300'
                                                                             : 'bg-zinc-900/50 border-muted-foreground/20 text-muted-foreground hover:bg-muted/10 hover:text-zinc-300'
-                                                                            }`}
+                                                                            } `}
                                                                     >
                                                                         <type.icon className="w-4 h-4" />
                                                                         <span className="text-[10px] font-bold uppercase">{type.label}</span>
@@ -562,6 +568,14 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
 
                                     {/* Image Preview Area */}
                                     <div className="relative w-full aspect-video bg-zinc-950 rounded-lg overflow-hidden border border-muted-foreground/20 group mb-6">
+                                        <style>{OVERLAY_CSS}</style>
+
+                                        {/* Overlay Layer - Always rendered but controlled by CSS class */}
+                                        <div className={`scene-overlay ${localScene.overlayEffect ? 'overlay-' + localScene.overlayEffect : ''}`} style={{ zIndex: 10 }}></div>
+                                        {localScene.overlayEffect === 'rain' && <RainOverlay />}
+                                        {localScene.overlayEffect === 'blur' && <BlurOverlay />}
+                                        {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
+
                                         {localScene.image ? (
                                             <>
                                                 <img src={localScene.image} alt={localScene.name} className="w-full h-full object-cover" />
@@ -593,12 +607,30 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         )}
                                     </div>
 
+                                    {/* Overlay Effect Section */}
+                                    <div className="space-y-2 mb-4">
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                                            Efeito Visual (Overlay)
+                                        </label>
+                                        <select
+                                            value={localScene.overlayEffect || ''}
+                                            onChange={(e) => updateLocalScene('overlayEffect', e.target.value)}
+                                            className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all [&>option]:bg-zinc-950"
+                                        >
+                                            <option value="">Nenhum</option>
+                                            <option value="grain">Granulado (Cinematográfico)</option>
+                                            <option value="rain">Chuva (Tempestade)</option>
+                                            <option value="blur">Vintage (Filme Antigo)</option>
+                                            <option value="chromatic">Scanline</option>
+                                        </select>
+                                    </div>
+
                                     {/* Audio Section */}
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha Sonora (.mp3)</label>
                                         <div className="flex items-center gap-3 p-3 bg-zinc-950/50 border border-dashed border-muted-foreground/30 rounded-lg hover:border-purple-500/30 transition-colors">
                                             <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center flex-shrink-0">
-                                                <Music className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-purple-400' : 'text-zinc-600'}`} />
+                                                <Music className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-purple-400' : 'text-zinc-600'} `} />
                                             </div>
                                             <div className="flex-grow min-w-0">
                                                 {localScene.backgroundMusic ? (
@@ -640,7 +672,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         </h3>
                                         <div className="space-y-3">
                                             {/* Chance Removal */}
-                                            <label className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.removesChanceOnEntry ? 'bg-zinc-900/80 border-red-500/30' : 'bg-transparent border-muted-foreground/20 hover:bg-muted/10'}`}>
+                                            <label className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.removesChanceOnEntry ? 'bg-zinc-900/80 border-red-500/30' : 'bg-transparent border-muted-foreground/20 hover:bg-muted/10'} `}>
                                                 <div className="relative flex items-center mt-0.5">
                                                     <input
                                                         type="checkbox"
@@ -651,13 +683,13 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                     />
                                                 </div>
                                                 <div>
-                                                    <span className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-400' : 'text-zinc-400 group-hover:text-zinc-300'}`}>Esta cena remove uma chance</span>
+                                                    <span className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-400' : 'text-zinc-400 group-hover:text-zinc-300'} `}>Esta cena remove uma chance</span>
                                                     <span className="block text-[10px] text-muted-foreground mt-0.5">O jogador perde uma vida/tentativa ao entrar aqui.</span>
                                                 </div>
                                             </label>
 
                                             {/* Chance Restoration */}
-                                            <label className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.restoresChanceOnEntry ? 'bg-zinc-900/80 border-green-500/30' : 'bg-transparent border-muted-foreground/20 hover:bg-muted/10'}`}>
+                                            <label className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.restoresChanceOnEntry ? 'bg-zinc-900/80 border-green-500/30' : 'bg-transparent border-muted-foreground/20 hover:bg-muted/10'} `}>
                                                 <div className="relative flex items-center mt-0.5">
                                                     <input
                                                         type="checkbox"
@@ -668,7 +700,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                     />
                                                 </div>
                                                 <div>
-                                                    <span className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-400' : 'text-zinc-400 group-hover:text-zinc-300'}`}>Esta cena restaura uma chance</span>
+                                                    <span className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-400' : 'text-zinc-400 group-hover:text-zinc-300'} `}>Esta cena restaura uma chance</span>
                                                     <span className="block text-[10px] text-muted-foreground mt-0.5">O jogador ganha uma vida extra ou cura.</span>
                                                 </div>
                                             </label>
@@ -728,17 +760,17 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                             <button
                                                 key={choice.id}
                                                 onClick={() => setSelectedChoiceId(choice.id)}
-                                                className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedChoiceId === choice.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
+                                                className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedChoiceId === choice.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'} `}
                                             >
                                                 <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0">
-                                                    <ArrowRight className={`w-4 h-4 ${selectedChoiceId === choice.id ? 'text-purple-400' : 'text-zinc-600'}`} />
+                                                    <ArrowRight className={`w-4 h-4 ${selectedChoiceId === choice.id ? 'text-purple-400' : 'text-zinc-600'} `} />
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <div className={`text-xs font-bold truncate ${selectedChoiceId === choice.id ? 'text-purple-300' : 'text-zinc-300'}`}>
+                                                    <div className={`text-xs font-bold truncate ${selectedChoiceId === choice.id ? 'text-purple-300' : 'text-zinc-300'} `}>
                                                         {choice.label || 'Nova Escolha'}
                                                     </div>
                                                     <div className="text-[10px] text-zinc-500 font-mono truncate">
-                                                        {choice.targetSceneId ? `-> ${allScenes.find(s => s.id === choice.targetSceneId)?.name || choice.targetSceneId}` : '(Sem destino)'}
+                                                        {choice.targetSceneId ? `-> ${allScenes.find(s => s.id === choice.targetSceneId)?.name || choice.targetSceneId} ` : '(Sem destino)'}
                                                     </div>
                                                 </div>
                                             </button>
@@ -749,7 +781,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                 <div className="p-3 border-t border-muted-foreground/10 bg-zinc-900/50">
                                     <button
                                         onClick={() => {
-                                            const newId = `choice_${Date.now()}`;
+                                            const newId = `choice_${Date.now()} `;
                                             const newChoice: Choice = {
                                                 id: newId,
                                                 label: 'Nova Escolha',
