@@ -41,7 +41,8 @@ export const useExportImport = ({
         // IF Builder stores everything in JSON as base64 or URL.
         // We need to bundle assets.
 
-        const exportData = JSON.parse(JSON.stringify(gameData));
+        // Deep clone gameData (JSON parse/stringify for max compatibility)
+        const exportData = JSON.parse(JSON.stringify(gameData)) as any;
         const assetsFolder = zip.folder("assets");
         const assetMap = new Map<string, string>(); // base64 -> filename
 
@@ -235,7 +236,12 @@ DATE:        ${exportDate.toLocaleString()}
         zip.file("style.css", css);
         zip.file("game.js", finalGameScript);
 
-        const zipContent = await zip.generateAsync({ type: "blob", compression: "DEFLATE" });
+        // Use lower compression level for speed
+        const zipContent = await zip.generateAsync({
+            type: "blob",
+            compression: "DEFLATE",
+            compressionOptions: { level: 1 }
+        });
         const finalBlob = new Blob([zipContent], { type: "application/zip" });
         const link = document.createElement('a');
         link.href = URL.createObjectURL(finalBlob);
@@ -334,7 +340,7 @@ DATE:        ${exportDate.toLocaleString()}
         }
 
         setGameData(prev => ({
-            ...prev,
+            ...initialGameData, // Start fresh to avoid ghost data from previous session
             ...data,
             scenes: cleanedScenes,
             sceneOrder: newSceneOrder,
