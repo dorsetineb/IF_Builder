@@ -1084,6 +1084,22 @@ export const OVERLAY_CSS = `
     50% { top: 110%; opacity: 0; }
     100% { top: 110%; opacity: 0; }
 }
+
+/* Confetti Effect */
+.scene-overlay.overlay-confetti {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+.confetti-canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
 `;
 
 export const initialGameData: GameData = {

@@ -13,6 +13,7 @@ import RainOverlay from './effects/RainOverlay';
 import BlurOverlay from './effects/BlurOverlay';
 import ChromaticOverlay from './effects/ChromaticOverlay';
 import TVOverlay from './effects/TVOverlay';
+import ConfettiOverlay from './effects/ConfettiOverlay';
 
 interface SceneEditorProps {
     scene: Scene;
@@ -577,6 +578,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         {localScene.overlayEffect === 'blur' && <BlurOverlay />}
                                         {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
                                         {localScene.overlayEffect === 'tv' && <TVOverlay />}
+                                        {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
 
                                         {localScene.image ? (
                                             <>
@@ -625,6 +627,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                             <option value="blur">Vintage (Filme Antigo)</option>
                                             <option value="chromatic">Scanline</option>
                                             <option value="tv">Televisor (CRT)</option>
+                                            <option value="confetti">Confetes (Celebração)</option>
                                         </select>
                                     </div>
 

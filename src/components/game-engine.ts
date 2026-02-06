@@ -402,6 +402,255 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const rainEffect = new RainEffect();
 
+    // Confetti Effect Classes
+    class Vector2 {
+        constructor(x, y) { this.x = x; this.y = y; }
+        Length() { return Math.sqrt(this.x * this.x + this.y * this.y); }
+        Add(v) { this.x += v.x; this.y += v.y; }
+        Sub(v) { this.x -= v.x; this.y -= v.y; }
+        Div(f) { this.x /= f; this.y /= f; }
+        Mul(f) { this.x *= f; this.y *= f; }
+        Normalize() {
+            const len = this.Length();
+            if (len !== 0) { this.x /= len; this.y /= len; }
+        }
+        static Sub(v0, v1) { return new Vector2(v0.x - v1.x, v0.y - v1.y); }
+    }
+
+    class EulerMass {
+        constructor(x, y, mass, drag) {
+            this.position = new Vector2(x, y);
+            this.mass = mass; this.drag = drag;
+            this.force = new Vector2(0, 0);
+            this.velocity = new Vector2(0, 0);
+        }
+        AddForce(f) { this.force.Add(f); }
+        Integrate(dt) {
+            const acc = new Vector2(this.force.x, this.force.y);
+            const speed = this.velocity.Length();
+            const dragVel = new Vector2(this.velocity.x, this.velocity.y);
+            dragVel.Mul(this.drag * this.mass * speed);
+            acc.Sub(dragVel);
+            acc.Div(this.mass);
+            const posDelta = new Vector2(this.velocity.x, this.velocity.y);
+            posDelta.Mul(dt);
+            this.position.Add(posDelta);
+            acc.Mul(dt);
+            this.velocity.Add(acc);
+            this.force = new Vector2(0, 0);
+        }
+    }
+
+    class ConfettiPaper {
+        constructor(x, y, effect) {
+            this.effect = effect;
+            this.pos = new Vector2(x, y);
+            this.rotationSpeed = Math.random() * 600 + 800;
+            this.angle = (Math.PI / 180) * Math.random() * 360;
+            this.rotation = (Math.PI / 180) * Math.random() * 360;
+            this.cosA = 1.0;
+            this.size = 5.0;
+            this.oscillationSpeed = Math.random() * 1.5 + 0.5;
+            this.xSpeed = 40.0;
+            this.ySpeed = Math.random() * 60 + 50.0;
+            this.corners = [];
+            this.time = Math.random();
+            const colors = [["#df0049","#660671"],["#00e857","#005291"],["#2bebbc","#05798a"],["#ffd200","#b06c00"]];
+            const ci = Math.round(Math.random() * (colors.length - 1));
+            this.frontColor = colors[ci][0];
+            this.backColor = colors[ci][1];
+            for (let i = 0; i < 4; i++) {
+                this.corners[i] = new Vector2(
+                    Math.cos(this.angle + (Math.PI / 180) * (i * 90 + 45)),
+                    Math.sin(this.angle + (Math.PI / 180) * (i * 90 + 45))
+                );
+            }
+        }
+        Update(dt) {
+            this.time += dt;
+            this.rotation += this.rotationSpeed * dt;
+            this.cosA = Math.cos((Math.PI / 180) * this.rotation);
+            this.pos.x += Math.cos(this.time * this.oscillationSpeed) * this.xSpeed * dt;
+            this.pos.y += this.ySpeed * dt;
+            if (this.pos.y > this.effect.canvasHeight) {
+                this.pos.x = Math.random() * this.effect.canvasWidth;
+                this.pos.y = 0;
+            }
+        }
+        Draw(g) {
+            const retina = window.devicePixelRatio || 1;
+            g.fillStyle = this.cosA > 0 ? this.frontColor : this.backColor;
+            g.beginPath();
+            g.moveTo((this.pos.x + this.corners[0].x * this.size) * retina, (this.pos.y + this.corners[0].y * this.size * this.cosA) * retina);
+            for (let i = 1; i < 4; i++) {
+                g.lineTo((this.pos.x + this.corners[i].x * this.size) * retina, (this.pos.y + this.corners[i].y * this.size * this.cosA) * retina);
+            }
+            g.closePath();
+            g.fill();
+        }
+    }
+
+    class ConfettiRibbon {
+        constructor(x, y, count, dist, thickness, angle, mass, drag, effect) {
+            this.effect = effect;
+            this.particleDist = dist; this.particleCount = count;
+            this.particleMass = mass; this.particleDrag = drag;
+            this.particles = [];
+            const colors = [["#df0049","#660671"],["#00e857","#005291"],["#2bebbc","#05798a"],["#ffd200","#b06c00"]];
+            const ci = Math.round(Math.random() * (colors.length - 1));
+            this.frontColor = colors[ci][0]; this.backColor = colors[ci][1];
+            this.xOff = Math.cos((Math.PI / 180) * angle) * thickness;
+            this.yOff = Math.sin((Math.PI / 180) * angle) * thickness;
+            this.position = new Vector2(x, y);
+            this.prevPosition = new Vector2(x, y);
+            this.velocityInherit = Math.random() * 2 + 4;
+            this.time = Math.random() * 100;
+            this.oscillationSpeed = Math.random() * 2 + 2;
+            this.oscillationDistance = Math.random() * 40 + 40;
+            this.ySpeed = Math.random() * 40 + 80;
+            for (let i = 0; i < this.particleCount; i++) {
+                this.particles[i] = new EulerMass(x, y - i * this.particleDist, this.particleMass, this.particleDrag);
+            }
+        }
+        Update(dt) {
+            this.time += dt * this.oscillationSpeed;
+            this.position.y += this.ySpeed * dt;
+            this.position.x += Math.cos(this.time) * this.oscillationDistance * dt;
+            this.particles[0].position = this.position;
+            const dX = this.prevPosition.x - this.position.x;
+            const dY = this.prevPosition.y - this.position.y;
+            const delta = Math.sqrt(dX * dX + dY * dY);
+            this.prevPosition = new Vector2(this.position.x, this.position.y);
+            for (let i = 1; i < this.particleCount; i++) {
+                const dirP = Vector2.Sub(this.particles[i - 1].position, this.particles[i].position);
+                dirP.Normalize();
+                dirP.Mul((delta / dt) * this.velocityInherit);
+                this.particles[i].AddForce(dirP);
+            }
+            for (let i = 1; i < this.particleCount; i++) {
+                this.particles[i].Integrate(dt);
+            }
+            for (let i = 1; i < this.particleCount; i++) {
+                const rp2 = new Vector2(this.particles[i].position.x, this.particles[i].position.y);
+                rp2.Sub(this.particles[i - 1].position);
+                rp2.Normalize();
+                rp2.Mul(this.particleDist);
+                rp2.Add(this.particles[i - 1].position);
+                this.particles[i].position = rp2;
+            }
+            if (this.position.y > this.effect.canvasHeight + this.particleDist * this.particleCount) {
+                this.Reset();
+            }
+        }
+        Reset() {
+            this.position.y = -Math.random() * this.effect.canvasHeight;
+            this.position.x = Math.random() * this.effect.canvasWidth;
+            this.prevPosition = new Vector2(this.position.x, this.position.y);
+            this.velocityInherit = Math.random() * 2 + 4;
+            this.time = Math.random() * 100;
+            this.oscillationSpeed = Math.random() * 2.0 + 1.5;
+            this.oscillationDistance = Math.random() * 40 + 40;
+            this.ySpeed = Math.random() * 40 + 80;
+            const colors = [["#df0049","#660671"],["#00e857","#005291"],["#2bebbc","#05798a"],["#ffd200","#b06c00"]];
+            const ci = Math.round(Math.random() * (colors.length - 1));
+            this.frontColor = colors[ci][0]; this.backColor = colors[ci][1];
+            this.particles = [];
+            for (let i = 0; i < this.particleCount; i++) {
+                this.particles[i] = new EulerMass(this.position.x, this.position.y - i * this.particleDist, this.particleMass, this.particleDrag);
+            }
+        }
+        Side(x1, y1, x2, y2, x3, y3) { return (x1 - x2) * (y3 - y2) - (y1 - y2) * (x3 - x2); }
+        Draw(g) {
+            const retina = window.devicePixelRatio || 1;
+            for (let i = 0; i < this.particleCount - 1; i++) {
+                const p0 = new Vector2(this.particles[i].position.x + this.xOff, this.particles[i].position.y + this.yOff);
+                const p1 = new Vector2(this.particles[i + 1].position.x + this.xOff, this.particles[i + 1].position.y + this.yOff);
+                g.fillStyle = this.Side(this.particles[i].position.x, this.particles[i].position.y, this.particles[i + 1].position.x, this.particles[i + 1].position.y, p1.x, p1.y) < 0 ? this.frontColor : this.backColor;
+                g.strokeStyle = g.fillStyle;
+                g.beginPath();
+                g.moveTo(this.particles[i].position.x * retina, this.particles[i].position.y * retina);
+                g.lineTo(this.particles[i + 1].position.x * retina, this.particles[i + 1].position.y * retina);
+                g.lineTo(p1.x * retina, p1.y * retina);
+                g.lineTo(p0.x * retina, p0.y * retina);
+                g.closePath();
+                g.stroke();
+                g.fill();
+            }
+        }
+    }
+
+    class ConfettiEffect {
+        constructor() {
+            this.canvas = null; this.ctx = null;
+            this.papers = []; this.ribbons = [];
+            this.animationFrameId = null;
+            this.overlay = null;
+            this.canvasWidth = 0; this.canvasHeight = 0;
+            this.started = false;
+            this.duration = 1.0 / 50;
+        }
+        init(targetId) {
+            this.overlay = document.getElementById(targetId);
+            if (!this.overlay) return;
+            let canvas = this.overlay.querySelector('.confetti-canvas');
+            if (!canvas) {
+                this.canvas = document.createElement('canvas');
+                this.canvas.className = 'confetti-canvas';
+                this.overlay.appendChild(this.canvas);
+            } else {
+                this.canvas = canvas;
+            }
+            this.ctx = this.canvas.getContext('2d');
+            this.resizer();
+            window.addEventListener('resize', () => this.resizer());
+        }
+        start(targetId = 'scene-overlay') {
+            if (this.started && this.currentTargetId === targetId) return;
+            if (this.started) this.stop();
+            this.currentTargetId = targetId;
+            this.init(targetId);
+            if (!this.ctx) return;
+            this.started = true;
+            this.loop();
+        }
+        stop() {
+            this.started = false;
+            if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+            if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+        resizer() {
+            if (!this.canvas || !this.overlay) return;
+            const retina = window.devicePixelRatio || 1;
+            this.canvasWidth = this.overlay.clientWidth;
+            this.canvasHeight = this.overlay.clientHeight;
+            this.canvas.width = this.canvasWidth * retina;
+            this.canvas.height = this.canvasHeight * retina;
+            this.papers = [];
+            for (let i = 0; i < 95; i++) {
+                this.papers.push(new ConfettiPaper(Math.random() * this.canvasWidth, Math.random() * this.canvasHeight, this));
+            }
+            this.ribbons = [];
+            for (let i = 0; i < 11; i++) {
+                this.ribbons.push(new ConfettiRibbon(Math.random() * this.canvasWidth, -Math.random() * this.canvasHeight * 2, 30, 8.0, 8.0, 45, 1, 0.05, this));
+            }
+        }
+        loop() {
+            if (!this.started || !this.ctx || !this.canvas) return;
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            for (let i = 0; i < this.papers.length; i++) {
+                this.papers[i].Update(this.duration);
+                this.papers[i].Draw(this.ctx);
+            }
+            for (let i = 0; i < this.ribbons.length; i++) {
+                this.ribbons[i].Update(this.duration);
+                this.ribbons[i].Draw(this.ctx);
+            }
+            this.animationFrameId = requestAnimationFrame(() => this.loop());
+        }
+    }
+
+    const confettiEffect = new ConfettiEffect();
+
     const init = () => {
         if (gameData.gameBackgroundMusic) {
             playBgm(gameData.gameBackgroundMusic);
@@ -729,6 +978,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 vOverlay.parentElement?.classList.remove('tv-distortion-active-lg');
             }
         }
+
+        // Confetti Effect Logic for Vignette (deferred to ensure element has dimensions)
+        if (scene.overlayEffect === 'confetti') {
+            requestAnimationFrame(() => {
+                if (typeof confettiEffect !== 'undefined') confettiEffect.start('vignette-overlay');
+            });
+        } else {
+            if (typeof confettiEffect !== 'undefined') confettiEffect.stop();
+        }
     };
 
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
@@ -797,6 +1055,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (existingChromatic) existingChromatic.remove();
             const existingTV = sceneOverlay.querySelector('.tv-overlay-container');
             if (existingTV) existingTV.remove();
+            const existingConfetti = sceneOverlay.querySelector('.confetti-overlay-container');
+            if (existingConfetti) existingConfetti.remove();
             
             if (scene.overlayEffect) {
                 sceneOverlay.classList.add('overlay-' + scene.overlayEffect);
@@ -835,6 +1095,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 sceneOverlay.appendChild(tvContainer);
             } else {
                 sceneOverlay.parentElement?.classList.remove('tv-distortion-active');
+            }
+
+            // Confetti Effect Logic - Inject canvas and start animation
+            if (scene.overlayEffect === 'confetti') {
+                if (typeof confettiEffect !== 'undefined') confettiEffect.start('scene-overlay');
+            } else {
+                if (typeof confettiEffect !== 'undefined') confettiEffect.stop();
             }
         }
 
