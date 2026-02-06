@@ -706,7 +706,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 const vOverlay = document.getElementById('vignette-overlay');
                 if (vOverlay) {
                     // Apply distortion to parent (likely body or wrapper for vignette)
-                    vOverlay.parentElement?.classList.add('tv-distortion-active');
+                    // Use LG version for full screen vignette to compensate for pixel density/size
+                    vOverlay.parentElement?.classList.add('tv-distortion-active-lg');
 
                     // Clear any existing TV container first
                     const existing = vOverlay.querySelector('.tv-overlay-container');
@@ -722,7 +723,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Remove distortion class if not TV
             const vOverlay = document.getElementById('vignette-overlay');
             if (vOverlay) {
-                vOverlay.parentElement?.classList.remove('tv-distortion-active');
+                vOverlay.parentElement?.classList.remove('tv-distortion-active-lg');
             }
         }
     };

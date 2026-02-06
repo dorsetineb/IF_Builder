@@ -175,7 +175,32 @@ export const gameHTML = `
         <feTurbulence type="fractalNoise" baseFrequency="0.001 0.75" numOctaves="1" result="noise" seed="0">
           <animate attributeName="baseFrequency" values="0.001 0.75; 0.001 0.76; 0.001 0.75" dur="0.15s" repeatCount="indefinite" />
         </feTurbulence>
-        <feDisplacementMap in="rgb" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="R" result="distorted"/>
+        <feDisplacementMap in="rgb" in2="noise" scale="1" xChannelSelector="R" yChannelSelector="R" result="distorted"/>
+      </filter>
+      
+      <filter id="tv-distortion-filter-lg" x="-20%" y="-20%" width="140%" height="140%">
+        <!-- 1. Chromatic Aberration (RGB Shift) -->
+        <feOffset in="SourceGraphic" dx="-4" dy="0" result="r_offset">
+          <animate attributeName="dx" values="-4;-3;-5;-4" dur="0.2s" repeatCount="indefinite"/>
+        </feOffset>
+        <feOffset in="SourceGraphic" dx="4" dy="0" result="b_offset">
+          <animate attributeName="dx" values="4;3;5;4" dur="0.3s" repeatCount="indefinite"/>
+        </feOffset>
+        <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+        
+        <!-- Split channels & merge with Screen blend mode (Fixes Blue Tint) -->
+        <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
+        <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
+        <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
+        
+        <feBlend in="red" in2="green" mode="screen" result="rg"/>
+        <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>
+        
+        <!-- 2. Horizontal Glitch/Jitter Distortion (Stronger for Large Screens) -->
+        <feTurbulence type="fractalNoise" baseFrequency="0.001 0.75" numOctaves="1" result="noise" seed="0">
+          <animate attributeName="baseFrequency" values="0.001 0.75; 0.001 0.76; 0.001 0.75" dur="0.15s" repeatCount="indefinite" />
+        </feTurbulence>
+        <feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="R" result="distorted"/>
       </filter>
     </defs>
   </svg>
@@ -923,9 +948,19 @@ export const OVERLAY_CSS = `
     /* Force hardware acceleration */
     transform: translateZ(0); 
 }
+.tv-distortion-active-lg {
+    /* Force hardware acceleration */
+    transform: translateZ(0); 
+}
 .tv-distortion-active img, 
 .tv-distortion-active .scene-image {
     filter: url(#tv-distortion-filter) !important;
+    transform: scale(1.02);
+}
+.tv-distortion-active-lg img, 
+.tv-distortion-active-lg .scene-image,
+.tv-distortion-active-lg video {
+    filter: url(#tv-distortion-filter-lg) !important;
     transform: scale(1.02);
 }
 
@@ -934,16 +969,19 @@ export const OVERLAY_CSS = `
     inset: 0;
     overflow: hidden;
     z-index: 10;
-    border-radius: 12px;
-    box-shadow: inset 0 0 40px rgba(0,0,0,0.7);
+    /* Responsive curvature */
+    border-radius: clamp(10px, 2vmin, 20px); 
+    /* Deep inset shadow relative to viewport size for consistent look */
+    box-shadow: inset 0 0 10vmin rgba(0,0,0,0.7); 
 }
 
 .scene-overlay.overlay-tv .tv-screen-wrapper {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    border-radius: 12px;
-    box-shadow: inset 0 0 20px rgba(0,0,0,0.8), inset 0 0 8px rgba(0,0,0,0.8);
+    border-radius: clamp(10px, 2vmin, 20px);
+    /* Inner shadow to simulate curved glass edges */
+    box-shadow: inset 0 0 5vmin rgba(0,0,0,0.8), inset 0 0 1vmin rgba(0,0,0,0.8);
     z-index: 20;
 }
 
@@ -959,7 +997,7 @@ export const OVERLAY_CSS = `
     );
     pointer-events: none;
     z-index: 3;
-    opacity: 0.7;
+    opacity: 0.6;
 }
 
 .scene-overlay.overlay-tv .tv-rgb-grid {
@@ -1004,7 +1042,7 @@ export const OVERLAY_CSS = `
     pointer-events: none;
     z-index: 5;
     animation: tvGlowPulse 5s ease-in-out infinite alternate;
-    opacity: 0.6;
+    opacity: 0.5;
 }
 
 .scene-overlay.overlay-tv .tv-flicker {

@@ -45,8 +45,10 @@ const TVOverlay: React.FC = () => {
                         inset: 0;
                         overflow: hidden;
                         z-index: 10;
-                        border-radius: 12px; /* Matching the curvature */
-                        box-shadow: inset 0 0 40px rgba(0,0,0,0.7); /* Deep inset shadow for depth */
+                        /* Responsive curvature */
+                        border-radius: clamp(10px, 2vmin, 20px); 
+                        /* Deep inset shadow relative to viewport size for consistent look */
+                        box-shadow: inset 0 0 10vmin rgba(0,0,0,0.7); 
                     }
 
                     /* Bezel/Glass Curvature Simulation */
@@ -54,9 +56,9 @@ const TVOverlay: React.FC = () => {
                         position: absolute;
                         inset: 0;
                         overflow: hidden;
-                        border-radius: 12px; 
+                        border-radius: clamp(10px, 2vmin, 20px);
                         /* Inner shadow to simulate curved glass edges */
-                        box-shadow: inset 0 0 20px rgba(0,0,0,0.8), inset 0 0 8px rgba(0,0,0,0.8);
+                        box-shadow: inset 0 0 5vmin rgba(0,0,0,0.8), inset 0 0 1vmin rgba(0,0,0,0.8);
                         z-index: 20;
                     }
                     
@@ -73,7 +75,7 @@ const TVOverlay: React.FC = () => {
                         );
                         pointer-events: none;
                         z-index: 3;
-                        opacity: 0.7; /* Increased opacity */
+                        opacity: 0.6;
                     }
 
                     /* RGB Pixel Grid - More visible */
@@ -121,7 +123,7 @@ const TVOverlay: React.FC = () => {
                         pointer-events: none;
                         z-index: 5;
                         animation: tvGlowPulse 5s ease-in-out infinite alternate;
-                        opacity: 0.6;
+                        opacity: 0.5;
                     }
 
                     /* Flicker */
