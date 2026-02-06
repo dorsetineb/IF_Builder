@@ -154,17 +154,28 @@ export const gameHTML = `
   <svg style="display: none;">
     <defs>
       <filter id="tv-distortion-filter" x="-20%" y="-20%" width="140%" height="140%">
-        <feOffset in="SourceGraphic" dx="-2" dy="0" result="r_offset" />
-        <feOffset in="SourceGraphic" dx="2" dy="0" result="b_offset" />
+        <!-- 1. Chromatic Aberration (RGB Shift) -->
+        <feOffset in="SourceGraphic" dx="-4" dy="0" result="r_offset">
+          <animate attributeName="dx" values="-4;-3;-5;-4" dur="0.2s" repeatCount="indefinite"/>
+        </feOffset>
+        <feOffset in="SourceGraphic" dx="4" dy="0" result="b_offset">
+          <animate attributeName="dx" values="4;3;5;4" dur="0.3s" repeatCount="indefinite"/>
+        </feOffset>
         <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+        
+        <!-- Split channels & merge with Screen blend mode (Fixes Blue Tint) -->
         <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
         <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
         <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
-        <feMerge>
-          <feMergeNode in="red" />
-          <feMergeNode in="green" />
-          <feMergeNode in="blue" />
-        </feMerge>
+        
+        <feBlend in="red" in2="green" mode="screen" result="rg"/>
+        <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>
+        
+        <!-- 2. Horizontal Glitch/Jitter Distortion -->
+        <feTurbulence type="fractalNoise" baseFrequency="0.001 0.75" numOctaves="1" result="noise" seed="0">
+          <animate attributeName="baseFrequency" values="0.001 0.75; 0.001 0.76; 0.001 0.75" dur="0.15s" repeatCount="indefinite" />
+        </feTurbulence>
+        <feDisplacementMap in="rgb" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="R" result="distorted"/>
       </filter>
     </defs>
   </svg>
