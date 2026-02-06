@@ -883,6 +883,105 @@ export const OVERLAY_CSS = `
     42% { transform: translate(-2px, 0) scale(1, 1.01) skew(1deg, 0deg); opacity: 0.95; }
     43% { transform: translate(0, 0) scale(1) skew(0deg, 0deg); opacity: 1; }
 }
+
+/* TV/CRT Effect */
+.scene-overlay.overlay-tv {
+    display: block;
+    overflow: hidden;
+}
+.scene-overlay.overlay-tv .tv-overlay-container {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    z-index: 1;
+}
+.scene-overlay.overlay-tv .tv-screen-wrapper {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: 8px;
+}
+.scene-overlay.overlay-tv .tv-scanlines {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0px, rgba(0, 0, 0, 0.15) 1px, transparent 1px, transparent 3px);
+    pointer-events: none;
+    z-index: 3;
+}
+.scene-overlay.overlay-tv .tv-rgb-grid {
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(90deg, rgba(255, 0, 0, 0.03) 0px, rgba(255, 0, 0, 0.03) 1px, rgba(0, 255, 0, 0.03) 1px, rgba(0, 255, 0, 0.03) 2px, rgba(0, 0, 255, 0.03) 2px, rgba(0, 0, 255, 0.03) 3px);
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.6;
+}
+.scene-overlay.overlay-tv .tv-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.15) 80%, rgba(0, 0, 0, 0.4) 100%);
+    pointer-events: none;
+    z-index: 4;
+}
+.scene-overlay.overlay-tv .tv-glow {
+    position: absolute;
+    inset: -2px;
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 1;
+    animation: tvGlowPulse 4s ease-in-out infinite;
+}
+.scene-overlay.overlay-tv .tv-flicker {
+    position: absolute;
+    inset: 0;
+    background: transparent;
+    animation: tvFlicker 50ms infinite;
+    pointer-events: none;
+    z-index: 5;
+}
+.scene-overlay.overlay-tv .tv-interference {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+    pointer-events: none;
+    z-index: 6;
+    animation: tvInterference 8s linear infinite;
+    opacity: 0;
+}
+.scene-overlay.overlay-tv .tv-aberration-r {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 0, 0, 0.02);
+    mix-blend-mode: screen;
+    transform: translateX(-1px);
+    pointer-events: none;
+}
+.scene-overlay.overlay-tv .tv-aberration-b {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 255, 0.02);
+    mix-blend-mode: screen;
+    transform: translateX(1px);
+    pointer-events: none;
+}
+@keyframes tvFlicker {
+    0% { opacity: 0.97; }
+    50% { opacity: 1; }
+    100% { opacity: 0.97; }
+}
+@keyframes tvGlowPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
+}
+@keyframes tvInterference {
+    0% { top: -3px; opacity: 0; }
+    2% { opacity: 0.8; }
+    4% { opacity: 0; }
+    20% { top: 100%; opacity: 0; }
+    100% { top: 100%; opacity: 0; }
+}
 `;
 
 export const initialGameData: GameData = {

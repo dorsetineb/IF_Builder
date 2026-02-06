@@ -699,6 +699,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
+
+        // TV Effect Logic for Vignette (deferred to ensure element has dimensions)
+        if (scene.overlayEffect === 'tv') {
+            requestAnimationFrame(() => {
+                const vOverlay = document.getElementById('vignette-overlay');
+                if (vOverlay) {
+                    // Clear any existing TV container first
+                    const existing = vOverlay.querySelector('.tv-overlay-container');
+                    if (existing) existing.remove();
+                    
+                    const tvContainer = document.createElement('div');
+                    tvContainer.className = 'tv-overlay-container';
+                    tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-aberration-r"></div><div class="tv-aberration-b"></div><div class="tv-glow"></div><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
+                    vOverlay.appendChild(tvContainer);
+                }
+            });
+        }
     };
 
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
@@ -765,6 +782,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (existingBlur) existingBlur.remove();
             const existingChromatic = sceneOverlay.querySelector('.chromatic-overlay-container');
             if (existingChromatic) existingChromatic.remove();
+            const existingTV = sceneOverlay.querySelector('.tv-overlay-container');
+            if (existingTV) existingTV.remove();
             
             if (scene.overlayEffect) {
                 sceneOverlay.classList.add('overlay-' + scene.overlayEffect);
@@ -791,6 +810,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 chromaticContainer.className = 'chromatic-overlay-container';
                 chromaticContainer.innerHTML = '<div class="chromatic-jerk-wrapper"><div class="chromatic-layer chromatic-red"></div><div class="chromatic-layer chromatic-green"></div><div class="chromatic-layer chromatic-blue"></div><div class="chromatic-flicker"></div></div><div class="chromatic-scanlines"></div>';
                 sceneOverlay.appendChild(chromaticContainer);
+            }
+
+            // TV Effect Logic - Inject DOM structure
+            if (scene.overlayEffect === 'tv') {
+                const tvContainer = document.createElement('div');
+                tvContainer.className = 'tv-overlay-container';
+                tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-aberration-r"></div><div class="tv-aberration-b"></div><div class="tv-glow"></div><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
+                sceneOverlay.appendChild(tvContainer);
             }
         }
 

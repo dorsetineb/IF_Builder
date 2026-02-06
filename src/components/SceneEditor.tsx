@@ -12,6 +12,7 @@ import { Upload, Eye, Trash2, Plus, ArrowRight, Music, Image as ImageIcon, Flag,
 import RainOverlay from './effects/RainOverlay';
 import BlurOverlay from './effects/BlurOverlay';
 import ChromaticOverlay from './effects/ChromaticOverlay';
+import TVOverlay from './effects/TVOverlay';
 
 interface SceneEditorProps {
     scene: Scene;
@@ -575,6 +576,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         {localScene.overlayEffect === 'rain' && <RainOverlay />}
                                         {localScene.overlayEffect === 'blur' && <BlurOverlay />}
                                         {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
+                                        {localScene.overlayEffect === 'tv' && <TVOverlay />}
 
                                         {localScene.image ? (
                                             <>
@@ -622,6 +624,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                             <option value="rain">Chuva (Tempestade)</option>
                                             <option value="blur">Vintage (Filme Antigo)</option>
                                             <option value="chromatic">Scanline</option>
+                                            <option value="tv">Televisor (CRT)</option>
                                         </select>
                                     </div>
 
