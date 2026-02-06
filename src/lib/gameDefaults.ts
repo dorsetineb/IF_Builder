@@ -1109,7 +1109,7 @@ export const initialGameData: GameData = {
     sceneOrder: [],
     defaultFailureMessage: 'Não aconteceu nada.',
     gameHTML: gameHTML,
-    gameCSS: gameCSS,
+    gameCSS: gameCSS + OVERLAY_CSS,
     gameTitle: 'Minha Aventura de Texto',
     gameSystemEnabled: 'none',
     enableTrackers: false,
