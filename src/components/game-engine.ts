@@ -705,16 +705,25 @@ document.addEventListener('DOMContentLoaded', () => {
             requestAnimationFrame(() => {
                 const vOverlay = document.getElementById('vignette-overlay');
                 if (vOverlay) {
+                    // Apply distortion to parent (likely body or wrapper for vignette)
+                    vOverlay.parentElement?.classList.add('tv-distortion-active');
+
                     // Clear any existing TV container first
                     const existing = vOverlay.querySelector('.tv-overlay-container');
                     if (existing) existing.remove();
                     
                     const tvContainer = document.createElement('div');
                     tvContainer.className = 'tv-overlay-container';
-                    tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-aberration-r"></div><div class="tv-aberration-b"></div><div class="tv-glow"></div><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
+                    tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-glow"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
                     vOverlay.appendChild(tvContainer);
                 }
             });
+        } else {
+            // Remove distortion class if not TV
+            const vOverlay = document.getElementById('vignette-overlay');
+            if (vOverlay) {
+                vOverlay.parentElement?.classList.remove('tv-distortion-active');
+            }
         }
     };
 
@@ -814,10 +823,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // TV Effect Logic - Inject DOM structure
             if (scene.overlayEffect === 'tv') {
+                sceneOverlay.parentElement?.classList.add('tv-distortion-active');
+                
                 const tvContainer = document.createElement('div');
                 tvContainer.className = 'tv-overlay-container';
-                tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-aberration-r"></div><div class="tv-aberration-b"></div><div class="tv-glow"></div><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
+                tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-glow"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
                 sceneOverlay.appendChild(tvContainer);
+            } else {
+                sceneOverlay.parentElement?.classList.remove('tv-distortion-active');
             }
         }
 

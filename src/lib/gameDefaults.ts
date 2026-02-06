@@ -151,6 +151,23 @@ export const gameHTML = `
             </div>
         </div>
     </div>
+  <svg style="display: none;">
+    <defs>
+      <filter id="tv-distortion-filter" x="-20%" y="-20%" width="140%" height="140%">
+        <feOffset in="SourceGraphic" dx="-2" dy="0" result="r_offset" />
+        <feOffset in="SourceGraphic" dx="2" dy="0" result="b_offset" />
+        <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+        <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
+        <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
+        <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
+        <feMerge>
+          <feMergeNode in="red" />
+          <feMergeNode in="green" />
+          <feMergeNode in="blue" />
+        </feMerge>
+      </filter>
+    </defs>
+  </svg>
 </body>
 </html>
 `;
@@ -889,98 +906,134 @@ export const OVERLAY_CSS = `
     display: block;
     overflow: hidden;
 }
+
+/* TV Overlay Effect Container */
+.tv-distortion-active {
+    /* Force hardware acceleration */
+    transform: translateZ(0); 
+}
+.tv-distortion-active img, 
+.tv-distortion-active .scene-image {
+    filter: url(#tv-distortion-filter) !important;
+    transform: scale(1.02);
+}
+
 .scene-overlay.overlay-tv .tv-overlay-container {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    z-index: 1;
+    z-index: 10;
+    border-radius: 12px;
+    box-shadow: inset 0 0 40px rgba(0,0,0,0.7);
 }
+
 .scene-overlay.overlay-tv .tv-screen-wrapper {
     position: absolute;
     inset: 0;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 12px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8), inset 0 0 8px rgba(0,0,0,0.8);
+    z-index: 20;
 }
+
 .scene-overlay.overlay-tv .tv-scanlines {
     position: absolute;
     inset: 0;
-    background: repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.15) 0px, rgba(0, 0, 0, 0.15) 1px, transparent 1px, transparent 3px);
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.2) 0px,
+        rgba(0, 0, 0, 0.2) 1px,
+        transparent 1px,
+        transparent 3px
+    );
     pointer-events: none;
     z-index: 3;
+    opacity: 0.7;
 }
+
 .scene-overlay.overlay-tv .tv-rgb-grid {
     position: absolute;
     inset: 0;
-    background-image: repeating-linear-gradient(90deg, rgba(255, 0, 0, 0.03) 0px, rgba(255, 0, 0, 0.03) 1px, rgba(0, 255, 0, 0.03) 1px, rgba(0, 255, 0, 0.03) 2px, rgba(0, 0, 255, 0.03) 2px, rgba(0, 0, 255, 0.03) 3px);
+    background-image: repeating-linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.06) 0px,
+        rgba(255, 0, 0, 0.06) 1px,
+        rgba(0, 255, 0, 0.06) 1px,
+        rgba(0, 255, 0, 0.06) 2px,
+        rgba(0, 0, 255, 0.06) 2px,
+        rgba(0, 0, 255, 0.06) 3px
+    );
     pointer-events: none;
     z-index: 2;
-    opacity: 0.6;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
 }
+
 .scene-overlay.overlay-tv .tv-vignette {
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at center, transparent 50%, rgba(0, 0, 0, 0.15) 80%, rgba(0, 0, 0, 0.4) 100%);
+    background: radial-gradient(
+        circle at center,
+        transparent 55%,
+        rgba(0, 0, 0, 0.3) 80%,
+        rgba(0, 0, 0, 0.95) 100%
+    );
     pointer-events: none;
     z-index: 4;
 }
+
 .scene-overlay.overlay-tv .tv-glow {
     position: absolute;
-    inset: -2px;
-    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+    top: -50%; left: -50%; right: -50%; bottom: -50%;
+    background: radial-gradient(
+        ellipse at center,
+        rgba(255, 255, 255, 0.05) 0%,
+        transparent 60%
+    );
     pointer-events: none;
-    z-index: 1;
-    animation: tvGlowPulse 4s ease-in-out infinite;
+    z-index: 5;
+    animation: tvGlowPulse 5s ease-in-out infinite alternate;
+    opacity: 0.6;
 }
+
 .scene-overlay.overlay-tv .tv-flicker {
     position: absolute;
     inset: 0;
-    background: transparent;
-    animation: tvFlicker 50ms infinite;
+    background: rgba(255, 255, 255, 0.02);
+    mix-blend-mode: overlay;
+    animation: tvFlicker 0.1s infinite;
     pointer-events: none;
-    z-index: 5;
+    z-index: 6;
 }
+
 .scene-overlay.overlay-tv .tv-interference {
     position: absolute;
     left: 0;
     right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.1) 50%, transparent 100%);
+    height: 2px;
+    background: rgba(255, 255, 255, 0.15);
     pointer-events: none;
-    z-index: 6;
-    animation: tvInterference 8s linear infinite;
+    z-index: 7;
+    animation: tvInterference 6s linear infinite;
     opacity: 0;
+    box-shadow: 0 0 10px rgba(255,255,255,0.5);
 }
-.scene-overlay.overlay-tv .tv-aberration-r {
-    position: absolute;
-    inset: 0;
-    background: rgba(255, 0, 0, 0.02);
-    mix-blend-mode: screen;
-    transform: translateX(-1px);
-    pointer-events: none;
-}
-.scene-overlay.overlay-tv .tv-aberration-b {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 255, 0.02);
-    mix-blend-mode: screen;
-    transform: translateX(1px);
-    pointer-events: none;
-}
+
 @keyframes tvFlicker {
-    0% { opacity: 0.97; }
-    50% { opacity: 1; }
-    100% { opacity: 0.97; }
+    0% { opacity: 0.9; }
+    50% { opacity: 1.0; }
+    100% { opacity: 0.9; }
 }
 @keyframes tvGlowPulse {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 0.8; }
+    0% { transform: scale(1); opacity: 0.4; }
+    100% { transform: scale(1.05); opacity: 0.5; }
 }
 @keyframes tvInterference {
-    0% { top: -3px; opacity: 0; }
-    2% { opacity: 0.8; }
-    4% { opacity: 0; }
-    20% { top: 100%; opacity: 0; }
-    100% { top: 100%; opacity: 0; }
+    0% { top: -10%; opacity: 0; }
+    10% { opacity: 0.5; }
+    11% { opacity: 0; }
+    50% { top: 110%; opacity: 0; }
+    100% { top: 110%; opacity: 0; }
 }
 `;
 
