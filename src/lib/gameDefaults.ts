@@ -200,7 +200,7 @@ export const gameHTML = `
         <feTurbulence type="fractalNoise" baseFrequency="0.001 0.75" numOctaves="1" result="noise" seed="0">
           <animate attributeName="baseFrequency" values="0.001 0.75; 0.001 0.76; 0.001 0.75" dur="0.15s" repeatCount="indefinite" />
         </feTurbulence>
-        <feDisplacementMap in="rgb" in2="noise" scale="3" xChannelSelector="R" yChannelSelector="R" result="distorted"/>
+        <feDisplacementMap in="rgb" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="R" result="distorted"/>
       </filter>
     </defs>
   </svg>
