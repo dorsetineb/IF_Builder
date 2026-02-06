@@ -705,9 +705,10 @@ document.addEventListener('DOMContentLoaded', () => {
             requestAnimationFrame(() => {
                 const vOverlay = document.getElementById('vignette-overlay');
                 if (vOverlay) {
-                    // Apply distortion to parent (likely body or wrapper for vignette)
-                    // Use LG version for full screen vignette to compensate for pixel density/size
-                    vOverlay.parentElement?.classList.add('tv-distortion-active-lg');
+                    // Apply distortion filter DIRECTLY to the vignetteScreen container 
+                    // (which has the background-image), not via CSS class
+                    vignetteScreen.style.filter = 'url(#tv-distortion-filter-lg)';
+                    vignetteScreen.style.transform = 'translateZ(0)'; // Hardware acceleration
 
                     // Clear any existing TV container first
                     const existing = vOverlay.querySelector('.tv-overlay-container');
@@ -720,7 +721,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         } else {
-            // Remove distortion class if not TV
+            // Remove distortion filter if not TV
+            vignetteScreen.style.filter = '';
+            vignetteScreen.style.transform = '';
             const vOverlay = document.getElementById('vignette-overlay');
             if (vOverlay) {
                 vOverlay.parentElement?.classList.remove('tv-distortion-active-lg');
