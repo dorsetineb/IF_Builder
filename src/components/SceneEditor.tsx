@@ -14,6 +14,8 @@ import BlurOverlay from './effects/BlurOverlay';
 import ChromaticOverlay from './effects/ChromaticOverlay';
 import TVOverlay from './effects/TVOverlay';
 import ConfettiOverlay from './effects/ConfettiOverlay';
+import GlitchOverlay from './effects/GlitchOverlay';
+import NosferatuOverlay from './effects/NosferatuOverlay';
 
 interface SceneEditorProps {
     scene: Scene;
@@ -390,13 +392,13 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                 <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
                                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                                         <FileText className="w-4 h-4 text-muted-foreground" />
-                                        DETALHES DA CENA
+                                        NARRATIVA
                                     </h3>
 
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-3 gap-4">
                                             <div className="col-span-2">
-                                                <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Nome da Cena</label>
+                                                <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Título</label>
                                                 <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2.5 text-sm text-zinc-200 focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all placeholder:text-zinc-700" placeholder="Ex: Entrada da Caverna" />
                                             </div>
                                             <div className="col-span-1">
@@ -416,7 +418,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         <div className="pt-2">
                                             <div className="flex justify-between items-center mb-1.5">
                                                 <label htmlFor="sceneDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                                                    {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição Narrativa'}
+                                                    {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição'}
                                                 </label>
                                                 <span className="text-[9px] text-muted-foreground font-medium tracking-wider">Use &lt;palavra&gt; para destacar</span>
                                             </div>
@@ -583,6 +585,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                 {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
                                                 {localScene.overlayEffect === 'tv' && <TVOverlay />}
                                                 {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
+                                                {localScene.overlayEffect === 'glitch' && <GlitchOverlay />}
+                                                {localScene.overlayEffect === 'nosferatu' && <NosferatuOverlay />}
 
                                                 {/* Hover buttons - highest z-index */}
                                                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm" style={{ zIndex: 20 }}>
@@ -624,12 +628,14 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                             className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all [&>option]:bg-zinc-950"
                                         >
                                             <option value="">Nenhum</option>
-                                            <option value="grain">Granulado (Cinematográfico)</option>
-                                            <option value="rain">Chuva (Tempestade)</option>
-                                            <option value="blur">Vintage (Filme Antigo)</option>
+                                            <option value="grain">Granulado</option>
+                                            <option value="rain">Chuva</option>
+                                            <option value="blur">Vintage</option>
                                             <option value="chromatic">Scanline</option>
-                                            <option value="tv">Televisor (CRT)</option>
-                                            <option value="confetti">Confetes (Celebração)</option>
+                                            <option value="tv">Televisor CRT</option>
+                                            <option value="confetti">Confetes</option>
+                                            <option value="glitch">Glitch</option>
+                                            <option value="nosferatu">Nosferatu</option>
                                         </select>
                                     </div>
 

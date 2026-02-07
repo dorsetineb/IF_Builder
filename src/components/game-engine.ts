@@ -651,6 +651,102 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const confettiEffect = new ConfettiEffect();
 
+    class GlitchEffect {
+        constructor() {
+            this.canvas = null; this.ctx = null;
+            this.animationFrameId = null;
+            this.overlay = null;
+            this.started = false;
+            this.width = 0; this.height = 0;
+        }
+
+        init(targetId) {
+            this.overlay = document.getElementById(targetId);
+            if (!this.overlay) return;
+            
+            let canvas = this.overlay.querySelector('.glitch-canvas');
+            if (!canvas) {
+                this.canvas = document.createElement('canvas');
+                this.canvas.className = 'glitch-canvas';
+                this.overlay.appendChild(this.canvas);
+            } else {
+                this.canvas = canvas;
+            }
+            this.ctx = this.canvas.getContext('2d');
+            this.resize();
+            window.addEventListener('resize', () => this.resize());
+        }
+
+        resize() {
+            if (!this.canvas || !this.overlay) return;
+            this.width = this.canvas.width = this.overlay.clientWidth;
+            this.height = this.canvas.height = this.overlay.clientHeight;
+        }
+
+        start(targetId = 'scene-overlay') {
+            if (this.started && this.currentTargetId === targetId) return;
+            if (this.started) this.stop();
+            this.currentTargetId = targetId;
+            this.init(targetId);
+            if (!this.ctx || !this.overlay) return;
+            
+            this.overlay.classList.add('overlay-glitch');
+            this.started = true;
+            this.loop();
+        }
+
+        stop() {
+            this.started = false;
+            if (this.overlay) this.overlay.classList.remove('overlay-glitch');
+            if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+            if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.width, this.height);
+        }
+
+        loop() {
+            if (!this.started || !this.ctx) return;
+            
+            this.ctx.clearRect(0, 0, this.width, this.height);
+
+            // 1. Random horizontal slice displacements
+            if (Math.random() > 0.9) {
+                const sliceHeight = Math.random() * 50 + 5;
+                const sliceY = Math.random() * this.height;
+                
+                this.ctx.fillStyle = 'rgba(' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ',' + (Math.random() * 0.5) + ')';
+                this.ctx.fillRect(0, sliceY, this.width, sliceHeight);
+
+                if (Math.random() > 0.5) {
+                   this.ctx.clearRect(0, Math.random() * this.height, this.width, Math.random() * 10);
+                }
+            }
+
+            // 2. RGB Shift / Blocks
+            if (Math.random() > 0.8) {
+                const blockW = Math.random() * 200 + 50;
+                const blockH = Math.random() * 50 + 10;
+                const blockX = Math.random() * this.width;
+                const blockY = Math.random() * this.height;
+
+                this.ctx.globalCompositeOperation = 'color-dodge';
+                this.ctx.fillStyle = '#ff0000';
+                this.ctx.fillRect(blockX - 5, blockY, blockW, blockH);
+                this.ctx.fillStyle = '#0000ff';
+                this.ctx.fillRect(blockX + 5, blockY, blockW, blockH);
+                this.ctx.globalCompositeOperation = 'source-over';
+            }
+
+            // 3. Scanline jitter
+            if (Math.random() > 0.95) {
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                this.ctx.fillRect(0, 0, this.width, this.height);
+            }
+
+            this.animationFrameId = requestAnimationFrame(() => this.loop());
+        }
+    }
+
+    const glitchEffect = new GlitchEffect();
+
     const init = () => {
         if (gameData.gameBackgroundMusic) {
             playBgm(gameData.gameBackgroundMusic);
@@ -954,10 +1050,8 @@ document.addEventListener('DOMContentLoaded', () => {
             requestAnimationFrame(() => {
                 const vOverlay = document.getElementById('vignette-overlay');
                 if (vOverlay) {
-                    // Apply distortion filter DIRECTLY to the vignetteScreen container 
-                    // (which has the background-image), not via CSS class
-                    vignetteScreen.style.filter = 'url(#tv-distortion-filter-lg)';
-                    vignetteScreen.style.transform = 'translateZ(0)'; // Hardware acceleration
+                    // Use CSS class - filter is applied via ::before pseudo-element to only affect background
+                    vignetteScreen.classList.add('tv-active');
 
                     // Clear any existing TV container first
                     const existing = vOverlay.querySelector('.tv-overlay-container');
@@ -970,9 +1064,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         } else {
-            // Remove distortion filter if not TV
-            vignetteScreen.style.filter = '';
-            vignetteScreen.style.transform = '';
+            // Remove CSS class
+            vignetteScreen.classList.remove('tv-active');
             const vOverlay = document.getElementById('vignette-overlay');
             if (vOverlay) {
                 vOverlay.parentElement?.classList.remove('tv-distortion-active-lg');
@@ -986,6 +1079,77 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         } else {
             if (typeof confettiEffect !== 'undefined') confettiEffect.stop();
+        }
+
+        // Glitch Effect Logic for Vignette - Inject SVG filter and apply to background
+        if (scene.overlayEffect === 'glitch') {
+            requestAnimationFrame(() => {
+                // Ensure SVG filter exists
+                if (!document.getElementById('glitch-distortion-filter')) {
+                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.setAttribute('style', 'position:absolute;width:0;height:0;');
+                    svg.innerHTML = \`
+                        <defs>
+                            <filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%">
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset">
+                                    <animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/>
+                                </feOffset>
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset">
+                                    <animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/>
+                                </feOffset>
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+                                <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
+                                <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
+                                <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
+                                <feBlend in="red" in2="green" mode="screen" result="rg"/>
+                                <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>
+                                <feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5">
+                                    <animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/>
+                                </feTurbulence>
+                                <feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+                            </filter>
+                        </defs>
+                    \`;
+                    document.body.appendChild(svg);
+                }
+                // Use CSS class - filter is applied via ::before pseudo-element
+                vignetteScreen.classList.add('glitch-active');
+                if (typeof glitchEffect !== 'undefined') glitchEffect.start('vignette-overlay');
+            });
+        } else {
+            // Remove CSS class
+            vignetteScreen.classList.remove('glitch-active');
+            if (typeof glitchEffect !== 'undefined') glitchEffect.stop();
+        }
+
+        // Nosferatu Effect Logic for Vignette
+        if (scene.overlayEffect === 'nosferatu') {
+            requestAnimationFrame(() => {
+                const vOverlay = document.getElementById('vignette-overlay');
+                if (vOverlay) {
+                    // Clear any existing nosferatu container first
+                    const existing = vOverlay.querySelector('.nosferatu-container');
+                    if (existing) existing.remove();
+                    
+                    const nosferatuContainer = document.createElement('div');
+                    nosferatuContainer.className = 'nosferatu-container';
+                    nosferatuContainer.innerHTML = '<div class="nosferatu-cinema"></div><div class="nosferatu-scratch"></div><div class="nosferatu-effect-scratch"></div><div class="nosferatu-grain"></div><div class="nosferatu-vignette"></div>';
+                    vOverlay.appendChild(nosferatuContainer);
+                }
+                // CSS class handles the background filter via ::before pseudo-element
+                vignetteScreen.classList.add('nosferatu-active');
+            });
+        } else {
+            // Remove nosferatu filter if not active and not other filter effect
+            if (scene.overlayEffect !== 'tv' && scene.overlayEffect !== 'glitch') {
+                vignetteScreen.style.filter = '';
+            }
+            vignetteScreen.classList.remove('nosferatu-active');
+            const vOverlay = document.getElementById('vignette-overlay');
+            if (vOverlay) {
+                const existing = vOverlay.querySelector('.nosferatu-container');
+                if (existing) existing.remove();
+            }
         }
     };
 
@@ -1057,6 +1221,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (existingTV) existingTV.remove();
             const existingConfetti = sceneOverlay.querySelector('.confetti-overlay-container');
             if (existingConfetti) existingConfetti.remove();
+            const existingGlitch = sceneOverlay.querySelector('.glitch-canvas');
+            if (existingGlitch) existingGlitch.remove();
             
             if (scene.overlayEffect) {
                 sceneOverlay.classList.add('overlay-' + scene.overlayEffect);
@@ -1102,6 +1268,76 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (typeof confettiEffect !== 'undefined') confettiEffect.start('scene-overlay');
             } else {
                 if (typeof confettiEffect !== 'undefined') confettiEffect.stop();
+            }
+
+            // Glitch Effect Logic - Inject SVG filter and apply to image
+            if (scene.overlayEffect === 'glitch') {
+                // Ensure SVG filter exists
+                if (!document.getElementById('glitch-distortion-filter')) {
+                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.setAttribute('style', 'position:absolute;width:0;height:0;');
+                    svg.innerHTML = \`
+                        <defs>
+                            <filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%">
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset">
+                                    <animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/>
+                                </feOffset>
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset">
+                                    <animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/>
+                                </feOffset>
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+                                <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
+                                <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
+                                <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
+                                <feBlend in="red" in2="green" mode="screen" result="rg"/>
+                                <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>
+                                <feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5">
+                                    <animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/>
+                                </feTurbulence>
+                                <feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+                            </filter>
+                        </defs>
+                    \`;
+                    document.body.appendChild(svg);
+                }
+                // Apply filter directly to images
+                if (sceneImage) sceneImage.style.filter = 'url(#glitch-distortion-filter)';
+                if (sceneImageBack) sceneImageBack.style.filter = 'url(#glitch-distortion-filter)';
+                sceneOverlay.parentElement?.classList.add('glitch-distortion-active');
+                if (typeof glitchEffect !== 'undefined') glitchEffect.start('scene-overlay');
+            } else {
+                // Remove filter from images
+                if (sceneImage) sceneImage.style.filter = '';
+                if (sceneImageBack) sceneImageBack.style.filter = '';
+                sceneOverlay.parentElement?.classList.remove('glitch-distortion-active');
+                if (typeof glitchEffect !== 'undefined') glitchEffect.stop();
+            }
+        }
+
+        // Nosferatu Effect Logic for Scene
+        if (scene.overlayEffect === 'nosferatu') {
+            // Clear any existing nosferatu container first
+            const existing = sceneOverlay.querySelector('.nosferatu-container');
+            if (existing) existing.remove();
+            
+            const nosferatuContainer = document.createElement('div');
+            nosferatuContainer.className = 'nosferatu-container';
+            nosferatuContainer.innerHTML = '<div class="nosferatu-cinema"></div><div class="nosferatu-scratch"></div><div class="nosferatu-effect-scratch"></div><div class="nosferatu-grain"></div><div class="nosferatu-vignette"></div>';
+            sceneOverlay.appendChild(nosferatuContainer);
+            
+            // Apply sepia filter to images
+            if (sceneImage) sceneImage.style.filter = 'sepia(0.8) contrast(1.1) brightness(0.9)';
+            if (sceneImageBack) sceneImageBack.style.filter = 'sepia(0.8) contrast(1.1) brightness(0.9)';
+            sceneOverlay.parentElement?.classList.add('nosferatu-active');
+        } else {
+            // Remove nosferatu effects if not active
+            const existing = sceneOverlay.querySelector('.nosferatu-container');
+            if (existing) existing.remove();
+            sceneOverlay.parentElement?.classList.remove('nosferatu-active');
+            // Only clear filter if not another filter effect
+            if (scene.overlayEffect !== 'glitch' && scene.overlayEffect !== 'tv') {
+                if (sceneImage) sceneImage.style.filter = '';
+                if (sceneImageBack) sceneImageBack.style.filter = '';
             }
         }
 

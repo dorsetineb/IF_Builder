@@ -49,7 +49,8 @@ export const gameHTML = `
         </div>
 
         <div id="vignette-screen" class="splash-screen hidden">
-            <div class="splash-content">
+            <div id="vignette-overlay" class="scene-overlay" style="z-index: 1;"></div>
+            <div class="splash-content" style="z-index: 10;">
                 <div class="splash-text">
                     <h1 id="vignette-title"></h1>
                     <p id="vignette-description"></p>
@@ -67,6 +68,7 @@ export const gameHTML = `
                   <img id="scene-image-back" src="" alt="Cena seguinte" class="scene-image hidden">
                   <!-- Front image: The Current Scene (animates out) -->
                   <img id="scene-image" src="" alt="Cena atual" class="scene-image">
+                  <div id="scene-overlay" class="scene-overlay"></div>
                   <div id="scene-name-overlay" class="scene-name-overlay"></div>
                 </div>
             </div>
@@ -202,6 +204,32 @@ export const gameHTML = `
         </feTurbulence>
         <feDisplacementMap in="rgb" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="R" result="distorted"/>
       </filter>
+      
+      <!-- Glitch Distortion Filter -->
+      <filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%">
+        <!-- Sporadic Chromatic Aberration (RGB Shift) - Normal when static -->
+        <feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset">
+          <animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/>
+        </feOffset>
+        <feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset">
+          <animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/>
+        </feOffset>
+        <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+        
+        <!-- Split channels & merge with Screen blend mode -->
+        <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
+        <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
+        <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
+        
+        <feBlend in="red" in2="green" mode="screen" result="rg"/>
+        <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>
+        
+        <!-- Sporadic Horizontal Slice Displacement -->
+        <feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5">
+          <animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/>
+        </feTurbulence>
+        <feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" result="distorted"/>
+      </filter>
     </defs>
   </svg>
 </body>
@@ -223,7 +251,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); background-size: cover; background-position: center; z-index: 2000; padding: 0; display: flex; align-items: var(--splash-align-items); justify-content: var(--splash-justify-content); transition: opacity 1s ease-in-out; }
 .splash-screen.fade-out { opacity: 0; pointer-events: none; }
 .splash-screen.align-left { --splash-justify-content: flex-start; --splash-align-items: flex-start; --splash-text-align: left; --splash-content-align-items: flex-start; }
-.splash-content { text-align: var(--splash-text-align); display: flex; flex-direction: column; align-items: var(--splash-content-align-items); gap: 20px; width: 100%; padding: 5vw 225px; }
+.splash-content { text-align: var(--splash-text-align); display: flex; flex-direction: column; align-items: var(--splash-content-align-items); gap: 20px; width: 100%; padding: 5vw 225px; position: relative; }
 .splash-logo { max-height: 150px; width: auto; margin-bottom: 20px; }
 .splash-text h1 { font-size: 2em; color: var(--accent-color); margin: 0; text-shadow: none; }
 .splash-text p { font-size: 0.95em; margin-top: 10px; color: var(--text-color); max-width: 60ch; white-space: pre-wrap; }
@@ -1100,6 +1128,210 @@ export const OVERLAY_CSS = `
     width: 100%;
     height: 100%;
     pointer-events: none;
+}
+
+/* Glitch Effect */
+.scene-overlay.overlay-glitch {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+.glitch-canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    mix-blend-mode: hard-light;
+    opacity: 0.6;
+}
+
+/* Apply SVG filter to image when glitch is active */
+.glitch-distortion-active #scene-image,
+.glitch-distortion-active #scene-image-back {
+    filter: url(#glitch-distortion-filter);
+}
+
+/* Scanline overlay for glitch */
+.scene-overlay.overlay-glitch::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.05) 0px,
+        rgba(0, 0, 0, 0.05) 1px,
+        transparent 1px,
+        transparent 3px
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+@keyframes glitchScanlines {
+    0% { opacity: 0.8; }
+    50% { opacity: 0.6; }
+    100% { opacity: 0.8; }
+}
+
+/* Nosferatu Effect - Vintage Silent Film */
+.scene-overlay.overlay-nosferatu,
+#vignette-overlay.overlay-nosferatu {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+    overflow: hidden;
+}
+
+/* Apply sepia filter to image when nosferatu is active */
+.nosferatu-active #scene-image,
+.nosferatu-active #scene-image-back {
+    filter: sepia(0.8) contrast(1.1) brightness(0.9);
+}
+
+/* For vignette screen - use pseudo-element to filter only the background, not content */
+#vignette-screen.nosferatu-active {
+    background-color: transparent;
+}
+#vignette-screen.nosferatu-active::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    background-size: cover;
+    background-position: center;
+    filter: sepia(0.8) contrast(1.1) brightness(0.9);
+    z-index: 0;
+}
+
+/* For vignette screen with glitch - use pseudo-element to filter only the background */
+#vignette-screen.glitch-active::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    background-size: cover;
+    background-position: center;
+    filter: url(#glitch-distortion-filter);
+    z-index: 0;
+    transform: translateZ(0);
+}
+
+/* For vignette screen with TV effect - use pseudo-element to filter only the background */
+#vignette-screen.tv-active::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    background-size: cover;
+    background-position: center;
+    filter: url(#tv-distortion-filter-lg);
+    z-index: 0;
+    transform: translateZ(0);
+}
+
+/* Cinema effect layer */
+.nosferatu-cinema {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.1);
+    filter: blur(0.45px);
+    z-index: 1;
+}
+
+/* Scratch lines */
+.nosferatu-scratch {
+    position: absolute;
+    width: 120%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    opacity: 0.4;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 2px, transparent 120px);
+    animation: nosferatuScratch 0.45s steps(1) infinite;
+    z-index: 2;
+}
+
+/* Effect scratch */
+.nosferatu-effect-scratch {
+    position: absolute;
+    width: 120%;
+    height: 100%;
+    top: 0;
+    left: 30%;
+    opacity: 0.3;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 2px, transparent 80px);
+    animation: nosferatuEffectScratch 2s infinite;
+    z-index: 3;
+}
+
+/* Film grain */
+.nosferatu-grain {
+    position: absolute;
+    width: 110%;
+    height: 110%;
+    top: -5%;
+    left: -5%;
+    opacity: 0.2;
+    background-image: 
+        repeating-conic-gradient(rgba(255,255,255,0.5) 0%, transparent 0.0003%, transparent 0.0075%, transparent 0.0085%),
+        repeating-conic-gradient(#FFF 0%, transparent 0.0005%, transparent 0.0015%, transparent 0.065%);
+    animation: nosferatuGrain 0.5s steps(1) infinite;
+    z-index: 4;
+}
+
+/* Vignette */
+.nosferatu-vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+    pointer-events: none;
+    z-index: 5;
+}
+
+@keyframes nosferatuScratch {
+    0%, 100% { transform: translateX(0); opacity: 0.4; }
+    10% { transform: translateX(-1%); }
+    20% { transform: translateX(1%); }
+    30% { transform: translateX(-2%); opacity: 0.6; }
+    40% { transform: translateX(3%); }
+    50% { transform: translateX(-3%); opacity: 0.4; }
+    60% { transform: translateX(8%); }
+    70% { transform: translateX(-3%); }
+    80% { transform: translateX(10%); opacity: 0.2; }
+    90% { transform: translateX(-2%); }
+}
+
+@keyframes nosferatuEffectScratch {
+    0% { transform: translateX(0); opacity: 0.5; }
+    10% { transform: translateX(-1%); }
+    20% { transform: translateX(1%); }
+    30% { transform: translateX(-2%); }
+    40% { transform: translateX(3%); }
+    50% { transform: translateX(-3%); opacity: 0.35; }
+    60% { transform: translateX(8%); }
+    70% { transform: translateX(-3%); }
+    80% { transform: translateX(10%); opacity: 0.2; }
+    90% { transform: translateX(20%); }
+    100% { transform: translateX(30%); opacity: 0; }
+}
+
+@keyframes nosferatuGrain {
+    0%, 100% { transform: translate(0, 0); }
+    10% { transform: translate(-1%, -1%); }
+    20% { transform: translate(1%, 1%); }
+    30% { transform: translate(-2%, -2%); }
+    40% { transform: translate(3%, 3%); }
+    50% { transform: translate(-3%, -3%); }
+    60% { transform: translate(4%, 4%); }
+    70% { transform: translate(-4%, -4%); }
+    80% { transform: translate(2%, 2%); }
+    90% { transform: translate(-3%, -3%); }
 }
 `;
 
