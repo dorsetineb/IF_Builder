@@ -49,7 +49,7 @@ const Profile: React.FC = () => {
         if (data) setPosts(data);
     };
 
-    if (!loading && !profile) return <div className="text-white p-8">Perfil não encontrado.</div>;
+    if (!loading && !profile) return <div className="text-foreground p-8">Perfil não encontrado.</div>;
 
     return (
         <div className="font-sans text-foreground min-h-screen bg-background text-xs text-left relative">
@@ -79,7 +79,7 @@ const Profile: React.FC = () => {
                 <div className="flex flex-col md:flex-row items-end gap-4 mb-6">
                     {/* Avatar */}
                     <div className="relative group">
-                        <div className="w-24 h-24 rounded-full border-4 border-background bg-card overflow-hidden shadow-2xl">
+                        <div className="w-24 h-24 rounded-full border-4 border-background bg-card overflow-hidden">
                             {profile.avatar_url ? (
                                 <img src={profile.avatar_url} alt={profile.username || ''} className="w-full h-full object-cover" />
                             ) : (
@@ -94,7 +94,7 @@ const Profile: React.FC = () => {
                     {/* Basic Info */}
                     <div className="flex-1 pb-1">
                         <div className="flex items-center gap-2 mb-0.5">
-                            <h1 className="text-xl font-bold text-foreground shadow-sm">{profile.full_name || profile.username}</h1>
+                            <h1 className="text-xl font-bold text-foreground">{profile.full_name || profile.username}</h1>
                             <CheckCircle size={16} className="text-blue-500 fill-blue-500/10" />
                         </div>
                         <p className="text-muted-foreground font-medium mb-1.5 text-xs">@{profile.username} • Membro desde {new Date(profile.created_at).getFullYear()}</p>
@@ -105,7 +105,7 @@ const Profile: React.FC = () => {
 
                     {/* Action Buttons */}
                     <div className="flex gap-2 pb-2">
-                        <button className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg shadow-lg shadow-blue-900/20 transition-all flex items-center gap-1.5 text-xs">
+                        <button className="px-4 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold rounded-lg transition-all flex items-center gap-1.5 text-xs">
                             <User size={14} /> Seguir
                         </button>
                         <button className="p-1.5 bg-muted hover:bg-muted/80 rounded-lg border border-border transition-colors text-foreground">
@@ -162,7 +162,7 @@ const Profile: React.FC = () => {
                     </div>
 
                     {posts.map(post => (
-                        <div key={post.id} className="bg-card border border-border rounded-lg overflow-hidden hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/10 transition-all group">
+                        <div key={post.id} className="bg-card border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-all group">
                             <div className="h-28 bg-muted relative overflow-hidden">
                                 {post.category_id && <div className="absolute top-2 left-2 bg-black/60 backdrop-blur-md px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider text-white border border-white/10">DEVLOG</div>}
                                 {/* Placeholder Gradient for thumbnail */}

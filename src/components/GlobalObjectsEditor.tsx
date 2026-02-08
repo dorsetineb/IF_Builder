@@ -169,8 +169,8 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     return (
         <div className="space-y-6 pb-8" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* Header with Save/Undo actions */}
-            <div className="sticky top-0 z-40 flex justify-between items-center bg-zinc-900/95 backdrop-blur-md p-4 rounded-xl border border-muted-foreground/10 shadow-lg">
-                <p className="text-zinc-500 text-xs font-medium max-w-lg">
+            <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-border">
+                <p className="text-muted-foreground text-xs font-medium max-w-lg">
                     Gerenciador Global: Objetos criados aqui podem ser usados em qualquer cena.
                 </p>
                 <div className="flex items-center gap-3">
@@ -183,25 +183,25 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     <button
                         onClick={handleUndo}
                         disabled={!isDirty}
-                        className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
+                        className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
                     >
                         Desfazer
                     </button>
                     <button
                         onClick={handleSave}
                         disabled={!isDirty}
-                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-lg shadow-yellow-900/10"
+                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
                     >
                         Salvar Alterações
                     </button>
                 </div>
             </div>
 
-            <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
+            <div className="flex h-[600px] border border-border rounded-xl overflow-hidden bg-card">
                 {/* LEFT SIDEBAR */}
-                <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
+                <div className="w-1/3 min-w-[250px] border-r border-border flex flex-col bg-muted/10">
                     {/* Sidebar Header */}
-                    <div className="p-4 border-b border-muted-foreground/10 space-y-4">
+                    <div className="p-4 border-b border-border space-y-4">
                         <div className="relative">
                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                             <input
@@ -209,10 +209,10 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                 placeholder="Buscar objetos globais..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-200 focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 placeholder:text-zinc-600"
+                                className="w-full bg-input border border-input rounded-lg pl-8 pr-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-muted-foreground"
                             />
                         </div>
-                        <div className="flex justify-between items-center text-[10px] text-zinc-500 font-bold uppercase tracking-wider px-1">
+                        <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider px-1">
                             <span>Lista de Objetos</span>
                             <span>{filteredObjects.length}</span>
                         </div>
@@ -227,18 +227,18 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                     <button
                                         key={obj.id}
                                         onClick={() => setSelectedObjectId(obj.id)}
-                                        className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedObjectId === obj.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
+                                        className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedObjectId === obj.id ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-accent hover:border-accent'}`}
                                     >
-                                        <div className="w-10 h-10 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0">
+                                        <div className="w-10 h-10 rounded bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0">
                                             {obj.image ? (
                                                 <img src={obj.image} alt="" className="w-full h-full object-cover" />
                                             ) : (
-                                                <IconComponent className="w-4 h-4 text-zinc-600" />
+                                                <IconComponent className="w-4 h-4 text-muted-foreground" />
                                             )}
                                         </div>
                                         <div className="min-w-0 flex-1">
-                                            <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-purple-300' : 'text-zinc-300'}`}>{obj.name}</div>
-                                            <div className="text-[10px] text-zinc-500 font-mono truncate">#{obj.id}</div>
+                                            <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-primary' : 'text-foreground'}`}>{obj.name}</div>
+                                            <div className="text-[10px] text-muted-foreground font-mono truncate">#{obj.id}</div>
                                         </div>
                                     </button>
                                 );
@@ -252,10 +252,10 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="p-3 border-t border-muted-foreground/10 bg-zinc-900/50">
+                    <div className="p-3 border-t border-border bg-muted/30">
                         <button
                             onClick={handleCreate}
-                            className="w-full py-2 bg-zinc-100 hover:bg-white text-zinc-900 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow"
+                            className="w-full py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow-none"
                         >
                             <Plus className="w-3.5 h-3.5 mr-2" />
                             Criar Novo Objeto
@@ -264,21 +264,21 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                 </div>
 
                 {/* RIGHT MAIN PANEL */}
-                <div className="flex-1 flex flex-col bg-zinc-950/10 min-w-0">
+                <div className="flex-1 flex flex-col bg-muted/5 min-w-0">
                     {selectedObject ? (
                         <div className="flex flex-col h-full">
                             {/* Header - Minimalist */}
-                            <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30">
+                            <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-muted/30">
                                 <div className="flex items-center gap-2">
-                                    <Box className="w-4 h-4 text-purple-500" />
-                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Propriedades do Objeto</span>
+                                    <Box className="w-4 h-4 text-primary" />
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Propriedades do Objeto</span>
                                 </div>
 
                                 {/* Context Actions */}
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={() => handleDelete(selectedObject.id)}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
                                         Excluir Objeto
@@ -301,7 +301,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                             e.stopPropagation();
                                                             setIsIconPickerOpen(!isIconPickerOpen);
                                                         }}
-                                                        className="w-10 h-10 flex items-center justify-center bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-400 hover:text-white hover:border-purple-500/50 transition-all"
+                                                        className="w-10 h-10 flex items-center justify-center bg-input border border-input rounded-lg text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
                                                     >
                                                         {(() => {
                                                             const Icon = TRACKER_ICONS.find(i => i.name === selectedObject.icon)?.component || Box;
@@ -309,12 +309,12 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                         })()}
                                                     </button>
                                                     {isIconPickerOpen && (
-                                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-card border border-border rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
                                                             {TRACKER_ICONS.map(icon => (
                                                                 <button
                                                                     key={icon.name}
                                                                     onClick={() => { handleObjectChange(selectedObject.id, 'icon', icon.name); setIsIconPickerOpen(false); }}
-                                                                    className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedObject.icon === icon.name ? 'bg-purple-500/20 text-purple-400' : 'text-zinc-500'}`}
+                                                                    className={`p-2 rounded hover:bg-accent flex items-center justify-center transition-colors ${selectedObject.icon === icon.name ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}
                                                                     title={icon.name}
                                                                 >
                                                                     <icon.component className="w-4 h-4" />
@@ -327,7 +327,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                     type="text"
                                                     value={selectedObject.name}
                                                     onChange={(e) => handleObjectChange(selectedObject.id, 'name', e.target.value)}
-                                                    className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
+                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary"
                                                 />
                                             </div>
                                         </div>
@@ -339,7 +339,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                 type="text"
                                                 value={selectedObject.id}
                                                 readOnly
-                                                className="w-full bg-zinc-950/50 border border-muted-foreground/20 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono cursor-not-allowed h-[38px]"
+                                                className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2 text-xs text-muted-foreground font-mono cursor-not-allowed h-[38px]"
                                                 title="O ID é gerado automaticamente e não pode ser alterado."
                                             />
                                         </div>
@@ -351,7 +351,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                 rows={10}
                                                 value={selectedObject.examineDescription}
                                                 onChange={(e) => handleObjectChange(selectedObject.id, 'examineDescription', e.target.value)}
-                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-zinc-300 focus:ring-1 focus:ring-purple-500/50 resize-none flex-1 min-h-[250px]"
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary resize-none flex-1 min-h-[250px]"
                                                 placeholder="O que o jogador vê ao examinar este objeto?"
                                             />
                                         </div>
@@ -359,7 +359,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                         {/* Image field */}
                                         <div className="col-span-1 space-y-1.5">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem do Objeto</label>
-                                            <div className="relative w-full aspect-square bg-zinc-950 rounded-lg overflow-hidden border border-muted-foreground/30 group">
+                                            <div className="relative w-full aspect-square bg-muted rounded-lg overflow-hidden border border-input group">
                                                 {selectedObject.image ? (
                                                     <>
                                                         <img src={selectedObject.image} alt={selectedObject.name} className="w-full h-full object-cover" />
@@ -370,27 +370,27 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                             </label>
                                                             <button
                                                                 onClick={() => handleObjectChange(selectedObject.id, 'image', '')}
-                                                                className="p-2 bg-red-500/20 rounded-full cursor-pointer hover:bg-red-500/40 text-red-400 transition-all"
+                                                                className="p-2 bg-red-500/20 rounded-full cursor-pointer hover:bg-red-500/40 text-red-500 transition-all"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
                                                             </button>
                                                         </div>
                                                     </>
                                                 ) : (
-                                                    <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-zinc-900 transition-colors">
-                                                        <Upload className="w-6 h-6 text-zinc-700 mb-2" />
-                                                        <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-wider">Carregar</span>
+                                                    <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-accent/50 transition-colors">
+                                                        <Upload className="w-6 h-6 text-muted-foreground mb-2" />
+                                                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Carregar</span>
                                                         <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                                     </label>
                                                 )}
                                             </div>
-                                            <p className="text-[9px] text-zinc-600 italic leading-tight">Esta imagem aparece no pop-up de detalhes do objeto durante o jogo.</p>
+                                            <p className="text-[9px] text-muted-foreground italic leading-tight">Esta imagem aparece no pop-up de detalhes do objeto durante o jogo.</p>
                                         </div>
                                     </div>
 
 
                                     {/* Usage Info */}
-                                    <div className="pt-4 border-t border-muted-foreground/10">
+                                    <div className="pt-4 border-t border-border">
                                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Usado nas cenas</label>
                                         <div className="flex flex-wrap gap-2">
                                             {usages.length > 0 ? (
@@ -398,14 +398,14 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                     <button
                                                         key={u.id}
                                                         onClick={() => onSelectScene(u.id)}
-                                                        className="px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-md text-[10px] text-zinc-400 font-bold uppercase hover:bg-zinc-800 hover:text-purple-400 hover:border-purple-500/30 transition-all flex items-center gap-1.5"
+                                                        className="px-3 py-1.5 bg-input border border-input rounded-md text-[10px] text-muted-foreground font-bold uppercase hover:bg-accent hover:text-primary hover:border-primary/30 transition-all flex items-center gap-1.5"
                                                     >
                                                         <Unlink className="w-3 h-3 opacity-50" /> {/* Just an icon for visual context */}
                                                         {u.name}
                                                     </button>
                                                 ))
                                             ) : (
-                                                <p className="text-[10px] text-zinc-600 italic">Este objeto ainda não foi adicionado a nenhuma cena.</p>
+                                                <p className="text-[10px] text-muted-foreground italic">Este objeto ainda não foi adicionado a nenhuma cena.</p>
                                             )}
                                         </div>
                                     </div>
@@ -415,7 +415,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     ) : (
                         <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
                             <Box className="w-12 h-12 mb-4 opacity-20" />
-                            <h4 className="text-sm font-bold text-zinc-400 mb-1">Nenhum objeto selecionado</h4>
+                            <h4 className="text-sm font-bold text-muted-foreground mb-1">Nenhum objeto selecionado</h4>
                             <p className="text-xs max-w-xs opacity-60">Selecione um objeto da lista ao lado para editar suas propriedades globais.</p>
                         </div>
                     )}

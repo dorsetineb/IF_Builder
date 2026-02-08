@@ -12,6 +12,7 @@ interface SceneListProps {
   onDeleteScene: (id: string) => void;
   onReorderScenes: (newOrder: string[]) => void;
   isDirty?: boolean;
+  theme?: string;
 }
 
 const SceneList: React.FC<SceneListProps> = ({
@@ -23,6 +24,7 @@ const SceneList: React.FC<SceneListProps> = ({
   onDeleteScene,
   onReorderScenes,
   isDirty,
+  theme = 'dark',
 }) => {
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
@@ -59,6 +61,19 @@ const SceneList: React.FC<SceneListProps> = ({
       case 'conclusion': return <Flag className="w-3 h-3 text-red-400" />;
       default: return null;
     }
+  };
+
+  const getAddButtonClass = () => {
+    const baseClass = "w-full flex items-center justify-center px-4 py-2 font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent";
+
+    if (theme === 'light') {
+      return `${baseClass} bg-black text-white hover:bg-zinc-800`;
+    }
+    if (theme === 'cream') {
+      return `${baseClass} bg-[#5c4033] text-white hover:bg-[#4a332a]`;
+    }
+    // Default / Dark
+    return `${baseClass} bg-white text-zinc-950 hover:bg-zinc-200`;
   };
 
   return (
@@ -117,9 +132,9 @@ const SceneList: React.FC<SceneListProps> = ({
       </ul>
       <button
         onClick={onAddScene}
-        className="w-full flex items-center justify-center px-4 py-2 bg-white text-zinc-950 font-bold rounded-lg hover:bg-zinc-200 transition-all shadow-md active:scale-95 text-xs"
+        className={getAddButtonClass()}
       >
-        <Plus className="w-4 h-4 mr-2 text-zinc-950" />
+        <Plus className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
         Adicionar Cena
       </button>
     </div>

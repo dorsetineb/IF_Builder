@@ -169,7 +169,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     <button
                         type="button"
                         onClick={(e) => handleLogout(e)}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white border border-red-500/20 text-xs font-bold transition-all shadow-sm"
+                        className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white border border-red-500/20 text-xs font-bold transition-all"
                     >
                         <LogOut size={14} /> Sair da Conta
                     </button>
@@ -181,14 +181,14 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     <button
                         onClick={handleSave}
                         disabled={loading || !isDirty}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold py-2 px-6 rounded-lg flex items-center gap-2 transition-all disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed text-xs shadow-md"
+                        className="bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold py-2 px-6 rounded-lg flex items-center gap-2 transition-all disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed text-xs"
                     >
                         {loading ? 'Salvando...' : 'Salvar Alterações'}
                     </button>
                 </div>
 
                 {/* Theme Section */}
-                <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
+                <div className="bg-card border border-border rounded-lg p-4 mb-4">
                     <div className="flex items-center gap-2 mb-3 text-primary">
                         <Sun size={16} />
                         <h2 className="text-sm font-bold text-card-foreground">Aparência</h2>
@@ -230,7 +230,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 </div>
 
                 {/* Account Data Section - Matches Signup */}
-                <div className="bg-card border border-border rounded-lg p-4 mb-4 shadow-sm">
+                <div className="bg-card border border-border rounded-lg p-4 mb-4">
                     <div className="flex items-center gap-2 mb-4 text-primary">
                         <User size={16} />
                         <h2 className="text-sm font-bold text-card-foreground">Dados da Conta</h2>

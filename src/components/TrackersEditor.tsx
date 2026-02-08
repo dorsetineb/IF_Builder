@@ -163,8 +163,8 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
     return (
         <div className="space-y-6 pb-8" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* Header with Save/Undo actions */}
-            <div className="sticky top-0 z-40 backdrop-blur-md shadow-lg bg-zinc-900/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/10">
-                <p className="text-zinc-500 text-xs font-medium max-w-lg">
+            <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-border/50">
+                <p className="text-muted-foreground text-xs font-medium max-w-lg">
                     Crie e gerencie variáveis que mudam com as ações do jogador (ex: Vida, Dinheiro, Sanidade).
                 </p>
                 <div className="flex items-center gap-3">
@@ -177,23 +177,23 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                     <button
                         onClick={handleUndo}
                         disabled={!isDirty}
-                        className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
+                        className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
                     >
                         Desfazer
                     </button>
                     <button
                         onClick={handleSave}
                         disabled={!isDirty}
-                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-lg shadow-yellow-900/10"
+                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed shadow-sm"
                     >
                         Salvar Alterações
                     </button>
                 </div>
             </div>
 
-            <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
+            <div className="flex h-[600px] border border-border/50 rounded-xl overflow-hidden bg-card shadow-sm">
                 {/* LEFT SIDEBAR */}
-                <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
+                <div className="w-1/3 min-w-[250px] border-r border-border/50 flex flex-col bg-muted/10">
                     {/* Sidebar Header */}
                     <div className="p-4 border-b border-muted-foreground/10 space-y-4">
                         <div className="relative">
@@ -203,10 +203,10 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                 placeholder="Buscar rastreadores..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-200 focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 placeholder:text-zinc-600"
+                                className="w-full bg-input border border-border rounded-lg pl-8 pr-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-muted-foreground"
                             />
                         </div>
-                        <div className="flex justify-between items-center text-[10px] text-zinc-500 font-bold uppercase tracking-wider px-1">
+                        <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider px-1">
                             <span>Lista de Rastreadores</span>
                             <span>{filteredTrackers.length}</span>
                         </div>
@@ -224,9 +224,9 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                     <button
                                         key={tracker.id}
                                         onClick={() => setSelectedTrackerId(tracker.id)}
-                                        className={`relative w-full flex items-start gap-3 p-3 rounded-xl border transition-all text-left group ${selectedTrackerId === tracker.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
+                                        className={`relative w-full flex items-start gap-3 p-3 rounded-xl border transition-all text-left group ${selectedTrackerId === tracker.id ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-muted hover:border-border'}`}
                                     >
-                                        <div className={`w-10 h-10 rounded-lg bg-zinc-900 border flex items-center justify-center overflow-hidden shrink-0 shadow-sm ${selectedTrackerId === tracker.id ? 'border-purple-500/30' : 'border-zinc-800 group-hover:border-zinc-700'}`}>
+                                        <div className={`w-10 h-10 rounded-lg bg-card border flex items-center justify-center overflow-hidden shrink-0 shadow-sm ${selectedTrackerId === tracker.id ? 'border-primary/30' : 'border-border group-hover:border-border/80'}`}>
                                             <IconComponent
                                                 className="w-5 h-5 shadow-sm"
                                                 style={{ color: tracker.barColor || '#a855f7' }}
@@ -235,7 +235,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                         </div>
                                         <div className="min-w-0 flex-1 flex flex-col gap-1.5 pt-0.5">
                                             <div className="flex justify-between items-center w-full">
-                                                <div className={`text-xs font-bold truncate ${selectedTrackerId === tracker.id ? 'text-purple-100' : 'text-zinc-300'}`} style={{ textShadow: selectedTrackerId === tracker.id ? `0 0 10px ${tracker.barColor}40` : 'none' }}>
+                                                <div className={`text-xs font-bold truncate ${selectedTrackerId === tracker.id ? 'text-primary' : 'text-foreground'}`} style={{ textShadow: selectedTrackerId === tracker.id ? `0 0 10px ${tracker.barColor}40` : 'none' }}>
                                                     {tracker.name || 'Sem nome'}
                                                 </div>
                                                 <div className="text-[10px] text-zinc-500 font-mono truncate opacity-60">
@@ -244,9 +244,9 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                             </div>
 
                                             {/* Progress Bar Preview */}
-                                            <div className="w-full h-1.5 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800/60 shadow-inner">
+                                            <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden border border-border shadow-inner">
                                                 <div
-                                                    className="h-full rounded-full transition-all duration-500 ease-out shadow-[0_0_10px_rgba(0,0,0,0.5)]"
+                                                    className="h-full rounded-full transition-all duration-500 ease-out"
                                                     style={{
                                                         width: barWidth,
                                                         backgroundColor: tracker.barColor || '#a855f7',
@@ -256,11 +256,11 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                             </div>
                                         </div>
 
-                                        <div className="absolute -top-1 -right-1 p-1 bg-zinc-950 rounded-full border border-zinc-800 shadow-sm z-10" title={tracker.invertBar ? "Barra Invertida" : "Barra Normal"}>
+                                        <div className="absolute -top-1 -right-1 p-1 bg-background rounded-full border border-border shadow-sm z-10" title={tracker.invertBar ? "Barra Invertida" : "Barra Normal"}>
                                             {tracker.invertBar ? (
-                                                <ArrowLeft className="w-2.5 h-2.5 text-zinc-500" />
+                                                <ArrowLeft className="w-2.5 h-2.5 text-muted-foreground" />
                                             ) : (
-                                                <ArrowRight className="w-2.5 h-2.5 text-zinc-600 opacity-50" />
+                                                <ArrowRight className="w-2.5 h-2.5 text-muted-foreground opacity-50" />
                                             )}
                                         </div>
                                     </button>
@@ -275,10 +275,10 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                     </div>
 
                     {/* Footer Actions */}
-                    <div className="p-3 border-t border-muted-foreground/10 bg-zinc-900/50">
+                    <div className="p-3 border-t border-border/50 bg-background/50">
                         <button
                             onClick={handleAddTracker}
-                            className="w-full py-2 bg-zinc-100 hover:bg-white text-zinc-900 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow"
+                            className="w-full py-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow-sm"
                         >
                             <Plus className="w-3.5 h-3.5 mr-2" />
                             Novo Rastreador
@@ -287,21 +287,21 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                 </div>
 
                 {/* RIGHT MAIN PANEL */}
-                <div className="flex-1 flex flex-col bg-zinc-950/10 min-w-0">
+                <div className="flex-1 flex flex-col bg-background min-w-0">
                     {selectedTracker ? (
                         <div className="flex flex-col h-full">
                             {/* Header */}
-                            <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30">
+                            <div className="px-6 py-4 border-b border-border/50 flex justify-between items-center bg-muted/10">
                                 <div className="flex items-center gap-2">
-                                    <Activity className="w-4 h-4 text-purple-500" />
-                                    <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Propriedades do Rastreador</span>
+                                    <Activity className="w-4 h-4 text-primary" />
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Propriedades do Rastreador</span>
                                 </div>
 
                                 {/* Context Actions */}
                                 <div className="flex items-center gap-2">
                                     <button
                                         onClick={() => handleRemoveTracker(selectedTracker.id)}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
+                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-destructive/10 text-destructive hover:bg-destructive/20 border border-destructive/20 rounded-md text-[10px] font-bold uppercase transition-all"
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
                                         Excluir
@@ -326,7 +326,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                             e.stopPropagation();
                                                             setIsIconPickerOpen(!isIconPickerOpen);
                                                         }}
-                                                        className="w-10 h-10 flex items-center justify-center bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-400 hover:text-white hover:border-purple-500/50 transition-all"
+                                                        className="w-10 h-10 flex items-center justify-center bg-input border border-input rounded-lg text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
                                                     >
                                                         {(() => {
                                                             const Icon = TRACKER_ICONS.find(i => i.name === selectedTracker.icon)?.component || Activity;
@@ -334,12 +334,12 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                         })()}
                                                     </button>
                                                     {isIconPickerOpen && (
-                                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-popover border border-border rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
                                                             {TRACKER_ICONS.map(icon => (
                                                                 <button
                                                                     key={icon.name}
                                                                     onClick={() => { handleTrackerChange(selectedTracker.id, 'icon', icon.name); setIsIconPickerOpen(false); }}
-                                                                    className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedTracker.icon === icon.name ? 'bg-purple-500/20 text-purple-400' : 'text-zinc-500'}`}
+                                                                    className={`p-2 rounded hover:bg-accent flex items-center justify-center transition-colors ${selectedTracker.icon === icon.name ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}
                                                                     title={icon.name}
                                                                 >
                                                                     <icon.component className="w-4 h-4" />
@@ -352,7 +352,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                     type="text"
                                                     value={selectedTracker.name}
                                                     onChange={(e) => handleTrackerChange(selectedTracker.id, 'name', e.target.value)}
-                                                    className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
+                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary/50"
                                                 />
                                             </div>
                                         </div>
@@ -364,7 +364,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                 type="text"
                                                 value={selectedTracker.id}
                                                 readOnly
-                                                className="w-full bg-zinc-950/50 border border-muted-foreground/20 rounded-lg px-3 py-2 text-xs text-zinc-500 font-mono cursor-not-allowed h-[38px]"
+                                                className="w-full bg-muted/50 border border-border/50 rounded-lg px-3 py-2 text-xs text-muted-foreground font-mono cursor-not-allowed h-[38px]"
                                                 title="O ID é gerado automaticamente e não pode ser alterado."
                                             />
                                         </div>
@@ -376,7 +376,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                 type="number"
                                                 value={selectedTracker.initialValue}
                                                 onChange={e => handleTrackerChange(selectedTracker.id, 'initialValue', parseInt(e.target.value, 10) || 0)}
-                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-zinc-300 focus:ring-1 focus:ring-purple-500/50"
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary/50"
                                             />
                                         </div>
 
@@ -387,7 +387,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                 type="number"
                                                 value={selectedTracker.maxValue}
                                                 onChange={e => handleTrackerChange(selectedTracker.id, 'maxValue', parseInt(e.target.value, 10) || 0)}
-                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-zinc-300 focus:ring-1 focus:ring-purple-500/50"
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary/50"
                                             />
                                         </div>
 
@@ -395,7 +395,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                         <div className="col-span-1 space-y-1.5">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cor da Barra</label>
                                             <div className="flex items-center gap-2">
-                                                <div className="flex-1 flex items-center bg-zinc-950 border border-muted-foreground/30 rounded-lg px-2 py-1.5 h-[38px]">
+                                                <div className="flex-1 flex items-center bg-input border border-input rounded-lg px-2 py-1.5 h-[38px]">
                                                     <input
                                                         type="color"
                                                         value={selectedTracker.barColor || '#a855f7'}
@@ -406,7 +406,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                         type="text"
                                                         value={selectedTracker.barColor || '#a855f7'}
                                                         onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
-                                                        className="flex-1 bg-transparent border-none text-xs text-zinc-300 focus:ring-0 font-mono p-0 uppercase"
+                                                        className="flex-1 bg-transparent border-none text-xs text-foreground focus:ring-0 font-mono p-0 uppercase"
                                                         placeholder="#a855f7"
                                                     />
                                                 </div>
@@ -416,51 +416,51 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
 
                                         {/* Flags */}
                                         <div className="col-span-4 grid grid-cols-2 gap-4 pt-2">
-                                            <label className="flex items-start p-3 rounded-lg border border-muted-foreground/10 bg-zinc-900/20 hover:bg-zinc-900/40 transition-colors cursor-pointer group">
+                                            <label className="flex items-start p-3 rounded-lg border border-border/50 bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer group">
                                                 <div className="flex items-center h-5">
                                                     <input
                                                         type="checkbox"
                                                         checked={!!selectedTracker.invertBar}
                                                         onChange={e => handleTrackerChange(selectedTracker.id, 'invertBar', e.target.checked)}
-                                                        className="w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-0 transition-all"
+                                                        className="w-4 h-4 rounded border-muted-foreground/30 bg-input text-primary focus:ring-primary/50 focus:ring-offset-0 transition-all"
                                                     />
                                                 </div>
                                                 <div className="ml-3">
-                                                    <span className="block text-xs font-bold text-zinc-300 group-hover:text-white">Inverter Preenchimento</span>
-                                                    <span className="block text-[10px] text-zinc-500 mt-0.5">A barra diminui da direita para a esquerda.</span>
+                                                    <span className="block text-xs font-bold text-foreground group-hover:text-primary transition-colors">Inverter Preenchimento</span>
+                                                    <span className="block text-[10px] text-muted-foreground mt-0.5">A barra diminui da direita para a esquerda.</span>
                                                 </div>
-                                                <ArrowLeft className={`ml-auto w-4 h-4 text-zinc-600 ${selectedTracker.invertBar ? 'text-purple-500' : ''}`} />
+                                                <ArrowLeft className={`ml-auto w-4 h-4 text-muted-foreground ${selectedTracker.invertBar ? 'text-primary' : ''}`} />
                                             </label>
 
-                                            <label className="flex items-start p-3 rounded-lg border border-muted-foreground/10 bg-zinc-900/20 hover:bg-zinc-900/40 transition-colors cursor-pointer group">
+                                            <label className="flex items-start p-3 rounded-lg border border-border/50 bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer group">
                                                 <div className="flex items-center h-5">
                                                     <input
                                                         type="checkbox"
                                                         checked={!!selectedTracker.hideValue}
                                                         onChange={e => handleTrackerChange(selectedTracker.id, 'hideValue', e.target.checked)}
-                                                        className="w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-purple-600 focus:ring-purple-500/50 focus:ring-offset-0 transition-all"
+                                                        className="w-4 h-4 rounded border-muted-foreground/30 bg-input text-primary focus:ring-primary/50 focus:ring-offset-0 transition-all"
                                                     />
                                                 </div>
                                                 <div className="ml-3">
-                                                    <span className="block text-xs font-bold text-zinc-300 group-hover:text-white">Ocultar Valores</span>
-                                                    <span className="block text-[10px] text-zinc-500 mt-0.5">Não mostra os números (X/Y) na interface.</span>
+                                                    <span className="block text-xs font-bold text-foreground group-hover:text-primary transition-colors">Ocultar Valores</span>
+                                                    <span className="block text-[10px] text-muted-foreground mt-0.5">Não mostra os números (X/Y) na interface.</span>
                                                 </div>
                                             </label>
                                         </div>
 
                                         {/* Consequence Scene */}
-                                        <div className="col-span-4 space-y-1.5 pt-4 border-t border-muted-foreground/10">
+                                        <div className="col-span-4 space-y-1.5 pt-4 border-t border-border/50">
                                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Consequência ao atingir máximo</label>
                                             <div className="flex gap-2">
                                                 <select
                                                     value={selectedTracker.consequenceSceneId || ''}
                                                     onChange={e => handleTrackerChange(selectedTracker.id, 'consequenceSceneId', e.target.value)}
-                                                    className={selectBaseClasses}
-                                                    style={selectStyle}
+                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 [&>option]:bg-card"
+                                                // style={selectStyle} // Using default arrow for simplicity in semantic refactor
                                                 >
-                                                    <option value="" className={optionDimClasses}>Nenhuma (Nada acontece)</option>
+                                                    <option value="" className="bg-card text-muted-foreground">Nenhuma (Nada acontece)</option>
                                                     {allScenes.map(scene => (
-                                                        <option key={scene.id} value={scene.id} className={optionBaseClasses}>
+                                                        <option key={scene.id} value={scene.id} className="bg-card text-foreground">
                                                             {scene.name}
                                                         </option>
                                                     ))}
@@ -468,21 +468,21 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                 {selectedTracker.consequenceSceneId && (
                                                     <button
                                                         onClick={() => onSelectScene(selectedTracker.consequenceSceneId)}
-                                                        className="h-[38px] aspect-square flex items-center justify-center bg-zinc-900 border border-muted-foreground/30 rounded-lg hover:bg-zinc-800 hover:border-purple-500/50 hover:text-purple-400 text-zinc-400 transition-all shrink-0"
+                                                        className="h-[38px] aspect-square flex items-center justify-center bg-card border border-border rounded-lg hover:bg-accent hover:border-primary/50 hover:text-primary text-muted-foreground transition-all shrink-0"
                                                         title="Ir para a cena de consequência"
                                                     >
                                                         <ExternalLink className="w-4 h-4" />
                                                     </button>
                                                 )}
                                             </div>
-                                            <p className="text-[10px] text-zinc-600 italic">
+                                            <p className="text-[10px] text-muted-foreground italic">
                                                 O jogador será enviado para esta cena quando o valor do rastreador for maior ou igual ao máximo.
                                             </p>
                                         </div>
                                     </div>
 
                                     {/* Usages List */}
-                                    <div className="pt-6 border-t border-muted-foreground/10 space-y-4">
+                                    <div className="pt-6 border-t border-border/50 space-y-4">
                                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Interações que alteram este rastreador</label>
                                         {usages.length > 0 ? (
                                             <div className="grid grid-cols-2 gap-3">
@@ -492,22 +492,22 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                         <button
                                                             key={`${interaction.id}-${index}`}
                                                             onClick={() => onSelectScene(scene.id)}
-                                                            className="flex flex-col items-start p-3 bg-zinc-950 border border-zinc-800 rounded-lg hover:border-purple-500/30 hover:bg-zinc-900 transition-all text-left group"
+                                                            className="flex flex-col items-start p-3 bg-card border border-border rounded-lg hover:border-primary/50 hover:bg-accent/50 transition-all text-left group"
                                                         >
                                                             <div className="w-full flex justify-between items-start mb-1">
-                                                                <span className="text-xs font-bold text-zinc-300 group-hover:text-purple-300 truncate">{scene.name}</span>
-                                                                <span className={`font-mono text-[10px] px-1.5 py-0.5 rounded ${effect.valueChange >= 0 ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                                                                <span className="text-xs font-bold text-foreground group-hover:text-primary truncate">{scene.name}</span>
+                                                                <span className={`font-mono text-[10px] px-1.5 py-0.5 rounded ${effect.valueChange >= 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
                                                                     {effect.valueChange >= 0 ? '+' : ''}{effect.valueChange}
                                                                 </span>
                                                             </div>
-                                                            <span className="text-[10px] text-zinc-500 truncate w-full">{interactionDesc}</span>
+                                                            <span className="text-[10px] text-muted-foreground truncate w-full">{interactionDesc}</span>
                                                         </button>
                                                     );
                                                 })}
                                             </div>
                                         ) : (
-                                            <div className="flex flex-col items-center justify-center p-6 bg-zinc-950/30 border border-dashed border-zinc-800 rounded-lg text-center">
-                                                <p className="text-zinc-600 text-xs italic">Nenhuma interação altera este rastreador ainda.</p>
+                                            <div className="flex flex-col items-center justify-center p-6 bg-muted/20 border border-dashed border-border rounded-lg text-center">
+                                                <p className="text-muted-foreground text-xs italic">Nenhuma interação altera este rastreador ainda.</p>
                                             </div>
                                         )}
                                     </div>
@@ -517,7 +517,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                     ) : (
                         <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
                             <Activity className="w-12 h-12 mb-4 opacity-20" />
-                            <h4 className="text-sm font-bold text-zinc-400 mb-1">Nenhum rastreador selecionado</h4>
+                            <h4 className="text-sm font-bold text-foreground mb-1">Nenhum rastreador selecionado</h4>
                             <p className="text-xs max-w-xs opacity-60">Selecione um rastreador da lista ao lado para editar suas propriedades.</p>
                         </div>
                     )}

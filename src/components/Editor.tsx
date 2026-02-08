@@ -46,6 +46,69 @@ import { useTheme } from './ThemeProvider';
 
 // ... (existing imports)
 
+
+// Pixel Art Patterns for Import Animation
+const PATTERN_BULL = [
+    // Row 1 (Horns tips)
+    1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    // Row 2 (Horns curve)
+    0, 1, 1, 0, 0, 0, 1, 1, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+    // Row 3 (Head top)
+    0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+    // Row 4 (Head/Neck)
+    0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+    // Row 5
+    0, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+    // Row 6 (Body)
+    0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0,
+    // Row 7
+    0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
+    // Row 8
+    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0,
+    // Row 9 (Legs)
+    0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0,
+    // Row 10
+    0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0,
+    // Row 11
+    0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0,
+    // Row 12 (Hooves)
+    0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0,
+];
+
+const PATTERN_MAN = [
+    // Centered Stick Figure
+    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, // Head top
+    0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, // Head sides
+    0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, // Head bottom
+    0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, // Neck
+    0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, // Shoulders
+    0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, // Arms
+    0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, // Hands
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Torso
+    0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, // Hips
+    0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, // Legs top
+    0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, // Legs low
+    0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, // Feet
+];
+
+const PATTERN_COMPUTER = [
+    // Centered Computer
+    0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, // Top border
+    0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, // Sides top
+    0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 0, 0, // Screen content
+    0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, // Screen content
+    0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, // Screen content
+    0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, // Screen bottom
+    0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, // Bottom bezel
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Stand neck
+    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, // Keyboard Row 1
+    0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, // Keyboard keys
+    0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, // Keyboard bottom
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Space
+];
+
+const IMPORT_PATTERNS = [PATTERN_BULL, PATTERN_MAN, PATTERN_COMPUTER];
+
 const Editor: React.FC = () => {
     const { toast } = useToast();
     const { user, profile, loading: authLoading } = useUser();
@@ -69,6 +132,15 @@ const Editor: React.FC = () => {
     }, []);
 
     const [importKey, setImportKey] = useState(0);
+
+    // Import Animation Rotation
+    const [currentPixelPatternIndex, setCurrentPixelPatternIndex] = useState(0);
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setCurrentPixelPatternIndex(prev => (prev + 1) % 3);
+        }, 2000); // Rotate every 2 seconds
+        return () => clearInterval(interval);
+    }, []);
 
     // BIOS Animation Sequence (runs once on mount)
     useEffect(() => {
@@ -389,32 +461,42 @@ const Editor: React.FC = () => {
         <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans selection:bg-primary/30" >
             <TransitionScreen isVisible={isTransitioning} />
 
-            {/* Import Loading Popup */}
+
             {isImporting && (
                 <div className="fixed inset-0 z-[9998] bg-black/80 backdrop-blur-sm flex items-center justify-center">
                     <style>{`
-                        @keyframes sequential-fade {
-                            0%, 100% { opacity: 0.2; background-color: #4c1d95; }
-                            20% { opacity: 1; background-color: #9d4edd; }
-                            40% { opacity: 0.2; background-color: #4c1d95; }
+                        @keyframes pixel-blink {
+                            0%, 100% { opacity: 0; }
+                            50% { opacity: 1; }
+                        }
+                        @keyframes pulse-glow {
+                            0%, 100% { box-shadow: 0 0 15px -5px #ffffff; }
+                            50% { box-shadow: 0 0 40px 0px #ffffff; }
                         }
                     `}</style>
-                    <div className="bg-zinc-900 border border-zinc-700 rounded-lg p-8 flex flex-col items-center gap-6 shadow-2xl min-w-[300px]">
-                        <div className="flex gap-3">
-                            {[0, 1, 2, 3, 4].map((i) => (
-                                <div
-                                    key={i}
-                                    className="w-4 h-4 rounded-sm bg-purple-900"
-                                    style={{
-                                        animation: `sequential-fade 1.5s infinite ease-in-out`,
-                                        animationDelay: `${i * 0.3}s`
-                                    }}
-                                />
-                            ))}
+                    <div className="bg-zinc-900 border border-zinc-500 rounded-lg p-8 flex flex-col items-center gap-6 animate-[pulse-glow_2s_ease-in-out_infinite] min-w-[300px]">
+                        {/* Pixel Animation (Rotates: Bull -> Man -> Computer) */}
+                        <div className="grid grid-cols-[repeat(20,minmax(0,1fr))] gap-0.5 w-40 h-24 p-2 rounded-sm">
+                            {Array.from({ length: 240 }).map((_, i) => {
+                                const pattern = IMPORT_PATTERNS[currentPixelPatternIndex];
+                                const isPixel = pattern[i] === 1;
+                                return (
+                                    <div
+                                        key={i}
+                                        className={`w-full h-full ${isPixel ? 'bg-white' : 'bg-transparent'}`}
+                                        style={{
+                                            opacity: isPixel ? 1 : 0.05,
+                                            animation: isPixel ? `pixel-blink ${1.5 + Math.random()}s infinite ${Math.random()}s` : 'none',
+                                            boxShadow: isPixel ? '0 0 2px #ffffff' : 'none',
+                                            transition: 'background-color 0.5s, opacity 0.5s'
+                                        }}
+                                    />
+                                );
+                            })}
                         </div>
-                        <div className="text-center space-y-2">
-                            <p className="text-white text-lg font-medium font-['Silkscreen'] tracking-wide">IMPORTANDO SISTEMA</p>
-                            <p className="text-zinc-500 text-xs uppercase tracking-widest">Processando Dados</p>
+
+                        <div className="text-center">
+                            <p className="text-white text-lg font-medium font-sans tracking-wide uppercase">IMPORTANDO FICÇÃO</p>
                         </div>
                     </div>
                 </div>

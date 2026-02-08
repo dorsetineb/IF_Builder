@@ -309,7 +309,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
 
     return (
         <div className="space-y-6">
-            <div className="sticky top-0 z-40 flex justify-between items-center bg-zinc-900/95 backdrop-blur-md p-4 rounded-xl border border-muted-foreground/10 shadow-lg mb-6">
+            <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-border mb-6">
                 <p className="text-zinc-500 text-xs font-medium max-w-lg">
                     Defina a imagem, descrição, objetos e interações para esta cena.
                 </p>
@@ -349,7 +349,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                     <button
                         onClick={handleSave}
                         disabled={!isDirty}
-                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-zinc-800 disabled:text-zinc-600 disabled:cursor-not-allowed shadow-lg shadow-yellow-900/10"
+                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
                     >
                         Salvar Alterações
                     </button>
@@ -389,7 +389,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                             {/* Left Column: Details & Rules */}
                             <div className="space-y-6">
                                 {/* Scene Details Card */}
-                                <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
+                                <div className="bg-card border border-border rounded-xl p-6">
                                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                                         <FileText className="w-4 h-4 text-muted-foreground" />
                                         NARRATIVA
@@ -399,7 +399,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         <div className="grid grid-cols-3 gap-4">
                                             <div className="col-span-2">
                                                 <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Título</label>
-                                                <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2.5 text-sm text-zinc-200 focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all placeholder:text-zinc-700" placeholder="Ex: Entrada da Caverna" />
+                                                <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground" placeholder="Ex: Entrada da Caverna" />
                                             </div>
                                             <div className="col-span-1">
                                                 <label htmlFor="sceneId" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">ID Único</label>
@@ -408,7 +408,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                         type="text"
                                                         value={localScene.id}
                                                         disabled
-                                                        className="w-full bg-zinc-950/50 border border-muted-foreground/20 rounded-lg px-3 py-2.5 text-xs text-zinc-500 font-mono"
+                                                        className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2.5 text-xs text-muted-foreground font-mono"
                                                     />
                                                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-700 text-[10px]">#</span>
                                                 </div>
@@ -427,7 +427,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                     id="sceneDescription"
                                                     value={localScene.description}
                                                     onChange={handleDescriptionChange}
-                                                    className="w-full h-32 md:h-40 bg-zinc-950 border border-muted-foreground/30 rounded-lg px-4 py-3 text-sm text-zinc-300 resize-y focus:ring-1 focus:ring-purple-500/50 focus:border-purple-500/50 transition-all leading-relaxed placeholder:text-zinc-700"
+                                                    className="w-full h-32 md:h-40 bg-input border border-input rounded-lg px-4 py-3 text-sm text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
                                                     placeholder="Descreva o que o jogador vê e sente nesta cena..."
                                                 />
 
@@ -535,7 +535,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                 </div>
 
                                 {/* Branching Preview Card */}
-                                <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
+                                <div className="bg-card border border-border rounded-xl p-6">
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                                             <GitBranch className="w-4 h-4 text-muted-foreground" />
@@ -559,7 +559,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                             <div className="space-y-6">
 
                                 {/* Multimedia Card */}
-                                <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
+                                <div className="bg-card border border-border rounded-xl p-6">
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                                             <ImageIcon className="w-4 h-4 text-muted-foreground" />
@@ -625,13 +625,13 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         <select
                                             value={localScene.overlayEffect || ''}
                                             onChange={(e) => updateLocalScene('overlayEffect', e.target.value)}
-                                            className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all [&>option]:bg-zinc-950"
+                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
                                         >
                                             <option value="">Nenhum</option>
                                             <option value="grain">Granulado</option>
                                             <option value="rain">Chuva</option>
                                             <option value="blur">Vintage</option>
-                                            <option value="chromatic">Scanline</option>
+                                            <option value="chromatic">Fósforo verde</option>
                                             <option value="tv">Televisor CRT</option>
                                             <option value="confetti">Confetes</option>
                                             <option value="glitch">Glitch</option>
@@ -642,7 +642,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                     {/* Audio Section */}
                                     <div className="space-y-2">
                                         <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha Sonora (.mp3)</label>
-                                        <div className="flex items-center gap-3 p-3 bg-zinc-950/50 border border-dashed border-muted-foreground/30 rounded-lg hover:border-purple-500/30 transition-colors">
+                                        <div className="flex items-center gap-3 p-3 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors">
                                             <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center flex-shrink-0">
                                                 <Music className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-purple-400' : 'text-zinc-600'} `} />
                                             </div>
@@ -679,7 +679,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
 
                                 {/* Narrative Rules Card - Renamed to Chance Rules */}
                                 {(enableChances || gameSystemEnabled === 'chances') && (
-                                    <div className="bg-card border border-muted-foreground/20 rounded-xl p-6 shadow-sm">
+                                    <div className="bg-card border border-border rounded-xl p-6">
                                         <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                                             <Scroll className="w-4 h-4 text-muted-foreground" />
                                             REGRAS DE CHANCES
@@ -753,9 +753,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                     )}
 
                     {activeTab === 'choices' && (
-                        <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
+                        <div className="flex h-[600px] border border-border rounded-xl overflow-hidden bg-card">
                             {/* LEFT LIST PANEL */}
-                            <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
+                            <div className="w-1/3 min-w-[250px] border-r border-border flex flex-col bg-muted/10">
                                 <div className="p-4 border-b border-muted-foreground/10 space-y-4">
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
@@ -774,13 +774,13 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                             <button
                                                 key={choice.id}
                                                 onClick={() => setSelectedChoiceId(choice.id)}
-                                                className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedChoiceId === choice.id ? 'bg-purple-500/10 border-purple-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'} `}
+                                                className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedChoiceId === choice.id ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-accent hover:border-accent'} `}
                                             >
-                                                <div className="w-8 h-8 rounded bg-zinc-900 border border-zinc-700 flex items-center justify-center overflow-hidden shrink-0">
-                                                    <ArrowRight className={`w-4 h-4 ${selectedChoiceId === choice.id ? 'text-purple-400' : 'text-zinc-600'} `} />
+                                                <div className="w-8 h-8 rounded bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0">
+                                                    <ArrowRight className={`w-4 h-4 ${selectedChoiceId === choice.id ? 'text-primary' : 'text-muted-foreground'} `} />
                                                 </div>
                                                 <div className="min-w-0">
-                                                    <div className={`text-xs font-bold truncate ${selectedChoiceId === choice.id ? 'text-purple-300' : 'text-zinc-300'} `}>
+                                                    <div className={`text-xs font-bold truncate ${selectedChoiceId === choice.id ? 'text-primary' : 'text-foreground'} `}>
                                                         {choice.label || 'Nova Escolha'}
                                                     </div>
                                                     <div className="text-[10px] text-zinc-500 font-mono truncate">
@@ -792,7 +792,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                     )}
                                 </div>
 
-                                <div className="p-3 border-t border-muted-foreground/10 bg-zinc-900/50">
+                                <div className="p-3 border-t border-border bg-muted/30">
                                     <button
                                         onClick={() => {
                                             const newId = `choice_${Date.now()} `;
@@ -804,7 +804,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                             updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
                                             setSelectedChoiceId(newId);
                                         }}
-                                        className="w-full py-2 bg-zinc-100 hover:bg-white text-zinc-900 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow"
+                                        className="w-full py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow-none"
                                     >
                                         <Plus className="w-3.5 h-3.5 mr-2" />
                                         Criar Nova Escolha
@@ -820,10 +820,10 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         const choice = localScene.choices![choiceIndex];
                                         return (
                                             <div className="flex flex-col h-full">
-                                                <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30">
+                                                <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-muted/30">
                                                     <div className="flex items-center gap-2">
                                                         <ArrowRight className="w-4 h-4 text-purple-500" />
-                                                        <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-[0.2em]">Detalhes da Escolha</span>
+                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Detalhes da Escolha</span>
                                                     </div>
                                                     <button
                                                         onClick={() => {
@@ -852,7 +852,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                     newChoices[choiceIndex] = { ...choice, label: e.target.value };
                                                                     updateLocalScene('choices', newChoices);
                                                                 }}
-                                                                className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-white focus:ring-1 focus:ring-purple-500/50"
+                                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary"
                                                                 placeholder="Ex: Tentar abrir a porta..."
                                                             />
                                                         </div>
@@ -867,7 +867,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                         newChoices[choiceIndex] = { ...choice, targetSceneId: e.target.value };
                                                                         updateLocalScene('choices', newChoices);
                                                                     }}
-                                                                    className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-sm text-zinc-300 pr-8 appearance-none focus:ring-1 focus:ring-purple-500/50 [&>option]:bg-zinc-950"
+                                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground pr-8 appearance-none focus:ring-1 focus:ring-primary [&>option]:bg-card"
                                                                 >
                                                                     <option value="">Selecione...</option>
                                                                     {allScenes.map(s => (
@@ -888,7 +888,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                 ) : (
                                     <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
                                         <ArrowRight className="w-12 h-12 mb-4 opacity-20" />
-                                        <h4 className="text-sm font-bold text-zinc-400 mb-1">Nenhuma escolha selecionada</h4>
+                                        <h4 className="text-sm font-bold text-muted-foreground mb-1">Nenhuma escolha selecionada</h4>
                                         <p className="text-xs max-w-xs opacity-60">Selecione uma escolha da lista para editar seus detalhes ou crie uma nova.</p>
                                     </div>
                                 )}
