@@ -43,7 +43,7 @@ export const useSceneManagement = ({
             description: 'Descrição da nova cena.',
             objectIds: [],
             interactions: [],
-            vignetteType: 'none',
+            vignetteType: existingSceneCount === 0 ? 'opening' : 'none',
             mapX: initialMapX,
             mapY: 0
         };

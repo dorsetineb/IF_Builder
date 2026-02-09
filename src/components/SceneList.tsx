@@ -117,10 +117,8 @@ const SceneList: React.FC<SceneListProps> = ({
         >
           <div className={`flex items-center flex-grow p-2`}>
             {/* Always reserve space for the icon to ensure alignment */}
-            {scene.id !== startSceneId ? (
+            {scene.id !== startSceneId && (
               <Menu className={`w-4 h-4 mr-2 flex-shrink-0 ${isDraggable ? 'cursor-move' : 'cursor-default opacity-50'} ${selectedSceneId === scene.id ? (isDirty ? 'text-yellow-500' : 'text-primary') : 'text-muted-foreground'}`} />
-            ) : (
-              <div className="w-4 h-4 mr-2 flex-shrink-0" />
             )}
 
             <div className="flex items-center justify-between w-full min-w-0">
