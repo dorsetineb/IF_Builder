@@ -26,7 +26,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
-  const { onExit, onNavigate, currentView, onSetView, scenes, gameData, isCollapsed, onToggleCollapse, onOpenManual, isDirty, theme = 'dark', ...sceneListProps } = props;
+  const { onExit, onNavigate, currentView, onSetView, scenes, gameData, isCollapsed, onToggleCollapse, isDirty, theme = 'dark', ...sceneListProps } = props;
   const [isScenesExpanded, setIsScenesExpanded] = useState(false);
 
 
@@ -117,13 +117,13 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
           {/* Expanded Content */}
           {(!isCollapsed && isScenesExpanded) && (
-            <div className="pl-4 mt-1 mb-2 animate-in slide-in-from-top-2 duration-200">
-              <div className="pl-3 border-l-2 border-primary/30 flex flex-col gap-1">
+            <div className="pl-4 mt-1 mb-2 animate-in slide-in-from-top-2 duration-200 flex-grow min-h-0 flex flex-col">
+              <div className="pl-3 border-l-2 border-primary/30 flex flex-col gap-1 flex-grow min-h-0">
                 <SceneList scenes={scenes} isDirty={isDirty} theme={theme} {...sceneListProps} />
 
                 {/* Map Button inside accordion */}
                 <button
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-xs font-medium text-left mt-1 ${currentView === 'map'
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-xs font-medium text-left mt-1 flex-shrink-0 ${currentView === 'map'
                     ? 'bg-primary/20 text-primary border border-primary/30'
                     : 'text-muted-foreground hover:bg-zinc-800 hover:text-white border border-transparent'}`}
                   onClick={() => onSetView('map')}

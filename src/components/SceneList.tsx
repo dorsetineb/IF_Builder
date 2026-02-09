@@ -1,7 +1,8 @@
-
-import React, { useRef } from 'react';
+import React, { useRef, CSSProperties } from 'react';
 import { Scene } from '../types';
 import { Plus, Trash2, Menu, Play, ArrowRight, Flag } from 'lucide-react';
+import { FixedSizeList as List } from 'react-window';
+import { AutoSizer } from 'react-virtualized-auto-sizer';
 
 interface SceneListProps {
   scenes: Scene[];
@@ -29,12 +30,12 @@ const SceneList: React.FC<SceneListProps> = ({
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
 
-  const handleDragStart = (e: React.DragEvent<HTMLLIElement>, position: number) => {
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, position: number) => {
     dragItem.current = position;
     e.dataTransfer.effectAllowed = 'move';
   };
 
-  const handleDragEnter = (e: React.DragEvent<HTMLLIElement>, position: number) => {
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>, position: number) => {
     dragOverItem.current = position;
     const list = scenes.map(s => s.id);
     const dragItemContent = list[dragItem.current!];
@@ -64,7 +65,7 @@ const SceneList: React.FC<SceneListProps> = ({
   };
 
   const getAddButtonClass = () => {
-    const baseClass = "w-full flex items-center justify-center px-4 py-2 font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent";
+    const baseClass = "w-full flex items-center justify-center px-4 py-2 font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent mt-2 flex-shrink-0";
 
     if (theme === 'light') {
       return `${baseClass} bg-black text-white hover:bg-zinc-800`;
@@ -76,60 +77,84 @@ const SceneList: React.FC<SceneListProps> = ({
     return `${baseClass} bg-white text-zinc-950 hover:bg-zinc-200`;
   };
 
-  return (
-    <div className="flex flex-col gap-2">
-      <ul className="flex flex-col gap-2">
-        {scenes.map((scene, index) => (
-          <li
-            key={scene.id}
-            onClick={() => onSelectScene(scene.id)}
-            className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-lg transition-all overflow-hidden cursor-pointer ${selectedSceneId === scene.id
-              ? isDirty
-                ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold'
-                : 'bg-primary/20 text-primary border border-primary/30'
-              : 'hover:bg-muted/50'
-              }`}
-            onDragStart={(e) => scene.id !== startSceneId && handleDragStart(e, index)}
-            onDragEnter={(e) => scene.id !== startSceneId && handleDragEnter(e, index)}
-            onDragEnd={handleDragEnd}
-            onDragOver={(e) => e.preventDefault()}
-            draggable={scene.id !== startSceneId}
-          >
-            <div className={`flex items-center flex-grow p-2`}>
-              {scene.id !== startSceneId ? (
-                <Menu className={`w-4 h-4 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? (isDirty ? 'text-yellow-500' : 'text-primary') : 'text-muted-foreground'}`} />
-              ) : null}
+  // Row Component for react-window
+  const Row = ({ index, style }: { index: number; style: CSSProperties }) => {
+    const scene = scenes[index];
 
-              <div className="flex items-center justify-between w-full min-w-0">
-                <span className="truncate font-medium text-xs">{scene.name}</span>
-                <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
-                  {getVignetteIcon(scene)}
-                  {startSceneId === scene.id && (
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${selectedSceneId === scene.id
-                      ? isDirty
-                        ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
-                        : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
-                      : 'bg-primary text-primary-foreground border-primary/50' // Inactive Start
-                      }`}>
-                      Início
-                    </span>
-                  )}
-                </div>
+    return (
+      <div style={style} className="px-1">
+        <div
+          onClick={() => onSelectScene(scene.id)}
+          className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-lg transition-all overflow-hidden cursor-pointer h-[36px] ${selectedSceneId === scene.id
+            ? isDirty
+              ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold'
+              : 'bg-primary/20 text-primary border border-primary/30'
+            : 'hover:bg-muted/50'
+            }`}
+          onDragStart={(e) => scene.id !== startSceneId && handleDragStart(e, index)}
+          onDragEnter={(e) => scene.id !== startSceneId && handleDragEnter(e, index)}
+          onDragEnd={handleDragEnd}
+          onDragOver={(e) => e.preventDefault()}
+          draggable={scene.id !== startSceneId}
+        >
+          <div className={`flex items-center flex-grow p-2`}>
+            {scene.id !== startSceneId ? (
+              <Menu className={`w-4 h-4 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? (isDirty ? 'text-yellow-500' : 'text-primary') : 'text-muted-foreground'}`} />
+            ) : null}
+
+            <div className="flex items-center justify-between w-full min-w-0">
+              <span className="truncate font-medium text-xs">{scene.name}</span>
+              <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+                {getVignetteIcon(scene)}
+                {startSceneId === scene.id && (
+                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${selectedSceneId === scene.id
+                    ? isDirty
+                      ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
+                      : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
+                    : 'bg-primary text-primary-foreground border-primary/50' // Inactive Start
+                    }`}>
+                    Início
+                  </span>
+                )}
               </div>
             </div>
+          </div>
 
-            {startSceneId !== scene.id && (
-              <button
-                onClick={(e) => { e.stopPropagation(); onDeleteScene(scene.id); }}
-                className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer"
-                title="Deletar cena"
-              >
-                <Trash2 className="w-5 h-5 pointer-events-none" />
-              </button>
-            )}
-          </li>
-        ))}
-      </ul>
+          {startSceneId !== scene.id && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onDeleteScene(scene.id); }}
+              className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer"
+              title="Deletar cena"
+            >
+              <Trash2 className="w-5 h-5 pointer-events-none" />
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="flex flex-col gap-2 h-full">
+      {/* 
+        h-full is critical here for AutoSizer to work. 
+        The parent container in Sidebar.tsx must also have a defined height or flex-grow.
+      */}
+      <div className="flex-grow min-h-0">
+        <AutoSizer>
+          {({ height, width }) => (
+            <List
+              height={height}
+              itemCount={scenes.length}
+              itemSize={40} // 36px height + 4px gap roughly
+              width={width}
+            >
+              {Row}
+            </List>
+          )}
+        </AutoSizer>
+      </div>
+
       <button
         onClick={onAddScene}
         className={getAddButtonClass()}
