@@ -32,12 +32,12 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
   // Sync accordion state with current view
   useEffect(() => {
-    if (currentView === 'scenes' || currentView === 'map') {
+    if ((currentView === 'scenes' || currentView === 'map') && scenes.length > 0) {
       setIsScenesExpanded(true);
     } else {
       setIsScenesExpanded(false);
     }
-  }, [currentView]);
+  }, [currentView, scenes.length]);
 
   // Platform Sidebar Style Button Class
   const getButtonClass = (view: View) =>
