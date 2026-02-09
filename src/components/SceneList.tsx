@@ -156,7 +156,7 @@ const SceneList: React.FC<SceneListProps> = ({
   };
 
   return (
-    <div className="flex flex-col gap-2 h-full">
+    <div className="flex flex-col gap-0 h-full">
       {/* Search Input */}
       <div className="relative flex-shrink-0 mb-1">
         <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
