@@ -230,6 +230,28 @@ export const gameHTML = `
         </feTurbulence>
         <feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" result="distorted"/>
       </filter>
+
+      <!-- Wiggle (Squiggly) Filters for Squigglevision -->
+      <filter id="squiggly-0">
+        <feTurbulence baseFrequency="0.02" numOctaves="3" result="noise" seed="0"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+      </filter>
+      <filter id="squiggly-1">
+        <feTurbulence baseFrequency="0.02" numOctaves="3" result="noise" seed="1"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+      </filter>
+      <filter id="squiggly-2">
+        <feTurbulence baseFrequency="0.02" numOctaves="3" result="noise" seed="2"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+      </filter>
+      <filter id="squiggly-3">
+        <feTurbulence baseFrequency="0.02" numOctaves="3" result="noise" seed="3"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+      </filter>
+      <filter id="squiggly-4">
+        <feTurbulence baseFrequency="0.02" numOctaves="3" result="noise" seed="4"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+      </filter>
     </defs>
   </svg>
 </body>
@@ -1332,6 +1354,42 @@ export const OVERLAY_CSS = `
     70% { transform: translate(-4%, -4%); }
     80% { transform: translate(2%, 2%); }
     90% { transform: translate(-3%, -3%); }
+}
+
+/* Wiggle (Squigglevision) Effect */
+@keyframes squigglevision {
+  0% { filter: url("#squiggly-0"); }
+  25% { filter: url("#squiggly-1"); }
+  50% { filter: url("#squiggly-2"); }
+  75% { filter: url("#squiggly-3"); }
+  100% { filter: url("#squiggly-4"); }
+}
+
+.scene-overlay.overlay-wiggle {
+    display: block;
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Apply animation to images when wiggle is active */
+.wiggle-active #scene-image,
+.wiggle-active #scene-image-back,
+#vignette-screen.wiggle-active::before {
+    animation: squigglevision 0.3s infinite alternate;
+}
+
+/* For vignette screen - use pseudo-element to filter only the background */
+#vignette-screen.wiggle-active::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: inherit;
+    background-size: cover;
+    background-position: center;
+    z-index: 0;
+    transform: translateZ(0); /* Hardware accel */
 }
 `;
 

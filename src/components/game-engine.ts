@@ -1145,11 +1145,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 vignetteScreen.style.filter = '';
             }
             vignetteScreen.classList.remove('nosferatu-active');
-            const vOverlay = document.getElementById('vignette-overlay');
             if (vOverlay) {
                 const existing = vOverlay.querySelector('.nosferatu-container');
                 if (existing) existing.remove();
             }
+        }
+
+        // Wiggle Effect Logic for Vignette
+        if (scene.overlayEffect === 'wiggle') {
+            requestAnimationFrame(() => {
+                // CSS class handles the background animation via ::before pseudo-element
+                vignetteScreen.classList.add('wiggle-active');
+            });
+        } else {
+            vignetteScreen.classList.remove('wiggle-active');
         }
     };
 
@@ -1325,7 +1334,6 @@ document.addEventListener('DOMContentLoaded', () => {
             nosferatuContainer.innerHTML = '<div class="nosferatu-cinema"></div><div class="nosferatu-scratch"></div><div class="nosferatu-effect-scratch"></div><div class="nosferatu-grain"></div><div class="nosferatu-vignette"></div>';
             sceneOverlay.appendChild(nosferatuContainer);
             
-            // Apply sepia filter to images
             if (sceneImage) sceneImage.style.filter = 'sepia(0.8) contrast(1.1) brightness(0.9)';
             if (sceneImageBack) sceneImageBack.style.filter = 'sepia(0.8) contrast(1.1) brightness(0.9)';
             sceneOverlay.parentElement?.classList.add('nosferatu-active');
@@ -1339,6 +1347,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (sceneImage) sceneImage.style.filter = '';
                 if (sceneImageBack) sceneImageBack.style.filter = '';
             }
+        }
+
+        // Wiggle Effect Logic for Scene
+        if (scene.overlayEffect === 'wiggle') {
+            sceneOverlay.parentElement?.classList.add('wiggle-active');
+        } else {
+            sceneOverlay.parentElement?.classList.remove('wiggle-active');
         }
 
         sceneDescription.innerHTML = '';
