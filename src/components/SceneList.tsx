@@ -1,8 +1,8 @@
 import React, { useRef, CSSProperties } from 'react';
 import { Scene } from '../types';
 import { Plus, Trash2, Menu, Play, ArrowRight, Flag } from 'lucide-react';
-import { FixedSizeList as List } from 'react-window';
-import { AutoSizer } from 'react-virtualized-auto-sizer';
+import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
 
 interface SceneListProps {
   scenes: Scene[];
