@@ -102,16 +102,16 @@ const SceneList: React.FC<SceneListProps> = ({
         <div
           onClick={() => onSelectScene(scene.id)}
           className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-lg transition-all overflow-hidden cursor-pointer h-[36px] ${selectedSceneId === scene.id
-              ? isDirty
-                ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold'
-                : 'bg-primary/20 text-primary border border-primary/30'
-              : 'hover:bg-muted/50'
+            ? isDirty
+              ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold'
+              : 'bg-primary/20 text-primary border border-primary/30'
+            : 'hover:bg-muted/50'
             }`}
-          onDragStart={(e) => scene.id !== startSceneId && handleDragStart(e, index)}
-          onDragEnter={(e) => scene.id !== startSceneId && handleDragEnter(e, index)}
+          onDragStart={(e) => !searchTerm && scene.id !== startSceneId && handleDragStart(e, index)}
+          onDragEnter={(e) => !searchTerm && scene.id !== startSceneId && handleDragEnter(e, index)}
           onDragEnd={handleDragEnd}
           onDragOver={(e) => e.preventDefault()}
-          draggable={scene.id !== startSceneId}
+          draggable={!searchTerm && scene.id !== startSceneId}
         >
           <div className={`flex items-center flex-grow p-2`}>
             {scene.id !== startSceneId ? (
@@ -124,10 +124,10 @@ const SceneList: React.FC<SceneListProps> = ({
                 {getVignetteIcon(scene)}
                 {startSceneId === scene.id && (
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${selectedSceneId === scene.id
-                      ? isDirty
-                        ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
-                        : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
-                      : 'bg-primary text-primary-foreground border-primary/50' // Inactive Start
+                    ? isDirty
+                      ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
+                      : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
+                    : 'bg-primary text-primary-foreground border-primary/50' // Inactive Start
                     }`}>
                     Início
                   </span>
