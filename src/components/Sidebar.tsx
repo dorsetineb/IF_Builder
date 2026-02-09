@@ -64,7 +64,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full hover:border-r-purple-500/40`}>
 
 
-      <nav className="flex flex-col gap-1 flex-grow overflow-y-auto overflow-x-hidden px-3 py-4">
+      <nav className={`flex flex-col gap-1 flex-grow px-3 py-4 ${isScenesExpanded ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden'}`}>
         {/* Community Button - REMOVED AS REQUESTED */}
 
 
