@@ -83,7 +83,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         </button>
 
         {/* Scene Editor - Accordion */}
-        <div className="flex flex-col">
+        <div className={`flex flex-col ${isScenesExpanded ? 'flex-grow min-h-0' : ''}`}>
           <button
             className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${isScenesExpanded
               ? `bg-primary text-primary-foreground font-bold shadow-sm`
