@@ -160,47 +160,56 @@ const SceneList: React.FC<SceneListProps> = ({
           placeholder="Buscar cenas..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-8 pr-2 py-1.5 text-sm rounded-md bg-input border border-border focus:outline-none focus:ring-1 focus:ring-primary"
+          className="w-full pl-8 pr-2 py-1.5 text-xs rounded-md bg-input border border-border focus:outline-none focus:ring-1 focus:ring-primary"
         />
       </div>
 
       <div className="flex-grow min-h-0">
         <AutoSizer>
-          {({ height, width }) => {
-            // Apply the "shrink to fit" logic:
-            // If content is smaller than available height, use content height.
-            // Otherwise, use available height (and scroll).
-            const itemSize = 40; // Fixed row height (36px height + 4px gap roughly)
+          {({ height, width }: { height: number; width: number }) => {
+            const itemSize = 40; // Fixed row height
+            const buttonHeight = 36; // Approx height of add button + margins
             const contentHeight = filteredScenes.length * itemSize;
-            const listHeight = height > 0 ? Math.min(contentHeight, height) : 0;
+
+            // Calculate maximum space available for the list
+            // We reserve space for the button if the container is full
+            const maxListHeight = height - buttonHeight - 8; // 8px for gap/margin
+
+            // Actual list height is content height, capped at max available
+            const listHeight = Math.max(0, Math.min(contentHeight, maxListHeight));
 
             if (height === 0 || width === 0) return null;
 
             return (
-              <List
-                height={listHeight}
-                itemCount={filteredScenes.length}
-                itemSize={itemSize}
-                width={width}
-                outerElementType="div"
-                innerElementType="ul"
-                ref={listRef}
-                itemData={filteredScenes} // Pass data explicitly if needed, though closure works
-              >
-                {Row}
-              </List>
+              <div style={{ height, width }} className="flex flex-col">
+                <List
+                  height={listHeight}
+                  itemCount={filteredScenes.length}
+                  itemSize={itemSize}
+                  width={width}
+                  outerElementType="div"
+                  innerElementType="ul"
+                  ref={listRef}
+                  itemData={filteredScenes}
+                  className="scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent"
+                >
+                  {Row}
+                </List>
+
+                {/* Add Scene Button - Now integrated into the flow */}
+                <button
+                  onClick={onAddScene}
+                  className={getAddButtonClass()}
+                  style={{ marginTop: '0.5rem' }} // Ensure gap
+                >
+                  <Plus className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
+                  Adicionar Cena
+                </button>
+              </div>
             );
           }}
         </AutoSizer>
       </div>
-
-      <button
-        onClick={onAddScene}
-        className={getAddButtonClass()}
-      >
-        <Plus className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
-        Adicionar Cena
-      </button>
     </div>
   );
 };

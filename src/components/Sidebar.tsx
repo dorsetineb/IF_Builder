@@ -118,7 +118,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           {/* Expanded Content */}
           {(!isCollapsed && isScenesExpanded) && (
             <div className="pl-4 mt-1 mb-2 animate-in slide-in-from-top-2 duration-200 flex-grow min-h-0 flex flex-col">
-              <div className="pl-3 border-l-2 border-primary/30 flex flex-col gap-1 flex-grow min-h-0">
+              <div className="pl-3 border-l-2 border-dotted border-primary/60 flex flex-col gap-1 flex-grow min-h-0">
                 <SceneList scenes={scenes} isDirty={isDirty} theme={theme} {...sceneListProps} />
 
                 {/* Map Button inside accordion */}
