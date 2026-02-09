@@ -118,7 +118,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           {/* Expanded Content */}
           {(!isCollapsed && isScenesExpanded) && (
             <div className="pl-4 mt-1 mb-2 animate-in slide-in-from-top-2 duration-200 flex-grow min-h-0 flex flex-col">
-              <div className="pl-3 border-l-2 border-dotted border-primary/60 flex flex-col gap-1 flex-grow min-h-0">
+              <div className="pl-3 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[2px] before:bg-[image:repeating-linear-gradient(to_bottom,var(--primary)_0,var(--primary)_2px,transparent_2px,transparent_10px)] before:opacity-60 flex flex-col gap-1 flex-grow min-h-0">
                 <SceneList scenes={scenes} isDirty={isDirty} theme={theme} {...sceneListProps} />
 
                 {/* Map Button inside accordion */}
