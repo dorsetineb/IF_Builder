@@ -71,16 +71,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
 
 
-        {/* Informações e Interface */}
-        <button
-          className={getButtonClass('interface')}
-          onClick={() => handleSetView('interface')}
-          title={isCollapsed ? "Informações e Interface" : undefined}
-        >
-          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`} />
-          <Code className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">Informações e Interface</span>}
-        </button>
+
 
         {/* Scene Editor - Accordion */}
         <div className={`flex flex-col ${isScenesExpanded ? 'flex-grow min-h-0' : ''}`}>
@@ -172,6 +163,17 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             {!isCollapsed && <span className="truncate relative z-10">Comandos Globais</span>}
           </button>
         )}
+
+        {/* Interface (Renamed & Moved) */}
+        <button
+          className={getButtonClass('interface')}
+          onClick={() => handleSetView('interface')}
+          title={isCollapsed ? "Interface" : undefined}
+        >
+          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`} />
+          <Code className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && <span className="truncate relative z-10">Interface</span>}
+        </button>
 
 
 
