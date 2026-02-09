@@ -76,7 +76,7 @@ const SceneList: React.FC<SceneListProps> = ({
   };
 
   const getAddButtonClass = () => {
-    const baseClass = "w-full flex items-center justify-start px-4 py-2 font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent mt-2 flex-shrink-0";
+    const baseClass = "w-full flex items-center justify-start px-2 py-2 font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent mt-2 flex-shrink-0";
 
     if (theme === 'light') {
       return `${baseClass} bg-black text-white hover:bg-zinc-800`;
@@ -100,7 +100,7 @@ const SceneList: React.FC<SceneListProps> = ({
     const isDraggable = !searchTerm && scene.id !== startSceneId;
 
     return (
-      <div style={style} className="px-1">
+      <div style={style}>
         <div
           onClick={() => onSelectScene(scene.id)}
           className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-lg transition-all overflow-hidden cursor-pointer h-[36px] ${selectedSceneId === scene.id
