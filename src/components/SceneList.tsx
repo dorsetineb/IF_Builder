@@ -76,7 +76,7 @@ const SceneList: React.FC<SceneListProps> = ({
   };
 
   const getAddButtonClass = () => {
-    const baseClass = "w-full flex items-center justify-center px-4 py-2 font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent mt-2 flex-shrink-0";
+    const baseClass = "w-full flex items-center justify-start px-4 py-2 font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent mt-2 flex-shrink-0";
 
     if (theme === 'light') {
       return `${baseClass} bg-black text-white hover:bg-zinc-800`;
@@ -97,6 +97,8 @@ const SceneList: React.FC<SceneListProps> = ({
     // If scene is undefined (sync issue), return null
     if (!scene) return null;
 
+    const isDraggable = !searchTerm && scene.id !== startSceneId;
+
     return (
       <div style={style} className="px-1">
         <div
@@ -114,9 +116,12 @@ const SceneList: React.FC<SceneListProps> = ({
           draggable={!searchTerm && scene.id !== startSceneId}
         >
           <div className={`flex items-center flex-grow p-2`}>
+            {/* Always reserve space for the icon to ensure alignment */}
             {scene.id !== startSceneId ? (
-              <Menu className={`w-4 h-4 mr-2 cursor-move flex-shrink-0 ${selectedSceneId === scene.id ? (isDirty ? 'text-yellow-500' : 'text-primary') : 'text-muted-foreground'}`} />
-            ) : null}
+              <Menu className={`w-4 h-4 mr-2 flex-shrink-0 ${isDraggable ? 'cursor-move' : 'cursor-default opacity-50'} ${selectedSceneId === scene.id ? (isDirty ? 'text-yellow-500' : 'text-primary') : 'text-muted-foreground'}`} />
+            ) : (
+              <div className="w-4 h-4 mr-2 flex-shrink-0" />
+            )}
 
             <div className="flex items-center justify-between w-full min-w-0">
               <span className="truncate font-medium text-xs">{scene.name}</span>
@@ -153,7 +158,7 @@ const SceneList: React.FC<SceneListProps> = ({
   return (
     <div className="flex flex-col gap-2 h-full">
       {/* Search Input */}
-      <div className="relative flex-shrink-0">
+      <div className="relative flex-shrink-0 mb-1">
         <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
           type="text"
@@ -200,7 +205,7 @@ const SceneList: React.FC<SceneListProps> = ({
                 <button
                   onClick={onAddScene}
                   className={getAddButtonClass()}
-                  style={{ marginTop: '0.5rem' }} // Ensure gap
+                  style={{ marginTop: '4px' }} // Ensure gap matches item gap
                 >
                   <Plus className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
                   Adicionar Cena
