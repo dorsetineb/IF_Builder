@@ -1,6 +1,6 @@
-import React, { useRef, CSSProperties } from 'react';
+import React, { useRef, CSSProperties, useState, useMemo } from 'react';
 import { Scene } from '../types';
-import { Plus, Trash2, Menu, Play, ArrowRight, Flag } from 'lucide-react';
+import { Plus, Trash2, Menu, Play, ArrowRight, Flag, Search } from 'lucide-react';
 import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
@@ -27,6 +27,17 @@ const SceneList: React.FC<SceneListProps> = ({
   isDirty,
   theme = 'dark',
 }) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const listRef = useRef<List | null>(null);
+
+  const filteredScenes = useMemo(() => {
+    if (!searchTerm) return scenes;
+    return scenes.filter(scene =>
+      scene.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      scene.id.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [scenes, searchTerm]);
+
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
 
@@ -78,18 +89,23 @@ const SceneList: React.FC<SceneListProps> = ({
   };
 
   // Row Component for react-window
-  const Row = ({ index, style }: { index: number; style: CSSProperties }) => {
-    const scene = scenes[index];
+  const Row = ({ index, style }: ListChildComponentProps) => {
+    // Determine which item to render from filtered list
+    // Note: React Window's index corresponds to the filtered list index
+    const scene = filteredScenes[index];
+
+    // If scene is undefined (sync issue), return null
+    if (!scene) return null;
 
     return (
       <div style={style} className="px-1">
         <div
           onClick={() => onSelectScene(scene.id)}
           className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-lg transition-all overflow-hidden cursor-pointer h-[36px] ${selectedSceneId === scene.id
-            ? isDirty
-              ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold'
-              : 'bg-primary/20 text-primary border border-primary/30'
-            : 'hover:bg-muted/50'
+              ? isDirty
+                ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold'
+                : 'bg-primary/20 text-primary border border-primary/30'
+              : 'hover:bg-muted/50'
             }`}
           onDragStart={(e) => scene.id !== startSceneId && handleDragStart(e, index)}
           onDragEnter={(e) => scene.id !== startSceneId && handleDragEnter(e, index)}
@@ -108,10 +124,10 @@ const SceneList: React.FC<SceneListProps> = ({
                 {getVignetteIcon(scene)}
                 {startSceneId === scene.id && (
                   <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${selectedSceneId === scene.id
-                    ? isDirty
-                      ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
-                      : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
-                    : 'bg-primary text-primary-foreground border-primary/50' // Inactive Start
+                      ? isDirty
+                        ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
+                        : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
+                      : 'bg-primary text-primary-foreground border-primary/50' // Inactive Start
                     }`}>
                     Início
                   </span>
@@ -136,22 +152,45 @@ const SceneList: React.FC<SceneListProps> = ({
 
   return (
     <div className="flex flex-col gap-2 h-full">
-      {/* 
-        h-full is critical here for AutoSizer to work. 
-        The parent container in Sidebar.tsx must also have a defined height or flex-grow.
-      */}
+      {/* Search Input */}
+      <div className="relative flex-shrink-0">
+        <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <input
+          type="text"
+          placeholder="Buscar cenas..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-8 pr-2 py-1.5 text-sm rounded-md bg-input border border-border focus:outline-none focus:ring-1 focus:ring-primary"
+        />
+      </div>
+
       <div className="flex-grow min-h-0">
         <AutoSizer>
-          {({ height, width }) => (
-            <List
-              height={height}
-              itemCount={scenes.length}
-              itemSize={40} // 36px height + 4px gap roughly
-              width={width}
-            >
-              {Row}
-            </List>
-          )}
+          {({ height, width }) => {
+            // Apply the "shrink to fit" logic:
+            // If content is smaller than available height, use content height.
+            // Otherwise, use available height (and scroll).
+            const itemSize = 40; // Fixed row height (36px height + 4px gap roughly)
+            const contentHeight = filteredScenes.length * itemSize;
+            const listHeight = height > 0 ? Math.min(contentHeight, height) : 0;
+
+            if (height === 0 || width === 0) return null;
+
+            return (
+              <List
+                height={listHeight}
+                itemCount={filteredScenes.length}
+                itemSize={itemSize}
+                width={width}
+                outerElementType="div"
+                innerElementType="ul"
+                ref={listRef}
+                itemData={filteredScenes} // Pass data explicitly if needed, though closure works
+              >
+                {Row}
+              </List>
+            );
+          }}
         </AutoSizer>
       </div>
 
