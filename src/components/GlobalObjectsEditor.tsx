@@ -61,14 +61,20 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
 
     useEffect(() => {
-        setLocalObjects(sortedObjects);
-        // If selected object was deleted or doesn't exist, select first or null
-        if (selectedObjectId && !sortedObjects.find(o => o.id === selectedObjectId)) {
-            setSelectedObjectId(sortedObjects.length > 0 ? sortedObjects[0].id : null);
-        } else if (!selectedObjectId && sortedObjects.length > 0) {
-            setSelectedObjectId(sortedObjects[0].id);
+        // Deep compare to avoid unnecessary updates and infinite loops
+        const areObjectsDifferent = JSON.stringify(localObjects) !== JSON.stringify(sortedObjects);
+
+        if (areObjectsDifferent) {
+            setLocalObjects(sortedObjects);
+
+            // If selected object was deleted or doesn't exist, select first or null
+            if (selectedObjectId && !sortedObjects.find(o => o.id === selectedObjectId)) {
+                setSelectedObjectId(sortedObjects.length > 0 ? sortedObjects[0].id : null);
+            } else if (!selectedObjectId && sortedObjects.length > 0) {
+                setSelectedObjectId(sortedObjects[0].id);
+            }
         }
-    }, [sortedObjects]);
+    }, [sortedObjects]); // localObjects dependency removed to avoid cyclic dependency in effect logic, though strictly it's used in comparison
 
     useEffect(() => {
         setIsIconPickerOpen(false);
