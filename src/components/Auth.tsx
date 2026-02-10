@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
-import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, User, MapPin, Eye, EyeOff, ArrowLeft, KeyRound, Gamepad2, Info, X, Activity } from 'lucide-react';
+import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, User, MapPin, Eye, EyeOff, ArrowLeft, KeyRound, Gamepad2, Info, X, Activity, Minus, Square } from 'lucide-react';
 import { DitherShader } from '@/components/ui/dither-shader';
 
 interface AuthProps {
@@ -586,10 +586,19 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                             TERM.V2.EXE - REMOTE CONNECTION
                         </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <div className="w-3 h-3 rounded-full bg-red-500 cursor-pointer hover:bg-red-400 transition-colors" onClick={resetToLanding} />
-                        <div className="w-3 h-3 rounded-full bg-yellow-500" />
-                        <div className="w-3 h-3 rounded-full bg-green-500" />
+                    <div className="flex items-center">
+                        <button className="h-6 w-8 flex items-center justify-center hover:bg-white/10 transition-colors rounded-sm">
+                            <Minus className="w-3 h-3 text-zinc-500" />
+                        </button>
+                        <button className="h-6 w-8 flex items-center justify-center hover:bg-white/10 transition-colors rounded-sm">
+                            <Square className="w-2.5 h-2.5 text-zinc-500" />
+                        </button>
+                        <button
+                            className="h-6 w-8 flex items-center justify-center hover:bg-red-500 transition-colors group rounded-sm"
+                            onClick={resetToLanding}
+                        >
+                            <X className="w-3.5 h-3.5 text-zinc-500 group-hover:text-white" />
+                        </button>
                     </div>
                 </div>
 
