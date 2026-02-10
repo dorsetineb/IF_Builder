@@ -31,20 +31,11 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
 
   // Sync accordion state with current view
+  // Sync accordion state with current view
   useEffect(() => {
-    // Only auto-expand if we switch TO scenes view. 
-    // We don't want to force-expand if the user manually collapsed it while already in scenes view.
-    if (currentView === 'scenes' || currentView === 'map') {
-      // Optional: Only expand if not already expanded? 
-      // For now, let's keep it simple: if view changes to scenes, expand.
-      // But we need to remove scenes.length from dependency to avoid re-expanding on every scene add/edit if user collapsed it.
-      setIsScenesExpanded(true);
-    }
-    // We don't force collapse here anymore to allow manual control, 
-    // but the 'else' block from before was also handling "leaving" the view.
-    // If we leave the view, the component re-renders and the accordion state might persist or reset depending on mounting.
-    // Sidebar persists, so state persists.
-    else {
+    // Only force collapse if we leave scenes/map view.
+    // We do NOT force expand anymore, as the user wants it to start closed.
+    if (currentView !== 'scenes' && currentView !== 'map') {
       setIsScenesExpanded(false);
     }
   }, [currentView]); // Removed scenes.length dependency
