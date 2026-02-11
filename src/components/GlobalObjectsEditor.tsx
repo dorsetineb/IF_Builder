@@ -261,7 +261,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     <div className="p-3 border-t border-border bg-muted/30">
                         <button
                             onClick={handleCreate}
-                            className="w-full py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow-none"
+                            className="w-full py-2 bg-white hover:bg-zinc-200 text-zinc-950 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow-none"
                         >
                             <Plus className="w-3.5 h-3.5 mr-2" />
                             Criar Novo Objeto

@@ -278,7 +278,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                     <div className="p-3 border-t border-border/50 bg-background/50">
                         <button
                             onClick={handleAddTracker}
-                            className="w-full py-2 bg-primary text-primary-foreground hover:bg-primary/90 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow-sm"
+                            className="w-full py-2 bg-white text-zinc-950 hover:bg-zinc-200 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow-sm"
                         >
                             <Plus className="w-3.5 h-3.5 mr-2" />
                             Novo Rastreador

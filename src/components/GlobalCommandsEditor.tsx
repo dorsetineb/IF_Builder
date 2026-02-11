@@ -212,7 +212,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                     <div className="p-3 border-t border-border/50">
                         <button
                             onClick={handleCreate}
-                            className="w-full py-2.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm transform hover:-translate-y-0.5"
+                            className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm transform hover:-translate-y-0.5"
                         >
                             <Plus className="w-4 h-4" />
                             Novo Comando
@@ -308,7 +308,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                             <p className="text-xs text-muted-foreground mt-1">ou crie um novo clicando no botão abaixo</p>
                             <button
                                 onClick={handleCreate}
-                                className="mt-4 px-4 py-2 bg-primary text-primary-foreground rounded-lg text-xs font-bold hover:bg-primary/90 transition-all"
+                                className="mt-4 px-4 py-2 bg-white text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-200 transition-all"
                             >
                                 <Plus className="w-4 h-4 inline-block mr-1" />
                                 Criar Comando

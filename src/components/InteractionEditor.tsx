@@ -454,7 +454,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                 <div className="p-3 border-t border-muted-foreground/10 bg-zinc-900/50">
                     <button
                         onClick={handleAdd}
-                        className="w-full py-2 bg-zinc-100 hover:bg-white text-zinc-900 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow"
+                        className="w-full py-2 bg-white hover:bg-zinc-200 text-zinc-950 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow"
                     >
                         <Plus className="w-3.5 h-3.5 mr-2" />
                         Nova Interação
