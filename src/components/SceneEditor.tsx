@@ -310,8 +310,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
 
     return (
         <div className="space-y-6">
-            <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-border mb-6">
-                <p className="text-zinc-500 text-xs font-medium max-w-lg">
+            <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-border">
+                <p className="text-muted-foreground text-xs font-medium max-w-lg">
                     Defina a imagem, descrição, objetos e interações para esta cena.
                 </p>
                 <div className="flex items-center gap-3">

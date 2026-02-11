@@ -124,7 +124,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
     return (
         <div className="space-y-6 pb-8" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* Header with Save/Undo actions */}
-            <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-border/50">
+            <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-border">
                 <div className="text-muted-foreground text-xs font-medium w-full space-y-1">
                     <p>Configure verbos e comandos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).</p>
                     <p>Os verbos <strong>"olhar", "examinar", "ver"</strong> e <strong>"ler"</strong> sempre estarão disponíveis para o usuário acionar a descrição de um objeto.</p>
