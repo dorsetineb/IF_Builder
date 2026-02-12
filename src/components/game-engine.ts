@@ -841,10 +841,18 @@ document.addEventListener('DOMContentLoaded', () => {
         standardActionBar.classList.remove('hidden');
         endingActionBar.classList.add('hidden');
         
-        // Restore smooth transition
-        splashScreen.classList.remove('hidden');
-        splashScreen.classList.add('fade-out');
-        setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
+        // Handle Splash Screen visibility
+        if (window.isSceneTest) {
+            // In test mode, immediately hide splash and show game to avoid freezing/delays
+            splashScreen.classList.add('hidden');
+            splashScreen.classList.remove('fade-out');
+            gameContainer.classList.remove('hidden');
+        } else {
+            // Restore smooth transition for normal play
+            splashScreen.classList.remove('hidden');
+            splashScreen.classList.add('fade-out');
+            setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
+        }
     };
 
     const loadGameFromData = (jsonString) => {
