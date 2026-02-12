@@ -15,6 +15,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
     const [isFlashing, setIsFlashing] = useState(false);
     const [showDownloadHelp, setShowDownloadHelp] = useState(false);
     const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+    const [isGamePopupOpen, setIsGamePopupOpen] = useState(false);
 
     const handleDownloadClick = () => {
         setIsFlashing(true);
@@ -65,11 +66,8 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
 
             <div className="relative z-10 flex flex-col items-center justify-center text-center p-8">
                 <h2 className="text-3xl font-bold text-white mb-4">Bem-vindo ao IF Builder</h2>
-                <p className="max-w-md text-zinc-300 mb-12">
-                    Voce acordou em uma caverna escura. Um antigo computador está ao seu lado, e estranhamente ele ainda funciona.
-                </p>
                 <p className="max-w-md text-zinc-300 mb-12"><b>O que você quer fazer?</b></p>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full max-w-6xl">
                     {/* Botão 1: Começar a Criar */}
                     <button
                         onClick={() => setIsNewProjectModalOpen(true)}
@@ -99,6 +97,17 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                                 }`} />
                         </div>
                         <span className={`font-bold text-lg transition-colors ${isFlashing ? (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>Baixe um exemplo</span>
+                    </button>
+
+                    {/* Botão 3: Jogar a Demo */}
+                    <button
+                        onClick={() => setIsGamePopupOpen(true)}
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-zinc-600 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
+                    >
+                        <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'bg-primary/10 group-hover:bg-primary' : 'bg-white/10 group-hover:bg-white'}`}>
+                            <Gamepad2 className={`w-6 h-6 transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary group-hover:text-primary-foreground' : 'text-white group-hover:text-black'}`} />
+                        </div>
+                        <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">Jogar a demo</span>
                     </button>
 
                     {/* Botão 3: Conheça o projeto */}
@@ -167,6 +176,41 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                 onClose={() => setIsNewProjectModalOpen(false)}
                 onCreate={handleCreateProject}
             />
+
+            {/* Game Popup */}
+            {isGamePopupOpen && (
+                <div
+                    className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-300"
+                    onClick={() => setIsGamePopupOpen(false)}
+                >
+                    <div
+                        className="bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300"
+                        style={{ width: '80vw', height: '70vh' }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="bg-zinc-800 border-b border-zinc-700 px-4 py-3 flex items-center justify-between flex-shrink-0">
+                            <div className="flex items-center gap-3">
+                                <span className="font-mono text-xs text-zinc-500 uppercase tracking-widest">
+                                    TERM.V2.EXE - REMOTE CONNECTION
+                                </span>
+                            </div>
+                            <button
+                                className="h-6 w-8 flex items-center justify-center hover:bg-red-500 transition-colors group rounded-sm"
+                                onClick={() => setIsGamePopupOpen(false)}
+                            >
+                                <X className="w-3.5 h-3.5 text-zinc-500 group-hover:text-white" />
+                            </button>
+                        </div>
+                        <div className="flex-1 min-h-0">
+                            <iframe
+                                src="/fuja_da_masmorra/index.html"
+                                className="w-full h-full border-0"
+                                title="Fuja da Masmorra Demo"
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };

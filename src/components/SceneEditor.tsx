@@ -8,7 +8,7 @@ import { useToast } from './ToastContext';
 import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
 import BranchingPreview from './BranchingPreview';
-import { Upload, Eye, Trash2, Plus, ArrowRight, Music, Image as ImageIcon, Flag, FileText, Scroll, GitBranch, Play } from 'lucide-react';
+import { Upload, Eye, Trash2, Plus, ArrowRight, Music, Image as ImageIcon, Flag, FileText, Scroll, GitBranch, Play, Copy, RotateCcw, Save } from 'lucide-react';
 import RainOverlay from './effects/RainOverlay';
 import BlurOverlay from './effects/BlurOverlay';
 import ChromaticOverlay from './effects/ChromaticOverlay';
@@ -314,45 +314,49 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                 <p className="text-muted-foreground text-xs font-medium max-w-lg">
                     Defina a imagem, descrição, objetos e interações para esta cena.
                 </p>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                     {isDirty && (
-                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
+                        <div className="flex items-center gap-1 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-1">
                             <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            Alterações não salvas
+                            <span className="hidden sm:inline">Alterações não salvas</span>
                         </div>
                     )}
 
                     <button
                         onClick={handlePreview}
-                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 rounded-lg"
+                        className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 rounded-lg"
                         title="Testar apenas esta cena"
                     >
                         <Eye className="w-3.5 h-3.5" />
-                        Testar
+                        <span className="hidden sm:inline">Testar</span>
                     </button>
 
                     <button
                         onClick={() => onCopyScene(localScene)}
-                        className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors"
+                        className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors hover:bg-zinc-800 rounded-lg"
                         title="Copiar Cena"
                     >
-                        Copiar
+                        <Copy className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Copiar</span>
                     </button>
 
                     <button
                         onClick={handleUndo}
                         disabled={!isDirty}
-                        className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
+                        className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors hover:bg-zinc-800 rounded-lg"
+                        title="Desfazer alterações"
                     >
-                        Desfazer
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">Desfazer</span>
                     </button>
 
                     <button
                         onClick={handleSave}
                         disabled={!isDirty}
-                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
+                        className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
                     >
-                        Salvar Alterações
+                        <Save className="w-3.5 h-3.5" />
+                        <span>Salvar</span>
                     </button>
                 </div>
             </div>

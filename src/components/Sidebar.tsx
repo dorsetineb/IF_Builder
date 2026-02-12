@@ -75,7 +75,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
 
         {/* Scene Editor - Accordion */}
-        <div className={`flex flex-col ${isScenesExpanded ? 'flex-grow min-h-0' : ''}`}>
+        <div className={`flex flex-col ${(isScenesExpanded && !isCollapsed) ? 'flex-grow min-h-0' : ''}`}>
           <button
             className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${isScenesExpanded
               ? `bg-primary text-primary-foreground font-bold shadow-sm`
@@ -101,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
             {/* Show tiny counter badge if collapsed */}
             {isCollapsed && (
-              <div className="absolute top-1 right-1 w-4 h-4 bg-primary text-primary-foreground rounded-full flex items-center justify-center text-[8px] font-bold border border-white/20 z-20 shadow-sm">
+              <div className="absolute top-1 right-1 w-4 h-4 bg-black/30 text-white rounded-md flex items-center justify-center text-[8px] font-bold border border-white/20 z-20 shadow-sm">
                 {scenes.length}
               </div>
             )}

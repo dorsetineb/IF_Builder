@@ -1,7 +1,7 @@
 
 import React, { useRef } from 'react';
 import { GameData } from '../types';
-import { Eye, Plus, CircleHelp, LogOut, ChevronLeft, ChevronRight, PanelLeft, Upload, Download } from 'lucide-react';
+import { Eye, Plus, CircleHelp, LogOut, ChevronLeft, ChevronRight, PanelLeft, Upload, Download, Save } from 'lucide-react';
 
 const Header: React.FC<{
   gameData: GameData;
@@ -100,19 +100,19 @@ const Header: React.FC<{
 
 
                   <button
-                    onClick={() => importInputRef.current?.click()}
+                    onClick={onExport}
                     className="flex items-center justify-center px-3 py-2 text-primary hover:text-primary/80 transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
-                    title="Importar Jogo"
+                    title="Salvar Jogo"
                   >
-                    <Download className="w-4 h-4" /> Importar
+                    <Save className="w-4 h-4" /> Salvar
                   </button>
 
                   <button
-                    onClick={onExport}
+                    onClick={() => importInputRef.current?.click()}
                     className="flex items-center justify-center px-3 py-2 text-primary hover:text-primary/80 transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
-                    title="Exportar Jogo"
+                    title="Carregar Jogo"
                   >
-                    <Upload className="w-4 h-4" /> Exportar
+                    <Download className="w-4 h-4" /> Carregar
                   </button>
 
                   <button
