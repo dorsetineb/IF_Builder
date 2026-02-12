@@ -1132,15 +1132,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  const durationMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--image-anim-speed')) * 1000;
                  setTimeout(() => { renderScene(scene, successPrefix); sceneImage.classList.remove(animClass); sceneImageBack.src = ''; sceneImageBack.classList.add('hidden'); }, durationMs + 50);
              } else renderScene(scene, successPrefix);
-        } else { 
-            // Explicitly handle image for non-transition (instant) load to ensure it shows
-            if (scene.image && gameData.enableImages !== false) {
-                if (sceneImage) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); }
-                if (sceneImageBack) { sceneImageBack.src = ''; sceneImageBack.classList.add('hidden'); }
-                if (imageContainer) imageContainer.classList.remove('no-image');
-            }
-            renderScene(scene, successPrefix); 
-        }
+        } else { renderScene(scene, successPrefix); }
         autoSaveGame();
     };
 
@@ -1160,7 +1152,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderScene = (scene, successPrefix = null) => {
-        if (scene.image && gameData.enableImages !== false) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
+        if (scene.image) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
         else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
         if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
         
