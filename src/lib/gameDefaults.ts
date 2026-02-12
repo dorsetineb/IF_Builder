@@ -759,6 +759,45 @@ export const OVERLAY_CSS = `
     display: none;
     overflow: hidden;
 }
+
+/* FOG EFFECT */
+.scene-overlay.overlay-fog {
+    display: block;
+}
+.fog-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+.fog-img {
+  position: absolute;
+  height: 100%;
+  width: 300%;
+  z-index: 2;
+  top: 0;
+  left: 0;
+}
+.fog-img-first {
+  background: url("https://raw.githubusercontent.com/WebDevSHORTS/Fog-Overlay-Animation/master/img/fog-1.png");
+  background-repeat: repeat-x;
+  background-size: contain;
+  background-position: center;
+  animation: marquee 60s linear infinite;
+}
+.fog-img-second {
+  background: url("https://raw.githubusercontent.com/WebDevSHORTS/Fog-Overlay-Animation/master/img/fog-2.png");
+  background-repeat: repeat-x;
+  background-size: contain;
+  background-position: center;
+  animation: marquee 30s linear infinite;
+}
+@keyframes marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-200%, 0, 0); }
+}
+
 .scene-overlay.overlay-grain {
     display: block;
 }

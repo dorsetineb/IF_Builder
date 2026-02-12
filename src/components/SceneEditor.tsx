@@ -17,6 +17,7 @@ import ConfettiOverlay from './effects/ConfettiOverlay';
 import GlitchOverlay from './effects/GlitchOverlay';
 import NosferatuOverlay from './effects/NosferatuOverlay';
 import WiggleOverlay from './effects/WiggleOverlay';
+import FogOverlay from './effects/FogOverlay';
 
 interface SceneEditorProps {
     scene: Scene;
@@ -593,6 +594,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                 {localScene.overlayEffect === 'glitch' && <GlitchOverlay />}
                                                 {localScene.overlayEffect === 'nosferatu' && <NosferatuOverlay />}
                                                 {localScene.overlayEffect === 'wiggle' && <WiggleOverlay />}
+                                                {localScene.overlayEffect === 'fog' && <FogOverlay />}
 
                                                 {/* Hover buttons - highest z-index */}
                                                 <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm" style={{ zIndex: 20 }}>
@@ -643,6 +645,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                             <option value="glitch">Glitch</option>
                                             <option value="nosferatu">Nosferatu</option>
                                             <option value="wiggle">Wiggle (Tremido)</option>
+                                            <option value="fog">Neblina (Fog)</option>
                                         </select>
                                     </div>
 

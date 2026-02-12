@@ -1160,6 +1160,30 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             vignetteScreen.classList.remove('wiggle-active');
         }
+
+        // Fog Effect Logic for Vignette
+        if (scene.overlayEffect === 'fog') {
+            requestAnimationFrame(() => {
+                const vOverlay = document.getElementById('vignette-overlay');
+                if (vOverlay) {
+                    const existing = vOverlay.querySelector('.fog-container');
+                    if (existing) existing.remove();
+                    
+                    const fogContainer = document.createElement('div');
+                    fogContainer.className = 'fog-container';
+                    fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
+                    vOverlay.appendChild(fogContainer);
+                    vOverlay.classList.add('overlay-fog');
+                }
+            });
+        } else {
+            const vOverlay = document.getElementById('vignette-overlay');
+            if (vOverlay) {
+                vOverlay.classList.remove('overlay-fog');
+                const existing = vOverlay.querySelector('.fog-container');
+                if (existing) existing.remove();
+            }
+        }
     };
 
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
@@ -1354,6 +1378,22 @@ document.addEventListener('DOMContentLoaded', () => {
             sceneOverlay.parentElement?.classList.add('wiggle-active');
         } else {
             sceneOverlay.parentElement?.classList.remove('wiggle-active');
+        }
+
+        // Fog Effect Logic for Scene
+        if (scene.overlayEffect === 'fog') {
+             const existing = sceneOverlay.querySelector('.fog-container');
+             if (existing) existing.remove();
+
+             const fogContainer = document.createElement('div');
+             fogContainer.className = 'fog-container';
+             fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
+             sceneOverlay.appendChild(fogContainer);
+             sceneOverlay.classList.add('overlay-fog');
+        } else {
+             sceneOverlay.classList.remove('overlay-fog');
+             const existing = sceneOverlay.querySelector('.fog-container');
+             if (existing) existing.remove();
         }
 
         sceneDescription.innerHTML = '';
