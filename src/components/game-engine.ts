@@ -80,6 +80,13 @@ export const prepareGameDataForEngine = (data: GameData): object => {
 
 export const gameJS = `
 document.addEventListener('DOMContentLoaded', () => {
+    // DEBUG: Unconditional marker to verify gameJS execution
+    const _dbgMarker = document.createElement('div');
+    _dbgMarker.id = 'engine-debug-marker';
+    _dbgMarker.style.cssText = 'position:fixed;bottom:10px;left:10px;background:lime;color:black;z-index:2147483647;padding:10px;font-family:monospace;font-size:14px;font-weight:bold;border:3px solid black;pointer-events:none;';
+    _dbgMarker.textContent = 'ENGINE JS LOADED - isSceneTest=' + (window.isSceneTest ? 'TRUE' : 'FALSE');
+    document.body.appendChild(_dbgMarker);
+
     const ICONS = {
         heart: '<svg fill="%COLOR%" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
         circle: '<svg fill="%COLOR%" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
