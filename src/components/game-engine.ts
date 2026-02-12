@@ -843,12 +843,22 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Handle Splash Screen visibility
         if (window.isSceneTest) {
+            // DEBUG: Inject debug overlay
+            const dbg = document.createElement('div');
+            dbg.style.cssText = 'position:fixed;top:0;left:0;background:rgba(255,0,0,0.8);color:white;z-index:99999;padding:10px;font-family:monospace;pointer-events:none;';
+            const startSceneCheck = gameData.cenas[currentSceneId];
+            dbg.innerHTML = 'TEST MODE<br>ID: ' + currentSceneId + '<br>Type: ' + (startSceneCheck ? (startSceneCheck.vignetteType || 'scene') : 'undefined') + '<br>Found: ' + !!startSceneCheck;
+            document.body.appendChild(dbg);
+            setTimeout(() => dbg.remove(), 5000); // Remove after 5s
+
             // In test mode, immediately hide splash and show game to avoid freezing/delays
             splashScreen.classList.add('hidden');
+            splashScreen.style.display = 'none'; // FORCE HIDE
             splashScreen.classList.remove('fade-out');
             gameContainer.classList.remove('hidden');
         } else {
             // Restore smooth transition for normal play
+            splashScreen.style.display = ''; // Reset
             splashScreen.classList.remove('hidden');
             splashScreen.classList.add('fade-out');
             setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
