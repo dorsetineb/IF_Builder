@@ -785,6 +785,8 @@ export const OVERLAY_CSS = `
   background-size: contain;
   background-position: center;
   animation: marquee 60s linear infinite;
+  filter: brightness(2.5) contrast(1.2);
+  opacity: 1;
 }
 .fog-img-second {
   background: url("https://raw.githubusercontent.com/WebDevSHORTS/Fog-Overlay-Animation/master/img/fog-2.png");
@@ -792,6 +794,8 @@ export const OVERLAY_CSS = `
   background-size: contain;
   background-position: center;
   animation: marquee 30s linear infinite;
+  filter: brightness(2.5) contrast(1.2);
+  opacity: 1;
 }
 @keyframes marquee {
   0% { transform: translate3d(0, 0, 0); }
