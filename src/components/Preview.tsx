@@ -244,11 +244,12 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             window.isPreview = true;
             window.isSceneTest = ${!!testSceneId};
         </script>`;
+        const testSceneCss = testSceneId ? `<style>#splash-screen,.splash-screen,#vignette-screen{display:none!important;opacity:0!important;pointer-events:none!important}#game-container{display:block!important;opacity:1!important}</style>` : '';
         const styleTag = `<style>${finalCss}</style>`;
         const gameScriptTag = `<script>${gameJS}</script>`;
 
         return finalHtml
-            .replace('</head>', `${styleTag}</head>`)
+            .replace('</head>', `${testSceneCss}${styleTag}</head>`)
             .replace('</body>', `${dataScript}${gameScriptTag}</body>`);
 
     }, [gameData, testSceneId]);
