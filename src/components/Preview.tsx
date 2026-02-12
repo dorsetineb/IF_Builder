@@ -244,7 +244,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             window.isPreview = true;
             window.isSceneTest = ${!!testSceneId};
         </script>`;
-        const testSceneCss = testSceneId ? `<style>#splash-screen{display:none!important;opacity:0!important;pointer-events:none!important}</style>` : '';
+        const testSceneCss = testSceneId ? `<style>html,body{background-color:#000!important}#splash-screen{display:none!important;opacity:0!important;pointer-events:none!important}#game-container{opacity:0;transition:opacity 0.3s ease-in-out}#game-container.ready{opacity:1!important}</style>` : '';
         const styleTag = `<style>${finalCss}</style>`;
         const gameScriptTag = `<script>${gameJS}</script>`;
 

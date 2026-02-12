@@ -847,7 +847,36 @@ document.addEventListener('DOMContentLoaded', () => {
             splashScreen.classList.add('hidden');
             splashScreen.style.display = 'none';
             splashScreen.classList.remove('fade-out');
+            
+            // Allow game container to be visible in layout (display:block) but keep opacity 0 until ready
             gameContainer.classList.remove('hidden');
+
+            const startScene = gameData.cenas[currentSceneId];
+            const hasImage = startScene && startScene.image && gameData.enableImages !== false;
+            
+            const showGame = () => {
+                 gameContainer.classList.add('ready');
+            };
+
+            if (hasImage) {
+                 const img = document.getElementById('scene-image');
+                 if (img && img instanceof HTMLImageElement) {
+                     if (img.complete && img.naturalHeight !== 0) {
+                         showGame();
+                     } else {
+                         img.onload = showGame;
+                         img.onerror = showGame;
+                         // Safety timeout
+                         setTimeout(showGame, 2000);
+                     }
+                 } else {
+                     showGame();
+                 }
+            } else {
+                 // Small delay to ensure layout frames are ready
+                 setTimeout(showGame, 50);
+            }
+
         } else {
             // Restore smooth transition for normal play
             splashScreen.style.display = '';
