@@ -255,13 +255,6 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
 
     return (
         <div className="w-full h-full bg-brand-bg relative">
-            {/* DEBUG OVERLAY */}
-            <div style={{ position: 'absolute', top: 50, left: 10, background: 'blue', color: 'white', zIndex: 999999, padding: 20 }}>
-                PREVIEW<br />
-                testSceneId: {String(testSceneId)}<br />
-                Length: {testSceneId?.length}<br />
-                isSceneTest: {String(!!testSceneId)}
-            </div>
             <iframe
                 srcDoc={srcDoc}
                 title="Pré-visualização do Jogo"

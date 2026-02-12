@@ -80,12 +80,6 @@ export const prepareGameDataForEngine = (data: GameData): object => {
 
 export const gameJS = `
 document.addEventListener('DOMContentLoaded', () => {
-    // DEBUG: Unconditional marker to verify gameJS execution
-    const _dbgMarker = document.createElement('div');
-    _dbgMarker.id = 'engine-debug-marker';
-    _dbgMarker.style.cssText = 'position:fixed;bottom:10px;left:10px;background:lime;color:black;z-index:2147483647;padding:10px;font-family:monospace;font-size:14px;font-weight:bold;border:3px solid black;pointer-events:none;';
-    _dbgMarker.textContent = 'ENGINE JS LOADED - isSceneTest=' + (window.isSceneTest ? 'TRUE' : 'FALSE');
-    document.body.appendChild(_dbgMarker);
 
     const ICONS = {
         heart: '<svg fill="%COLOR%" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
@@ -813,7 +807,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (gameData.gameBackgroundMusic) playBgm(gameData.gameBackgroundMusic);
             else playBgm("");
         };
-        if (window.isSceneTest) startGame();
+
     };
 
     const startGame = () => {
@@ -828,17 +822,18 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameEnded = false;
         (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
         
-        // Fix Audio Persistence: If the starting scene has no specific music.
-        // If it is a SCENE TEST, we do NOT fallback to global music (keep it silent/clean).
+        // In test scene mode: hide splash immediately and skip global BGM
+        if (window.isSceneTest) {
+            splashScreen.classList.add('hidden');
+            splashScreen.style.display = 'none';
+            gameContainer.classList.remove('hidden');
+            playBgm("");
+        }
+        
         const startScene = gameData.cenas[currentSceneId];
         if (startScene) {
-            if (!startScene.backgroundMusic) {
-                // If NOT in test mode, play global BGM. If in test mode, play nothing (or stop previous).
-                if (!window.isSceneTest) {
-                    playBgm(gameData.gameBackgroundMusic || "");
-                } else {
-                    playBgm(""); 
-                }
+            if (!startScene.backgroundMusic && !window.isSceneTest) {
+                playBgm(gameData.gameBackgroundMusic || "");
             }
             loadScene(currentSceneId, false);
         } else {
@@ -848,41 +843,8 @@ document.addEventListener('DOMContentLoaded', () => {
         standardActionBar.classList.remove('hidden');
         endingActionBar.classList.add('hidden');
         
-        // Handle Splash Screen visibility
-        if (window.isSceneTest) {
-            // DEBUG: Alert to force visibility
-            // alert('Engine Running! Test Mode: ' + window.isSceneTest + '\\nScene ID: ' + currentSceneId); // Removed to avoid annoying user in future steps, but kept principle.
-            
-            // DEBUG: Inject debug overlay (Updated Z-Index)
-            const dbg = document.createElement('div');
-            dbg.style.cssText = 'position:fixed;top:10px;right:10px;background:red;color:white;z-index:2147483647;padding:15px;font-family:monospace;pointer-events:none;font-size:20px;border: 2px solid white;';
-            const startSceneCheck = gameData.cenas[currentSceneId];
-            dbg.innerHTML = 'ENGINE ACTIVE<br>ID: ' + currentSceneId + '<br>Type: ' + (startSceneCheck ? (startSceneCheck.vignetteType || 'scene') : 'undefined');
-            document.body.appendChild(dbg);
-            
-            // Force hide splash screen with extreme prejudice
-            const hideSplash = () => {
-                const s = document.getElementById('splash-screen');
-                if (s) {
-                    s.style.display = 'none !important';
-                    s.style.opacity = '0';
-                    s.style.zIndex = '-1';
-                    s.classList.add('hidden');
-                }
-                const g = document.getElementById('game-container');
-                if (g) g.classList.remove('hidden');
-            };
-            hideSplash();
-            // Retry a few times just in case of race conditions
-            setTimeout(hideSplash, 50);
-            setTimeout(hideSplash, 100);
-            setTimeout(hideSplash, 500);
-
-            splashScreen.classList.add('hidden');
-            splashScreen.style.display = 'none'; // FORCE HIDE
-            splashScreen.classList.remove('fade-out');
-            gameContainer.classList.remove('hidden');
-        } else {
+        // Handle Splash Screen visibility for normal mode
+        if (!window.isSceneTest) {
             // Restore smooth transition for normal play
             splashScreen.style.display = ''; // Reset
             splashScreen.classList.remove('hidden');
@@ -1223,8 +1185,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!visitedScenes.includes(sceneId)) visitedScenes.push(sceneId);
         actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
         
-        // Check if this is a vignette scene
-        if (scene.vignetteType && scene.vignetteType !== 'none') {
+        // Check if this is a vignette scene (skip in test mode - render as regular scene)
+        if (scene.vignetteType && scene.vignetteType !== 'none' && !window.isSceneTest) {
             showVignetteScreen(scene);
             autoSaveGame();
             return;
