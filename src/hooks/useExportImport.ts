@@ -70,7 +70,7 @@ export const useExportImport = ({
 
         exportData.gameLogo = processAsset(exportData.gameLogo, 'logo');
         exportData.gameSplashImage = processAsset(exportData.gameSplashImage, 'splash_image');
-        exportData.gameBackgroundMusic = processAsset(exportData.gameBackgroundMusic, 'global_bgm');
+        exportData.gameBackgroundMusic = processAsset(exportData.gameBackgroundMusic, 'project_bgm');
         exportData.positiveEndingImage = processAsset(exportData.positiveEndingImage, 'positive_ending');
         exportData.negativeEndingImage = processAsset(exportData.negativeEndingImage, 'negative_ending');
 
@@ -405,7 +405,13 @@ DATE:        ${exportDate.toLocaleString()}
                     const globalAssetsPromises = [
                         restoreAsset(data.gameLogo).then(res => data.gameLogo = res),
                         restoreAsset(data.gameSplashImage).then(res => data.gameSplashImage = res),
-                        restoreAsset(data.gameBackgroundMusic).then(res => data.gameBackgroundMusic = res),
+                        restoreAsset(data.gameBackgroundMusic).then(res => {
+                            if (typeof data.gameBackgroundMusic === 'string' && data.gameBackgroundMusic.includes('global_bgm')) {
+                                data.gameBackgroundMusic = "";
+                            } else {
+                                data.gameBackgroundMusic = res;
+                            }
+                        }),
                         restoreAsset(data.positiveEndingImage).then(res => data.positiveEndingImage = res),
                         restoreAsset(data.negativeEndingImage).then(res => data.negativeEndingImage = res)
                     ];

@@ -124,6 +124,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let bgmFadeInterval = null;
     const playBgm = (src) => {
+        // STRICT BLOCK: Prevent legacy global_bgm from playing
+        if (src && typeof src === 'string' && src.includes('global_bgm')) {
+            console.log("Blocking legacy global_bgm");
+            src = ""; 
+        }
+        
         if (!bgmAudio) return;
         if (src === currentBgmSrc) {
             if (bgmAudio.paused && src) {
