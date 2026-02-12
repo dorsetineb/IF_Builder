@@ -1,84 +1,4 @@
-
-import { GameData } from '../types';
-
-export const prepareGameDataForEngine = (data: GameData): object => {
-    const translatedCenas: { [id: string]: any } = {};
-    for (const sceneId in data.scenes) {
-        if (Object.prototype.hasOwnProperty.call(data.scenes, sceneId)) {
-            const scene = data.scenes[sceneId];
-            translatedCenas[sceneId] = {
-                id: scene.id,
-                name: scene.name,
-                image: scene.image,
-                description: scene.description,
-                backgroundMusic: scene.backgroundMusic,
-                interactions: scene.interactions,
-                exits: scene.exits,
-                isEndingScene: scene.isEndingScene,
-                removesChanceOnEntry: scene.removesChanceOnEntry,
-                restoresChanceOnEntry: scene.restoresChanceOnEntry,
-                objectIds: scene.objectIds || [],
-                choices: scene.choices || [],
-                vignetteType: scene.vignetteType,
-                vignetteButtonText: scene.vignetteButtonText,
-                vignetteNextSceneId: scene.vignetteNextSceneId,
-                overlayEffect: scene.overlayEffect,
-                isDefeatOutcome: scene.isDefeatOutcome
-            };
-        }
-    }
-    return {
-        cena_inicial: data.startScene,
-        cenas: translatedCenas,
-        globalObjects: data.globalObjects,
-        mensagem_falha_padrao: data.defaultFailureMessage,
-        nome_jogador_diario: data.gameDiaryPlayerName,
-        gameSystemEnabled: data.gameSystemEnabled,
-        gameMaxChances: data.gameMaxChances,
-        gameChanceIcon: data.gameChanceIcon,
-        gameChanceIconColor: data.gameChanceIconColor,
-        gameChanceReturnButtonText: data.gameChanceReturnButtonText,
-        gameTheme: data.gameTheme,
-        gameTextColorLight: data.textColorLight,
-        gameTitleColorLight: data.titleColorLight,
-        gameFocusColorLight: data.focusColorLight,
-        gameTextReadingFlow: data.gameTextReadingFlow,
-        gameBackgroundMusic: data.gameBackgroundMusic,
-        positiveEndingImage: data.positiveEndingImage,
-        positiveEndingContentAlignment: data.positiveEndingContentAlignment,
-        positiveEndingDescription: data.positiveEndingDescription,
-        positiveEndingMusic: data.positiveEndingMusic,
-        negativeEndingImage: data.negativeEndingImage,
-        negativeEndingContentAlignment: data.negativeEndingContentAlignment,
-        negativeEndingDescription: data.negativeEndingDescription,
-        negativeEndingMusic: data.negativeEndingMusic,
-        gameRestartButtonText: data.gameRestartButtonText,
-        gameContinueButtonText: data.gameContinueButtonText,
-        gameSystemButtonText: data.gameSystemButtonText,
-        gameSaveMenuTitle: data.gameSaveMenuTitle,
-        gameLoadMenuTitle: data.gameLoadMenuTitle,
-        gameMainMenuButtonText: data.gameMainMenuButtonText,
-        gameViewEndingButtonText: data.gameViewEndingButtonText,
-        fixedVerbs: data.fixedVerbs || [],
-        consequenceTrackers: data.consequenceTrackers || [],
-        gameShowTrackersUI: data.gameShowTrackersUI,
-        gameShowSystemButton: data.gameShowSystemButton,
-        gameTextAnimationType: data.gameTextAnimationType,
-        gameTextSpeed: data.gameTextSpeed,
-        gameImageTransitionType: data.gameImageTransitionType,
-        gameImageSpeed: data.gameImageSpeed,
-        enableInventory: data.enableInventory,
-        enableChances: data.enableChances === true || (data.gameSystemEnabled === 'chances') || Object.values(data.scenes).some((s: any) => s.removesChanceOnEntry || s.restoresChanceOnEntry),
-        enableTrackers: data.enableTrackers ?? (data.gameSystemEnabled === 'trackers'),
-        enableDiary: data.enableDiary,
-        enableFixedVerbs: data.enableFixedVerbs,
-        enableImages: data.enableImages,
-        enableTextControl: data.enableTextControl,
-        gameInteractionType: data.gameInteractionType,
-    };
-};
-
-export const gameJS = `
+`
 document.addEventListener('DOMContentLoaded', () => {
     // DEBUG: Unconditional marker to verify gameJS execution
     const _dbgMarker = document.createElement('div');
@@ -1137,7 +1057,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!document.getElementById('glitch-distortion-filter')) {
                     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
                     svg.setAttribute('style', 'position:absolute;width:0;height:0;');
-                    svg.innerHTML = '<defs><filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%"><feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset"><animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset"><animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" /><feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/><feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/><feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/><feBlend in="red" in2="green" mode="screen" result="rg"/><feBlend in="rg" in2="blue" mode="screen" result="rgb"/><feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5"><animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>';
+                    svg.innerHTML = \`
+                        <defs>
+                            <filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%">
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset">
+                                    <animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/>
+                                </feOffset>
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset">
+                                    <animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/>
+                                </feOffset>
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+                                <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
+                                <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
+                                <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
+                                <feBlend in="red" in2="green" mode="screen" result="rg"/>
+                                <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>
+                                <feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5">
+                                    <animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/>
+                                </feTurbulence>
+                                <feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+                            </filter>
+                        </defs>
+                    \`;
                     document.body.appendChild(svg);
                 }
                 // Use CSS class - filter is applied via ::before pseudo-element
@@ -1337,7 +1278,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!document.getElementById('glitch-distortion-filter')) {
                     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
                     svg.setAttribute('style', 'position:absolute;width:0;height:0;');
-                    svg.innerHTML = '<defs><filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%"><feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset"><animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset"><animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" /><feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/><feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/><feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/><feBlend in="red" in2="green" mode="screen" result="rg"/><feBlend in="rg" in2="blue" mode="screen" result="rgb"/><feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5"><animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>';
+                    svg.innerHTML = \`
+                        <defs>
+                            <filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%">
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset">
+                                    <animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/>
+                                </feOffset>
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset">
+                                    <animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/>
+                                </feOffset>
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+                                <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
+                                <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
+                                <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
+                                <feBlend in="red" in2="green" mode="screen" result="rg"/>
+                                <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>
+                                <feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5">
+                                    <animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/>
+                                </feTurbulence>
+                                <feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+                            </filter>
+                        </defs>
+                    \`;
                     document.body.appendChild(svg);
                 }
                 // Apply filter directly to images
@@ -1480,6 +1442,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sceneDescription.scrollTop = sceneDescription.scrollHeight; 
                 if (chances <= 0) gameOver(); else { verbInput.focus(); if (scene.isEndingScene) activateEndingUI('win'); }
             }
+        };
         };
         // Small delay to ensure any previous clear/setup settles? No, direct call is fine but verify ID.
         // renderNextParagraph called immediately
@@ -1778,4 +1741,4 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     init();
 });
-`;
+`
