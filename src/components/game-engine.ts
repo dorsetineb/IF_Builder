@@ -843,15 +843,34 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Handle Splash Screen visibility
         if (window.isSceneTest) {
-            // DEBUG: Inject debug overlay
+            // DEBUG: Alert to force visibility
+            // alert('Engine Running! Test Mode: ' + window.isSceneTest + '\\nScene ID: ' + currentSceneId); // Removed to avoid annoying user in future steps, but kept principle.
+            
+            // DEBUG: Inject debug overlay (Updated Z-Index)
             const dbg = document.createElement('div');
-            dbg.style.cssText = 'position:fixed;top:0;left:0;background:rgba(255,0,0,0.8);color:white;z-index:99999;padding:10px;font-family:monospace;pointer-events:none;';
+            dbg.style.cssText = 'position:fixed;top:10px;right:10px;background:red;color:white;z-index:2147483647;padding:15px;font-family:monospace;pointer-events:none;font-size:20px;border: 2px solid white;';
             const startSceneCheck = gameData.cenas[currentSceneId];
-            dbg.innerHTML = 'TEST MODE<br>ID: ' + currentSceneId + '<br>Type: ' + (startSceneCheck ? (startSceneCheck.vignetteType || 'scene') : 'undefined') + '<br>Found: ' + !!startSceneCheck;
+            dbg.innerHTML = 'ENGINE ACTIVE<br>ID: ' + currentSceneId + '<br>Type: ' + (startSceneCheck ? (startSceneCheck.vignetteType || 'scene') : 'undefined');
             document.body.appendChild(dbg);
-            setTimeout(() => dbg.remove(), 5000); // Remove after 5s
+            
+            // Force hide splash screen with extreme prejudice
+            const hideSplash = () => {
+                const s = document.getElementById('splash-screen');
+                if (s) {
+                    s.style.display = 'none !important';
+                    s.style.opacity = '0';
+                    s.style.zIndex = '-1';
+                    s.classList.add('hidden');
+                }
+                const g = document.getElementById('game-container');
+                if (g) g.classList.remove('hidden');
+            };
+            hideSplash();
+            // Retry a few times just in case of race conditions
+            setTimeout(hideSplash, 50);
+            setTimeout(hideSplash, 100);
+            setTimeout(hideSplash, 500);
 
-            // In test mode, immediately hide splash and show game to avoid freezing/delays
             splashScreen.classList.add('hidden');
             splashScreen.style.display = 'none'; // FORCE HIDE
             splashScreen.classList.remove('fade-out');
