@@ -644,8 +644,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                             <option value="confetti">Confetes</option>
                                             <option value="glitch">Glitch</option>
                                             <option value="nosferatu">Nosferatu</option>
-                                            <option value="wiggle">Wiggle (Tremido)</option>
-                                            <option value="fog">Neblina (Fog)</option>
+                                            <option value="wiggle">Tremido</option>
+                                            <option value="fog">Neblina</option>
                                         </select>
                                     </div>
 

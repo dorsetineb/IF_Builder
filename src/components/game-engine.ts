@@ -108,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentBgmSrc = "";
     let isPrinting = false;
     let activePopupType = null;
+    let renderSessionId = 0; // Prevent race conditions in rendering
 
     const textSpeedVal = gameData.gameTextSpeed || 3; 
     const imgSpeedVal = gameData.gameImageSpeed || 3;
@@ -820,13 +821,17 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameEnded = false;
         (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
         
-        // Fix Audio Persistence: If the starting scene has no specific music, 
-        // fallback to Global Music (or silence) to stop any lingering Conclusion music.
-        // If it DOES have music, loadScene will handle it.
+        // Fix Audio Persistence: If the starting scene has no specific music.
+        // If it is a SCENE TEST, we do NOT fallback to global music (keep it silent/clean).
         const startScene = gameData.cenas[currentSceneId];
         if (startScene) {
             if (!startScene.backgroundMusic) {
-                playBgm(gameData.gameBackgroundMusic || "");
+                // If NOT in test mode, play global BGM. If in test mode, play nothing (or stop previous).
+                if (!window.isSceneTest) {
+                    playBgm(gameData.gameBackgroundMusic || "");
+                } else {
+                    playBgm(""); 
+                }
             }
             loadScene(currentSceneId, false);
         } else {
@@ -1407,6 +1412,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         isPrinting = true;
         sceneDescription.classList.add('typewriting-active');
+        
+        // Loop protection
+        renderSessionId++;
+        const mySessionId = renderSessionId;
 
         const renderNextParagraph = () => {
             if (pIndex >= paragraphs.length) { 
@@ -1424,6 +1433,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
                 let nodeIdx = 0; let charIdx = 0;
                 const type = () => {
+                    if (mySessionId !== renderSessionId) return; // Stop if new render started
                     if (nodeIdx >= textNodes.length) { p.classList.remove('typewriter-cursor'); setupHighlights(p); finishParagraph(); return; }
                     const currentNode = textNodes[nodeIdx]; const fullText = fullTexts[nodeIdx];
                     if (charIdx < fullText.length) { currentNode.nodeValue += fullText[charIdx]; charIdx++; if (sceneDescription) sceneDescription.scrollTop = sceneDescription.scrollHeight; setTimeout(type, typeSpeedBase); }
@@ -1438,7 +1448,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pIndex < paragraphs.length) {
                 if (gameData.gameTextReadingFlow === 'continuous') {
                     // Bypass pause for continuous flow
-                    setTimeout(renderNextParagraph, 30);
+                    setTimeout(() => {
+                        if (mySessionId === renderSessionId) renderNextParagraph();
+                    }, 30);
                     return;
                 }
                 const continueBtn = document.createElement('div'); continueBtn.className = 'continue-indicator'; continueBtn.innerHTML = '<span>▼</span>';
@@ -1454,7 +1466,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     sceneDescription.removeEventListener('click', continueHandler); 
                     window.removeEventListener('keydown', continueHandler);
-                    renderNextParagraph(); 
+                    if (mySessionId === renderSessionId) renderNextParagraph(); 
                 };
                 continueBtn.addEventListener('click', continueHandler); 
                 sceneDescription.addEventListener('click', continueHandler);
@@ -1467,7 +1479,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (chances <= 0) gameOver(); else { verbInput.focus(); if (scene.isEndingScene) activateEndingUI('win'); }
             }
         };
-        renderNextParagraph();
+        };
+        // Small delay to ensure any previous clear/setup settles? No, direct call is fine but verify ID.
+        // renderNextParagraph called immediately
+        if (mySessionId === renderSessionId) renderNextParagraph();
         
         const chancesContainer = document.getElementById('chances-container');
         if (chancesContainer) {
@@ -1675,8 +1690,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 else { nodeIdx++; charIdx = 0; type(); }
             };
             type();
+            type();
         } else {
-            p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
+            // Also respecting session ID for safety though printOutput is usually atomic-ish or one-off
+            if (textAnimType === 'typewriter') {
+                 // Already handled by if block above
+            } else {
+                p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
+            }
         }
     };
 
