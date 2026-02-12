@@ -1185,8 +1185,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!visitedScenes.includes(sceneId)) visitedScenes.push(sceneId);
         actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
         
-        // Check if this is a vignette scene (skip in test mode - render as regular scene)
-        if (scene.vignetteType && scene.vignetteType !== 'none' && !window.isSceneTest) {
+        // Check if this is a vignette scene
+        if (scene.vignetteType && scene.vignetteType !== 'none') {
             showVignetteScreen(scene);
             autoSaveGame();
             return;
