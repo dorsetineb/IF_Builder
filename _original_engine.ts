@@ -1,4 +1,4 @@
-
+﻿
 import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
@@ -80,7 +80,6 @@ export const prepareGameDataForEngine = (data: GameData): object => {
 
 export const gameJS = `
 document.addEventListener('DOMContentLoaded', () => {
-
     const ICONS = {
         heart: '<svg fill="%COLOR%" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
         circle: '<svg fill="%COLOR%" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
@@ -827,6 +826,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const startScene = gameData.cenas[currentSceneId];
         if (startScene) {
             if (!startScene.backgroundMusic) {
+                // If NOT in test mode, play global BGM. If in test mode, play nothing (or stop previous).
                 if (!window.isSceneTest) {
                     playBgm(gameData.gameBackgroundMusic || "");
                 } else {
@@ -843,14 +843,22 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Handle Splash Screen visibility
         if (window.isSceneTest) {
+            // DEBUG: Inject debug overlay
+            const dbg = document.createElement('div');
+            dbg.style.cssText = 'position:fixed;top:0;left:0;background:rgba(255,0,0,0.8);color:white;z-index:99999;padding:10px;font-family:monospace;pointer-events:none;';
+            const startSceneCheck = gameData.cenas[currentSceneId];
+            dbg.innerHTML = 'TEST MODE<br>ID: ' + currentSceneId + '<br>Type: ' + (startSceneCheck ? (startSceneCheck.vignetteType || 'scene') : 'undefined') + '<br>Found: ' + !!startSceneCheck;
+            document.body.appendChild(dbg);
+            setTimeout(() => dbg.remove(), 5000); // Remove after 5s
+
             // In test mode, immediately hide splash and show game to avoid freezing/delays
             splashScreen.classList.add('hidden');
-            splashScreen.style.display = 'none';
+            splashScreen.style.display = 'none'; // FORCE HIDE
             splashScreen.classList.remove('fade-out');
             gameContainer.classList.remove('hidden');
         } else {
             // Restore smooth transition for normal play
-            splashScreen.style.display = '';
+            splashScreen.style.display = ''; // Reset
             splashScreen.classList.remove('hidden');
             splashScreen.classList.add('fade-out');
             setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
@@ -905,7 +913,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = JSON.parse(savedData); const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
                 contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
                 if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Sobrescrever</span></div>';
-                else contentHtml += '<div class="slot-actions"><button class="slot-delete-btn" data-slot="' + i + '">×</button></div>';
+                else contentHtml += '<div class="slot-actions"><button class="slot-delete-btn" data-slot="' + i + '">├ù</button></div>';
             } else {
                 contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + '</span><span class="slot-empty">Vazio</span></div>';
                 if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Salvar</span></div>';
@@ -1103,7 +1111,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!document.getElementById('glitch-distortion-filter')) {
                     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
                     svg.setAttribute('style', 'position:absolute;width:0;height:0;');
-                    svg.innerHTML = '<defs><filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%"><feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset"><animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset"><animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" /><feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/><feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/><feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/><feBlend in="red" in2="green" mode="screen" result="rg"/><feBlend in="rg" in2="blue" mode="screen" result="rgb"/><feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5"><animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>';
+                    svg.innerHTML = \`
+                        <defs>
+                            <filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%">
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset">
+                                    <animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/>
+                                </feOffset>
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset">
+                                    <animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/>
+                                </feOffset>
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+                                <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
+                                <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
+                                <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
+                                <feBlend in="red" in2="green" mode="screen" result="rg"/>
+                                <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>
+                                <feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5">
+                                    <animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/>
+                                </feTurbulence>
+                                <feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+                            </filter>
+                        </defs>
+                    \`;
                     document.body.appendChild(svg);
                 }
                 // Use CSS class - filter is applied via ::before pseudo-element
@@ -1303,7 +1332,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!document.getElementById('glitch-distortion-filter')) {
                     const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
                     svg.setAttribute('style', 'position:absolute;width:0;height:0;');
-                    svg.innerHTML = '<defs><filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%"><feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset"><animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset"><animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" /><feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/><feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/><feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/><feBlend in="red" in2="green" mode="screen" result="rg"/><feBlend in="rg" in2="blue" mode="screen" result="rgb"/><feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5"><animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>';
+                    svg.innerHTML = \`
+                        <defs>
+                            <filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%">
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset">
+                                    <animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/>
+                                </feOffset>
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset">
+                                    <animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/>
+                                </feOffset>
+                                <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+                                <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
+                                <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
+                                <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
+                                <feBlend in="red" in2="green" mode="screen" result="rg"/>
+                                <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>
+                                <feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5">
+                                    <animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/>
+                                </feTurbulence>
+                                <feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/>
+                            </filter>
+                        </defs>
+                    \`;
                     document.body.appendChild(svg);
                 }
                 // Apply filter directly to images
@@ -1421,11 +1471,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     }, 30);
                     return;
                 }
-                const continueBtn = document.createElement('div'); continueBtn.className = 'continue-indicator'; continueBtn.innerHTML = '<span>▼</span>';
+                const continueBtn = document.createElement('div'); continueBtn.className = 'continue-indicator'; continueBtn.innerHTML = '<span>Ôû╝</span>';
                 const continueHandler = (e) => { 
                     if (e) { if (e.type === 'keydown' && e.key !== 'Enter') return; e.stopPropagation(); if (e.type === 'keydown') e.preventDefault(); }
                     
-                    // NO MODO IMERSIVO MOBILE: Limpa tudo ANTES de renderizar o próximo parágrafo
+                    // NO MODO IMERSIVO MOBILE: Limpa tudo ANTES de renderizar o pr├│ximo par├ígrafo
                     if (isImmersive) {
                         sceneDescription.innerHTML = '';
                     } else {
@@ -1446,6 +1496,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sceneDescription.scrollTop = sceneDescription.scrollHeight; 
                 if (chances <= 0) gameOver(); else { verbInput.focus(); if (scene.isEndingScene) activateEndingUI('win'); }
             }
+        };
         };
         // Small delay to ensure any previous clear/setup settles? No, direct call is fine but verify ID.
         // renderNextParagraph called immediately
@@ -1562,7 +1613,7 @@ document.addEventListener('DOMContentLoaded', () => {
         while (index !== -1) {
             const charBefore = index > 0 ? normalizedText[index - 1] : ' ';
             const charAfter = index + normalizedWord.length < normalizedText.length ? normalizedText[index + normalizedWord.length] : ' ';
-            const isBoundary = (char) => /[^a-zA-Z0-9áéíóúàèìòùâêîôûãõç]/.test(char);
+            const isBoundary = (char) => /[^a-zA-Z0-9├í├®├¡├│├║├á├¿├¼├▓├╣├ó├¬├«├┤├╗├ú├Á├º]/.test(char);
             if (isBoundary(charBefore) && isBoundary(charAfter)) return true;
             index = normalizedText.indexOf(normalizedWord, index + 1);
         }
@@ -1598,7 +1649,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (foundInteraction) { executeInteraction(foundInteraction); return; }
         if (hasWord('inventario', inputLower) || hasWord('i', inputLower)) { 
             if (gameData.enableInventory) { actionPopup.classList.add('hidden'); activePopupType = null; togglePopup('inventory'); }
-            else { printOutput("O sistema de inventário está desativado."); }
+            else { printOutput("O sistema de invent├írio est├í desativado."); }
             return; 
         }
         const lookVerbs = ['olhar', 'examinar', 'ver', 'ler'];
@@ -1607,7 +1658,7 @@ document.addEventListener('DOMContentLoaded', () => {
              if (obj) { printOutput(obj.examineDescription); return; }
              printOutput(scene.description); return;
         }
-        printOutput(gameData.mensagem_falha_padrao || "Não aconteceu nada.");
+        printOutput(gameData.mensagem_falha_padrao || "N├úo aconteceu nada.");
     };
 
     const executeInteraction = (interaction) => {
@@ -1706,7 +1757,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     const showInventory = () => {
         actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; const list = document.createElement('div'); list.className = 'action-popup-list';
-        if (inventory.length === 0) { const msg = document.createElement('p'); msg.textContent = 'Seu inventário está vazio.'; list.appendChild(msg); }
+        if (inventory.length === 0) { const msg = document.createElement('p'); msg.textContent = 'Seu invent├írio est├í vazio.'; list.appendChild(msg); }
         else { inventory.forEach(item => { const btn = document.createElement('button'); btn.textContent = item.name; btn.addEventListener('click', () => { 
             openItemModal(item); 
             actionPopup.classList.add('hidden'); 

@@ -727,7 +727,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (gameData.gameBackgroundMusic) playBgm(gameData.gameBackgroundMusic);
             else playBgm("");
         };
-
+        if (window.isSceneTest) startGame();
     };
 
     const startGame = () => {
@@ -742,18 +742,16 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameEnded = false;
         (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
         
-        // In test scene mode: hide splash immediately and skip global BGM
-        if (window.isSceneTest) {
-            splashScreen.classList.add('hidden');
-            splashScreen.style.display = 'none';
-            gameContainer.classList.remove('hidden');
-            playBgm("");
-        }
-        
+        // Fix Audio Persistence: If the starting scene has no specific music.
+        // If it is a SCENE TEST, we do NOT fallback to global music (keep it silent/clean).
         const startScene = gameData.cenas[currentSceneId];
         if (startScene) {
-            if (!startScene.backgroundMusic && !window.isSceneTest) {
-                playBgm(gameData.gameBackgroundMusic || "");
+            if (!startScene.backgroundMusic) {
+                if (!window.isSceneTest) {
+                    playBgm(gameData.gameBackgroundMusic || "");
+                } else {
+                    playBgm(""); 
+                }
             }
             loadScene(currentSceneId, false);
         } else {
@@ -763,10 +761,16 @@ document.addEventListener('DOMContentLoaded', () => {
         standardActionBar.classList.remove('hidden');
         endingActionBar.classList.add('hidden');
         
-        // Handle Splash Screen visibility for normal mode
-        if (!window.isSceneTest) {
+        // Handle Splash Screen visibility
+        if (window.isSceneTest) {
+            // In test mode, immediately hide splash and show game to avoid freezing/delays
+            splashScreen.classList.add('hidden');
+            splashScreen.style.display = 'none';
+            splashScreen.classList.remove('fade-out');
+            gameContainer.classList.remove('hidden');
+        } else {
             // Restore smooth transition for normal play
-            splashScreen.style.display = ''; // Reset
+            splashScreen.style.display = '';
             splashScreen.classList.remove('hidden');
             splashScreen.classList.add('fade-out');
             setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
