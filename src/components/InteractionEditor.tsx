@@ -420,7 +420,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
 
                 {/* List */}
                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                    {filteredInteractions.length > 0 ? (
+                    {filteredInteractions.length > 0 && (
                         filteredInteractions.map(({ inter, index }) => (
                             <button
                                 key={inter.id}
@@ -443,20 +443,12 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 </div>
                             </button>
                         ))
-                    ) : (
-                        <div className="text-center py-8 text-muted-foreground">
-                            <p className="text-xs italic">Nenhuma interação.</p>
-                        </div>
                     )}
-                </div>
-
-                {/* Footer */}
-                <div className="p-3 border-t border-muted-foreground/10 bg-zinc-900/50">
                     <button
                         onClick={handleAdd}
-                        className="w-full py-2 bg-white hover:bg-zinc-200 text-zinc-950 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow"
+                        className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-2 shadow-sm"
                     >
-                        <Plus className="w-3.5 h-3.5 mr-2" />
+                        <Plus className="w-4 h-4 mr-1" />
                         Nova Interação
                     </button>
                 </div>

@@ -153,9 +153,9 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                 </div>
             </div>
 
-            <div className="flex h-[550px] border border-border/50 rounded-xl overflow-hidden bg-card shadow-sm">
+            <div className="flex h-[550px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
                 {/* LEFT SIDEBAR - Command List */}
-                <div className="w-1/3 min-w-[250px] border-r border-border/50 flex flex-col bg-muted/10">
+                <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
                     {/* Sidebar Header */}
                     <div className="p-4 border-b border-muted-foreground/10 space-y-4">
                         <div className="relative">
@@ -176,7 +176,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
 
                     {/* Command List */}
                     <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                        {filteredVerbs.length > 0 ? (
+                        {filteredVerbs.length > 0 && (
                             filteredVerbs.map(verb => {
                                 const IconComponent = COMMAND_ICONS.find(i => i.name === verb.icon)?.component || MessageSquare;
                                 return (
@@ -199,32 +199,22 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                     </button>
                                 );
                             })
-                        ) : (
-                            <div className="flex flex-col items-center justify-center h-full text-center p-4">
-                                <Command className="w-8 h-8 text-muted-foreground/50 mb-2" />
-                                <p className="text-xs text-muted-foreground">Nenhum comando encontrado</p>
-                                <p className="text-[10px] text-muted-foreground/70 mt-1">Clique em "Novo Comando" para criar</p>
-                            </div>
                         )}
-                    </div>
-
-                    {/* Add button */}
-                    <div className="p-3 border-t border-border/50">
                         <button
                             onClick={handleCreate}
-                            className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm transform hover:-translate-y-0.5"
+                            className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm transform hover:-translate-y-0.5 mt-2"
                         >
-                            <Plus className="w-4 h-4" />
+                            <Plus className="w-4 h-4 mr-1" />
                             Novo Comando
                         </button>
                     </div>
                 </div>
 
                 {/* RIGHT PANEL - Command Editor */}
-                <div className="flex-1 flex flex-col bg-background/50">
+                <div className="flex-1 flex flex-col bg-zinc-950/10 min-w-0">
                     {selectedVerb ? (
                         <>
-                            <div className="p-4 border-b border-muted-foreground/10 flex items-center justify-between">
+                            <div className="px-6 py-4 border-b border-muted-foreground/10 flex items-center justify-between bg-zinc-900/30 shrink-0">
                                 <h3 className="text-sm font-bold text-foreground">Editar Comando</h3>
                                 <button
                                     onClick={() => handleDelete(selectedVerb.id)}

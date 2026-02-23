@@ -115,11 +115,11 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
     };
 
     return (
-        <div className="flex h-[600px] border border-border rounded-xl overflow-hidden bg-card shadow-sm" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
+        <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* LEFT SIDEBAR */}
-            <div className="w-1/3 min-w-[250px] border-r border-border flex flex-col bg-muted/10">
+            <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
                 {/* Sidebar Header */}
-                <div className="p-4 border-b border-border space-y-4">
+                <div className="p-4 border-b border-muted-foreground/10 space-y-4">
                     <div className="flex bg-muted rounded-lg p-1 border border-border">
                         <button
                             onClick={() => setIsLinkMode(false)}
@@ -151,94 +151,84 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
                     {!isLinkMode ? (
                         /* CURRENT SCENE OBJECTS */
-                        filteredSceneObjects.length > 0 ? (
-                            filteredSceneObjects.map(obj => {
-                                const IconComponent = TRACKER_ICONS.find(i => i.name === obj.icon)?.component || Box;
-                                return (
-                                    <button
-                                        key={obj.id}
-                                        onClick={() => setSelectedObjectId(obj.id)}
-                                        className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedObjectId === obj.id ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-accent hover:border-accent'}`}
-                                    >
-                                        <div className="w-10 h-10 rounded bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0">
-                                            {obj.image ? (
-                                                <img src={obj.image} alt="" className="w-full h-full object-cover" />
-                                            ) : (
-                                                <IconComponent className="w-4 h-4 text-muted-foreground" />
-                                            )}
-                                        </div>
-                                        <div className="min-w-0">
-                                            <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-primary' : 'text-foreground'}`}>{obj.name}</div>
-                                            <div className="text-[10px] text-muted-foreground font-mono truncate">#{obj.id}</div>
-                                        </div>
-                                    </button>
-                                );
-                            })
-                        ) : (
-                            <div className="text-center py-8 text-muted-foreground">
-                                <p className="text-xs italic">Nenhum objeto encontrado.</p>
-                            </div>
-                        )
-                    ) : (
-                        /* AVAILABLE TO LINK OBJECTS */
-                        availableObjectsToLink.length > 0 ? (
-                            availableObjectsToLink.map(obj => {
-                                const IconComponent = TRACKER_ICONS.find(i => i.name === obj.icon)?.component || Box;
-                                return (
-                                    <div
-                                        key={obj.id}
-                                        className="w-full flex items-center justify-between gap-2 p-2 rounded-lg border border-dashed border-border hover:bg-accent transition-all text-left group"
-                                    >
-                                        <div className="flex items-center gap-3 min-w-0" onClick={() => setSelectedObjectId(obj.id)}>
-                                            <div className="w-8 h-8 rounded bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0 opacity-50">
+                        <>
+                            {filteredSceneObjects.length > 0 && (
+                                filteredSceneObjects.map(obj => {
+                                    const IconComponent = TRACKER_ICONS.find(i => i.name === obj.icon)?.component || Box;
+                                    return (
+                                        <button
+                                            key={obj.id}
+                                            onClick={() => setSelectedObjectId(obj.id)}
+                                            className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedObjectId === obj.id ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-accent hover:border-accent'}`}
+                                        >
+                                            <div className="w-10 h-10 rounded bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0">
                                                 {obj.image ? (
                                                     <img src={obj.image} alt="" className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <IconComponent className="w-3 h-3 text-muted-foreground" />
+                                                    <IconComponent className="w-4 h-4 text-muted-foreground" />
                                                 )}
                                             </div>
                                             <div className="min-w-0">
-                                                <div className="text-xs font-medium text-muted-foreground truncate">{obj.name}</div>
+                                                <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-primary' : 'text-foreground'}`}>{obj.name}</div>
+                                                <div className="text-[10px] text-muted-foreground font-mono truncate">#{obj.id}</div>
                                             </div>
-                                        </div>
-                                        <button
-                                            onClick={() => handleLinkExistingObject(obj.id)}
-                                            className="p-1.5 bg-primary/10 text-primary rounded hover:bg-primary hover:text-primary-foreground transition-colors"
-                                            title="Vincular à cena"
-                                        >
-                                            <Plus className="w-4 h-4" />
                                         </button>
-                                    </div>
-                                );
-                            })
-                        ) : (
-                            <div className="text-center py-8 text-muted-foreground">
-                                <p className="text-xs italic">Todos os objetos já estão vinculados ou nenhum encontrado.</p>
-                            </div>
-                        )
+                                    );
+                                })
+                            )}
+                            <button
+                                onClick={handleCreateNewObject}
+                                className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-2 shadow-sm"
+                            >
+                                <Plus className="w-4 h-4 mr-1" />
+                                Criar Novo Objeto
+                            </button>
+                        </>
+                    ) : (
+                        /* AVAILABLE TO LINK OBJECTS */
+                        <>
+                            {availableObjectsToLink.length > 0 && (
+                                availableObjectsToLink.map(obj => {
+                                    const IconComponent = TRACKER_ICONS.find(i => i.name === obj.icon)?.component || Box;
+                                    return (
+                                        <div
+                                            key={obj.id}
+                                            className="w-full flex items-center justify-between gap-2 p-2 rounded-lg border border-dashed border-border hover:bg-accent transition-all text-left group"
+                                        >
+                                            <div className="flex items-center gap-3 min-w-0" onClick={() => setSelectedObjectId(obj.id)}>
+                                                <div className="w-8 h-8 rounded bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0 opacity-50">
+                                                    {obj.image ? (
+                                                        <img src={obj.image} alt="" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <IconComponent className="w-3 h-3 text-muted-foreground" />
+                                                    )}
+                                                </div>
+                                                <div className="min-w-0">
+                                                    <div className="text-xs font-medium text-muted-foreground truncate">{obj.name}</div>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => handleLinkExistingObject(obj.id)}
+                                                className="p-1.5 bg-primary/10 text-primary rounded hover:bg-primary hover:text-primary-foreground transition-colors"
+                                                title="Vincular à cena"
+                                            >
+                                                <Plus className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    );
+                                })
+                            )}
+                        </>
                     )}
                 </div>
-
-                {/* Footer Actions */}
-                {!isLinkMode && (
-                    <div className="p-3 border-t border-border bg-muted/30">
-                        <button
-                            onClick={handleCreateNewObject}
-                            className="w-full py-2 bg-white hover:bg-zinc-200 text-zinc-950 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow-none"
-                        >
-                            <Plus className="w-3.5 h-3.5 mr-2" />
-                            Criar Novo Objeto
-                        </button>
-                    </div>
-                )}
             </div>
 
             {/* RIGHT MAIN PANEL */}
-            <div className="flex-1 flex flex-col bg-muted/5 min-w-0">
+            <div className="flex-1 flex flex-col bg-zinc-950/10 min-w-0">
                 {selectedObject ? (
                     <div className="flex flex-col h-full">
                         {/* Header */}
-                        <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-muted/30">
+                        <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30 shrink-0">
                             <div className="flex items-center gap-2">
                                 <Box className="w-4 h-4 text-primary" />
                                 <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Propriedades do Objeto</span>

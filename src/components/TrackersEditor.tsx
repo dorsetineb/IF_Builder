@@ -191,9 +191,9 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                 </div>
             </div>
 
-            <div className="flex h-[600px] border border-border/50 rounded-xl overflow-hidden bg-card shadow-sm">
+            <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
                 {/* LEFT SIDEBAR */}
-                <div className="w-1/3 min-w-[250px] border-r border-border/50 flex flex-col bg-muted/10">
+                <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
                     {/* Sidebar Header */}
                     <div className="p-4 border-b border-muted-foreground/10 space-y-4">
                         <div className="relative">
@@ -214,7 +214,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
 
                     {/* Tracker List */}
                     <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                        {filteredTrackers.length > 0 ? (
+                        {filteredTrackers.length > 0 && (
                             filteredTrackers.map(tracker => {
                                 const percentage = Math.min(100, Math.max(0, (tracker.initialValue / (tracker.maxValue || 100)) * 100));
                                 const barWidth = `${percentage}%`;
@@ -266,32 +266,23 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                     </button>
                                 );
                             })
-                        ) : (
-                            <div className="text-center py-12 text-muted-foreground">
-                                <Activity className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                                <p className="text-xs italic">Nenhum rastreador encontrado.</p>
-                            </div>
                         )}
-                    </div>
-
-                    {/* Footer Actions */}
-                    <div className="p-3 border-t border-border/50 bg-background/50">
                         <button
                             onClick={handleAddTracker}
-                            className="w-full py-2 bg-white text-zinc-950 hover:bg-zinc-200 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow-sm"
+                            className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm mt-2"
                         >
-                            <Plus className="w-3.5 h-3.5 mr-2" />
+                            <Plus className="w-4 h-4 mr-1" />
                             Novo Rastreador
                         </button>
                     </div>
                 </div>
 
                 {/* RIGHT MAIN PANEL */}
-                <div className="flex-1 flex flex-col bg-background min-w-0">
+                <div className="flex-1 flex flex-col bg-zinc-950/10 min-w-0">
                     {selectedTracker ? (
                         <div className="flex flex-col h-full">
                             {/* Header */}
-                            <div className="px-6 py-4 border-b border-border/50 flex justify-between items-center bg-muted/10">
+                            <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30 shrink-0">
                                 <div className="flex items-center gap-2">
                                     <Activity className="w-4 h-4 text-primary" />
                                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Propriedades do Rastreador</span>
