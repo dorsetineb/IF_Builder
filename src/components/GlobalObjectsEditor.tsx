@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { GameData, GameObject, Scene } from '../types';
 import { Plus, Trash2, Upload, Search, Box, Unlink, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const TRACKER_ICONS = [
     { name: 'activity', component: Activity },
@@ -59,6 +60,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     const [selectedObjectId, setSelectedObjectId] = useState<string | null>(sortedObjects.length > 0 ? sortedObjects[0].id : null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+    const { t } = useTranslation();
 
     useEffect(() => {
         // Deep compare to avoid unnecessary updates and infinite loops
@@ -121,8 +123,8 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         const newId = generateUniqueId('obj', combinedIds);
         const newObject: GameObject = {
             id: newId,
-            name: 'Novo Objeto',
-            examineDescription: 'Descrição do novo objeto.',
+            name: t('objectEditor.newObject', 'Novo Objeto'),
+            examineDescription: t('objectEditor.newObjectDesc', 'Descrição do novo objeto.'),
         };
 
         onCreateObject(newObject);
@@ -130,7 +132,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     };
 
     const handleDelete = (id: string) => {
-        if (window.confirm('Tem certeza? Isso excluirá o objeto de todo o jogo.')) {
+        if (window.confirm(t('globalObjectsEditor.deleteConfirm', 'Tem certeza? Isso excluirá o objeto de todo o jogo.'))) {
             onDeleteObject(id);
             if (selectedObjectId === id) {
                 setSelectedObjectId(null);
@@ -177,13 +179,13 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
             {/* Header with Save/Undo actions */}
             <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-border">
                 <p className="text-muted-foreground text-xs font-medium max-w-lg">
-                    Gerenciador Global: Objetos criados aqui podem ser usados em qualquer cena.
+                    {t('globalObjectsEditor.headerDesc', 'Gerenciador Global: Objetos criados aqui podem ser usados em qualquer cena.')}
                 </p>
                 <div className="flex items-center gap-3">
                     {isDirty && (
                         <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
                             <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            Alterações não salvas
+                            {t('globalObjectsEditor.unsavedChanges', 'Alterações não salvas')}
                         </div>
                     )}
                     <button
@@ -191,14 +193,14 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                         disabled={!isDirty}
                         className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
                     >
-                        Desfazer
+                        {t('globalObjectsEditor.undoBtn', 'Desfazer')}
                     </button>
                     <button
                         onClick={handleSave}
                         disabled={!isDirty}
                         className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
                     >
-                        Salvar Alterações
+                        {t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
                     </button>
                 </div>
             </div>
@@ -212,14 +214,14 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                             <input
                                 type="text"
-                                placeholder="Buscar objetos globais..."
+                                placeholder={t('globalObjectsEditor.searchPlaceholder', 'Buscar objetos globais...')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full bg-input border border-input rounded-lg pl-8 pr-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-muted-foreground"
                             />
                         </div>
                         <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider px-1">
-                            <span>Lista de Objetos</span>
+                            <span>{t('globalObjectsEditor.objectList', 'Lista de Objetos')}</span>
                             <span>{filteredObjects.length}</span>
                         </div>
                     </div>
@@ -255,7 +257,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                             className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-2 shadow-sm"
                         >
                             <Plus className="w-4 h-4 mr-1" />
-                            Criar Novo Objeto
+                            {t('objectEditor.createNewBtn', 'Criar Novo Objeto')}
                         </button>
                     </div>
                 </div>
@@ -268,7 +270,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                             <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30 shrink-0">
                                 <div className="flex items-center gap-2">
                                     <Box className="w-4 h-4 text-primary" />
-                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Propriedades do Objeto</span>
+                                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{t('objectEditor.propertiesTitle', 'Propriedades do Objeto')}</span>
                                 </div>
 
                                 {/* Context Actions */}
@@ -278,7 +280,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
                                     >
                                         <Trash2 className="w-3.5 h-3.5" />
-                                        Excluir Objeto
+                                        {t('globalObjectsEditor.deleteBtn', 'Excluir Objeto')}
                                     </button>
                                 </div>
                             </div>
@@ -289,7 +291,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                     <div className="grid grid-cols-3 gap-x-8 gap-y-6">
                                         {/* Name field */}
                                         <div className="col-span-2 space-y-1.5">
-                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nome do Objeto</label>
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.objectNameLabel', 'Nome do Objeto')}</label>
                                             <div className="flex gap-2">
                                                 {/* Icon Picker */}
                                                 <div className="relative group shrink-0">
@@ -331,31 +333,31 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
 
                                         {/* ID field */}
                                         <div className="col-span-1 space-y-1.5">
-                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">ID Único</label>
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.uniqueIdLabel', 'ID Único')}</label>
                                             <input
                                                 type="text"
                                                 value={selectedObject.id}
                                                 readOnly
                                                 className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2 text-xs text-muted-foreground font-mono cursor-not-allowed h-[38px]"
-                                                title="O ID é gerado automaticamente e não pode ser alterado."
+                                                title={t('objectEditor.idTooltip', 'O ID é gerado automaticamente e não pode ser alterado.')}
                                             />
                                         </div>
 
                                         {/* Description field */}
                                         <div className="col-span-2 space-y-1.5 flex flex-col">
-                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Descrição ao Examinar</label>
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.examineDescriptionLabel', 'Descrição ao Examinar')}</label>
                                             <textarea
                                                 rows={10}
                                                 value={selectedObject.examineDescription}
                                                 onChange={(e) => handleObjectChange(selectedObject.id, 'examineDescription', e.target.value)}
                                                 className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary resize-none flex-1 min-h-[250px]"
-                                                placeholder="O que o jogador vê ao examinar este objeto?"
+                                                placeholder={t('objectEditor.examinePlaceholder', 'O que o jogador vê ao examinar este objeto?')}
                                             />
                                         </div>
 
                                         {/* Image field */}
                                         <div className="col-span-1 space-y-1.5">
-                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem do Objeto</label>
+                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.objectImageLabel', 'Imagem do Objeto')}</label>
                                             <div className="relative w-full aspect-square bg-muted rounded-lg overflow-hidden border border-input group">
                                                 {selectedObject.image ? (
                                                     <>
@@ -376,19 +378,19 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                 ) : (
                                                     <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-accent/50 transition-colors">
                                                         <Upload className="w-6 h-6 text-muted-foreground mb-2" />
-                                                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Carregar</span>
+                                                        <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{t('objectEditor.uploadBtn', 'Carregar')}</span>
                                                         <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                                     </label>
                                                 )}
                                             </div>
-                                            <p className="text-[9px] text-muted-foreground italic leading-tight">Esta imagem aparece no pop-up de detalhes do objeto durante o jogo.</p>
+                                            <p className="text-[9px] text-muted-foreground italic leading-tight">{t('globalObjectsEditor.imageHint', 'Esta imagem aparece no pop-up de detalhes do objeto durante o jogo.')}</p>
                                         </div>
                                     </div>
 
 
                                     {/* Usage Info */}
                                     <div className="pt-4 border-t border-border">
-                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">Usado nas cenas</label>
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">{t('globalObjectsEditor.usedInScenes', 'Usado nas cenas')}</label>
                                         <div className="flex flex-wrap gap-2">
                                             {usages.length > 0 ? (
                                                 usages.map(u => (
@@ -402,7 +404,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                     </button>
                                                 ))
                                             ) : (
-                                                <p className="text-[10px] text-muted-foreground italic">Este objeto ainda não foi adicionado a nenhuma cena.</p>
+                                                <p className="text-[10px] text-muted-foreground italic">{t('globalObjectsEditor.notUsedAnywhere', 'Este objeto ainda não foi adicionado a nenhuma cena.')}</p>
                                             )}
                                         </div>
                                     </div>
@@ -412,8 +414,8 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     ) : (
                         <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
                             <Box className="w-12 h-12 mb-4 opacity-20" />
-                            <h4 className="text-sm font-bold text-muted-foreground mb-1">Nenhum objeto selecionado</h4>
-                            <p className="text-xs max-w-xs opacity-60">Selecione um objeto da lista ao lado para editar suas propriedades globais.</p>
+                            <h4 className="text-sm font-bold text-muted-foreground mb-1">{t('objectEditor.noObjectSelected', 'Nenhum objeto selecionado')}</h4>
+                            <p className="text-xs max-w-xs opacity-60">{t('globalObjectsEditor.noObjectDesc', 'Selecione um objeto da lista ao lado para editar suas propriedades globais.')}</p>
                         </div>
                     )}
                 </div>

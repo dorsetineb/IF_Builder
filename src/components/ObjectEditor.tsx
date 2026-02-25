@@ -1,6 +1,7 @@
 import React, { useState, DragEvent, useMemo, useEffect } from 'react';
 import { GameObject } from '../types';
 import { Plus, Trash2, Upload, Search, Link as LinkIcon, Unlink, Box, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const TRACKER_ICONS = [
     { name: 'activity', component: Activity },
@@ -53,6 +54,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
     const [searchTerm, setSearchTerm] = useState('');
     const [isLinkMode, setIsLinkMode] = useState(false); // Toggle between "My Objects" and "Link Existing"
     const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+    const { t } = useTranslation();
 
     useEffect(() => {
         setIsIconPickerOpen(false);
@@ -62,8 +64,8 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
         const allIds = allGlobalObjects.map(o => o.id);
         const newObject: GameObject = {
             id: generateUniqueId('obj', allIds),
-            name: 'Novo Objeto',
-            examineDescription: 'Descrição do novo objeto.',
+            name: t('objectEditor.newObject', 'Novo Objeto'),
+            examineDescription: t('objectEditor.newObjectDesc', 'Descrição do novo objeto.'),
         };
         onCreateGlobalObject(newObject, sceneId);
         setSelectedObjectId(newObject.id);
@@ -125,13 +127,13 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                             onClick={() => setIsLinkMode(false)}
                             className={`flex-1 py-2 text-xs font-bold uppercase tracking-wide rounded-md transition-all ${!isLinkMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            Nesta Cena ({objects.length})
+                            {t('objectEditor.inThisScene', 'Nesta Cena ({{count}})', { count: objects.length })}
                         </button>
                         <button
                             onClick={() => setIsLinkMode(true)}
                             className={`flex-1 py-2 text-xs font-bold uppercase tracking-wide rounded-md transition-all ${isLinkMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            Vincular ({availableObjectsToLink.length})
+                            {t('objectEditor.linkOptions', 'Vincular ({{count}})', { count: availableObjectsToLink.length })}
                         </button>
                     </div>
 
@@ -139,7 +141,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                         <input
                             type="text"
-                            placeholder="Buscar objetos..."
+                            placeholder={t('objectEditor.searchPlaceholder', 'Buscar objetos...')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="w-full bg-input border border-input rounded-lg pl-8 pr-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-muted-foreground"
@@ -181,7 +183,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                 className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-2 shadow-sm"
                             >
                                 <Plus className="w-4 h-4 mr-1" />
-                                Criar Novo Objeto
+                                {t('objectEditor.createNewBtn', 'Criar Novo Objeto')}
                             </button>
                         </>
                     ) : (
@@ -210,7 +212,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                             <button
                                                 onClick={() => handleLinkExistingObject(obj.id)}
                                                 className="p-1.5 bg-primary/10 text-primary rounded hover:bg-primary hover:text-primary-foreground transition-colors"
-                                                title="Vincular à cena"
+                                                title={t('objectEditor.linkToSceneTooltip', 'Vincular à cena')}
                                             >
                                                 <Plus className="w-4 h-4" />
                                             </button>
@@ -231,7 +233,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                         <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30 shrink-0">
                             <div className="flex items-center gap-2">
                                 <Box className="w-4 h-4 text-primary" />
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Propriedades do Objeto</span>
+                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{t('objectEditor.propertiesTitle', 'Propriedades do Objeto')}</span>
                             </div>
 
                             {/* Context Actions */}
@@ -239,7 +241,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                 {isSelectedObjectLinked ? (
                                     <button
                                         onClick={() => {
-                                            if (window.confirm('Tem certeza? Isso removerá o objeto desta cena, mas ele ainda existirá no projeto.')) {
+                                            if (window.confirm(t('objectEditor.unlinkConfirm', 'Tem certeza? Isso removerá o objeto desta cena, mas ele ainda existirá no projeto.'))) {
                                                 onUnlinkObject(sceneId, selectedObject.id);
                                                 setSelectedObjectId(null);
                                             }
@@ -247,7 +249,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
                                     >
                                         <Unlink className="w-3.5 h-3.5" />
-                                        Desvincular
+                                        {t('objectEditor.unlinkBtn', 'Desvincular')}
                                     </button>
                                 ) : (
                                     <button
@@ -255,7 +257,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-[10px] font-bold uppercase transition-all shadow-sm"
                                     >
                                         <LinkIcon className="w-3.5 h-3.5" />
-                                        Vincular Agora
+                                        {t('objectEditor.linkNowBtn', 'Vincular Agora')}
                                     </button>
                                 )}
                             </div>
@@ -267,7 +269,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                 <div className="grid grid-cols-3 gap-x-6 gap-y-4">
                                     {/* Basic Info */}
                                     <div className="col-span-2 space-y-1.5">
-                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Nome do Objeto</label>
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.objectNameLabel', 'Nome do Objeto')}</label>
                                         <div className="flex gap-2">
                                             {/* Icon Picker */}
                                             <div className="relative group shrink-0">
@@ -306,31 +308,31 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                             />
                                         </div>
                                     </div>                                    <div className="col-span-1 space-y-1.5">
-                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">ID Único</label>
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.uniqueIdLabel', 'ID Único')}</label>
                                         <input
                                             type="text"
                                             value={selectedObject.id}
                                             readOnly
                                             className="w-full bg-muted/50 border border-input rounded-lg px-3 py-2 text-xs text-muted-foreground font-mono cursor-not-allowed h-[38px]"
-                                            title="O ID é gerado automaticamente e não pode ser alterado."
+                                            title={t('objectEditor.idTooltip', 'O ID é gerado automaticamente e não pode ser alterado.')}
                                         />
                                     </div>
 
                                     {/* Description field */}
                                     <div className="col-span-2 space-y-1.5 flex flex-col">
-                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Descrição ao Examinar</label>
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.examineDescriptionLabel', 'Descrição ao Examinar')}</label>
                                         <textarea
                                             rows={6}
                                             value={selectedObject.examineDescription}
                                             onChange={(e) => onUpdateGlobalObject(selectedObject.id, { examineDescription: e.target.value })}
                                             className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary resize-none flex-1 min-h-[150px]"
-                                            placeholder="O que o jogador vê ao examinar este objeto?"
+                                            placeholder={t('objectEditor.examinePlaceholder', 'O que o jogador vê ao examinar este objeto?')}
                                         />
                                     </div>
 
                                     {/* Image Preview & Upload */}
                                     <div className="col-span-1 space-y-1.5">
-                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem do Objeto</label>
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.objectImageLabel', 'Imagem do Objeto')}</label>
                                         <div className="relative w-full aspect-square bg-muted rounded-lg overflow-hidden border border-input group">
                                             {selectedObject.image ? (
                                                 <>
@@ -348,22 +350,22 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                             ) : (
                                                 <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-accent/50 transition-colors">
                                                     <Upload className="w-6 h-6 text-muted-foreground mb-2" />
-                                                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Carregar</span>
+                                                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{t('objectEditor.uploadBtn', 'Carregar')}</span>
                                                     <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                                 </label>
                                             )}
                                         </div>
                                     </div>
                                 </div>
-                                <p className="text-[10px] text-muted-foreground text-center mt-6 italic">Objetos aparecem no inventário ou na lista de &apos;coisas aqui&apos;.</p>
+                                <p className="text-[10px] text-muted-foreground text-center mt-6 italic">{t('objectEditor.objectsHint', 'Objetos aparecem no inventário ou na lista de \'coisas aqui\'.')}</p>
                             </div>
                         </div>
                     </div>
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
                         <Box className="w-12 h-12 mb-4 opacity-20" />
-                        <h4 className="text-sm font-bold text-muted-foreground mb-1">Nenhum objeto selecionado</h4>
-                        <p className="text-xs max-w-xs opacity-60">Selecione um objeto da lista ao lado para editar suas propriedades ou vincule um novo objeto à cena.</p>
+                        <h4 className="text-sm font-bold text-muted-foreground mb-1">{t('objectEditor.noObjectSelected', 'Nenhum objeto selecionado')}</h4>
+                        <p className="text-xs max-w-xs opacity-60">{t('objectEditor.noObjectDesc', 'Selecione um objeto da lista ao lado para editar suas propriedades ou vincule um novo objeto à cena.')}</p>
                     </div>
                 )}
             </div>

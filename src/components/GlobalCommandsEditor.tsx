@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { FixedVerb } from '../types';
 import { Plus, Trash2, Search, Command, MessageSquare, Box, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
+import { Trans, useTranslation } from 'react-i18next';
 
 const COMMAND_ICONS = [
     { name: 'message', component: MessageSquare },
@@ -48,6 +49,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
     const [selectedVerbId, setSelectedVerbId] = useState<string | null>(fixedVerbs.length > 0 ? fixedVerbs[0].id : null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+    const { t } = useTranslation();
 
     // Sync from props
     useEffect(() => {
@@ -126,14 +128,18 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
             {/* Header with Save/Undo actions */}
             <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-border">
                 <div className="text-muted-foreground text-xs font-medium w-full space-y-1">
-                    <p>Configure verbos e comandos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).</p>
-                    <p>Os verbos <strong>"olhar", "examinar", "ver"</strong> e <strong>"ler"</strong> sempre estarão disponíveis para o usuário acionar a descrição de um objeto.</p>
+                    <p>{t('globalCommandsEditor.headerDesc1', 'Configure verbos e comandos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).')}</p>
+                    <p>
+                        <Trans i18nKey="globalCommandsEditor.headerDesc2">
+                            Os verbos <strong>"olhar", "examinar", "ver"</strong> e <strong>"ler"</strong> sempre estarão disponíveis para o usuário acionar a descrição de um objeto.
+                        </Trans>
+                    </p>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                     {isDirty && (
                         <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
                             <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            Alterações não salvas
+                            {t('globalObjectsEditor.unsavedChanges', 'Alterações não salvas')}
                         </div>
                     )}
                     <button
@@ -141,14 +147,14 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                         disabled={!isDirty}
                         className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
                     >
-                        Desfazer
+                        {t('globalObjectsEditor.undoBtn', 'Desfazer')}
                     </button>
                     <button
                         onClick={handleSave}
                         disabled={!isDirty}
                         className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed shadow-sm"
                     >
-                        Salvar Alterações
+                        {t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
                     </button>
                 </div>
             </div>
@@ -162,14 +168,14 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                             <input
                                 type="text"
-                                placeholder="Buscar comandos..."
+                                placeholder={t('globalCommandsEditor.searchPlaceholder', 'Buscar comandos...')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="w-full bg-input border border-border rounded-lg pl-8 pr-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-muted-foreground"
                             />
                         </div>
                         <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider px-1">
-                            <span>Lista de Comandos</span>
+                            <span>{t('globalCommandsEditor.commandList', 'Lista de Comandos')}</span>
                             <span>{filteredVerbs.length}</span>
                         </div>
                     </div>
@@ -190,10 +196,10 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className={`text-xs font-bold truncate ${selectedVerbId === verb.id ? 'text-primary' : 'text-foreground'}`}>
-                                                {verb.verbs.length > 0 ? verb.verbs.join(', ') : '(sem verbos)'}
+                                                {verb.verbs.length > 0 ? verb.verbs.join(', ') : t('globalCommandsEditor.noVerbs', '(sem verbos)')}
                                             </p>
                                             <p className="text-[10px] text-muted-foreground truncate mt-0.5">
-                                                {verb.description || '(sem descrição)'}
+                                                {verb.description || t('globalCommandsEditor.noDescription', '(sem descrição)')}
                                             </p>
                                         </div>
                                     </button>
@@ -205,7 +211,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                             className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm transform hover:-translate-y-0.5 mt-2"
                         >
                             <Plus className="w-4 h-4 mr-1" />
-                            Novo Comando
+                            {t('globalCommandsEditor.newCommand', 'Novo Comando')}
                         </button>
                     </div>
                 </div>
@@ -215,11 +221,11 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                     {selectedVerb ? (
                         <>
                             <div className="px-6 py-4 border-b border-muted-foreground/10 flex items-center justify-between bg-zinc-900/30 shrink-0">
-                                <h3 className="text-sm font-bold text-foreground">Editar Comando</h3>
+                                <h3 className="text-sm font-bold text-foreground">{t('globalCommandsEditor.editCommandTitle', 'Editar Comando')}</h3>
                                 <button
                                     onClick={() => handleDelete(selectedVerb.id)}
                                     className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors rounded-lg"
-                                    title="Excluir comando"
+                                    title={t('globalCommandsEditor.deleteCommandTooltip', 'Excluir comando')}
                                 >
                                     <Trash2 className="w-4 h-4" />
                                 </button>
@@ -227,7 +233,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                             <div className="flex-1 overflow-y-auto p-6 space-y-6">
                                 <div className="space-y-2">
                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                                        Verbos (separados por vírgula)
+                                        {t('globalCommandsEditor.verbsLabel', 'Verbos (separados por vírgula)')}
                                     </label>
                                     <div className="flex gap-2">
                                         {/* Icon Picker */}
@@ -238,7 +244,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                                     setIsIconPickerOpen(!isIconPickerOpen);
                                                 }}
                                                 className="w-10 h-10 flex items-center justify-center bg-input border border-input rounded-lg text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
-                                                title="Escolher ícone"
+                                                title={t('globalCommandsEditor.chooseIconTooltip', 'Escolher ícone')}
                                             >
                                                 {(() => {
                                                     const Icon = COMMAND_ICONS.find(i => i.name === selectedVerb.icon)?.component || MessageSquare;
@@ -267,22 +273,22 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                                 const cleanedVerbs = e.target.value.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
                                                 handleVerbChange(selectedVerb.id, 'verbs', cleanedVerbs);
                                             }}
-                                            placeholder="ex: ajuda, help, ?"
+                                            placeholder={t('globalCommandsEditor.verbsPlaceholder', 'ex: ajuda, help, ?')}
                                             className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary/30 transition-all"
                                         />
                                     </div>
                                     <p className="text-[10px] text-muted-foreground">
-                                        Palavras que ativam este comando. Ex: "ajuda" ou "help".
+                                        {t('globalCommandsEditor.verbsDesc', 'Palavras que ativam este comando. Ex: "ajuda" ou "help".')}
                                     </p>
                                 </div>
                                 <div className="space-y-2 flex-1">
                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                                        Descrição / Resposta
+                                        {t('globalCommandsEditor.descriptionLabel', 'Descrição / Resposta')}
                                     </label>
                                     <textarea
                                         value={selectedVerb.description}
                                         onChange={(e) => handleVerbChange(selectedVerb.id, 'description', e.target.value)}
-                                        placeholder="Texto que será exibido para o jogador quando usar este comando."
+                                        placeholder={t('globalCommandsEditor.descriptionPlaceholder', 'Texto que será exibido para o jogador quando usar este comando.')}
                                         rows={8}
                                         className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary/30 transition-all resize-none"
                                     />
@@ -294,14 +300,14 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                             <div className="w-16 h-16 rounded-2xl bg-muted/30 border border-border/50 flex items-center justify-center mb-4">
                                 <Command className="w-8 h-8 text-muted-foreground/50" />
                             </div>
-                            <p className="text-sm text-foreground font-medium">Selecione um comando para editar</p>
-                            <p className="text-xs text-muted-foreground mt-1">ou crie um novo clicando no botão abaixo</p>
+                            <p className="text-sm text-foreground font-medium">{t('globalCommandsEditor.noCommandSelected', 'Selecione um comando para editar')}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{t('globalCommandsEditor.noCommandDesc', 'ou crie um novo clicando no botão abaixo')}</p>
                             <button
                                 onClick={handleCreate}
                                 className="mt-4 px-4 py-2 bg-white text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-200 transition-all"
                             >
                                 <Plus className="w-4 h-4 inline-block mr-1" />
-                                Criar Comando
+                                {t('globalCommandsEditor.createCommandBtn', 'Criar Comando')}
                             </button>
                         </div>
                     )}

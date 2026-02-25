@@ -6,6 +6,7 @@ import { FONTS, PREDEFINED_THEMES, MAX_IMAGE_SIZE, MAX_AUDIO_SIZE } from '../con
 
 
 import { GameData, FixedVerb } from '../types';
+import { useTranslation } from 'react-i18next';
 import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List } from 'lucide-react';
 
 interface UIEditorProps {
@@ -209,6 +210,7 @@ const FixedVerbItem: React.FC<{
 });
 
 export const UIEditor: React.FC<UIEditorProps> = (props) => {
+    const { t } = useTranslation();
     const { theme } = useTheme(); // Get app theme
     const currentSliderColor = APP_THEME_COLORS[theme as keyof typeof APP_THEME_COLORS] || APP_THEME_COLORS.dark;
 
@@ -319,9 +321,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed);
 
     const TABS = {
-        aparencia: 'Aparência',
-        sistemas: 'Sistemas',
-        textos: 'Textos'
+        layout: t('UIEditor.tabs.layout'),
+        sistemas: t('UIEditor.tabs.sistemas'),
+        textos: t('UIEditor.tabs.textos'),
+        aparencia: t('UIEditor.tabs.aparencia'),
     };
 
     const [activeSections, setActiveSections] = useState({
@@ -785,7 +788,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             if (file.size > MAX_IMAGE_SIZE) {
-                toast("Erro no Upload", `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024}MB.`, "error");
+                toast(t('UIEditor.errors.uploadError'), t('SceneEditor.imageLimitExceeded', { size: MAX_IMAGE_SIZE / 1024 / 1024 }), "error");
                 if (e.target) (e.target as HTMLInputElement).value = '';
                 return;
             }
@@ -807,7 +810,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             if (file.size > MAX_AUDIO_SIZE) {
-                toast("Erro no Upload", `O áudio excede o limite de ${MAX_AUDIO_SIZE / 1024 / 1024}MB.`, "error");
+                toast(t('UIEditor.errors.uploadError'), t('UIEditor.errors.audioLimitExceeded', { size: MAX_AUDIO_SIZE / 1024 / 1024 }), "error");
                 if (e.target) (e.target as HTMLInputElement).value = '';
                 return;
             }
@@ -889,13 +892,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
             {/* Header with Save/Undo actions */}
             <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-border">
                 <p className="text-muted-foreground text-xs font-medium max-w-lg">
-                    Personalize a interface do jogo, configure menus e textos.
+                    {t('UIEditor.header.description')}
                 </p>
                 <div className="flex items-center gap-3">
                     {isDirty && (
                         <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
                             <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            Alterações não salvas
+                            {t('UIEditor.header.unsavedChanges')}
                         </div>
                     )}
                     <button
@@ -903,14 +906,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         disabled={!isDirty}
                         className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
                     >
-                        Desfazer
+                        {t('UIEditor.header.undo')}
                     </button>
                     <button
                         onClick={handleSave}
                         disabled={!isDirty}
                         className="px-4 py-1.5 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
                     >
-                        Salvar Alterações
+                        {t('UIEditor.header.save')}
                     </button>
                 </div>
             </div>
@@ -940,18 +943,18 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             <div>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
                                     <div className="space-y-8 col-span-1">
-                                        <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Tela de Abertura</h3>
+                                        <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">{t('UIEditor.layout.splashScreen')}</h3>
                                         <div className="space-y-8">
                                             <div>
-                                                <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
+                                                <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.layout.contentAlignment')}</label>
                                                 <select
                                                     id="splashContentAlignment"
                                                     value={localSplashContentAlignment}
                                                     onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
                                                     className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background"
                                                 >
-                                                    <option value="right">Direita</option>
-                                                    <option value="left">Esquerda</option>
+                                                    <option value="right">{t('UIEditor.layout.alignRight')}</option>
+                                                    <option value="left">{t('UIEditor.layout.alignLeft')}</option>
                                                 </select>
                                             </div>
                                             <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}>
@@ -962,13 +965,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
                                                     className="custom-checkbox"
                                                 />
-                                                <label htmlFor="omitSplashTitle" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">Ocultar título e descrição</label>
+                                                <label htmlFor="omitSplashTitle" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('UIEditor.layout.hideTitleDesc')}</label>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="space-y-4 col-span-1 md:mt-0">
-                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">Pré-visualização</p>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">{t('UIEditor.layout.preview')}</p>
                                         <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-center h-fit aspect-video">
                                             <div
                                                 className="relative w-full max-w-full aspect-video bg-muted border border-border rounded-xl flex overflow-hidden"
@@ -978,13 +981,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 }}
                                             >
                                                 <div className="absolute inset-0 flex items-center justify-center -translate-y-4">
-                                                    <div className="text-secondary-foreground font-black text-[8px] uppercase tracking-[0.2em] border-2 border-secondary-foreground/20 px-3 py-1 rounded">Imagem de Fundo</div>
+                                                    <div className="text-secondary-foreground font-black text-[8px] uppercase tracking-[0.2em] border-2 border-secondary-foreground/20 px-3 py-1 rounded">{t('UIEditor.layout.backgroundImage')}</div>
                                                 </div>
                                                 {!localOmitSplashTitle && (
                                                     <div
                                                         className="w-2/3 h-1/3 m-6 bg-primary/5 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center justify-center text-center text-[8px] p-2 text-primary font-bold uppercase tracking-widest"
                                                     >
-                                                        Título e Descrição
+                                                        {t('UIEditor.layout.titleAndDesc')}
                                                     </div>
                                                 )}
                                             </div>
@@ -996,62 +999,62 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             <div className="pt-6 border-t border-border">
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-x-8 gap-y-4">
                                     <div className="space-y-8 col-span-1">
-                                        <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Layout do Jogo</h3>
+                                        <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">{t('UIEditor.layout.gameLayout')}</h3>
                                         <div className="space-y-4">
                                             <div>
-                                                <label htmlFor="orientation-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Orientação</label>
+                                                <label htmlFor="orientation-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.layout.orientation')}</label>
                                                 <select
                                                     id="orientation-select"
                                                     value={localLayoutOrientation}
                                                     onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
                                                     className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background"
                                                 >
-                                                    <option value="vertical">Vertical</option>
-                                                    <option value="horizontal">Horizontal</option>
+                                                    <option value="vertical">{t('UIEditor.layout.vertical')}</option>
+                                                    <option value="horizontal">{t('UIEditor.layout.horizontal')}</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label htmlFor="order-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posição da Imagem</label>
+                                                <label htmlFor="order-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.layout.imagePosition')}</label>
                                                 <select
                                                     id="order-select"
                                                     value={localLayoutOrder}
                                                     onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
                                                     className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background"
                                                 >
-                                                    <option value="image-first">{localLayoutOrientation === 'vertical' ? 'Esquerda' : 'Acima'}</option>
-                                                    <option value="image-last">{localLayoutOrientation === 'vertical' ? 'Direita' : 'Abaixo'}</option>
+                                                    <option value="image-first">{localLayoutOrientation === 'vertical' ? t('UIEditor.layout.posLeft') : t('UIEditor.layout.posAbove')}</option>
+                                                    <option value="image-last">{localLayoutOrientation === 'vertical' ? t('UIEditor.layout.posRight') : t('UIEditor.layout.posBelow')}</option>
                                                 </select>
                                             </div>
                                             <div>
-                                                <label htmlFor="frame-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Tipo de Moldura</label>
+                                                <label htmlFor="frame-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.layout.frameType')}</label>
                                                 <select
                                                     id="frame-select"
                                                     value={localImageFrame}
                                                     onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
                                                     className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background"
                                                 >
-                                                    <option value="none">Sem moldura</option>
-                                                    <option value="rounded-top">Portal</option>
-                                                    <option value="book-cover">Quadrada</option>
-                                                    <option value="trading-card">Arredondada</option>
+                                                    <option value="none">{t('UIEditor.layout.frameNone')}</option>
+                                                    <option value="rounded-top">{t('UIEditor.layout.framePortal')}</option>
+                                                    <option value="book-cover">{t('UIEditor.layout.frameSquare')}</option>
+                                                    <option value="trading-card">{t('UIEditor.layout.frameRounded')}</option>
                                                 </select>
                                             </div>
                                             <div>
                                                 {localImageFrame === 'rounded-top' && (
-                                                    <ColorInput label="Cor da Moldura" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
+                                                    <ColorInput label={t('UIEditor.layout.frameColor')} id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
                                                 )}
                                                 {localImageFrame === 'book-cover' && (
-                                                    <ColorInput label="Cor da Moldura" id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
+                                                    <ColorInput label={t('UIEditor.layout.frameColor')} id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
                                                 )}
                                                 {localImageFrame === 'trading-card' && (
-                                                    <ColorInput label="Cor da Moldura" id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
+                                                    <ColorInput label={t('UIEditor.layout.frameColor')} id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
                                                 )}
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="flex flex-col col-span-1 md:mt-0">
-                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">Pré-visualização do Layout</p>
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">{t('UIEditor.layout.layoutPreview')}</p>
                                         <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-center h-fit aspect-video shadow-inner">
                                             <div
                                                 className="w-full max-w-[400px] aspect-video border border-border bg-muted rounded-xl flex p-3 gap-3 transition-all overflow-hidden"
@@ -1068,11 +1071,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             backgroundColor: undefined
                                                         }}
                                                     >
-                                                        FOTO
+                                                        {t('UIEditor.layout.previewPhoto')}
                                                     </div>
                                                 </div>
                                                 <div className={`flex-1 bg-primary/5 border border-primary/20 rounded-lg flex items-center justify-center text-center text-[7px] p-2 text-primary font-black uppercase tracking-[0.2em] shadow-lg ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}>
-                                                    TEXTO
+                                                    {t('UIEditor.layout.previewText')}
                                                 </div>
                                             </div>
                                         </div>
@@ -1086,10 +1089,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
                             <div>
                                 <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest flex items-center gap-2">
-                                    <Grid className="w-4 h-4 text-muted-foreground" /> Sistemas Ativos
+                                    <Grid className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.sistemas.activeSystems')}
                                 </h3>
                                 <p className="text-xs text-muted-foreground mb-6 max-w-2xl">
-                                    Habilite e configure os sistemas que estarão disponíveis no seu jogo. Você pode combinar múltiplos sistemas.
+                                    {t('UIEditor.sistemas.activeSystemsDesc')}
                                 </p>
 
                                 {/* --- BENTO BOX LAYOUT: FULL WIDTH HEADER + 2 INDEPENDENT COLUMNS + FOOTER --- */}
@@ -1103,8 +1106,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     <LayoutTemplate className="w-5 h-5" />
                                                 </div>
                                                 <div>
-                                                    <h4 className="text-sm font-bold uppercase tracking-wide text-foreground">Estilo de Jogo</h4>
-                                                    <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Define a interação principal do jogador</p>
+                                                    <h4 className="text-sm font-bold uppercase tracking-wide text-foreground">{t('UIEditor.sistemas.gameStyle')}</h4>
+                                                    <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.gameStyleDesc')}</p>
                                                 </div>
                                             </div>
                                         </div>
@@ -1118,8 +1121,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     <Type className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <span className="text-xs font-bold uppercase block">Parser (Descreva Comandos)</span>
-                                                    <span className="text-[10px] opacity-70 mt-0.5">O jogador digita ações como "pegar chave" ou "olhar mesa"</span>
+                                                    <span className="text-xs font-bold uppercase block">{t('UIEditor.sistemas.parser')}</span>
+                                                    <span className="text-[10px] opacity-70 mt-0.5">{t('UIEditor.sistemas.parserDesc')}</span>
                                                 </div>
                                             </button>
                                             <button
@@ -1133,8 +1136,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     <List className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <span className="text-xs font-bold uppercase block">IF (Escolha uma opção)</span>
-                                                    <span className="text-[10px] opacity-70 mt-0.5">O jogador escolhe entre opções pré-definidas na tela</span>
+                                                    <span className="text-xs font-bold uppercase block">{t('UIEditor.sistemas.choice')}</span>
+                                                    <span className="text-[10px] opacity-70 mt-0.5">{t('UIEditor.sistemas.choiceDesc')}</span>
                                                 </div>
                                             </button>
                                         </div>
@@ -1152,8 +1155,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 <Package className="w-5 h-5" />
                                                             </div>
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>Inventário</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Gestão de itens pegos pelo jogador</p>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.inventoryDesc')}</p>
                                                             </div>
                                                         </div>
                                                         <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
@@ -1181,8 +1184,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 <Type className="w-5 h-5" />
                                                             </div>
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>Controle de Texto</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Animação e fluxo da descrição de cena</p>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.textControl')}</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.textControlDesc')}</p>
                                                             </div>
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -1196,32 +1199,32 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
                                                             <div className="grid grid-cols-2 gap-4">
                                                                 <div className="space-y-2">
-                                                                    <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Estilo de Animação</label>
+                                                                    <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.animationStyle')}</label>
                                                                     <select
                                                                         id="textAnimationType"
                                                                         value={localTextAnimationType}
                                                                         onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
                                                                         className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
                                                                     >
-                                                                        <option value="fade">Esmaecer (Fade In)</option>
-                                                                        <option value="typewriter">Máquina de Escrever</option>
+                                                                        <option value="fade">{t('UIEditor.sistemas.animFade')}</option>
+                                                                        <option value="typewriter">{t('UIEditor.sistemas.animTypewriter')}</option>
                                                                     </select>
                                                                 </div>
                                                                 <div className="space-y-2">
-                                                                    <label htmlFor="textReadingFlow" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Fluxo de Leitura</label>
+                                                                    <label htmlFor="textReadingFlow" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.readingFlow')}</label>
                                                                     <select
                                                                         id="textReadingFlow"
                                                                         value={localTextReadingFlow}
                                                                         onChange={(e) => setLocalTextReadingFlow(e.target.value as 'continuous' | 'paused')}
                                                                         className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
                                                                     >
-                                                                        <option value="paused">Pausado (Por Parágrafo)</option>
-                                                                        <option value="continuous">Contínuo (Texto Completo)</option>
+                                                                        <option value="paused">{t('UIEditor.sistemas.flowPaused')}</option>
+                                                                        <option value="continuous">{t('UIEditor.sistemas.flowContinuous')}</option>
                                                                     </select>
                                                                 </div>
                                                             </div>
                                                             <div className="space-y-2">
-                                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Velocidade</label>
+                                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.speed')}</label>
                                                                 <div className="flex items-center gap-4">
                                                                     <input
                                                                         type="range"
@@ -1251,8 +1254,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 <Heart className="w-5 h-5" />
                                                             </div>
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>Sistema de Vidas</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Limitar tentativas</p>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.lifeSystem')}</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.lifeSystemDesc')}</p>
                                                             </div>
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -1266,7 +1269,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
                                                             <div className="flex items-end gap-3 w-full">
                                                                 <div className="space-y-1 flex-1 min-w-0">
-                                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Ícone</label>
+                                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.icon')}</label>
                                                                     <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-muted-foreground/50 h-9 w-full">
                                                                         {['heart', 'circle', 'diamond', 'cross'].map((icon) => (
                                                                             <button
@@ -1281,7 +1284,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                     </div>
                                                                 </div>
                                                                 <div className="space-y-1 flex-1 min-w-0">
-                                                                    <label htmlFor="chanceColor" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cor</label>
+                                                                    <label htmlFor="chanceColor" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.color')}</label>
                                                                     <div className="flex items-center gap-2 p-1 bg-background border border-border rounded-lg focus-within:border-primary/50 transition-all h-9 w-full">
                                                                         <input
                                                                             type="color"
@@ -1302,7 +1305,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                     </div>
                                                                 </div>
                                                                 <div className="space-y-1 w-20 shrink-0">
-                                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Vidas</label>
+                                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.lives')}</label>
                                                                     <input
                                                                         type="number"
                                                                         value={localMaxChances}
@@ -1330,8 +1333,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 <Book className="w-5 h-5" />
                                                             </div>
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>Diário de Bordo</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Registro de eventos</p>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.diary')}</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.diaryDesc')}</p>
                                                             </div>
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -1345,11 +1348,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
                                                             <div className="space-y-3">
                                                                 <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-muted-foreground/50">
-                                                                    <span className="text-[11px] text-muted-foreground">Mostrar Imagem da Cena</span>
+                                                                    <span className="text-[11px] text-muted-foreground">{t('UIEditor.sistemas.showSceneImage')}</span>
                                                                     <input type="checkbox" checked={localDiaryShowSceneImage} onChange={(e) => setLocalDiaryShowSceneImage(e.target.checked)} className="custom-checkbox" />
                                                                 </div>
                                                                 <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-muted-foreground/50">
-                                                                    <span className="text-[11px] text-muted-foreground">Mostrar Ação do Jogador</span>
+                                                                    <span className="text-[11px] text-muted-foreground">{t('UIEditor.sistemas.showPlayerAction')}</span>
                                                                     <input type="checkbox" checked={localDiaryShowPlayerAction} onChange={(e) => setLocalDiaryShowPlayerAction(e.target.checked)} className="custom-checkbox" />
                                                                 </div>
                                                             </div>
@@ -1367,8 +1370,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 <ImageIcon className="w-5 h-5" />
                                                             </div>
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>Imagens nas Cenas</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Cenas ilustradas por imagens</p>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.imagesInScenes')}</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.imagesInScenesDesc')}</p>
                                                             </div>
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -1381,20 +1384,20 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     {localEnableImages && (
                                                         <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
                                                             <div className="space-y-2">
-                                                                <label htmlFor="imageTransitionType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Transição de Imagem</label>
+                                                                <label htmlFor="imageTransitionType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.imageTransition')}</label>
                                                                 <select
                                                                     id="imageTransitionType"
                                                                     value={localImageTransitionType}
                                                                     onChange={(e) => setLocalImageTransitionType(e.target.value as any)}
                                                                     className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
                                                                 >
-                                                                    <option value="fade">Esmaecer (Fade)</option>
-                                                                    <option value="slide">Deslizar (Slide)</option>
-                                                                    <option value="none">Nenhuma</option>
+                                                                    <option value="fade">{t('UIEditor.sistemas.transFade')}</option>
+                                                                    <option value="slide">{t('UIEditor.sistemas.transSlide')}</option>
+                                                                    <option value="none">{t('UIEditor.sistemas.transNone')}</option>
                                                                 </select>
                                                             </div>
                                                             <div className="space-y-2">
-                                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Velocidade</label>
+                                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.speed')}</label>
                                                                 <div className="flex items-center gap-4">
                                                                     <input
                                                                         type="range"
@@ -1425,8 +1428,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 <SlidersHorizontal className="w-5 h-5" />
                                                             </div>
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>Rastreadores</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">Variáveis Numéricas</p>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.trackers')}</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.trackersDesc')}</p>
                                                             </div>
                                                         </div>
                                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -1439,13 +1442,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     {localEnableTrackers && (
                                                         <div className="space-y-4 pt-4 border-t border-muted-foreground/50 animate-in fade-in slide-in-from-top-2 duration-300">
                                                             <p className="text-[11px] text-muted-foreground leading-relaxed">
-                                                                Rastreadores são variáveis para pontos de vida alternativos, dinheiro, sanidade, etc.
+                                                                {t('UIEditor.sistemas.trackersInfo')}
                                                             </p>
                                                             <button
                                                                 onClick={() => props.onNavigateToTrackers?.()}
                                                                 className="w-full py-3 bg-primary/10 text-primary border border-primary/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all active:scale-95 flex items-center justify-center gap-2"
                                                             >
-                                                                <SlidersHorizontal className="w-4 h-4" /> Configurar Rastreadores
+                                                                <SlidersHorizontal className="w-4 h-4" /> {t('UIEditor.sistemas.configureTrackers')}
                                                             </button>
                                                         </div>
                                                     )}
@@ -1465,24 +1468,24 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             {/* LEFT COLUMN: Texts & Audio */}
                             <div className="flex flex-col h-full gap-4">
                                 <div className="space-y-2">
-                                    <label htmlFor="gameTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Título do Jogo</label>
+                                    <label htmlFor="gameTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.gameTitle')}</label>
                                     <input
                                         type="text"
                                         id="gameTitle"
                                         value={localTitle}
                                         onChange={(e) => setLocalTitle(e.target.value)}
                                         className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-primary/50 transition-all font-bold placeholder:text-muted-foreground"
-                                        placeholder="Ex: A Masmorra Esquecida"
+                                        placeholder={t('UIEditor.sistemas.gameTitlePlaceholder')}
                                     />
                                 </div>
                                 <div className="flex flex-col gap-2 flex-1 h-full">
-                                    <label htmlFor="splashDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Descrição do Jogo</label>
+                                    <label htmlFor="splashDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.gameDescription')}</label>
                                     <textarea
                                         id="splashDescription"
                                         value={localSplashDescription}
                                         onChange={(e) => setLocalSplashDescription(e.target.value)}
                                         className="w-full flex-1 bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-primary/50 transition-all resize-none leading-relaxed placeholder:text-muted-foreground h-full"
-                                        placeholder="Uma breve descrição da sua aventura..."
+                                        placeholder={t('UIEditor.sistemas.gameDescriptionPlaceholder')}
                                     />
                                 </div>
                             </div>
@@ -1492,7 +1495,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                             {/* RIGHT COLUMN: Preview & Image Settings */}
                             <div className="flex flex-col h-full gap-2">
-                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Imagem de Fundo</label>
+                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.layout.backgroundImage')}</label>
                                 <div className="relative w-full aspect-video bg-muted/50 border border-border rounded-xl overflow-hidden shadow-2xl group flex-shrink-0">
                                     {/* Background Image Layer */}
                                     {localSplashImage ? (
@@ -1502,7 +1505,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     ) : (
                                         <div className="absolute inset-0 flex flex-col items-start justify-start p-4 bg-muted/10">
                                             <ImageIcon className="w-8 h-8 text-muted-foreground/30 mb-2" />
-                                            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/50 font-bold">Sem imagem de fundo</p>
+                                            <p className="text-[9px] uppercase tracking-widest text-muted-foreground/50 font-bold">{t('UIEditor.sistemas.noBackgroundImage')}</p>
                                         </div>
                                     )}
 
@@ -1545,7 +1548,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     )}
                                 </div>
                                 <div className="space-y-1 pt-2 w-full flex flex-col items-center text-center">
-                                    <p className="text-[10px] text-muted-foreground font-medium italic">Recomendado: Full HD (1920x1080), proporção 16:9.</p>
+                                    <p className="text-[10px] text-muted-foreground font-medium italic">{t('UIEditor.layout.recommendedRes')}</p>
 
                                 </div>
                             </div>
@@ -1554,29 +1557,29 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-0">
                                 {/* Left: Soundtrack */}
                                 <div className="space-y-4">
-                                    <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha Sonora Inicial</h4>
+                                    <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.startSoundtrack')}</h4>
                                     <div className="flex items-center gap-3">
                                         <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-muted-foreground/50 text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg group">
-                                            <Upload className="w-4 h-4 mr-2 text-primary group-hover:scale-110 transition-transform" /> {localBackgroundMusic ? 'Alterar Música' : 'Carregar Música (.mp3)'}
+                                            <Upload className="w-4 h-4 mr-2 text-primary group-hover:scale-110 transition-transform" /> {localBackgroundMusic ? t('UIEditor.sistemas.changeMusic') : t('UIEditor.sistemas.loadMusic')}
                                             <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalBackgroundMusic)} className="hidden" />
                                         </label>
                                         {localBackgroundMusic && (
                                             <button
                                                 onClick={() => setLocalBackgroundMusic('')}
                                                 className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-muted-foreground/50 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-lg"
-                                                title="Remover Música"
+                                                title={t('UIEditor.sistemas.removeMusic')}
                                             >
                                                 <Trash2 className="w-5 h-5" />
                                             </button>
                                         )}
                                     </div>
-                                    <p className="text-[10px] text-muted-foreground font-medium italic">Esta trilha começará a tocar assim que a tela de início for carregada.</p>
+                                    <p className="text-[10px] text-muted-foreground font-medium italic">{t('UIEditor.sistemas.musicInfo')}</p>
                                 </div>
 
                                 {/* Right: Controls */}
                                 <div className="space-y-6">
                                     <div className="space-y-2">
-                                        <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Posicionamento do Conteúdo</label>
+                                        <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.layout.contentAlignment')}</label>
                                         <div className="grid grid-cols-2 gap-4">
                                             <select
                                                 id="splashContentAlignment"
@@ -1584,8 +1587,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
                                                 className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background shadow-lg"
                                             >
-                                                <option value="right">Direita</option>
-                                                <option value="left">Esquerda</option>
+                                                <option value="right">{t('UIEditor.layout.alignRight')}</option>
+                                                <option value="left">{t('UIEditor.layout.alignLeft')}</option>
                                             </select>
                                             <select
                                                 id="splashContentVerticalAlignment"
@@ -1593,8 +1596,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 onChange={(e) => setLocalSplashContentVerticalAlignment(e.target.value as 'top' | 'bottom')}
                                                 className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background shadow-lg"
                                             >
-                                                <option value="bottom">Inferior</option>
-                                                <option value="top">Superior</option>
+                                                <option value="bottom">{t('UIEditor.sistemas.alignBottom')}</option>
+                                                <option value="top">{t('UIEditor.sistemas.alignTop')}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -1607,7 +1610,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 onChange={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}
                                                 className="custom-checkbox"
                                             />
-                                            <span className="text-[11px] text-muted-foreground group-hover:text-foreground transition-colors">Ocultar título e descrição</span>
+                                            <span className="text-[11px] text-muted-foreground group-hover:text-foreground transition-colors">{t('UIEditor.layout.hideTitleDesc')}</span>
                                         </label>
                                     </div>
                                 </div>
@@ -1621,66 +1624,66 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         activeTab === 'textos' && (
                             <div className="space-y-6">
                                 <div>
-                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Textos da Interface</h3>
+                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">{t('UIEditor.textos.interfaceTexts')}</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                         <div className="space-y-2">
-                                            <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Ação</label>
+                                            <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.actionButtonText')}</label>
                                             <input type="text" id="actionButtonText" value={localActionButtonText} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Campo de Comando</label>
+                                            <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.commandInputPlaceholder')}</label>
                                             <input type="text" id="verbInputPlaceholder" value={localVerbInputPlaceholder} onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="viewEndingButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão "Ver Final"</label>
-                                            <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText} onChange={(e) => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all placeholder:text-muted-foreground" placeholder="Ver Final" />
-                                            <p className="text-[10px] text-muted-foreground mt-2 italic">Aparece quando o jogo termina, para levar às telas de final.</p>
+                                            <label htmlFor="viewEndingButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.viewEndingButtonText')}</label>
+                                            <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText} onChange={(e) => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all placeholder:text-muted-foreground" placeholder={t('UIEditor.textos.viewEndingPlaceholder')} />
+                                            <p className="text-[10px] text-muted-foreground mt-2 italic">{t('UIEditor.textos.viewEndingInfo')}</p>
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Nome do Jogador no Diário</label>
+                                            <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.diaryPlayerName')}</label>
                                             <input type="text" id="diaryPlayerName" value={localDiaryPlayerName} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="splashButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Início</label>
-                                            <input type="text" id="splashButtonText" value={localSplashButtonText} onChange={(e) => setLocalSplashButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder="INICIAR" />
+                                            <label htmlFor="splashButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.splashButtonText')}</label>
+                                            <input type="text" id="splashButtonText" value={localSplashButtonText} onChange={(e) => setLocalSplashButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.splashButtonPlaceholder')} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="continueButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Continuar</label>
-                                            <input type="text" id="continueButtonText" value={localContinueButtonText} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder="Continuar Aventura" />
+                                            <label htmlFor="continueButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.continueButtonText')}</label>
+                                            <input type="text" id="continueButtonText" value={localContinueButtonText} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.continueButtonPlaceholder')} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Texto do Botão de Reiniciar</label>
-                                            <input type="text" id="restartButtonText" value={localRestartButtonText} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder="Reiniciar Aventura" />
+                                            <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.restartButtonText')}</label>
+                                            <input type="text" id="restartButtonText" value={localRestartButtonText} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.restartButtonPlaceholder')} />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className="pt-6 border-t border-border">
-                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">Botões de Navegação</h3>
+                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">{t('UIEditor.textos.navigationButtons')}</h3>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
                                         <div className="space-y-2">
-                                            <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Sugestões</label>
+                                            <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.suggestionsButton')}</label>
                                             <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Inventário</label>
+                                            <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.inventoryButton')}</label>
                                             <input type="text" id="inventoryButtonText" value={localInventoryButtonText} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Diário</label>
+                                            <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.diaryButton')}</label>
                                             <input type="text" id="diaryButtonText" value={localDiaryButtonText} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="trackersButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Rastreadores</label>
-                                            <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder="Rastreadores" disabled={localGameSystemEnabled !== 'trackers'} />
+                                            <label htmlFor="trackersButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.trackersButton')}</label>
+                                            <input type="text" id="trackersButtonText" value={localTrackersButtonText} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.trackersPlaceholder')} disabled={localGameSystemEnabled !== 'trackers'} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="systemButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Sistema</label>
-                                            <input type="text" id="systemButtonText" value={localSystemButtonText} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder="Sistema" />
+                                            <label htmlFor="systemButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.systemButton')}</label>
+                                            <input type="text" id="systemButtonText" value={localSystemButtonText} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.systemPlaceholder')} />
                                         </div>
                                         <div className="space-y-2">
-                                            <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">Botão Menu Principal</label>
-                                            <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder="Menu Principal" />
+                                            <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.mainMenuButton')}</label>
+                                            <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.mainMenuPlaceholder')} />
                                         </div>
                                     </div>
                                 </div>
@@ -1703,7 +1706,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <LayoutTemplate className="w-4 h-4 text-muted-foreground" /> ESTRUTURA
+                                                <LayoutTemplate className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.structure')}
                                             </h3>
                                             {activeSections.estrutura ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
@@ -1711,22 +1714,22 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         {activeSections.estrutura && (
                                             <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Orientação</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.orientation')}</label>
                                                     <div className="relative">
                                                         <select
                                                             value={localLayoutOrientation}
                                                             onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
                                                             className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
                                                         >
-                                                            <option value="vertical">Vertical</option>
-                                                            <option value="horizontal">Horizontal</option>
+                                                            <option value="vertical">{t('UIEditor.layout.vertical')}</option>
+                                                            <option value="horizontal">{t('UIEditor.layout.horizontal')}</option>
                                                         </select>
                                                         <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                                                     </div>
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Posição da Imagem</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.imagePosition')}</label>
                                                     <div className="relative">
                                                         <select
                                                             value={localLayoutOrder}
@@ -1735,13 +1738,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         >
                                                             {localLayoutOrientation === 'vertical' ? (
                                                                 <>
-                                                                    <option value="image-first">Esquerda</option>
-                                                                    <option value="image-last">Direita</option>
+                                                                    <option value="image-first">{t('UIEditor.layout.posLeft')}</option>
+                                                                    <option value="image-last">{t('UIEditor.layout.posRight')}</option>
                                                                 </>
                                                             ) : (
                                                                 <>
-                                                                    <option value="image-first">Acima do Texto</option>
-                                                                    <option value="image-last">Abaixo do Texto</option>
+                                                                    <option value="image-first">{t('UIEditor.layout.posAbove')}</option>
+                                                                    <option value="image-last">{t('UIEditor.layout.posBelow')}</option>
                                                                 </>
                                                             )}
                                                         </select>
@@ -1750,17 +1753,17 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Tipo de Moldura</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.frameType')}</label>
                                                     <div className="relative">
                                                         <select
                                                             value={localImageFrame}
                                                             onChange={(e) => setLocalImageFrame(e.target.value as any)}
                                                             className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
                                                         >
-                                                            <option value="none">Sem moldura</option>
-                                                            <option value="rounded-top">Portal</option>
-                                                            <option value="book-cover">Quadrada</option>
-                                                            <option value="trading-card">Arredondada</option>
+                                                            <option value="none">{t('UIEditor.layout.frameNone')}</option>
+                                                            <option value="rounded-top">{t('UIEditor.layout.framePortal')}</option>
+                                                            <option value="book-cover">{t('UIEditor.layout.frameSquare')}</option>
+                                                            <option value="trading-card">{t('UIEditor.layout.frameRounded')}</option>
                                                         </select>
                                                         <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                                                     </div>
@@ -1776,7 +1779,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <Palette className="w-4 h-4 text-muted-foreground" /> ESTILO & TEMA
+                                                <Palette className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.styleTheme')}
                                             </h3>
                                             {activeSections.estilo ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
@@ -1796,13 +1799,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             onClick={() => handleThemeChange('light')}
                                                             className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'light' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                                         >
-                                                            Claro
+                                                            {t('UIEditor.aparencia.light')}
                                                         </button>
                                                     </div>
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Temas Predefinidos</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.predefinedThemes')}</label>
                                                     <div className="grid grid-cols-3 gap-2">
                                                         {PREDEFINED_THEMES.map((theme) => (
                                                             <button
@@ -1825,44 +1828,44 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         onClick={() => toggleSection('cores')}
                                                         className="flex items-center justify-between w-full text-left bg-muted/30 p-3 rounded-lg hover:bg-muted/50 transition-all"
                                                     >
-                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Personalização de Cores</span>
+                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.aparencia.colorCustom')}</span>
                                                         {activeSections.cores ? <ChevronUp className="w-3 h-3 text-muted-foreground" /> : <ChevronDown className="w-3 h-3 text-muted-foreground" />}
                                                     </button>
                                                     {activeSections.cores && (
                                                         <div className="mt-3 space-y-6 animate-in fade-in slide-in-from-top-1 px-1">
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">Descrição de Cena</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.sceneDesc')}</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label="Texto Padrão" id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label="Título / Destaque" id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
-                                                                    <ColorInput label="Destaque (Foco)" id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label="Seta Indicação" id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.defaultText')} id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.titleHighlight')} id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.focusHighlight')} id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.indicatorArrow')} id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
                                                                 </div>
                                                             </div>
 
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">Botões da interface</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.uiButtons')}</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label="Botão de Início" id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label="Texto Botão de Início" id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label="Botão Início (Hover)" id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label="Botão de Ação" id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label="Texto Botão de Ação" id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.splashButton')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.splashButtonText')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.splashButtonHover')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.actionButton')} id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.actionButtonText')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
                                                                 </div>
                                                             </div>
 
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">Box de Nome da Cena</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.sceneNameBox')}</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label="Cor de fundo" id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
-                                                                    <ColorInput label="Texto" id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.bgColor')} id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.text')} id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
                                                                 </div>
                                                             </div>
 
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">Outros</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.others')}</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label="Fundo Principal" id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#000000" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.mainBg')} id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#000000" />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1879,7 +1882,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <Type className="w-4 h-4 text-muted-foreground" /> FONTES & TEXTO
+                                                <Type className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.fontsText')}
                                             </h3>
                                             {activeSections.texto ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
@@ -1887,7 +1890,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         {activeSections.texto && (
                                             <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Botão de Ação</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.actionButton')}</label>
                                                     <input
                                                         type="text"
                                                         value={localActionButtonText}
@@ -1896,7 +1899,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Input do jogador</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.playerInput')}</label>
                                                     <input
                                                         type="text"
                                                         value={localVerbInputPlaceholder}
@@ -1906,7 +1909,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 </div>
                                                 <div className="grid grid-cols-2 gap-4">
                                                     <div className="space-y-2">
-                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Fonte</label>
+                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.font')}</label>
                                                         <div className="relative">
                                                             <select
                                                                 value={localFontFamily}
@@ -1921,16 +1924,16 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         </div>
                                                     </div>
                                                     <div className="space-y-2">
-                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Tamanho</label>
+                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.size')}</label>
                                                         <div className="relative">
                                                             <select
                                                                 value={localGameFontSize}
                                                                 onChange={(e) => setLocalGameFontSize(e.target.value)}
                                                                 className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
                                                             >
-                                                                <option value="12">Pequeno</option>
-                                                                <option value="14">Médio</option>
-                                                                <option value="16">Grande</option>
+                                                                <option value="12">{t('UIEditor.aparencia.sizeSmall')}</option>
+                                                                <option value="14">{t('UIEditor.aparencia.sizeMedium')}</option>
+                                                                <option value="16">{t('UIEditor.aparencia.sizeLarge')}</option>
                                                             </select>
                                                             <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                                                         </div>
@@ -2010,7 +2013,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                             className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest"
                                                                             style={{ backgroundColor: localGameSceneNameOverlayBg, color: localGameSceneNameOverlayTextColor }}
                                                                         >
-                                                                            Nome da Cena
+                                                                            {t('UIEditor.aparencia.sceneName')}
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -2023,10 +2026,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 {/* Text Area */}
                                                 <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
                                                     <p className="leading-relaxed" style={{ color: localTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize }}>
-                                                        Esta é uma descrição de exemplo para a cena. O texto flui conforme as <span style={{ color: localTitleColor, fontWeight: 'bold' }}>CONFIGURAÇÕES</span> escolhidas.
+                                                        {t('UIEditor.aparencia.sampleDesc1')} <span style={{ color: localTitleColor, fontWeight: 'bold' }}>{t('UIEditor.aparencia.sampleDescHighlight')}</span> {t('UIEditor.aparencia.sampleDesc2')}
                                                     </p>
                                                     <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: '0.85em' }}>
-                                                        {'>'} COMANDO DE EXEMPLO
+                                                        {'>'} {t('UIEditor.aparencia.sampleCommand')}
                                                     </p>
                                                 </div>
                                             </div>
@@ -2042,14 +2045,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
                                                         style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}
                                                     >
-                                                        {localActionButtonText || 'AÇÃO'}
+                                                        {localActionButtonText || t('UIEditor.aparencia.action')}
                                                     </button>
                                                 </div>
                                                 <button
                                                     className="w-full h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center transition-colors hover:opacity-90 truncate"
                                                     style={{ backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}
                                                 >
-                                                    {localSplashButtonText || 'BOTÃO DE INÍCIO'}
+                                                    {localSplashButtonText || t('UIEditor.aparencia.homeButton')}
                                                 </button>
                                             </div>
                                         </div>

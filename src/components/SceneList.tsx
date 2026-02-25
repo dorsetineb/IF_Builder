@@ -3,6 +3,7 @@ import { Scene } from '../types';
 import { Plus, Trash2, Menu, Play, ArrowRight, Flag, Search } from 'lucide-react';
 import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { useTranslation } from 'react-i18next';
 
 interface SceneListProps {
   scenes: Scene[];
@@ -27,6 +28,7 @@ const SceneList: React.FC<SceneListProps> = ({
   isDirty,
   theme = 'dark',
 }) => {
+  const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
   const listRef = useRef<List | null>(null);
 
@@ -132,7 +134,7 @@ const SceneList: React.FC<SceneListProps> = ({
                       : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
                     : 'bg-primary text-primary-foreground border-primary/50' // Inactive Start
                     }`}>
-                    Início
+                    {t('sceneList.start', 'Início')}
                   </span>
                 )}
               </div>
@@ -143,7 +145,7 @@ const SceneList: React.FC<SceneListProps> = ({
             <button
               onClick={(e) => { e.stopPropagation(); onDeleteScene(scene.id); }}
               className="absolute top-0 right-0 h-full w-12 flex items-center justify-center bg-red-500 text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer"
-              title="Deletar cena"
+              title={t('sceneList.deleteScene', 'Deletar cena')}
             >
               <Trash2 className="w-5 h-5 pointer-events-none" />
             </button>
@@ -160,7 +162,7 @@ const SceneList: React.FC<SceneListProps> = ({
         <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
           type="text"
-          placeholder="Buscar cenas..."
+          placeholder={t('sceneList.search', 'Buscar cenas...')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-8 pr-2 py-1.5 text-xs rounded-md bg-input border border-border focus:outline-none focus:ring-1 focus:ring-primary"
@@ -206,7 +208,7 @@ const SceneList: React.FC<SceneListProps> = ({
                   style={{ marginTop: '4px' }} // Ensure gap matches item gap
                 >
                   <Plus className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
-                  Adicionar Cena
+                  {t('sceneList.addScene', 'Adicionar Cena')}
                 </button>
               </div>
             );

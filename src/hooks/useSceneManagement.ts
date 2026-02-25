@@ -2,6 +2,7 @@
 import React, { useCallback } from 'react';
 import { GameData, Scene, Vignette, View } from '../types';
 import { generateUniqueId } from '../utils/helpers';
+import { useTranslation } from 'react-i18next';
 
 interface UseSceneManagementProps {
     gameData: GameData;
@@ -26,6 +27,7 @@ export const useSceneManagement = ({
     closeConfirmationModal,
     setConfirmationModal
 }: UseSceneManagementProps) => {
+    const { t } = useTranslation();
 
     const handleAddScene = useCallback(() => {
         const newId = generateUniqueId('scn', Object.keys(gameData.scenes));
@@ -79,7 +81,11 @@ export const useSceneManagement = ({
 
     const handleDeleteScene = useCallback((id: string) => {
         if (id === gameData.startScene && Object.keys(gameData.scenes).length > 1) {
-            toast("Ação não permitida", "Você não pode deletar a cena inicial. Defina outra cena como inicial antes de excluir esta.", "error");
+            toast(
+                t('editor.actionNotAllowed', 'Ação não permitida'),
+                t('editor.deleteStartSceneError', 'Você não pode deletar a cena inicial. Defina outra cena como inicial antes de excluir esta.'),
+                "error"
+            );
             return;
         }
 
@@ -118,7 +124,11 @@ export const useSceneManagement = ({
                 setSelectedSceneId(newSceneId);
             }
             setIsDirty(true);
-            toast("Cena deletada", "A cena foi removida com sucesso.", "success");
+            toast(
+                t('editor.sceneDeletedTitle', 'Cena deletada'),
+                t('editor.sceneDeletedDesc', 'A cena foi removida com sucesso.'),
+                "success"
+            );
             closeConfirmationModal();
         };
 
@@ -130,7 +140,7 @@ export const useSceneManagement = ({
             onConfirm: proceedWithDelete,
             onCancel: closeConfirmationModal
         });
-    }, [gameData.startScene, gameData.scenes, gameData.sceneOrder, selectedSceneId, toast, closeConfirmationModal, setConfirmationModal, setGameData, setIsDirty, setSelectedSceneId]);
+    }, [gameData.startScene, gameData.scenes, gameData.sceneOrder, selectedSceneId, toast, closeConfirmationModal, setConfirmationModal, setGameData, setIsDirty, setSelectedSceneId, t]);
 
     const handleUpdateScene = useCallback((updatedScene: Scene) => {
         setGameData(prev => ({
@@ -177,8 +187,12 @@ export const useSceneManagement = ({
             vignettes: [...(prev.vignettes || []), newVignette]
         }));
         setIsDirty(true);
-        toast("Vinheta Criada", "Nova vinheta criada com sucesso.", "success");
-    }, [setGameData, setIsDirty, toast]);
+        toast(
+            t('editor.vignetteCreatedTitle', 'Vinheta Criada'),
+            t('editor.vignetteCreatedDesc', 'Nova vinheta criada com sucesso.'),
+            "success"
+        );
+    }, [setGameData, setIsDirty, toast, t]);
 
     const handleReorderScenes = useCallback((newSceneIds: string[]) => {
         setGameData(prev => ({ ...prev, sceneOrder: newSceneIds }));

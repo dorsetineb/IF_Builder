@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { LogIn, UserPlus, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle2, User, MapPin, Eye, EyeOff, ArrowLeft, KeyRound, Gamepad2, Info, X, Activity, Minus, Square } from 'lucide-react';
 import { DitherShader } from '@/components/ui/dither-shader';
+import { useTranslation } from 'react-i18next';
 
 interface AuthProps {
     isRecoveryMode?: boolean;
@@ -10,22 +11,23 @@ interface AuthProps {
 
 type LandingView = 'landing' | 'login' | 'register' | 'about' | 'play';
 
-const translateAuthError = (originalMessage: string): string => {
+const translateAuthError = (originalMessage: string, t: any): string => {
     // Exact matches
-    if (originalMessage === 'User already registered') return 'Este usuário já está cadastrado.';
-    if (originalMessage === 'Invalid login credentials') return 'E-mail ou senha incorretos.';
-    if (originalMessage === 'New password should be different from the old password.') return 'A nova senha deve ser diferente da anterior.';
-    if (originalMessage === 'Failed to fetch') return 'Falha na conexão. Verifique sua internet.';
+    if (originalMessage === 'User already registered') return t('auth.errors.alreadyRegistered', 'Este usuário já está cadastrado.');
+    if (originalMessage === 'Invalid login credentials') return t('auth.errors.invalidCredentials', 'E-mail ou senha incorretos.');
+    if (originalMessage === 'New password should be different from the old password.') return t('auth.errors.newPasswordSameAsOld', 'A nova senha deve ser diferente da anterior.');
+    if (originalMessage === 'Failed to fetch') return t('auth.errors.failedToFetch', 'Falha na conexão. Verifique sua internet.');
 
     // Partial matches
-    if (originalMessage?.includes('security purposes')) return 'Por segurança, aguarde alguns segundos antes de tentar novamente.';
-    if (originalMessage?.includes('rate limit')) return 'Muitas tentativas. Aguarde um momento.';
-    if (originalMessage?.includes('Password should be at least')) return 'A senha deve ter pelo menos 6 caracteres.';
+    if (originalMessage?.includes('security purposes')) return t('auth.errors.securityPurposes', 'Por segurança, aguarde alguns segundos antes de tentar novamente.');
+    if (originalMessage?.includes('rate limit')) return t('auth.errors.rateLimit', 'Muitas tentativas. Aguarde um momento.');
+    if (originalMessage?.includes('Password should be at least')) return t('auth.errors.passwordLength', 'A senha deve ter pelo menos 6 caracteres.');
 
-    return originalMessage || 'Ocorreu um erro desconhecido.';
+    return originalMessage || t('auth.errors.unknown', 'Ocorreu um erro desconhecido.');
 };
 
 export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) {
+    const { t } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [isForgotPassword, setIsForgotPassword] = useState(false);
@@ -83,9 +85,9 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                 redirectTo: `${window.location.origin}`,
             });
             if (error) throw error;
-            setMessage('E-mail de recuperação enviado! Verifique sua caixa de entrada.');
+            setMessage(t('auth.messages.recoveryEmailSent', 'E-mail de recuperação enviado! Verifique sua caixa de entrada.'));
         } catch (err: any) {
-            setError(translateAuthError(err.message));
+            setError(translateAuthError(err.message, t));
         } finally {
             setLoading(false);
         }
@@ -100,28 +102,28 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
         try {
             if (password !== confirmPassword) {
-                throw new Error('As senhas não coincidem.');
+                throw new Error(t('auth.errors.passwordsDoNotMatch', 'As senhas não coincidem.'));
             }
             if (password.length < 6) {
-                throw new Error('A senha deve ter pelo menos 6 caracteres.');
+                throw new Error(t('auth.errors.passwordLength', 'A senha deve ter pelo menos 6 caracteres.'));
             }
 
             // Ensure we have a valid session before updating password
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) {
-                throw new Error('Sessão expirada. Por favor, solicite um novo link de recuperação.');
+                throw new Error(t('auth.errors.sessionExpired', 'Sessão expirada. Por favor, solicite um novo link de recuperação.'));
             }
 
             const { error } = await supabase.auth.updateUser({ password });
             if (error) throw error;
 
-            setMessage('Senha redefinida com sucesso! Redirecionando...');
+            setMessage(t('auth.messages.passwordResetSuccess', 'Senha redefinida com sucesso! Redirecionando...'));
             setTimeout(() => {
                 if (onRecoveryComplete) onRecoveryComplete();
                 window.location.href = window.location.origin;
             }, 2000);
         } catch (err: any) {
-            setError(translateAuthError(err.message));
+            setError(translateAuthError(err.message, t));
         } finally {
             setLoading(false);
         }
@@ -139,10 +141,10 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             if (isSignUp) {
                 // Validation
                 if (password !== confirmPassword) {
-                    throw new Error("As senhas não coincidem.");
+                    throw new Error(t('auth.errors.passwordsDoNotMatch', 'As senhas não coincidem.'));
                 }
                 if (fullName.length < 3) {
-                    throw new Error("Por favor, insira seu nome e sobrenome.");
+                    throw new Error(t('auth.errors.insertFullName', 'Por favor, insira seu nome e sobrenome.'));
                 }
 
                 // Sign Up via Supabase Auth
@@ -163,7 +165,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                 });
 
                 if (error) throw error;
-                setMessage('Conta criada com sucesso! Verifique seu e-mail para confirmar.');
+                setMessage(t('auth.messages.accountCreated', 'Conta criada com sucesso! Verifique seu e-mail para confirmar.'));
             } else {
                 // Login
                 const { error } = await supabase.auth.signInWithPassword({
@@ -174,7 +176,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             }
         } catch (err: any) {
             console.error('Auth error:', err);
-            setError(translateAuthError(err.message));
+            setError(translateAuthError(err.message, t));
         } finally {
             setLoading(false);
         }
@@ -203,9 +205,9 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             <div className="flex-1 flex flex-col justify-center w-full px-6 space-y-12">
                 {/* Tagline */}
                 <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1">
-                    <p>Em uma caverna escura.</p>
-                    <p>Monitores CRT iluminam o mofo.</p>
-                    <p className="text-purple-400 font-bold mt-2">&gt; O QUE VOCÊ FAZ?</p>
+                    <p>{t('auth.sidebar.line1', 'Em uma caverna escura.')}</p>
+                    <p>{t('auth.sidebar.line2', 'Monitores CRT iluminam o mofo.')}</p>
+                    <p className="text-purple-400 font-bold mt-2">&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
                 </div>
 
                 {/* Navigation Buttons */}
@@ -232,7 +234,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                             }}
                         />
                         <LogIn size={18} className="group-hover:translate-x-1 transition-transform relative z-10" />
-                        <span className="uppercase tracking-wider relative z-10">Acessar</span>
+                        <span className="uppercase tracking-wider relative z-10">{t('auth.sidebar.access', 'Acessar')}</span>
                     </button>
 
                     {/* Criar Conta - Secondary */}
@@ -257,13 +259,13 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                             }}
                         />
                         <UserPlus size={18} className="group-hover:translate-x-1 transition-transform relative z-10" />
-                        <span className="uppercase tracking-wider relative z-10">Criar Conta</span>
+                        <span className="uppercase tracking-wider relative z-10">{t('auth.sidebar.createAccount', 'Criar Conta')}</span>
                     </button>
 
                     {/* Secret Hint Text */}
                     <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1 pt-8 opacity-50">
-                        <p>Algo pode acontecer,</p>
-                        <p>Se você clicar nos computadores.</p>
+                        <p>{t('auth.sidebar.hint1', 'Algo pode acontecer,')}</p>
+                        <p>{t('auth.sidebar.hint2', 'Se você clicar nos computadores.')}</p>
                     </div>
 
                     {/* Jogar Button removed (Secret Trigger now) */}
@@ -298,9 +300,9 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                         <div className="space-y-1 text-center">
                             <h1 className="text-xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
                                 {isSignUp ? (
-                                    <><UserPlus className="w-5 h-5 text-purple-400" /> Criar Conta</>
+                                    <><UserPlus className="w-5 h-5 text-purple-400" /> {t('auth.form.createAccountTitle', 'Criar Conta')}</>
                                 ) : (
-                                    <><LogIn className="w-5 h-5 text-purple-400" /> Acessar IF Builder</>
+                                    <><LogIn className="w-5 h-5 text-purple-400" /> {t('auth.form.loginTitle', 'Acessar IF Builder')}</>
                                 )}
                             </h1>
                         </div>
@@ -312,17 +314,17 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                             {message ? (
                                 <div className="flex flex-col items-center gap-2 p-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 rounded-lg text-sm text-center">
                                     <CheckCircle2 className="w-6 h-6" />
-                                    <p>E-mail de recuperação enviado!<br />Verifique sua caixa de entrada.</p>
+                                    <p>{t('auth.messages.recoveryEmailSentDetail1', 'E-mail de recuperação enviado!')}<br />{t('auth.messages.recoveryEmailSentDetail2', 'Verifique sua caixa de entrada.')}</p>
                                 </div>
                             ) : (
                                 <form onSubmit={handleForgotPassword} className="space-y-4">
                                     <div className="space-y-2">
-                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">E-mail</label>
+                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">{t('auth.form.email', 'E-mail')}</label>
                                         <div className="relative">
                                             <Mail className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                                             <input
                                                 type="email"
-                                                placeholder="seu@email.com"
+                                                placeholder={t('auth.form.emailPlaceholder', 'seu@email.com')}
                                                 value={email}
                                                 onChange={(e) => setEmail(e.target.value)}
                                                 className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
@@ -336,7 +338,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                         className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-white/5"
                                         disabled={loading}
                                     >
-                                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Enviar Link <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
+                                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{t('auth.form.sendLink', 'Enviar Link')} <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
                                     </button>
                                 </form>
                             )}
@@ -346,7 +348,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                 onClick={() => { setIsForgotPassword(false); setError(null); setMessage(null); }}
                                 className="w-full text-zinc-500 hover:text-white py-2 transition-colors text-xs flex items-center justify-center gap-1"
                             >
-                                <ArrowLeft size={12} /> Voltar para o login
+                                <ArrowLeft size={12} /> {t('auth.form.backToLogin', 'Voltar para o login')}
                             </button>
                         </div>
                     )}
@@ -357,12 +359,12 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                             <div className="animate-in fade-in slide-in-from-right-4 duration-300 space-y-4">
                                 {isSignUp && (
                                     <div className="space-y-2">
-                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Nome e Sobrenome</label>
+                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">{t('auth.form.fullName', 'Nome e Sobrenome')}</label>
                                         <div className="relative">
                                             <User className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                                             <input
                                                 type="text"
-                                                placeholder="Ex: João Silva"
+                                                placeholder={t('auth.form.fullNamePlaceholder', 'Ex: João Silva')}
                                                 value={fullName}
                                                 onChange={(e) => setFullName(e.target.value)}
                                                 className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
@@ -373,12 +375,12 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                 )}
 
                                 <div className="space-y-2">
-                                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">E-mail</label>
+                                    <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">{t('auth.form.email', 'E-mail')}</label>
                                     <div className="relative">
                                         <Mail className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                                         <input
                                             type="email"
-                                            placeholder="seu@email.com"
+                                            placeholder={t('auth.form.emailPlaceholder', 'seu@email.com')}
                                             value={email}
                                             onChange={(e) => setEmail(e.target.value)}
                                             className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
@@ -389,12 +391,12 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
                                 {isSignUp && (
                                     <div className="space-y-2">
-                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Local (Opcional)</label>
+                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">{t('auth.form.location', 'Local (Opcional)')}</label>
                                         <div className="relative">
                                             <MapPin className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                                             <input
                                                 type="text"
-                                                placeholder="Ex: São Paulo, SP"
+                                                placeholder={t('auth.form.locationPlaceholder', 'Ex: São Paulo, SP')}
                                                 value={location}
                                                 onChange={(e) => setLocation(e.target.value)}
                                                 className="w-full pl-10 pr-4 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
@@ -405,12 +407,12 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
 
                                 {!isSignUp ? (
                                     <div className="space-y-2">
-                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Senha</label>
+                                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">{t('auth.form.password', 'Senha')}</label>
                                         <div className="relative">
                                             <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                                             <input
                                                 type={showPassword ? "text" : "password"}
-                                                placeholder="Sua senha"
+                                                placeholder={t('auth.form.passwordPlaceholder', 'Sua senha')}
                                                 value={password}
                                                 onChange={(e) => setPassword(e.target.value)}
                                                 className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
@@ -428,12 +430,12 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                 ) : (
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="space-y-2">
-                                            <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Senha</label>
+                                            <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">{t('auth.form.password', 'Senha')}</label>
                                             <div className="relative">
                                                 <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                                                 <input
                                                     type={showPassword ? "text" : "password"}
-                                                    placeholder="Mínimo de 6"
+                                                    placeholder={t('auth.form.passwordMinLength', 'Mínimo de 6')}
                                                     value={password}
                                                     onChange={(e) => setPassword(e.target.value)}
                                                     className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
@@ -450,12 +452,12 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                         </div>
 
                                         <div className="space-y-2">
-                                            <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Confirmar</label>
+                                            <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">{t('auth.form.confirmPassword', 'Confirmar')}</label>
                                             <div className="relative">
                                                 <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                                                 <input
                                                     type={showConfirmPassword ? "text" : "password"}
-                                                    placeholder="Repita senha"
+                                                    placeholder={t('auth.form.confirmPasswordPlaceholder', 'Repita senha')}
                                                     value={confirmPassword}
                                                     onChange={(e) => setConfirmPassword(e.target.value)}
                                                     className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
@@ -478,7 +480,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                     className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed mt-2 shadow-xl shadow-white/5"
                                     disabled={loading}
                                 >
-                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{isSignUp ? 'Criar Conta' : 'Entrar'} <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
+                                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{isSignUp ? t('auth.form.createAccountBtn', 'Criar Conta') : t('auth.form.loginBtn', 'Entrar')} <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
                                 </button>
                             </div>
 
@@ -489,7 +491,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                                     onClick={() => { setIsForgotPassword(true); setError(null); setMessage(null); }}
                                     className="w-full text-zinc-500 hover:text-purple-400 py-1 transition-colors text-xs text-center"
                                 >
-                                    Esqueceu sua senha?
+                                    {t('auth.form.forgotPassword', 'Esqueceu sua senha?')}
                                 </button>
                             )}
                         </form>
@@ -512,12 +514,12 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                     {/* Toggle Login/Sign Up */}
                     <div className="pt-4 border-t border-zinc-800/50">
                         <p className="text-xs text-zinc-500 text-center">
-                            {isSignUp ? 'Já tem uma conta?' : 'Ainda não tem conta?'}
+                            {isSignUp ? t('auth.form.alreadyHaveAccount', 'Já tem uma conta?') : t('auth.form.dontHaveAccount', 'Ainda não tem conta?')}
                             <button
                                 onClick={() => { setCurrentView(isSignUp ? 'login' : 'register'); setError(null); setMessage(null); }}
                                 className="ml-1 text-white hover:text-purple-400 underline underline-offset-4 transition-colors font-medium"
                             >
-                                {isSignUp ? 'Fazer login' : 'Cadastre-se'}
+                                {isSignUp ? t('auth.form.toggleLogin', 'Fazer login') : t('auth.form.toggleRegister', 'Cadastre-se')}
                             </button>
                         </p>
                     </div>
@@ -539,17 +541,17 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                 <div className="flex items-center justify-center mb-6">
                     <div className="space-y-1 text-center">
                         <h2 className="text-xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
-                            <Activity className="w-5 h-5 text-purple-400" /> Sobre o IF Builder
+                            <Activity className="w-5 h-5 text-purple-400" /> {t('auth.about.title', 'Sobre o IF Builder')}
                         </h2>
                     </div>
                 </div>
 
                 <div className="space-y-4 text-zinc-400 leading-relaxed text-sm">
                     <p>
-                        Crie cenas, objetos e defina as interações que avançam a sua ficção interativa.
+                        {t('auth.about.p1', 'Crie cenas, objetos e defina as interações que avançam a sua ficção interativa.')}
                     </p>
                     <p>
-                        Todas as ficções interativas criadas aqui são exportadas em um arquivo .zip. Ele não precisa de internet nem do editor para funcionar - apenas um navegador. Pense nesse arquivo como um pendrive: você pode guardá-lo em uma gaveta, ou entregá-lo a alguém.
+                        {t('auth.about.p2', 'Todas as ficções interativas criadas aqui são exportadas em um arquivo .zip. Ele não precisa de internet nem do editor para funcionar - apenas um navegador. Pense nesse arquivo como um pendrive: você pode guardá-lo em uma gaveta, ou entregá-lo a alguém.')}
                     </p>
 
                 </div>
@@ -622,19 +624,19 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
             <div className="p-8 space-y-6">
                 <div className="space-y-2 text-center">
                     <h1 className="text-2xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
-                        <KeyRound className="w-6 h-6 text-purple-400" /> Redefinir Senha
+                        <KeyRound className="w-6 h-6 text-purple-400" /> {t('auth.recovery.title', 'Redefinir Senha')}
                     </h1>
-                    <p className="text-zinc-400 text-sm">Digite sua nova senha abaixo.</p>
+                    <p className="text-zinc-400 text-sm">{t('auth.recovery.subtitle', 'Digite sua nova senha abaixo.')}</p>
                 </div>
 
                 <form onSubmit={handleResetPassword} className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
                     <div className="space-y-2">
-                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Nova Senha</label>
+                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">{t('auth.form.newPassword', 'Nova Senha')}</label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                             <input
                                 type={showPassword ? "text" : "password"}
-                                placeholder="Mínimo 6 caracteres"
+                                placeholder={t('auth.form.min6Chars', 'Mínimo 6 caracteres')}
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
@@ -651,12 +653,12 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                     </div>
 
                     <div className="space-y-2">
-                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">Confirmar Nova Senha</label>
+                        <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider px-1">{t('auth.form.confirmNewPassword', 'Confirmar Nova Senha')}</label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-500" />
                             <input
                                 type={showConfirmPassword ? "text" : "password"}
-                                placeholder="Repita a senha"
+                                placeholder={t('auth.form.repeatPassword', 'Repita a senha')}
                                 value={confirmPassword}
                                 onChange={(e) => setConfirmPassword(e.target.value)}
                                 className="w-full pl-10 pr-10 py-2.5 bg-zinc-950/50 border border-muted-foreground/50 rounded-lg text-white placeholder:text-zinc-600 focus:outline-none focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500/40 transition-all text-sm"
@@ -677,7 +679,7 @@ export function Auth({ isRecoveryMode = false, onRecoveryComplete }: AuthProps) 
                         className="w-full bg-white text-black hover:bg-zinc-200 py-3 rounded-lg transition-all flex items-center justify-center gap-2 group font-semibold text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-xl shadow-white/5"
                         disabled={loading}
                     >
-                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Redefinir Senha <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
+                        {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>{t('auth.recovery.submitBtn', 'Redefinir Senha')} <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" /></>}
                     </button>
                 </form>
 

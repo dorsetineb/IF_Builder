@@ -9,6 +9,7 @@ import ObjectEditor from './ObjectEditor';
 import InteractionEditor from './InteractionEditor';
 import BranchingPreview from './BranchingPreview';
 import { Upload, Eye, Trash2, Plus, ArrowRight, Music, Image as ImageIcon, Flag, FileText, Scroll, GitBranch, Play, Copy, RotateCcw, Save } from 'lucide-react';
+import { useTranslation, Trans } from 'react-i18next';
 import RainOverlay from './effects/RainOverlay';
 import BlurOverlay from './effects/BlurOverlay';
 import ChromaticOverlay from './effects/ChromaticOverlay';
@@ -85,6 +86,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
     gameSystemEnabled,
 }) => {
     const { toast } = useToast();
+    const { t } = useTranslation();
     const [localScene, setLocalScene] = useState<Scene>(() => getCleanSceneState(scene));
     const [pendingObjectUpdates, setPendingObjectUpdates] = useState<{ [id: string]: Partial<GameObject> }>({});
     const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions' | 'choices'>('properties');
@@ -209,7 +211,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             if (file.size > MAX_IMAGE_SIZE) {
-                toast("Erro no Upload", `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024} MB.`, "error");
+                toast(
+                    t('editor.uploadErrorTitle', 'Erro no Upload'),
+                    t('editor.imageLimitExceeded', { limit: MAX_IMAGE_SIZE / 1024 / 1024, defaultValue: `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024} MB.` }),
+                    "error"
+                );
                 if (e.target) (e.target as HTMLInputElement).value = '';
                 return;
             }
@@ -231,7 +237,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
             if (file.size > MAX_AUDIO_SIZE) {
-                toast("Erro no Upload", `O áudio excede o limite de ${MAX_AUDIO_SIZE / 1024 / 1024} MB.`, "error");
+                toast(
+                    t('editor.uploadErrorTitle', 'Erro no Upload'),
+                    t('editor.audioLimitExceeded', { limit: MAX_AUDIO_SIZE / 1024 / 1024, defaultValue: `O áudio excede o limite de ${MAX_AUDIO_SIZE / 1024 / 1024} MB.` }),
+                    "error"
+                );
                 if (e.target) (e.target as HTMLInputElement).value = '';
                 return;
             }
@@ -256,7 +266,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
         if (e.dataTransfer.files && e.dataTransfer.files[0]) {
             const file = e.dataTransfer.files[0];
             if (file.size > MAX_IMAGE_SIZE) {
-                toast("Erro no Upload", `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024} MB.`, "error");
+                toast(
+                    t('editor.uploadErrorTitle', 'Erro no Upload'),
+                    t('editor.imageLimitExceeded', { limit: MAX_IMAGE_SIZE / 1024 / 1024, defaultValue: `A imagem excede o limite de ${MAX_IMAGE_SIZE / 1024 / 1024} MB.` }),
+                    "error"
+                );
                 return;
             }
             const event = { target: { files: e.dataTransfer.files } } as unknown as React.ChangeEvent<HTMLInputElement>;
@@ -296,16 +310,16 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
     const TABS = useMemo(() => {
         if (gameInteractionType === 'choice') {
             return {
-                properties: 'Propriedades',
-                choices: 'Decisões',
+                properties: t('sceneEditor.tabs.properties'),
+                choices: t('sceneEditor.tabs.choices'),
             };
         }
         return {
-            properties: 'Propriedades',
-            objects: 'Objetos',
-            interactions: 'Interações',
+            properties: t('sceneEditor.tabs.properties'),
+            objects: t('sceneEditor.tabs.objects'),
+            interactions: t('sceneEditor.tabs.interactions'),
         };
-    }, [gameInteractionType]);
+    }, [gameInteractionType, t]);
 
     const isAnyCheckboxChecked = !!localScene.isEndingScene || !!localScene.removesChanceOnEntry || !!localScene.restoresChanceOnEntry;
 
@@ -313,42 +327,42 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
         <div className="space-y-6">
             <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-border">
                 <p className="text-muted-foreground text-xs font-medium max-w-lg">
-                    Defina a imagem, descrição, objetos e interações para esta cena.
+                    {t('sceneEditor.headerDesc')}
                 </p>
                 <div className="flex items-center gap-2">
                     {isDirty && (
                         <div className="flex items-center gap-1 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-1">
                             <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            <span className="hidden sm:inline">Alterações não salvas</span>
+                            <span className="hidden sm:inline">{t('sceneEditor.unsavedChanges')}</span>
                         </div>
                     )}
 
                     <button
                         onClick={handlePreview}
                         className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 rounded-lg"
-                        title="Testar apenas esta cena"
+                        title={t('sceneEditor.testTooltip')}
                     >
                         <Eye className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">Testar</span>
+                        <span className="hidden sm:inline">{t('sceneEditor.testBtn')}</span>
                     </button>
 
                     <button
                         onClick={() => onCopyScene(localScene)}
                         className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors hover:bg-zinc-800 rounded-lg"
-                        title="Copiar Cena"
+                        title={t('sceneEditor.copyTooltip')}
                     >
                         <Copy className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">Copiar</span>
+                        <span className="hidden sm:inline">{t('sceneEditor.copyBtn')}</span>
                     </button>
 
                     <button
                         onClick={handleUndo}
                         disabled={!isDirty}
                         className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors hover:bg-zinc-800 rounded-lg"
-                        title="Desfazer alterações"
+                        title={t('sceneEditor.undoTooltip')}
                     >
                         <RotateCcw className="w-3.5 h-3.5" />
-                        <span className="hidden sm:inline">Desfazer</span>
+                        <span className="hidden sm:inline">{t('sceneEditor.undoBtn')}</span>
                     </button>
 
                     <button
@@ -357,7 +371,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                         className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
                     >
                         <Save className="w-3.5 h-3.5" />
-                        <span>Salvar</span>
+                        <span>{t('sceneEditor.saveBtn')}</span>
                     </button>
                 </div>
             </div>
@@ -384,7 +398,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                     </div>
                     {activeTab === 'objects' && (
                         <span className="text-xs text-yellow-400 mb-2 italic">
-                            Alterações feitas aqui afetam o mesmo objeto caso utilizado em outras cenas.
+                            {t('sceneEditor.objectWarning')}
                         </span>
                     )}
                 </div>
@@ -398,17 +412,17 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                 <div className="bg-card border border-border rounded-xl p-6">
                                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                                         <FileText className="w-4 h-4 text-muted-foreground" />
-                                        NARRATIVA
+                                        {t('sceneEditor.narrativeTitle')}
                                     </h3>
 
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-3 gap-4">
                                             <div className="col-span-2">
-                                                <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Título</label>
-                                                <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground" placeholder="Ex: Entrada da Caverna" />
+                                                <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">{t('sceneEditor.titleLabel')}</label>
+                                                <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground" placeholder={t('sceneEditor.titlePlaceholder')} />
                                             </div>
                                             <div className="col-span-1">
-                                                <label htmlFor="sceneId" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">ID Único</label>
+                                                <label htmlFor="sceneId" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">{t('sceneEditor.uniqueIdLabel')}</label>
                                                 <div className="relative">
                                                     <input
                                                         type="text"
@@ -424,9 +438,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         <div className="pt-2">
                                             <div className="flex justify-between items-center mb-1.5">
                                                 <label htmlFor="sceneDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                                                    {localScene.isEndingScene ? 'Mensagem de Fim de Jogo' : 'Descrição'}
+                                                    {localScene.isEndingScene ? t('sceneEditor.endingMessage') : t('sceneEditor.description')}
                                                 </label>
-                                                <span className="text-[9px] text-muted-foreground font-medium tracking-wider">Use &lt;palavra&gt; para destacar</span>
+                                                <span className="text-[9px] text-muted-foreground font-medium tracking-wider">{t('sceneEditor.highlightTip')}</span>
                                             </div>
                                             <div className="relative">
                                                 <textarea
@@ -434,7 +448,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                     value={localScene.description}
                                                     onChange={handleDescriptionChange}
                                                     className="w-full h-32 md:h-40 bg-input border border-input rounded-lg px-4 py-3 text-sm text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
-                                                    placeholder="Descreva o que o jogador vê e sente nesta cena..."
+                                                    placeholder={t('sceneEditor.descPlaceholder')}
                                                 />
 
                                                 <div className="pt-4 border-t border-muted-foreground/10 mt-4">
@@ -451,16 +465,16 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                             }}
                                                             className="peer h-4 w-4 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground accent-purple-500"
                                                         />
-                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Esta cena é uma vinheta?</span>
+                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.isVignette')}</span>
                                                     </label>
 
                                                     {localScene.vignetteType && localScene.vignetteType !== 'none' && (
                                                         <div className="animate-in fade-in slide-in-from-top-2 space-y-4">
                                                             <div className="grid grid-cols-3 gap-2">
                                                                 {[
-                                                                    { id: 'opening', label: 'Abertura', icon: Play },
-                                                                    { id: 'transition', label: 'Transição', icon: ArrowRight },
-                                                                    { id: 'conclusion', label: 'Conclusão', icon: Flag }
+                                                                    { id: 'opening', label: t('sceneEditor.vignetteTypes.opening'), icon: Play },
+                                                                    { id: 'transition', label: t('sceneEditor.vignetteTypes.transition'), icon: ArrowRight },
+                                                                    { id: 'conclusion', label: t('sceneEditor.vignetteTypes.conclusion'), icon: Flag }
                                                                 ].map((type) => (
                                                                     <button
                                                                         key={type.id}
@@ -482,13 +496,13 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                             <div className="grid grid-cols-2 gap-4">
                                                                 <div>
                                                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                                                                        Texto do Botão
+                                                                        {t('sceneEditor.buttonTextLabel')}
                                                                     </label>
                                                                     <input
                                                                         type="text"
                                                                         value={localScene.vignetteButtonText || ''}
                                                                         onChange={(e) => updateLocalScene('vignetteButtonText', e.target.value)}
-                                                                        placeholder={localScene.vignetteType === 'conclusion' ? 'Reiniciar' : 'Continuar'}
+                                                                        placeholder={localScene.vignetteType === 'conclusion' ? t('sceneEditor.restart') : t('sceneEditor.continue')}
                                                                         className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all placeholder:text-zinc-700"
                                                                     />
                                                                 </div>
@@ -502,8 +516,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                             className="peer h-3.5 w-3.5 shrink-0 rounded-sm border border-primary ring-offset-background focus-visible:outline-none data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground accent-red-500"
                                                                         />
                                                                         <div>
-                                                                            <span className="block text-[10px] font-bold text-zinc-300 uppercase tracking-widest">Resultado negativo</span>
-                                                                            <span className="block text-[9px] text-muted-foreground">Exibir quando as chances acabam.</span>
+                                                                            <span className="block text-[10px] font-bold text-zinc-300 uppercase tracking-widest">{t('sceneEditor.negativeOutcome')}</span>
+                                                                            <span className="block text-[9px] text-muted-foreground">{t('sceneEditor.negativeOutcomeDesc')}</span>
                                                                         </div>
                                                                     </label>
                                                                 )}
@@ -511,16 +525,16 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                 {localScene.vignetteType !== 'conclusion' && (
                                                                     <div>
                                                                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                                                                            Ir Para
+                                                                            {t('sceneEditor.goToLabel')}
                                                                         </label>
                                                                         <select
                                                                             value={localScene.vignetteNextSceneId || ''}
                                                                             onChange={(e) => updateLocalScene('vignetteNextSceneId', e.target.value)}
                                                                             className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all [&>option]:bg-zinc-950"
                                                                         >
-                                                                            <option value="">(Basta fechar)</option>
-                                                                            <option value="END_GAME">Encerramento (Fim de Jogo)</option>
-                                                                            <optgroup label="Cenas">
+                                                                            <option value="">{t('sceneEditor.justClose')}</option>
+                                                                            <option value="END_GAME">{t('sceneEditor.endGame')}</option>
+                                                                            <optgroup label={t('sceneEditor.scenesGroup')}>
                                                                                 {allScenes.filter(s => s.id !== localScene.id).map(s => (
                                                                                     <option key={s.id} value={s.id}>
                                                                                         {s.name}
@@ -545,18 +559,18 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                                             <GitBranch className="w-4 h-4 text-muted-foreground" />
-                                            CONEXÕES
+                                            {t('sceneEditor.connectionsTitle')}
                                         </h3>
                                         {/* Optional: Link to full map if needed, but simplistic for now */}
-                                        <button onClick={() => onViewMap?.()} className="text-[10px] text-purple-400 hover:text-purple-300 font-bold uppercase tracking-widest transition-colors flex items-center gap-1" title="Volte ao mapa para ver completo">
-                                            Ver Mapa Completo
+                                        <button onClick={() => onViewMap?.()} className="text-[10px] text-purple-400 hover:text-purple-300 font-bold uppercase tracking-widest transition-colors flex items-center gap-1" title={t('sceneEditor.viewFullMapTooltip')}>
+                                            {t('sceneEditor.viewFullMap')}
                                         </button>
                                     </div>
 
                                     <BranchingPreview currentScene={localScene} allScenes={allScenes} />
 
                                     <p className="text-[10px] text-zinc-500 text-center mt-3">
-                                        Visualização rápida das conexões diretas.
+                                        {t('sceneEditor.connectionsDesc')}
                                     </p>
                                 </div>
                             </div>
@@ -569,10 +583,10 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                                             <ImageIcon className="w-4 h-4 text-muted-foreground" />
-                                            MULTIMÍDIA
+                                            {t('sceneEditor.multimediaTitle')}
                                         </h3>
                                         <span className="text-[10px] text-muted-foreground">
-                                            {layoutOrientation === 'vertical' ? '720x1280 sugerido' : '1280x720 sugerido'}
+                                            {layoutOrientation === 'vertical' ? t('sceneEditor.suggestedResVertical') : t('sceneEditor.suggestedResHorizontal')}
                                         </span>
                                     </div>
 
@@ -606,14 +620,14 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                         <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
                                                             <Upload className="w-5 h-5" />
                                                         </div>
-                                                        <span className="text-[10px] font-bold uppercase tracking-wider">Trocar</span>
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.changeBtn')}</span>
                                                         <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                                     </label>
                                                     <button onClick={() => updateLocalScene('image', '')} className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors">
                                                         <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
                                                             <Trash2 className="w-5 h-5" />
                                                         </div>
-                                                        <span className="text-[10px] font-bold uppercase tracking-wider">Remover</span>
+                                                        <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.removeBtn')}</span>
                                                     </button>
                                                 </div>
 
@@ -623,7 +637,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                 <div className="w-12 h-12 rounded-full bg-zinc-900 border border-zinc-700 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-purple-500/50 transition-all">
                                                     <ImageIcon className="w-5 h-5 text-zinc-600 group-hover:text-purple-400" />
                                                 </div>
-                                                <span className="text-xs font-medium text-zinc-500 group-hover:text-zinc-300">Carregar Imagem de Fundo</span>
+                                                <span className="text-xs font-medium text-zinc-500 group-hover:text-zinc-300">{t('sceneEditor.loadImage')}</span>
                                                 <input id="image-upload-input" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                                             </label>
                                         )}
@@ -632,30 +646,30 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                     {/* Overlay Effect Section */}
                                     <div className="space-y-2 mb-4">
                                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                                            Efeito Visual (Overlay)
+                                            {t('sceneEditor.overlayLabel')}
                                         </label>
                                         <select
                                             value={localScene.overlayEffect || ''}
                                             onChange={(e) => updateLocalScene('overlayEffect', e.target.value)}
                                             className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
                                         >
-                                            <option value="">Nenhum</option>
-                                            <option value="grain">Granulado</option>
-                                            <option value="rain">Chuva</option>
-                                            <option value="blur">Vintage</option>
-                                            <option value="chromatic">Fósforo verde</option>
-                                            <option value="tv">Televisor CRT</option>
-                                            <option value="confetti">Confetes</option>
-                                            <option value="glitch">Glitch</option>
-                                            <option value="nosferatu">Nosferatu</option>
-                                            <option value="wiggle">Tremido</option>
-                                            <option value="fog">Neblina</option>
+                                            <option value="">{t('sceneEditor.effects.none')}</option>
+                                            <option value="grain">{t('sceneEditor.effects.grain')}</option>
+                                            <option value="rain">{t('sceneEditor.effects.rain')}</option>
+                                            <option value="blur">{t('sceneEditor.effects.blur')}</option>
+                                            <option value="chromatic">{t('sceneEditor.effects.chromatic')}</option>
+                                            <option value="tv">{t('sceneEditor.effects.tv')}</option>
+                                            <option value="confetti">{t('sceneEditor.effects.confetti')}</option>
+                                            <option value="glitch">{t('sceneEditor.effects.glitch')}</option>
+                                            <option value="nosferatu">{t('sceneEditor.effects.nosferatu')}</option>
+                                            <option value="wiggle">{t('sceneEditor.effects.wiggle')}</option>
+                                            <option value="fog">{t('sceneEditor.effects.fog')}</option>
                                         </select>
                                     </div>
 
                                     {/* Audio Section */}
                                     <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Trilha Sonora (.mp3)</label>
+                                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.audioLabel')}</label>
                                         <div className="flex items-center gap-3 p-3 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors">
                                             <div className="w-8 h-8 rounded-full bg-zinc-900 flex items-center justify-center flex-shrink-0">
                                                 <Music className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-purple-400' : 'text-zinc-600'} `} />
@@ -663,24 +677,24 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                             <div className="flex-grow min-w-0">
                                                 {localScene.backgroundMusic ? (
                                                     <div className="flex flex-col">
-                                                        <span className="text-xs text-zinc-200 truncate">Trilha Personalizada Definida</span>
-                                                        <span className="text-[10px] text-green-500">Áudio carregado com sucesso</span>
+                                                        <span className="text-xs text-zinc-200 truncate">{t('sceneEditor.customAudioSet')}</span>
+                                                        <span className="text-[10px] text-green-500">{t('sceneEditor.audioLoaded')}</span>
                                                     </div>
                                                 ) : (
                                                     <div className="flex flex-col">
-                                                        <span className="text-xs text-zinc-400 italic">Nenhuma trilha selecionada</span>
-                                                        <span className="text-[9px] text-zinc-600">Deixe vazio para continuar a música anterior.</span>
+                                                        <span className="text-xs text-zinc-400 italic">{t('sceneEditor.noAudio')}</span>
+                                                        <span className="text-[9px] text-zinc-600">{t('sceneEditor.leaveEmptyAudio')}</span>
                                                     </div>
                                                 )}
                                             </div>
                                             <div className="flex-shrink-0">
                                                 {localScene.backgroundMusic ? (
-                                                    <button onClick={() => updateLocalScene('backgroundMusic', undefined)} className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all" title="Remover">
+                                                    <button onClick={() => updateLocalScene('backgroundMusic', undefined)} className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all" title={t('sceneEditor.removeBtn')}>
                                                         <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 ) : (
                                                     <label htmlFor="music-upload" className="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-zinc-700">
-                                                        Carregar
+                                                        {t('sceneEditor.loadBtn')}
                                                         <input id="music-upload" type="file" accept="audio/*" onChange={handleMusicUpload} className="hidden" />
                                                     </label>
                                                 )}
@@ -696,7 +710,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                     <div className="bg-card border border-border rounded-xl p-6">
                                         <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                                             <Scroll className="w-4 h-4 text-muted-foreground" />
-                                            REGRAS DE CHANCES
+                                            {t('sceneEditor.chancesTitle')}
                                         </h3>
                                         <div className="space-y-3">
                                             {/* Chance Removal */}
@@ -711,8 +725,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                     />
                                                 </div>
                                                 <div>
-                                                    <span className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-400' : 'text-zinc-400 group-hover:text-zinc-300'} `}>Esta cena remove uma chance</span>
-                                                    <span className="block text-[10px] text-muted-foreground mt-0.5">O jogador perde uma vida/tentativa ao entrar aqui.</span>
+                                                    <span className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-400' : 'text-zinc-400 group-hover:text-zinc-300'} `}>{t('sceneEditor.removesChance')}</span>
+                                                    <span className="block text-[10px] text-muted-foreground mt-0.5">{t('sceneEditor.removesChanceDesc')}</span>
                                                 </div>
                                             </label>
 
@@ -728,8 +742,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                     />
                                                 </div>
                                                 <div>
-                                                    <span className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-400' : 'text-zinc-400 group-hover:text-zinc-300'} `}>Esta cena restaura uma chance</span>
-                                                    <span className="block text-[10px] text-muted-foreground mt-0.5">O jogador ganha uma vida extra ou cura.</span>
+                                                    <span className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-400' : 'text-zinc-400 group-hover:text-zinc-300'} `}>{t('sceneEditor.restoresChance')}</span>
+                                                    <span className="block text-[10px] text-muted-foreground mt-0.5">{t('sceneEditor.restoresChanceDesc')}</span>
                                                 </div>
                                             </label>
                                         </div>
@@ -773,7 +787,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                 <div className="p-4 border-b border-muted-foreground/10 space-y-4">
                                     <div className="flex items-center justify-between">
                                         <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                                            Escolhas ({localScene.choices?.length || 0})
+                                            {t('sceneEditor.choicesCount', { count: localScene.choices?.length || 0 })}
                                         </span>
                                     </div>
                                 </div>
@@ -781,7 +795,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                 <div className="flex-1 overflow-y-auto p-2 space-y-1">
                                     {(localScene.choices || []).length === 0 ? (
                                         <div className="text-center py-8 text-muted-foreground">
-                                            <p className="text-xs italic">Nenhuma escolha definida.</p>
+                                            <p className="text-xs italic">{t('sceneEditor.noChoices')}</p>
                                         </div>
                                     ) : (
                                         (localScene.choices || []).map((choice, index) => (
@@ -795,10 +809,10 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                 </div>
                                                 <div className="min-w-0">
                                                     <div className={`text-xs font-bold truncate ${selectedChoiceId === choice.id ? 'text-primary' : 'text-foreground'} `}>
-                                                        {choice.label || 'Nova Escolha'}
+                                                        {choice.label || t('sceneEditor.newChoice')}
                                                     </div>
                                                     <div className="text-[10px] text-zinc-500 font-mono truncate">
-                                                        {choice.targetSceneId ? `-> ${allScenes.find(s => s.id === choice.targetSceneId)?.name || choice.targetSceneId} ` : '(Sem destino)'}
+                                                        {choice.targetSceneId ? `-> ${allScenes.find(s => s.id === choice.targetSceneId)?.name || choice.targetSceneId} ` : t('sceneEditor.noDestination')}
                                                     </div>
                                                 </div>
                                             </button>
@@ -812,7 +826,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                             const newId = `choice_${Date.now()} `;
                                             const newChoice: Choice = {
                                                 id: newId,
-                                                label: 'Nova Escolha',
+                                                label: t('sceneEditor.newChoice'),
                                                 targetSceneId: ''
                                             };
                                             updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
@@ -821,7 +835,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         className="w-full py-2 bg-white hover:bg-zinc-200 text-zinc-950 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow-none"
                                     >
                                         <Plus className="w-3.5 h-3.5 mr-2" />
-                                        Criar Nova Escolha
+                                        {t('sceneEditor.createChoiceBtn')}
                                     </button>
                                 </div>
                             </div>
@@ -837,11 +851,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                 <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-muted/30">
                                                     <div className="flex items-center gap-2">
                                                         <ArrowRight className="w-4 h-4 text-purple-500" />
-                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">Detalhes da Escolha</span>
+                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{t('sceneEditor.choiceDetails')}</span>
                                                     </div>
                                                     <button
                                                         onClick={() => {
-                                                            if (window.confirm('Tem certeza que deseja remover esta escolha?')) {
+                                                            if (window.confirm(t('sceneEditor.removeChoiceConfirm'))) {
                                                                 const newChoices = localScene.choices!.filter(c => c.id !== selectedChoiceId);
                                                                 updateLocalScene('choices', newChoices);
                                                                 setSelectedChoiceId(null);
@@ -850,14 +864,14 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
                                                     >
                                                         <Trash2 className="w-3.5 h-3.5" />
-                                                        Remover
+                                                        {t('sceneEditor.removeBtn')}
                                                     </button>
                                                 </div>
 
                                                 <div className="flex-1 overflow-y-auto p-6">
                                                     <div className="max-w-2xl mx-auto space-y-6">
                                                         <div className="space-y-1.5">
-                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Texto do Botão</label>
+                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.buttonTextChoiceLabel')}</label>
                                                             <input
                                                                 type="text"
                                                                 value={choice.label}
@@ -867,12 +881,12 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                     updateLocalScene('choices', newChoices);
                                                                 }}
                                                                 className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary"
-                                                                placeholder="Ex: Tentar abrir a porta..."
+                                                                placeholder={t('sceneEditor.buttonTextChoicePlaceholder')}
                                                             />
                                                         </div>
 
                                                         <div className="space-y-1.5">
-                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Cena de Destino</label>
+                                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.targetSceneChoiceLabel')}</label>
                                                             <div className="relative">
                                                                 <select
                                                                     value={choice.targetSceneId}
@@ -883,7 +897,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                     }}
                                                                     className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground pr-8 appearance-none focus:ring-1 focus:ring-primary [&>option]:bg-card"
                                                                 >
-                                                                    <option value="">Selecione...</option>
+                                                                    <option value="">{t('sceneEditor.selectPlaceholder')}</option>
                                                                     {allScenes.map(s => (
                                                                         <option key={s.id} value={s.id}>
                                                                             {s.name}
@@ -892,7 +906,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                 </select>
                                                                 <ArrowRight className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                                                             </div>
-                                                            <p className="text-[10px] text-muted-foreground mt-1">Para onde o jogador irá ao clicar neste botão.</p>
+                                                            <p className="text-[10px] text-muted-foreground mt-1">{t('sceneEditor.targetSceneChoiceDesc')}</p>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -902,8 +916,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                 ) : (
                                     <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
                                         <ArrowRight className="w-12 h-12 mb-4 opacity-20" />
-                                        <h4 className="text-sm font-bold text-muted-foreground mb-1">Nenhuma escolha selecionada</h4>
-                                        <p className="text-xs max-w-xs opacity-60">Selecione uma escolha da lista para editar seus detalhes ou crie uma nova.</p>
+                                        <h4 className="text-sm font-bold text-muted-foreground mb-1">{t('sceneEditor.noChoiceSelected')}</h4>
+                                        <p className="text-xs max-w-xs opacity-60">{t('sceneEditor.noChoiceSelectedDesc')}</p>
                                     </div>
                                 )}
                             </div>

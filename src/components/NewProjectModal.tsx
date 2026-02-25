@@ -4,6 +4,7 @@ import { GameData, Vignette, Scene } from '../types';
 import { initialGameData } from '../lib/gameDefaults';
 import { FONTS, PREDEFINED_THEMES } from '../constants';
 import Preview from './Preview';
+import { useTranslation } from 'react-i18next';
 
 interface NewProjectModalProps {
     isOpen: boolean;
@@ -38,6 +39,7 @@ const ColorInput: React.FC<{ label: string, id: string, value: string, onChange:
 );
 
 export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClose, onCreate }) => {
+    const { t } = useTranslation();
     const [tab, setTab] = useState<Tab>('info');
 
     // Info State
@@ -293,8 +295,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                             <BookOpen className="w-6 h-6 text-primary" />
                         </div>
                         <div>
-                            <h2 className="text-xl font-bold text-white uppercase tracking-widest">Nova Ficção</h2>
-                            <p className="text-xs text-zinc-400 font-medium">Configure os detalhes iniciais da sua aventura</p>
+                            <h2 className="text-xl font-bold text-white uppercase tracking-widest">{t('newProject.title', 'Nova Ficção')}</h2>
+                            <p className="text-xs text-zinc-400 font-medium">{t('newProject.subtitle', 'Configure os detalhes iniciais da sua aventura')}</p>
                         </div>
                     </div>
                     <button onClick={onClose} className="p-2 hover:bg-zinc-900 rounded-lg text-zinc-500 hover:text-white transition-colors">
@@ -313,19 +315,19 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                 onClick={() => setTab('info')}
                                 className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'info' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
                             >
-                                Informações
+                                {t('newProject.tabs.info', 'Informações')}
                             </button>
                             <button
                                 onClick={() => setTab('system')}
                                 className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'system' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
                             >
-                                Sistema
+                                {t('newProject.tabs.system', 'Sistema')}
                             </button>
                             <button
                                 onClick={() => setTab('appearance')}
                                 className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'appearance' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
                             >
-                                Aparência
+                                {t('newProject.tabs.appearance', 'Aparência')}
                             </button>
                         </div>
 
@@ -343,9 +345,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 <Terminal className="w-8 h-8" />
                                             </div>
                                             <div>
-                                                <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'parser' ? 'text-white' : 'text-zinc-300'}`}>Parser (Descreva comandos)</h3>
+                                                <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'parser' ? 'text-white' : 'text-zinc-300'}`}>{t('newProject.system.parserTitle', 'Parser (Descreva comandos)')}</h3>
                                                 <p className="text-xs text-zinc-400 leading-relaxed">
-                                                    O jogador digita ações como "pegar chave" ou "olhar mesa".
+                                                    {t('newProject.system.parserDesc', 'O jogador digita ações como "pegar chave" ou "olhar mesa".')}
                                                 </p>
                                             </div>
                                         </button>
@@ -358,9 +360,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 <MousePointerClick className="w-8 h-8" />
                                             </div>
                                             <div>
-                                                <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'choice' ? 'text-white' : 'text-zinc-300'}`}>IF (Escolha uma opção)</h3>
+                                                <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'choice' ? 'text-white' : 'text-zinc-300'}`}>{t('newProject.system.choiceTitle', 'IF (Escolha uma opção)')}</h3>
                                                 <p className="text-xs text-zinc-400 leading-relaxed">
-                                                    O jogador escolhe entre opções pré-definidas para avançar na história.
+                                                    {t('newProject.system.choiceDesc', 'O jogador escolhe entre opções pré-definidas para avançar na história.')}
                                                 </p>
                                             </div>
                                         </button>
@@ -375,8 +377,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <Package className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableInventory ? 'text-white' : 'text-zinc-400'}`}>Inventário</h4>
-                                                    <p className="text-xs text-zinc-500">Gestão de itens pegos pelo jogador</p>
+                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableInventory ? 'text-white' : 'text-zinc-400'}`}>{t('newProject.features.inventory', 'Inventário')}</h4>
+                                                    <p className="text-xs text-zinc-500">{t('newProject.features.inventoryDesc', 'Gestão de itens pegos pelo jogador')}</p>
                                                 </div>
                                             </div>
                                             <button
@@ -394,8 +396,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <BookText className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableDiary ? 'text-white' : 'text-zinc-400'}`}>Diário de Bordo</h4>
-                                                    <p className="text-xs text-zinc-500">Registro automático de eventos</p>
+                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableDiary ? 'text-white' : 'text-zinc-400'}`}>{t('newProject.features.diary', 'Diário de Bordo')}</h4>
+                                                    <p className="text-xs text-zinc-500">{t('newProject.features.diaryDesc', 'Registro automático de eventos')}</p>
                                                 </div>
                                             </div>
                                             <button
@@ -412,8 +414,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <Heart className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableChances ? 'text-white' : 'text-zinc-400'}`}>Sistema de Vidas</h4>
-                                                    <p className="text-xs text-zinc-500">Limitar tentativas e chances</p>
+                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableChances ? 'text-white' : 'text-zinc-400'}`}>{t('newProject.features.chances', 'Sistema de Vidas')}</h4>
+                                                    <p className="text-xs text-zinc-500">{t('newProject.features.chancesDesc', 'Limitar tentativas e chances')}</p>
                                                 </div>
                                             </div>
                                             <button
@@ -430,8 +432,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <SlidersHorizontal className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableTrackers ? 'text-white' : 'text-zinc-400'}`}>Rastreadores</h4>
-                                                    <p className="text-xs text-zinc-500">Variáveis numéricas (saúde, dinheiro, sanidade)</p>
+                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableTrackers ? 'text-white' : 'text-zinc-400'}`}>{t('newProject.features.trackers', 'Rastreadores')}</h4>
+                                                    <p className="text-xs text-zinc-500">{t('newProject.features.trackersDesc', 'Variáveis numéricas (saúde, dinheiro, sanidade)')}</p>
                                                 </div>
                                             </div>
                                             <button
@@ -448,34 +450,34 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                             {tab === 'info' && (
                                 <div className="space-y-6 animate-in slide-in-from-left-4 duration-300">
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Título do Jogo</label>
+                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('newProject.info.gameTitleLabel', 'Título do Jogo')}</label>
                                         <input
                                             type="text"
                                             value={title}
                                             onChange={(e) => setTitle(e.target.value)}
                                             className="w-full bg-black/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-700 font-bold"
-                                            placeholder="Ex: A Caverna dos Dragões"
+                                            placeholder={t('newProject.info.gameTitlePlaceholder', 'Ex: A Caverna dos Dragões')}
                                         />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Sinopse / Descrição</label>
+                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('newProject.info.descriptionLabel', 'Sinopse / Descrição')}</label>
                                         <textarea
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
                                             className="w-full h-32 bg-black/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all resize-none placeholder:text-zinc-700 leading-relaxed"
-                                            placeholder="Uma breve descrição da sua história..."
+                                            placeholder={t('newProject.info.descriptionPlaceholder', 'Uma breve descrição da sua história...')}
                                         />
                                     </div>
 
                                     <div className="space-y-2">
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Texto do Botão de Início</label>
+                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('newProject.info.startButtonLabel', 'Texto do Botão de Início')}</label>
                                         <input
                                             type="text"
                                             value={startButtonText}
                                             onChange={(e) => setStartButtonText(e.target.value)}
                                             className="w-full bg-black/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-700 font-bold"
-                                            placeholder="Ex: Iniciar Aventura"
+                                            placeholder={t('newProject.info.startButtonPlaceholder', 'Ex: Iniciar Aventura')}
                                         />
                                     </div>
 
@@ -499,11 +501,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
                                         </div>
                                         <div className="flex-1 space-y-2">
-                                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Capa / Imagem de Fundo</label>
+                                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('newProject.info.coverImageLabel', 'Capa / Imagem de Fundo')}</label>
                                             <p className="text-[11px] text-zinc-400 leading-relaxed">
-                                                Esta imagem será usada como fundo da tela inicial e da cena de abertura caso não seja definida outra.
+                                                {t('newProject.info.coverImageDesc', 'Esta imagem será usada como fundo da tela inicial e da cena de abertura caso não seja definida outra.')}
                                             </p>
-                                            <p className="text-[9px] text-zinc-600 uppercase tracking-wider">Recomendado: 1920x1080</p>
+                                            <p className="text-[9px] text-zinc-600 uppercase tracking-wider">{t('newProject.info.recommendedDimensions', 'Recomendado: 1920x1080')}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -519,7 +521,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-zinc-300 uppercase tracking-widest flex items-center gap-2">
-                                                <LayoutTemplate className="w-4 h-4 text-zinc-500" /> ESTRUTURA
+                                                <LayoutTemplate className="w-4 h-4 text-zinc-500" /> {t('newProject.appearance.structureTitle', 'ESTRUTURA')}
                                             </h3>
                                             {activeSections.estrutura ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
                                         </button>
@@ -527,18 +529,18 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                         {activeSections.estrutura && (
                                             <div className="space-y-4 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Orientação</label>
+                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.orientation', 'Orientação')}</label>
                                                     <select
                                                         value={layoutOrientation}
                                                         onChange={(e) => setLayoutOrientation(e.target.value as any)}
                                                         className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                     >
-                                                        <option value="vertical">Vertical</option>
-                                                        <option value="horizontal">Horizontal</option>
+                                                        <option value="vertical">{t('newProject.appearance.vertical', 'Vertical')}</option>
+                                                        <option value="horizontal">{t('newProject.appearance.horizontal', 'Horizontal')}</option>
                                                     </select>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Posição da Imagem</label>
+                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.imagePosition', 'Posição da Imagem')}</label>
                                                     <select
                                                         value={layoutOrder}
                                                         onChange={(e) => setLayoutOrder(e.target.value as any)}
@@ -546,28 +548,28 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     >
                                                         {layoutOrientation === 'vertical' ? (
                                                             <>
-                                                                <option value="image-first">Esquerda</option>
-                                                                <option value="image-last">Direita</option>
+                                                                <option value="image-first">{t('newProject.appearance.left', 'Esquerda')}</option>
+                                                                <option value="image-last">{t('newProject.appearance.right', 'Direita')}</option>
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <option value="image-first">Acima</option>
-                                                                <option value="image-last">Abaixo</option>
+                                                                <option value="image-first">{t('newProject.appearance.above', 'Acima')}</option>
+                                                                <option value="image-last">{t('newProject.appearance.below', 'Abaixo')}</option>
                                                             </>
                                                         )}
                                                     </select>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Moldura</label>
+                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.frameTitle', 'Moldura')}</label>
                                                     <select
                                                         value={imageFrame}
                                                         onChange={(e) => setImageFrame(e.target.value as any)}
                                                         className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                     >
-                                                        <option value="none">Sem moldura</option>
-                                                        <option value="rounded-top">Portal</option>
-                                                        <option value="book-cover">Quadrada</option>
-                                                        <option value="trading-card">Arredondada</option>
+                                                        <option value="none">{t('newProject.appearance.frameNone', 'Sem moldura')}</option>
+                                                        <option value="rounded-top">{t('newProject.appearance.framePortal', 'Portal')}</option>
+                                                        <option value="book-cover">{t('newProject.appearance.frameSquare', 'Quadrada')}</option>
+                                                        <option value="trading-card">{t('newProject.appearance.frameRounded', 'Arredondada')}</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -581,7 +583,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-zinc-300 uppercase tracking-widest flex items-center gap-2">
-                                                <Palette className="w-4 h-4 text-zinc-500" /> ESTILO & TEMA
+                                                <Palette className="w-4 h-4 text-zinc-500" /> {t('newProject.appearance.styleTheme', 'ESTILO & TEMA')}
                                             </h3>
                                             {activeSections.estilo ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
                                         </button>
@@ -607,7 +609,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 </div>
 
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Temas Predefinidos</label>
+                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.predefinedThemes', 'Temas Predefinidos')}</label>
                                                     <div className="grid grid-cols-3 gap-2">
                                                         {PREDEFINED_THEMES.map((t) => (
                                                             <button
@@ -632,17 +634,17 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                         onClick={() => toggleSection('cores')}
                                                         className="flex items-center justify-between w-full text-left py-2 hover:bg-zinc-800/50 px-2 rounded transition-colors"
                                                     >
-                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase">Cores Personalizadas</span>
+                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase">{t('newProject.appearance.customColors', 'Cores Personalizadas')}</span>
                                                         {activeSections.cores ? <ChevronUp className="w-3 h-3 text-zinc-500" /> : <ChevronDown className="w-3 h-3 text-zinc-500" />}
                                                     </button>
 
                                                     {activeSections.cores && (
                                                         <div className="space-y-4 pt-4 px-2">
                                                             <div className="grid grid-cols-2 gap-3">
-                                                                <ColorInput label="Texto" id="textColor" value={colors.textColor} onChange={(v) => setColors({ ...colors, textColor: v })} />
-                                                                <ColorInput label="Título" id="titleColor" value={colors.titleColor} onChange={(v) => setColors({ ...colors, titleColor: v })} />
-                                                                <ColorInput label="Foco" id="focusColor" value={colors.focusColor} onChange={(v) => setColors({ ...colors, focusColor: v })} />
-                                                                <ColorInput label="Botões Ação" id="actionBtnColor" value={colors.actionButtonColor} onChange={(v) => setColors({ ...colors, actionButtonColor: v })} />
+                                                                <ColorInput label={t('newProject.appearance.colorText', 'Texto')} id="textColor" value={colors.textColor} onChange={(v) => setColors({ ...colors, textColor: v })} />
+                                                                <ColorInput label={t('newProject.appearance.colorTitle', 'Título')} id="titleColor" value={colors.titleColor} onChange={(v) => setColors({ ...colors, titleColor: v })} />
+                                                                <ColorInput label={t('newProject.appearance.colorFocus', 'Foco')} id="focusColor" value={colors.focusColor} onChange={(v) => setColors({ ...colors, focusColor: v })} />
+                                                                <ColorInput label={t('newProject.appearance.colorActionBtn', 'Botões Ação')} id="actionBtnColor" value={colors.actionButtonColor} onChange={(v) => setColors({ ...colors, actionButtonColor: v })} />
                                                             </div>
                                                         </div>
                                                     )}
@@ -658,7 +660,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-zinc-300 uppercase tracking-widest flex items-center gap-2">
-                                                <Type className="w-4 h-4 text-zinc-500" /> FONTES & TEXTO
+                                                <Type className="w-4 h-4 text-zinc-500" /> {t('newProject.appearance.fontsTextTitle', 'FONTES & TEXTO')}
                                             </h3>
                                             {activeSections.texto ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
                                         </button>
@@ -666,7 +668,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                         {activeSections.texto && (
                                             <div className="space-y-4 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Família da Fonte</label>
+                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.fontFamily', 'Família da Fonte')}</label>
                                                     <select
                                                         value={fontFamily}
                                                         onChange={(e) => setFontFamily(e.target.value)}
@@ -678,15 +680,15 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     </select>
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Tamanho</label>
+                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.fontSize', 'Tamanho')}</label>
                                                     <select
                                                         value={fontSize}
                                                         onChange={(e) => setFontSize(e.target.value)}
                                                         className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                     >
-                                                        <option value="12">Pequeno</option>
-                                                        <option value="14">Médio</option>
-                                                        <option value="16">Grande</option>
+                                                        <option value="12">{t('newProject.appearance.sizeSmall', 'Pequeno')}</option>
+                                                        <option value="14">{t('newProject.appearance.sizeMedium', 'Médico')}</option>
+                                                        <option value="16">{t('newProject.appearance.sizeLarge', 'Grande')}</option>
                                                     </select>
                                                 </div>
                                             </div>
@@ -702,7 +704,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                     <div className="w-full lg:w-1/2 bg-black border-l border-zinc-800 flex flex-col">
                         <div className="flex border-b border-zinc-800 bg-zinc-950/50">
                             <div className="flex-1 py-4 px-6 text-xs font-bold uppercase tracking-widest border-b-2 border-transparent text-zinc-500 flex items-center justify-between">
-                                <h3>Pré-visualização</h3>
+                                <h3>{t('newProject.preview', 'Pré-visualização')}</h3>
                             </div>
                         </div>
                         <div className="flex-1 relative overflow-hidden flex items-center justify-center p-4 bg-black/50">
@@ -823,7 +825,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                                         className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest"
                                                                         style={{ backgroundColor: colors.gameSceneNameOverlayBg, color: colors.gameSceneNameOverlayTextColor }}
                                                                     >
-                                                                        Nome da Cena
+                                                                        {t('newProject.previewOverlay.sceneName', 'Nome da Cena')}
                                                                     </div>
                                                                 </div>
 
@@ -837,10 +839,10 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             <div className="flex-1 flex flex-col overflow-hidden relative">
                                                 <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar pr-2">
                                                     <p className="leading-relaxed" style={{ color: colors.textColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize }}>
-                                                        Esta é uma descrição de exemplo para a cena. O texto flui conforme as <span style={{ color: colors.titleColor, fontWeight: 'bold' }}>CONFIGURAÇÕES</span> escolhidas.
+                                                        {t('newProject.previewOverlay.exampleDesc', 'Esta é uma descrição de exemplo para a cena. O texto flui conforme as')} <span style={{ color: colors.titleColor, fontWeight: 'bold' }}>{t('newProject.previewOverlay.exampleDescBold', 'CONFIGURAÇÕES')}</span> {t('newProject.previewOverlay.exampleDesc2', 'escolhidas.')}
                                                     </p>
                                                     <p className="mt-4 opacity-70" style={{ color: colors.textColor, fontFamily: fontFamily, fontSize: '0.85em' }}>
-                                                        {'>'} COMANDO DE EXEMPLO
+                                                        {'>'} {t('newProject.previewOverlay.exampleCommand', 'COMANDO DE EXEMPLO')}
                                                     </p>
                                                 </div>
 
@@ -865,23 +867,23 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 {/* Suggestions Button - Only show in Parser mode */}
                                                 {interactionType === 'parser' && (
                                                     <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
-                                                        Sugestões
+                                                        {t('newProject.previewOverlay.suggestions', 'Sugestões')}
                                                     </button>
                                                 )}
 
                                                 {enableInventory && (
                                                     <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
-                                                        Inventário
+                                                        {t('newProject.features.inventory', 'Inventário')}
                                                     </button>
                                                 )}
                                                 {enableDiary && (
                                                     <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
-                                                        Diário
+                                                        {t('newProject.features.diary', 'Diário de Bordo')}
                                                     </button>
                                                 )}
                                                 {enableTrackers && (
                                                     <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
-                                                        Rastreadores
+                                                        {t('newProject.features.trackers', 'Rastreadores')}
                                                     </button>
                                                 )}
                                             </div>
@@ -896,7 +898,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                         className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
                                                         style={{ backgroundColor: colors.actionButtonColor, color: colors.actionButtonTextColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily }}
                                                     >
-                                                        {actionButtonText || 'AÇÃO'}
+                                                        {actionButtonText || t('newProject.previewOverlay.actionPlaceholder', 'AÇÃO')}
                                                     </button>
                                                 </div>
                                             ) : (
@@ -912,7 +914,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                             borderRadius: '0px' // Square
                                                         }}
                                                     >
-                                                        Opção de Exemplo 1
+                                                        {t('newProject.previewOverlay.option1', 'Opção de Exemplo 1')}
                                                     </button>
                                                     <button
                                                         className="w-full h-8 border-2 font-bold uppercase tracking-widest transition-all truncate"
@@ -925,7 +927,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                             borderRadius: '0px' // Square
                                                         }}
                                                     >
-                                                        Opção de Exemplo 2
+                                                        {t('newProject.previewOverlay.option2', 'Opção de Exemplo 2')}
                                                     </button>
                                                 </div>
                                             )}
@@ -941,7 +943,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                 onClick={onClose}
                                 className="px-6 py-2.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors"
                             >
-                                Cancelar
+                                {t('common.cancel', 'Cancelar')}
                             </button>
 
                             {tab === 'appearance' ? (
@@ -951,14 +953,14 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     className="px-8 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all text-xs disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20 flex items-center gap-2"
                                 >
                                     <Play className="w-3 h-3 fill-current" />
-                                    Criar Projeto
+                                    {t('newProject.createBtn', 'Criar Projeto')}
                                 </button>
                             ) : (
                                 <button
                                     onClick={handleNext}
                                     className="px-8 py-2.5 bg-zinc-100 text-zinc-900 font-bold rounded-xl hover:bg-white transition-all text-xs shadow-lg flex items-center gap-2"
                                 >
-                                    Avançar
+                                    {t('newProject.nextBtn', 'Avançar')}
                                     <ArrowRight className="w-3 h-3" />
                                 </button>
                             )}

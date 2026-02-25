@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { supabase } from '../lib/supabase';
 import { Database } from '../types/supabase';
-import { User, Lock, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, Terminal, Mail, Check } from 'lucide-react';
+import { User, Lock, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, Terminal, Mail, Check, Globe } from 'lucide-react';
 import { LoadingOverlay } from '../components/LoadingOverlay';
 import { useTheme } from '../components/ThemeProvider';
 import { useToast } from '../components/ToastContext';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../components/UserContext';
+import { useTranslation } from 'react-i18next';
 
 type Profile = Database['public']['Tables']['profiles']['Row'];
 
@@ -14,8 +15,10 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { theme, setTheme } = useTheme();
     const { toast } = useToast();
     const navigate = useNavigate();
+    const { t, i18n } = useTranslation();
     const [loading, setLoading] = useState(false);
     const [email, setEmail] = useState('');
+    const [language, setLanguage] = useState(i18n.language || 'pt');
 
     // Form States
     const [displayName, setDisplayName] = useState('');
@@ -76,9 +79,9 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         setTheme(newTheme);
     };
 
-    // Calculate isDirty
     const isDirty = (
         theme !== originalTheme ||
+        language !== (i18n.language || 'pt') ||
         displayName !== (initialProfile?.full_name || '') ||
         username !== (initialProfile?.username || '') ||
         website !== (initialProfile?.website || '') ||
@@ -90,6 +93,10 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         setLoading(true);
         try {
             savedRef.current = true; // Mark as saved so we don't revert theme
+
+            if (language !== (i18n.language || 'pt')) {
+                i18n.changeLanguage(language);
+            }
 
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
@@ -108,10 +115,10 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
             const { error } = await supabase.from('profiles').upsert(updates);
 
             if (error) {
-                toast("Erro ao salvar perfil", error.message, "error");
+                toast(t('settings.errors.saveProfile', 'Erro ao salvar perfil'), error.message, "error");
                 savedRef.current = false; // Reset if failed
             } else {
-                toast("Sucesso!", "Configurações atualizadas.", "success");
+                toast(t('settings.success.title', 'Sucesso!'), t('settings.success.updated', 'Configurações atualizadas.'), "success");
                 setInitialProfile({
                     full_name: displayName,
                     username,
@@ -124,7 +131,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
             }
         } catch (err) {
             console.error("Unexpected error saving profile:", err);
-            toast("Erro", "Ocorreu um erro inesperado.", "error");
+            toast(t('settings.errors.title', 'Erro'), t('settings.errors.unexpected', 'Ocorreu um erro inesperado.'), "error");
         } finally {
             setLoading(false);
         }
@@ -163,15 +170,15 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
             {!hideHeader && (
                 <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
                     <div className="flex flex-col justify-center h-full">
-                        <h1 className="text-xl font-bold text-foreground">Configurações</h1>
-                        <p className="text-[10px] text-muted-foreground hidden md:block">Gerencie suas preferências e perfil.</p>
+                        <h1 className="text-xl font-bold text-foreground">{t('settings.title', 'Configurações')}</h1>
+                        <p className="text-[10px] text-muted-foreground hidden md:block">{t('settings.subtitle', 'Gerencie suas preferências e perfil.')}</p>
                     </div>
                     <button
                         type="button"
                         onClick={(e) => handleLogout(e)}
                         className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white border border-red-500/20 text-xs font-bold transition-all"
                     >
-                        <LogOut size={14} /> Sair da Conta
+                        <LogOut size={14} /> {t('settings.logout', 'Sair da Conta')}
                     </button>
                 </div>
             )}
@@ -183,15 +190,17 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         disabled={loading || !isDirty}
                         className="bg-yellow-500 hover:bg-yellow-600 text-zinc-950 font-bold py-2 px-6 rounded-lg flex items-center gap-2 transition-all disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed text-xs"
                     >
-                        {loading ? 'Salvando...' : 'Salvar Alterações'}
+                        {loading ? t('settings.buttons.saving', 'Salvando...') : t('settings.buttons.save', 'Salvar Alterações')}
                     </button>
                 </div>
 
                 {/* Theme Section */}
                 <div className="bg-card border border-border rounded-lg p-4 mb-4">
-                    <div className="flex items-center gap-2 mb-3 text-primary">
-                        <Sun size={16} />
-                        <h2 className="text-sm font-bold text-card-foreground">Aparência</h2>
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-2 text-primary">
+                            <Sun size={16} />
+                            <h2 className="text-sm font-bold text-card-foreground">{t('settings.appearance', 'Aparência e Idioma')}</h2>
+                        </div>
                     </div>
 
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -200,7 +209,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Moon size={16} className={theme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>Escuro</span>
+                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.dark', 'Escuro')}</span>
                         </button>
 
                         <button
@@ -208,7 +217,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Sun size={16} className={theme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>Claro</span>
+                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.light', 'Claro')}</span>
                         </button>
 
                         <button
@@ -216,7 +225,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Coffee size={16} className={theme === 'cream' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>Creme</span>
+                            <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.cream', 'Creme')}</span>
                         </button>
 
                         <button
@@ -224,8 +233,25 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Terminal size={16} className={theme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>Terminal</span>
+                            <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
                         </button>
+                    </div>
+
+                    <div className="space-y-4 pt-4 border-t border-border mt-4">
+                        <div className="space-y-2 text-left">
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-2">
+                                <Globe size={12} />
+                                {t('settings.language.label', 'Idioma da Interface')}
+                            </label>
+                            <select
+                                value={language}
+                                onChange={(e) => setLanguage(e.target.value)}
+                                className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
+                            >
+                                <option value="pt">{t('common.languages.pt', 'Português')}</option>
+                                <option value="en">{t('common.languages.en', 'English')}</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
 
@@ -233,23 +259,23 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 <div className="bg-card border border-border rounded-lg p-4 mb-4">
                     <div className="flex items-center gap-2 mb-4 text-primary">
                         <User size={16} />
-                        <h2 className="text-sm font-bold text-card-foreground">Dados da Conta</h2>
+                        <h2 className="text-sm font-bold text-card-foreground">{t('settings.accountData', 'Dados da Conta')}</h2>
                     </div>
 
                     <div className="space-y-4">
                         <div className="space-y-2 text-left">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Nome e Sobrenome</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">{t('settings.fullName', 'Nome e Sobrenome')}</label>
                             <input
                                 type="text"
                                 value={displayName}
                                 onChange={(e) => setDisplayName(e.target.value)}
                                 className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium placeholder:text-muted-foreground/50"
-                                placeholder="Ex: João Silva"
+                                placeholder={t('settings.placeholders.name', 'Ex: João Silva')}
                             />
                         </div>
 
                         <div className="space-y-2 text-left">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">E-mail</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">{t('settings.email', 'E-mail')}</label>
                             <div className="flex gap-2 items-center">
                                 <div className="relative flex-1">
                                     <Mail className="absolute left-3 top-2.5 text-muted-foreground w-4 h-4" />
@@ -268,19 +294,19 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                         const { error } = await supabase.auth.resetPasswordForEmail(email, {
                                             redirectTo: window.location.origin + '/settings',
                                         });
-                                        if (error) toast("Erro", error.message, "error");
-                                        else toast("Sucesso", "Email de redefinição enviado!", "success");
+                                        if (error) toast(t('common.error', 'Erro'), error.message, "error");
+                                        else toast(t('common.success', 'Sucesso'), t('settings.resetPasswordSent', 'Email de redefinição enviado!'), "success");
                                         setLoading(false);
                                     }}
                                     disabled={loading}
                                 >
-                                    Redefinir senha
+                                    {t('settings.resetPasswordBtn', 'Redefinir senha')}
                                 </button>
                             </div>
                         </div>
 
                         <div className="space-y-2 text-left">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">Local (Opcional)</label>
+                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">{t('settings.location', 'Local (Opcional)')}</label>
                             <div className="relative">
                                 <span className="absolute left-2.5 top-1.5 text-muted-foreground text-[10px] font-bold"><User size={12} className="opacity-0" /></span> {/* Spacer if needed or icon */}
                                 <input
@@ -288,7 +314,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     value={location}
                                     onChange={(e) => setLocation(e.target.value)}
                                     className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium placeholder:text-muted-foreground/50"
-                                    placeholder="Ex: São Paulo, SP"
+                                    placeholder={t('settings.placeholders.location', 'Ex: São Paulo, SP')}
                                 />
                             </div>
                         </div>

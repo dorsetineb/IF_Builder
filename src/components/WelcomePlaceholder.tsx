@@ -3,6 +3,7 @@ import { DitherShader } from '@/components/ui/dither-shader';
 import { Plus, Download, Heart, X, Gamepad2 } from 'lucide-react';
 import { NewProjectModal } from './NewProjectModal';
 import { GameData } from '../types';
+import { useTranslation } from 'react-i18next';
 
 interface WelcomePlaceholderProps {
     onCreateScene: (data?: Partial<GameData>) => void;
@@ -12,6 +13,7 @@ interface WelcomePlaceholderProps {
 }
 
 export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreateScene, onDownloadExample, onMeetProject, theme = 'dark' }) => {
+    const { t } = useTranslation();
     const [isFlashing, setIsFlashing] = useState(false);
     const [showDownloadHelp, setShowDownloadHelp] = useState(false);
     const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
@@ -65,8 +67,8 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
             </div>
 
             <div className="relative z-10 flex flex-col items-center justify-center text-center p-8">
-                <h2 className="text-3xl font-bold text-white mb-4">Bem-vindo ao IF Builder</h2>
-                <p className="max-w-md text-zinc-300 mb-12"><b>O que você quer fazer?</b></p>
+                <h2 className="text-3xl font-bold text-white mb-4">{t('welcome.title', 'Bem-vindo ao IF Builder')}</h2>
+                <p className="max-w-md text-zinc-300 mb-12"><b>{t('welcome.subtitle', 'O que você quer fazer?')}</b></p>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full max-w-6xl">
                     {/* Botão 1: Começar a Criar */}
                     <button
@@ -76,7 +78,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'bg-primary/10 group-hover:bg-primary' : 'bg-white/10 group-hover:bg-white'}`}>
                             <Plus className={`w-6 h-6 transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary group-hover:text-primary-foreground' : 'text-white group-hover:text-black'}`} />
                         </div>
-                        <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">Crie uma ficção</span>
+                        <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.createNew', 'Crie uma ficção')}</span>
                     </button>
 
                     {/* Botão 2: Baixar Exemplo */}
@@ -96,7 +98,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                                 : (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary group-hover:text-primary-foreground' : 'text-white group-hover:text-black')
                                 }`} />
                         </div>
-                        <span className={`font-bold text-lg transition-colors ${isFlashing ? (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>Baixe um exemplo</span>
+                        <span className={`font-bold text-lg transition-colors ${isFlashing ? (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>{t('welcome.downloadExample', 'Baixe um exemplo')}</span>
                     </button>
 
                     {/* Botão 3: Jogar a Demo */}
@@ -107,7 +109,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'bg-primary/10 group-hover:bg-primary' : 'bg-white/10 group-hover:bg-white'}`}>
                             <Gamepad2 className={`w-6 h-6 transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary group-hover:text-primary-foreground' : 'text-white group-hover:text-black'}`} />
                         </div>
-                        <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">Jogar a demo</span>
+                        <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.playDemo', 'Jogar a demo')}</span>
                     </button>
 
                     {/* Botão 3: Conheça o projeto */}
@@ -118,7 +120,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'bg-primary/10 group-hover:bg-primary' : 'bg-white/10 group-hover:bg-white'}`}>
                             <Heart className={`w-6 h-6 transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary group-hover:text-primary-foreground' : 'text-white group-hover:text-black'}`} />
                         </div>
-                        <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">Conheça o projeto</span>
+                        <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.meetProject', 'Conheça o projeto')}</span>
                     </button>
                 </div>
             </div>
@@ -134,27 +136,23 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                             <X className="w-6 h-6" />
                         </button>
 
-                        <h3 className="text-2xl font-bold text-white mb-8 text-center">Como usar o exemplo baixado</h3>
+                        <h3 className="text-2xl font-bold text-white mb-8 text-center">{t('welcome.helpTItle', 'Como usar o exemplo baixado')}</h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div className="flex flex-col items-center text-center p-6 bg-zinc-950/50 rounded-lg border border-zinc-800">
                                 <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center mb-4">
                                     <Gamepad2 className="w-6 h-6 text-blue-500" />
                                 </div>
-                                <h4 className="text-lg font-semibold text-white mb-2">Para Jogar</h4>
-                                <p className="text-left text-zinc-400 text-sm">
-                                    Extraia o conteúdo do arquivo <strong>fuga_da_masmorra.zip</strong> no seu computador, e abra o arquivo <strong>index.html</strong> para acessar a ficção de modo offline.
-                                </p>
+                                <h4 className="text-lg font-semibold text-white mb-2">{t('welcome.helpPlayTitle', 'Para Jogar')}</h4>
+                                <p className="text-left text-zinc-400 text-sm" dangerouslySetInnerHTML={{ __html: t('welcome.helpPlayDesc', 'Extraia o conteúdo do arquivo <strong>fuga_da_masmorra.zip</strong> no seu computador, e abra o arquivo <strong>index.html</strong> para acessar a ficção de modo offline.') }} />
                             </div>
 
                             <div className="flex flex-col items-center text-center p-6 bg-zinc-950/50 rounded-lg border border-zinc-800">
                                 <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mb-4">
                                     <Download className="w-6 h-6 text-purple-500" />
                                 </div>
-                                <h4 className="text-lg font-semibold text-white mb-2">Para Editar</h4>
-                                <p className="text-left text-zinc-400 text-sm">
-                                    Clique no botão <strong>IMPORTAR</strong> no canto superior direito do editor para acessar o projeto aqui na interface.
-                                </p>
+                                <h4 className="text-lg font-semibold text-white mb-2">{t('welcome.helpEditTitle', 'Para Editar')}</h4>
+                                <p className="text-left text-zinc-400 text-sm" dangerouslySetInnerHTML={{ __html: t('welcome.helpEditDesc', 'Clique no botão <strong>IMPORTAR</strong> no canto superior direito do editor para acessar o projeto aqui na interface.') }} />
                             </div>
                         </div>
 
@@ -163,7 +161,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                                 onClick={() => setShowDownloadHelp(false)}
                                 className="px-6 py-2 bg-white text-black font-bold rounded-lg hover:bg-zinc-200 transition-colors"
                             >
-                                Entendi
+                                {t('common.confirm', 'Entendi')}
                             </button>
                         </div>
                     </div>

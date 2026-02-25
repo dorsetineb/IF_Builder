@@ -38,11 +38,8 @@ import AboutProject from '../pages/AboutProject';
 
 declare var JSZip: any;
 
-// Helpers extracted to utils/helpers.ts
-
-
-
 import { useTheme } from './ThemeProvider';
+import { useTranslation } from 'react-i18next';
 
 // ... (existing imports)
 
@@ -110,6 +107,7 @@ const PATTERN_COMPUTER = [
 const IMPORT_PATTERNS = [PATTERN_BULL, PATTERN_MAN, PATTERN_COMPUTER];
 
 const Editor: React.FC = () => {
+    const { t } = useTranslation();
     const { toast } = useToast();
     const { user, profile, loading: authLoading } = useUser();
     const { theme: appTheme } = useTheme();
@@ -344,7 +342,11 @@ const Editor: React.FC = () => {
         setIsDirty(false);
         setImportKey(prev => prev + 1);
         setCurrentView('scenes'); // Or 'interface' if you prefer to land on settings
-        toast("Nova Ficção Criada", "Projeto iniciado com sucesso!", "success");
+        toast(
+            t('editor.newProjectSuccessTitle', 'Nova Ficção Criada'),
+            t('editor.newProjectSuccessDesc', 'Projeto iniciado com sucesso!'),
+            "success"
+        );
     };
 
     const handleStartCreating = () => {
@@ -496,7 +498,7 @@ const Editor: React.FC = () => {
                         </div>
 
                         <div className="text-center">
-                            <p className="text-white text-lg font-medium font-sans tracking-wide uppercase">IMPORTANDO FICÇÃO</p>
+                            <p className="text-white text-lg font-medium font-sans tracking-wide uppercase">{t('editor.importing_fiction', 'IMPORTANDO FICÇÃO')}</p>
                         </div>
                     </div>
                 </div>

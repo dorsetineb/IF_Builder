@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import SceneList from './SceneList';
 import { Scene, View, GameData } from '../types';
 import { Code, BookOpen, Map, Box, SlidersHorizontal, Settings, Info, CircleHelp, ChevronLeft, ChevronRight, MessageSquare, Gamepad2, ChevronDown, MonitorPlay, Zap, Command } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
   scenes: Scene[];
@@ -26,6 +27,7 @@ interface SidebarProps {
 }
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
+  const { t } = useTranslation();
   const { onExit, onNavigate, currentView, onSetView, scenes, gameData, isCollapsed, onToggleCollapse, isDirty, theme = 'dark', ...sceneListProps } = props;
   const [isScenesExpanded, setIsScenesExpanded] = useState(false);
 
@@ -82,7 +84,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               : 'text-muted-foreground hover:bg-zinc-800 hover:text-white'
               } ${isCollapsed ? 'justify-center px-0 py-3' : ''}`}
             onClick={handleToggleScenes}
-            title={isCollapsed ? "Editor de Cenas" : undefined}
+            title={isCollapsed ? t('sidebar.sceneEditor', 'Editor de Cenas') : undefined}
           >
             {/* Hover Glow Effect */}
             <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${isScenesExpanded ? 'translate-x-0' : ''}`} />
@@ -90,7 +92,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             <BookOpen className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && (
               <>
-                <span className="truncate relative z-10 flex-1 text-left">Editor de Cenas</span>
+                <span className="truncate relative z-10 flex-1 text-left">{t('sidebar.sceneEditor', 'Editor de Cenas')}</span>
                 {/* Counter */}
                 <span className="bg-black/30 text-white text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-white/20 shadow-sm relative z-10">
                   {scenes.length}
@@ -121,7 +123,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                   onClick={() => onSetView('map')}
                 >
                   <Map size={14} />
-                  <span>Mapa de Cenas</span>
+                  <span>{t('sidebar.sceneMap', 'Mapa de Cenas')}</span>
                 </button>
               </div>
             </div>
@@ -136,32 +138,32 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           <button
             className={getButtonClass('global_objects')}
             onClick={() => handleSetView('global_objects')}
-            title={isCollapsed ? "Objetos" : undefined}
+            title={isCollapsed ? t('sidebar.objects', 'Objetos') : undefined}
           >
             <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'global_objects' ? 'translate-x-0' : ''}`} />
             <Box className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-            {!isCollapsed && <span className="truncate relative z-10">Objetos</span>}
+            {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.objects', 'Objetos')}</span>}
           </button>
         )}
         <button
           className={getButtonClass('trackers')}
           onClick={() => handleSetView('trackers')}
-          title={isCollapsed ? "Rastreadores" : undefined}
+          title={isCollapsed ? t('sidebar.trackers', 'Rastreadores') : undefined}
         >
           <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'trackers' ? 'translate-x-0' : ''}`} />
           <SlidersHorizontal className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">Rastreadores</span>}
+          {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.trackers', 'Rastreadores')}</span>}
         </button>
 
         {(gameData.gameInteractionType || 'parser') !== 'choice' && (
           <button
             className={getButtonClass('global_commands')}
             onClick={() => handleSetView('global_commands')}
-            title={isCollapsed ? "Comandos Globais" : undefined}
+            title={isCollapsed ? t('sidebar.globalCommands', 'Comandos Globais') : undefined}
           >
             <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'global_commands' ? 'translate-x-0' : ''}`} />
             <Command className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-            {!isCollapsed && <span className="truncate relative z-10">Comandos Globais</span>}
+            {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.globalCommands', 'Comandos Globais')}</span>}
           </button>
         )}
 
@@ -169,11 +171,11 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         <button
           className={getButtonClass('interface')}
           onClick={() => handleSetView('interface')}
-          title={isCollapsed ? "Interface" : undefined}
+          title={isCollapsed ? t('sidebar.interface', 'Interface') : undefined}
         >
           <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`} />
           <Code className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">Interface</span>}
+          {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.interface', 'Interface')}</span>}
         </button>
 
 
@@ -186,31 +188,31 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         <button
           onClick={() => onSetView('guide')}
           className={getButtonClass('guide')}
-          title={isCollapsed ? "Guia Rápido" : undefined}
+          title={isCollapsed ? t('sidebar.quickGuide', 'Guia Rápido') : undefined}
         >
           <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'guide' ? 'translate-x-0' : ''}`} />
           <CircleHelp className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">Guia Rápido</span>}
+          {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.quickGuide', 'Guia Rápido')}</span>}
         </button>
 
         <button
           onClick={() => handleSetView('about')}
           className={getButtonClass('about')}
-          title={isCollapsed ? "Sobre o Projeto" : undefined}
+          title={isCollapsed ? t('sidebar.aboutProject', 'Sobre o Projeto') : undefined}
         >
           <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'about' ? 'translate-x-0' : ''}`} />
           <Zap className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">Sobre o Projeto</span>}
+          {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>}
         </button>
 
         <button
           onClick={() => handleSetView('settings')}
           className={getButtonClass('settings')}
-          title={isCollapsed ? "Configurações" : undefined}
+          title={isCollapsed ? t('sidebar.settings', 'Configurações') : undefined}
         >
           <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'settings' ? 'translate-x-0' : ''}`} />
           <Settings className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">Configurações</span>}
+          {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.settings', 'Configurações')}</span>}
         </button>
       </div>
 

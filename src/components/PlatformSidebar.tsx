@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { LayoutDashboard, Users, Gamepad2, Settings, ChevronDown, ChevronRight, ChevronLeft, MessageSquare, FileText, Star, Share2, Tornado, Info } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 const PlatformSidebar: React.FC = () => {
+    const { t } = useTranslation();
     const location = useLocation();
     const isActive = (path: string) => location.pathname === path;
 
@@ -51,11 +53,11 @@ const PlatformSidebar: React.FC = () => {
                 <Link
                     to="/editor"
                     className={`flex items-center gap-3 w-full bg-secondary hover:bg-white hover:text-zinc-900 text-secondary-foreground font-bold py-3 rounded-xl transition-all shadow-sm hover:shadow-md text-sm group border border-purple-500/50 mb-4 relative overflow-hidden flex-shrink-0 ${isCollapsed ? 'justify-center px-0' : 'pl-4 justify-start'}`}
-                    title={isCollapsed ? "Abrir Editor" : undefined}
+                    title={isCollapsed ? t('sidebar.openEditor', 'Abrir Editor') : undefined}
                 >
                     <div className="absolute inset-x-0 bottom-0 h-full bg-gradient-to-t from-purple-500/20 to-transparent pointer-events-none" />
                     <Gamepad2 size={20} className="group-hover:scale-110 transition-transform text-primary relative z-10" />
-                    {!isCollapsed && <span className="truncate relative z-10">Abrir Editor</span>}
+                    {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.openEditor', 'Abrir Editor')}</span>}
                 </Link>
 
                 {/* Dashboard Removed */}
@@ -65,8 +67,8 @@ const PlatformSidebar: React.FC = () => {
                 */}
 
                 <div className="mt-auto pt-4 flex flex-col gap-1 relative">
-                    <NavItem to="/about" icon={Info} label="Sobre o Projeto" />
-                    <NavItem to="/settings" icon={Settings} label="Configurações" />
+                    <NavItem to="/about" icon={Info} label={t('sidebar.aboutProject', 'Sobre o Projeto')} />
+                    <NavItem to="/settings" icon={Settings} label={t('sidebar.settings', 'Configurações')} />
                 </div>
             </nav>
 

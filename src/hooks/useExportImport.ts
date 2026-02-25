@@ -5,6 +5,7 @@ import { getFontUrl, getFrameClass, getMimeTypeFromFileName } from '../utils/hel
 import { prepareGameDataForEngine, gameJS } from '../components/game-engine';
 import { gameHTML, gameCSS, initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
 import DOMPurify from 'dompurify';
+import { useTranslation } from 'react-i18next';
 
 declare var JSZip: any;
 
@@ -27,6 +28,7 @@ export const useExportImport = ({
     toast,
     profile
 }: UseExportImportProps) => {
+    const { t } = useTranslation();
 
     const [isImporting, setIsImporting] = useState(false);
 
@@ -365,9 +367,13 @@ DATE:        ${exportDate.toLocaleString()}
 
         setIsDirty(false);
         setImportKey(prev => prev + 1);
-        toast("Projeto Importado", "Projeto carregado e migrado com sucesso.", "success");
+        toast(
+            t('editor.projectImportedTitle', 'Projeto Importado'),
+            t('editor.projectImportedDesc', 'Projeto carregado e migrado com sucesso.'),
+            "success"
+        );
         setCurrentView('scenes');
-    }, [gameData.scenes, gameData.sceneOrder, setGameData, setIsDirty, setImportKey, setCurrentView, toast]);
+    }, [gameData.scenes, gameData.sceneOrder, setGameData, setIsDirty, setImportKey, setCurrentView, toast, t]);
 
     const handleImportFile = async (file: File) => {
         if (typeof JSZip === 'undefined') {
@@ -465,7 +471,11 @@ DATE:        ${exportDate.toLocaleString()}
                     handleImportGame(parsed);
                 } catch (error) {
                     console.error("Erro ao importar:", error);
-                    toast("Erro na Importação", "O arquivo selecionado não é um JSON válido ou está corrompido.", "error");
+                    toast(
+                        t('editor.importErrorTitle', 'Erro na Importação'),
+                        t('editor.importErrorDesc', 'O arquivo selecionado não é um JSON válido ou está corrompido.'),
+                        "error"
+                    );
                 } finally {
                     setIsImporting(false);
                 }

@@ -2,6 +2,7 @@
 import React, { useRef } from 'react';
 import { GameData } from '../types';
 import { Eye, Plus, CircleHelp, LogOut, ChevronLeft, ChevronRight, PanelLeft, Upload, Download, Save } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 const Header: React.FC<{
   gameData: GameData;
@@ -16,6 +17,7 @@ const Header: React.FC<{
   onHome?: () => void;
   currentView: 'scenes' | 'interface' | 'map' | 'global_objects' | 'trackers' | 'settings' | 'about';
 }> = ({ gameData, isPreviewing, onTogglePreview, onNewGame, onLogout, sidebarCollapsed, onToggleCollapse, onExport, onImport, onHome, currentView }) => {
+  const { t } = useTranslation();
   const importInputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -41,7 +43,7 @@ const Header: React.FC<{
           <button
             onClick={onToggleCollapse}
             className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-card border border-muted-foreground/50 rounded-full flex items-center justify-center text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary transition-all z-50 shadow-sm"
-            title={sidebarCollapsed ? "Expandir Sidebar" : "Recolher Sidebar"}
+            title={sidebarCollapsed ? t('header.expandSidebar', 'Expandir Sidebar') : t('header.collapseSidebar', 'Recolher Sidebar')}
           >
             {sidebarCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
           </button>
@@ -58,13 +60,13 @@ const Header: React.FC<{
             {/* Dynamic Title based on View */}
             {currentView === 'settings' ? (
               <div className="flex flex-col">
-                <span className="text-xl font-bold text-foreground tracking-tight">Configurações</span>
-                <p className="text-[10px] text-muted-foreground hidden md:block">Gerencie suas preferências e conta.</p>
+                <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.settings', 'Configurações')}</span>
+                <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.settingsDesc', 'Gerencie suas preferências e conta.')}</p>
               </div>
             ) : currentView === 'about' ? (
               <div className="flex flex-col">
-                <span className="text-xl font-bold text-foreground tracking-tight">Sobre o Projeto</span>
-                <p className="text-[10px] text-muted-foreground hidden md:block">Conheça a missão e os valores por trás do IF Builder.</p>
+                <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
+                <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.aboutDesc', 'Conheça a missão e os valores por trás do IF Builder.')}</p>
               </div>
             ) : (
               <span className="text-sm font-medium text-muted-foreground truncate max-w-[400px]" title={gameData.gameTitle}>
@@ -93,7 +95,7 @@ const Header: React.FC<{
 
               {isPreviewing ? (
                 <button onMouseDown={onTogglePreview} className="flex items-center px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs uppercase tracking-wider">
-                  <Eye className="w-3.5 h-3.5 mr-2" /> Fechar Preview
+                  <Eye className="w-3.5 h-3.5 mr-2" /> {t('header.closePreview', 'Fechar Preview')}
                 </button>
               ) : (
                 <>
@@ -102,25 +104,25 @@ const Header: React.FC<{
                   <button
                     onClick={onExport}
                     className="flex items-center justify-center px-3 py-2 text-primary hover:text-primary/80 transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
-                    title="Salvar Jogo"
+                    title={t('header.saveGame', 'Salvar Jogo')}
                   >
-                    <Save className="w-4 h-4" /> Salvar
+                    <Save className="w-4 h-4" /> {t('header.saveGameBtn', 'Salvar')}
                   </button>
 
                   <button
                     onClick={() => importInputRef.current?.click()}
                     className="flex items-center justify-center px-3 py-2 text-primary hover:text-primary/80 transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
-                    title="Carregar Jogo"
+                    title={t('header.loadGame', 'Carregar')}
                   >
-                    <Download className="w-4 h-4" /> Carregar
+                    <Download className="w-4 h-4" /> {t('header.loadGameBtn', 'Carregar')}
                   </button>
 
                   <button
                     onClick={onTogglePreview}
                     className="flex items-center justify-center px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all text-xs shadow-sm active:scale-95 border border-primary/50"
-                    title="Pré-visualizar Jogo"
+                    title={t('header.previewGame', 'Pré-visualizar Jogo')}
                   >
-                    <Eye className="w-3.5 h-3.5 mr-2" /> Pré-visualizar
+                    <Eye className="w-3.5 h-3.5 mr-2" /> {t('header.previewGameBtn', 'Pré-visualizar')}
                   </button>
 
                 </>
@@ -134,7 +136,7 @@ const Header: React.FC<{
               className="flex items-center justify-center px-4 py-2 bg-red-500/10 text-red-500 font-bold rounded-lg hover:bg-red-500 hover:text-white border border-red-500/20 transition-all text-xs"
             >
               <LogOut className="w-4 h-4 mr-2" />
-              Sair da Conta
+              {t('header.logout', 'Sair da Conta')}
             </button>
           )}
         </div>
