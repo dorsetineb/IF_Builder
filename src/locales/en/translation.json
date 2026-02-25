@@ -342,6 +342,15 @@
             "saving": "Saving...",
             "reset": "Reset Password",
             "resetSent": "Password reset email sent!"
+        },
+        "success": {
+            "title": "Success!",
+            "updated": "Settings updated."
+        },
+        "errors": {
+            "title": "Error",
+            "saveProfile": "Error saving profile.",
+            "unexpected": "An unexpected error occurred."
         }
     },
     "header": {
@@ -846,6 +855,8 @@
         "save": "Save",
         "confirm": "Confirm",
         "delete": "Delete",
+        "error": "Error",
+        "success": "Success",
         "languages": {
             "pt": "Português",
             "en": "English"

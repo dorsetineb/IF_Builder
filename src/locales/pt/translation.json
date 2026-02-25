@@ -142,6 +142,15 @@
             "reset": "Redefinir senha",
             "resetSent": "Email de redefinição enviado!"
         },
+        "success": {
+            "title": "Sucesso!",
+            "updated": "Configurações atualizadas."
+        },
+        "errors": {
+            "title": "Erro",
+            "saveProfile": "Erro ao salvar perfil.",
+            "unexpected": "Ocorreu um erro inesperado."
+        },
         "clear": {
             "title": "Limpar Tudo (Danger Zone)",
             "description": "Apaga Cenas, Itens, Variáveis Globais, etc. Retorna ao estado inicial do projeto vazío. Essa ação não pode ser desfeita.",
@@ -848,6 +857,8 @@
         "save": "Salvar",
         "confirm": "Confirmar",
         "delete": "Excluir",
+        "error": "Erro",
+        "success": "Sucesso",
         "languages": {
             "pt": "Português",
             "en": "English"
