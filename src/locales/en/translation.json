@@ -859,7 +859,8 @@
         "success": "Success",
         "languages": {
             "pt": "Português",
-            "en": "English"
+            "en": "English",
+            "es": "Español"
         },
         "loading": "Loading..."
     },

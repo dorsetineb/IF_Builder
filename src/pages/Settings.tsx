@@ -250,6 +250,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             >
                                 <option value="pt">{t('common.languages.pt', 'Português')}</option>
                                 <option value="en">{t('common.languages.en', 'English')}</option>
+                                <option value="es">{t('common.languages.es', 'Español')}</option>
                             </select>
                         </div>
                     </div>
