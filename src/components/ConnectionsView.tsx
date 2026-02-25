@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { Scene, Interaction, GameObject } from '../types';
 import { ConnectionDetail } from './SceneEditor';
 
@@ -18,17 +19,19 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
   allObjectsMap,
   onSelectScene,
 }) => {
+  const { t } = useTranslation();
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
       {/* Input Scenes Column */}
       <div className="space-y-4">
         <h4 className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
-          Entradas
+          {t('connectionsView.inputs', 'Entradas')}
           <span className="bg-purple-500/20 text-purple-400 text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-purple-500/20">
             {inputConnections.length}
           </span>
         </h4>
-        <p className="text-[10px] text-muted-foreground -mt-2 italic">Cenas que <b>trazem</b> o jogador para esta cena.</p>
+        <p className="text-[10px] text-muted-foreground -mt-2 italic">{t('connectionsView.inputsDesc1', 'Cenas que')} <b>{t('connectionsView.inputsDesc2', 'trazem')}</b> {t('connectionsView.inputsDesc3', 'o jogador para esta cena.')}</p>
         <div className="space-y-3">
           {inputConnections.length > 0 ? (
             inputConnections.map(({ scene, interactions }) => (
@@ -43,9 +46,9 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                 <div className="mt-3 pt-3 border-t border-muted-foreground/50/50 text-xs space-y-2">
                   {interactions.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 text-[9px] font-bold text-muted-foreground uppercase tracking-widest px-2 mb-1">
-                      <span>Verbos</span>
-                      <span>Alvo</span>
-                      <span>Requer</span>
+                      <span>{t('connectionsView.verbs', 'Verbos')}</span>
+                      <span>{t('connectionsView.target', 'Alvo')}</span>
+                      <span>{t('connectionsView.requires', 'Requer')}</span>
                     </div>
                   )}
                   {interactions.map(inter => {
@@ -67,7 +70,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
               </div>
             ))
           ) : (
-            <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/20 rounded-xl italic">Nenhuma cena traz o jogador para cá.</p>
+            <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/20 rounded-xl italic">{t('connectionsView.noneBring', 'Nenhuma cena traz o jogador para cá.')}</p>
           )}
         </div>
       </div>
@@ -75,12 +78,12 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
       {/* Output Scenes Column */}
       <div className="space-y-4">
         <h4 className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
-          Saídas
+          {t('connectionsView.outputs', 'Saídas')}
           <span className="bg-purple-500/20 text-purple-400 text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-purple-500/20">
             {outputConnections.length}
           </span>
         </h4>
-        <p className="text-[10px] text-muted-foreground -mt-2 italic">Cenas que o usuário pode chegar <b>partindo</b> desta cena.</p>
+        <p className="text-[10px] text-muted-foreground -mt-2 italic">{t('connectionsView.outputsDesc1', 'Cenas que o usuário pode chegar')} <b>{t('connectionsView.outputsDesc2', 'partindo')}</b> {t('connectionsView.outputsDesc3', 'desta cena.')}</p>
         <div className="space-y-3">
           {outputConnections.length > 0 ? (
             outputConnections.map(({ scene, interactions }) => (
@@ -95,9 +98,9 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                 <div className="mt-3 pt-3 border-t border-muted-foreground/50/50 text-xs space-y-2">
                   {interactions.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 text-[9px] font-bold text-muted-foreground uppercase tracking-widest px-2 mb-1">
-                      <span>Verbos</span>
-                      <span>Alvo</span>
-                      <span>Requer</span>
+                      <span>{t('connectionsView.verbs', 'Verbos')}</span>
+                      <span>{t('connectionsView.target', 'Alvo')}</span>
+                      <span>{t('connectionsView.requires', 'Requer')}</span>
                     </div>
                   )}
                   {interactions.map(inter => {
@@ -119,7 +122,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
               </div>
             ))
           ) : (
-            <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/20 rounded-xl italic">Esta cena não se conecta a nenhuma outra.</p>
+            <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/20 rounded-xl italic">{t('connectionsView.noneConnect', 'Esta cena não se conecta a nenhuma outra.')}</p>
           )}
         </div>
       </div>

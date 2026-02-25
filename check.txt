@@ -1,0 +1,27 @@
+
+============================================================
+  i18n CHECKER - Internationalization Audit
+============================================================
+
+[LOCALE FILES]
+----------------------------------------
+  [OK] Found 2 language(s): en, pt
+  [X] pt/translation: Missing 3 keys
+  [!] pt/translation: 5 extra keys
+
+[CODE ANALYSIS]
+----------------------------------------
+  [OK] Analyzed 62 code files
+  [OK] 33 files use i18n
+  [X] 3 files may have hardcoded strings
+     → BranchingPreview.tsx: >
+                            Sem origem...
+     → BranchingPreview.tsx: span...
+     → LoadingOverlay.tsx: >
+                    Carregando
+       ...
+     → LoadingOverlay.tsx: p...
+     → UserManualModal.tsx: >Manual de Uso</...
+
+============================================================
+[X] i18n CHECK: 2 issues found
