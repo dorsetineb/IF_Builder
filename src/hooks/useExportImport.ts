@@ -194,6 +194,10 @@ DATE:        ${exportDate.toLocaleString()}
             .replace('__SPLASH_ALIGN_CLASS__', exportData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
             .replace('__SPLASH_LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="splash-logo">` : '')
             .replace('__SPLASH_TITLE_H1_TAG__', !exportData.gameOmitSplashTitle ? `<h1>${exportData.gameTitle}</h1>` : '')
+            .replace(/<button id="splash-start-button"([^>]*)>.*?<\/button>/g, `<button id="splash-start-button"$1>${exportData.gameSplashButtonText || t('textos.splashButtonPlaceholder', 'INICIAR')}</button>`)
+            .replace(/(<button[^>]*class="[^"]*ending-restart-button[^"]*"[^>]*>)(.*?)(<\/button>)/g, `$1${exportData.gameRestartButtonText || t('textos.restartButtonPlaceholder', 'Reiniciar Aventura')}$3`)
+            .replace(/<button id="continue-button"([^>]*)>.*?<\/button>/g, `<button id="continue-button"$1>${exportData.gameContinueButtonText || t('textos.continueButtonPlaceholder', 'CONTINUAR')}</button>`)
+            .replace(/<button id="system-button"([^>]*)>.*?<\/button>/g, `<button id="system-button"$1>${exportData.gameSystemButtonText || t('textos.systemButton', 'Sistema')}</button>`)
             .replace('__SPLASH_DESCRIPTION__', exportData.gameSplashDescription || '')
             .replace('__SPLASH_BUTTON_TEXT__', exportData.gameSplashButtonText || t('textos.splashButtonPlaceholder', 'INICIAR'))
             .replace('__CONTINUE_BUTTON_TEXT__', exportData.gameContinueButtonText || t('textos.continueButtonPlaceholder', 'CONTINUAR'))
@@ -361,7 +365,7 @@ DATE:        ${exportDate.toLocaleString()}
             gameImageSpeed: data.gameImageSpeed || 5,
             gameShowTrackersUI: data.gameShowTrackersUI ?? true,
             gameShowSystemButton: data.gameShowSystemButton ?? true,
-            gameViewEndingButtonText: data.gameViewEndingButtonText || 'Ver Final',
+            gameViewEndingButtonText: data.gameViewEndingButtonText || '',
             positiveEndingMusic: data.positiveEndingMusic || '',
             negativeEndingMusic: data.negativeEndingMusic || '',
             vignettes: []

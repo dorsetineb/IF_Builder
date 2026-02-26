@@ -647,7 +647,7 @@ const Editor: React.FC = () => {
                                         gameLoadMenuTitle={gameData.gameLoadMenuTitle}
                                         gameMainMenuButtonText={gameData.gameMainMenuButtonText}
                                         gameContinueIndicatorColor={gameData.gameContinueIndicatorColor || '#58a6ff'}
-                                        gameViewEndingButtonText={gameData.gameViewEndingButtonText || 'Ver Final'}
+                                        gameViewEndingButtonText={gameData.gameViewEndingButtonText}
                                         textAnimationType={gameData.gameTextAnimationType || 'fade'}
                                         textSpeed={gameData.gameTextSpeed || 5}
                                         imageTransitionType={gameData.gameImageTransitionType || 'fade'}

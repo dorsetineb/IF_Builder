@@ -398,7 +398,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalTrackersButtonText(trackersButtonText); }, [trackersButtonText]);
     useEffect(() => { setLocalSystemButtonText(gameSystemButtonText); }, [gameSystemButtonText]);
     useEffect(() => { setLocalMainMenuButtonText(gameMainMenuButtonText); }, [gameMainMenuButtonText]);
-    useEffect(() => { setLocalViewEndingButtonText(gameViewEndingButtonText || 'Ver Final'); }, [gameViewEndingButtonText]);
+    useEffect(() => { setLocalViewEndingButtonText(gameViewEndingButtonText); }, [gameViewEndingButtonText]);
     useEffect(() => { setLocalSaveMenuTitle(gameSaveMenuTitle); }, [gameSaveMenuTitle]);
     useEffect(() => { setLocalLoadMenuTitle(gameLoadMenuTitle); }, [gameLoadMenuTitle]);
     useEffect(() => { setLocalChanceReturnButtonText(chanceReturnButtonText); }, [chanceReturnButtonText]);
@@ -676,7 +676,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalSaveMenuTitle(gameSaveMenuTitle);
         setLocalLoadMenuTitle(gameLoadMenuTitle);
         setLocalMainMenuButtonText(gameMainMenuButtonText);
-        setLocalViewEndingButtonText(gameViewEndingButtonText || 'Ver Final');
+        setLocalViewEndingButtonText(gameViewEndingButtonText);
         setLocalTextColor(textColor);
         setLocalTitleColor(titleColor);
         setLocalSplashButtonColor(splashButtonColor);
