@@ -182,7 +182,7 @@ DATE:        ${exportDate.toLocaleString()}
         const safeJson = JSON.stringify(engineData).replace(/<\/script/g, '<\\/script>');
         const finalGameScript = `window.embeddedGameData = ${safeJson};\n\n${gameJS}`;
 
-        const trackersButtonHTML = (exportData.gameSystemEnabled === 'trackers' && (exportData.gameShowTrackersUI ?? true)) ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>' : '';
+        const trackersButtonHTML = (exportData.enableTrackers && (exportData.gameShowTrackersUI ?? true)) ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>' : '';
         const systemButtonHTML = (exportData.gameShowSystemButton ?? true) ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>' : '';
 
         const inventoryButtonHTML = (exportData.enableInventory ?? true)
@@ -201,7 +201,7 @@ DATE:        ${exportDate.toLocaleString()}
             .replace('__FRAME_CLASS__', getFrameClass(exportData.gameImageFrame))
             .replace('__MOBILE_BEHAVIOR_CLASS__', 'behavior-immersive')
             .replace('__FONT_STYLESHEET__', fontStylesheet)
-            .replace('__CHANCES_CONTAINER__', (exportData.enableChances || exportData.gameSystemEnabled === 'chances') ? '<div id="chances-container" class="chances-container"></div>' : '')
+            .replace('__CHANCES_CONTAINER__', (exportData.enableChances) ? '<div id="chances-container" class="chances-container"></div>' : '')
             .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
             .replace('__SYSTEM_BUTTON__', systemButtonHTML)
             .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
@@ -371,7 +371,24 @@ DATE:        ${exportDate.toLocaleString()}
         // Only sanitize truly legacy projects (before metadata field was added).
         // Modern exports already have proper text values baked in.
         const isLegacyProject = !data.metadata;
-        const sanitizedData = isLegacyProject ? sanitizeLegacyI18n(data) : data;
+        const sanitizedData = isLegacyProject ? sanitizeLegacyI18n(data) : { ...data };
+
+        // --- MIGRATE AND PURGE LEGACY FLAGS ---
+        // Map legacy system flags to modern boolean flags if modern flags are missing
+        if (sanitizedData.gameSystemEnabled === 'chances') {
+            if (typeof sanitizedData.enableChances !== 'boolean') sanitizedData.enableChances = true;
+        } else if (sanitizedData.gameSystemEnabled === 'trackers') {
+            if (typeof sanitizedData.enableTrackers !== 'boolean') sanitizedData.enableTrackers = true;
+        }
+
+        if (sanitizedData.gameHideTitle && typeof sanitizedData.gameOmitSplashTitle !== 'boolean') {
+            sanitizedData.gameOmitSplashTitle = true;
+        }
+
+        // Purge legacy flags so they never bleed into active state and cause ghost behaviors
+        delete sanitizedData.gameSystemEnabled;
+        delete sanitizedData.gameHideTitle;
+        delete sanitizedData.vignettes; // Legacy vignettes array is obsolete (now scenes with vignetteType)
 
         setGameData(prev => ({
             ...initialGameData, // Start fresh to avoid ghost data from previous session

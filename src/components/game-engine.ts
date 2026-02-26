@@ -67,14 +67,18 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameTextSpeed: data.gameTextSpeed,
         gameImageTransitionType: data.gameImageTransitionType,
         gameImageSpeed: data.gameImageSpeed,
-        enableInventory: data.enableInventory,
-        enableChances: data.enableChances === true || (data.gameSystemEnabled === 'chances') || Object.values(data.scenes).some((s: any) => s.removesChanceOnEntry || s.restoresChanceOnEntry),
-        enableTrackers: data.enableTrackers ?? (data.gameSystemEnabled === 'trackers'),
-        enableDiary: data.enableDiary,
+        enableInventory: data.enableInventory ?? true,
+        enableChances: typeof data.enableChances === 'boolean'
+            ? data.enableChances
+            : (data.gameSystemEnabled === 'chances' || Object.values(data.scenes).some((s: any) => s.removesChanceOnEntry || s.restoresChanceOnEntry)),
+        enableTrackers: typeof data.enableTrackers === 'boolean'
+            ? data.enableTrackers
+            : (data.gameSystemEnabled === 'trackers'),
+        enableDiary: data.enableDiary ?? true,
         enableFixedVerbs: data.enableFixedVerbs,
-        enableImages: data.enableImages,
-        enableTextControl: data.enableTextControl,
-        gameInteractionType: data.gameInteractionType,
+        enableImages: data.enableImages ?? true,
+        enableTextControl: data.enableTextControl ?? true,
+        gameInteractionType: data.gameInteractionType || 'parser',
     };
 };
 
