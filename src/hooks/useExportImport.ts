@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react';
 import { GameData, Scene, View } from '../types';
 import { getFontUrl, getFrameClass, getMimeTypeFromFileName } from '../utils/helpers';
 import { prepareGameDataForEngine, gameJS } from '../components/game-engine';
-import { gameHTML, gameCSS, initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
+import { gameHTML, gameCSS, initialGameData, OVERLAY_CSS, sanitizeLegacyI18n } from '../lib/gameDefaults';
 import DOMPurify from 'dompurify';
 import { useTranslation } from 'react-i18next';
 
@@ -163,11 +163,11 @@ DATE:        ${exportDate.toLocaleString()}
         const systemButtonHTML = (exportData.gameShowSystemButton ?? true) ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>' : '';
 
         const inventoryButtonHTML = (exportData.enableInventory ?? true)
-            ? `<button id="inventory-button">${exportData.gameInventoryButtonText || 'Inventário'}</button>`
+            ? `<button id="inventory-button">${exportData.gameInventoryButtonText || t('textos.inventoryButton', 'Inventário')}</button>`
             : '';
 
         const diaryButtonHTML = (exportData.enableDiary ?? true)
-            ? `<button id="diary-button">${exportData.gameDiaryButtonText || 'Diário'}</button>`
+            ? `<button id="diary-button">${exportData.gameDiaryButtonText || t('textos.diaryButton', 'Diário')}</button>`
             : '';
 
         let htmlContent = gameData.gameHTML
@@ -183,24 +183,24 @@ DATE:        ${exportDate.toLocaleString()}
             .replace('__SYSTEM_BUTTON__', systemButtonHTML)
             .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
             .replace('__DIARY_BUTTON__', diaryButtonHTML)
-            .replace(/__INVENTORY_BUTTON_TEXT__/g, exportData.gameInventoryButtonText || 'Inventário')
-            .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, exportData.gameSuggestionsButtonText || 'Sugestões')
-            .replace(/__TRACKERS_BUTTON_TEXT__/g, exportData.gameTrackersButtonText || 'Rastreadores')
-            .replace(/__SYSTEM_BUTTON_TEXT__/g, exportData.gameSystemButtonText || 'Sistema')
-            .replace('__SAVE_MENU_TITLE__', exportData.gameSaveMenuTitle || 'Salvar Jogo')
-            .replace('__LOAD_MENU_TITLE__', exportData.gameLoadMenuTitle || 'Carregar Jogo')
-            .replace('__MAIN_MENU_BUTTON_TEXT__', exportData.gameMainMenuButtonText || 'Menu Principal')
+            .replace(/__INVENTORY_BUTTON_TEXT__/g, exportData.gameInventoryButtonText || t('textos.inventoryButton', 'Inventário'))
+            .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, exportData.gameSuggestionsButtonText || t('textos.suggestionsButton', 'Sugestões'))
+            .replace(/__TRACKERS_BUTTON_TEXT__/g, exportData.gameTrackersButtonText || t('textos.trackersButton', 'Rastreadores'))
+            .replace(/__SYSTEM_BUTTON_TEXT__/g, exportData.gameSystemButtonText || t('textos.systemButton', 'Sistema'))
+            .replace('__SAVE_MENU_TITLE__', exportData.gameSaveMenuTitle || t('textos.saveMenuTitle', 'Salvar Jogo'))
+            .replace('__LOAD_MENU_TITLE__', exportData.gameLoadMenuTitle || t('textos.loadMenuTitle', 'Carregar Jogo'))
+            .replace('__MAIN_MENU_BUTTON_TEXT__', exportData.gameMainMenuButtonText || t('textos.mainMenuButton', 'Menu Principal'))
             .replace('__SPLASH_BG_STYLE__', exportData.gameSplashImage ? `style="background-image: url('${exportData.gameSplashImage}')"` : '')
             .replace('__SPLASH_ALIGN_CLASS__', exportData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
             .replace('__SPLASH_LOGO_IMG_TAG__', exportData.gameLogo ? `<img src="${exportData.gameLogo}" alt="Logo" class="splash-logo">` : '')
             .replace('__SPLASH_TITLE_H1_TAG__', !exportData.gameOmitSplashTitle ? `<h1>${exportData.gameTitle}</h1>` : '')
             .replace('__SPLASH_DESCRIPTION__', exportData.gameSplashDescription || '')
-            .replace('__SPLASH_BUTTON_TEXT__', exportData.gameSplashButtonText || 'Start')
-            .replace('__CONTINUE_BUTTON_TEXT__', exportData.gameContinueButtonText || 'Continue')
-            .replace(/__RESTART_BUTTON_TEXT__/g, exportData.gameRestartButtonText || 'Reiniciar Aventura')
-            .replace('__ACTION_BUTTON_TEXT__', exportData.gameActionButtonText || 'Action')
-            .replace('__VERB_INPUT_PLACEHOLDER__', exportData.gameVerbInputPlaceholder || 'What do you do?')
-            .replace('__VIEW_ENDING_BUTTON_TEXT__', exportData.gameViewEndingButtonText || 'Ver Final')
+            .replace('__SPLASH_BUTTON_TEXT__', exportData.gameSplashButtonText || t('textos.splashButtonPlaceholder', 'INICIAR'))
+            .replace('__CONTINUE_BUTTON_TEXT__', exportData.gameContinueButtonText || t('textos.continueButtonPlaceholder', 'CONTINUAR'))
+            .replace(/__RESTART_BUTTON_TEXT__/g, exportData.gameRestartButtonText || t('textos.restartButtonPlaceholder', 'Reiniciar Aventura'))
+            .replace('__ACTION_BUTTON_TEXT__', exportData.gameActionButtonText || t('textos.actionButtonText', 'Ação'))
+            .replace('__VERB_INPUT_PLACEHOLDER__', exportData.gameVerbInputPlaceholder || t('textos.commandInputPlaceholder', 'O que você faz?'))
+            .replace('__VIEW_ENDING_BUTTON_TEXT__', exportData.gameViewEndingButtonText || t('textos.viewEndingButton', 'Ver Final'))
             .replace('__POSITIVE_ENDING_BG_STYLE__', exportData.positiveEndingImage ? `style="background-image: url('${exportData.positiveEndingImage}')"` : '')
             .replace('__POSITIVE_ENDING_ALIGN_CLASS__', exportData.positiveEndingContentAlignment === 'left' ? 'align-left' : '')
             .replace('__POSITIVE_ENDING_DESCRIPTION__', exportData.positiveEndingDescription || '')
@@ -341,9 +341,11 @@ DATE:        ${exportDate.toLocaleString()}
             }
         }
 
+        const sanitizedData = sanitizeLegacyI18n(data);
+
         setGameData(prev => ({
             ...initialGameData, // Start fresh to avoid ghost data from previous session
-            ...data,
+            ...sanitizedData,
             scenes: cleanedScenes,
             sceneOrder: newSceneOrder,
             startScene: newStartSceneId,

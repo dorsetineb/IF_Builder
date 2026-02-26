@@ -45,7 +45,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     // Info State
     const [title, setTitle] = useState('Minha Nova Aventura');
     const [description, setDescription] = useState('Uma breve descrição da sua história...');
-    const [startButtonText, setStartButtonText] = useState('Iniciar Aventura');
+    const [startButtonText, setStartButtonText] = useState('');
     const [splashImage, setSplashImage] = useState('');
 
     // System State
@@ -88,8 +88,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     // Appearance State - Fonts & Text
     const [fontFamily, setFontFamily] = useState(FONTS[0].family);
     const [fontSize, setFontSize] = useState('12');
-    const [actionButtonText, setActionButtonText] = useState('Ação');
-    const [verbInputPlaceholder, setVerbInputPlaceholder] = useState('O que você faz?');
+    const [actionButtonText, setActionButtonText] = useState('');
+    const [verbInputPlaceholder, setVerbInputPlaceholder] = useState('');
 
     // Collapsible sections state
     const [activeSections, setActiveSections] = useState({

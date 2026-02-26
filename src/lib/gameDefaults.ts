@@ -1485,3 +1485,38 @@ export const initialGameData: GameData = {
     negativeEndingMusic: '',
     vignettes: []
 };
+
+export const sanitizeLegacyI18n = (data: any): any => {
+    if (!data) return data;
+    const d = { ...data };
+
+    // Exact text strings that were hardcoded into Portuguese in legacy Projects
+    const legacyMap: Record<string, string[]> = {
+        gameSplashButtonText: ['COMEÇAR', 'INICIAR'],
+        gameRestartButtonText: ['Reiniciar Aventura', 'Reiniciar'],
+        gameContinueButtonText: ['Continuar', 'CONTINUAR'],
+        gameSystemButtonText: ['Sistema', 'SISTEMA'],
+        gameActionButtonText: ['Ação', 'Açao', 'AÇÃO', 'Action'],
+        gameVerbInputPlaceholder: ['O que você faz?', 'o que voce faz?'],
+        gameDiaryPlayerName: ['Jogador'],
+        gameMainMenuButtonText: ['Menu Principal'],
+        gameViewEndingButtonText: ['Ver Final'],
+        gameSaveMenuTitle: ['Salvar Jogo'],
+        gameLoadMenuTitle: ['Carregar Jogo'],
+        suggestionsButtonText: ['Sugestões', 'Sugestoes'],
+        inventoryButtonText: ['Inventário', 'Inventario'],
+        diaryButtonText: ['Diário', 'Diario'],
+        trackersButtonText: ['Trackers', 'Rastreadores']
+    };
+
+    Object.keys(legacyMap).forEach((key) => {
+        const val = d[key];
+        if (typeof val === 'string') {
+            if (legacyMap[key].includes(val.trim())) {
+                d[key] = ''; // clear it to allow i18n fallback to trigger
+            }
+        }
+    });
+
+    return d;
+};
