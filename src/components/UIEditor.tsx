@@ -1787,19 +1787,19 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         {activeSections.estilo && (
                                             <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">Cor da Interface</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('ThemeEditor.uiTheme', 'Cor da Interface')}</label>
                                                     <div className="flex bg-background rounded-lg p-1 border border-border">
                                                         <button
                                                             onClick={() => handleThemeChange('dark')}
                                                             className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                                         >
-                                                            Escuro
+                                                            {t('ThemeEditor.dark', 'Escuro')}
                                                         </button>
                                                         <button
                                                             onClick={() => handleThemeChange('light')}
                                                             className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'light' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                                         >
-                                                            {t('UIEditor.aparencia.light')}
+                                                            {t('ThemeEditor.light', 'Claro')}
                                                         </button>
                                                     </div>
                                                 </div>

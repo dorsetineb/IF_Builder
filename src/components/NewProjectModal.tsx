@@ -591,19 +591,19 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                         {activeSections.estilo && (
                                             <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">Cor da Interface</label>
+                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('ThemeEditor.uiTheme', 'Cor da Interface')}</label>
                                                     <div className="flex bg-zinc-950 rounded-lg p-1 border border-zinc-800">
                                                         <button
                                                             onClick={() => setTheme('dark')}
                                                             className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${theme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                                                         >
-                                                            Escuro
+                                                            {t('ThemeEditor.dark', 'Escuro')}
                                                         </button>
                                                         <button
                                                             onClick={() => setTheme('light')}
                                                             className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${theme === 'light' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                                                         >
-                                                            Claro
+                                                            {t('ThemeEditor.light', 'Claro')}
                                                         </button>
                                                     </div>
                                                 </div>
