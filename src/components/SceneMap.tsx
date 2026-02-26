@@ -81,7 +81,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
         items.push({
           id: `link-opening-${scene.id}`,
           targetId: startSceneId,
-          label: scene.vignetteButtonText || t('textos.splashButtonPlaceholder', 'INICIAR'),
+          label: scene.vignetteButtonText || t('UIEditor.textos.splashButtonPlaceholder', 'START'),
           type: 'scene'
         });
       }
@@ -102,7 +102,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
           items.push({
             id: `link-vignette-${scene.id}`,
             targetId: scene.vignetteNextSceneId,
-            label: scene.vignetteButtonText || t('textos.continueButtonPlaceholder', 'Continuar'),
+            label: scene.vignetteButtonText || t('UIEditor.textos.continueButtonPlaceholder', 'Continue'),
             type: 'scene'
           });
         }
@@ -180,7 +180,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
         return [{
           id: `link-${vig.id}-start`,
           targetId: startSceneId,
-          label: t('textos.splashButtonPlaceholder', 'INICIAR'),
+          label: t('UIEditor.textos.splashButtonPlaceholder', 'START'),
           type: 'scene' as MapNodeType
         }];
       }
@@ -189,7 +189,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
         return [{
           id: `link-${vig.id}`,
           targetId: vig.nextSceneId,
-          label: t('textos.continueButtonPlaceholder', 'Continuar'),
+          label: t('UIEditor.textos.continueButtonPlaceholder', 'Continue'),
           type: 'scene' as MapNodeType
         }];
       }

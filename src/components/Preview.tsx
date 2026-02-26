@@ -43,11 +43,11 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
         const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
 
         const inventoryButtonHTML = (gameData.enableInventory ?? true)
-            ? `<button id="inventory-button">${gameData.gameInventoryButtonText || t('textos.inventoryButton', 'Inventário')}</button>`
+            ? `<button id="inventory-button">${gameData.gameInventoryButtonText || t('UIEditor.textos.inventoryPlaceholder', 'Inventory')}</button>`
             : '';
 
         const diaryButtonHTML = (gameData.enableDiary ?? true)
-            ? `<button id="diary-button">${gameData.gameDiaryButtonText || t('textos.diaryButton', 'Diário')}</button>`
+            ? `<button id="diary-button">${gameData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder', 'Logbook')}</button>`
             : '';
 
         let finalHtml = gameData.gameHTML
@@ -63,29 +63,29 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('__SYSTEM_BUTTON__', systemButtonHTML)
             .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
             .replace('__DIARY_BUTTON__', diaryButtonHTML)
-            .replace(/__INVENTORY_BUTTON_TEXT__/g, gameData.gameInventoryButtonText || t('textos.inventoryButton', 'Inventário'))
-            .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, gameData.gameSuggestionsButtonText || t('textos.suggestionsButton', 'Sugestões'))
-            .replace(/__TRACKERS_BUTTON_TEXT__/g, gameData.gameTrackersButtonText || t('textos.trackersPlaceholder', 'Rastreadores'))
-            .replace(/__SYSTEM_BUTTON_TEXT__/g, gameData.gameSystemButtonText || t('textos.systemPlaceholder', 'Sistema'))
-            .replace(/__DIARY_BUTTON_TEXT__/g, gameData.gameDiaryButtonText || t('textos.diaryButton', 'Diário'))
+            .replace(/__INVENTORY_BUTTON_TEXT__/g, gameData.gameInventoryButtonText || t('UIEditor.textos.inventoryButton'))
+            .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, gameData.gameSuggestionsButtonText || t('UIEditor.textos.suggestionsButton'))
+            .replace(/__TRACKERS_BUTTON_TEXT__/g, gameData.gameTrackersButtonText || t('UIEditor.textos.trackersPlaceholder'))
+            .replace(/__SYSTEM_BUTTON_TEXT__/g, gameData.gameSystemButtonText || t('UIEditor.textos.systemPlaceholder'))
+            .replace(/__DIARY_BUTTON_TEXT__/g, gameData.gameDiaryButtonText || t('UIEditor.textos.diaryButton'))
             .replace('__SAVE_MENU_TITLE__', gameData.gameSaveMenuTitle || t('SystemEditor.saveMenu.previewSave', 'Salvar Jogo'))
             .replace('__LOAD_MENU_TITLE__', gameData.gameLoadMenuTitle || t('SystemEditor.loadMenu.previewLoad', 'Carregar Jogo'))
-            .replace('__MAIN_MENU_BUTTON_TEXT__', gameData.gameMainMenuButtonText || t('textos.mainMenuPlaceholder', 'Menu Principal'))
-            .replace('__VIEW_ENDING_BUTTON_TEXT__', gameData.gameViewEndingButtonText || t('textos.viewEndingPlaceholder', 'Ver Final'))
+            .replace('__MAIN_MENU_BUTTON_TEXT__', gameData.gameMainMenuButtonText || t('UIEditor.textos.mainMenuPlaceholder'))
+            .replace('__VIEW_ENDING_BUTTON_TEXT__', gameData.gameViewEndingButtonText || t('UIEditor.textos.viewEndingPlaceholder'))
             .replace('__SPLASH_BG_STYLE__', gameData.gameSplashImage ? `style="background-image: url('${gameData.gameSplashImage}')"` : '')
             .replace('__SPLASH_ALIGN_CLASS__', gameData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
             .replace('__SPLASH_LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="splash-logo">` : '')
             .replace('__SPLASH_TITLE_H1_TAG__', !gameData.gameOmitSplashTitle ? `<h1>${gameData.gameTitle}</h1>` : '')
-            .replace(/<button id="splash-start-button"([^>]*)>.*?<\/button>/g, `<button id="splash-start-button"$1>${gameData.gameSplashButtonText || t('textos.splashButtonPlaceholder', 'INICIAR')}</button>`)
-            .replace(/(<button[^>]*class="[^"]*ending-restart-button[^"]*"[^>]*>)(.*?)(<\/button>)/g, `$1${gameData.gameRestartButtonText || t('textos.restartButtonPlaceholder', 'Reiniciar')}$3`)
-            .replace(/<button id="continue-button"([^>]*)>.*?<\/button>/g, `<button id="continue-button"$1>${gameData.gameContinueButtonText || t('textos.continueButtonPlaceholder', 'Continuar')}</button>`)
-            .replace(/<button id="system-button"([^>]*)>.*?<\/button>/g, `<button id="system-button"$1>${gameData.gameSystemButtonText || t('textos.systemPlaceholder', 'Sistema')}</button>`)
+            .replace(/<button id="splash-start-button"([^>]*)>.*?<\/button>/g, `<button id="splash-start-button"$1>${gameData.gameSplashButtonText || t('UIEditor.textos.splashButtonPlaceholder')}</button>`)
+            .replace(/(<button[^>]*class="[^"]*ending-restart-button[^"]*"[^>]*>)(.*?)(<\/button>)/g, `$1${gameData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder')}$3`)
+            .replace(/<button id="continue-button"([^>]*)>.*?<\/button>/g, `<button id="continue-button"$1>${gameData.gameContinueButtonText || t('UIEditor.textos.continueButtonPlaceholder')}</button>`)
+            .replace(/<button id="system-button"([^>]*)>.*?<\/button>/g, `<button id="system-button"$1>${gameData.gameSystemButtonText || t('UIEditor.textos.systemPlaceholder')}</button>`)
             .replace('__SPLASH_DESCRIPTION__', gameData.gameSplashDescription || '')
-            .replace('__SPLASH_BUTTON_TEXT__', gameData.gameSplashButtonText || t('textos.splashButtonPlaceholder', 'INICIAR'))
-            .replace('__CONTINUE_BUTTON_TEXT__', gameData.gameContinueButtonText || t('textos.continueButtonPlaceholder', 'Continuar'))
-            .replace(/__RESTART_BUTTON_TEXT__/g, gameData.gameRestartButtonText || t('textos.restartButtonPlaceholder', 'Reiniciar Aventura'))
-            .replace('__ACTION_BUTTON_TEXT__', gameData.gameActionButtonText || t('textos.actionButtonText', 'Ação'))
-            .replace('__VERB_INPUT_PLACEHOLDER__', gameData.gameVerbInputPlaceholder || t('textos.commandInputPlaceholder', 'O que você faz?'))
+            .replace('__SPLASH_BUTTON_TEXT__', gameData.gameSplashButtonText || t('UIEditor.textos.splashButtonPlaceholder'))
+            .replace('__CONTINUE_BUTTON_TEXT__', gameData.gameContinueButtonText || t('UIEditor.textos.continueButtonPlaceholder'))
+            .replace(/__RESTART_BUTTON_TEXT__/g, gameData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder'))
+            .replace('__ACTION_BUTTON_TEXT__', gameData.gameActionButtonText || t('UIEditor.textos.actionButtonText'))
+            .replace('__VERB_INPUT_PLACEHOLDER__', gameData.gameVerbInputPlaceholder || t('UIEditor.textos.commandInputPlaceholder'))
             .replace('__POSITIVE_ENDING_BG_STYLE__', gameData.positiveEndingImage ? `style="background-image: url('${gameData.positiveEndingImage}')"` : '')
             .replace('__POSITIVE_ENDING_ALIGN_CLASS__', gameData.positiveEndingContentAlignment === 'left' ? 'align-left' : '')
             .replace('__POSITIVE_ENDING_DESCRIPTION__', gameData.positiveEndingDescription || '')

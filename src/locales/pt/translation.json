@@ -207,8 +207,10 @@
         "info": {
             "gameTitleLabel": "Título do Jogo",
             "gameTitlePlaceholder": "Ex: A Caverna dos Dragões",
+            "defaultTitle": "Minha Nova Aventura",
             "descriptionLabel": "Sinopse / Descrição",
             "descriptionPlaceholder": "Uma breve descrição da sua história...",
+            "defaultDescription": "Uma breve descrição da sua história...",
             "startButtonLabel": "Texto do Botão de Início",
             "startButtonPlaceholder": "Ex: Iniciar Aventura",
             "coverImageLabel": "Capa / Imagem de Fundo",
@@ -702,11 +704,14 @@
         "textos": {
             "interfaceTexts": "Textos da Interface",
             "actionButtonText": "Texto do Botão de Ação",
+            "actionButtonPlaceholder": "Ação",
             "commandInputPlaceholder": "Texto do Campo de Comando",
+            "commandInputValue": "O que você faz?",
             "viewEndingButtonText": "Texto do Botão \"Ver Final\"",
             "viewEndingPlaceholder": "Ver Final",
             "viewEndingInfo": "Aparece quando o jogo termina, para levar às telas de final.",
             "diaryPlayerName": "Nome do Jogador no Diário",
+            "diaryPlayerNamePlaceholder": "Jogador",
             "splashButtonText": "Texto do Botão de Início",
             "splashButtonPlaceholder": "INICIAR",
             "continueButtonText": "Texto do Botão de Continuar",
@@ -715,8 +720,11 @@
             "restartButtonPlaceholder": "Reiniciar Aventura",
             "navigationButtons": "Botões de Navegação",
             "suggestionsButton": "Botão Sugestões",
+            "suggestionsPlaceholder": "Sugestões",
             "inventoryButton": "Botão Inventário",
+            "inventoryPlaceholder": "Inventário",
             "diaryButton": "Botão Diário",
+            "diaryPlaceholder": "Diário",
             "trackersButton": "Botão Rastreadores",
             "trackersPlaceholder": "Rastreadores",
             "systemButton": "Botão Menu Sistema",
@@ -828,7 +836,13 @@
             "Spia": "Sépia",
             "Terminal": "Terminal",
             "Oceano": "Oceano",
-            "Vampiro": "Vampiro"
+            "Vampiro": "Vampiro",
+            "Cyberpunk": "Cyberpunk",
+            "Noir": "Noir",
+            "Fantasma": "Fantasma",
+            "Pergaminho": "Pergaminho",
+            "Neon": "Neon",
+            "Lavanda": "Lavanda"
         }
     },
     "editor": {

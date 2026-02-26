@@ -120,8 +120,10 @@
         "info": {
             "gameTitleLabel": "Game Title",
             "gameTitlePlaceholder": "Ex: The Dragon's Cave",
+            "defaultTitle": "My New Adventure",
             "descriptionLabel": "Synopsis / Description",
             "descriptionPlaceholder": "A brief description of your story...",
+            "defaultDescription": "A brief description of your story...",
             "startButtonLabel": "Start Button Text",
             "startButtonPlaceholder": "Ex: Start Adventure",
             "coverImageLabel": "Cover / Background Image",
@@ -700,11 +702,14 @@
         "textos": {
             "interfaceTexts": "Interface Texts",
             "actionButtonText": "Action Button Text",
+            "actionButtonPlaceholder": "Action",
             "commandInputPlaceholder": "Command Field Text",
+            "commandInputValue": "What do you do?",
             "viewEndingButtonText": "\"View Ending\" Button Text",
             "viewEndingPlaceholder": "View Ending",
             "viewEndingInfo": "Appears when the game ends, to take you to the ending screens.",
             "diaryPlayerName": "Player Name in Logbook",
+            "diaryPlayerNamePlaceholder": "Player",
             "splashButtonText": "Start Button Text",
             "splashButtonPlaceholder": "START",
             "continueButtonText": "Continue Button Text",
@@ -713,8 +718,11 @@
             "restartButtonPlaceholder": "Restart Adventure",
             "navigationButtons": "Navigation Buttons",
             "suggestionsButton": "Suggestions Button",
+            "suggestionsPlaceholder": "Suggestions",
             "inventoryButton": "Inventory Button",
+            "inventoryPlaceholder": "Inventory",
             "diaryButton": "Logbook Button",
+            "diaryPlaceholder": "Logbook",
             "trackersButton": "Trackers Button",
             "trackersPlaceholder": "Trackers",
             "systemButton": "System Menu Button",
@@ -826,7 +834,13 @@
             "Spia": "Sepia",
             "Terminal": "Terminal",
             "Oceano": "Ocean",
-            "Vampiro": "Vampire"
+            "Vampiro": "Vampire",
+            "Cyberpunk": "Cyberpunk",
+            "Noir": "Noir",
+            "Fantasma": "Ghost",
+            "Pergaminho": "Parchment",
+            "Neon": "Neon",
+            "Lavanda": "Lavender"
         }
     },
     "editor": {

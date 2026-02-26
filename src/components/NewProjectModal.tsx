@@ -43,8 +43,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     const [tab, setTab] = useState<Tab>('info');
 
     // Info State
-    const [title, setTitle] = useState('Minha Nova Aventura');
-    const [description, setDescription] = useState('Uma breve descrição da sua história...');
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
     const [startButtonText, setStartButtonText] = useState('');
     const [splashImage, setSplashImage] = useState('');
 
@@ -147,22 +147,23 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     // Helper for preview scene (Standard Scene)
     const previewStandardScene: Scene = useMemo(() => ({
         id: 'preview_scene',
-        name: 'Exemplo de Visualização',
+        name: t('newProject.previewOverlay.sceneName', 'Scene Name'),
         image: splashImage || '', // Use splash image if available for context
-        description: 'Esta é uma visualização da interface principal do jogo. Todas as suas escolhas de aparência (cores, fontes, molduras, layout) são aplicadas aqui em tempo real para que você possa ver o resultado final.',
+        description: t('newProject.previewOverlay.exampleDesc', 'This is an example description for the scene. The text flows according to the') + ' ' + t('newProject.previewOverlay.exampleDescBold', 'SETTINGS') + ' ' + t('newProject.previewOverlay.exampleDesc2', 'chosen.'),
         interactions: [],
         choices: [
-            { id: 'c1', label: 'Opção de Exemplo 1', targetSceneId: 'preview_scene' },
-            { id: 'c2', label: 'Opção de Exemplo 2', targetSceneId: 'preview_scene' }
+            { id: 'c1', label: t('newProject.previewOverlay.option1', 'Example Option 1'), targetSceneId: 'preview_scene' },
+            { id: 'c2', label: t('newProject.previewOverlay.option2', 'Example Option 2'), targetSceneId: 'preview_scene' }
         ],
         objectIds: [],
         exits: {}
-    }), [splashImage]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }), [splashImage, t]);
 
     // Helper for preview vignette (Splash Screen)
     const previewVignetteScene: Scene = useMemo(() => ({
         id: 'VNT_OPENING',
-        name: title || 'Abertura', // Map title here
+        name: title || t('newProject.info.defaultTitle', 'My New Adventure'), // Map title here
         image: splashImage || '',
         description: description,
         interactions: [],
@@ -232,8 +233,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
         vignettes: [{
             id: 'VNT_OPENING',
-            name: 'Abertura',
-            title: title || 'Abertura',
+            name: t('newProject.info.defaultTitle', 'My New Adventure'),
+            title: title || t('newProject.info.defaultTitle', 'My New Adventure'),
             description: description,
             buttonText: startButtonText,
             showTitle: true,
@@ -246,11 +247,16 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     const handleCreate = () => {
         const startSceneId = 'SCN_OPENING';
 
+        const defaultTitle = t('newProject.info.defaultTitle', 'My New Adventure');
+        const defaultDescription = t('newProject.info.defaultDescription', 'A brief description of your story...');
+        const finalTitle = title || defaultTitle;
+        const finalDescription = description || defaultDescription;
+
         // Create the Opening Vignette as a Scene
         const openingScene: Scene = {
             id: startSceneId,
-            name: title || 'Abertura',
-            description: description || '',
+            name: finalTitle,
+            description: finalDescription,
             image: splashImage, // Use the splash image for the scene background if desired, or keep generic/empty
             interactions: [],
             objectIds: [],
@@ -262,8 +268,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
         const newGameData: Partial<GameData> = {
             ...previewGameData,
-            gameTitle: title, // Ensure title is synced
-            gameSplashDescription: description,
+            gameTitle: finalTitle, // Ensure title is synced
+            gameSplashDescription: finalDescription,
             gameSplashButtonText: startButtonText,
             gameSplashImage: splashImage,
             startScene: startSceneId,
@@ -611,18 +617,18 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 <div className="space-y-2">
                                                     <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.predefinedThemes', 'Temas Predefinidos')}</label>
                                                     <div className="grid grid-cols-3 gap-2">
-                                                        {PREDEFINED_THEMES.map((t) => (
+                                                        {PREDEFINED_THEMES.map((theme) => (
                                                             <button
-                                                                key={t.name}
-                                                                onClick={() => handleApplyTheme(t)}
+                                                                key={theme.nameKey}
+                                                                onClick={() => handleApplyTheme(theme)}
                                                                 className="flex flex-col items-center gap-1 p-2 rounded border border-zinc-800 hover:bg-zinc-800 hover:border-zinc-600 transition-all text-center group"
                                                             >
                                                                 <div className="flex gap-1 justify-center">
-                                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: t.focusColor }}></div>
-                                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: t.titleColor }}></div>
-                                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: t.chanceIconColor }}></div>
+                                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.focusColor }}></div>
+                                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.titleColor }}></div>
+                                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.chanceIconColor }}></div>
                                                                 </div>
-                                                                <span className="text-[10px] font-bold text-zinc-500 group-hover:text-zinc-300">{t.name}</span>
+                                                                <span className="text-[10px] font-bold text-zinc-500 group-hover:text-zinc-300">{t(`ThemeEditor.themes.${theme.nameKey}`, { defaultValue: theme.name })}</span>
                                                             </button>
                                                         ))}
                                                     </div>

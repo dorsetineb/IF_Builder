@@ -987,7 +987,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (vignetteDescription) vignetteDescription.textContent = scene.description || '';
         
         // Set button text
-        const buttonText = scene.vignetteButtonText || (scene.vignetteType === 'conclusion' ? 'Reiniciar' : 'Continuar');
+        const buttonText = scene.vignetteButtonText || (scene.vignetteType === 'conclusion' ? (gameData.gameRestartButtonText || 'Restart') : (gameData.gameContinueButtonText || 'Continue'));
         if (vignetteContinueButton) vignetteContinueButton.textContent = buttonText;
         
         // Set background image

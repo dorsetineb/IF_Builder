@@ -23,7 +23,7 @@ export const FONTS = [
 
 export const PREDEFINED_THEMES = [
     {
-        name: 'Meia-Noite',
+        name: 'Meia-Noite', nameKey: 'MeiaNoite',
         mode: 'dark',
         textColor: '#c9d1d9', titleColor: '#58a6ff', focusColor: '#58a6ff',
         textColorLight: '#24292f', titleColorLight: '#0969da', focusColorLight: '#0969da',
@@ -32,7 +32,7 @@ export const PREDEFINED_THEMES = [
         chanceIconColor: '#ff4d4d',
     },
     {
-        name: 'Floresta',
+        name: 'Floresta', nameKey: 'Floresta',
         mode: 'dark',
         textColor: '#d4d4d2', titleColor: '#a3e635', focusColor: '#a3e635',
         textColorLight: '#1c1917', titleColorLight: '#166534', focusColorLight: '#166534',
@@ -41,7 +41,7 @@ export const PREDEFINED_THEMES = [
         chanceIconColor: '#dc2626',
     },
     {
-        name: 'Sépia',
+        name: 'Sépia', nameKey: 'Spia',
         mode: 'dark',
         textColor: '#e7e5e4', titleColor: '#f59e0b', focusColor: '#f59e0b',
         textColorLight: '#292524', titleColorLight: '#78350f', focusColorLight: '#78350f',
@@ -50,7 +50,7 @@ export const PREDEFINED_THEMES = [
         chanceIconColor: '#b91c1c',
     },
     {
-        name: 'Terminal',
+        name: 'Terminal', nameKey: 'Terminal',
         mode: 'dark',
         textColor: '#34d399', titleColor: '#6ee7b7', focusColor: '#a7f3d0',
         textColorLight: '#064e3b', titleColorLight: '#047857', focusColorLight: '#059669',
@@ -59,7 +59,7 @@ export const PREDEFINED_THEMES = [
         chanceIconColor: '#6ee7b7',
     },
     {
-        name: 'Oceano',
+        name: 'Oceano', nameKey: 'Oceano',
         mode: 'dark',
         textColor: '#cbd5e1', titleColor: '#60a5fa', focusColor: '#93c5fd',
         textColorLight: '#1e293b', titleColorLight: '#2563eb', focusColorLight: '#3b82f6',
@@ -68,7 +68,7 @@ export const PREDEFINED_THEMES = [
         chanceIconColor: '#3b82f6',
     },
     {
-        name: 'Vampiro',
+        name: 'Vampiro', nameKey: 'Vampiro',
         mode: 'dark',
         textColor: '#fecaca', titleColor: '#fca5a5', focusColor: '#f87171',
         textColorLight: '#450a0a', titleColorLight: '#991b1b', focusColorLight: '#b91c1c',
@@ -78,7 +78,7 @@ export const PREDEFINED_THEMES = [
     },
     // NEW THEMES
     {
-        name: 'Cyberpunk',
+        name: 'Cyberpunk', nameKey: 'Cyberpunk',
         mode: 'dark',
         textColor: '#e0e7ff', titleColor: '#f0abfc', focusColor: '#22d3ee',
         textColorLight: '#1e1b4b', titleColorLight: '#a21caf', focusColorLight: '#0891b2',
@@ -87,7 +87,7 @@ export const PREDEFINED_THEMES = [
         chanceIconColor: '#f0abfc',
     },
     {
-        name: 'Noir',
+        name: 'Noir', nameKey: 'Noir',
         mode: 'dark',
         textColor: '#a1a1aa', titleColor: '#d4af37', focusColor: '#fbbf24',
         textColorLight: '#18181b', titleColorLight: '#92400e', focusColorLight: '#b45309',
@@ -96,7 +96,7 @@ export const PREDEFINED_THEMES = [
         chanceIconColor: '#d4af37',
     },
     {
-        name: 'Fantasma',
+        name: 'Fantasma', nameKey: 'Fantasma',
         mode: 'dark',
         textColor: '#e4e4e7', titleColor: '#a78bfa', focusColor: '#c4b5fd',
         textColorLight: '#27272a', titleColorLight: '#6d28d9', focusColorLight: '#7c3aed',
@@ -105,7 +105,7 @@ export const PREDEFINED_THEMES = [
         chanceIconColor: '#c4b5fd',
     },
     {
-        name: 'Pergaminho',
+        name: 'Pergaminho', nameKey: 'Pergaminho',
         mode: 'light',
         textColor: '#44403c', titleColor: '#78350f', focusColor: '#92400e',
         textColorLight: '#44403c', titleColorLight: '#78350f', focusColorLight: '#92400e',
@@ -114,7 +114,7 @@ export const PREDEFINED_THEMES = [
         chanceIconColor: '#dc2626',
     },
     {
-        name: 'Neon',
+        name: 'Neon', nameKey: 'Neon',
         mode: 'dark',
         textColor: '#d4d4d8', titleColor: '#39ff14', focusColor: '#84cc16',
         textColorLight: '#18181b', titleColorLight: '#15803d', focusColorLight: '#22c55e',
@@ -123,7 +123,7 @@ export const PREDEFINED_THEMES = [
         chanceIconColor: '#39ff14',
     },
     {
-        name: 'Lavanda',
+        name: 'Lavanda', nameKey: 'Lavanda',
         mode: 'light',
         textColor: '#3f3f46', titleColor: '#7c3aed', focusColor: '#8b5cf6',
         textColorLight: '#3f3f46', titleColorLight: '#7c3aed', focusColorLight: '#8b5cf6',

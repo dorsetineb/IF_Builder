@@ -207,8 +207,10 @@
         "info": {
             "gameTitleLabel": "Título del Juego",
             "gameTitlePlaceholder": "Ej: La Cueva de los Dragones",
+            "defaultTitle": "Mi Nueva Aventura",
             "descriptionLabel": "Sinopsis / Descripción",
             "descriptionPlaceholder": "Una breve descripción de tu historia...",
+            "defaultDescription": "Una breve descripción de tu historia...",
             "startButtonLabel": "Texto del Botón de Inicio",
             "startButtonPlaceholder": "Ej: Iniciar Aventura",
             "coverImageLabel": "Portada / Imagen de Fondo",
@@ -702,11 +704,14 @@
         "textos": {
             "interfaceTexts": "Textos de la Interfaz",
             "actionButtonText": "Texto del Botón de Acción",
+            "actionButtonPlaceholder": "Acción",
             "commandInputPlaceholder": "Texto del Campo de Comando",
+            "commandInputValue": "¿Qué haces?",
             "viewEndingButtonText": "Texto del Botón \"Ver Final\"",
             "viewEndingPlaceholder": "Ver Final",
             "viewEndingInfo": "Aparece cuando el juego termina, para llevar a las pantallas finales.",
             "diaryPlayerName": "Nombre del Jugador en el Diario",
+            "diaryPlayerNamePlaceholder": "Jugador",
             "splashButtonText": "Texto del Botón de Inicio",
             "splashButtonPlaceholder": "INICIAR",
             "continueButtonText": "Texto del Botón de Continuar",
@@ -715,8 +720,11 @@
             "restartButtonPlaceholder": "Reiniciar Aventura",
             "navigationButtons": "Botones de Navegación",
             "suggestionsButton": "Botón de Sugerencias",
+            "suggestionsPlaceholder": "Sugerencias",
             "inventoryButton": "Botón de Inventario",
+            "inventoryPlaceholder": "Inventario",
             "diaryButton": "Botón de Diario",
+            "diaryPlaceholder": "Diario",
             "trackersButton": "Botón de Rastreadores",
             "trackersPlaceholder": "Rastreadores",
             "systemButton": "Botón Menú del Sistema",
@@ -828,7 +836,13 @@
             "Spia": "Sepia",
             "Terminal": "Terminal",
             "Oceano": "Océano",
-            "Vampiro": "Vampiro"
+            "Vampiro": "Vampiro",
+            "Cyberpunk": "Cyberpunk",
+            "Noir": "Noir",
+            "Fantasma": "Fantasma",
+            "Pergaminho": "Pergamino",
+            "Neon": "Neón",
+            "Lavanda": "Lavanda"
         }
     },
     "editor": {
