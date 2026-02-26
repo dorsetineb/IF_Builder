@@ -7,6 +7,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { t } = useTranslation();
     const [showPixModal, setShowPixModal] = useState(false);
     const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
+    const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>('pix');
 
     const handleCopyPix = () => {
         navigator.clipboard.writeText("rodbertes@gmail.com");
@@ -50,9 +51,9 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
             <div className="max-w-7xl mx-auto px-8 pt-6 pb-24 w-full animate-in fade-in duration-500">
 
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start relative">
-                    {/* Main Content - 3 Columns */}
-                    <div className="lg:col-span-3 space-y-6">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
+                    {/* Main Content */}
+                    <div className={`space-y-6 transition-all duration-300 ${supportMethod === 'kofi' ? 'lg:col-span-7 xl:col-span-8' : 'lg:col-span-9'}`}>
                         {/* Tabs Navigation */}
                         <div className="flex border-b border-muted-foreground/50 mb-6">
                             <div className="flex space-x-6">
@@ -172,7 +173,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     </div>
 
                     {/* Sidebar - Fixa/Sticky */}
-                    <div className="lg:col-span-1 lg:sticky lg:top-0 space-y-6">
+                    <div className={`lg:sticky lg:top-0 space-y-6 transition-all duration-300 ${supportMethod === 'kofi' ? 'lg:col-span-5 xl:col-span-4' : 'lg:col-span-3'}`}>
                         <div className="bg-gradient-to-b from-primary/20 to-transparent border border-primary/20 rounded-xl p-6 shadow-sm relative overflow-hidden group">
                             <div className="flex items-center gap-2 mb-2">
                                 <Heart className="w-4 h-4 text-primary fill-current" />
@@ -180,24 +181,53 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             </div>
 
                             <p className="text-[10px] text-zinc-400 leading-relaxed mb-4">
-                                {t('about.support.sidebar.desc', 'Este site é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX!')}
+                                {t('about.support.sidebar.desc', 'Este site é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX ou doar um Ko-fi!')}
                             </p>
 
-                            <div className="bg-white p-2 rounded-lg flex justify-center mb-6">
-                                <img
-                                    src="/qrcode-pix.png"
-                                    alt="QR Code PIX"
-                                    className="w-full h-auto object-contain"
-                                />
+                            <div className="flex bg-zinc-900/50 p-1 rounded-lg mb-6 border border-zinc-800">
+                                <button
+                                    onClick={() => setSupportMethod('pix')}
+                                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${supportMethod === 'pix' ? 'bg-primary text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                >
+                                    PIX
+                                </button>
+                                <button
+                                    onClick={() => setSupportMethod('kofi')}
+                                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${supportMethod === 'kofi' ? 'bg-[#29abe0] text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                >
+                                    Ko-Fi
+                                </button>
                             </div>
 
-                            <button
-                                onClick={() => setShowPixModal(true)}
-                                className="w-full py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20"
-                            >
-                                <Key className="w-4 h-4" />
-                                {t('about.support.sidebar.btn', 'Ver Chave PIX')}
-                            </button>
+                            {supportMethod === 'pix' ? (
+                                <>
+                                    <div className="bg-white p-2 rounded-lg flex justify-center mb-6">
+                                        <img
+                                            src="/qrcode-pix.png"
+                                            alt="QR Code PIX"
+                                            className="w-full h-auto object-contain"
+                                        />
+                                    </div>
+
+                                    <button
+                                        onClick={() => setShowPixModal(true)}
+                                        className="w-full py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20"
+                                    >
+                                        <Key className="w-4 h-4" />
+                                        {t('about.support.sidebar.btn', 'Ver Chave PIX')}
+                                    </button>
+                                </>
+                            ) : (
+                                <div className="w-full flex justify-center rounded-lg overflow-hidden border border-zinc-800 bg-[#f9f9f9] h-[720px]">
+                                    <iframe
+                                        id='kofiframe'
+                                        src='https://ko-fi.com/ifbuildr/?hidefeed=true&widget=true&embed=true&preview=true'
+                                        style={{ border: 'none', width: '100%', padding: '4px', background: '#f9f9f9' }}
+                                        height='712'
+                                        title='ifbuildr'
+                                    />
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
