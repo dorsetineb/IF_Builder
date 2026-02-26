@@ -516,6 +516,9 @@ const Editor: React.FC = () => {
                             setCurrentView('scenes');
                             setSelectedSceneId(null);
                         }}
+                        onExport={handleExport}
+                        onImport={handleImportFile}
+                        currentView={currentView}
                     />
                     <Preview gameData={gameData} testSceneId={previewSceneId} />
                 </div>
@@ -563,7 +566,6 @@ const Editor: React.FC = () => {
                             isCollapsed={sidebarCollapsed}
                             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
                             isDirty={isDirty}
-                            onOpenManual={() => setIsManualOpen(true)}
                             theme={appTheme}
                         />
                         <main className={`flex-1 overflow-y-auto relative bg-background ${currentView === 'scenes' && !selectedScene ? 'p-0' : 'p-6'}`}>
@@ -597,12 +599,12 @@ const Editor: React.FC = () => {
                                         negativeEndingDescription={gameData.negativeEndingDescription || ''}
                                         negativeEndingMusic={gameData.negativeEndingMusic || ''}
                                         fixedVerbs={fixedVerbs}
-                                        actionButtonText={gameData.gameActionButtonText || 'Ação'}
-                                        verbInputPlaceholder={gameData.gameVerbInputPlaceholder || 'O que você faz?'}
-                                        diaryPlayerName={gameData.gameDiaryPlayerName || 'Jogador'}
-                                        splashButtonText={gameData.gameSplashButtonText || 'INICIAR'}
-                                        continueButtonText={gameData.gameContinueButtonText || 'Continuar'}
-                                        restartButtonText={gameData.gameRestartButtonText || 'Reiniciar'}
+                                        actionButtonText={gameData.gameActionButtonText || t('textos.actionButtonText', 'Ação')}
+                                        verbInputPlaceholder={gameData.gameVerbInputPlaceholder || t('textos.commandInputPlaceholder', 'O que você faz?')}
+                                        diaryPlayerName={gameData.gameDiaryPlayerName || t('textos.diaryPlayerName', 'Jogador')}
+                                        splashButtonText={gameData.gameSplashButtonText || t('textos.splashButtonPlaceholder', 'INICIAR')}
+                                        continueButtonText={gameData.gameContinueButtonText || t('textos.continueButtonPlaceholder', 'Continuar')}
+                                        restartButtonText={gameData.gameRestartButtonText || t('textos.restartButtonPlaceholder', 'Reiniciar')}
                                         gameInteractionType={gameData.gameInteractionType || 'parser'}
                                         gameSystemEnabled={gameData.gameSystemEnabled || 'none'}
                                         maxChances={gameData.gameMaxChances || 3}
@@ -618,7 +620,7 @@ const Editor: React.FC = () => {
                                         gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
                                         gameFontSize={gameData.gameFontSize || '0.75em'}
                                         chanceIcon={gameData.gameChanceIcon || 'heart'}
-                                        chanceReturnButtonText={gameData.gameChanceReturnButtonText || 'Tentar Novamente'}
+                                        chanceReturnButtonText={gameData.gameChanceReturnButtonText || t('ThemeEditor.returnButtonText', 'Tentar Novamente')}
                                         gameTheme={gameData.gameTheme || 'dark'}
                                         textColorLight={gameData.textColorLight || '#24292f'}
                                         titleColorLight={gameData.titleColorLight || '#0969da'}

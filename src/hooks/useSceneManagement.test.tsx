@@ -52,7 +52,7 @@ describe('useSceneManagement Hook', () => {
 
     it('should update a scene', () => {
         const { result } = renderHook(() => useSceneManagement(defaultProps));
-        const scene = { id: 'scn_1', name: 'Original', description: 'Desc', interactions: [], objectIds: [], mapX: 0, mapY: 0 };
+        const scene = { id: 'scn_1', name: 'Original', image: '', description: 'Desc', interactions: [], objectIds: [], mapX: 0, mapY: 0 };
 
         act(() => {
             result.current.handleUpdateScene({ ...scene, name: 'Updated' });

@@ -1,6 +1,6 @@
 
 import React, { useRef } from 'react';
-import { GameData } from '../types';
+import { GameData, View } from '../types';
 import { Eye, Plus, CircleHelp, LogOut, ChevronLeft, ChevronRight, PanelLeft, Upload, Download, Save } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,7 +15,7 @@ const Header: React.FC<{
   onExport: () => void;
   onImport: (file: File) => void;
   onHome?: () => void;
-  currentView: 'scenes' | 'interface' | 'map' | 'global_objects' | 'trackers' | 'settings' | 'about';
+  currentView: View;
 }> = ({ gameData, isPreviewing, onTogglePreview, onNewGame, onLogout, sidebarCollapsed, onToggleCollapse, onExport, onImport, onHome, currentView }) => {
   const { t } = useTranslation();
   const importInputRef = useRef<HTMLInputElement>(null);

@@ -3,7 +3,7 @@ import React, { useEffect, useRef } from 'react';
 const GlitchOverlay: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
-    const requestRef = useRef<number>();
+    const requestRef = useRef<number>(0);
 
     useEffect(() => {
         // Apply glitch filter to parent image

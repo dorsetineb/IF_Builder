@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { FixedVerb } from '../types';
+import { FixedVerb, GameData } from '../types';
 import { Plus, Trash2, Search, Command, MessageSquare, Box, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
 
@@ -26,7 +26,7 @@ const COMMAND_ICONS = [
 
 interface GlobalCommandsEditorProps {
     fixedVerbs: FixedVerb[];
-    onUpdate: (field: string, value: any, skipDirty?: boolean) => void;
+    onUpdate: (field: keyof GameData | Partial<GameData>, value?: any, skipDirty?: boolean) => void;
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
 }

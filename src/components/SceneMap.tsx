@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, Vignette } from '../types';
 import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface SceneMapProps {
   allScenesMap: GameData['scenes'];
@@ -61,6 +62,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
   onReorganizeScenes,
   gameInteractionType = 'parser'
 }) => {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState({ x: 0, y: 0, scale: 1 });
   const [isPanning, setIsPanning] = useState(false);
@@ -79,7 +81,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
         items.push({
           id: `link-opening-${scene.id}`,
           targetId: startSceneId,
-          label: scene.vignetteButtonText || 'INICIAR',
+          label: scene.vignetteButtonText || t('textos.splashButtonPlaceholder', 'INICIAR'),
           type: 'scene'
         });
       }
@@ -92,7 +94,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
             items.push({
               id: `link-endgame-${scene.id}`,
               targetId: 'VNT_VICTORY',
-              label: scene.vignetteButtonText || 'Fim',
+              label: scene.vignetteButtonText || t('branchingPreview.endGame', 'Fim'),
               type: 'vignette'
             });
           }
@@ -100,7 +102,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
           items.push({
             id: `link-vignette-${scene.id}`,
             targetId: scene.vignetteNextSceneId,
-            label: scene.vignetteButtonText || 'Continuar',
+            label: scene.vignetteButtonText || t('textos.continueButtonPlaceholder', 'Continuar'),
             type: 'scene'
           });
         }
@@ -162,7 +164,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
             items.push({
               id: i.id,
               targetId: i.goToScene,
-              label: i.verbs?.[0] || 'Ir para',
+              label: i.verbs?.[0] || t('branchingPreview.thisScene', 'Ir para'),
               type: 'scene',
               original: i
             });
@@ -178,7 +180,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
         return [{
           id: `link-${vig.id}-start`,
           targetId: startSceneId,
-          label: 'INICIAR',
+          label: t('textos.splashButtonPlaceholder', 'INICIAR'),
           type: 'scene' as MapNodeType
         }];
       }
@@ -187,13 +189,13 @@ const SceneMap: React.FC<SceneMapProps> = ({
         return [{
           id: `link-${vig.id}`,
           targetId: vig.nextSceneId,
-          label: 'Continuar',
+          label: t('textos.continueButtonPlaceholder', 'Continuar'),
           type: 'scene' as MapNodeType
         }];
       }
       return [];
     }
-  }, [gameInteractionType, startSceneId]);
+  }, [gameInteractionType, startSceneId, t]);
 
   const { initialNodes, edges, bounds, activeAnchors, orphanIds } = useMemo(() => {
     // 1. Prepare Data Maps

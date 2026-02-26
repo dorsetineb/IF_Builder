@@ -15,7 +15,7 @@ interface UseExportImportProps {
     setIsDirty: React.Dispatch<React.SetStateAction<boolean>>;
     setImportKey: React.Dispatch<React.SetStateAction<number>>;
     setCurrentView: (view: View) => void;
-    toast: (title: string, description: string, variant?: "default" | "destructive" | "success" | "error") => void;
+    toast: (title: string, description?: string, type?: 'success' | 'error' | 'info') => void;
     profile: any; // User profile
 }
 

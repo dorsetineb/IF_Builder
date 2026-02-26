@@ -97,7 +97,7 @@ const Profile: React.FC = () => {
                             <h1 className="text-xl font-bold text-foreground">{profile.full_name || profile.username}</h1>
                             <CheckCircle size={16} className="text-blue-500 fill-blue-500/10" />
                         </div>
-                        <p className="text-muted-foreground font-medium mb-1.5 text-xs">@{profile.username} • Membro desde {new Date(profile.created_at).getFullYear()}</p>
+                        <p className="text-muted-foreground font-medium mb-1.5 text-xs">@{profile.username} • Atualizado em {new Date(profile.updated_at).getFullYear()}</p>
                         <p className="text-card-foreground/80 max-w-2xl leading-relaxed text-xs">
                             {profile.bio || "Sem biografia."}
                         </p>

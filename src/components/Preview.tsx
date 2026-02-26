@@ -3,6 +3,7 @@ import React, { useMemo } from 'react';
 import { GameData } from '../types';
 import { gameHTML, initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
+import { useTranslation } from 'react-i18next';
 
 // Helper to generate the correct Google Fonts URL from a font-family string.
 const getFontUrl = (fontFamily: string) => {
@@ -22,6 +23,7 @@ const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
 }
 
 const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = ({ gameData, testSceneId }) => {
+    const { t } = useTranslation();
     const srcDoc = useMemo(() => {
         const enableChances = gameData.enableChances || gameData.gameSystemEnabled === 'chances';
         const enableTrackers = gameData.enableTrackers || gameData.gameSystemEnabled === 'trackers';
@@ -41,11 +43,11 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
         const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
 
         const inventoryButtonHTML = (gameData.enableInventory ?? true)
-            ? `<button id="inventory-button">${gameData.gameInventoryButtonText || 'Inventário'}</button>`
+            ? `<button id="inventory-button">${gameData.gameInventoryButtonText || t('textos.inventoryButton', 'Inventário')}</button>`
             : '';
 
         const diaryButtonHTML = (gameData.enableDiary ?? true)
-            ? `<button id="diary-button">${gameData.gameDiaryButtonText || 'Diário'}</button>`
+            ? `<button id="diary-button">${gameData.gameDiaryButtonText || t('textos.diaryButton', 'Diário')}</button>`
             : '';
 
         let finalHtml = gameData.gameHTML
@@ -61,25 +63,25 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('__SYSTEM_BUTTON__', systemButtonHTML)
             .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
             .replace('__DIARY_BUTTON__', diaryButtonHTML)
-            .replace(/__INVENTORY_BUTTON_TEXT__/g, gameData.gameInventoryButtonText || 'Inventário')
-            .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, gameData.gameSuggestionsButtonText || 'Sugestões')
-            .replace(/__TRACKERS_BUTTON_TEXT__/g, gameData.gameTrackersButtonText || 'Rastreadores')
-            .replace(/__SYSTEM_BUTTON_TEXT__/g, gameData.gameSystemButtonText || 'Sistema')
-            .replace(/__DIARY_BUTTON_TEXT__/g, gameData.gameDiaryButtonText || 'Diário')
-            .replace('__SAVE_MENU_TITLE__', gameData.gameSaveMenuTitle || 'Salvar Jogo')
-            .replace('__LOAD_MENU_TITLE__', gameData.gameLoadMenuTitle || 'Carregar Jogo')
-            .replace('__MAIN_MENU_BUTTON_TEXT__', gameData.gameMainMenuButtonText || 'Menu Principal')
-            .replace('__VIEW_ENDING_BUTTON_TEXT__', gameData.gameViewEndingButtonText || 'Ver Final')
+            .replace(/__INVENTORY_BUTTON_TEXT__/g, gameData.gameInventoryButtonText || t('textos.inventoryButton', 'Inventário'))
+            .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, gameData.gameSuggestionsButtonText || t('textos.suggestionsButton', 'Sugestões'))
+            .replace(/__TRACKERS_BUTTON_TEXT__/g, gameData.gameTrackersButtonText || t('textos.trackersPlaceholder', 'Rastreadores'))
+            .replace(/__SYSTEM_BUTTON_TEXT__/g, gameData.gameSystemButtonText || t('textos.systemPlaceholder', 'Sistema'))
+            .replace(/__DIARY_BUTTON_TEXT__/g, gameData.gameDiaryButtonText || t('textos.diaryButton', 'Diário'))
+            .replace('__SAVE_MENU_TITLE__', gameData.gameSaveMenuTitle || t('SystemEditor.saveMenu.previewSave', 'Salvar Jogo'))
+            .replace('__LOAD_MENU_TITLE__', gameData.gameLoadMenuTitle || t('SystemEditor.loadMenu.previewLoad', 'Carregar Jogo'))
+            .replace('__MAIN_MENU_BUTTON_TEXT__', gameData.gameMainMenuButtonText || t('textos.mainMenuPlaceholder', 'Menu Principal'))
+            .replace('__VIEW_ENDING_BUTTON_TEXT__', gameData.gameViewEndingButtonText || t('textos.viewEndingPlaceholder', 'Ver Final'))
             .replace('__SPLASH_BG_STYLE__', gameData.gameSplashImage ? `style="background-image: url('${gameData.gameSplashImage}')"` : '')
             .replace('__SPLASH_ALIGN_CLASS__', gameData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
             .replace('__SPLASH_LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="splash-logo">` : '')
             .replace('__SPLASH_TITLE_H1_TAG__', !gameData.gameOmitSplashTitle ? `<h1>${gameData.gameTitle}</h1>` : '')
             .replace('__SPLASH_DESCRIPTION__', gameData.gameSplashDescription || '')
-            .replace('__SPLASH_BUTTON_TEXT__', gameData.gameSplashButtonText || 'Start')
-            .replace('__CONTINUE_BUTTON_TEXT__', gameData.gameContinueButtonText || 'Continue')
-            .replace(/__RESTART_BUTTON_TEXT__/g, gameData.gameRestartButtonText || 'Reiniciar Aventura')
-            .replace('__ACTION_BUTTON_TEXT__', gameData.gameActionButtonText || 'Action')
-            .replace('__VERB_INPUT_PLACEHOLDER__', gameData.gameVerbInputPlaceholder || 'What do you do?')
+            .replace('__SPLASH_BUTTON_TEXT__', gameData.gameSplashButtonText || t('textos.splashButtonPlaceholder', 'INICIAR'))
+            .replace('__CONTINUE_BUTTON_TEXT__', gameData.gameContinueButtonText || t('textos.continueButtonPlaceholder', 'Continuar'))
+            .replace(/__RESTART_BUTTON_TEXT__/g, gameData.gameRestartButtonText || t('textos.restartButtonPlaceholder', 'Reiniciar Aventura'))
+            .replace('__ACTION_BUTTON_TEXT__', gameData.gameActionButtonText || t('textos.actionButtonText', 'Ação'))
+            .replace('__VERB_INPUT_PLACEHOLDER__', gameData.gameVerbInputPlaceholder || t('textos.commandInputPlaceholder', 'O que você faz?'))
             .replace('__POSITIVE_ENDING_BG_STYLE__', gameData.positiveEndingImage ? `style="background-image: url('${gameData.positiveEndingImage}')"` : '')
             .replace('__POSITIVE_ENDING_ALIGN_CLASS__', gameData.positiveEndingContentAlignment === 'left' ? 'align-left' : '')
             .replace('__POSITIVE_ENDING_DESCRIPTION__', gameData.positiveEndingDescription || '')
@@ -252,7 +254,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('</head>', `${testSceneCss}${styleTag}</head>`)
             .replace('</body>', `${dataScript}${gameScriptTag}</body>`);
 
-    }, [gameData, testSceneId]);
+    }, [gameData, testSceneId, t]);
 
     return (
         <div className="w-full h-full bg-brand-bg relative">

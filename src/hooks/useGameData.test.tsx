@@ -29,7 +29,7 @@ describe('useGameData Hook', () => {
 
     it('should add global object', () => {
         const { result } = renderHook(() => useGameData());
-        const newObj = { id: 'obj_1', name: 'Novo Objeto', description: '', initialDescription: '', location: 'held', isContainer: false, isLocked: false, isOpen: false };
+        const newObj = { id: 'obj_1', name: 'Novo Objeto', description: '', initialDescription: '', examineDescription: '', location: 'held', isContainer: false, isLocked: false, isOpen: false };
 
         act(() => {
             result.current.handleCreateGlobalObject(newObj);

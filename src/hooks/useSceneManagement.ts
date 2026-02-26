@@ -8,7 +8,7 @@ interface UseSceneManagementProps {
     gameData: GameData;
     setGameData: React.Dispatch<React.SetStateAction<GameData>>;
     setIsDirty: React.Dispatch<React.SetStateAction<boolean>>;
-    toast: (title: string, description: string, variant?: "default" | "destructive" | "success" | "error") => void;
+    toast: (title: string, description?: string, type?: 'success' | 'error' | 'info') => void;
     setCurrentView: (view: View) => void;
     setSelectedSceneId: (id: string | null) => void;
     selectedSceneId: string | null;
