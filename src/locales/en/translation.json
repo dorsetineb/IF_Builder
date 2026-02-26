@@ -727,6 +727,8 @@
             "trackersPlaceholder": "Trackers",
             "systemButton": "System Menu Button",
             "systemPlaceholder": "System",
+            "saveMenuPlaceholder": "Save Game",
+            "loadMenuPlaceholder": "Load Game",
             "mainMenuButton": "Main Menu Button",
             "mainMenuPlaceholder": "Main Menu"
         },

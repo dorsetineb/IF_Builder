@@ -155,6 +155,29 @@ DATE:        ${exportDate.toLocaleString()}
             }
         }
 
+        // Inject translated defaults for empty text fields before export
+        const textDefaults: Record<string, string> = {
+            gameSplashButtonText: t('UIEditor.textos.splashButtonPlaceholder'),
+            gameContinueButtonText: t('UIEditor.textos.continueButtonPlaceholder'),
+            gameRestartButtonText: t('UIEditor.textos.restartButtonPlaceholder'),
+            gameActionButtonText: t('UIEditor.textos.actionButtonPlaceholder'),
+            gameVerbInputPlaceholder: t('UIEditor.textos.commandInputValue'),
+            gameSuggestionsButtonText: t('UIEditor.textos.suggestionsPlaceholder'),
+            gameInventoryButtonText: t('UIEditor.textos.inventoryPlaceholder'),
+            gameDiaryButtonText: t('UIEditor.textos.diaryPlaceholder'),
+            gameTrackersButtonText: t('UIEditor.textos.trackersPlaceholder'),
+            gameSystemButtonText: t('UIEditor.textos.systemPlaceholder'),
+            gameMainMenuButtonText: t('UIEditor.textos.mainMenuPlaceholder'),
+            gameSaveMenuTitle: t('UIEditor.textos.saveMenuPlaceholder', 'Save Game'),
+            gameLoadMenuTitle: t('UIEditor.textos.loadMenuPlaceholder', 'Load Game'),
+            gameViewEndingButtonText: t('UIEditor.textos.viewEndingPlaceholder'),
+            gameDiaryPlayerName: t('UIEditor.textos.diaryPlayerNamePlaceholder'),
+        };
+        // Fill empty text fields with translated defaults so exported data is self-contained
+        Object.keys(textDefaults).forEach(key => {
+            if (!exportData[key]) exportData[key] = textDefaults[key];
+        });
+
         const engineData = prepareGameDataForEngine(exportData);
         const safeJson = JSON.stringify(engineData).replace(/<\/script/g, '<\\/script>');
         const finalGameScript = `window.embeddedGameData = ${safeJson};\n\n${gameJS}`;
@@ -163,11 +186,11 @@ DATE:        ${exportDate.toLocaleString()}
         const systemButtonHTML = (exportData.gameShowSystemButton ?? true) ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>' : '';
 
         const inventoryButtonHTML = (exportData.enableInventory ?? true)
-            ? `<button id="inventory-button">${exportData.gameInventoryButtonText || t('UIEditor.textos.inventoryButton')}</button>`
+            ? `<button id="inventory-button">${exportData.gameInventoryButtonText || t('UIEditor.textos.inventoryPlaceholder')}</button>`
             : '';
 
         const diaryButtonHTML = (exportData.enableDiary ?? true)
-            ? `<button id="diary-button">${exportData.gameDiaryButtonText || t('UIEditor.textos.diaryButton')}</button>`
+            ? `<button id="diary-button">${exportData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder')}</button>`
             : '';
 
         let htmlContent = gameData.gameHTML
@@ -183,12 +206,12 @@ DATE:        ${exportDate.toLocaleString()}
             .replace('__SYSTEM_BUTTON__', systemButtonHTML)
             .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
             .replace('__DIARY_BUTTON__', diaryButtonHTML)
-            .replace(/__INVENTORY_BUTTON_TEXT__/g, exportData.gameInventoryButtonText || t('UIEditor.textos.inventoryButton'))
-            .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, exportData.gameSuggestionsButtonText || t('UIEditor.textos.suggestionsButton'))
+            .replace(/__INVENTORY_BUTTON_TEXT__/g, exportData.gameInventoryButtonText || t('UIEditor.textos.inventoryPlaceholder'))
+            .replace(/__SUGGESTIONS_BUTTON_TEXT__/g, exportData.gameSuggestionsButtonText || t('UIEditor.textos.suggestionsPlaceholder'))
             .replace(/__TRACKERS_BUTTON_TEXT__/g, exportData.gameTrackersButtonText || t('UIEditor.textos.trackersPlaceholder'))
             .replace(/__SYSTEM_BUTTON_TEXT__/g, exportData.gameSystemButtonText || t('UIEditor.textos.systemPlaceholder'))
-            .replace('__SAVE_MENU_TITLE__', exportData.gameSaveMenuTitle || t('SystemEditor.saveMenu.previewSave', 'Salvar Jogo'))
-            .replace('__LOAD_MENU_TITLE__', exportData.gameLoadMenuTitle || t('SystemEditor.loadMenu.previewLoad', 'Carregar Jogo'))
+            .replace('__SAVE_MENU_TITLE__', exportData.gameSaveMenuTitle || t('UIEditor.textos.saveMenuPlaceholder', 'Save Game'))
+            .replace('__LOAD_MENU_TITLE__', exportData.gameLoadMenuTitle || t('UIEditor.textos.loadMenuPlaceholder', 'Load Game'))
             .replace('__MAIN_MENU_BUTTON_TEXT__', exportData.gameMainMenuButtonText || t('UIEditor.textos.mainMenuPlaceholder'))
             .replace('__SPLASH_BG_STYLE__', exportData.gameSplashImage ? `style="background-image: url('${exportData.gameSplashImage}')"` : '')
             .replace('__SPLASH_ALIGN_CLASS__', exportData.gameSplashContentAlignment === 'left' ? 'align-left' : '')
@@ -202,8 +225,8 @@ DATE:        ${exportDate.toLocaleString()}
             .replace('__SPLASH_BUTTON_TEXT__', exportData.gameSplashButtonText || t('UIEditor.textos.splashButtonPlaceholder'))
             .replace('__CONTINUE_BUTTON_TEXT__', exportData.gameContinueButtonText || t('UIEditor.textos.continueButtonPlaceholder'))
             .replace(/__RESTART_BUTTON_TEXT__/g, exportData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder'))
-            .replace('__ACTION_BUTTON_TEXT__', exportData.gameActionButtonText || t('UIEditor.textos.actionButtonText'))
-            .replace('__VERB_INPUT_PLACEHOLDER__', exportData.gameVerbInputPlaceholder || t('UIEditor.textos.commandInputPlaceholder'))
+            .replace('__ACTION_BUTTON_TEXT__', exportData.gameActionButtonText || t('UIEditor.textos.actionButtonPlaceholder'))
+            .replace('__VERB_INPUT_PLACEHOLDER__', exportData.gameVerbInputPlaceholder || t('UIEditor.textos.commandInputValue'))
             .replace('__VIEW_ENDING_BUTTON_TEXT__', exportData.gameViewEndingButtonText || t('UIEditor.textos.viewEndingPlaceholder'))
             .replace('__POSITIVE_ENDING_BG_STYLE__', exportData.positiveEndingImage ? `style="background-image: url('${exportData.positiveEndingImage}')"` : '')
             .replace('__POSITIVE_ENDING_ALIGN_CLASS__', exportData.positiveEndingContentAlignment === 'left' ? 'align-left' : '')
@@ -345,7 +368,10 @@ DATE:        ${exportDate.toLocaleString()}
             }
         }
 
-        const sanitizedData = sanitizeLegacyI18n(data);
+        // Only sanitize truly legacy projects (before metadata field was added).
+        // Modern exports already have proper text values baked in.
+        const isLegacyProject = !data.metadata;
+        const sanitizedData = isLegacyProject ? sanitizeLegacyI18n(data) : data;
 
         setGameData(prev => ({
             ...initialGameData, // Start fresh to avoid ghost data from previous session
@@ -356,18 +382,18 @@ DATE:        ${exportDate.toLocaleString()}
             gameHTML: gameHTML,
             gameCSS: gameCSS,
             gameMobileLayoutBehavior: 'immersive',
-            fixedVerbs: data.fixedVerbs || [],
-            enableFixedVerbs: !!data.enableFixedVerbs || (Array.isArray(data.fixedVerbs) && data.fixedVerbs.length > 0),
-            consequenceTrackers: data.consequenceTrackers || [],
-            gameTextAnimationType: data.gameTextAnimationType || 'fade',
-            gameTextSpeed: data.gameTextSpeed || 5,
-            gameImageTransitionType: data.gameImageTransitionType || 'fade',
-            gameImageSpeed: data.gameImageSpeed || 5,
-            gameShowTrackersUI: data.gameShowTrackersUI ?? true,
-            gameShowSystemButton: data.gameShowSystemButton ?? true,
-            gameViewEndingButtonText: data.gameViewEndingButtonText || '',
-            positiveEndingMusic: data.positiveEndingMusic || '',
-            negativeEndingMusic: data.negativeEndingMusic || '',
+            fixedVerbs: sanitizedData.fixedVerbs || [],
+            enableFixedVerbs: !!sanitizedData.enableFixedVerbs || (Array.isArray(sanitizedData.fixedVerbs) && sanitizedData.fixedVerbs.length > 0),
+            consequenceTrackers: sanitizedData.consequenceTrackers || [],
+            gameTextAnimationType: sanitizedData.gameTextAnimationType || 'fade',
+            gameTextSpeed: sanitizedData.gameTextSpeed || 5,
+            gameImageTransitionType: sanitizedData.gameImageTransitionType || 'fade',
+            gameImageSpeed: sanitizedData.gameImageSpeed || 5,
+            gameShowTrackersUI: sanitizedData.gameShowTrackersUI ?? true,
+            gameShowSystemButton: sanitizedData.gameShowSystemButton ?? true,
+            gameViewEndingButtonText: sanitizedData.gameViewEndingButtonText || '',
+            positiveEndingMusic: sanitizedData.positiveEndingMusic || '',
+            negativeEndingMusic: sanitizedData.negativeEndingMusic || '',
             vignettes: []
         }));
 

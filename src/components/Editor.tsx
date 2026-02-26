@@ -599,12 +599,12 @@ const Editor: React.FC = () => {
                                         negativeEndingDescription={gameData.negativeEndingDescription || ''}
                                         negativeEndingMusic={gameData.negativeEndingMusic || ''}
                                         fixedVerbs={fixedVerbs}
-                                        actionButtonText={gameData.gameActionButtonText || t('UIEditor.textos.actionButtonPlaceholder', 'Action')}
-                                        verbInputPlaceholder={gameData.gameVerbInputPlaceholder || t('UIEditor.textos.commandInputValue', 'What do you do?')}
-                                        diaryPlayerName={gameData.gameDiaryPlayerName || t('UIEditor.textos.diaryPlayerNamePlaceholder', 'Player')}
-                                        splashButtonText={gameData.gameSplashButtonText || t('UIEditor.textos.splashButtonPlaceholder', 'START')}
-                                        continueButtonText={gameData.gameContinueButtonText || t('UIEditor.textos.continueButtonPlaceholder', 'Continue Adventure')}
-                                        restartButtonText={gameData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder', 'Restart Adventure')}
+                                        actionButtonText={gameData.gameActionButtonText || ''}
+                                        verbInputPlaceholder={gameData.gameVerbInputPlaceholder || ''}
+                                        diaryPlayerName={gameData.gameDiaryPlayerName || ''}
+                                        splashButtonText={gameData.gameSplashButtonText || ''}
+                                        continueButtonText={gameData.gameContinueButtonText || ''}
+                                        restartButtonText={gameData.gameRestartButtonText || ''}
                                         gameInteractionType={gameData.gameInteractionType || 'parser'}
                                         gameSystemEnabled={gameData.gameSystemEnabled || 'none'}
                                         maxChances={gameData.gameMaxChances || 3}
@@ -620,7 +620,7 @@ const Editor: React.FC = () => {
                                         gameFontFamily={gameData.gameFontFamily || "'Silkscreen', sans-serif"}
                                         gameFontSize={gameData.gameFontSize || '0.75em'}
                                         chanceIcon={gameData.gameChanceIcon || 'heart'}
-                                        chanceReturnButtonText={gameData.gameChanceReturnButtonText || t('ThemeEditor.returnButtonText', 'Tentar Novamente')}
+                                        chanceReturnButtonText={gameData.gameChanceReturnButtonText || ''}
                                         gameTheme={gameData.gameTheme || 'dark'}
                                         textColorLight={gameData.textColorLight || '#24292f'}
                                         titleColorLight={gameData.titleColorLight || '#0969da'}

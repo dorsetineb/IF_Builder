@@ -729,6 +729,8 @@
             "trackersPlaceholder": "Rastreadores",
             "systemButton": "Botão Menu Sistema",
             "systemPlaceholder": "Sistema",
+            "saveMenuPlaceholder": "Salvar Jogo",
+            "loadMenuPlaceholder": "Carregar Jogo",
             "mainMenuButton": "Botão Menu Principal",
             "mainMenuPlaceholder": "Menu Principal"
         },

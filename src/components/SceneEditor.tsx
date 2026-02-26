@@ -479,8 +479,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                     <button
                                                                         key={type.id}
                                                                         onClick={() => {
-                                                                            const newType = localScene.vignetteType === type.id ? undefined : (type.id as 'opening' | 'transition' | 'conclusion');
-                                                                            updateLocalScene('vignetteType', newType);
+                                                                            if (localScene.vignetteType !== type.id) {
+                                                                                updateLocalScene('vignetteType', type.id as 'opening' | 'transition' | 'conclusion');
+                                                                            }
                                                                         }}
                                                                         className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border transition-all ${localScene.vignetteType === type.id
                                                                             ? 'bg-purple-500/20 border-purple-500 text-purple-300'

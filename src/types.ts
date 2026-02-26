@@ -229,6 +229,14 @@ export interface GameData {
   gameImageTransitionType?: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom' | 'blur' | 'none';
   gameImageSpeed?: number; // 1 (slow) to 10 (fast)
   gameTextReadingFlow?: 'continuous' | 'paused';
+
+  // Export metadata (added by modern exports)
+  metadata?: {
+    exportedBy?: string;
+    exportDate?: string;
+    platform?: string;
+    version?: string;
+  };
 }
 
 export type View = 'scenes' | 'interface' | 'vignettes' | 'map' | 'global_objects' | 'global_commands' | 'trackers' | 'settings' | 'about' | 'guide';
