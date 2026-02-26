@@ -53,11 +53,8 @@ const Header: React.FC<{
       {/* Right Pane - Top Bar Content */}
       <div className="flex-1 flex items-center justify-between bg-card border-b border-muted-foreground/50 px-6">
         <div className="flex items-center h-full gap-4">
-          <span
-            className="text-muted-foreground text-sm font-medium truncate max-w-[400px]"
-            title={gameData.gameTitle}
-          >
-            {/* Dynamic Title based on View */}
+          <div className="flex items-center">
+            {/* Context-aware Sub-header Text */}
             {currentView === 'settings' ? (
               <div className="flex flex-col">
                 <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.settings', 'Configurações')}</span>
@@ -68,12 +65,8 @@ const Header: React.FC<{
                 <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
                 <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.aboutDesc', 'Conheça a missão e os valores por trás do IF Builder.')}</p>
               </div>
-            ) : (
-              <span className="text-sm font-medium text-muted-foreground truncate max-w-[400px]" title={gameData.gameTitle}>
-                {gameData.gameTitle}
-              </span>
-            )}
-          </span>
+            ) : null}
+          </div>
         </div>
 
         <div className="flex items-center gap-3">

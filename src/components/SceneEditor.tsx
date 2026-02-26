@@ -42,6 +42,8 @@ interface SceneEditorProps {
     onViewMap?: () => void;
     enableChances: boolean;
     gameSystemEnabled?: 'none' | 'chances' | 'trackers';
+    globalSplashButtonText?: string;
+    onUpdateGlobalSplashButtonText?: (text: string) => void;
 }
 
 const getCleanSceneState = (s: Scene): Scene => {
@@ -84,6 +86,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
     onViewMap,
     enableChances,
     gameSystemEnabled,
+    globalSplashButtonText,
+    onUpdateGlobalSplashButtonText,
 }) => {
     const { toast } = useToast();
     const { t } = useTranslation();
@@ -501,9 +505,18 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                     </label>
                                                                     <input
                                                                         type="text"
-                                                                        value={localScene.vignetteButtonText || ''}
-                                                                        onChange={(e) => updateLocalScene('vignetteButtonText', e.target.value)}
-                                                                        placeholder={localScene.vignetteType === 'conclusion' ? t('sceneEditor.restart') : t('sceneEditor.continue')}
+                                                                        value={localScene.vignetteType === 'conclusion' ? (localScene.vignetteButtonText || '') : (globalSplashButtonText || '')}
+                                                                        onChange={(e) => {
+                                                                            const val = e.target.value;
+                                                                            if (localScene.vignetteType === 'conclusion') {
+                                                                                updateLocalScene('vignetteButtonText', val);
+                                                                            } else {
+                                                                                if (onUpdateGlobalSplashButtonText) {
+                                                                                    onUpdateGlobalSplashButtonText(val);
+                                                                                }
+                                                                            }
+                                                                        }}
+                                                                        placeholder={localScene.vignetteType === 'conclusion' ? t('sceneEditor.restart', 'Reiniciar') : t('UIEditor.textos.splashButtonPlaceholder', 'Iniciar')}
                                                                         className="w-full bg-zinc-950 border border-muted-foreground/30 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-purple-500/50 transition-all placeholder:text-zinc-700"
                                                                     />
                                                                 </div>

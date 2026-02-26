@@ -682,6 +682,8 @@ const Editor: React.FC = () => {
                                     gameInteractionType={gameData.gameInteractionType || 'parser'}
                                     vignettes={gameData.vignettes || []}
                                     onViewMap={() => handleSetView('map')}
+                                    globalSplashButtonText={gameData.gameSplashButtonText || ''}
+                                    onUpdateGlobalSplashButtonText={(text) => handleUpdateGameData('gameSplashButtonText', text)}
                                 />
                             ) : currentView === 'scenes' ? (
                                 <WelcomePlaceholder

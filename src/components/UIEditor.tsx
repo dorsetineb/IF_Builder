@@ -613,9 +613,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor) onUpdate('gameSceneNameOverlayTextColor', localGameSceneNameOverlayTextColor, true);
         if (localGameFrameColor !== gameFrameColor) onUpdate('gameFrameColor', localGameFrameColor, true);
         if (localGameContinueIndicatorColor !== gameContinueIndicatorColor) onUpdate('gameContinueIndicatorColor', localGameContinueIndicatorColor, true);
-        if (localTitle !== title) onUpdate('gameTitle', localTitle, true);
-        if (localLogo !== logo) onUpdate('gameLogo', localLogo, true);
-        if (localOmitSplashTitle !== omitSplashTitle) onUpdate('gameOmitSplashTitle', localOmitSplashTitle, true);
         if (localSplashImage !== splashImage) onUpdate('gameSplashImage', localSplashImage, true);
         if (localSplashContentAlignment !== splashContentAlignment) onUpdate('gameSplashContentAlignment', localSplashContentAlignment, true);
         if (localSplashContentVerticalAlignment !== splashContentVerticalAlignment) onUpdate('gameSplashContentVerticalAlignment', localSplashContentVerticalAlignment, true);
