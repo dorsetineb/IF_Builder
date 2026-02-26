@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key } from 'lucide-react';
 import { useUser } from '../components/UserContext';
 import { useTranslation } from 'react-i18next';
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [showPixModal, setShowPixModal] = useState(false);
     const [activeTab, setActiveTab] = useState<'about_project' | 'support' | 'dev'>('about_project');
-    const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>('pix');
+    const [supportMethod, setSupportMethod] = useState<'pix' | 'kofi'>(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
+
+    // Automatically update the default selected tab if the user switches languages
+    useEffect(() => {
+        setSupportMethod(i18n.language.startsWith('pt') ? 'pix' : 'kofi');
+    }, [i18n.language]);
 
     const handleCopyPix = () => {
         navigator.clipboard.writeText("rodbertes@gmail.com");
@@ -53,7 +58,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
                     {/* Main Content */}
-                    <div className={`space-y-6 transition-all duration-300 ${supportMethod === 'kofi' ? 'lg:col-span-7 xl:col-span-8' : 'lg:col-span-9'}`}>
+                    <div className="space-y-6 lg:col-span-7 xl:col-span-8 transition-all duration-300">
                         {/* Tabs Navigation */}
                         <div className="flex border-b border-muted-foreground/50 mb-6">
                             <div className="flex space-x-6">
@@ -173,7 +178,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     </div>
 
                     {/* Sidebar - Fixa/Sticky */}
-                    <div className={`lg:sticky lg:top-0 space-y-6 transition-all duration-300 ${supportMethod === 'kofi' ? 'lg:col-span-5 xl:col-span-4' : 'lg:col-span-3'}`}>
+                    <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-0 space-y-6 transition-all duration-300">
                         <div className="bg-gradient-to-b from-primary/20 to-transparent border border-primary/20 rounded-xl p-6 shadow-sm relative overflow-hidden group">
                             <div className="flex items-center gap-2 mb-2">
                                 <Heart className="w-4 h-4 text-primary fill-current" />
@@ -218,12 +223,12 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     </button>
                                 </>
                             ) : (
-                                <div className="w-full flex justify-center rounded-lg overflow-hidden border border-zinc-800 bg-[#f9f9f9] h-[720px]">
+                                <div className="w-full flex justify-center rounded-lg overflow-hidden border border-zinc-800 bg-transparent h-[450px]">
                                     <iframe
                                         id='kofiframe'
                                         src='https://ko-fi.com/ifbuildr/?hidefeed=true&widget=true&embed=true&preview=true'
-                                        style={{ border: 'none', width: '100%', padding: '4px', background: '#f9f9f9' }}
-                                        height='712'
+                                        style={{ border: 'none', width: '100%', padding: '4px', background: 'transparent' }}
+                                        height='450'
                                         title='ifbuildr'
                                     />
                                 </div>

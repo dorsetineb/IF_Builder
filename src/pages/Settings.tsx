@@ -159,7 +159,8 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
             });
 
-            // Do NOT force reload. Let React state handle the view switch.
+            // 4. Force Reload and Redirect. Avoids race conditions.
+            window.location.href = '/';
         }
     };
 
