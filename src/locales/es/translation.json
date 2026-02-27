@@ -27,7 +27,8 @@
             "access": "Acceder",
             "createAccount": "Crear Cuenta",
             "hint1": "Algo podría pasar,",
-            "hint2": "Si haces clic en las computadoras."
+            "hint2": "Si haces clic en las computadoras.",
+            "startProgram": "Iniciar Programa"
         },
         "form": {
             "createAccountTitle": "Crear Cuenta",
@@ -193,7 +194,7 @@
         "meetProject": "Conoce el proyecto",
         "helpTItle": "Cómo usar el ejemplo descargado",
         "helpPlayTitle": "Para Jugar",
-        "helpPlayDesc": "Extrae el contenido del archivo <strong>fuga_da_masmorra.zip</strong> en tu computadora y abre el archivo <strong>index.html</strong> para acceder a la ficción sin conexión.",
+        "helpPlayDesc": "Extraye el contenido del archivo <strong>fuja_da_masmorra.zip</strong> en tu computadora y abre el archivo <strong>index.html</strong> para acceder a la ficción sin conexión.",
         "helpEditTitle": "Para Editar",
         "helpEditDesc": "Haz clic en el botón <strong>IMPORTAR</strong> en la esquina superior derecha del editor para acceder al proyecto aquí en la interfaz."
     },

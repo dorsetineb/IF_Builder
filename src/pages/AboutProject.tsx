@@ -185,7 +185,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             </div>
 
                             <p className="text-[12px] text-zinc-400 leading-relaxed mb-4">
-                                {t('about.support.sidebar.desc', 'Este projeto é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX ou doar um Ko-fi!')}
+                                {t('about.support.sidebar.desc', 'Este site é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX! ou um Ko-fi!')}
                             </p>
 
                             <div className="flex bg-zinc-900/50 p-1 rounded-lg mb-6 border border-zinc-800">
@@ -199,7 +199,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     onClick={() => setSupportMethod('kofi')}
                                     className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${supportMethod === 'kofi' ? 'bg-[#29abe0] text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                                 >
-                                    Ko-Fi
+                                    Ko-fi
                                 </button>
                             </div>
 
@@ -222,13 +222,14 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     </button>
                                 </>
                             ) : (
-                                <div className="w-full flex justify-center rounded-lg overflow-hidden border border-zinc-800 bg-transparent h-[450px]">
+                                <div className="w-full flex justify-center rounded-lg overflow-hidden border border-zinc-800 bg-transparent min-h-[450px]">
                                     <iframe
                                         id='kofiframe'
                                         src='https://ko-fi.com/ifbuildr/?hidefeed=true&widget=true&embed=true&preview=true'
-                                        style={{ border: 'none', padding: '4px' }}
+                                        style={{ border: 'none', width: '100%', backgroundColor: 'transparent' }}
                                         height='450'
                                         title='ifbuildr'
+                                        scrolling='no'
                                     />
                                 </div>
                             )}

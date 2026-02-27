@@ -27,7 +27,8 @@
             "access": "Acessar",
             "createAccount": "Criar Conta",
             "hint1": "Algo pode acontecer,",
-            "hint2": "Se você clicar nos computadores."
+            "hint2": "Se você clicar nos computadores.",
+            "startProgram": "Iniciar Programa"
         },
         "form": {
             "createAccountTitle": "Criar Conta",
@@ -79,7 +80,7 @@
             "p3": "Se tiver sugestões, críticas ou quiser compartilhar suas histórias, mande um e-mail para: ",
             "sidebar": {
                 "title": "Apoie o Projeto",
-                "desc": "Este site é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX!",
+                "desc": "Este site é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX! ou um Ko-fi!",
                 "btn": "Ver Chave PIX"
             },
             "modal": {
@@ -193,7 +194,7 @@
         "meetProject": "Conheça o projeto",
         "helpTItle": "Como usar o exemplo baixado",
         "helpPlayTitle": "Para Jogar",
-        "helpPlayDesc": "Extraia o conteúdo do arquivo <strong>fuga_da_masmorra.zip</strong> no seu computador, e abra o arquivo <strong>index.html</strong> para acessar a ficção de modo offline.",
+        "helpPlayDesc": "Extraia o conteúdo do arquivo <strong>fuja_da_masmorra.zip</strong> no seu computador, e abra o arquivo <strong>index.html</strong> para acessar a ficção de modo offline.",
         "helpEditTitle": "Para Editar",
         "helpEditDesc": "Clique no botão <strong>IMPORTAR</strong> no canto superior direito do editor para acessar o projeto aqui na interface."
     },

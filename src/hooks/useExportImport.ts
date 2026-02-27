@@ -538,7 +538,7 @@ DATE:        ${exportDate.toLocaleString()}
         const filename = isEnglish ? "escape_the_dungeon.zip" : "fuja_da_masmorra.zip";
 
         const element = document.createElement("a");
-        element.href = `/${filename}`;
+        element.href = `/${filename}?v=${Date.now()}`;
         element.download = filename;
         document.body.appendChild(element);
         element.click();
