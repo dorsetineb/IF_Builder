@@ -1812,13 +1812,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             onClick={() => handleThemeChange('dark')}
                                                             className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                                         >
-                                                            {t('ThemeEditor.dark', 'Escuro')}
+                                                            {t('ThemeEditor.dark', 'Noite')}
                                                         </button>
                                                         <button
                                                             onClick={() => handleThemeChange('light')}
                                                             className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'light' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                                         >
-                                                            {t('ThemeEditor.light', 'Claro')}
+                                                            {t('ThemeEditor.light', 'Dia')}
                                                         </button>
                                                     </div>
                                                 </div>
@@ -2096,14 +2096,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             className={`flex justify-center items-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                                         >
                                             <Moon size={16} className={theme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
-                                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.dark', 'Escuro')}</span>
+                                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.dark', 'Noite')}</span>
                                         </button>
                                         <button
                                             onClick={() => handleAppThemeChange('light')}
                                             className={`flex justify-center items-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                                         >
                                             <Sun size={16} className={theme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
-                                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.light', 'Claro')}</span>
+                                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.light', 'Dia')}</span>
                                         </button>
                                         <button
                                             onClick={() => handleAppThemeChange('cream')}

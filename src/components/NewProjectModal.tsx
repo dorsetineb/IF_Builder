@@ -603,13 +603,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                             onClick={() => setTheme('dark')}
                                                             className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${theme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                                                         >
-                                                            {t('ThemeEditor.dark', 'Escuro')}
+                                                            {t('ThemeEditor.dark', 'Noite')}
                                                         </button>
                                                         <button
                                                             onClick={() => setTheme('light')}
                                                             className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${theme === 'light' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                                                         >
-                                                            {t('ThemeEditor.light', 'Claro')}
+                                                            {t('ThemeEditor.light', 'Dia')}
                                                         </button>
                                                     </div>
                                                 </div>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Sun, Moon, Coffee, Terminal, Globe } from 'lucide-react';
+import { Sun, Moon, Coffee, Terminal, Globe, Monitor } from 'lucide-react';
 import { useTheme } from '../components/ThemeProvider';
 import { useToast } from '../components/ToastContext';
 import { useTranslation } from 'react-i18next';
@@ -85,13 +85,13 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                         <button
                             onClick={() => handleThemeChange('dark')}
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Moon size={16} className={theme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.dark', 'Escuro')}</span>
+                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.dark', 'Noite')}</span>
                         </button>
 
                         <button
@@ -99,7 +99,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
                             <Sun size={16} className={theme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.light', 'Claro')}</span>
+                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.light', 'Dia')}</span>
                         </button>
 
                         <button
@@ -116,6 +116,14 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         >
                             <Terminal size={16} className={theme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
                             <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
+                        </button>
+
+                        <button
+                            onClick={() => handleThemeChange('windows')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'windows' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                        >
+                            <Monitor size={16} className={theme === 'windows' ? 'text-primary' : 'text-muted-foreground'} />
+                            <span className={`font-medium text-xs ${theme === 'windows' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.windows', 'Windows')}</span>
                         </button>
                     </div>
 

@@ -302,6 +302,65 @@
   --dither-overlay: #000000;
 }
 
+.windows {
+  --background: #0F0F0F;
+  --foreground: #FFFFFF;
+
+  /* Cards & Surfaces */
+  --card: #1A1A1A;
+  --card-foreground: #FFFFFF;
+  --popover: #1A1A1A;
+  --popover-foreground: #FFFFFF;
+
+  /* Brand / Primary - Windows Teal */
+  --primary: #008080;
+  --primary-foreground: #FFFFFF;
+
+  /* Secondary */
+  --secondary: #2A2A2A;
+  --secondary-foreground: #FFFFFF;
+
+  /* Muted */
+  --muted: #2A2A2A;
+  --muted-foreground: #A1A1AA;
+
+  /* Accent */
+  --accent: #2A2A2A;
+  --accent-foreground: #FFFFFF;
+
+  /* Destructive */
+  --destructive: #7f1d1d;
+  --destructive-foreground: #fef2f2;
+
+  /* Borders & Inputs */
+  --border: #2A2A2A;
+  --input: #2A2A2A;
+  --ring: #008080;
+
+  /* Charts */
+  --chart-1: #008080;
+  --chart-2: #238636;
+  --chart-3: #161B22;
+  --chart-4: #008080;
+  --chart-5: #238636;
+
+  /* Sidebar */
+  --sidebar: #1A1A1A;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #008080;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #333333;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #2A2A2A;
+  --sidebar-ring: #008080;
+
+  /* Dither Colors */
+  --dither-bg-1: #18181b;
+  --dither-bg-2: #008080;
+  --dither-bg-3: #000000;
+  --dither-overlay: #000000;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
