@@ -384,7 +384,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                 <div className="border-b border-muted-foreground/50 flex items-center justify-between pr-4">
                     <div className="flex space-x-1 overflow-x-auto">
                         {Object.entries(TABS).map(([key, name]) => {
-                            const isTabDisabled = localScene.isEndingScene && (key === 'objects' || key === 'interactions');
+                            const isVignette = localScene.vignetteType && localScene.vignetteType !== 'none';
+                            const isTabDisabled = (localScene.isEndingScene || isVignette) && (key === 'objects' || key === 'interactions');
                             return (
                                 <button
                                     key={key}

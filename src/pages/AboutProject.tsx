@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Check, Heart, ExternalLink, Zap, BadgeDollarSign, ShieldCheck, Target, X, Globe, Copy, User, Workflow, Crop, Key } from 'lucide-react';
-import { useUser } from '../components/UserContext';
 import { useTranslation } from 'react-i18next';
 
 const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
@@ -185,8 +184,8 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 <h3 className="font-bold text-sm text-white">{t('about.support.sidebar.title', 'Apoie o Projeto')}</h3>
                             </div>
 
-                            <p className="text-[10px] text-zinc-400 leading-relaxed mb-4">
-                                {t('about.support.sidebar.desc', 'Este site é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX ou doar um Ko-fi!')}
+                            <p className="text-[12px] text-zinc-400 leading-relaxed mb-4">
+                                {t('about.support.sidebar.desc', 'Este projeto é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX ou doar um Ko-fi!')}
                             </p>
 
                             <div className="flex bg-zinc-900/50 p-1 rounded-lg mb-6 border border-zinc-800">
@@ -227,7 +226,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     <iframe
                                         id='kofiframe'
                                         src='https://ko-fi.com/ifbuildr/?hidefeed=true&widget=true&embed=true&preview=true'
-                                        style={{ border: 'none', width: '100%', padding: '4px', background: 'transparent' }}
+                                        style={{ border: 'none', padding: '4px' }}
                                         height='450'
                                         title='ifbuildr'
                                     />

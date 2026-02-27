@@ -167,15 +167,15 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           </button>
         )}
 
-        {/* Interface (Renamed & Moved) */}
+        {/* Configurações (anteriormente Interface) */}
         <button
           className={getButtonClass('interface')}
           onClick={() => handleSetView('interface')}
-          title={isCollapsed ? t('sidebar.interface', 'Interface') : undefined}
+          title={isCollapsed ? t('sidebar.settings', 'Configurações') : undefined}
         >
           <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`} />
-          <Code className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.interface', 'Interface')}</span>}
+          <Settings className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.settings', 'Configurações')}</span>}
         </button>
 
 
@@ -205,15 +205,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>}
         </button>
 
-        <button
-          onClick={() => handleSetView('settings')}
-          className={getButtonClass('settings')}
-          title={isCollapsed ? t('sidebar.settings', 'Configurações') : undefined}
-        >
-          <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'settings' ? 'translate-x-0' : ''}`} />
-          <Settings className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.settings', 'Configurações')}</span>}
-        </button>
+
       </div>
 
 

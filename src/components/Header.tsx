@@ -70,8 +70,8 @@ const Header: React.FC<{
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Only show Game Controls if NOT in Settings or About */}
-          {(currentView !== 'settings' && currentView !== 'about') && (
+          {/* Only show Game Controls if NOT in About */}
+          {(currentView !== 'about') && (
             <>
               {/* Hidden Import Input */}
               <input
@@ -123,13 +123,13 @@ const Header: React.FC<{
             </>
           )}
 
-          {currentView === 'settings' && (
+          {currentView === 'interface' && (
             <button
               onClick={onLogout}
               className="flex items-center justify-center px-4 py-2 bg-red-500/10 text-red-500 font-bold rounded-lg hover:bg-red-500 hover:text-white border border-red-500/20 transition-all text-xs"
             >
               <LogOut className="w-4 h-4 mr-2" />
-              {t('header.logout', 'Sair da Conta')}
+              {t('header.exitEditor', 'Sair do Editor')}
             </button>
           )}
         </div>

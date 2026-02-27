@@ -1,41 +1,19 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { supabase } from '../lib/supabase';
-import { Database } from '../types/supabase';
-import { User, Lock, Link as LinkIcon, AlertCircle, LogOut, Sun, Moon, Coffee, Sparkles, Terminal, Mail, Check, Globe } from 'lucide-react';
-import { LoadingOverlay } from '../components/LoadingOverlay';
+import { Sun, Moon, Coffee, Terminal, Globe } from 'lucide-react';
 import { useTheme } from '../components/ThemeProvider';
 import { useToast } from '../components/ToastContext';
-import { useNavigate } from 'react-router-dom';
-import { useUser } from '../components/UserContext';
 import { useTranslation } from 'react-i18next';
-
-type Profile = Database['public']['Tables']['profiles']['Row'];
 
 const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
     const { theme, setTheme } = useTheme();
     const { toast } = useToast();
-    const navigate = useNavigate();
     const { t, i18n } = useTranslation();
     const [loading, setLoading] = useState(false);
-    const [email, setEmail] = useState('');
     const [language, setLanguage] = useState(i18n.language || 'pt');
-
-    // Form States
-    const [displayName, setDisplayName] = useState('');
-    const [username, setUsername] = useState('');
-    const [website, setWebsite] = useState('');
-    const [bio, setBio] = useState('');
-    const [location, setLocation] = useState('');
-    // Initial State for Dirty Checking
-    const [initialProfile, setInitialProfile] = useState<Partial<Profile> | null>(null);
 
     // Theme Logic
     const [originalTheme, setOriginalTheme] = useState(theme); // Capture theme on mount
     const savedRef = useRef(false);
-
-    const [pageLoading, setPageLoading] = useState(true);
-
-    const { user, profile, refreshProfile } = useUser();
 
     // Revert theme on unmount if not saved
     useEffect(() => {
@@ -46,47 +24,13 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         };
     }, []);
 
-    useEffect(() => {
-        if (profile) {
-            setDisplayName(profile.full_name || '');
-            setUsername(profile.username || '');
-            setWebsite(profile.website || '');
-            setBio(profile.bio || '');
-
-            setInitialProfile({
-                full_name: profile.full_name,
-                username: profile.username,
-                website: profile.website,
-                bio: profile.bio,
-                location: profile.location
-            });
-            setLocation(profile.location || '');
-            if (user) setEmail(user.email || '');
-            setPageLoading(false);
-        } else if (user) {
-            // Fallback if profile row is missing but user exists
-            const meta = user.user_metadata || {};
-            setDisplayName(meta.full_name || meta.name || '');
-            setUsername(meta.username || '');
-            setLocation(meta.location || '');
-            setEmail(user.email || '');
-            setInitialProfile({});
-            setPageLoading(false);
-        }
-    }, [profile, user]);
-
     const handleThemeChange = (newTheme: typeof theme) => {
         setTheme(newTheme);
     };
 
     const isDirty = (
         theme !== originalTheme ||
-        language !== (i18n.language || 'pt') ||
-        displayName !== (initialProfile?.full_name || '') ||
-        username !== (initialProfile?.username || '') ||
-        website !== (initialProfile?.website || '') ||
-        bio !== (initialProfile?.bio || '') ||
-        location !== (initialProfile?.location || '')
+        language !== (i18n.language || 'pt')
     );
 
     const handleSave = async () => {
@@ -98,69 +42,13 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 i18n.changeLanguage(language);
             }
 
-            const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                return;
-            }
-
-            const updates = {
-                id: user.id,
-                full_name: displayName,
-                bio,
-                website,
-                location,
-                updated_at: new Date().toISOString(),
-            };
-
-            const { error } = await supabase.from('profiles').upsert(updates);
-
-            if (error) {
-                toast(t('settings.errors.saveProfile', 'Erro ao salvar perfil'), error.message, "error");
-                savedRef.current = false; // Reset if failed
-            } else {
-                toast(t('settings.success.title', 'Sucesso!'), t('settings.success.updated', 'Configurações atualizadas.'), "success");
-                setInitialProfile({
-                    full_name: displayName,
-                    username,
-                    website,
-                    bio,
-                    location
-                });
-                await refreshProfile(); // Update global context
-                setOriginalTheme(theme); // Update original theme to current to plain dirty state
-            }
+            toast(t('settings.success.title', 'Sucesso!'), t('settings.success.updated', 'Configurações atualizadas.'), "success");
+            setOriginalTheme(theme);
         } catch (err) {
-            console.error("Unexpected error saving profile:", err);
+            console.error("Unexpected error saving settings:", err);
             toast(t('settings.errors.title', 'Erro'), t('settings.errors.unexpected', 'Ocorreu um erro inesperado.'), "error");
         } finally {
             setLoading(false);
-        }
-    };
-
-    const handleLogout = async (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        try {
-            // 1. Sign out from Supabase
-            // This will trigger onAuthStateChange in App.tsx -> setSession(null) -> Shows Auth
-            const { error } = await supabase.auth.signOut({ scope: 'global' });
-            if (error) throw error;
-
-        } catch (error) {
-            console.error('Error during sign out attempt:', error);
-        } finally {
-            // 2. Clear local storage to be absolutely sure
-            localStorage.clear();
-            sessionStorage.clear();
-
-            // 3. Clear cookies
-            document.cookie.split(";").forEach((c) => {
-                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-            });
-
-            // 4. Force Reload and Redirect. Avoids race conditions.
-            window.location.href = '/';
         }
     };
 
@@ -172,15 +60,8 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
                     <div className="flex flex-col justify-center h-full">
                         <h1 className="text-xl font-bold text-foreground">{t('settings.title', 'Configurações')}</h1>
-                        <p className="text-[10px] text-muted-foreground hidden md:block">{t('settings.subtitle', 'Gerencie suas preferências e perfil.')}</p>
+                        <p className="text-[10px] text-muted-foreground hidden md:block">{t('settings.subtitle', 'Gerencie suas preferências.')}</p>
                     </div>
-                    <button
-                        type="button"
-                        onClick={(e) => handleLogout(e)}
-                        className="flex items-center gap-2 px-4 py-2 bg-red-500/10 text-red-500 rounded-lg hover:bg-red-500 hover:text-white border border-red-500/20 text-xs font-bold transition-all"
-                    >
-                        <LogOut size={14} /> {t('settings.logout', 'Sair da Conta')}
-                    </button>
                 </div>
             )}
 
@@ -256,75 +137,6 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         </div>
                     </div>
                 </div>
-
-                {/* Account Data Section - Matches Signup */}
-                <div className="bg-card border border-border rounded-lg p-4 mb-4">
-                    <div className="flex items-center gap-2 mb-4 text-primary">
-                        <User size={16} />
-                        <h2 className="text-sm font-bold text-card-foreground">{t('settings.accountData', 'Dados da Conta')}</h2>
-                    </div>
-
-                    <div className="space-y-4">
-                        <div className="space-y-2 text-left">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">{t('settings.fullName', 'Nome e Sobrenome')}</label>
-                            <input
-                                type="text"
-                                value={displayName}
-                                onChange={(e) => setDisplayName(e.target.value)}
-                                className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium placeholder:text-muted-foreground/50"
-                                placeholder={t('settings.placeholders.name', 'Ex: João Silva')}
-                            />
-                        </div>
-
-                        <div className="space-y-2 text-left">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">{t('settings.email', 'E-mail')}</label>
-                            <div className="flex gap-2 items-center">
-                                <div className="relative flex-1">
-                                    <Mail className="absolute left-3 top-2.5 text-muted-foreground w-4 h-4" />
-                                    <input
-                                        type="email"
-                                        value={email}
-                                        disabled
-                                        className="w-full bg-muted/50 border border-border rounded pl-9 pr-4 py-2 text-xs text-muted-foreground cursor-not-allowed font-medium"
-                                    />
-                                </div>
-                                <button
-                                    className="px-3 py-2 bg-primary/10 text-primary hover:bg-primary/20 border border-primary/20 rounded text-xs font-bold transition-all whitespace-nowrap"
-                                    onClick={async () => {
-                                        if (!email) return;
-                                        setLoading(true);
-                                        const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                                            redirectTo: window.location.origin + '/settings',
-                                        });
-                                        if (error) toast(t('common.error', 'Erro'), error.message, "error");
-                                        else toast(t('common.success', 'Sucesso'), t('settings.resetPasswordSent', 'Email de redefinição enviado!'), "success");
-                                        setLoading(false);
-                                    }}
-                                    disabled={loading}
-                                >
-                                    {t('settings.resetPasswordBtn', 'Redefinir senha')}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2 text-left">
-                            <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2">{t('settings.location', 'Local (Opcional)')}</label>
-                            <div className="relative">
-                                <span className="absolute left-2.5 top-1.5 text-muted-foreground text-[10px] font-bold"><User size={12} className="opacity-0" /></span> {/* Spacer if needed or icon */}
-                                <input
-                                    type="text"
-                                    value={location}
-                                    onChange={(e) => setLocation(e.target.value)}
-                                    className="w-full bg-input border border-input rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium placeholder:text-muted-foreground/50"
-                                    placeholder={t('settings.placeholders.location', 'Ex: São Paulo, SP')}
-                                />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-
-
 
             </div>
         </div>

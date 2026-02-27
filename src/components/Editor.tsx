@@ -1,9 +1,7 @@
 
 import React, { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
-import { useUser } from './UserContext';
-import { Auth } from './Auth';
+
 import { useToast } from './ToastContext';
 import { useGameData } from '../hooks/useGameData';
 import { useSceneManagement } from '../hooks/useSceneManagement';
@@ -109,7 +107,7 @@ const IMPORT_PATTERNS = [PATTERN_BULL, PATTERN_MAN, PATTERN_COMPUTER];
 const Editor: React.FC = () => {
     const { t } = useTranslation();
     const { toast } = useToast();
-    const { user, profile, loading: authLoading } = useUser();
+    const profile = null;
     const { theme: appTheme } = useTheme();
     const navigate = useNavigate();
 
@@ -196,26 +194,8 @@ const Editor: React.FC = () => {
 
     const handleExit = () => handleNavigate('/dashboard');
 
-    // Session loading handled by UserContext now.
-    // If we need to block rendering until auth is ready:
-    const loadingSession = authLoading;
-
-
-
-    const handleLogout = async () => {
-        try {
-            // Perform actual logout
-            await supabase.auth.signOut({ scope: 'global' });
-        } catch (error) {
-            console.error('Logout error:', error);
-        } finally {
-            localStorage.clear();
-            sessionStorage.clear();
-            document.cookie.split(";").forEach((c) => {
-                document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
-            });
-            window.location.href = '/';
-        }
+    const handleLogout = () => {
+        window.location.href = '/';
     };
 
     // --- Game Data Hook ---
@@ -405,17 +385,7 @@ const Editor: React.FC = () => {
         navigate('/community');
     };
 
-    if (loadingSession) {
-        return (
-            <div className="fixed inset-0 z-[9999] bg-black flex items-center justify-center">
-                {/* Simple loader while checking auth - NOT TransitionScreen */}
-            </div>
-        );
-    }
-
-    if (!user) {
-        return <Auth />;
-    }
+    // Show BIOS animation first
 
     // Show BIOS animation first (after authentication)
     if (!isBiosFinished) {

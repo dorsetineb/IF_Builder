@@ -7,7 +7,7 @@ import { FONTS, PREDEFINED_THEMES, MAX_IMAGE_SIZE, MAX_AUDIO_SIZE } from '../con
 
 import { GameData, FixedVerb } from '../types';
 import { useTranslation } from 'react-i18next';
-import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List } from 'lucide-react';
+import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Terminal, Globe } from 'lucide-react';
 
 interface UIEditorProps {
     html: string;
@@ -210,8 +210,8 @@ const FixedVerbItem: React.FC<{
 });
 
 export const UIEditor: React.FC<UIEditorProps> = (props) => {
-    const { t } = useTranslation();
-    const { theme } = useTheme(); // Get app theme
+    const { t, i18n } = useTranslation();
+    const { theme, setTheme } = useTheme(); // Get app theme
     const currentSliderColor = APP_THEME_COLORS[theme as keyof typeof APP_THEME_COLORS] || APP_THEME_COLORS.dark;
 
     const {
@@ -265,7 +265,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localLoadMenuTitle, setLocalLoadMenuTitle] = useState(gameLoadMenuTitle);
     const [localMainMenuButtonText, setLocalMainMenuButtonText] = useState(gameMainMenuButtonText);
     const [localViewEndingButtonText, setLocalViewEndingButtonText] = useState(gameViewEndingButtonText);
-    const [activeTab, setActiveTab] = useState('aparencia');
+    const [activeTab, setActiveTab] = useState<'layout' | 'sistemas' | 'aparencia' | 'textos' | 'config'>('config');
+    const [originalTheme, setOriginalTheme] = useState(theme);
+    const [localLanguage, setLocalLanguage] = useState(i18n.language || 'pt');
+    const handleAppThemeChange = (newTheme: string) => {
+        if (setTheme) setTheme(newTheme as any);
+    };
 
     const [localTextColor, setLocalTextColor] = useState(textColor);
     const [localTitleColor, setLocalTitleColor] = useState(titleColor);
@@ -321,10 +326,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed);
 
     const TABS = {
+        config: t('UIEditor.tabs.config', 'Aparência e idioma'),
         layout: t('UIEditor.tabs.layout'),
+        aparencia: t('UIEditor.tabs.aparencia'),
         sistemas: t('UIEditor.tabs.sistemas'),
         textos: t('UIEditor.tabs.textos'),
-        aparencia: t('UIEditor.tabs.aparencia'),
     };
 
     const [activeSections, setActiveSections] = useState({
@@ -643,10 +649,23 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localEnableFixedVerbs !== (enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0))) onUpdate('enableFixedVerbs', localEnableFixedVerbs, true);
         if (localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances'))) onUpdate('enableChances', localEnableChances, true);
 
+        if (localLanguage !== (i18n.language || 'pt')) {
+            i18n.changeLanguage(localLanguage);
+        }
+        setOriginalTheme(theme);
+
         // Update snapshot to current state to prevent dirty flag from persisting
         initialStateRef.current = getCurrentState();
         onSetDirty(false);
     };
+
+    // Custom dirty effect for Configurações
+    useEffect(() => {
+        const isAppStyleDirty = theme !== originalTheme || localLanguage !== (i18n.language || 'pt');
+        if (isAppStyleDirty) {
+            props.onSetDirty(true);
+        }
+    }, [theme, localLanguage, originalTheme, i18n.language, props]);
 
 
 
@@ -739,6 +758,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalDiaryMaxMessages(diaryMaxMessages ?? 100);
         setLocalDiaryShowSceneImage(diaryShowSceneImage ?? false);
         setLocalDiaryShowPlayerAction(diaryShowPlayerAction ?? true);
+
+        if (setTheme) setTheme(originalTheme as any);
+        setLocalLanguage(i18n.language || 'pt');
     };
 
     const handleThemeChange = (theme: 'dark' | 'light') => {
@@ -934,7 +956,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                     </div>
                 </div>
 
-                <div className={`bg-muted/10 -mt-px py-8 grid grid-cols-1 ${activeTab === 'cores' ? 'xl:grid-cols-[1fr_450px]' : ''} gap-8 items-start`}>
+                <div className={`bg-muted/10 -mt-px py-8 grid grid-cols-1 gap-8 items-start`}>
                     {activeTab === 'layout' && (
                         <div className="space-y-6">
                             <div>
@@ -2059,6 +2081,67 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
                             </div>
                         )}
+
+                    {
+                        activeTab === 'config' && (
+                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                <div className="bg-card border border-border rounded-xl p-6 shadow-sm mb-4">
+                                    <h3 className="text-xs font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
+                                        <Sun className="w-4 h-4 text-muted-foreground" /> {t('settings.appearance', 'Aparência e Idioma')}
+                                    </h3>
+
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                        <button
+                                            onClick={() => handleAppThemeChange('dark')}
+                                            className={`flex justify-center items-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                        >
+                                            <Moon size={16} className={theme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
+                                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.dark', 'Escuro')}</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleAppThemeChange('light')}
+                                            className={`flex justify-center items-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                        >
+                                            <Sun size={16} className={theme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
+                                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.light', 'Claro')}</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleAppThemeChange('cream')}
+                                            className={`flex justify-center items-center gap-2 p-3 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                        >
+                                            <Coffee size={16} className={theme === 'cream' ? 'text-primary' : 'text-muted-foreground'} />
+                                            <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.cream', 'Creme')}</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleAppThemeChange('terminal')}
+                                            className={`flex justify-center items-center gap-2 p-3 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                        >
+                                            <Terminal size={16} className={theme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
+                                            <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
+                                        </button>
+                                    </div>
+
+                                    <div className="space-y-4 pt-6 border-t border-border mt-6">
+                                        <div className="space-y-2 text-left">
+                                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-2">
+                                                <Globe size={12} />
+                                                {t('settings.language.label', 'Idioma da Interface')}
+                                            </label>
+                                            <select
+                                                value={localLanguage}
+                                                onChange={(e) => setLocalLanguage(e.target.value)}
+                                                className="w-full bg-input border border-border rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
+                                            >
+                                                <option value="pt">{t('common.languages.pt', 'Português')}</option>
+                                                <option value="en">{t('common.languages.en', 'English')}</option>
+                                                <option value="es">{t('common.languages.es', 'Español')}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        )
+                    }
 
                 </div >
             </div >
