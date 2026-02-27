@@ -1,11 +1,31 @@
 import React from 'react';
 import { DitherShader } from '@/components/ui/dither-shader';
+import { useTheme } from './ThemeProvider';
 
 interface TransitionScreenProps {
     isVisible: boolean;
 }
 
 export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible }) => {
+    const { theme } = useTheme();
+
+    const getDitherColors = () => {
+        switch (theme) {
+            case 'cream':
+                return { primary: '#5c4033', secondary: '#fdfbf7' };
+            case 'terminal':
+                return { primary: '#0d1117', secondary: '#4af626' };
+            case 'light':
+                return { primary: '#000000', secondary: '#ffffff' };
+            case 'windows':
+                return { primary: '#0f0f0f', secondary: '#008080' };
+            default: // dark
+                return { primary: '#000000', secondary: '#9d4edd' };
+        }
+    };
+
+    const ditherColors = getDitherColors();
+
     return (
         <div
             className={`fixed inset-0 z-[9999] flex items-center justify-center bg-zinc-950 transition-opacity duration-1000 ease-out ${isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
@@ -18,8 +38,8 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
                     gridSize={2}
                     ditherMode="bayer"
                     colorMode="duotone"
-                    primaryColor="#000000"
-                    secondaryColor="#9d4edd"
+                    primaryColor={ditherColors.primary}
+                    secondaryColor={ditherColors.secondary}
                     invert={false}
                     animated={true}
                     animationSpeed={0.005}

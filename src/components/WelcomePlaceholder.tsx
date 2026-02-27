@@ -34,6 +34,8 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                 return { primary: '#0d1117', secondary: '#4af626' };
             case 'light':
                 return { primary: '#000000', secondary: '#ffffff' };
+            case 'windows':
+                return { primary: '#0f0f0f', secondary: '#008080' };
             default: // dark
                 return { primary: '#000000', secondary: '#9d4edd' };
         }

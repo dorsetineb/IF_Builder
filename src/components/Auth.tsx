@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Activity, Minus, Square, X, Play } from 'lucide-react';
 import { DitherShader } from '@/components/ui/dither-shader';
 import { useTranslation } from 'react-i18next';
+import { useTheme } from './ThemeProvider';
 
 type LandingView = 'landing' | 'about' | 'play';
 
@@ -13,6 +14,25 @@ export function Auth() {
 
     // Landing page view state
     const [currentView, setCurrentView] = useState<LandingView>('landing');
+
+    const { theme } = useTheme();
+
+    const getDitherColors = () => {
+        switch (theme) {
+            case 'cream':
+                return { primary: '#5c4033', secondary: '#fdfbf7' };
+            case 'terminal':
+                return { primary: '#0d1117', secondary: '#4af626' };
+            case 'light':
+                return { primary: '#000000', secondary: '#ffffff' };
+            case 'windows':
+                return { primary: '#0f0f0f', secondary: '#008080' };
+            default: // dark
+                return { primary: '#000000', secondary: '#9d4edd' };
+        }
+    };
+
+    const ditherColors = getDitherColors();
 
     const resetToLanding = (e?: React.MouseEvent) => {
         if (e) e.stopPropagation();
@@ -167,8 +187,8 @@ export function Auth() {
                     gridSize={2}
                     ditherMode="bayer"
                     colorMode="duotone"
-                    primaryColor="#000000"
-                    secondaryColor="#9d4edd"
+                    primaryColor={ditherColors.primary}
+                    secondaryColor={ditherColors.secondary}
                     invert={false}
                     animated={true}
                     animationSpeed={0.005}
