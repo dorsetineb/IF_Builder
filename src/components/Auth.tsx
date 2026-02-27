@@ -50,10 +50,10 @@ export function Auth() {
         <div className="w-96 flex flex-col h-full relative z-20 transition-all duration-300">
             <div className="flex-1 flex flex-col justify-center w-full pl-12 pr-6 space-y-12">
                 {/* Tagline */}
-                <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1 drop-shadow-md">
+                <div className="text-sm text-muted-foreground leading-relaxed text-left space-y-1 drop-shadow-md">
                     <p>{t('auth.sidebar.line1', 'Em uma caverna escura.')}</p>
                     <p>{t('auth.sidebar.line2', 'Monitores CRT iluminam o mofo.')}</p>
-                    <p className="text-purple-400 font-bold mt-2 drop-shadow-md">&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
+                    <p className="text-primary font-bold mt-2 drop-shadow-md">&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
                 </div>
 
                 {/* Navigation Buttons */}
@@ -67,7 +67,7 @@ export function Auth() {
                             e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
                         }}
                         onClick={() => navigate('/editor')}
-                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden bg-purple-600 border-purple-500 text-white shadow-xl hover:scale-[1.02]`}
+                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden bg-primary border-primary text-primary-foreground shadow-xl hover:scale-[1.02]`}
                     >
                         <div
                             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
@@ -80,7 +80,7 @@ export function Auth() {
                     </button>
 
                     {/* Secret Hint Text */}
-                    <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1 pt-8 opacity-50 drop-shadow-md">
+                    <div className="text-sm text-muted-foreground leading-relaxed text-left space-y-1 pt-8 opacity-50 drop-shadow-md">
                         <p>{t('auth.sidebar.hint1', 'Algo pode acontecer,')}</p>
                         <p>{t('auth.sidebar.hint2', 'Se você clicar nos computadores.')}</p>
                     </div>
@@ -91,23 +91,23 @@ export function Auth() {
 
     const renderAboutPanel = () => (
         <div
-            className={`w-full max-w-2xl bg-zinc-900/80 border border-muted-foreground/50 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl ${isClosing
+            className={`w-full max-w-2xl bg-card/80 border border-border backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl text-card-foreground ${isClosing
                 ? 'animate-out fade-out zoom-out-95 duration-300'
                 : 'animate-in fade-in zoom-in-95 duration-300'
                 }`}
             onClick={(e) => e.stopPropagation()}
         >
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-50" />
+            <div className="absolute top-0 left-0 w-full h-1 bg-primary opacity-50" />
             <div className="p-8">
                 <div className="flex items-center justify-center mb-6">
                     <div className="space-y-1 text-center">
-                        <h2 className="text-xl font-bold tracking-tight text-white flex items-center justify-center gap-2">
-                            <Activity className="w-5 h-5 text-purple-400" /> {t('auth.about.title', 'Sobre o IF Builder')}
+                        <h2 className="text-xl font-bold tracking-tight text-foreground flex items-center justify-center gap-2">
+                            <Activity className="w-5 h-5 text-primary" /> {t('auth.about.title', 'Sobre o IF Builder')}
                         </h2>
                     </div>
                 </div>
 
-                <div className="space-y-4 text-zinc-400 leading-relaxed text-sm">
+                <div className="space-y-4 text-muted-foreground leading-relaxed text-sm">
                     <p>
                         {t('auth.about.p1', 'Crie cenas, objetos e defina as interações que avançam a sua ficção interativa.')}
                     </p>
@@ -131,7 +131,7 @@ export function Auth() {
         >
             {/* 4:3 Container - scales proportionally with viewport */}
             <div
-                className={`bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col ${isClosing
+                className={`bg-card border border-border rounded-2xl shadow-2xl overflow-hidden flex flex-col ${isClosing
                     ? 'animate-out zoom-out-95 duration-300'
                     : 'animate-in zoom-in-95 duration-300'
                     }`}
@@ -143,24 +143,24 @@ export function Auth() {
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Fake Browser Header */}
-                <div className="bg-zinc-800 border-b border-zinc-700 px-4 py-3 flex items-center justify-between flex-shrink-0">
+                <div className="bg-muted border-b border-border px-4 py-3 flex items-center justify-between flex-shrink-0">
                     <div className="flex items-center gap-3">
-                        <span className="font-mono text-xs text-zinc-500 uppercase tracking-widest">
+                        <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
                             TERM.V2.EXE - REMOTE CONNECTION
                         </span>
                     </div>
                     <div className="flex items-center">
-                        <button className="h-6 w-8 flex items-center justify-center hover:bg-white/10 transition-colors rounded-sm">
-                            <Minus className="w-3 h-3 text-zinc-500" />
+                        <button className="h-6 w-8 flex items-center justify-center hover:bg-foreground/10 transition-colors rounded-sm">
+                            <Minus className="w-3 h-3 text-muted-foreground" />
                         </button>
-                        <button className="h-6 w-8 flex items-center justify-center hover:bg-white/10 transition-colors rounded-sm">
-                            <Square className="w-2.5 h-2.5 text-zinc-500" />
+                        <button className="h-6 w-8 flex items-center justify-center hover:bg-foreground/10 transition-colors rounded-sm">
+                            <Square className="w-2.5 h-2.5 text-muted-foreground" />
                         </button>
                         <button
-                            className="h-6 w-8 flex items-center justify-center hover:bg-red-500 transition-colors group rounded-sm"
+                            className="h-6 w-8 flex items-center justify-center hover:bg-destructive transition-colors group rounded-sm"
                             onClick={resetToLanding}
                         >
-                            <X className="w-3.5 h-3.5 text-zinc-500 group-hover:text-white" />
+                            <X className="w-3.5 h-3.5 text-muted-foreground group-hover:text-destructive-foreground" />
                         </button>
                     </div>
                 </div>
@@ -179,9 +179,9 @@ export function Auth() {
 
     // Main landing layout with sidebar
     return (
-        <div className="h-screen w-screen flex bg-black font-sans relative overflow-hidden">
+        <div className="h-screen w-screen flex bg-background font-sans relative overflow-hidden">
             {/* Global Dither Background */}
-            <div className="absolute inset-0 z-0 bg-neutral-950 overflow-hidden pointer-events-none">
+            <div className="absolute inset-0 z-0 bg-background overflow-hidden pointer-events-none">
                 <DitherShader
                     src="/background.png"
                     gridSize={2}
@@ -231,10 +231,10 @@ export function Auth() {
 
             {/* IF Logo & Status - Bottom Right Group */}
             <div className="fixed bottom-12 right-12 z-10 flex flex-col gap-0 select-none pointer-events-none opacity-20 items-end">
-                <h1 className="text-[120px] font-black text-white tracking-tighter italic leading-[0.8] notranslate" translate="no" style={{ fontFamily: 'Inter, sans-serif' }}>
+                <h1 className="text-[120px] font-black text-foreground tracking-tighter italic leading-[0.8] notranslate" translate="no" style={{ fontFamily: 'Inter, sans-serif' }}>
                     IF
                 </h1>
-                <div className="font-mono text-[10px] text-zinc-500 tracking-wider pr-2 mt-2 border-r-2 border-zinc-800 text-right">
+                <div className="font-mono text-[10px] text-muted-foreground tracking-wider pr-2 mt-2 border-r-2 border-border text-right">
                     <p>SYS.STATUS: ONLINE</p>
                     <p>NODE: ALPHA-7</p>
                 </div>
