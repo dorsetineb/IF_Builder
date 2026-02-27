@@ -13,7 +13,7 @@ interface WelcomePlaceholderProps {
 }
 
 export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreateScene, onDownloadExample, onMeetProject, theme = 'dark' }) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const [isFlashing, setIsFlashing] = useState(false);
     const [showDownloadHelp, setShowDownloadHelp] = useState(false);
     const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
@@ -146,7 +146,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                                     <Gamepad2 className="w-6 h-6 text-blue-500" />
                                 </div>
                                 <h4 className="text-lg font-semibold text-white mb-2">{t('welcome.helpPlayTitle', 'Para Jogar')}</h4>
-                                <p className="text-left text-zinc-400 text-sm" dangerouslySetInnerHTML={{ __html: t('welcome.helpPlayDesc', 'Extraia o conteúdo do arquivo <strong>fuga_da_masmorra.zip</strong> no seu computador, e abra o arquivo <strong>index.html</strong> para acessar a ficção de modo offline.') }} />
+                                <p className="text-left text-zinc-400 text-sm" dangerouslySetInnerHTML={{ __html: t('welcome.helpPlayDesc', `Extraia o conteúdo do arquivo <strong>${i18n.language.startsWith('en') ? 'escape_the_dungeon.zip' : 'fuga_da_masmorra.zip'}</strong> no seu computador, e abra o arquivo <strong>index.html</strong> para acessar a ficção de modo offline.`) }} />
                             </div>
 
                             <div className="flex flex-col items-center text-center p-6 bg-zinc-950/50 rounded-lg border border-zinc-800">
@@ -203,9 +203,9 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         </div>
                         <div className="flex-1 min-h-0">
                             <iframe
-                                src="/fuja_da_masmorra/index.html"
+                                src={i18n.language.startsWith('en') ? "/escape_the_dungeon/index.html" : "/fuja_da_masmorra/index.html"}
                                 className="w-full h-full border-0"
-                                title="Fuja da Masmorra Demo"
+                                title="Demo"
                             />
                         </div>
                     </div>

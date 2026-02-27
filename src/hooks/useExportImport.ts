@@ -28,7 +28,7 @@ export const useExportImport = ({
     toast,
     profile
 }: UseExportImportProps) => {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
 
     const [isImporting, setIsImporting] = useState(false);
 
@@ -534,9 +534,12 @@ DATE:        ${exportDate.toLocaleString()}
     };
 
     const handleDownloadExample = () => {
+        const isEnglish = i18n.language.startsWith('en');
+        const filename = isEnglish ? "escape_the_dungeon.zip" : "fuja_da_masmorra.zip";
+
         const element = document.createElement("a");
-        element.href = "/fuja_da_masmorra.zip";
-        element.download = "fuja_da_masmorra.zip";
+        element.href = `/${filename}`;
+        element.download = filename;
         document.body.appendChild(element);
         element.click();
         document.body.removeChild(element);
