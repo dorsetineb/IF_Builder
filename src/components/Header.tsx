@@ -1,7 +1,7 @@
 
 import React, { useRef } from 'react';
 import { GameData, View } from '../types';
-import { Eye, Plus, CircleHelp, LogOut, ChevronLeft, ChevronRight, PanelLeft, Upload, Download, Save } from 'lucide-react';
+import { Eye, Plus, CircleHelp, ChevronLeft, ChevronRight, PanelLeft, Upload, Download, Save } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const Header: React.FC<{
@@ -9,14 +9,13 @@ const Header: React.FC<{
   isPreviewing: boolean;
   onTogglePreview: () => void;
   onNewGame: () => void;
-  onLogout: () => void;
   sidebarCollapsed?: boolean;
   onToggleCollapse?: () => void;
   onExport: () => void;
   onImport: (file: File) => void;
   onHome?: () => void;
   currentView: View;
-}> = ({ gameData, isPreviewing, onTogglePreview, onNewGame, onLogout, sidebarCollapsed, onToggleCollapse, onExport, onImport, onHome, currentView }) => {
+}> = ({ gameData, isPreviewing, onTogglePreview, onNewGame, sidebarCollapsed, onToggleCollapse, onExport, onImport, onHome, currentView }) => {
   const { t } = useTranslation();
   const importInputRef = useRef<HTMLInputElement>(null);
 
@@ -121,16 +120,6 @@ const Header: React.FC<{
                 </>
               )}
             </>
-          )}
-
-          {currentView === 'interface' && (
-            <button
-              onClick={onLogout}
-              className="flex items-center justify-center px-4 py-2 bg-red-500/10 text-red-500 font-bold rounded-lg hover:bg-red-500 hover:text-white border border-red-500/20 transition-all text-xs"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              {t('header.exitEditor', 'Sair do Editor')}
-            </button>
           )}
         </div>
       </div>

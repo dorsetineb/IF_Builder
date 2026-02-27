@@ -194,10 +194,6 @@ const Editor: React.FC = () => {
 
     const handleExit = () => handleNavigate('/dashboard');
 
-    const handleLogout = () => {
-        window.location.href = '/';
-    };
-
     // --- Game Data Hook ---
     const {
         gameData, setGameData, isDirty, setIsDirty,
@@ -481,7 +477,6 @@ const Editor: React.FC = () => {
                         isPreviewing={isPreviewing}
                         onTogglePreview={() => setIsPreviewing(false)}
                         onNewGame={handleNewGame}
-                        onLogout={handleLogout}
                         onHome={() => {
                             setCurrentView('scenes');
                             setSelectedSceneId(null);
@@ -503,7 +498,6 @@ const Editor: React.FC = () => {
                             setIsPreviewing(true);
                         }}
                         onNewGame={handleNewGame}
-                        onLogout={handleLogout}
                         sidebarCollapsed={sidebarCollapsed}
                         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
                         onExport={handleExport}

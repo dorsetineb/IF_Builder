@@ -27,13 +27,13 @@ export function Auth() {
 
     // Sidebar Component (Left)
     const renderSidebar = () => (
-        <div className="w-72 bg-zinc-950/2 backdrop-blur-[2px] border-r border-muted-foreground/50 flex flex-col h-full relative z-20 transition-all duration-300 hover:border-purple-500/40 hover:shadow-2xl hover:shadow-purple-900/10">
-            <div className="flex-1 flex flex-col justify-center w-full px-6 space-y-12">
+        <div className="w-96 flex flex-col h-full relative z-20 transition-all duration-300">
+            <div className="flex-1 flex flex-col justify-center w-full pl-12 pr-6 space-y-12">
                 {/* Tagline */}
-                <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1">
+                <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1 drop-shadow-md">
                     <p>{t('auth.sidebar.line1', 'Em uma caverna escura.')}</p>
                     <p>{t('auth.sidebar.line2', 'Monitores CRT iluminam o mofo.')}</p>
-                    <p className="text-purple-400 font-bold mt-2">&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
+                    <p className="text-purple-400 font-bold mt-2 drop-shadow-md">&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
                 </div>
 
                 {/* Navigation Buttons */}
@@ -47,7 +47,7 @@ export function Auth() {
                             e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
                         }}
                         onClick={() => navigate('/editor')}
-                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden bg-purple-600 border-purple-500 text-white shadow-lg shadow-purple-600/30 hover:scale-[1.02]`}
+                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden bg-purple-600 border-purple-500 text-white shadow-xl hover:scale-[1.02]`}
                     >
                         <div
                             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
@@ -60,17 +60,10 @@ export function Auth() {
                     </button>
 
                     {/* Secret Hint Text */}
-                    <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1 pt-8 opacity-50">
+                    <div className="text-sm text-zinc-400 leading-relaxed text-left space-y-1 pt-8 opacity-50 drop-shadow-md">
                         <p>{t('auth.sidebar.hint1', 'Algo pode acontecer,')}</p>
                         <p>{t('auth.sidebar.hint2', 'Se você clicar nos computadores.')}</p>
                     </div>
-                </div>
-            </div>
-
-            {/* Footer */}
-            <div className="p-8 border-t border-zinc-900/50 bg-zinc-950/2">
-                <div className="font-mono text-[10px] text-zinc-600 leading-relaxed text-left">
-                    <p>© 2026 IF Builder.</p>
                 </div>
             </div>
         </div>
