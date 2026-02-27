@@ -17,7 +17,11 @@ i18n
     .use(initReactI18next)
     .init({
         resources,
-        fallbackLng: 'pt', // Usa PT como padrão
+        fallbackLng: 'en', // Agora usa EN como fallback para usuários internacionais
+        detection: {
+            order: ['localStorage', 'cookie', 'navigator', 'htmlTag'],
+            caches: ['localStorage', 'cookie'],
+        },
         interpolation: {
             escapeValue: false // O React já faz escape de XSS por padrão
         }
