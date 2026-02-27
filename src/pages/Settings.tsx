@@ -87,6 +87,14 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                         <button
+                            onClick={() => handleThemeChange('windows')}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'windows' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                        >
+                            <Monitor size={16} className={theme === 'windows' ? 'text-primary' : 'text-muted-foreground'} />
+                            <span className={`font-medium text-xs ${theme === 'windows' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.windows', 'W95')}</span>
+                        </button>
+
+                        <button
                             onClick={() => handleThemeChange('dark')}
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
                         >
@@ -116,14 +124,6 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         >
                             <Terminal size={16} className={theme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
                             <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
-                        </button>
-
-                        <button
-                            onClick={() => handleThemeChange('windows')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'windows' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
-                        >
-                            <Monitor size={16} className={theme === 'windows' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'windows' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.windows', 'Windows')}</span>
                         </button>
                     </div>
 
