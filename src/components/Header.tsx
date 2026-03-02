@@ -19,6 +19,9 @@ const Header: React.FC<{
   const { t } = useTranslation();
   const importInputRef = useRef<HTMLInputElement>(null);
 
+  const totalConnectableNodes = Object.keys(gameData?.scenes || {}).length + (gameData?.vignettes?.length || 0);
+  const isPreviewDisabled = totalConnectableNodes < 2;
+
   return (
     <header className="flex w-full h-[61px]">
       {/* Left Pane - Sidebar Alignment */}
@@ -50,11 +53,16 @@ const Header: React.FC<{
       </div>
 
       {/* Right Pane - Top Bar Content */}
-      <div className="flex-1 flex items-center justify-between bg-card border-b border-muted-foreground/50 px-6">
-        <div className="flex items-center h-full gap-4">
+      <div className="flex-1 flex items-center justify-start gap-4 bg-card border-b border-muted-foreground/50 px-6">
+        <div className={`flex items-center h-full ${!['about', 'guide', 'settings'].includes(currentView) ? 'border-r border-muted-foreground/30 pr-6' : ''}`}>
           <div className="flex items-center">
             {/* Context-aware Sub-header Text */}
-            {currentView === 'settings' ? (
+            {currentView === 'guide' ? (
+              <div className="flex flex-col">
+                <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
+                <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.guideDesc', 'Aprenda como criar suas próprias histórias interativas.')}</p>
+              </div>
+            ) : currentView === 'settings' ? (
               <div className="flex flex-col">
                 <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.settings', 'Configurações')}</span>
                 <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.settingsDesc', 'Gerencie suas preferências e conta.')}</p>
@@ -64,13 +72,25 @@ const Header: React.FC<{
                 <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
                 <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.aboutDesc', 'Conheça a missão e os valores por trás do IF Builder.')}</p>
               </div>
-            ) : null}
+            ) : (
+              <div className="flex flex-col">
+                <div className="flex items-center gap-2">
+                  <span className="text-xl font-bold text-foreground tracking-tight">
+                    {currentView === 'map' ? t('sidebar.sceneMap', 'Mapa de Cenas') :
+                      currentView === 'global_objects' ? t('sidebar.objects', 'Objetos') :
+                        currentView === 'trackers' ? t('sidebar.trackers', 'Rastreadores') :
+                          currentView === 'global_commands' ? t('sidebar.globalCommands', 'Comandos Globais') :
+                            currentView === 'interface' ? t('sidebar.interface', 'Interface') :
+                              t('sidebar.sceneEditor', 'Editor de Cenas')}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
         <div className="flex items-center gap-3">
-          {/* Only show Game Controls if NOT in About */}
-          {(currentView !== 'about') && (
+          {(!['about', 'guide', 'settings'].includes(currentView)) && (
             <>
               {/* Hidden Import Input */}
               <input
@@ -110,9 +130,10 @@ const Header: React.FC<{
                   </button>
 
                   <button
-                    onClick={onTogglePreview}
-                    className="flex items-center justify-center px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-lg transition-all text-xs shadow-sm active:scale-95 border border-primary/50"
-                    title={t('header.previewGame', 'Pré-visualizar Jogo')}
+                    onClick={isPreviewDisabled ? undefined : onTogglePreview}
+                    disabled={isPreviewDisabled}
+                    className={`flex items-center justify-center px-4 py-2 font-bold rounded-lg transition-all text-xs shadow-sm uppercase tracking-wider ${isPreviewDisabled ? 'bg-muted text-muted-foreground cursor-not-allowed border border-muted-foreground/30' : 'bg-primary hover:bg-primary/90 text-primary-foreground active:scale-95 border border-primary/50'}`}
+                    title={isPreviewDisabled ? t('header.previewDisabled', 'Adicione pelo menos 2 cenas ou vinhetas para usar o Preview.') : t('header.previewGame', 'Pré-visualizar Jogo')}
                   >
                     <Eye className="w-3.5 h-3.5 mr-2" /> {t('header.previewGameBtn', 'Pré-visualizar')}
                   </button>

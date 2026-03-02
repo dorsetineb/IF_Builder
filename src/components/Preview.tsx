@@ -77,7 +77,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('__SPLASH_LOGO_IMG_TAG__', gameData.gameLogo ? `<img src="${gameData.gameLogo}" alt="Logo" class="splash-logo">` : '')
             .replace('__SPLASH_TITLE_H1_TAG__', !gameData.gameOmitSplashTitle ? `<h1>${gameData.gameTitle}</h1>` : '')
             .replace(/<button id="splash-start-button"([^>]*)>.*?<\/button>/g, `<button id="splash-start-button"$1>${gameData.gameSplashButtonText || t('UIEditor.textos.splashButtonPlaceholder')}</button>`)
-            .replace(/(<button[^>]*class="[^"]*ending-restart-button[^"]*"[^>]*>)(.*?)(<\/button>)/g, `$1${gameData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder')}$3`)
+            .replace(/(<button(?:(?!\bid="vignette-continue-button")[^>])*class="[^"]*ending-restart-button[^"]*"[^>]*>)(.*?)(<\/button>)/g, `$1${gameData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder')}$3`)
             .replace(/<button id="continue-button"([^>]*)>.*?<\/button>/g, `<button id="continue-button"$1>${gameData.gameContinueButtonText || t('UIEditor.textos.continueButtonPlaceholder')}</button>`)
             .replace(/<button id="system-button"([^>]*)>.*?<\/button>/g, `<button id="system-button"$1>${gameData.gameSystemButtonText || t('UIEditor.textos.systemPlaceholder')}</button>`)
             .replace('__SPLASH_DESCRIPTION__', gameData.gameSplashDescription || '')

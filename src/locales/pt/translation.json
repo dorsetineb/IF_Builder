@@ -162,6 +162,7 @@
     "header": {
         "settingsDesc": "Gerencie suas preferências e conta.",
         "aboutDesc": "Conheça a missão e os valores por trás do IF Builder.",
+        "guideDesc": "Aprenda como criar suas próprias histórias interativas.",
         "expandSidebar": "Expandir Sidebar",
         "collapseSidebar": "Recolher Sidebar",
         "closePreview": "Fechar Preview",

@@ -360,6 +360,7 @@
     "header": {
         "settingsDesc": "Manage your preferences and account.",
         "aboutDesc": "Learn about the mission and values behind IF Builder.",
+        "guideDesc": "Learn how to create your own interactive stories.",
         "expandSidebar": "Expand Sidebar",
         "collapseSidebar": "Collapse Sidebar",
         "closePreview": "Close Preview",

@@ -131,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const negativeEndingScreen = document.getElementById('negative-ending-screen');
     const splashStartButton = document.getElementById('splash-start-button');
     const continueButton = document.getElementById('continue-button');
-    const endingRestartButtons = document.querySelectorAll('.ending-restart-button');
+    const endingRestartButtons = document.querySelectorAll('.ending-restart-button:not(#vignette-continue-button)');
     
     const gameContainer = document.getElementById('game-container');
     const imageContainer = document.getElementById('image-container');
