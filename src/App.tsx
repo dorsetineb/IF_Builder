@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Auth } from './components/Auth';
 import PlatformLayout from './components/layouts/PlatformLayout';
 import Settings from './pages/Settings';
@@ -9,6 +10,12 @@ import { ToastProvider } from './components/ToastContext';
 import AboutProject from './pages/AboutProject';
 
 const App: React.FC = () => {
+    const { t, i18n } = useTranslation();
+
+    useEffect(() => {
+        document.title = t('app.title', 'IF Builder / Ficções Interativas');
+    }, [i18n.language, t]);
+
     return (
         <ThemeProvider defaultTheme="dark" storageKey="if-builder-theme">
             <ToastProvider>

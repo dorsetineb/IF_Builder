@@ -1,4 +1,7 @@
 {
+  "app": {
+    "title": "IF Builder / Ficções Interativas"
+  },
   "auth": {
     "errors": {
       "alreadyRegistered": "Este usuário já está cadastrado.",

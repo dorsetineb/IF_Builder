@@ -1,4 +1,7 @@
 {
+  "app": {
+    "title": "IF Builder / Interactive Fictions"
+  },
   "auth": {
     "errors": {
       "alreadyRegistered": "This user is already registered.",
