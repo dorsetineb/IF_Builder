@@ -6,6 +6,17 @@ export const prepareGameDataForEngine = (data: GameData): object => {
     for (const sceneId in data.scenes) {
         if (Object.prototype.hasOwnProperty.call(data.scenes, sceneId)) {
             const scene = data.scenes[sceneId];
+
+            // Cleanse "ghost" strings that stuck to legacy scenes from old defaults
+            let finalVignetteButtonText = scene.vignetteButtonText;
+            if (scene.vignetteType === 'opening' && ['COMEÇAR', 'START', 'INICIAR'].includes(finalVignetteButtonText || '')) {
+                finalVignetteButtonText = data.gameSplashButtonText || finalVignetteButtonText;
+            } else if ((scene.vignetteType === 'conclusion' || scene.isDefeatOutcome) && ['REINICIAR', 'RESTART'].includes(finalVignetteButtonText || '')) {
+                finalVignetteButtonText = data.gameRestartButtonText || finalVignetteButtonText;
+            } else if (scene.vignetteType === 'transition' && ['CONTINUAR', 'CONTINUE'].includes(finalVignetteButtonText || '')) {
+                finalVignetteButtonText = data.gameContinueButtonText || finalVignetteButtonText;
+            }
+
             translatedCenas[sceneId] = {
                 id: scene.id,
                 name: scene.name,
@@ -20,7 +31,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 objectIds: scene.objectIds || [],
                 choices: scene.choices || [],
                 vignetteType: scene.vignetteType,
-                vignetteButtonText: scene.vignetteButtonText,
+                vignetteButtonText: finalVignetteButtonText,
                 vignetteNextSceneId: scene.vignetteNextSceneId,
                 overlayEffect: scene.overlayEffect,
                 isDefeatOutcome: scene.isDefeatOutcome
