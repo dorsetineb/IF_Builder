@@ -207,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
     vDiv.className = 'splash-screen hidden';
     // Use inline styles as a fallback to guarantee the look matches splash button even if CSS is missing
     const btnStyle = 'font-family: var(--font-family); padding: 12px 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; background-color: var(--splash-button-bg);';
-    vDiv.innerHTML = '<div id="vignette-overlay" class="scene-overlay"></div><div class="splash-content" style="z-index: 10;"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '">Continuar</button></div></div>';
+    vDiv.innerHTML = '<div id="vignette-overlay" class="scene-overlay"></div><div class="splash-content" style="z-index: 10;"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '"></button></div></div>';
     document.body.appendChild(vDiv);
     vignetteScreen = vDiv;
 
