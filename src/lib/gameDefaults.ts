@@ -1,4 +1,3 @@
-
 import { GameData } from '../types';
 
 export const gameHTML = `
@@ -49,7 +48,7 @@ export const gameHTML = `
             </div>
         </div>
 
-        <div class="game-container __LAYOUT_ORIENTATION_CLASS__ __LAYOUT_ORDER_CLASS__" id="game-container">
+        <div class="game-container __LAYOUT_ORIENTATION_CLASS__ __LAYOUT_ORDER_CLASS__ hidden" id="game-container">
             <div class="image-panel">
                 <div id="image-container" class="image-container">
                   <!-- Back image: The Next Scene (loads behind) -->
@@ -1425,86 +1424,86 @@ export const OVERLAY_CSS = `
 `;
 
 export const initialGameData: GameData = {
-    startScene: '',
-    scenes: {},
-    globalObjects: {},
-    sceneOrder: [],
-    defaultFailureMessage: '',
-    gameHTML: gameHTML,
-    gameCSS: gameCSS + OVERLAY_CSS,
-    gameTitle: 'Minha Aventura de Texto',
-    gameSystemEnabled: 'none',
-    enableTrackers: false,
-    enableInventory: true,
-    enableDiary: true,
-    enableFixedVerbs: false,
-    enableChances: false,
-    gameTextReadingFlow: 'paused',
-    gameInteractionType: 'parser',
+  startScene: '',
+  scenes: {},
+  globalObjects: {},
+  sceneOrder: [],
+  defaultFailureMessage: '',
+  gameHTML: gameHTML,
+  gameCSS: gameCSS + OVERLAY_CSS,
+  gameTitle: 'Minha Aventura de Texto',
+  gameSystemEnabled: 'none',
+  enableTrackers: false,
+  enableInventory: true,
+  enableDiary: true,
+  enableFixedVerbs: false,
+  enableChances: false,
+  gameTextReadingFlow: 'paused',
+  gameInteractionType: 'parser',
 
-    // Inventory Defaults
-    inventoryCapacity: 10,
-    inventoryMaxWeight: 0,
+  // Inventory Defaults
+  inventoryCapacity: 10,
+  inventoryMaxWeight: 0,
 
-    // Diary Defaults
-    diaryAutoScroll: true,
-    diaryAllowExport: false,
-    diaryMaxMessages: 100,
+  // Diary Defaults
+  diaryAutoScroll: true,
+  diaryAllowExport: false,
+  diaryMaxMessages: 100,
 
-    gameMaxChances: 3,
-    gameChanceIcon: 'heart',
-    gameChanceIconColor: '#ff4d4d',
-    frameBookColor: '#FFFFFF',
-    frameTradingCardColor: '#1c1917',
-    frameRoundedTopColor: '#facc15',
-    gameSceneNameOverlayBg: '#0d1117',
-    gameSceneNameOverlayTextColor: '#c9d1d9',
-    gameContinueIndicatorColor: '#58a6ff',
-    gameTextAnimationType: 'fade',
-    gameTextSpeed: 5,
-    gameImageTransitionType: 'fade',
-    gameImageSpeed: 5,
-    gameFontSize: '12',
-    gameShowTrackersUI: true,
-    gameShowSystemButton: true,
-    fixedVerbs: [],
-    consequenceTrackers: [],
-    positiveEndingMusic: '',
-    negativeEndingMusic: '',
-    vignettes: []
+  gameMaxChances: 3,
+  gameChanceIcon: 'heart',
+  gameChanceIconColor: '#ff4d4d',
+  frameBookColor: '#FFFFFF',
+  frameTradingCardColor: '#1c1917',
+  frameRoundedTopColor: '#facc15',
+  gameSceneNameOverlayBg: '#0d1117',
+  gameSceneNameOverlayTextColor: '#c9d1d9',
+  gameContinueIndicatorColor: '#58a6ff',
+  gameTextAnimationType: 'fade',
+  gameTextSpeed: 5,
+  gameImageTransitionType: 'fade',
+  gameImageSpeed: 5,
+  gameFontSize: '12',
+  gameShowTrackersUI: true,
+  gameShowSystemButton: true,
+  fixedVerbs: [],
+  consequenceTrackers: [],
+  positiveEndingMusic: '',
+  negativeEndingMusic: '',
+  vignettes: [],
 };
 
 export const sanitizeLegacyI18n = (data: any): any => {
-    if (!data) return data;
-    const d = { ...data };
+  if (!data) return data;
+  const d = { ...data };
 
-    // Exact text strings that were hardcoded into Portuguese in legacy Projects
-    const legacyMap: Record<string, string[]> = {
-        gameSplashButtonText: ['COMEÇAR', 'INICIAR'],
-        gameRestartButtonText: ['Reiniciar Aventura', 'Reiniciar'],
-        gameContinueButtonText: ['Continuar', 'CONTINUAR'],
-        gameSystemButtonText: ['Sistema', 'SISTEMA'],
-        gameActionButtonText: ['Ação', 'Açao', 'AÇÃO', 'Action'],
-        gameVerbInputPlaceholder: ['O que você faz?', 'o que voce faz?'],
-        gameDiaryPlayerName: ['Jogador'],
-        gameMainMenuButtonText: ['Menu Principal'],
-        gameViewEndingButtonText: ['Ver Final'],
-        gameSaveMenuTitle: ['Salvar Jogo'],
-        gameLoadMenuTitle: ['Carregar Jogo'],
-        suggestionsButtonText: ['Sugestões', 'Sugestoes'],
-        inventoryButtonText: ['Inventário', 'Inventario'],
-        diaryButtonText: ['Diário', 'Diario'],
-        trackersButtonText: ['Trackers', 'Rastreadores']
-    };
+  // Exact text strings that were hardcoded into Portuguese in legacy Projects
+  const legacyMap: Record<string, string[]> = {
+    gameSplashButtonText: ['COMEÇAR', 'INICIAR'],
+    gameRestartButtonText: ['Reiniciar Aventura', 'Reiniciar'],
+    gameContinueButtonText: ['Continuar', 'CONTINUAR'],
+    gameSystemButtonText: ['Sistema', 'SISTEMA'],
+    gameActionButtonText: ['Ação', 'Açao', 'AÇÃO', 'Action'],
+    gameVerbInputPlaceholder: ['O que você faz?', 'o que voce faz?'],
+    gameDiaryPlayerName: ['Jogador'],
+    gameMainMenuButtonText: ['Menu Principal'],
+    gameViewEndingButtonText: ['Ver Final'],
+    gameSaveMenuTitle: ['Salvar Jogo'],
+    gameLoadMenuTitle: ['Carregar Jogo'],
+    suggestionsButtonText: ['Sugestões', 'Sugestoes'],
+    inventoryButtonText: ['Inventário', 'Inventario'],
+    diaryButtonText: ['Diário', 'Diario'],
+    trackersButtonText: ['Trackers', 'Rastreadores'],
+  };
 
-    Object.keys(legacyMap).forEach((key) => {
-        const val = d[key];
-        if (typeof val === 'string') {
-            if (legacyMap[key].includes(val.trim())) {
-                d[key] = ''; // clear it to allow i18n fallback to trigger
-            }
-        }
-    });
+  Object.keys(legacyMap).forEach((key) => {
+    const val = d[key];
+    if (typeof val === 'string') {
+      if (legacyMap[key].includes(val.trim())) {
+        d[key] = ''; // clear it to allow i18n fallback to trigger
+      }
+    }
+  });
 
-    return d;
+  return d;
 };
