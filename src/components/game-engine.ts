@@ -137,11 +137,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
 
-    const splashScreen = document.getElementById('splash-screen');
     const positiveEndingScreen = document.getElementById('positive-ending-screen');
     const negativeEndingScreen = document.getElementById('negative-ending-screen');
-    const splashStartButton = document.getElementById('splash-start-button');
-    const continueButton = document.getElementById('continue-button');
     const endingRestartButtons = document.querySelectorAll('.ending-restart-button:not(#vignette-continue-button)');
     
     const gameContainer = document.getElementById('game-container');
@@ -816,11 +813,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         btnMainMenu.onclick = (e) => {
             systemModal.classList.add('hidden');
-            splashScreen.classList.remove('fade-out');
-            splashScreen.classList.remove('hidden');
             isGameEnded = false; 
-            if (gameData.gameBackgroundMusic) playBgm(gameData.gameBackgroundMusic);
-            else playBgm("");
+            startGame();
         };
         if (window.isSceneTest) startGame();
     };
@@ -856,16 +850,8 @@ document.addEventListener('DOMContentLoaded', () => {
         standardActionBar.classList.remove('hidden');
         endingActionBar.classList.add('hidden');
         
-        // Handle Splash Screen visibility
+        gameContainer.classList.remove('hidden');
         if (window.isSceneTest) {
-            // In test mode, immediately hide splash and show game to avoid freezing/delays
-            splashScreen.classList.add('hidden');
-            splashScreen.style.display = 'none';
-            splashScreen.classList.remove('fade-out');
-            
-            // Allow game container to be visible in layout (display:block) but keep opacity 0 until ready
-            gameContainer.classList.remove('hidden');
-
             const startScene = gameData.cenas[currentSceneId];
             const hasImage = startScene && startScene.image && gameData.enableImages !== false;
             
@@ -893,11 +879,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         } else {
-            // Restore smooth transition for normal play
-            splashScreen.style.display = '';
-            splashScreen.classList.remove('hidden');
-            splashScreen.classList.add('fade-out');
-            setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
+            // Unhide game container instantly in standard play
+            gameContainer.classList.add('ready');
         }
     };
 
@@ -917,8 +900,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 endingActionBar.classList.add('hidden');
                 systemModal.classList.add('hidden');
                 loadScene(currentSceneId, false);
-                splashScreen.classList.add('fade-out');
-                setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
+                gameContainer.classList.remove('hidden');
+                gameContainer.classList.add('ready');
             }
         } catch (e) { startGame(); }
     };

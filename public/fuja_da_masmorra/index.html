@@ -1,37 +1,24 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fuja da Masmorra</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
+
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body class="dark-theme with-spacing frame-trading-card __FONT_ADJUST_CLASS__ behavior-immersive">
     <audio id="scene-sound-effect" preload="auto"></audio>
     <audio id="bgm-audio" preload="auto" loop></audio>
     <div class="main-wrapper" id="main-wrapper">
-        <div id="splash-screen" class="splash-screen " style="background-image: url('assets/splash_image.png')">
-          <div class="splash-content" __SPLASH_TEXT_STYLE__>
-            <div class="splash-text">
-                
-                <h1>Fuja da Masmorra</h1>
-                <p>Você acorda em uma cela escura.
-Escreva para fugir da cela!
 
-(digite AJUDA para acessar o tutorial)</p>
-            </div>
-            <div class="splash-buttons">
-                <button id="continue-button" class="hidden">CONTINUAR</button>
-                <button id="splash-start-button">INICIAR</button>
-            </div>
-          </div>
-        </div>
 
-        <div id="positive-ending-screen" class="splash-screen hidden " style="background-image: url('assets/splash_image.png')">
+        <div id="positive-ending-screen" class="splash-screen hidden "
+            style="background-image: url('assets/splash_image.png')">
             <div class="splash-content">
                 <div class="splash-text">
                     <p>Você conseguiu fugir da masmorra!</p>
@@ -39,7 +26,8 @@ Escreva para fugir da cela!
                 <button class="ending-restart-button">REINICIAR</button>
             </div>
         </div>
-        <div id="negative-ending-screen" class="splash-screen hidden " style="background-image: url('assets/splash_image.png')">
+        <div id="negative-ending-screen" class="splash-screen hidden "
+            style="background-image: url('assets/splash_image.png')">
             <div class="splash-content">
                 <div class="splash-text">
                     <p>Você morreu...</p>
@@ -63,11 +51,11 @@ Escreva para fugir da cela!
         <div class="game-container  " id="game-container">
             <div class="image-panel">
                 <div id="image-container" class="image-container">
-                  <!-- Back image: The Next Scene (loads behind) -->
-                  <img id="scene-image-back" src="" alt="Cena seguinte" class="scene-image hidden">
-                  <!-- Front image: The Current Scene (animates out) -->
-                  <img id="scene-image" src="" alt="Cena atual" class="scene-image">
-                  <div id="scene-name-overlay" class="scene-name-overlay"></div>
+                    <!-- Back image: The Next Scene (loads behind) -->
+                    <img id="scene-image-back" src="" alt="Cena seguinte" class="scene-image hidden">
+                    <!-- Front image: The Current Scene (animates out) -->
+                    <img id="scene-image" src="" alt="Cena atual" class="scene-image">
+                    <div id="scene-name-overlay" class="scene-name-overlay"></div>
                 </div>
             </div>
             <div class="text-panel">
@@ -79,8 +67,8 @@ Escreva para fugir da cela!
                         <button id="suggestions-button">Sugestões</button>
                         <button id="inventory-button">Inventário</button>
                         <button id="diary-button">Diário</button>
-                        
-                        
+
+
                     </div>
                     <div class="input-area">
                         <input type="text" id="verb-input" placeholder="O QUE VOCÊ FAZ?">
@@ -111,13 +99,13 @@ Escreva para fugir da cela!
             <div id="diary-log" class="diary-log"></div>
         </div>
     </div>
-    
+
     <!-- System Modal -->
     <div id="system-modal" class="modal-overlay hidden">
         <div class="modal-content system-modal-content">
             <button class="modal-close-button">&times;</button>
             <h2 id="system-modal-title">Salvar / Carregar</h2>
-            
+
             <!-- Main System Menu -->
             <div id="system-menu-main" class="system-menu">
                 <button id="btn-save-menu">Salvar Jogo</button>
@@ -134,7 +122,7 @@ Escreva para fugir da cela!
             </div>
         </div>
     </div>
-    
+
     <!-- Item Modal -->
     <div id="item-modal" class="modal-overlay hidden">
         <div class="modal-content item-modal-content">
@@ -151,5 +139,7 @@ Escreva para fugir da cela!
             </div>
         </div>
     </div>
-<script src="game.js"></script></body>
+    <script src="game.js"></script>
+</body>
+
 </html>

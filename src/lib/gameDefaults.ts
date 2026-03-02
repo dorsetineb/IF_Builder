@@ -17,19 +17,7 @@ export const gameHTML = `
     <audio id="scene-sound-effect" preload="auto"></audio>
     <audio id="bgm-audio" preload="auto" loop></audio>
     <div class="main-wrapper" id="main-wrapper">
-        <div id="splash-screen" class="splash-screen __SPLASH_ALIGN_CLASS__" __SPLASH_BG_STYLE__>
-          <div class="splash-content" __SPLASH_TEXT_STYLE__>
-            <div class="splash-text">
-                __SPLASH_LOGO_IMG_TAG__
-                __SPLASH_TITLE_H1_TAG__
-                <p>__SPLASH_DESCRIPTION__</p>
-            </div>
-            <div class="splash-buttons">
-                <button id="continue-button" class="hidden">__CONTINUE_BUTTON_TEXT__</button>
-                <button id="splash-start-button">__SPLASH_BUTTON_TEXT__</button>
-            </div>
-          </div>
-        </div>
+
 
         <div id="positive-ending-screen" class="splash-screen hidden __POSITIVE_ENDING_ALIGN_CLASS__" __POSITIVE_ENDING_BG_STYLE__>
             <div class="splash-content">
