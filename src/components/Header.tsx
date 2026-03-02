@@ -55,7 +55,7 @@ const Header: React.FC<{
       {/* Right Pane - Top Bar Content */}
       <div className="flex-1 flex items-center justify-start gap-4 bg-card border-b border-muted-foreground/50 px-6">
         {['about', 'guide', 'settings'].includes(currentView) && (
-          <div className="flex items-center h-full border-r border-muted-foreground/30 pr-6">
+          <div className="flex items-center h-full">
             <div className="flex items-center">
               {/* Context-aware Sub-header Text */}
               {currentView === 'guide' ? (
