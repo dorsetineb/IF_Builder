@@ -326,7 +326,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed);
 
     const TABS = {
-        config: t('UIEditor.tabs.config', 'Aparência e idioma'),
+        config: t('settings.appearance', 'Aparência e idioma'),
         layout: t('UIEditor.tabs.layout'),
         aparencia: t('UIEditor.tabs.aparencia'),
         sistemas: t('UIEditor.tabs.sistemas'),

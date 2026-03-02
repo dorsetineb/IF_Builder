@@ -54,40 +54,29 @@ const Header: React.FC<{
 
       {/* Right Pane - Top Bar Content */}
       <div className="flex-1 flex items-center justify-start gap-4 bg-card border-b border-muted-foreground/50 px-6">
-        <div className={`flex items-center h-full ${!['about', 'guide', 'settings'].includes(currentView) ? 'border-r border-muted-foreground/30 pr-6' : ''}`}>
-          <div className="flex items-center">
-            {/* Context-aware Sub-header Text */}
-            {currentView === 'guide' ? (
-              <div className="flex flex-col">
-                <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
-                <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.guideDesc', 'Aprenda como criar suas próprias histórias interativas.')}</p>
-              </div>
-            ) : currentView === 'settings' ? (
-              <div className="flex flex-col">
-                <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.settings', 'Configurações')}</span>
-                <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.settingsDesc', 'Gerencie suas preferências e conta.')}</p>
-              </div>
-            ) : currentView === 'about' ? (
-              <div className="flex flex-col">
-                <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
-                <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.aboutDesc', 'Conheça a missão e os valores por trás do IF Builder.')}</p>
-              </div>
-            ) : (
-              <div className="flex flex-col">
-                <div className="flex items-center gap-2">
-                  <span className="text-xl font-bold text-foreground tracking-tight">
-                    {currentView === 'map' ? t('sidebar.sceneMap', 'Mapa de Cenas') :
-                      currentView === 'global_objects' ? t('sidebar.objects', 'Objetos') :
-                        currentView === 'trackers' ? t('sidebar.trackers', 'Rastreadores') :
-                          currentView === 'global_commands' ? t('sidebar.globalCommands', 'Comandos Globais') :
-                            currentView === 'interface' ? t('sidebar.interface', 'Interface') :
-                              t('sidebar.sceneEditor', 'Editor de Cenas')}
-                  </span>
+        {['about', 'guide', 'settings'].includes(currentView) && (
+          <div className="flex items-center h-full border-r border-muted-foreground/30 pr-6">
+            <div className="flex items-center">
+              {/* Context-aware Sub-header Text */}
+              {currentView === 'guide' ? (
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.guideDesc', 'Aprenda como criar suas próprias histórias interativas.')}</p>
                 </div>
-              </div>
-            )}
+              ) : currentView === 'settings' ? (
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.settings', 'Configurações')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.settingsDesc', 'Gerencie suas preferências e conta.')}</p>
+                </div>
+              ) : currentView === 'about' ? (
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.aboutDesc', 'Conheça a missão e os valores por trás do IF Builder.')}</p>
+                </div>
+              ) : null}
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="flex items-center gap-3">
           {(!['about', 'guide', 'settings'].includes(currentView)) && (
