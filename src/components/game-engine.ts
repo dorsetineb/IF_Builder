@@ -850,37 +850,40 @@ document.addEventListener('DOMContentLoaded', () => {
         standardActionBar.classList.remove('hidden');
         endingActionBar.classList.add('hidden');
         
-        gameContainer.classList.remove('hidden');
-        if (window.isSceneTest) {
-            const startScene = gameData.cenas[currentSceneId];
-            const hasImage = startScene && startScene.image && gameData.enableImages !== false;
-            
-            const showGame = () => {
-                 gameContainer.classList.add('ready');
-            };
+        const isVignette = startScene && startScene.vignetteType && startScene.vignetteType !== 'none';
+        
+        if (!isVignette) {
+            gameContainer.classList.remove('hidden');
+            if (window.isSceneTest) {
+                const hasImage = startScene && startScene.image && gameData.enableImages !== false;
+                
+                const showGame = () => {
+                     gameContainer.classList.add('ready');
+                };
 
-            if (hasImage) {
-                 const img = document.getElementById('scene-image');
-                 if (img && img instanceof HTMLImageElement) {
-                     if (img.complete && img.naturalHeight !== 0) {
-                         showGame();
+                if (hasImage) {
+                     const img = document.getElementById('scene-image');
+                     if (img && img instanceof HTMLImageElement) {
+                         if (img.complete && img.naturalHeight !== 0) {
+                             showGame();
+                         } else {
+                             img.onload = showGame;
+                             img.onerror = showGame;
+                             // Safety timeout
+                             setTimeout(showGame, 2000);
+                         }
                      } else {
-                         img.onload = showGame;
-                         img.onerror = showGame;
-                         // Safety timeout
-                         setTimeout(showGame, 2000);
+                         showGame();
                      }
-                 } else {
-                     showGame();
-                 }
-            } else {
-                 // Small delay to ensure layout frames are ready
-                 setTimeout(showGame, 50);
-            }
+                } else {
+                     // Small delay to ensure layout frames are ready
+                     setTimeout(showGame, 50);
+                }
 
-        } else {
-            // Unhide game container instantly in standard play
-            gameContainer.classList.add('ready');
+            } else {
+                // Unhide game container instantly in standard play
+                gameContainer.classList.add('ready');
+            }
         }
     };
 
@@ -1025,6 +1028,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (scene.vignetteNextSceneId) {
                 // Go to next scene: Load it FIRST (behind the vignette), then fade out
                 gameContainer.classList.remove('hidden');
+                gameContainer.classList.add('ready'); // Ensure gameContainer visually appears
                 loadScene(scene.vignetteNextSceneId, false);
                 
                 vignetteScreen.classList.add('fade-out');
@@ -1036,6 +1040,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // No next scene defined, just hide vignette and show game
                 vignetteScreen.classList.add('hidden');
                 gameContainer.classList.remove('hidden');
+                gameContainer.classList.add('ready'); // Ensure gameContainer visually appears
             }
         };
         
