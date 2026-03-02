@@ -839,12 +839,7 @@ const Editor: React.FC = () => {
   const [typedCommand, setTypedCommand] = useState('');
   const [isBiosFinished, setIsBiosFinished] = useState(false);
 
-  useEffect(() => {
-    document.title = 'IF Builder / Ficções Interativas';
-    return () => {
-      document.title = 'IF Builder / Ficções Interativas';
-    };
-  }, []);
+
 
   const [importKey, setImportKey] = useState(0);
 
@@ -950,8 +945,8 @@ const Editor: React.FC = () => {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => {},
-    onCancel: () => {},
+    onConfirm: () => { },
+    onCancel: () => { },
     isDanger: false,
   });
 

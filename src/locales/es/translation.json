@@ -613,7 +613,7 @@
       "layout": "Diseño",
       "sistemas": "Sistemas",
       "textos": "Textos",
-      "aparencia": "Apariencia"
+      "aparencia": "Estilo"
     },
     "header": {
       "description": "Personaliza la interfaz del juego, configura menús y textos.",

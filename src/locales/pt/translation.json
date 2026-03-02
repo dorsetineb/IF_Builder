@@ -104,7 +104,7 @@
     "title": "Configurações Globais",
     "subtitle": "Gerencie suas preferências e perfil.",
     "logout": "Sair da Conta",
-    "appearance": "Estilo",
+    "appearance": "Aparência e Idioma",
     "themes": {
       "dark": "Noite",
       "light": "Dia",
@@ -614,7 +614,7 @@
       "layout": "Layout",
       "sistemas": "Sistemas",
       "textos": "Textos",
-      "aparencia": "Aparência"
+      "aparencia": "Estilo"
     },
     "header": {
       "description": "Personalize a interface do jogo, configure menus e textos.",

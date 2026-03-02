@@ -612,7 +612,7 @@
       "layout": "Layout",
       "sistemas": "Systems",
       "textos": "Texts",
-      "aparencia": "Appearance"
+      "aparencia": "Style"
     },
     "header": {
       "description": "Customize the game interface, configure menus and texts.",
