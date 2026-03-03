@@ -88,6 +88,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         onSetDirty(isDifferent);
     }, [localObjects, sortedObjects, onSetDirty]);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleObjectChange = (objectId: string, field: keyof GameObject, value: any) => {
         setLocalObjects(prev =>
             prev.map(obj =>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { FixedVerb, GameData } from '../types';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Plus, Trash2, Search, Command, MessageSquare, Box, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
 import { Trans, useTranslation } from 'react-i18next';
 
@@ -26,6 +27,7 @@ const COMMAND_ICONS = [
 
 interface GlobalCommandsEditorProps {
     fixedVerbs: FixedVerb[];
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onUpdate: (field: keyof GameData | Partial<GameData>, value?: any, skipDirty?: boolean) => void;
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
@@ -84,6 +86,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
         return localVerbs.find(v => v.id === selectedVerbId) || null;
     }, [localVerbs, selectedVerbId]);
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleVerbChange = (verbId: string, field: keyof FixedVerb, value: any) => {
         setLocalVerbs(prev =>
             prev.map(v => v.id === verbId ? { ...v, [field]: value } : v)
@@ -131,7 +134,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                     <p>{t('globalCommandsEditor.headerDesc1', 'Configure verbos e comandos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).')}</p>
                     <p>
                         <Trans i18nKey="globalCommandsEditor.headerDesc2">
-                            Os verbos <strong>"olhar", "examinar", "ver"</strong> e <strong>"ler"</strong> sempre estarão disponíveis para o usuário acionar a descrição de um objeto.
+                            Os verbos <strong>&quot;olhar&quot;, &quot;examinar&quot;, &quot;ver&quot;</strong> e <strong>&quot;ler&quot;</strong> sempre estarão disponíveis para o usuário acionar a descrição de um objeto.
                         </Trans>
                     </p>
                 </div>
@@ -301,7 +304,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                 <Command className="w-8 h-8 text-muted-foreground/50" />
                             </div>
                             <p className="text-sm text-foreground font-medium">{t('globalCommandsEditor.noCommandSelected', 'Selecione um comando para editar')}</p>
-                            <p className="text-xs text-muted-foreground mt-1">{t('globalCommandsEditor.noCommandDesc', 'ou crie um novo clicando no botão abaixo')}</p>
+                            <p className="text-[10px] text-muted-foreground mt-0.5">{t('globalCommandsEditor.emptyDesc', 'Adicione comandos como &quot;olhar&quot;, &quot;pegar&quot; ou &quot;inventário&quot; e o texto que será respondido ao jogador.')}</p>
                             <button
                                 onClick={handleCreate}
                                 className="mt-4 px-4 py-2 bg-white text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-200 transition-all"

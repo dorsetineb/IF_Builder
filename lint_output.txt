@@ -1,0 +1,11 @@
+
+> if-builder@0.0.0 lint
+> eslint src --ext ts,tsx --report-unused-disable-directives --max-warnings 0
+
+
+C:\Users\rodrigo.bsilva\Documents\if-builder\IF_Builder\src\components\UIEditor.tsx
+  1319:78   error    Comments inside children section of tag should be placed inside braces  react/jsx-no-comment-textnodes
+  1321:107  warning  Unexpected any. Specify a different type                                @typescript-eslint/no-explicit-any
+
+✖ 2 problems (1 error, 1 warning)
+

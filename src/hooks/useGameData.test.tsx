@@ -6,6 +6,7 @@ import { initialGameData } from '../lib/gameDefaults';
 
 // Mock dependências externas se necessário, mas useGameData é principalmente estado
 // Mock toast
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const mockToast = vi.fn();
 
 describe('useGameData Hook', () => {
@@ -46,7 +47,7 @@ describe('useGameData Hook', () => {
         const newTracker = { id: 'trk_1', name: 'Tracker 1', type: 'boolean', value: false, visible: true };
 
         act(() => {
-            // @ts-ignore
+            // @ts-expect-error - Mocking handleCreateTracker for testing
             result.current.handleCreateTracker(newTracker);
         });
 

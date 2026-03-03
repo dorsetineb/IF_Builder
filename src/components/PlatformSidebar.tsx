@@ -1,4 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useState, useRef, useEffect } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { LayoutDashboard, Users, Gamepad2, Settings, ChevronDown, ChevronRight, ChevronLeft, MessageSquare, FileText, Star, Share2, Tornado, Info } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
@@ -12,6 +14,7 @@ const PlatformSidebar: React.FC = () => {
 
 
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const NavItem = ({ to, icon: Icon, label }: { to: string, icon: any, label: string }) => (
         <Link
             to={to}

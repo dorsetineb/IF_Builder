@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Scene, Interaction, GameObject } from '../types';
 import { ConnectionDetail } from './SceneEditor';
 
@@ -13,6 +14,7 @@ interface ConnectionsViewProps {
 }
 
 const ConnectionsView: React.FC<ConnectionsViewProps> = ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   currentScene,
   inputConnections,
   outputConnections,

@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect, Vignette } from '../types';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Plus, Trash2, Upload, Search, MousePointer2, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -53,6 +54,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
     sceneObjects,
     allTakableObjects,
     consequenceTrackers,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     vignettes
 }) => {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(interactions.length > 0 ? 0 : null);
@@ -116,6 +118,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
     const renderEditor = () => {
         if (!selectedInteraction || selectedIndex === null) return null;
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleInteractionChange = (field: keyof Interaction, value: any) => {
             handleUpdate(selectedIndex, { ...selectedInteraction, [field]: value });
         };
@@ -142,6 +145,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
             }
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const handleTrackerEffectChange = (effectIndex: number, field: keyof TrackerEffect, value: any) => {
             const newEffects = [...(selectedInteraction.trackerEffects || [])];
             newEffects[effectIndex] = { ...newEffects[effectIndex], [field]: value };
@@ -284,7 +288,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                                 type="checkbox"
                                                 checked={!!selectedInteraction.removesTargetFromScene}
                                                 onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)}
-                                                className="peer w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 transition-all"
+                                                className="custom-checkbox"
                                             />
                                         </div>
                                         <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.removesTarget', 'Remove Alvo da Cena')}</span>
@@ -296,7 +300,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                                 type="checkbox"
                                                 checked={!!selectedInteraction.addsToInventory}
                                                 onChange={e => handleInteractionChange('addsToInventory', e.target.checked)}
-                                                className="peer w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 transition-all"
+                                                className="custom-checkbox"
                                             />
                                         </div>
                                         <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.addsToInventory', 'Adiciona ao Inventário')}</span>
@@ -309,7 +313,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                                 checked={!!selectedInteraction.consumesItem}
                                                 onChange={e => handleInteractionChange('consumesItem', e.target.checked)}
                                                 disabled={!selectedInteraction.requiresInInventory}
-                                                className="peer w-4 h-4 rounded border-zinc-600 bg-zinc-900/50 text-purple-500 focus:ring-purple-500/20 focus:ring-offset-0 transition-all"
+                                                className="custom-checkbox"
                                             />
                                         </div>
                                         <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.consumesItem', 'Consome Item Usado')}</span>

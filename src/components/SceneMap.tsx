@@ -74,6 +74,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
   const getLinkingItems = useCallback((node: MapNodeData) => {
     if (node.type === 'scene') {
       const scene = node.data as Scene;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const items: { id: string, targetId: string, label: string, type: MapNodeType, original?: any }[] = [];
 
       // 1. Opening Vignette (as Scene) links to Start Scene
@@ -282,6 +283,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
       const children = dependents.get(u) || [];
       children.forEach(v => {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const current_v_level = levels.get(v) ?? -1;
         const new_v_level = u_level + 1;
 

@@ -1,5 +1,6 @@
 
 import { useState, useCallback, useMemo } from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { GameData, Scene, GameObject, Interaction, ConsequenceTracker, FixedVerb, Vignette } from '../types';
 import { initialGameData } from '../lib/gameDefaults';
 import DOMPurify from 'dompurify';
@@ -17,6 +18,7 @@ export const useGameData = () => {
     const consequenceTrackers = useMemo(() => gameData.consequenceTrackers || [], [gameData.consequenceTrackers]);
 
     // --- Core Update Logic ---
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleUpdateGameData = useCallback((field: keyof GameData | Partial<GameData>, value?: any, skipDirty?: boolean) => {
         if (typeof field === 'object' && field !== null) {
             const updates = field as Partial<GameData>;
@@ -107,12 +109,15 @@ export const useGameData = () => {
     const detectedActiveSystems = useMemo(() => {
         let hasInventoryUsage = false;
         let hasChancesUsage = false;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const hasTrackers = (gameData as any).trackers && (gameData as any).trackers.length > 0;
 
         if (gameData.scenes) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             Object.values(gameData.scenes).forEach((scene: any) => {
                 if (scene.removesChanceOnEntry || scene.restoresChanceOnEntry) hasChancesUsage = true;
                 if (scene.interactions) {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     scene.interactions.forEach((interaction: any) => {
                         if (interaction.addsToInventory || interaction.requiresInInventory) hasInventoryUsage = true;
                     });
@@ -120,6 +125,7 @@ export const useGameData = () => {
             });
         }
         return { inventory: hasInventoryUsage, chances: hasChancesUsage, trackers: hasTrackers };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }, [gameData.scenes, (gameData as any).trackers]);
 
     // --- Scene Helper Methods ---

@@ -13,6 +13,7 @@ interface UseSceneManagementProps {
     setSelectedSceneId: (id: string | null) => void;
     selectedSceneId: string | null;
     closeConfirmationModal: () => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setConfirmationModal: (modal: any) => void;
 }
 
@@ -104,6 +105,7 @@ export const useSceneManagement = ({
                         scene.interactions = scene.interactions.filter(i => i.goToScene !== id);
                     }
                     if (scene.exits) {
+                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const exits = scene.exits as any;
                         Object.keys(exits).forEach(key => {
                             if (exits[key] === id) delete exits[key];

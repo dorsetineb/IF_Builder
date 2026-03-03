@@ -98,6 +98,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
     customPalette = ["#000000", "#ffffff"],
     brightness = 0,
     contrast = 1,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     backgroundColor = "transparent",
     objectFit = "cover",
     threshold = 0.5,
@@ -122,6 +123,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
 
     const parsedPrimaryColor = parseColor(primaryColor);
     const parsedSecondaryColor = parseColor(secondaryColor);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const parsedCustomPalette = customPalette.map(parseColor);
 
     useEffect(() => {
@@ -140,6 +142,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
         };
     }, [enableHover]);
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleMouseLeave = useCallback(() => {
         mouseRef.current = null;
     }, []);

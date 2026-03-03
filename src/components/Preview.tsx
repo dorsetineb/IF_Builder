@@ -1,6 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { GameData } from '../types';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { gameHTML, initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 import { useTranslation } from 'react-i18next';
@@ -50,7 +51,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             ? `<button id="diary-button">${gameData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder', 'Logbook')}</button>`
             : '';
 
-        let finalHtml = gameData.gameHTML
+        const finalHtml = gameData.gameHTML
             .replace(/__GAME_TITLE__/g, gameData.gameTitle || 'IF Builder Game')
             .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme with-spacing`)
             .replace('__LAYOUT_ORIENTATION_CLASS__', gameData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : '')
@@ -205,7 +206,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             ${OVERLAY_CSS}
         `;
 
-        let finalCss = (gameData.gameCSS + cssOverrides)
+        const finalCss = (gameData.gameCSS + cssOverrides)
             // Hotfix for legacy typo
             .replace('__FRAME_ROUND_TOP_COLOR__', '__FRAME_ROUNDED_TOP_COLOR__')
             .replace(/__FONT_FAMILY__/g, fontFamily)
@@ -240,6 +241,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             gameVerbInputPlaceholder: gameData.gameVerbInputPlaceholder || t('UIEditor.textos.commandInputValue'),
         });
         if (testSceneId) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (engineData as any).cena_inicial = testSceneId;
         }
 

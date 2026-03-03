@@ -23,6 +23,7 @@ interface ThemeEditorProps {
     titleColorLight: string;
     focusColorLight: string;
     gameFrameColor: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onUpdate: (field: keyof GameData, value: any) => void;
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
@@ -100,6 +101,7 @@ const ColorInput: React.FC<{
     onChange: (value: string) => void;
     placeholder: string;
 }> = ({ label, id, value, onChange, placeholder }) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { t } = useTranslation();
     return (
         <div>
@@ -430,6 +432,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                         <select
                                             id="chanceIcon"
                                             value={localChanceIcon}
+                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                             onChange={(e) => setLocalChanceIcon(e.target.value as any)}
                                             className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-0 [&>option]:bg-zinc-950"
                                         >

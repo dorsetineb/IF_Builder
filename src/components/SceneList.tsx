@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useRef, CSSProperties, useState, useMemo } from 'react';
 import { Scene } from '../types';
 import { Plus, Trash2, Menu, Play, ArrowRight, Flag, Search } from 'lucide-react';

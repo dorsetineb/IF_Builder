@@ -57,7 +57,7 @@ export const GuideView: React.FC = () => {
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.scenes.title', '1. Editor de Cenas')}</h3>
                     </div>
                     <div className="text-sm text-muted-foreground space-y-3 pl-12">
-                        <p>{t('guide.sections.scenes.desc', 'Cada cena é um local ou momento no seu jogo.')}</p>
+                        <p dangerouslySetInnerHTML={{ __html: t('guideView.section1.desc', 'O IF Builder usa um sistema de nós simples. Cada cena possui uma &quot;Ação Principal&quot; que conecta a outras cenas.') }}></p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item1', '<strong>Nome e Descrição:</strong> Defina o título e o texto que o jogador verá ao entrar na cena.') }}></li>
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item2', '<strong>Texto Interativo:</strong> Utilize <code className="bg-muted px-1 rounded">&lt; &gt;</code> em uma palavra para torná-la clicável (ex: <code className="bg-muted px-1 rounded">&lt;porta&gt;</code>).') }}></li>
@@ -126,7 +126,7 @@ export const GuideView: React.FC = () => {
                                 <div className="space-y-3 relative z-10">
                                     <div className="bg-background/80 backdrop-blur-sm border border-border rounded-lg p-3 font-mono text-foreground/90 shadow-sm">
                                         <span className="text-muted-foreground select-none me-2">&gt;</span>
-                                        "{t('guide.sections.interactions.exampleCommand', 'Destrancar porta com a chave')}"
+                                        &quot;{t('guide.sections.interactions.exampleCommand', 'Destrancar porta com a chave')}&quot;
                                     </div>
                                     <div className="grid grid-cols-3 gap-2 text-center">
                                         <div className="bg-background/50 rounded p-2 border border-border/50">

@@ -49,8 +49,8 @@ describe('Helpers', () => {
 
         it('should return default class for unknown or undefined', () => {
             expect(getFrameClass(undefined)).toBe('frame-none');
-            // @ts-ignore
-            expect(getFrameClass('unknown')).toBe('frame-none');
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            expect(getFrameClass('unknown' as any)).toBe('frame-none');
         });
     });
 

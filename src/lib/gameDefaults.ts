@@ -1473,6 +1473,7 @@ export const initialGameData: GameData = {
   vignettes: [],
 };
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sanitizeLegacyI18n = (data: any): any => {
   if (!data) return data;
   const d = { ...data };

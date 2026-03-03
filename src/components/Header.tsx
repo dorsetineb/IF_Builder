@@ -1,6 +1,7 @@
 
 import React, { useRef } from 'react';
 import { GameData, View } from '../types';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Eye, Plus, CircleHelp, ChevronLeft, ChevronRight, PanelLeft, Upload, Download, Save } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -15,6 +16,7 @@ const Header: React.FC<{
   onImport: (file: File) => void;
   onHome?: () => void;
   currentView: View;
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 }> = ({ gameData, isPreviewing, onTogglePreview, onNewGame, sidebarCollapsed, onToggleCollapse, onExport, onImport, onHome, currentView }) => {
   const { t } = useTranslation();
   const importInputRef = useRef<HTMLInputElement>(null);

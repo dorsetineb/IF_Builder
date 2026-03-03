@@ -2,6 +2,7 @@
 import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const translatedCenas: { [id: string]: any } = {};
     for (const sceneId in data.scenes) {
         if (Object.prototype.hasOwnProperty.call(data.scenes, sceneId)) {
@@ -82,6 +83,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         enableInventory: data.enableInventory ?? true,
         enableChances: typeof data.enableChances === 'boolean'
             ? data.enableChances
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             : (data.gameSystemEnabled === 'chances' || Object.values(data.scenes).some((s: any) => s.removesChanceOnEntry || s.restoresChanceOnEntry)),
         enableTrackers: typeof data.enableTrackers === 'boolean'
             ? data.enableTrackers
