@@ -1152,7 +1152,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 objectFit="cover"
                                                             />
                                                         </div>
-                                                        <div className="z-10 bg-background/80 border border-secondary-foreground/20 px-2 py-0.5 rounded backdrop-blur-sm text-[7px] pointer-events-none text-secondary-foreground">{t('UIEditor.layout.previewPhoto')}</div>
+                                                        <div className="absolute top-4 left-4 z-10 bg-background/80 border border-secondary-foreground/20 px-2 py-0.5 rounded backdrop-blur-sm text-[7px] font-black uppercase tracking-[0.2em] pointer-events-none text-secondary-foreground">{t('UIEditor.layout.previewPhoto')}</div>
                                                     </div>
                                                 </div>
                                                 <div className={`flex-1 bg-card border border-border rounded-lg flex flex-col text-[7px] p-4 text-foreground font-black uppercase tracking-[0.2em] ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'} text-left overflow-hidden`}>
