@@ -622,15 +622,15 @@
       "save": "Guardar Cambios"
     },
     "layout": {
-      "splashScreen": "Pantalla de Inicio",
+      "splashScreen": "Viñetas",
       "contentAlignment": "Alineación del Contenido",
       "alignRight": "Derecha",
       "alignLeft": "Izquierda",
       "hideTitleDesc": "Ocultar título y descripción",
-      "preview": "Vista Previa",
+      "preview": "Vista previa de la viñeta",
       "backgroundImage": "Imagen de Fondo",
       "titleAndDesc": "Título y Descripción",
-      "gameLayout": "Diseño del Juego",
+      "gameLayout": "Interfaz del Juego",
       "orientation": "Orientación",
       "vertical": "Vertical",
       "horizontal": "Horizontal",
@@ -647,7 +647,7 @@
       "frameSquare": "Cuadrado",
       "frameRounded": "Redondeado",
       "frameColor": "Color del Marco",
-      "layoutPreview": "Vista Previa del Diseño",
+      "layoutPreview": "Vista previa de la interfaz",
       "previewPhoto": "FOTO",
       "previewText": "TEXTO",
       "recommendedRes": "Recomendado: Full HD (1920x1080), proporción 16:9."

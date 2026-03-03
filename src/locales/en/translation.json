@@ -621,15 +621,15 @@
       "save": "Save Changes"
     },
     "layout": {
-      "splashScreen": "Splash Screen",
+      "splashScreen": "Vignettes",
       "contentAlignment": "Content Alignment",
       "alignRight": "Right",
       "alignLeft": "Left",
       "hideTitleDesc": "Hide title and description",
-      "preview": "Preview",
+      "preview": "Vignette Preview",
       "backgroundImage": "Background Image",
       "titleAndDesc": "Title and Description",
-      "gameLayout": "Game Layout",
+      "gameLayout": "Game Interface",
       "orientation": "Orientation",
       "vertical": "Vertical",
       "horizontal": "Horizontal",
@@ -646,7 +646,7 @@
       "frameSquare": "Square",
       "frameRounded": "Rounded",
       "frameColor": "Frame Color",
-      "layoutPreview": "Layout Preview",
+      "layoutPreview": "Interface Preview",
       "previewPhoto": "PHOTO",
       "previewText": "TEXT",
       "recommendedRes": "Recommended: Full HD (1920x1080), 16:9 aspect ratio."

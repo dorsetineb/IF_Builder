@@ -1015,19 +1015,24 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 className="relative w-full max-w-full aspect-video bg-muted border border-border rounded-xl flex overflow-hidden"
                                                 style={{
                                                     justifyContent: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
-                                                    alignItems: 'flex-end'
+                                                    alignItems: 'center'
                                                 }}
                                             >
+                                                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=500&auto=format&fit=crop&q=60')] bg-cover bg-center opacity-30 mix-blend-overlay"></div>
                                                 <div className="absolute inset-0 flex items-center justify-center -translate-y-4">
-                                                    <div className="text-secondary-foreground font-black text-[8px] uppercase tracking-[0.2em] border-2 border-secondary-foreground/20 px-3 py-1 rounded">{t('UIEditor.layout.backgroundImage')}</div>
+                                                    <div className="text-secondary-foreground font-black text-[8px] uppercase tracking-[0.2em] border-2 border-secondary-foreground/20 px-3 py-1 rounded backdrop-blur-sm z-0">{t('UIEditor.layout.backgroundImage')}</div>
                                                 </div>
-                                                {!localOmitSplashTitle && (
-                                                    <div
-                                                        className="w-2/3 h-1/3 m-6 bg-primary/5 backdrop-blur-sm border border-primary/20 rounded-lg flex items-center justify-center text-center text-[8px] p-2 text-primary font-bold uppercase tracking-widest"
-                                                    >
-                                                        {t('UIEditor.layout.titleAndDesc')}
-                                                    </div>
-                                                )}
+                                                <div
+                                                    className={`relative w-2/3 max-h-[80%] mx-4 bg-background/80 backdrop-blur-md border border-border rounded-lg flex flex-col items-center justify-center text-center p-3 z-10 shadow-lg transition-all`}
+                                                >
+                                                    {!localOmitSplashTitle && (
+                                                        <div className="text-[10px] text-foreground font-bold mb-2 uppercase tracking-widest">{t('UIEditor.layout.titleAndDesc')}</div>
+                                                    )}
+                                                    <div className="w-4/5 h-1.5 bg-muted rounded-full mb-1.5"></div>
+                                                    <div className="w-3/5 h-1.5 bg-muted rounded-full mb-4"></div>
+
+                                                    <div className="w-16 h-5 bg-primary text-primary-foreground rounded flex items-center justify-center text-[7px] font-bold uppercase tracking-widest">{t('common.button', 'Botão')}</div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -1095,7 +1100,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">{t('UIEditor.layout.layoutPreview')}</p>
                                         <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-center h-fit aspect-video shadow-inner">
                                             <div
-                                                className="w-full max-w-[400px] aspect-video border border-border bg-muted rounded-xl flex p-3 gap-3 transition-all overflow-hidden"
+                                                className="w-full max-w-[400px] aspect-video border border-border bg-muted rounded-xl flex p-3 gap-3 transition-all overflow-hidden relative"
                                                 style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
                                             >
                                                 <div
@@ -1103,17 +1108,25 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     style={getFramePreviewStyles(localImageFrame).panelStyles}
                                                 >
                                                     <div
-                                                        className={`flex-1 w-full h-full rounded-lg flex items-center justify-center text-center text-[7px] p-2 font-black uppercase tracking-[0.2em] text-muted-foreground border border-border bg-card shadow-inner`}
+                                                        className={`flex-1 w-full h-full rounded-lg flex flex-col items-center justify-center text-center p-2 font-black uppercase tracking-[0.2em] text-muted-foreground border border-border bg-card shadow-inner overflow-hidden relative`}
                                                         style={{
                                                             ...getFramePreviewStyles(localImageFrame).containerStyles,
                                                             backgroundColor: undefined
                                                         }}
                                                     >
-                                                        {t('UIEditor.layout.previewPhoto')}
+                                                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60')] bg-cover bg-center opacity-60"></div>
+                                                        <div className="z-10 bg-background/80 px-2 py-1 rounded backdrop-blur-sm text-[7px] pointer-events-none">{t('UIEditor.layout.previewPhoto')}</div>
                                                     </div>
                                                 </div>
-                                                <div className={`flex-1 bg-primary/5 border border-primary/20 rounded-lg flex items-center justify-center text-center text-[7px] p-2 text-primary font-black uppercase tracking-[0.2em] shadow-lg ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}>
-                                                    {t('UIEditor.layout.previewText')}
+                                                <div className={`flex-1 bg-primary/5 border border-primary/20 rounded-lg flex flex-col text-[7px] p-4 text-primary font-black uppercase tracking-[0.2em] shadow-lg ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'} text-left overflow-hidden`}>
+                                                    <div className="font-bold text-[8px] mb-2">{t('UIEditor.layout.previewText')}</div>
+                                                    <div className="space-y-1.5 opacity-70 w-full">
+                                                        <div className="h-1 bg-primary/30 rounded w-full"></div>
+                                                        <div className="h-1 bg-primary/30 rounded w-5/6"></div>
+                                                        <div className="h-1 bg-primary/30 rounded w-4/6"></div>
+                                                        <div className="h-1 bg-primary/30 rounded w-full mt-2"></div>
+                                                        <div className="h-1 bg-primary/30 rounded w-3/4"></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
