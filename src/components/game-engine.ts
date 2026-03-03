@@ -39,6 +39,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         }
     }
     return {
+        gameTitle: data.gameTitle,
         cena_inicial: data.startScene,
         cenas: translatedCenas,
         globalObjects: data.globalObjects,
@@ -776,7 +777,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mousedown', startAudioOnInteraction);
         document.addEventListener('keydown', startAudioOnInteraction);
 
-        const hasAutoSave = localStorage.getItem('if_builder_autosave_' + document.title);
+        const hasAutoSave = localStorage.getItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
         // Auto-start game, bypassing splash screen
         startGame();
         endingRestartButtons.forEach(btn => btn.addEventListener('click', () => {
@@ -820,7 +821,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const startGame = () => {
-        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + document.title);
+        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
         currentSceneId = gameData.cena_inicial; 
         inventory = []; 
         visitedScenes = []; 
@@ -913,7 +914,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.isPreview) return; 
         if (isGameEnded) return;
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
-        localStorage.setItem('if_builder_autosave_' + document.title, JSON.stringify(save));
+        localStorage.setItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'), JSON.stringify(save));
     };
 
     const toggleSystemMenu = () => {
@@ -927,7 +928,7 @@ document.addEventListener('DOMContentLoaded', () => {
         systemMenuMain.classList.add('hidden'); systemSlotsContainer.classList.remove('hidden'); slotsList.innerHTML = '';
         systemModalTitle.textContent = mode === 'save' ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') : (gameData.gameLoadMenuTitle || 'Carregar Jogo');
         for (let i = 1; i <= 3; i++) {
-            const slotKey = 'if_builder_slot_' + i + '_' + document.title;
+            const slotKey = 'if_builder_slot_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
             const savedData = localStorage.getItem(slotKey);
             const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
             let contentHtml = '';
@@ -947,7 +948,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const performSave = (slotIndex) => {
-        const slotKey = 'if_builder_slot_' + slotIndex + '_' + document.title;
+        const slotKey = 'if_builder_slot_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
         localStorage.setItem(slotKey, JSON.stringify(save)); renderSlots('save');
     };
@@ -1574,7 +1575,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameEnded = type;
         standardActionBar.classList.add('hidden');
         endingActionBar.classList.remove('hidden');
-        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + document.title);
+        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
     };
 
     const gameOver = () => { 
