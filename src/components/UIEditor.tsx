@@ -1012,26 +1012,24 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-4">{t('UIEditor.layout.preview')}</p>
                                         <div className="bg-card border border-border rounded-2xl p-4 flex items-center justify-center h-fit aspect-video">
                                             <div
-                                                className="relative w-full max-w-full aspect-video bg-muted border border-border rounded-xl flex overflow-hidden"
+                                                className="relative w-full max-w-full aspect-video bg-muted border border-border rounded-xl flex flex-col justify-end overflow-hidden p-3 box-border"
                                                 style={{
-                                                    justifyContent: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
-                                                    alignItems: 'center'
+                                                    alignItems: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
+                                                    textAlign: localSplashContentAlignment === 'left' ? 'left' : 'right'
                                                 }}
                                             >
-                                                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1518791841217-8f162f1e1131?w=500&auto=format&fit=crop&q=60')] bg-cover bg-center opacity-30 mix-blend-overlay"></div>
-                                                <div className="absolute inset-0 flex items-center justify-center -translate-y-4">
-                                                    <div className="text-secondary-foreground font-black text-[8px] uppercase tracking-[0.2em] border-2 border-secondary-foreground/20 px-3 py-1 rounded backdrop-blur-sm z-0">{t('UIEditor.layout.backgroundImage')}</div>
+                                                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60')] bg-cover bg-center opacity-60"></div>
+                                                <div className="absolute top-2 left-1/2 -translate-x-1/2 flex items-center justify-center">
+                                                    <div className="text-secondary-foreground font-black text-[7px] uppercase tracking-[0.2em] border border-secondary-foreground/20 px-2 py-0.5 rounded backdrop-blur-sm z-0">{t('UIEditor.layout.backgroundImage')}</div>
                                                 </div>
-                                                <div
-                                                    className={`relative w-2/3 max-h-[80%] mx-4 bg-background/80 backdrop-blur-md border border-border rounded-lg flex flex-col items-center justify-center text-center p-3 z-10 shadow-lg transition-all`}
-                                                >
+                                                <div className={`relative z-10 w-full flex flex-col gap-1.5 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
                                                     {!localOmitSplashTitle && (
-                                                        <div className="text-[10px] text-foreground font-bold mb-2 uppercase tracking-widest">{t('UIEditor.layout.titleAndDesc')}</div>
+                                                        <div className="text-[10px] text-foreground font-bold uppercase tracking-widest drop-shadow-md">{t('UIEditor.layout.titleAndDesc')}</div>
                                                     )}
-                                                    <div className="w-4/5 h-1.5 bg-muted rounded-full mb-1.5"></div>
-                                                    <div className="w-3/5 h-1.5 bg-muted rounded-full mb-4"></div>
+                                                    <div className={`w-3/4 h-1 bg-foreground/50 rounded-full drop-shadow-sm`}></div>
+                                                    <div className={`w-1/2 h-1 bg-foreground/50 rounded-full mb-1 drop-shadow-sm`}></div>
 
-                                                    <div className="w-16 h-5 bg-primary text-primary-foreground rounded flex items-center justify-center text-[7px] font-bold uppercase tracking-widest">{t('common.button', 'Botão')}</div>
+                                                    <div className="px-3 py-1 bg-primary text-primary-foreground rounded flex items-center justify-center text-[6px] font-bold uppercase tracking-widest shadow-md">{t('common.button', 'Botão')}</div>
                                                 </div>
                                             </div>
                                         </div>
