@@ -170,7 +170,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
 
 
     return (
-        <div className="space-y-6 pb-8" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
+        <div className="flex flex-col h-full space-y-6" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* Header with Save/Undo actions */}
             <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-border">
                 <p className="text-muted-foreground text-xs font-medium max-w-lg">
@@ -200,7 +200,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                 </div>
             </div>
 
-            <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
+            <div className="flex flex-1 min-h-0 border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
                 {/* LEFT SIDEBAR */}
                 <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
                     {/* Sidebar Header */}
