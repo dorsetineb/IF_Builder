@@ -7,6 +7,7 @@ import { FONTS, PREDEFINED_THEMES, MAX_IMAGE_SIZE, MAX_AUDIO_SIZE } from '../con
 
 import { GameData, FixedVerb } from '../types';
 import { useTranslation } from 'react-i18next';
+import { DitherShader } from '@/components/ui/dither-shader';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Terminal, Globe } from 'lucide-react';
 
@@ -219,6 +220,22 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const { t, i18n } = useTranslation();
     const { theme, setTheme } = useTheme(); // Get app theme
     const currentSliderColor = APP_THEME_COLORS[theme as keyof typeof APP_THEME_COLORS] || APP_THEME_COLORS.dark;
+
+    const getDitherColors = () => {
+        switch (theme) {
+            case 'cream':
+                return { primary: '#5c4033', secondary: '#fdfbf7' };
+            case 'terminal':
+                return { primary: '#0d1117', secondary: '#4af626' };
+            case 'light':
+                return { primary: '#000000', secondary: '#ffffff' };
+            case 'windows':
+                return { primary: '#0f0f0f', secondary: '#008080' };
+            default: // dark
+                return { primary: '#000000', secondary: currentSliderColor };
+        }
+    };
+    const ditherColors = getDitherColors();
 
     const {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -1018,7 +1035,18 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     textAlign: localSplashContentAlignment === 'left' ? 'left' : 'right'
                                                 }}
                                             >
-                                                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60')] bg-cover bg-center opacity-60"></div>
+                                                <div className="absolute inset-0 opacity-60">
+                                                    <DitherShader
+                                                        src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
+                                                        gridSize={2}
+                                                        ditherMode="bayer"
+                                                        colorMode="duotone"
+                                                        primaryColor={ditherColors.primary}
+                                                        secondaryColor={ditherColors.secondary}
+                                                        className="w-full h-full opacity-60"
+                                                        objectFit="cover"
+                                                    />
+                                                </div>
                                                 <div className="absolute top-2 left-1/2 -translate-x-1/2 flex items-center justify-center">
                                                     <div className="text-secondary-foreground font-black text-[7px] uppercase tracking-[0.2em] border border-secondary-foreground/20 px-2 py-0.5 rounded backdrop-blur-sm z-0">{t('UIEditor.layout.backgroundImage')}</div>
                                                 </div>
@@ -1112,18 +1140,29 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             backgroundColor: undefined
                                                         }}
                                                     >
-                                                        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60')] bg-cover bg-center opacity-60"></div>
-                                                        <div className="z-10 bg-background/80 px-2 py-1 rounded backdrop-blur-sm text-[7px] pointer-events-none">{t('UIEditor.layout.previewPhoto')}</div>
+                                                        <div className="absolute inset-0 opacity-60">
+                                                            <DitherShader
+                                                                src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
+                                                                gridSize={2}
+                                                                ditherMode="bayer"
+                                                                colorMode="duotone"
+                                                                primaryColor={ditherColors.primary}
+                                                                secondaryColor={ditherColors.secondary}
+                                                                className="w-full h-full"
+                                                                objectFit="cover"
+                                                            />
+                                                        </div>
+                                                        <div className="z-10 bg-background/80 border border-secondary-foreground/20 px-2 py-0.5 rounded backdrop-blur-sm text-[7px] pointer-events-none text-secondary-foreground">{t('UIEditor.layout.previewPhoto')}</div>
                                                     </div>
                                                 </div>
-                                                <div className={`flex-1 bg-primary/5 border border-primary/20 rounded-lg flex flex-col text-[7px] p-4 text-primary font-black uppercase tracking-[0.2em] shadow-lg ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'} text-left overflow-hidden`}>
+                                                <div className={`flex-1 bg-card border border-border rounded-lg flex flex-col text-[7px] p-4 text-foreground font-black uppercase tracking-[0.2em] ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'} text-left overflow-hidden`}>
                                                     <div className="font-bold text-[8px] mb-2">{t('UIEditor.layout.previewText')}</div>
                                                     <div className="space-y-1.5 opacity-70 w-full">
-                                                        <div className="h-1 bg-primary/30 rounded w-full"></div>
-                                                        <div className="h-1 bg-primary/30 rounded w-5/6"></div>
-                                                        <div className="h-1 bg-primary/30 rounded w-4/6"></div>
-                                                        <div className="h-1 bg-primary/30 rounded w-full mt-2"></div>
-                                                        <div className="h-1 bg-primary/30 rounded w-3/4"></div>
+                                                        <div className="h-1 bg-foreground/20 rounded w-full"></div>
+                                                        <div className="h-1 bg-foreground/20 rounded w-5/6"></div>
+                                                        <div className="h-1 bg-foreground/20 rounded w-4/6"></div>
+                                                        <div className="h-1 bg-foreground/20 rounded w-full mt-2"></div>
+                                                        <div className="h-1 bg-foreground/20 rounded w-3/4"></div>
                                                     </div>
                                                 </div>
                                             </div>
