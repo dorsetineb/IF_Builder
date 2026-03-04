@@ -2049,8 +2049,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                 {/* Right Column: Preview (Expanded width) */}
                                 <div className="col-span-1 lg:col-span-7 relative">
-                                    <div className="sticky top-28 space-y-2 h-[calc(100vh-140px)] flex flex-col">
-
+                                    <div className="sticky top-28 space-y-2 h-[calc(100vh-140px)] flex flex-col pt-2">
+                                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-2">{t('UIEditor.layout.layoutPreview')}</p>
 
                                         <div
                                             className={`
@@ -2109,7 +2109,18 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                     style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
                                                                     className={containerClass}
                                                                 >
-                                                                    <ImageIcon className="w-12 h-12 text-zinc-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50" />
+                                                                    <div className="absolute inset-0 opacity-60">
+                                                                        <DitherShader
+                                                                            src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
+                                                                            gridSize={2}
+                                                                            ditherMode="bayer"
+                                                                            colorMode="duotone"
+                                                                            primaryColor={ditherColors.primary}
+                                                                            secondaryColor={ditherColors.secondary}
+                                                                            className="w-full h-full"
+                                                                            objectFit="cover"
+                                                                        />
+                                                                    </div>
                                                                     {/* Scene Name Overlay inside the inner container */}
                                                                     <div className="absolute bottom-4 left-0 right-0 flex justify-center z-20">
                                                                         <div
@@ -2151,12 +2162,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         {localActionButtonText || t('UIEditor.aparencia.action')}
                                                     </button>
                                                 </div>
-                                                <button
-                                                    className="w-full h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center transition-colors hover:opacity-90 truncate"
-                                                    style={{ backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}
-                                                >
-                                                    {localSplashButtonText || t('UIEditor.aparencia.homeButton')}
-                                                </button>
+                                                <div className="w-full flex justify-end">
+                                                    <button
+                                                        className="px-6 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center transition-colors hover:opacity-90 truncate max-w-xs"
+                                                        style={{ backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}
+                                                    >
+                                                        {localSplashButtonText || t('UIEditor.layout.vignetteButton', 'Botão da Vinheta')}
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
 
