@@ -995,12 +995,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 <div className={`bg-muted/10 -mt-px py-8 grid grid-cols-1 gap-8 items-start`}>
                     {activeTab === 'layout' && (
                         <div className="space-y-6">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-12 items-start">
+                            <div className="grid grid-cols-1 xl:grid-cols-3 gap-x-8 gap-y-8 items-start">
                                 {/* --- LEFT COLUMN: SETTINGS --- */}
-                                <div className="space-y-12">
+                                <div className="space-y-6 xl:col-span-1">
                                     {/* Vinhetas Settings */}
-                                    <div className="space-y-6">
-                                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                                    <div className="w-full p-6 bg-card border border-border rounded-2xl shadow-sm flex flex-col space-y-6">
+                                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2 mb-2">
                                             <ImageIcon className="w-4 h-4 text-muted-foreground" />
                                             {t('UIEditor.layout.splashScreen')}
                                         </h3>
@@ -1031,8 +1031,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     </div>
 
                                     {/* Interface Settings */}
-                                    <div className="space-y-6">
-                                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                                    <div className="w-full p-6 bg-card border border-border rounded-2xl shadow-sm flex flex-col space-y-6">
+                                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2 mb-2">
                                             <Monitor className="w-4 h-4 text-muted-foreground" />
                                             {t('UIEditor.layout.gameLayout')}
                                         </h3>
@@ -1091,13 +1091,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
 
                                 {/* --- RIGHT COLUMN: PREVIEWS --- */}
-                                <div className="flex flex-col xl:flex-row gap-8 items-center xl:items-start justify-center">
+                                <div className="flex flex-col xl:flex-row gap-8 items-center xl:items-start justify-center xl:col-span-2 w-full">
                                     {/* Preview Vinheta */}
                                     <div className="space-y-4 w-full">
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">{t('UIEditor.layout.preview')}</p>
                                         <div className="flex items-center justify-center w-full">
                                             <div
-                                                className="relative w-full max-w-[300px] aspect-video bg-muted border border-border rounded-xl flex flex-col justify-end overflow-hidden p-3 box-border shadow-sm"
+                                                className="relative w-full aspect-video bg-muted border border-border rounded-xl flex flex-col justify-end overflow-hidden p-6 box-border shadow-sm"
                                                 style={{
                                                     alignItems: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
                                                     textAlign: localSplashContentAlignment === 'left' ? 'left' : 'right'
@@ -1115,17 +1115,17 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         objectFit="cover"
                                                     />
                                                 </div>
-                                                <div className="absolute top-2 left-1/2 -translate-x-1/2 flex items-center justify-center">
-                                                    <div className="text-secondary-foreground font-black text-[7px] uppercase tracking-[0.2em] border border-secondary-foreground/20 px-2 py-0.5 rounded backdrop-blur-sm z-0">{t('UIEditor.layout.backgroundImage')}</div>
+                                                <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center justify-center">
+                                                    <div className="text-secondary-foreground font-black text-[9px] uppercase tracking-[0.2em] border border-secondary-foreground/20 px-3 py-1 rounded backdrop-blur-sm z-0">{t('UIEditor.layout.backgroundImage')}</div>
                                                 </div>
-                                                <div className={`relative z-10 w-full flex flex-col gap-1.5 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
+                                                <div className={`relative z-10 w-full flex flex-col gap-2 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
                                                     {!localOmitSplashTitle && (
-                                                        <div className="text-[10px] text-foreground font-bold uppercase tracking-widest drop-shadow-md">{t('UIEditor.layout.titleAndDesc')}</div>
+                                                        <div className="text-[12px] text-foreground font-bold uppercase tracking-widest drop-shadow-md">{t('UIEditor.layout.titleAndDesc')}</div>
                                                     )}
-                                                    <div className={`w-3/4 h-1 bg-foreground/50 rounded-full drop-shadow-sm`}></div>
-                                                    <div className={`w-1/2 h-1 bg-foreground/50 rounded-full mb-1 drop-shadow-sm`}></div>
+                                                    <div className={`w-3/4 h-1.5 bg-foreground/50 rounded-full drop-shadow-sm`}></div>
+                                                    <div className={`w-1/2 h-1.5 bg-foreground/50 rounded-full mb-1 drop-shadow-sm`}></div>
 
-                                                    <div className="px-3 py-1 bg-primary text-primary-foreground rounded flex items-center justify-center text-[6px] font-bold uppercase tracking-widest shadow-md">{t('common.button', 'Botão')}</div>
+                                                    <div className="px-4 py-1.5 bg-primary text-primary-foreground rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-widest shadow-md mt-1">{t('common.button', 'Botão')}</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1136,7 +1136,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">{t('UIEditor.layout.layoutPreview')}</p>
                                         <div className="flex items-center justify-center w-full">
                                             <div
-                                                className="w-full max-w-[300px] aspect-video border border-border bg-muted rounded-xl flex p-2.5 gap-2.5 transition-all overflow-hidden relative shadow-sm"
+                                                className="w-full aspect-video border border-border bg-muted rounded-xl flex p-4 gap-4 transition-all overflow-hidden relative shadow-sm"
                                                 style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
                                             >
                                                 <div
@@ -1144,7 +1144,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     style={getFramePreviewStyles(localImageFrame).panelStyles}
                                                 >
                                                     <div
-                                                        className={`flex-1 w-full h-full rounded-lg flex flex-col items-center justify-center text-center p-2 font-black uppercase tracking-[0.2em] text-muted-foreground border border-border bg-card shadow-inner overflow-hidden relative`}
+                                                        className={`flex-1 w-full h-full rounded-lg flex flex-col items-center justify-center text-center p-3 font-black uppercase tracking-[0.2em] text-muted-foreground border border-border bg-card shadow-inner overflow-hidden relative`}
                                                         style={{
                                                             ...getFramePreviewStyles(localImageFrame).containerStyles,
                                                             backgroundColor: undefined
@@ -1162,17 +1162,17 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 objectFit="cover"
                                                             />
                                                         </div>
-                                                        <div className="absolute top-2 left-2 z-10 bg-background/80 border border-secondary-foreground/20 px-1.5 py-0.5 rounded backdrop-blur-sm text-[6px] font-black uppercase tracking-[0.2em] pointer-events-none text-secondary-foreground truncate max-w-[90%]">{t('UIEditor.layout.previewPhoto')}</div>
+                                                        <div className="absolute top-3 left-3 z-10 bg-background/80 border border-secondary-foreground/20 px-2 py-0.5 rounded backdrop-blur-sm text-[8px] font-black uppercase tracking-[0.2em] pointer-events-none text-secondary-foreground truncate max-w-[90%]">{t('UIEditor.layout.previewPhoto')}</div>
                                                     </div>
                                                 </div>
-                                                <div className={`flex-1 bg-card border border-border rounded-lg flex flex-col text-[6px] p-3 text-foreground font-black uppercase tracking-[0.2em] ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'} text-left overflow-hidden`}>
-                                                    <div className="font-bold text-[7px] mb-2">{t('UIEditor.layout.previewText')}</div>
-                                                    <div className="space-y-1.5 opacity-70 w-full">
-                                                        <div className="h-1 bg-foreground/20 rounded w-full"></div>
-                                                        <div className="h-1 bg-foreground/20 rounded w-5/6"></div>
-                                                        <div className="h-1 bg-foreground/20 rounded w-4/6"></div>
-                                                        <div className="h-1 bg-foreground/20 rounded w-full mt-2"></div>
-                                                        <div className="h-1 bg-foreground/20 rounded w-3/4"></div>
+                                                <div className={`flex-1 bg-card border border-border rounded-lg flex flex-col justify-center text-[8px] p-5 text-foreground font-black uppercase tracking-[0.2em] ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'} text-left overflow-hidden`}>
+                                                    <div className="font-bold text-[9px] mb-3">{t('UIEditor.layout.previewText')}</div>
+                                                    <div className="space-y-2 opacity-70 w-full">
+                                                        <div className="h-1.5 bg-foreground/20 rounded w-full"></div>
+                                                        <div className="h-1.5 bg-foreground/20 rounded w-5/6"></div>
+                                                        <div className="h-1.5 bg-foreground/20 rounded w-4/6"></div>
+                                                        <div className="h-1.5 bg-foreground/20 rounded w-full mt-3"></div>
+                                                        <div className="h-1.5 bg-foreground/20 rounded w-3/4"></div>
                                                     </div>
                                                 </div>
                                             </div>
