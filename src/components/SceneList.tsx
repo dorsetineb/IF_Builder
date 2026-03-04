@@ -209,7 +209,7 @@ const SceneList: React.FC<SceneListProps> = ({
                   style={{ marginTop: '4px' }} // Ensure gap matches item gap
                 >
                   <Plus className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
-                  {t('sceneList.addScene', 'Adicionar Cena')}
+                  {t('sceneList.createNode', 'Criar...')}
                 </button>
               </div>
             );

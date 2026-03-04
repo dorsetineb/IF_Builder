@@ -54,6 +54,7 @@ import { ConfirmationModal } from './ConfirmationModal';
 import { NewProjectModal } from './NewProjectModal';
 import { TransitionScreen } from './TransitionScreen';
 import UserManualModal from './UserManualModal';
+import NodeTypeModal from './NodeTypeModal';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -968,6 +969,7 @@ const Editor: React.FC = () => {
   });
 
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
+  const [isNodeTypeModalOpen, setIsNodeTypeModalOpen] = useState(false);
 
   const closeConfirmationModal = useCallback(() => {
     setConfirmationModal((prev) => ({ ...prev, isOpen: false }));
@@ -992,6 +994,38 @@ const Editor: React.FC = () => {
     closeConfirmationModal,
     setConfirmationModal,
   });
+
+  const handleAddNodeType = (type: 'scene' | 'vignette') => {
+    setIsNodeTypeModalOpen(false);
+
+    // We get the new scene ID from handleAddScene (which returns it)
+    // Wait for the state to update, then modify if it was a vignette
+    // handleAddScene automatically sets it as the selected scene
+    handleAddScene();
+
+    // Give handleAddScene a tiny moment to run before updating the new scene
+    setTimeout(() => {
+      setGameData((prev) => {
+        const newScenes = { ...prev.scenes };
+        // The newly added scene's ID is the last one in the sceneOrder
+        const newSceneId = prev.sceneOrder[prev.sceneOrder.length - 1];
+        const newScene = newScenes[newSceneId];
+
+        if (newScene) {
+          if (type === 'vignette') {
+            newScene.name = 'Nova vinheta';
+            const hasOpeningVignette = Object.values(prev.scenes).some(s => s.vignetteType === 'opening' && s.id !== newSceneId);
+            newScene.vignetteType = hasOpeningVignette ? 'transition' : 'opening';
+          } else {
+            newScene.name = 'Nova cena';
+            newScene.vignetteType = 'none';
+          }
+          setIsDirty(true);
+        }
+        return { ...prev, scenes: newScenes };
+      });
+    }, 0);
+  };
 
   const { handleExport, handleImportFile, handleImportGame, handleDownloadExample, isImporting } =
     useExportImport({
@@ -1273,7 +1307,7 @@ const Editor: React.FC = () => {
               currentView={currentView}
               gameData={gameData}
               onSelectScene={handleSelectScene}
-              onAddScene={handleAddScene}
+              onAddScene={() => setIsNodeTypeModalOpen(true)}
               onDeleteScene={handleDeleteScene}
               onReorderScenes={handleReorderScenes}
               onSetView={handleSetView}
@@ -1613,6 +1647,11 @@ const Editor: React.FC = () => {
         isOpen={isNewProjectModalOpen}
         onClose={() => setIsNewProjectModalOpen(false)}
         onCreate={handleProjectCreated}
+      />
+      <NodeTypeModal
+        isOpen={isNodeTypeModalOpen}
+        onClose={() => setIsNodeTypeModalOpen(false)}
+        onSelect={handleAddNodeType}
       />
       <UserManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
     </div>

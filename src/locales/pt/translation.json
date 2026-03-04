@@ -112,6 +112,33 @@
       "terminal": "Terminal",
       "windows": "W95"
     },
+    "sceneList": {
+      "search": "Buscar cenas...",
+      "addScene": "+ Criar",
+      "start": "Início",
+      "deleteScene": "Deletar cena",
+      "nodeSelection": {
+        "title": "SELECIONE O TIPO DE NÓ",
+        "scene": {
+          "title": "Cena",
+          "description": "Momentos de divergência. Onde o jogador faz escolhas e o destino muda.",
+          "tags": [
+            "DECISÃO",
+            "RAMIFICAÇÃO",
+            "COMPLEXIDADE"
+          ]
+        },
+        "vignette": {
+          "title": "Vinheta",
+          "description": "Uma ponte narrativa. Conecte pontos da história sem interrupções.",
+          "tags": [
+            "LINEAR",
+            "FIXO",
+            "ATMOSFERA"
+          ]
+        }
+      }
+    },
     "language": {
       "label": "Idioma da Interface",
       "description": "Selecione o idioma em que deseja usar o editor."
@@ -533,6 +560,9 @@
     },
     "objectWarning": "Alterações feitas aqui afetam o mesmo objeto caso utilizado em outras cenas.",
     "narrativeTitle": "NARRATIVA",
+    "vignetteNarrativeTitle": "DETALHES DA VINHETA",
+    "vignetteTitleLabel": "NOME DA VINHETA",
+    "vignetteDescription": "TEXTO DA VINHETA",
     "titleLabel": "Título",
     "titlePlaceholder": "Ex: Entrada da Caverna",
     "uniqueIdLabel": "ID Único",

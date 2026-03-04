@@ -531,6 +531,9 @@
     },
     "objectWarning": "Changes made here affect the same object if used in other scenes.",
     "narrativeTitle": "NARRATIVE",
+    "vignetteNarrativeTitle": "VIGNETTE DETAILS",
+    "vignetteTitleLabel": "VIGNETTE NAME",
+    "vignetteDescription": "VIGNETTE TEXT",
     "titleLabel": "Title",
     "titlePlaceholder": "e.g.: Cave Entrance",
     "uniqueIdLabel": "Unique ID",
@@ -576,6 +579,33 @@
       "nosferatu": "Nosferatu",
       "wiggle": "Wiggle",
       "fog": "Fog"
+    },
+    "sceneList": {
+      "search": "Search scenes...",
+      "addScene": "+ Create",
+      "start": "Start",
+      "deleteScene": "Delete scene",
+      "nodeSelection": {
+        "title": "SELECT NODE TYPE",
+        "scene": {
+          "title": "Scene",
+          "description": "Moments of divergence. Where the player makes choices and destiny changes.",
+          "tags": [
+            "DECISION",
+            "BRANCHING",
+            "COMPLEXITY"
+          ]
+        },
+        "vignette": {
+          "title": "Vignette",
+          "description": "A narrative bridge. Connect points of the story without interruptions.",
+          "tags": [
+            "LINEAR",
+            "FIXED",
+            "ATMOSPHERE"
+          ]
+        }
+      }
     },
     "audioLabel": "Soundtrack (.mp3)",
     "customAudioSet": "Custom Soundtrack Set",

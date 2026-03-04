@@ -532,6 +532,9 @@
     },
     "objectWarning": "Los cambios hechos aquí afectan al mismo objeto si se usa en otras escenas.",
     "narrativeTitle": "NARRATIVA",
+    "vignetteNarrativeTitle": "DETALLES DE LA VIÑETA",
+    "vignetteTitleLabel": "NOMBRE DE LA VIÑETA",
+    "vignetteDescription": "TEXTO DE LA VIÑETA",
     "titleLabel": "Título",
     "titlePlaceholder": "Ej: Entrada de la Cueva",
     "uniqueIdLabel": "ID Único",
@@ -577,6 +580,33 @@
       "nosferatu": "Nosferatu",
       "wiggle": "Temblor",
       "fog": "Niebla"
+    },
+    "sceneList": {
+      "search": "Buscar escenas...",
+      "addScene": "+ Crear",
+      "start": "Inicio",
+      "deleteScene": "Eliminar escena",
+      "nodeSelection": {
+        "title": "SELECCIONE EL TIPO DE NODO",
+        "scene": {
+          "title": "Escena",
+          "description": "Momentos de divergencia. Donde el jugador toma decisiones y el destino cambia.",
+          "tags": [
+            "DECISIÓN",
+            "RAMIFICACIÓN",
+            "COMPLEJIDAD"
+          ]
+        },
+        "vignette": {
+          "title": "Viñeta",
+          "description": "Un puente narrativo. Conecta puntos de la historia sin interrupciones.",
+          "tags": [
+            "LINEAL",
+            "FIJO",
+            "ATMÓSFERA"
+          ]
+        }
+      }
     },
     "audioLabel": "Banda Sonora (.mp3)",
     "customAudioSet": "Pista Personalizada Definida",

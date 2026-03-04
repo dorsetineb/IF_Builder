@@ -340,6 +340,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
 
     const isAnyCheckboxChecked = !!localScene.isEndingScene || !!localScene.removesChanceOnEntry || !!localScene.restoresChanceOnEntry;
 
+    const isVignetteMode = localScene.vignetteType && localScene.vignetteType !== 'none';
+
     return (
         <div className="space-y-6">
             <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-border">
@@ -394,33 +396,35 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
             </div>
 
             <div>
-                <div className="border-b border-muted-foreground/50 flex items-center justify-between pr-4">
-                    <div className="flex space-x-1 overflow-x-auto">
-                        {Object.entries(TABS).map(([key, name]) => {
-                            const isVignette = localScene.vignetteType && localScene.vignetteType !== 'none';
-                            const isTabDisabled = (localScene.isEndingScene || isVignette) && (key === 'objects' || key === 'interactions');
-                            return (
-                                <button
-                                    key={key}
-                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                    onClick={() => !isTabDisabled && setActiveTab(key as any)}
-                                    disabled={isTabDisabled}
-                                    className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 ${activeTab === key
-                                        ? 'border-primary text-primary bg-primary/5'
-                                        : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
-                                        } ${isTabDisabled ? 'opacity-30 cursor-not-allowed' : ''} `}
-                                >
-                                    {name}
-                                </button>
-                            );
-                        })}
+                {!isVignetteMode && (
+                    <div className="border-b border-muted-foreground/50 flex items-center justify-between pr-4">
+                        <div className="flex space-x-1 overflow-x-auto">
+                            {Object.entries(TABS).map(([key, name]) => {
+                                const isVignette = localScene.vignetteType && localScene.vignetteType !== 'none';
+                                const isTabDisabled = (localScene.isEndingScene || isVignette) && (key === 'objects' || key === 'interactions');
+                                return (
+                                    <button
+                                        key={key}
+                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                        onClick={() => !isTabDisabled && setActiveTab(key as any)}
+                                        disabled={isTabDisabled}
+                                        className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 ${activeTab === key
+                                            ? 'border-primary text-primary bg-primary/5'
+                                            : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                                            } ${isTabDisabled ? 'opacity-30 cursor-not-allowed' : ''} `}
+                                    >
+                                        {name}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        {activeTab === 'objects' && (
+                            <span className="text-xs text-yellow-400 mb-2 italic">
+                                {t('sceneEditor.objectWarning')}
+                            </span>
+                        )}
                     </div>
-                    {activeTab === 'objects' && (
-                        <span className="text-xs text-yellow-400 mb-2 italic">
-                            {t('sceneEditor.objectWarning')}
-                        </span>
-                    )}
-                </div>
+                )}
 
                 <div className="bg-background pt-6">
                     {activeTab === 'properties' && (
@@ -431,13 +435,13 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                 <div className="bg-card border border-border rounded-xl p-6">
                                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                                         <FileText className="w-4 h-4 text-muted-foreground" />
-                                        {t('sceneEditor.narrativeTitle')}
+                                        {isVignetteMode ? t('sceneEditor.vignetteNarrativeTitle', 'Detalhes da Vinheta') : t('sceneEditor.narrativeTitle')}
                                     </h3>
 
                                     <div className="space-y-4">
                                         <div className="grid grid-cols-3 gap-4">
                                             <div className="col-span-2">
-                                                <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">{t('sceneEditor.titleLabel')}</label>
+                                                <label htmlFor="sceneName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">{isVignetteMode ? t('sceneEditor.vignetteTitleLabel', 'NOME DA VINHETA') : t('sceneEditor.titleLabel')}</label>
                                                 <input type="text" id="sceneName" value={localScene.name} onChange={handleNameChange} className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground" placeholder={t('sceneEditor.titlePlaceholder')} />
                                             </div>
                                             <div className="col-span-1">
@@ -457,7 +461,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         <div className="pt-2">
                                             <div className="flex justify-between items-center mb-1.5">
                                                 <label htmlFor="sceneDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                                                    {localScene.isEndingScene ? t('sceneEditor.endingMessage') : t('sceneEditor.description')}
+                                                    {localScene.isEndingScene ? t('sceneEditor.endingMessage') : (isVignetteMode ? t('sceneEditor.vignetteDescription', 'TEXTO DA VINHETA') : t('sceneEditor.description'))}
                                                 </label>
                                                 <span className="text-[9px] text-muted-foreground font-medium tracking-wider">{t('sceneEditor.highlightTip')}</span>
                                             </div>
@@ -470,24 +474,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                     placeholder={t('sceneEditor.descPlaceholder')}
                                                 />
 
-                                                <div className="pt-4 border-t border-muted-foreground/10 mt-4">
-                                                    <label className="flex items-center gap-2 cursor-pointer mb-4">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={localScene.vignetteType && localScene.vignetteType !== 'none'}
-                                                            onChange={(e) => {
-                                                                if (e.target.checked) {
-                                                                    updateLocalScene('vignetteType', 'opening');
-                                                                } else {
-                                                                    updateLocalScene('vignetteType', 'none');
-                                                                }
-                                                            }}
-                                                            className="custom-checkbox"
-                                                        />
-                                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.isVignette')}</span>
-                                                    </label>
-
-                                                    {localScene.vignetteType && localScene.vignetteType !== 'none' && (
+                                                {isVignetteMode && (
+                                                    <div className="pt-4 border-t border-muted-foreground/10 mt-4">
                                                         <div className="animate-in fade-in slide-in-from-top-2 space-y-4">
                                                             <div className="grid grid-cols-3 gap-2">
                                                                 {[
@@ -566,9 +554,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                 )}
                                                             </div>
                                                         </div>
-                                                    )}
-                                                </div>
-
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
