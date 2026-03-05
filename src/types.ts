@@ -166,6 +166,7 @@ export interface GameData {
   gameSystemEnabled?: 'none' | 'chances' | 'trackers'; // Legacy, keep for migration
   enableTrackers?: boolean;
   enableInventory?: boolean;
+  enableSuggestions?: boolean;
   enableDiary?: boolean;
   enableFixedVerbs?: boolean;
   enableChances?: boolean; // Legacy/Basic system

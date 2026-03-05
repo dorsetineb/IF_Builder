@@ -43,13 +43,14 @@ const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
 
 const whiteChevron = "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20' stroke-width='1.5' stroke='white'%3e%3cpath stroke-linecap='round' stroke-linejoin='round' d='m5.25 7.5 4.5 4.5 4.5-4.5' /%3e%3c/svg%3e";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const selectBaseClasses = "w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 appearance-none bg-no-repeat pr-8 focus:ring-0 [&>option]:bg-zinc-950";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const selectBaseClasses = "w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground appearance-none bg-no-repeat pr-8 focus:ring-0 [&>option]:bg-card";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const selectStyle = { backgroundImage: `url("${whiteChevron}")`, backgroundPosition: 'right 0.5rem center', backgroundSize: '1.25em' };
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const optionBaseClasses = "bg-zinc-950 text-zinc-300";
+const optionBaseClasses = "bg-card text-foreground";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const optionDimClasses = "bg-zinc-950 text-zinc-500";
+const optionDimClasses = "bg-card text-muted-foreground";
 
 const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrackers, allScenes, allTrackerIds, isDirty, onSetDirty, onSelectScene }) => {
     const sortedTrackers = useMemo(() => {
@@ -202,7 +203,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
 
             <div className="flex flex-1 min-h-0 border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
                 {/* LEFT SIDEBAR */}
-                <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
+                <div className="w-1/3 min-w-[250px] border-r border-border flex flex-col bg-muted/30">
                     {/* Sidebar Header */}
                     <div className="p-4 border-b border-muted-foreground/10 space-y-4">
                         <div className="relative">
@@ -287,11 +288,11 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                 </div>
 
                 {/* RIGHT MAIN PANEL */}
-                <div className="flex-1 flex flex-col bg-zinc-950/10 min-w-0">
+                <div className="flex-1 flex flex-col bg-background/50 min-w-0">
                     {selectedTracker ? (
                         <div className="flex flex-col h-full">
                             {/* Header */}
-                            <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30 shrink-0">
+                            <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-muted/50 shrink-0">
                                 <div className="flex items-center gap-2">
                                     <Activity className="w-4 h-4 text-primary" />
                                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{t('trackersEditor.propertiesTitle', 'Propriedades do Rastreador')}</span>

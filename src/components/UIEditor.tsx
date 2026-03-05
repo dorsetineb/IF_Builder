@@ -9,7 +9,7 @@ import { GameData, FixedVerb } from '../types';
 import { useTranslation } from 'react-i18next';
 import { DitherShader } from '@/components/ui/dither-shader';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Terminal, Globe, Split, ArrowRight, Wrench } from 'lucide-react';
+import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Terminal, Globe, Split, ArrowRight, Wrench, Lightbulb } from 'lucide-react';
 
 interface UIEditorProps {
     html: string;
@@ -99,6 +99,7 @@ interface UIEditorProps {
     // New System Props
     enableTrackers?: boolean;
     enableInventory?: boolean;
+    enableSuggestions?: boolean;
     enableDiary?: boolean;
     enableFixedVerbs?: boolean;
     enableChances?: boolean;
@@ -257,7 +258,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription, negativeEndingMusic,
         fixedVerbs, textAnimationType, textSpeed, textReadingFlow, imageTransitionType, imageSpeed,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        onAnnotate, enableTrackers, enableInventory, enableDiary, enableFixedVerbs, enableChances,
+        onAnnotate, enableTrackers, enableInventory, enableSuggestions, enableDiary, enableFixedVerbs, enableChances,
         enableImages, enableTextControl, inventoryCapacity, inventoryMaxWeight, diaryAutoScroll,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         diaryAllowExport, diaryMaxMessages, diaryShowSceneImage, diaryShowPlayerAction, onNavigateToTrackers,
@@ -401,6 +402,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     // New System States
     const [localEnableTrackers, setLocalEnableTrackers] = useState(enableTrackers ?? (gameSystemEnabled === 'trackers'));
     const [localEnableInventory, setLocalEnableInventory] = useState(enableInventory ?? true);
+    const [localEnableSuggestions, setLocalEnableSuggestions] = useState(enableSuggestions ?? true);
     const [localEnableDiary, setLocalEnableDiary] = useState(enableDiary ?? true);
     const [localEnableFixedVerbs, setLocalEnableFixedVerbs] = useState(enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0));
     const [localEnableChances, setLocalEnableChances] = useState(enableChances ?? (gameSystemEnabled === 'chances'));
@@ -508,6 +510,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     // 7. Feature Flags (Enablers)
     useEffect(() => { setLocalEnableTrackers(enableTrackers ?? (gameSystemEnabled === 'trackers')); }, [enableTrackers, gameSystemEnabled]);
     useEffect(() => { setLocalEnableInventory(enableInventory ?? true); }, [enableInventory]);
+    useEffect(() => { setLocalEnableSuggestions(enableSuggestions ?? true); }, [enableSuggestions]);
     useEffect(() => { setLocalEnableDiary(enableDiary ?? true); }, [enableDiary]);
     useEffect(() => { setLocalEnableFixedVerbs(enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0)); }, [enableFixedVerbs, fixedVerbs]);
     useEffect(() => { setLocalEnableChances(enableChances ?? (gameSystemEnabled === 'chances')); }, [enableChances, gameSystemEnabled]);
@@ -548,7 +551,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localFixedVerbs, localTextAnimationType, localTextSpeed, localTextReadingFlow,
         localImageTransitionType, localImageSpeed,
         // New Systems
-        localEnableTrackers, localEnableInventory, localEnableDiary, localEnableFixedVerbs,
+        localEnableTrackers, localEnableInventory, localEnableSuggestions, localEnableDiary, localEnableFixedVerbs,
         localEnableChances, localEnableImages, localEnableTextControl, localInventoryCapacity,
         localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
         localDiaryShowSceneImage, localDiaryShowPlayerAction
@@ -596,7 +599,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localNegativeEndingContentAlignment, localNegativeEndingDescription, localNegativeEndingMusic,
         localFixedVerbs, localTextAnimationType, localTextSpeed, localTextReadingFlow,
         localImageTransitionType, localImageSpeed,
-        localEnableTrackers, localEnableInventory, localEnableDiary, localEnableFixedVerbs,
+        localEnableTrackers, localEnableInventory, localEnableSuggestions, localEnableDiary, localEnableFixedVerbs,
         localEnableChances, localEnableImages, localEnableTextControl, localInventoryCapacity,
         localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
         localDiaryShowSceneImage, localDiaryShowPlayerAction
@@ -678,6 +681,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         // Sync new systems
         if (localEnableTrackers !== (enableTrackers ?? (gameSystemEnabled === 'trackers'))) onUpdate('enableTrackers', localEnableTrackers, true);
         if (localEnableInventory !== (enableInventory ?? true)) onUpdate('enableInventory', localEnableInventory, true);
+        if (localEnableSuggestions !== (enableSuggestions ?? true)) onUpdate('enableSuggestions', localEnableSuggestions, true);
         if (localEnableDiary !== (enableDiary ?? true)) onUpdate('enableDiary', localEnableDiary, true);
         if (localEnableFixedVerbs !== (enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0))) onUpdate('enableFixedVerbs', localEnableFixedVerbs, true);
         if (localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances'))) onUpdate('enableChances', localEnableChances, true);
@@ -779,6 +783,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         // Reset New Systems
         setLocalEnableTrackers(enableTrackers ?? (gameSystemEnabled === 'trackers'));
         setLocalEnableInventory(enableInventory ?? true);
+        setLocalEnableSuggestions(enableSuggestions ?? true);
         setLocalEnableDiary(enableDiary ?? true);
         setLocalEnableFixedVerbs(enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0));
         setLocalEnableChances(enableChances ?? (gameSystemEnabled === 'chances'));
@@ -1363,27 +1368,27 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 </div>
                                             </div>
 
-                                            {/* INVENTORY */}
+                                            {/* SUGGESTOES */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableInventory ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
+                                                <div className={`w-full p-6 bg-card border ${localEnableSuggestions ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <Package className="w-5 h-5 text-muted-foreground" />
+                                                            <Lightbulb className="w-5 h-5 text-muted-foreground" />
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.inventoryDesc')}</p>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableSuggestions ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.suggestions', 'Sugestões')}</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.suggestionsDesc', 'Ativa o botão de sugestões de ações.')}</p>
                                                             </div>
                                                         </div>
                                                         <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
                                                             <input
                                                                 type="checkbox"
-                                                                checked={localEnableInventory}
-                                                                onChange={(e) => setLocalEnableInventory(e.target.checked)}
+                                                                checked={localEnableSuggestions}
+                                                                onChange={(e) => setLocalEnableSuggestions(e.target.checked)}
                                                                 disabled={localGameInteractionType === 'choice'}
                                                                 className="sr-only peer"
                                                             />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableInventory ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableSuggestions ? 'translateX(16px)' : 'translateX(0)' }}></div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -1466,6 +1471,33 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             </div>
                                                         </div>
                                                     )}
+                                                </div>
+                                            </div>
+
+                                            {/* INVENTORY */}
+                                            <div className="w-full">
+                                                <div className={`w-full p-6 bg-card border ${localEnableInventory ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <Package className="w-5 h-5 text-muted-foreground" />
+                                                            <div>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.inventoryDesc')}</p>
+                                                            </div>
+                                                        </div>
+                                                        <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={localEnableInventory}
+                                                                onChange={(e) => setLocalEnableInventory(e.target.checked)}
+                                                                disabled={localGameInteractionType === 'choice'}
+                                                                className="sr-only peer"
+                                                            />
+                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableInventory ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
                                                 </div>
                                             </div>
 

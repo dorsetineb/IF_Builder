@@ -33,7 +33,9 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
             {inputConnections.length}
           </span>
         </h4>
-        <p className="text-[10px] text-muted-foreground -mt-2 italic">{t('connectionsView.inputsDesc1', 'Cenas que')} <b>{t('connectionsView.inputsDesc2', 'trazem')}</b> {t('connectionsView.inputsDesc3', 'o jogador para esta cena.')}</p>
+        <p className="text-[10px] text-muted-foreground -mt-2 italic">
+          {t('connectionsView.inputsDesc1', 'Cenas que')} <b>{t('connectionsView.inputsDesc2', 'trazem')}</b> {currentScene.vignetteType && currentScene.vignetteType !== 'none' ? t('connectionsView.inputsDesc3Vignette', 'o jogador para esta vinheta.') : t('connectionsView.inputsDesc3', 'o jogador para esta cena.')}
+        </p>
         <div className="space-y-3">
           {inputConnections.length > 0 ? (
             inputConnections.map(({ scene, interactions }) => (
@@ -85,7 +87,9 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
             {outputConnections.length}
           </span>
         </h4>
-        <p className="text-[10px] text-muted-foreground -mt-2 italic">{t('connectionsView.outputsDesc1', 'Cenas que o usuário pode chegar')} <b>{t('connectionsView.outputsDesc2', 'partindo')}</b> {t('connectionsView.outputsDesc3', 'desta cena.')}</p>
+        <p className="text-[10px] text-muted-foreground -mt-2 italic">
+          {t('connectionsView.outputsDesc1', 'Cenas que o usuário pode chegar')} <b>{t('connectionsView.outputsDesc2', 'partindo')}</b> {currentScene.vignetteType && currentScene.vignetteType !== 'none' ? t('connectionsView.outputsDesc3Vignette', 'desta vinheta.') : t('connectionsView.outputsDesc3', 'desta cena.')}
+        </p>
         <div className="space-y-3">
           {outputConnections.length > 0 ? (
             outputConnections.map(({ scene, interactions }) => (
@@ -124,7 +128,11 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
               </div>
             ))
           ) : (
-            <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/20 rounded-xl italic">{t('connectionsView.noneConnect', 'Esta cena não se conecta a nenhuma outra.')}</p>
+            <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/20 rounded-xl italic">
+              {currentScene.vignetteType && currentScene.vignetteType !== 'none'
+                ? t('connectionsView.noneConnectVignette', 'Esta vinheta não se conecta a nenhuma outra.')
+                : t('connectionsView.noneConnect', 'Esta cena não se conecta a nenhuma outra.')}
+            </p>
           )}
         </div>
       </div>

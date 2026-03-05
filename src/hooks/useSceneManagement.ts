@@ -30,7 +30,7 @@ export const useSceneManagement = ({
 }: UseSceneManagementProps) => {
     const { t } = useTranslation();
 
-    const handleAddScene = useCallback(() => {
+    const handleAddScene = useCallback((type: 'scene' | 'vignette' = 'scene') => {
         const newId = generateUniqueId('scn', Object.keys(gameData.scenes));
 
         // Calculate position to the right of existing scenes
@@ -39,14 +39,17 @@ export const useSceneManagement = ({
         const existingSceneCount = gameData.sceneOrder.length;
         const initialMapX = existingSceneCount * (NODE_WIDTH + X_GAP);
 
+        const isFirst = existingSceneCount === 0;
+        const isVignette = type === 'vignette' || isFirst;
+
         const newScene: Scene = {
             id: newId,
-            name: 'Nova Cena',
+            name: isVignette ? t('editor.newVignetteName', 'Nova Vinheta') : t('editor.newSceneName', 'Nova Cena'),
             image: '',
-            description: 'Descrição da nova cena.',
+            description: isVignette ? t('editor.newVignetteDescription', 'Descrição da nova vinheta.') : t('editor.newSceneDescription', 'Descrição da nova cena.'),
             objectIds: [],
             interactions: [],
-            vignetteType: existingSceneCount === 0 ? 'opening' : 'none',
+            vignetteType: isFirst ? 'opening' : (type === 'vignette' ? 'transition' : 'none'),
             mapX: initialMapX,
             mapY: 0
         };
@@ -54,7 +57,7 @@ export const useSceneManagement = ({
         setGameData(prev => {
             const newScenes = { ...prev.scenes, [newId]: newScene };
             const updatedOrder = [...prev.sceneOrder, newId];
-            const isFirst = updatedOrder.length === 1;
+            const isFirstScene = updatedOrder.length === 1;
 
             // Auto-link: If there's an opening vignette without vignetteNextSceneId, link it to this new scene
             if (existingSceneCount === 1) {

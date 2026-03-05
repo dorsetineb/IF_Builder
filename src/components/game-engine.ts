@@ -81,6 +81,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameImageTransitionType: data.gameImageTransitionType,
         gameImageSpeed: data.gameImageSpeed,
         enableInventory: data.enableInventory ?? true,
+        enableSuggestions: data.enableSuggestions ?? true,
         enableChances: typeof data.enableChances === 'boolean'
             ? data.enableChances
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -790,9 +791,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
         submitVerb.addEventListener('click', handleInput);
         verbInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleInput(); });
-        suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
-        inventoryButton.addEventListener('click', () => togglePopup('inventory'));
-        diaryButton.addEventListener('click', showDiary);
+        if (suggestionsButton) suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
+        if (inventoryButton) inventoryButton.addEventListener('click', () => togglePopup('inventory'));
+        if (diaryButton) diaryButton.addEventListener('click', showDiary);
         if (trackersButton) trackersButton.addEventListener('click', showTrackers);
         if (systemButton) systemButton.addEventListener('click', toggleSystemMenu);
         closeButtons.forEach(btn => btn.addEventListener('click', (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); }));

@@ -39,6 +39,10 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>'
             : '';
 
+        const suggestionsButtonHTML = (gameData.enableSuggestions ?? true)
+            ? `<button id="suggestions-button">${gameData.gameSuggestionsButtonText || t('UIEditor.textos.suggestionsPlaceholder', 'Suggestions')}</button>`
+            : '';
+
         const fontFamily = gameData.gameFontFamily || "'Silkscreen', sans-serif";
         const fontUrl = getFontUrl(fontFamily);
         const fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
@@ -62,6 +66,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
             .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
             .replace('__SYSTEM_BUTTON__', systemButtonHTML)
+            .replace('__SUGGESTIONS_BUTTON__', suggestionsButtonHTML)
             .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
             .replace('__DIARY_BUTTON__', diaryButtonHTML)
             .replace(/__INVENTORY_BUTTON_TEXT__/g, gameData.gameInventoryButtonText || t('UIEditor.textos.inventoryPlaceholder'))

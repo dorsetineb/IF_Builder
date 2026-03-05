@@ -165,7 +165,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
         return (
             <div className="flex flex-col h-full" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30 shrink-0">
+                <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-muted/50 shrink-0">
                     <div>
                         <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
                             {(() => {
@@ -194,7 +194,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                         <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                             <Target className="w-3 h-3" /> {t('interactionEditor.triggersConditions', 'Gatilhos & Condições')}
                         </h4>
-                        <div className="bg-zinc-950/30 p-4 rounded-lg border border-muted-foreground/10 space-y-6">
+                        <div className="bg-muted/20 p-4 rounded-lg border border-border space-y-6">
 
                             {/* Row 1: Icon, Verbs, Target */}
                             <div className="flex gap-4 items-start">
@@ -206,7 +206,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                             e.stopPropagation();
                                             setIsIconPickerOpen(!isIconPickerOpen);
                                         }}
-                                        className="w-10 h-10 flex items-center justify-center bg-zinc-900 border border-zinc-700 rounded-lg text-zinc-400 hover:text-white hover:border-green-500/50 transition-all"
+                                        className="w-10 h-10 flex items-center justify-center bg-input border border-input rounded-lg text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
                                     >
                                         {(() => {
                                             const Icon = INTERACTION_ICONS.find(i => i.name === selectedInteraction.icon)?.component || MousePointer2;
@@ -215,7 +215,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                     </button>
 
                                     {isIconPickerOpen && (
-                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-zinc-900 border border-zinc-800 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-card border border-border rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
                                             <button
                                                 onClick={() => { handleInteractionChange('icon', undefined); setIsIconPickerOpen(false); }}
                                                 className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${!selectedInteraction.icon ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
@@ -245,7 +245,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                         value={verbsInput}
                                         onChange={e => setVerbsInput(e.target.value)}
                                         onBlur={handleVerbsBlur}
-                                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-xs text-zinc-100 focus:ring-1 focus:ring-green-500/50 placeholder:text-zinc-600"
+                                        className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/50 placeholder:text-muted-foreground"
                                         placeholder={t('interactionEditor.verbsPlaceholder', 'ex: pegar, usar, abrir')}
                                     />
                                     <p className="text-[10px] text-zinc-600">{t('interactionEditor.verbsDesc', 'O jogador deve digitar um destes para iniciar a ação.')}</p>
@@ -257,7 +257,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                     <select
                                         value={selectedInteraction.target}
                                         onChange={e => handleInteractionChange('target', e.target.value)}
-                                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-xs text-zinc-300"
+                                        className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground"
                                     >
                                         <option value="">{t('interactionEditor.noTarget', 'Nenhum (Ação no ambiente)')}</option>
                                         {sceneObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
@@ -273,7 +273,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                     <select
                                         value={selectedInteraction.requiresInInventory || ''}
                                         onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)}
-                                        className="w-full bg-zinc-900 border border-zinc-700 rounded-lg p-2.5 text-xs text-zinc-300"
+                                        className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground"
                                     >
                                         <option value="">{t('interactionEditor.noItemRequired', 'Não requer item')}</option>
                                         {allTakableObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
@@ -328,12 +328,12 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                         <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                             <CheckCircle2 className="w-3 h-3" /> {t('interactionEditor.outcomeTitle', 'Resultado')}
                         </h4>
-                        <div className="bg-zinc-950/30 p-4 rounded-lg border border-muted-foreground/10 space-y-4">
+                        <div className="bg-muted/20 p-4 rounded-lg border border-border space-y-4">
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="col-span-2">
                                     <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">{t('interactionEditor.goToSceneLabel', 'Ir para Cena')}</label>
-                                    <select value={selectedInteraction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300">
+                                    <select value={selectedInteraction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className="w-full bg-input border border-input rounded p-2 text-xs text-foreground">
                                         <option value="">{t('interactionEditor.stayInScene', '(Permanecer na cena)')}</option>
                                         {allScenes.filter(s => s.id !== currentSceneId).map(s => <option key={s.id} value={s.id}>{s.name} ({s.id})</option>)}
                                     </select>
@@ -346,7 +346,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                         value={selectedInteraction.successMessage || ''} // Using legacy field for backward compatibility, UI says "Description"
                                         onChange={e => handleInteractionChange('successMessage', e.target.value)}
                                         rows={2}
-                                        className="w-full bg-zinc-900 border border-zinc-700 rounded p-2 text-xs text-zinc-300 resize-none"
+                                        className="w-full bg-input border border-input rounded p-2 text-xs text-foreground resize-none"
                                         placeholder={t('interactionEditor.updateSceneDescPlaceholder', 'Descreve o que acontece...')}
                                     />
                                 </div>
@@ -355,8 +355,8 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 <div className="col-span-1">
                                     <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">{t('interactionEditor.soundEffectLabel', 'Efeito Sonoro (.mp3)')}</label>
                                     <div className="flex items-center gap-2 h-[50px]">
-                                        <label className="flex-1 h-full flex items-center justify-center px-3 py-2 bg-zinc-900 border border-zinc-800 rounded hover:bg-zinc-800 cursor-pointer text-xs font-medium transition-colors">
-                                            <Upload className="w-3 h-3 mr-2 text-zinc-500" /> {selectedInteraction.soundEffect ? t('interactionEditor.changeBtn', 'Alterar') : t('interactionEditor.uploadBtn', 'Upload')}
+                                        <label className="flex-1 h-full flex items-center justify-center px-3 py-2 bg-input border border-input rounded hover:bg-muted cursor-pointer text-xs font-medium transition-colors">
+                                            <Upload className="w-3 h-3 mr-2 text-muted-foreground" /> {selectedInteraction.soundEffect ? t('interactionEditor.changeBtn', 'Alterar') : t('interactionEditor.uploadBtn', 'Upload')}
                                             <input type="file" accept="audio/*" onChange={handleSoundUpload} className="hidden" />
                                         </label>
                                         {selectedInteraction.soundEffect && (
@@ -375,21 +375,21 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                     </div>
                                     <div className="space-y-2">
                                         {(selectedInteraction.trackerEffects || []).map((effect, i) => (
-                                            <div key={i} className="flex items-center gap-2 bg-zinc-900 p-2 rounded border border-zinc-800">
-                                                <Activity className="w-3 h-3 text-zinc-600" />
+                                            <div key={i} className="flex items-center gap-2 bg-input p-2 rounded border border-input">
+                                                <Activity className="w-3 h-3 text-muted-foreground" />
                                                 <select value={effect.trackerId} onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)} className="flex-1 bg-transparent border-none text-xs text-zinc-200 focus:ring-0 p-0">
                                                     <option value="">{t('interactionEditor.selectTracker', 'Selecione um rastreador...')}</option>
                                                     {consequenceTrackers.map(tOption => <option key={tOption.id} value={tOption.id}>{tOption.name}</option>)}
                                                 </select>
-                                                <div className="flex items-center gap-1 bg-zinc-950 px-2 py-1 rounded border border-zinc-800">
+                                                <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-border">
                                                     <span className="text-[10px] text-zinc-500">{t('interactionEditor.valueLabel', 'Valor:')}</span>
-                                                    <input type="number" value={effect.valueChange} onChange={e => handleTrackerEffectChange(i, 'valueChange', parseInt(e.target.value))} className="w-12 bg-transparent border-none text-xs h-auto p-0 text-right text-zinc-300 font-mono focus:ring-0" />
+                                                    <input type="number" value={effect.valueChange} onChange={e => handleTrackerEffectChange(i, 'valueChange', parseInt(e.target.value))} className="w-12 bg-transparent border-none text-xs h-auto p-0 text-right text-foreground font-mono focus:ring-0" />
                                                 </div>
-                                                <button onClick={() => handleRemoveTrackerEffect(i)} className="p-1 text-zinc-500 hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                                                <button onClick={() => handleRemoveTrackerEffect(i)} className="p-1 text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                                             </div>
                                         ))}
                                         {(selectedInteraction.trackerEffects || []).length === 0 && (
-                                            <div className="text-center py-4 border border-dashed border-zinc-800 rounded bg-zinc-900/30">
+                                            <div className="text-center py-4 border border-dashed border-border rounded bg-muted/20">
                                                 <p className="text-[10px] text-zinc-600 italic">{t('interactionEditor.noTrackerEffects', 'Nenhum efeito em rastreadores configurado.')}</p>
                                             </div>
                                         )}
@@ -406,7 +406,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
     return (
         <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
             {/* LEFT SIDEBAR - List */}
-            <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
+            <div className="w-1/3 min-w-[250px] border-r border-border flex flex-col bg-muted/30">
                 {/* Header/Search */}
                 <div className="p-4 border-b border-muted-foreground/10 space-y-3">
                     <div className="flex items-center justify-between">
@@ -419,7 +419,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                             placeholder={t('interactionEditor.searchPlaceholder', 'Buscar verbos...')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-zinc-900 border border-zinc-800 rounded-lg pl-8 pr-3 py-2 text-xs text-zinc-200 focus:ring-1 focus:ring-green-500/50 placeholder:text-zinc-600"
+                            className="w-full bg-input border border-input rounded-lg pl-8 pr-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/50 placeholder:text-muted-foreground"
                         />
                     </div>
                 </div>
@@ -431,19 +431,19 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                             <button
                                 key={inter.id}
                                 onClick={() => setSelectedIndex(index)}
-                                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left group ${selectedIndex === index ? 'bg-green-500/10 border-green-500/40' : 'bg-transparent border-transparent hover:bg-zinc-900 hover:border-zinc-800'}`}
+                                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left group ${selectedIndex === index ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-muted hover:border-border'}`}
                             >
-                                <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${selectedIndex === index ? 'bg-green-500/20 text-green-400' : 'bg-zinc-900 text-zinc-600'}`}>
+                                <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${selectedIndex === index ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
                                     {(() => {
                                         const Icon = INTERACTION_ICONS.find(i => i.name === inter.icon)?.component || MousePointer2;
                                         return <Icon className="w-4 h-4" />;
                                     })()}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <div className={`text-xs font-bold truncate ${selectedIndex === index ? 'text-green-400' : 'text-zinc-300'}`}>
+                                    <div className={`text-xs font-bold truncate ${selectedIndex === index ? 'text-primary' : 'text-foreground'}`}>
                                         {inter.verbs.join(', ')}
                                     </div>
-                                    <div className="text-[10px] text-zinc-500 truncate flex items-center gap-1">
+                                    <div className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
                                         {inter.target ? `${t('interactionEditor.targetPrefix', 'Alvo: ')}${sceneObjects.find(o => o.id === inter.target)?.name || '?'}` : t('interactionEditor.generalTarget', 'Geral')}
                                     </div>
                                 </div>
@@ -461,7 +461,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
             </div>
 
             {/* RIGHT MAIN PANEL - Editor */}
-            <div className="flex-1 flex flex-col bg-zinc-950/10 min-w-0">
+            <div className="flex-1 flex flex-col bg-background/50 min-w-0">
                 {selectedIndex !== null ? (
                     renderEditor()
                 ) : (

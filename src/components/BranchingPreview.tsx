@@ -104,7 +104,11 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                 {/* Current Scene Node - Center Stage */}
                 <div className="w-1/4 flex-shrink-0 z-20">
                     <div className="px-4 py-3 bg-zinc-900 border-2 border-purple-500/50 rounded-lg shadow-[0_0_15px_rgba(168,85,247,0.15)] flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest whitespace-nowrap">{t('branchingPreview.thisScene', 'Esta Cena')}</span>
+                        <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest whitespace-nowrap">
+                            {currentScene.vignetteType && currentScene.vignetteType !== 'none'
+                                ? t('branchingPreview.thisVignette', 'Esta Vinheta')
+                                : t('branchingPreview.thisScene', 'Esta Cena')}
+                        </span>
                     </div>
                 </div>
 

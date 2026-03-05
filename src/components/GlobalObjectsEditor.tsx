@@ -208,7 +208,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
 
             <div className="flex flex-1 min-h-0 border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
                 {/* LEFT SIDEBAR */}
-                <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/20 flex flex-col bg-zinc-950/30">
+                <div className="w-1/3 min-w-[250px] border-r border-border flex flex-col bg-muted/30">
                     {/* Sidebar Header */}
                     <div className="p-4 border-b border-muted-foreground/10 space-y-4">
                         <div className="relative">
@@ -264,11 +264,11 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                 </div>
 
                 {/* RIGHT MAIN PANEL */}
-                <div className="flex-1 flex flex-col bg-zinc-950/10 min-w-0">
+                <div className="flex-1 flex flex-col bg-background/50 min-w-0">
                     {selectedObject ? (
                         <div className="flex flex-col h-full">
                             {/* Header - Minimalist */}
-                            <div className="px-6 py-4 border-b border-muted-foreground/10 flex justify-between items-center bg-zinc-900/30 shrink-0">
+                            <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-muted/50 shrink-0">
                                 <div className="flex items-center gap-2">
                                     <Box className="w-4 h-4 text-primary" />
                                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{t('objectEditor.propertiesTitle', 'Propriedades do Objeto')}</span>

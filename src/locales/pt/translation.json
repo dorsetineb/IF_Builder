@@ -221,7 +221,7 @@
     "subtitle": "O que você quer fazer?",
     "createNew": "Crie uma ficção",
     "downloadExample": "Baixe um exemplo",
-    "playDemo": "Jogar a demo",
+    "playDemo": "Acesse a demo",
     "meetProject": "Conheça o projeto",
     "helpTItle": "Como usar o exemplo baixado",
     "helpPlayTitle": "Para Jogar",
@@ -884,6 +884,10 @@
     }
   },
   "editor": {
+    "newSceneName": "Nova Cena",
+    "newSceneDescription": "Descrição da nova cena.",
+    "newVignetteName": "Nova Vinheta",
+    "newVignetteDescription": "Descrição da nova vinheta.",
     "actionNotAllowed": "Ação não permitida",
     "deleteStartSceneError": "Você não pode deletar a cena inicial. Defina outra cena como inicial antes de excluir esta.",
     "sceneDeletedTitle": "Cena deletada",

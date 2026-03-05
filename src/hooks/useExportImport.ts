@@ -214,6 +214,11 @@ DATE:        ${exportDate.toLocaleString()}
         ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>'
         : '';
 
+    const suggestionsButtonHTML =
+      (exportData.enableSuggestions ?? true)
+        ? `<button id="suggestions-button">${exportData.gameSuggestionsButtonText || t('UIEditor.textos.suggestionsPlaceholder')}</button>`
+        : '';
+
     const inventoryButtonHTML =
       (exportData.enableInventory ?? true)
         ? `<button id="inventory-button">${exportData.gameInventoryButtonText || t('UIEditor.textos.inventoryPlaceholder')}</button>`
@@ -246,6 +251,7 @@ DATE:        ${exportDate.toLocaleString()}
       )
       .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
       .replace('__SYSTEM_BUTTON__', systemButtonHTML)
+      .replace('__SUGGESTIONS_BUTTON__', suggestionsButtonHTML)
       .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
       .replace('__DIARY_BUTTON__', diaryButtonHTML)
       .replace(
@@ -529,6 +535,7 @@ DATE:        ${exportDate.toLocaleString()}
         gameTextSpeed: sanitizedData.gameTextSpeed || 5,
         gameImageTransitionType: sanitizedData.gameImageTransitionType || 'fade',
         gameImageSpeed: sanitizedData.gameImageSpeed || 5,
+        enableSuggestions: sanitizedData.enableSuggestions ?? true,
         gameShowTrackersUI: sanitizedData.gameShowTrackersUI ?? true,
         gameShowSystemButton: sanitizedData.gameShowSystemButton ?? true,
         gameViewEndingButtonText: sanitizedData.gameViewEndingButtonText || '',

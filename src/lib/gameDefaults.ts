@@ -65,7 +65,7 @@ export const gameHTML = `
                 <div class="action-bar" id="standard-action-bar">
                     <div id="action-popup" class="action-popup hidden"></div>
                     <div class="action-buttons">
-                        <button id="suggestions-button">__SUGGESTIONS_BUTTON_TEXT__</button>
+                        __SUGGESTIONS_BUTTON__
                         __INVENTORY_BUTTON__
                         __DIARY_BUTTON__
                         __TRACKERS_BUTTON__
@@ -1435,6 +1435,7 @@ export const initialGameData: GameData = {
     gameSystemEnabled: 'none',
     enableTrackers: false,
     enableInventory: true,
+    enableSuggestions: true,
     enableDiary: true,
     enableFixedVerbs: false,
     enableChances: false,

@@ -99,8 +99,8 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                         {/* TAB: SOBRE O PROJETO (NOVO) */}
                         {activeTab === 'about_project' && (
-                            <div className="space-y-8 animate-in slide-in-from-left-4 duration-300">
-                                <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
+                            <div className="space-y-8 animate-in slide-in-from-left-4 duration-300 pt-4">
+                                <div className="">
                                     <div className="flex items-center gap-3 mb-6">
                                         <h2 className="text-lg font-bold text-foreground">
                                             {t('about.title', 'Sobre o IF Builder')}
@@ -117,8 +117,8 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                         {/* TAB: APOIAR (ANTIGO SOBRE O PROJETO) */}
                         {activeTab === 'support' && (
-                            <div className="space-y-8 animate-in slide-in-from-left-4 duration-300">
-                                <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
+                            <div className="space-y-8 animate-in slide-in-from-left-4 duration-300 pt-4">
+                                <div className="">
                                     <div className="flex items-center gap-3 mb-6">
                                         <h2 className="text-lg font-bold text-foreground">
                                             {t('about.support.title', 'Por que apoiar?')}
@@ -140,8 +140,8 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                         {/* TAB: SOBRE O DESENVOLVEDOR (Renamed & Reordered) */}
                         {activeTab === 'dev' && (
-                            <div className="space-y-8 animate-in slide-in-from-left-4 duration-300">
-                                <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
+                            <div className="space-y-8 animate-in slide-in-from-left-4 duration-300 pt-4">
+                                <div className="">
                                     <div className="flex flex-col md:flex-row gap-8">
                                         {/* Avatar Refined */}
                                         <div className="flex-shrink-0 flex flex-col items-center">
@@ -173,8 +173,8 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     </div>
 
                     {/* Sidebar - Fixa/Sticky */}
-                    <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-0 space-y-6 transition-all duration-300">
-                        <div className="bg-gradient-to-b from-primary/20 to-transparent border border-primary/20 rounded-xl p-6 shadow-sm relative overflow-hidden group">
+                    <div className="lg:col-span-5 xl:col-span-4 lg:sticky lg:top-8 space-y-6 transition-all duration-300">
+                        <div className="bg-gradient-to-b from-primary/10 to-transparent border-2 border-primary/50 rounded-xl p-6 shadow-sm relative overflow-hidden group">
                             <div className="flex items-center gap-2 mb-2">
                                 <Heart className="w-4 h-4 text-primary fill-current" />
                                 <h3 className="font-bold text-sm text-white">{t('about.support.sidebar.title', 'Apoie o Projeto')}</h3>
