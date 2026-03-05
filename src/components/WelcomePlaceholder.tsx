@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DitherShader } from '@/components/ui/dither-shader';
-import { Plus, Download, Heart, X, Gamepad2 } from 'lucide-react';
+import { Download, X, Gamepad2 } from 'lucide-react';
 import { NewProjectModal } from './NewProjectModal';
 import { GameData } from '../types';
 import { useTranslation } from 'react-i18next';
@@ -77,9 +77,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         onClick={() => setIsNewProjectModalOpen(true)}
                         className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-zinc-600 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20"
                     >
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'bg-primary/10 group-hover:bg-primary' : 'bg-white/10 group-hover:bg-white'}`}>
-                            <Plus className={`w-6 h-6 transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary group-hover:text-primary-foreground' : 'text-white group-hover:text-black'}`} />
-                        </div>
+                        <img src="/icons/criar.svg" alt="" className="w-10 h-10 invert opacity-60 group-hover:opacity-100 transition-opacity" />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.createNew', 'Crie uma ficção')}</span>
                     </button>
 
@@ -91,15 +89,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                             : 'bg-black/40 backdrop-blur-sm border-zinc-600 hover:border-white hover:bg-black/50'
                             }`}
                     >
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${isFlashing
-                            ? (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'bg-primary-foreground' : 'bg-black')
-                            : (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'bg-primary/10 group-hover:bg-primary' : 'bg-white/10 group-hover:bg-white')
-                            }`}>
-                            <Download className={`w-6 h-6 transition-colors ${isFlashing
-                                ? (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary' : 'text-white')
-                                : (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary group-hover:text-primary-foreground' : 'text-white group-hover:text-black')
-                                }`} />
-                        </div>
+                        <img src="/icons/exemplo.svg" alt="" className={`w-10 h-10 transition-all ${isFlashing ? 'opacity-100' : 'invert opacity-60 group-hover:opacity-100'}`} />
                         <span className={`font-bold text-lg transition-colors ${isFlashing ? (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>{t('welcome.downloadExample', 'Baixe um exemplo')}</span>
                     </button>
 
@@ -108,20 +98,16 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         onClick={() => setIsGamePopupOpen(true)}
                         className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-zinc-600 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
                     >
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'bg-primary/10 group-hover:bg-primary' : 'bg-white/10 group-hover:bg-white'}`}>
-                            <Gamepad2 className={`w-6 h-6 transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary group-hover:text-primary-foreground' : 'text-white group-hover:text-black'}`} />
-                        </div>
+                        <img src="/icons/demo.svg" alt="" className="w-10 h-10 invert opacity-60 group-hover:opacity-100 transition-opacity" />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.playDemo', 'Jogar a demo')}</span>
                     </button>
 
-                    {/* Botão 3: Conheça o projeto */}
+                    {/* Botão 4: Conheça o projeto */}
                     <button
                         onClick={onMeetProject}
                         className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-zinc-600 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
                     >
-                        <div className={`w-12 h-12 rounded-full flex items-center justify-center transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'bg-primary/10 group-hover:bg-primary' : 'bg-white/10 group-hover:bg-white'}`}>
-                            <Heart className={`w-6 h-6 transition-colors ${theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary group-hover:text-primary-foreground' : 'text-white group-hover:text-black'}`} />
-                        </div>
+                        <img src="/icons/apoie.svg" alt="" className="w-10 h-10 invert opacity-60 group-hover:opacity-100 transition-opacity" />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.meetProject', 'Conheça o projeto')}</span>
                     </button>
                 </div>

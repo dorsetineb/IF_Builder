@@ -16,7 +16,7 @@ const Header: React.FC<{
   onImport: (file: File) => void;
   onHome?: () => void;
   currentView: View;
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
 }> = ({ gameData, isPreviewing, onTogglePreview, onNewGame, sidebarCollapsed, onToggleCollapse, onExport, onImport, onHome, currentView }) => {
   const { t } = useTranslation();
   const importInputRef = useRef<HTMLInputElement>(null);
@@ -63,7 +63,7 @@ const Header: React.FC<{
               {currentView === 'guide' ? (
                 <div className="flex flex-col">
                   <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
-                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.guideDesc', 'Aprenda como criar suas próprias histórias interativas.')}</p>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.guideDesc', 'Aprenda como criar suas próprias ficções interativas.')}</p>
                 </div>
               ) : currentView === 'settings' ? (
                 <div className="flex flex-col">
@@ -73,7 +73,7 @@ const Header: React.FC<{
               ) : currentView === 'about' ? (
                 <div className="flex flex-col">
                   <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
-                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.aboutDesc', 'Conheça a missão e os valores por trás do IF Builder.')}</p>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.aboutDesc', 'Saiba mais sobre o If Builder.')}</p>
                 </div>
               ) : null}
             </div>

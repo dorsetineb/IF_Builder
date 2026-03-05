@@ -9,7 +9,7 @@ import { GameData, FixedVerb } from '../types';
 import { useTranslation } from 'react-i18next';
 import { DitherShader } from '@/components/ui/dither-shader';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Terminal, Globe, Split, ArrowRight } from 'lucide-react';
+import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Terminal, Globe, Split, ArrowRight, Wrench } from 'lucide-react';
 
 interface UIEditorProps {
     html: string;
@@ -1363,6 +1363,36 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 </div>
                                             </div>
 
+                                            {/* INVENTORY */}
+                                            <div className="w-full">
+                                                <div className={`w-full p-6 bg-card border ${localEnableInventory ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <Package className="w-5 h-5 text-muted-foreground" />
+                                                            <div>
+                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.inventoryDesc')}</p>
+                                                            </div>
+                                                        </div>
+                                                        <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={localEnableInventory}
+                                                                onChange={(e) => setLocalEnableInventory(e.target.checked)}
+                                                                disabled={localGameInteractionType === 'choice'}
+                                                                className="sr-only peer"
+                                                            />
+                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableInventory ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {/* --- RIGHT COLUMN --- */}
+                                        <div className="flex-1 w-full space-y-6">
                                             {/* CHANCES/VIDAS */}
                                             <div className="w-full">
                                                 <div className={`w-full p-6 bg-card border ${localEnableChances ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
@@ -1436,36 +1466,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             </div>
                                                         </div>
                                                     )}
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* --- RIGHT COLUMN --- */}
-                                        <div className="flex-1 w-full space-y-6">
-                                            {/* INVENTORY */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableInventory ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <Package className="w-5 h-5 text-muted-foreground" />
-                                                            <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.inventoryDesc')}</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={localEnableInventory}
-                                                                onChange={(e) => setLocalEnableInventory(e.target.checked)}
-                                                                disabled={localGameInteractionType === 'choice'}
-                                                                className="sr-only peer"
-                                                            />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableInventory ? 'translateX(16px)' : 'translateX(0)' }}></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
                                                 </div>
                                             </div>
 
@@ -1708,73 +1708,78 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                     {
                         activeTab === 'textos' && (
-                            <div className="space-y-6">
-                                <div>
-                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">{t('UIEditor.textos.interfaceTexts')}</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                                        <div className="space-y-2">
-                                            <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.actionButtonText')}</label>
-                                            <input type="text" id="actionButtonText" value={localActionButtonText || ''} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.actionButtonPlaceholder')} />
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 content-start">
+                                {/* LEFT COLUMN: Navegação (Ex-Textos da Interface) */}
+                                <div className="flex flex-col gap-8 h-full">
+                                    <div className="w-full p-6 bg-card border border-border rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
+                                        <div className="flex items-center gap-3">
+                                            <ArrowRight className="w-5 h-5 text-muted-foreground" />
+                                            <div>
+                                                <h4 className="text-sm font-bold uppercase tracking-wide text-foreground">{t('UIEditor.textos.interfaceTexts')}</h4>
+                                            </div>
                                         </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.commandInputPlaceholder')}</label>
-                                            <input type="text" id="verbInputPlaceholder" value={localVerbInputPlaceholder || ''} onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.commandInputValue')} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="viewEndingButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.viewEndingButtonText')}</label>
-                                            <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText || ''} onChange={(e) => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all placeholder:text-muted-foreground" placeholder={t('UIEditor.textos.viewEndingPlaceholder')} />
-                                            <p className="text-[10px] text-muted-foreground mt-2 italic">{t('UIEditor.textos.viewEndingInfo')}</p>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.diaryPlayerName')}</label>
-                                            <input type="text" id="diaryPlayerName" value={localDiaryPlayerName || ''} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.diaryPlayerNamePlaceholder')} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="splashButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.splashButtonText')}</label>
-                                            <input type="text" id="splashButtonText" value={localSplashButtonText || ''} onChange={(e) => setLocalSplashButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.splashButtonPlaceholder')} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="continueButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.continueButtonText')}</label>
-                                            <input type="text" id="continueButtonText" value={localContinueButtonText || ''} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.continueButtonPlaceholder')} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.restartButtonText')}</label>
-                                            <input type="text" id="restartButtonText" value={localRestartButtonText || ''} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.restartButtonPlaceholder')} />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="pt-6 border-t border-border">
-                                    <h3 className="text-xs font-bold text-foreground mb-4 uppercase tracking-widest">{t('UIEditor.textos.navigationButtons')}</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                                        <div className="space-y-2">
-                                            <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.suggestionsButton')}</label>
-                                            <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText || ''} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.suggestionsPlaceholder')} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.inventoryButton')}</label>
-                                            <input type="text" id="inventoryButtonText" value={localInventoryButtonText || ''} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.inventoryPlaceholder')} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.diaryButton')}</label>
-                                            <input type="text" id="diaryButtonText" value={localDiaryButtonText || ''} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.diaryPlaceholder')} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="trackersButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.trackersButton')}</label>
-                                            <input type="text" id="trackersButtonText" value={localTrackersButtonText || ''} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.trackersPlaceholder')} disabled={localGameSystemEnabled !== 'trackers'} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="systemButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.systemButton')}</label>
-                                            <input type="text" id="systemButtonText" value={localSystemButtonText || ''} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.systemPlaceholder')} />
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.mainMenuButton')}</label>
-                                            <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText || ''} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.mainMenuPlaceholder')} />
+                                        <div className="flex flex-col gap-4">
+                                            <div className="space-y-2">
+                                                <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.actionButtonText')}</label>
+                                                <input type="text" id="actionButtonText" value={localActionButtonText || ''} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.actionButtonPlaceholder')} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.commandInputPlaceholder')}</label>
+                                                <input type="text" id="verbInputPlaceholder" value={localVerbInputPlaceholder || ''} onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.commandInputValue')} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.diaryPlayerName')}</label>
+                                                <input type="text" id="diaryPlayerName" value={localDiaryPlayerName || ''} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.diaryPlayerNamePlaceholder')} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="continueButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.continueButtonText')}</label>
+                                                <input type="text" id="continueButtonText" value={localContinueButtonText || ''} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.continueButtonPlaceholder')} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.restartButtonText')}</label>
+                                                <input type="text" id="restartButtonText" value={localRestartButtonText || ''} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.restartButtonPlaceholder')} />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-
+                                {/* RIGHT COLUMN: Ferramentas (Ex-Botões de Navegação) */}
+                                <div className="flex flex-col gap-8 h-full">
+                                    <div className="w-full p-6 bg-card border border-border rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
+                                        <div className="flex items-center gap-3">
+                                            <Wrench className="w-5 h-5 text-muted-foreground" />
+                                            <div>
+                                                <h4 className="text-sm font-bold uppercase tracking-wide text-foreground">{t('UIEditor.textos.navigationButtons')}</h4>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col gap-4">
+                                            <div className="space-y-2">
+                                                <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.suggestionsButton')}</label>
+                                                <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText || ''} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.suggestionsPlaceholder')} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.inventoryButton')}</label>
+                                                <input type="text" id="inventoryButtonText" value={localInventoryButtonText || ''} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.inventoryPlaceholder')} disabled={!localEnableInventory} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.diaryButton')}</label>
+                                                <input type="text" id="diaryButtonText" value={localDiaryButtonText || ''} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.diaryPlaceholder')} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="trackersButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.trackersButton')}</label>
+                                                <input type="text" id="trackersButtonText" value={localTrackersButtonText || ''} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.trackersPlaceholder')} disabled={!localEnableTrackers} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="systemButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.systemButton')}</label>
+                                                <input type="text" id="systemButtonText" value={localSystemButtonText || ''} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.systemPlaceholder')} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.mainMenuButton')}</label>
+                                                <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText || ''} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.mainMenuPlaceholder')} />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         )
                     }

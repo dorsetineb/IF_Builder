@@ -49,7 +49,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-20 shrink-0">
                     <div className="flex flex-col justify-center h-full">
                         <h1 className="text-xl font-bold text-foreground">{t('about.title', 'Sobre o IF Builder')}</h1>
-                        <p className="text-[10px] text-muted-foreground hidden md:block">{t('about.subtitle', 'Conheça a missão e os valores por trás do IF Builder.')}</p>
+                        <p className="text-[10px] text-muted-foreground hidden md:block">{t('about.subtitle', 'Saiba mais sobre o If Builder.')}</p>
                     </div>
                 </div>
             )}
@@ -102,9 +102,6 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             <div className="space-y-8 animate-in slide-in-from-left-4 duration-300">
                                 <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <div className="p-3 bg-purple-500/10 rounded-lg">
-                                            <Zap className="w-6 h-6 text-purple-500" />
-                                        </div>
                                         <h2 className="text-lg font-bold text-foreground">
                                             {t('about.title', 'Sobre o IF Builder')}
                                         </h2>
@@ -123,9 +120,6 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             <div className="space-y-8 animate-in slide-in-from-left-4 duration-300">
                                 <div className="bg-card border border-border rounded-xl p-8 shadow-sm">
                                     <div className="flex items-center gap-3 mb-6">
-                                        <div className="p-3 bg-primary/10 rounded-lg">
-                                            <Heart className="w-6 h-6 text-primary" />
-                                        </div>
                                         <h2 className="text-lg font-bold text-foreground">
                                             {t('about.support.title', 'Por que apoiar?')}
                                         </h2>

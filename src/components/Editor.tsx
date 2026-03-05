@@ -950,6 +950,18 @@ const Editor: React.FC = () => {
     handleReorganizeScenes,
   } = useGameData();
 
+  // Warn user about unsaved changes when trying to close or reload
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
+
   // Remove: const [gameData, setGameData] = useState<GameData>(initialGameData);
   // Remove: detectedActiveSystems useMemo
   // Remove local isDirty state definition (handled by hook)
