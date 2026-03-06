@@ -745,6 +745,7 @@
       "commandInputPlaceholder": "Command Field Text",
       "commandInputValue": "What do you do?",
       "viewEndingButtonText": "\"View Ending\" Button Text",
+      "viewEndingButton": "View Ending Button",
       "viewEndingPlaceholder": "View Ending",
       "viewEndingInfo": "Appears when the game ends, to take you to the ending screens.",
       "diaryPlayerName": "Player Name in Logbook",
@@ -760,14 +761,16 @@
       "suggestionsPlaceholder": "Suggestions",
       "inventoryButton": "Inventory Button",
       "inventoryPlaceholder": "Inventory",
-      "diaryButton": "Logbook Button",
+      "diaryButton": "Diary Button",
       "diaryPlaceholder": "Logbook",
       "trackersButton": "Trackers Button",
       "trackersPlaceholder": "Trackers",
       "systemButton": "System Menu Button",
       "systemPlaceholder": "System",
       "saveMenuPlaceholder": "Save Game",
+      "saveMenuTitle": "Save Button",
       "loadMenuPlaceholder": "Load Game",
+      "loadMenuTitle": "Load Button",
       "mainMenuButton": "Main Menu Button",
       "mainMenuPlaceholder": "Main Menu",
       "suggestionsEmptyFeedbackLabel": "Suggestions Feedback",
@@ -775,7 +778,14 @@
       "suggestionsEmptyFeedbackDefault": "no suggestions available",
       "inventoryEmptyFeedbackLabel": "Inventory Feedback",
       "inventoryEmptyFeedbackPlaceholder": "there are no items in inventory",
-      "inventoryEmptyFeedbackDefault": "there are no items in inventory"
+      "inventoryEmptyFeedbackDefault": "there are no items in inventory",
+      "sections": {
+        "actions": "Actions & Interaction",
+        "suggestions": "Suggestions",
+        "inventory": "Inventory",
+        "diary": "Log & Narrative",
+        "system": "Interface & System"
+      }
     },
     "aparencia": {
       "structure": "STRUCTURE",

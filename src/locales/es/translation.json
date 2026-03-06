@@ -746,6 +746,7 @@
       "commandInputPlaceholder": "Texto del Campo de Comando",
       "commandInputValue": "¿Qué haces?",
       "viewEndingButtonText": "Texto del Botón \"Ver Final\"",
+      "viewEndingButton": "Botón Ver Final",
       "viewEndingPlaceholder": "Ver Final",
       "viewEndingInfo": "Aparece cuando el juego termina, para llevar a las pantallas finales.",
       "diaryPlayerName": "Nombre del Jugador en el Diario",
@@ -768,7 +769,9 @@
       "systemButton": "Botón Menú del Sistema",
       "systemPlaceholder": "Sistema",
       "saveMenuPlaceholder": "Guardar Partida",
+      "saveMenuTitle": "Botón Guardar",
       "loadMenuPlaceholder": "Cargar Partida",
+      "loadMenuTitle": "Botón Carregar",
       "mainMenuButton": "Botón Menú Principal",
       "mainMenuPlaceholder": "Menú Principal",
       "suggestionsEmptyFeedbackLabel": "Feedback Sugerencias",
@@ -776,7 +779,14 @@
       "suggestionsEmptyFeedbackDefault": "no hay sugerencias",
       "inventoryEmptyFeedbackLabel": "Feedback Inventario",
       "inventoryEmptyFeedbackPlaceholder": "no hay objetos en el inventario",
-      "inventoryEmptyFeedbackDefault": "no hay objetos en el inventario"
+      "inventoryEmptyFeedbackDefault": "no hay objetos en el inventario",
+      "sections": {
+        "actions": "Acciones e Interacción",
+        "suggestions": "Sugerencias",
+        "inventory": "Inventario",
+        "diary": "Diario y Narrativa",
+        "system": "Interfaz y Sistema"
+      }
     },
     "aparencia": {
       "structure": "ESTRUCTURA",
