@@ -105,7 +105,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
     const [pendingObjectUpdates, setPendingObjectUpdates] = useState<{ [id: string]: Partial<GameObject> }>({});
     const [activeTab, setActiveTab] = useState<'properties' | 'objects' | 'interactions' | 'choices'>('properties');
     const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
+    const [suggestionsInput, setSuggestionsInput] = useState('');
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
     const [isDraggingOver, setIsDraggingOver] = useState(false);
     const initialSceneJson = useRef(JSON.stringify(getCleanSceneState(scene)));
 
@@ -116,7 +118,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
         setPendingObjectUpdates({});
         initialSceneJson.current = JSON.stringify(cleanScene);
         setActiveTab('properties');
+        setSuggestionsInput(cleanScene.suggestions ? cleanScene.suggestions.join(', ') : '');
     }, [scene.id]);
+
 
     // Check for dirty state
     useEffect(() => {
@@ -222,6 +226,17 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
     const handleDescriptionChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         updateLocalScene('description', e.target.value);
     };
+
+    const handleSuggestionsChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        setSuggestionsInput(e.target.value);
+    };
+
+    const handleSuggestionsBlur = () => {
+        const suggestionsArray = suggestionsInput.split(',').map(s => s.trim()).filter(s => s !== '');
+        updateLocalScene('suggestions', suggestionsArray);
+        setSuggestionsInput(suggestionsArray.join(', '));
+    };
+
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -473,6 +488,26 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                     className="w-full h-32 md:h-40 bg-input border border-input rounded-lg px-4 py-3 text-sm text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
                                                     placeholder={t('sceneEditor.descPlaceholder')}
                                                 />
+
+                                                {gameInteractionType !== 'choice' && !isVignetteMode && (
+                                                    <div className="pt-4 mt-4">
+                                                        <div className="flex justify-between items-center mb-1.5">
+                                                            <label htmlFor="sceneSuggestions" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                                                {t('sceneEditor.suggestionsLabel', 'SUGESTÕES')}
+                                                            </label>
+                                                            <span className="text-[9px] text-muted-foreground font-medium tracking-wider">{t('sceneEditor.suggestionsHint', 'Use vírgula para separar')}</span>
+                                                        </div>
+                                                        <textarea
+                                                            id="sceneSuggestions"
+                                                            value={suggestionsInput}
+                                                            onChange={handleSuggestionsChange}
+                                                            onBlur={handleSuggestionsBlur}
+                                                            className="w-full h-16 bg-input border border-input rounded-lg px-4 py-3 text-sm text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
+                                                            placeholder={t('sceneEditor.suggestionsPlaceholder', 'Ex: examinar, pegar, usar, falar')}
+                                                        />
+
+                                                    </div>
+                                                )}
 
                                                 {isVignetteMode && (
                                                     <div className="pt-4 border-t border-muted-foreground/10 mt-4">

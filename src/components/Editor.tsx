@@ -1402,6 +1402,8 @@ const Editor: React.FC = () => {
                     gameMainMenuButtonText={gameData.gameMainMenuButtonText}
                     gameContinueIndicatorColor={gameData.gameContinueIndicatorColor || '#58a6ff'}
                     gameViewEndingButtonText={gameData.gameViewEndingButtonText}
+                    gameSuggestionsEmptyFeedback={gameData.gameSuggestionsEmptyFeedback}
+                    gameInventoryEmptyFeedback={gameData.gameInventoryEmptyFeedback}
                     textAnimationType={gameData.gameTextAnimationType || 'fade'}
                     textSpeed={gameData.gameTextSpeed || 5}
                     imageTransitionType={gameData.gameImageTransitionType || 'fade'}

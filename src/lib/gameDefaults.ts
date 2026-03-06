@@ -1472,7 +1472,11 @@ export const initialGameData: GameData = {
     positiveEndingMusic: '',
     negativeEndingMusic: '',
     vignettes: [],
+    gameSuggestionsEmptyFeedback: '',
+    gameInventoryEmptyFeedback: '',
 };
+
+
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sanitizeLegacyI18n = (data: any): any => {
@@ -1496,7 +1500,10 @@ export const sanitizeLegacyI18n = (data: any): any => {
         inventoryButtonText: ['Inventário', 'Inventario'],
         diaryButtonText: ['Diário', 'Diario'],
         trackersButtonText: ['Trackers', 'Rastreadores'],
+        gameSuggestionsEmptyFeedback: ['Sem sugestões disponíveis.'],
+        gameInventoryEmptyFeedback: ['Seu inventário está vazio.'],
     };
+
 
     Object.keys(legacyMap).forEach((key) => {
         const val = d[key];

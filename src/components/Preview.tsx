@@ -244,6 +244,8 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             gameRestartButtonText: gameData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder'),
             gameActionButtonText: gameData.gameActionButtonText || t('UIEditor.textos.actionButtonPlaceholder'),
             gameVerbInputPlaceholder: gameData.gameVerbInputPlaceholder || t('UIEditor.textos.commandInputValue'),
+            gameSuggestionsEmptyFeedback: gameData.gameSuggestionsEmptyFeedback || t('UIEditor.textos.suggestionsEmptyFeedbackDefault'),
+            gameInventoryEmptyFeedback: gameData.gameInventoryEmptyFeedback || t('UIEditor.textos.inventoryEmptyFeedbackDefault'),
         });
         if (testSceneId) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

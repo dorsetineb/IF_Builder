@@ -541,6 +541,9 @@
     "description": "Description",
     "highlightTip": "Use <word> to highlight",
     "descPlaceholder": "Describe what the player sees and feels in this scene...",
+    "suggestionsLabel": "SUGGESTIONS",
+    "suggestionsHint": "Use comma to separate",
+    "suggestionsPlaceholder": "Suggestions (e.g.: look, take)",
     "isVignette": "Is this scene a vignette?",
     "vignetteTypes": {
       "opening": "Opening",
@@ -766,7 +769,13 @@
       "saveMenuPlaceholder": "Save Game",
       "loadMenuPlaceholder": "Load Game",
       "mainMenuButton": "Main Menu Button",
-      "mainMenuPlaceholder": "Main Menu"
+      "mainMenuPlaceholder": "Main Menu",
+      "suggestionsEmptyFeedbackLabel": "Suggestions Feedback",
+      "suggestionsEmptyFeedbackPlaceholder": "no suggestions available",
+      "suggestionsEmptyFeedbackDefault": "no suggestions available",
+      "inventoryEmptyFeedbackLabel": "Inventory Feedback",
+      "inventoryEmptyFeedbackPlaceholder": "there are no items in inventory",
+      "inventoryEmptyFeedbackDefault": "there are no items in inventory"
     },
     "aparencia": {
       "structure": "STRUCTURE",

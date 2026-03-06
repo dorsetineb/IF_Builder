@@ -542,6 +542,9 @@
     "description": "Descripción",
     "highlightTip": "Usa <palabra> para destacar",
     "descPlaceholder": "Describe lo que el jugador ve y siente en esta escena...",
+    "suggestionsLabel": "SUGERENCIAS",
+    "suggestionsHint": "Usa comas para separar",
+    "suggestionsPlaceholder": "Sugerencias (ej: mirar, coger)",
     "isVignette": "¿Esta escena es una viñeta?",
     "vignetteTypes": {
       "opening": "Apertura",
@@ -767,7 +770,13 @@
       "saveMenuPlaceholder": "Guardar Partida",
       "loadMenuPlaceholder": "Cargar Partida",
       "mainMenuButton": "Botón Menú Principal",
-      "mainMenuPlaceholder": "Menú Principal"
+      "mainMenuPlaceholder": "Menú Principal",
+      "suggestionsEmptyFeedbackLabel": "Feedback Sugerencias",
+      "suggestionsEmptyFeedbackPlaceholder": "no hay sugerencias",
+      "suggestionsEmptyFeedbackDefault": "no hay sugerencias",
+      "inventoryEmptyFeedbackLabel": "Feedback Inventario",
+      "inventoryEmptyFeedbackPlaceholder": "no hay objetos en el inventario",
+      "inventoryEmptyFeedbackDefault": "no hay objetos en el inventario"
     },
     "aparencia": {
       "structure": "ESTRUCTURA",

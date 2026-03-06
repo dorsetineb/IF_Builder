@@ -71,6 +71,7 @@ export interface Scene {
   vignetteButtonText?: string;
   vignetteNextSceneId?: string;
   overlayEffect?: string;
+  suggestions?: string[];
 }
 
 export interface FixedVerb {
@@ -223,6 +224,9 @@ export interface GameData {
   gameMainMenuButtonText?: string;
   gameContinueIndicatorColor?: string;
   gameViewEndingButtonText?: string;
+  gameSuggestionsEmptyFeedback?: string;
+  gameInventoryEmptyFeedback?: string;
+
 
   // Transitions
   gameTextAnimationType?: 'fade' | 'typewriter';

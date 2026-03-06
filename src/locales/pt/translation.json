@@ -570,7 +570,10 @@
     "description": "Descrição",
     "highlightTip": "Use <palavra> para destacar",
     "descPlaceholder": "Descreva o que o jogador vê e sente nesta cena...",
-    "isVignette": "Esta cena é uma vinheta?",
+    "suggestionsLabel": "SUGESTÕES",
+    "suggestionsHint": "Use vírgula para separar",
+    "suggestionsPlaceholder": "Sugestões (ex: Olhar, Pegar)",
+    "diaryPlaceholder": "Diário (ex: Meus Registros)",
     "vignetteTypes": {
       "opening": "Abertura",
       "transition": "Transição",
@@ -768,7 +771,13 @@
       "saveMenuPlaceholder": "Salvar Jogo",
       "loadMenuPlaceholder": "Carregar Jogo",
       "mainMenuButton": "Menu Principal",
-      "mainMenuPlaceholder": "Menu Principal"
+      "mainMenuPlaceholder": "Menu Principal",
+      "suggestionsEmptyFeedbackLabel": "Feedback Sugestões",
+      "suggestionsEmptyFeedbackPlaceholder": "não há sugestões",
+      "suggestionsEmptyFeedbackDefault": "não há sugestões",
+      "inventoryEmptyFeedbackLabel": "Feedback Inventário",
+      "inventoryEmptyFeedbackPlaceholder": "não há itens no inventário",
+      "inventoryEmptyFeedbackDefault": "não há itens no inventário"
     },
     "aparencia": {
       "structure": "ESTRUTURA",

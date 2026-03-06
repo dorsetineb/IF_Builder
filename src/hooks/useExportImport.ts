@@ -195,6 +195,8 @@ DATE:        ${exportDate.toLocaleString()}
       gameLoadMenuTitle: t('UIEditor.textos.loadMenuPlaceholder', 'Load Game'),
       gameViewEndingButtonText: t('UIEditor.textos.viewEndingPlaceholder'),
       gameDiaryPlayerName: t('UIEditor.textos.diaryPlayerNamePlaceholder'),
+      gameSuggestionsEmptyFeedback: t('UIEditor.textos.suggestionsEmptyFeedbackDefault'),
+      gameInventoryEmptyFeedback: t('UIEditor.textos.inventoryEmptyFeedbackDefault'),
     };
     // Fill empty text fields with translated defaults so exported data is self-contained
     Object.keys(textDefaults).forEach((key) => {
@@ -493,6 +495,26 @@ DATE:        ${exportDate.toLocaleString()}
           };
         }
       }
+
+      const anySceneHasSuggestions = Object.values(cleanedScenes).some(
+        (s) => s.suggestions && s.suggestions.length > 0
+      );
+
+      if (!anySceneHasSuggestions && data.gameInteractionType !== 'choice') {
+        Object.values(cleanedScenes).forEach((s) => {
+          if (s.vignetteType !== 'opening' && s.vignetteType !== 'conclusion' && s.vignetteType !== 'transition') {
+            s.suggestions = ['Examinar', 'Pegar', 'Usar', 'Falar', 'Abrir'];
+          }
+        });
+      }
+
+      const migratedData: GameData = {
+        ...data,
+        scenes: cleanedScenes,
+        startScene: newStartSceneId,
+        sceneOrder: newSceneOrder,
+        vignettes: [],
+      };
 
       // Only sanitize truly legacy projects (before metadata field was added).
       // Modern exports already have proper text values baked in.

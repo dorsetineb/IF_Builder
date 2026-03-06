@@ -112,7 +112,8 @@ interface UIEditorProps {
     diaryMaxMessages?: number;
     diaryShowSceneImage?: boolean;
     diaryShowPlayerAction?: boolean;
-
+    gameSuggestionsEmptyFeedback?: string;
+    gameInventoryEmptyFeedback?: string;
     onNavigateToTrackers?: () => void;
 }
 
@@ -348,7 +349,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localNegativeEndingContentAlignment, setLocalNegativeEndingContentAlignment] = useState(negativeEndingContentAlignment);
     const [localNegativeEndingDescription, setLocalNegativeEndingDescription] = useState(negativeEndingDescription);
     const [localNegativeEndingMusic, setLocalNegativeEndingMusic] = useState(negativeEndingMusic);
+
     const [localFixedVerbs, setLocalFixedVerbs] = useState(fixedVerbs);
+    const [localSuggestionsEmptyFeedback, setLocalSuggestionsEmptyFeedback] = useState(props.gameSuggestionsEmptyFeedback || '');
+    const [localInventoryEmptyFeedback, setLocalInventoryEmptyFeedback] = useState(props.gameInventoryEmptyFeedback || '');
 
     const [localTextAnimationType, setLocalTextAnimationType] = useState<'fade' | 'typewriter'>(props.textAnimationType || 'typewriter');
     const [localTextSpeed, setLocalTextSpeed] = useState<number>(props.textSpeed || 3);
@@ -443,6 +447,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalSaveMenuTitle(gameSaveMenuTitle); }, [gameSaveMenuTitle]);
     useEffect(() => { setLocalLoadMenuTitle(gameLoadMenuTitle); }, [gameLoadMenuTitle]);
     useEffect(() => { setLocalChanceReturnButtonText(chanceReturnButtonText); }, [chanceReturnButtonText]);
+    useEffect(() => { setLocalSuggestionsEmptyFeedback(props.gameSuggestionsEmptyFeedback || ''); }, [props.gameSuggestionsEmptyFeedback]);
+    useEffect(() => { setLocalInventoryEmptyFeedback(props.gameInventoryEmptyFeedback || ''); }, [props.gameInventoryEmptyFeedback]);
 
     // 3. Colors
     useEffect(() => { setLocalTextColor(textColor); }, [textColor]);
@@ -554,8 +560,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localEnableTrackers, localEnableInventory, localEnableSuggestions, localEnableDiary, localEnableFixedVerbs,
         localEnableChances, localEnableImages, localEnableTextControl, localInventoryCapacity,
         localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
-        localDiaryShowSceneImage, localDiaryShowPlayerAction
+        localDiaryShowSceneImage, localDiaryShowPlayerAction,
+        localSuggestionsEmptyFeedback, localInventoryEmptyFeedback
     });
+
 
     // Store the initial state on mount
     const initialStateRef = React.useRef<ReturnType<typeof getCurrentState> | null>(null);
@@ -602,8 +610,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localEnableTrackers, localEnableInventory, localEnableSuggestions, localEnableDiary, localEnableFixedVerbs,
         localEnableChances, localEnableImages, localEnableTextControl, localInventoryCapacity,
         localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
-        localDiaryShowSceneImage, localDiaryShowPlayerAction
+        localDiaryShowSceneImage, localDiaryShowPlayerAction,
+        localSuggestionsEmptyFeedback, localInventoryEmptyFeedback
     ]);
+
 
 
     const handleSave = () => {
@@ -685,6 +695,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localEnableDiary !== (enableDiary ?? true)) onUpdate('enableDiary', localEnableDiary, true);
         if (localEnableFixedVerbs !== (enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0))) onUpdate('enableFixedVerbs', localEnableFixedVerbs, true);
         if (localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances'))) onUpdate('enableChances', localEnableChances, true);
+
+        if (localSuggestionsEmptyFeedback !== (props.gameSuggestionsEmptyFeedback || '')) onUpdate('gameSuggestionsEmptyFeedback', localSuggestionsEmptyFeedback, true);
+        if (localInventoryEmptyFeedback !== (props.gameInventoryEmptyFeedback || '')) onUpdate('gameInventoryEmptyFeedback', localInventoryEmptyFeedback, true);
 
         if (localLanguage !== (i18n.language || 'pt')) {
             i18n.changeLanguage(localLanguage);
@@ -797,6 +810,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalDiaryMaxMessages(diaryMaxMessages ?? 100);
         setLocalDiaryShowSceneImage(diaryShowSceneImage ?? false);
         setLocalDiaryShowPlayerAction(diaryShowPlayerAction ?? true);
+
+        setLocalSuggestionsEmptyFeedback(props.gameSuggestionsEmptyFeedback || '');
+        setLocalInventoryEmptyFeedback(props.gameInventoryEmptyFeedback || '');
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         if (setTheme) setTheme(originalTheme as any);
@@ -1790,8 +1806,41 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText || ''} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all" placeholder={t('UIEditor.textos.suggestionsPlaceholder')} />
                                             </div>
                                             <div className="space-y-2">
+                                                <label htmlFor="suggestionsEmptyFeedback" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.suggestionsEmptyFeedbackLabel')}</label>
+                                                <input
+                                                    type="text"
+                                                    id="suggestionsEmptyFeedback"
+                                                    value={localSuggestionsEmptyFeedback || ''}
+
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        setLocalSuggestionsEmptyFeedback(val);
+                                                        onUpdate('gameSuggestionsEmptyFeedback', val);
+                                                    }}
+                                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all"
+                                                    placeholder={t('UIEditor.textos.suggestionsEmptyFeedbackPlaceholder')}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
                                                 <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.inventoryButton')}</label>
                                                 <input type="text" id="inventoryButtonText" value={localInventoryButtonText || ''} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.inventoryPlaceholder')} disabled={!localEnableInventory} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label htmlFor="inventoryEmptyFeedback" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.inventoryEmptyFeedbackLabel')}</label>
+                                                <input
+                                                    type="text"
+                                                    id="inventoryEmptyFeedback"
+                                                    value={localInventoryEmptyFeedback || ''}
+
+                                                    onChange={(e) => {
+                                                        const val = e.target.value;
+                                                        setLocalInventoryEmptyFeedback(val);
+                                                        onUpdate('gameInventoryEmptyFeedback', val);
+                                                    }}
+                                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                                    placeholder={t('UIEditor.textos.inventoryEmptyFeedbackPlaceholder')}
+                                                    disabled={!localEnableInventory}
+                                                />
                                             </div>
                                             <div className="space-y-2">
                                                 <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.textos.diaryButton')}</label>

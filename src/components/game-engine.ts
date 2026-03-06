@@ -35,7 +35,8 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 vignetteButtonText: finalVignetteButtonText,
                 vignetteNextSceneId: scene.vignetteNextSceneId,
                 overlayEffect: scene.overlayEffect,
-                isDefeatOutcome: scene.isDefeatOutcome
+                isDefeatOutcome: scene.isDefeatOutcome,
+                suggestions: scene.suggestions || []
             };
         }
     }
@@ -94,6 +95,8 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         enableImages: data.enableImages ?? true,
         enableTextControl: data.enableTextControl ?? true,
         gameInteractionType: data.gameInteractionType || 'parser',
+        gameSuggestionsEmptyFeedback: data.gameSuggestionsEmptyFeedback,
+        gameInventoryEmptyFeedback: data.gameInventoryEmptyFeedback,
     };
 };
 
@@ -1722,34 +1725,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const showSuggestions = () => {
         actionPopup.classList.remove('hidden'); actionPopup.innerHTML = '';
-        const sceneObjects = getObjectsForScene(currentSceneId); const container = document.createElement('div'); container.className = 'action-popup-container';
-        const row1 = document.createElement('div'); row1.className = 'action-popup-row';
-        sceneObjects.forEach(obj => { const btn = document.createElement('button'); btn.textContent = obj.name; btn.addEventListener('click', () => { 
-            verbInput.value = 'examinar ' + obj.name; 
-            actionPopup.classList.add('hidden'); 
-            activePopupType = null; 
-            handleInput(); 
-        }); row1.appendChild(btn); });
-        container.appendChild(row1);
-        const row2 = document.createElement('div'); row2.className = 'action-popup-row';
-        ['Examinar', 'Pegar', 'Usar', 'Falar', 'Abrir'].forEach(v => { const btn = document.createElement('button'); btn.textContent = v; btn.addEventListener('click', () => { 
-            verbInput.value = v.toLowerCase() + ' '; 
-            verbInput.focus(); 
-            actionPopup.classList.add('hidden'); 
-            activePopupType = null; 
-        }); row2.appendChild(btn); });
-        container.appendChild(row2); actionPopup.appendChild(container);
+        const currentSceneData = gameData.cenas[currentSceneId];
+        const sceneSuggestions = currentSceneData.suggestions || [];
+        
+        const container = document.createElement('div'); container.className = 'action-popup-container';
+        
+        if (sceneSuggestions.length === 0) {
+            const row1 = document.createElement('div'); row1.className = 'action-popup-row mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            row1.textContent = gameData.gameSuggestionsEmptyFeedback || 'não há sugestões';
+            container.appendChild(row1);
+        } else {
+
+            const row1 = document.createElement('div'); row1.className = 'action-popup-row max-w-full flex-wrap justify-center';
+            sceneSuggestions.forEach(v => { 
+                const btn = document.createElement('button'); btn.textContent = v; 
+                btn.addEventListener('click', () => { 
+                    verbInput.value = v.toLowerCase() + ' '; 
+                    verbInput.focus(); 
+                    actionPopup.classList.add('hidden'); 
+                    activePopupType = null; 
+                }); 
+                row1.appendChild(btn); 
+            });
+            container.appendChild(row1); 
+        }
+        actionPopup.appendChild(container);
     };
     const showInventory = () => {
-        actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; const list = document.createElement('div'); list.className = 'action-popup-list';
-        if (inventory.length === 0) { const msg = document.createElement('p'); msg.textContent = 'Seu inventário está vazio.'; list.appendChild(msg); }
-        else { inventory.forEach(item => { const btn = document.createElement('button'); btn.textContent = item.name; btn.addEventListener('click', () => { 
-            openItemModal(item); 
-            actionPopup.classList.add('hidden'); 
-            activePopupType = null; 
-        }); list.appendChild(btn); }); }
-        actionPopup.appendChild(list);
+        actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; 
+        const container = document.createElement('div'); container.className = 'action-popup-container';
+        if (inventory.length === 0) { 
+            const msg = document.createElement('div'); 
+            msg.className = 'action-popup-row mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            msg.textContent = gameData.gameInventoryEmptyFeedback || 'não há itens no inventário'; 
+            container.appendChild(msg); 
+        }
+        else { 
+            const list = document.createElement('div');
+            list.className = 'action-popup-list';
+            inventory.forEach(item => { 
+                const btn = document.createElement('button'); 
+                btn.textContent = item.name; 
+                btn.addEventListener('click', () => { 
+                    openItemModal(item); 
+                    actionPopup.classList.add('hidden'); 
+                    activePopupType = null; 
+                }); 
+                list.appendChild(btn); 
+            }); 
+            container.appendChild(list);
+        }
+        actionPopup.appendChild(container);
     };
+
     const openItemModal = (item) => {
         itemModalName.textContent = item.name; itemModalDescription.innerHTML = formatText(item.examineDescription);
         setupHighlights(itemModalDescription);
