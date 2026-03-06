@@ -1033,6 +1033,10 @@ const Editor: React.FC = () => {
     return selectedSceneId ? gameData.scenes[selectedSceneId] : null;
   }, [gameData.scenes, selectedSceneId]);
 
+  const hasOpeningVignette = useMemo(() => {
+    return scenesList.some(s => s.vignetteType === 'opening');
+  }, [scenesList]);
+
   // handleUpdateGameData coming from hook
 
   // Scene handlers and Reorder handlers moved to useSceneManagement
@@ -1639,6 +1643,7 @@ const Editor: React.FC = () => {
         isOpen={isNodeTypeModalOpen}
         onClose={() => setIsNodeTypeModalOpen(false)}
         onSelect={handleAddNodeType}
+        hasOpeningVignette={hasOpeningVignette}
       />
       <UserManualModal isOpen={isManualOpen} onClose={() => setIsManualOpen(false)} />
     </div>

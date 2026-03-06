@@ -361,7 +361,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed);
 
     const TABS = {
-        config: t('settings.appearance', 'Aparência e idioma'),
+        config: t('settings.workspace', 'Área de trabalho'),
         layout: t('UIEditor.tabs.layout'),
         aparencia: t('UIEditor.tabs.aparencia'),
         sistemas: t('UIEditor.tabs.sistemas'),
@@ -1020,6 +1020,38 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                                 {/* --- LEFT COLUMN: SETTINGS --- */}
                                 <div className="col-span-1 lg:col-span-5 space-y-6">
+                                    {/* Vinhetas Settings */}
+                                    <div className="w-full p-6 bg-card border border-border rounded-2xl shadow-sm flex flex-col space-y-6">
+                                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2 mb-2">
+                                            <ArrowRight className="w-4 h-4 text-muted-foreground" />
+                                            {t('UIEditor.layout.splashScreen')}
+                                        </h3>
+                                        <div className="space-y-6">
+                                            <div>
+                                                <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.layout.contentAlignment')}</label>
+                                                <select
+                                                    id="splashContentAlignment"
+                                                    value={localSplashContentAlignment}
+                                                    onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
+                                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background"
+                                                >
+                                                    <option value="right">{t('UIEditor.layout.alignRight')}</option>
+                                                    <option value="left">{t('UIEditor.layout.alignLeft')}</option>
+                                                </select>
+                                            </div>
+                                            <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}>
+                                                <input
+                                                    type="checkbox"
+                                                    id="omitSplashTitle"
+                                                    checked={localOmitSplashTitle}
+                                                    onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
+                                                    className="custom-checkbox"
+                                                />
+                                                <label htmlFor="omitSplashTitle" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('UIEditor.layout.hideTitleDesc')}</label>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {/* Cenas Settings */}
                                     <div className="w-full p-6 bg-card border border-border rounded-2xl shadow-sm flex flex-col space-y-6">
                                         <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2 mb-2">
@@ -1078,43 +1110,50 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             </div>
                                         </div>
                                     </div>
-
-                                    {/* Vinhetas Settings */}
-                                    <div className="w-full p-6 bg-card border border-border rounded-2xl shadow-sm flex flex-col space-y-6">
-                                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2 mb-2">
-                                            <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                                            {t('UIEditor.layout.splashScreen')}
-                                        </h3>
-                                        <div className="space-y-6">
-                                            <div>
-                                                <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.layout.contentAlignment')}</label>
-                                                <select
-                                                    id="splashContentAlignment"
-                                                    value={localSplashContentAlignment}
-                                                    onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background"
-                                                >
-                                                    <option value="right">{t('UIEditor.layout.alignRight')}</option>
-                                                    <option value="left">{t('UIEditor.layout.alignLeft')}</option>
-                                                </select>
-                                            </div>
-                                            <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}>
-                                                <input
-                                                    type="checkbox"
-                                                    id="omitSplashTitle"
-                                                    checked={localOmitSplashTitle}
-                                                    onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
-                                                    className="custom-checkbox"
-                                                />
-                                                <label htmlFor="omitSplashTitle" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('UIEditor.layout.hideTitleDesc')}</label>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
 
                                 {/* --- RIGHT COLUMN: PREVIEWS --- */}
                                 <div className="col-span-1 lg:col-span-7">
                                     <div className="space-y-8 flex flex-col pt-2">
+                                        {/* Preview Vinheta */}
+                                        <div className="space-y-4 w-full">
+                                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">{t('UIEditor.layout.preview')}</p>
+                                            <div className="flex items-center justify-center w-full">
+                                                <div
+                                                    className="relative w-full aspect-video bg-muted border border-border rounded-xl flex flex-col justify-end overflow-hidden p-6 box-border shadow-sm"
+                                                    style={{
+                                                        alignItems: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
+                                                        textAlign: localSplashContentAlignment === 'left' ? 'left' : 'right'
+                                                    }}
+                                                >
+                                                    <div className="absolute inset-0 opacity-60">
+                                                        <DitherShader
+                                                            src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
+                                                            gridSize={2}
+                                                            ditherMode="bayer"
+                                                            colorMode="duotone"
+                                                            primaryColor={ditherColors.primary}
+                                                            secondaryColor={ditherColors.secondary}
+                                                            className="w-full h-full"
+                                                            objectFit="cover"
+                                                        />
+                                                    </div>
+                                                    <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center justify-center">
+                                                        <div className="text-secondary-foreground font-black text-[9px] uppercase tracking-[0.2em] border border-secondary-foreground/20 px-3 py-1 rounded backdrop-blur-sm z-0">{t('UIEditor.layout.backgroundImage')}</div>
+                                                    </div>
+                                                    <div className={`relative z-10 w-full flex flex-col gap-2 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
+                                                        {!localOmitSplashTitle && (
+                                                            <div className="text-[12px] text-foreground font-bold uppercase tracking-widest drop-shadow-md">{t('UIEditor.layout.titleAndDesc')}</div>
+                                                        )}
+                                                        <div className={`w-3/4 h-1.5 bg-foreground/50 rounded-full drop-shadow-sm`}></div>
+                                                        <div className={`w-1/2 h-1.5 bg-foreground/50 rounded-full mb-1 drop-shadow-sm`}></div>
+
+                                                        <div className="px-4 py-1.5 bg-primary text-primary-foreground rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-widest shadow-md mt-1">{t('common.button', 'Botão')}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
                                         {/* Preview Cena (Scene) */}
                                         <div className="space-y-4 w-full">
                                             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">{t('UIEditor.layout.layoutPreview')}</p>
@@ -1158,45 +1197,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             <div className="h-1.5 bg-foreground/20 rounded w-full mt-3"></div>
                                                             <div className="h-1.5 bg-foreground/20 rounded w-3/4"></div>
                                                         </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Preview Vinheta */}
-                                        <div className="space-y-4 w-full">
-                                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">{t('UIEditor.layout.preview')}</p>
-                                            <div className="flex items-center justify-center w-full">
-                                                <div
-                                                    className="relative w-full aspect-video bg-muted border border-border rounded-xl flex flex-col justify-end overflow-hidden p-6 box-border shadow-sm"
-                                                    style={{
-                                                        alignItems: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
-                                                        textAlign: localSplashContentAlignment === 'left' ? 'left' : 'right'
-                                                    }}
-                                                >
-                                                    <div className="absolute inset-0 opacity-60">
-                                                        <DitherShader
-                                                            src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
-                                                            gridSize={2}
-                                                            ditherMode="bayer"
-                                                            colorMode="duotone"
-                                                            primaryColor={ditherColors.primary}
-                                                            secondaryColor={ditherColors.secondary}
-                                                            className="w-full h-full"
-                                                            objectFit="cover"
-                                                        />
-                                                    </div>
-                                                    <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center justify-center">
-                                                        <div className="text-secondary-foreground font-black text-[9px] uppercase tracking-[0.2em] border border-secondary-foreground/20 px-3 py-1 rounded backdrop-blur-sm z-0">{t('UIEditor.layout.backgroundImage')}</div>
-                                                    </div>
-                                                    <div className={`relative z-10 w-full flex flex-col gap-2 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
-                                                        {!localOmitSplashTitle && (
-                                                            <div className="text-[12px] text-foreground font-bold uppercase tracking-widest drop-shadow-md">{t('UIEditor.layout.titleAndDesc')}</div>
-                                                        )}
-                                                        <div className={`w-3/4 h-1.5 bg-foreground/50 rounded-full drop-shadow-sm`}></div>
-                                                        <div className={`w-1/2 h-1.5 bg-foreground/50 rounded-full mb-1 drop-shadow-sm`}></div>
-
-                                                        <div className="px-4 py-1.5 bg-primary text-primary-foreground rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-widest shadow-md mt-1">{t('common.button', 'Botão')}</div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -2301,66 +2301,78 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                     {
                         activeTab === 'config' && (
-                            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                <div className="bg-card border border-border rounded-xl p-6 shadow-sm mb-4">
-                                    <h3 className="text-xs font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
-                                        <Sun className="w-4 h-4 text-muted-foreground" /> {t('settings.appearance', 'Aparência e Idioma')}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                                {/* Idioma Section */}
+                                <div className="bg-card border border-border rounded-xl p-6 shadow-sm hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+                                    <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
+                                        <Globe className="w-4 h-4 text-muted-foreground" />
+                                        {t('settings.language.label', 'Idioma')}
                                     </h3>
 
-                                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                                        <button
-                                            onClick={() => handleAppThemeChange('windows')}
-                                            className={`flex justify-center items-center gap-2 p-3 rounded-lg border transition-all ${theme === 'windows' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
-                                        >
-                                            <Monitor size={16} className={theme === 'windows' ? 'text-primary' : 'text-muted-foreground'} />
-                                            <span className={`font-medium text-xs ${theme === 'windows' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.windows', 'W95')}</span>
-                                        </button>
-                                        <button
-                                            onClick={() => handleAppThemeChange('dark')}
-                                            className={`flex justify-center items-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
-                                        >
-                                            <Moon size={16} className={theme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
-                                            <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.dark', 'Noite')}</span>
-                                        </button>
-                                        <button
-                                            onClick={() => handleAppThemeChange('light')}
-                                            className={`flex justify-center items-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
-                                        >
-                                            <Sun size={16} className={theme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
-                                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.light', 'Dia')}</span>
-                                        </button>
-                                        <button
-                                            onClick={() => handleAppThemeChange('cream')}
-                                            className={`flex justify-center items-center gap-2 p-3 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
-                                        >
-                                            <Coffee size={16} className={theme === 'cream' ? 'text-primary' : 'text-muted-foreground'} />
-                                            <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.cream', 'Creme')}</span>
-                                        </button>
-                                        <button
-                                            onClick={() => handleAppThemeChange('terminal')}
-                                            className={`flex justify-center items-center gap-2 p-3 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
-                                        >
-                                            <Terminal size={16} className={theme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
-                                            <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
-                                        </button>
-                                    </div>
-
-                                    <div className="space-y-4 pt-6 border-t border-border mt-6">
-                                        <div className="space-y-2 text-left">
-                                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-2">
-                                                <Globe size={12} />
-                                                {t('settings.language.label', 'Idioma da Interface')}
+                                    <div className="space-y-4">
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 block">
+                                                {t('settings.language.select', 'Idioma')}
                                             </label>
                                             <select
                                                 value={localLanguage}
                                                 onChange={(e) => setLocalLanguage(e.target.value)}
-                                                className="w-full bg-input border border-border rounded px-3 py-2 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
+                                                className="w-full bg-input border border-border rounded-lg px-3 py-2.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
                                             >
                                                 <option value="pt">{t('common.languages.pt', 'Português')}</option>
                                                 <option value="en">{t('common.languages.en', 'English')}</option>
                                                 <option value="es">{t('common.languages.es', 'Español')}</option>
                                             </select>
                                         </div>
+                                        <p className="text-[10px] text-muted-foreground italic leading-relaxed">
+                                            {t('settings.language.description', 'Altere o idioma para que a interface do editor seja traduzida conforme sua preferência.')}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Aparência Section */}
+                                <div className="bg-card border border-border rounded-xl p-6 shadow-sm hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+                                    <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
+                                        <Palette className="w-4 h-4 text-muted-foreground" />
+                                        {t('settings.appearance', 'Aparência')}
+                                    </h3>
+
+                                    <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
+                                        <button
+                                            onClick={() => handleAppThemeChange('windows')}
+                                            className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'windows' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                        >
+                                            <Monitor size={16} className="text-muted-foreground" />
+                                            <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'windows' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.windows', 'W95')}</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleAppThemeChange('dark')}
+                                            className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                        >
+                                            <Moon size={16} className="text-muted-foreground" />
+                                            <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.dark', 'Noite')}</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleAppThemeChange('light')}
+                                            className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                        >
+                                            <Sun size={16} className="text-muted-foreground" />
+                                            <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.light', 'Dia')}</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleAppThemeChange('cream')}
+                                            className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                        >
+                                            <Coffee size={16} className="text-muted-foreground" />
+                                            <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.cream', 'Creme')}</span>
+                                        </button>
+                                        <button
+                                            onClick={() => handleAppThemeChange('terminal')}
+                                            className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                        >
+                                            <Terminal size={16} className="text-muted-foreground" />
+                                            <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
+                                        </button>
                                     </div>
                                 </div>
                             </div>

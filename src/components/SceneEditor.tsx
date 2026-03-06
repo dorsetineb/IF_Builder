@@ -517,23 +517,31 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                                                     { id: 'opening', label: t('sceneEditor.vignetteTypes.opening'), icon: Play },
                                                                     { id: 'transition', label: t('sceneEditor.vignetteTypes.transition'), icon: ArrowRight },
                                                                     { id: 'conclusion', label: t('sceneEditor.vignetteTypes.conclusion'), icon: Flag }
-                                                                ].map((type) => (
-                                                                    <button
-                                                                        key={type.id}
-                                                                        onClick={() => {
-                                                                            if (localScene.vignetteType !== type.id) {
-                                                                                updateLocalScene('vignetteType', type.id as 'opening' | 'transition' | 'conclusion');
-                                                                            }
-                                                                        }}
-                                                                        className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border transition-all ${localScene.vignetteType === type.id
-                                                                            ? 'bg-primary/20 border-primary text-primary'
-                                                                            : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted hover:text-foreground'
-                                                                            }`}
-                                                                    >
-                                                                        <type.icon className="w-4 h-4" />
-                                                                        <span className="text-[10px] font-bold uppercase">{type.label}</span>
-                                                                    </button>
-                                                                ))}
+                                                                ].map((type) => {
+                                                                    const isOpeningDisabled = type.id === 'opening' && allScenes.some(s => s.vignetteType === 'opening' && s.id !== localScene.id);
+
+                                                                    return (
+                                                                        <button
+                                                                            key={type.id}
+                                                                            disabled={isOpeningDisabled}
+                                                                            onClick={() => {
+                                                                                if (localScene.vignetteType !== type.id) {
+                                                                                    updateLocalScene('vignetteType', type.id as 'opening' | 'transition' | 'conclusion');
+                                                                                }
+                                                                            }}
+                                                                            className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border transition-all ${localScene.vignetteType === type.id
+                                                                                ? 'bg-primary/20 border-primary text-primary'
+                                                                                : isOpeningDisabled
+                                                                                    ? 'bg-muted/10 border-border/50 text-muted-foreground/30 cursor-not-allowed opacity-50'
+                                                                                    : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted hover:text-foreground'
+                                                                                }`}
+                                                                            title={isOpeningDisabled ? t('sceneEditor.alreadyHasOpening', 'Já existe uma vinheta de abertura.') : undefined}
+                                                                        >
+                                                                            <type.icon className="w-4 h-4" />
+                                                                            <span className="text-[10px] font-bold uppercase">{type.label}</span>
+                                                                        </button>
+                                                                    );
+                                                                })}
                                                             </div>
 
                                                             <div className="grid grid-cols-2 gap-4">

@@ -163,7 +163,7 @@ const SceneList: React.FC<SceneListProps> = ({
         <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
           type="text"
-          placeholder={t('sceneList.search', 'Buscar cenas...')}
+          placeholder={t('sceneList.search', 'Buscar...')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full pl-8 pr-2 py-1.5 text-xs rounded-md bg-input border border-border focus:outline-none focus:ring-1 focus:ring-primary"
@@ -209,7 +209,7 @@ const SceneList: React.FC<SceneListProps> = ({
                   style={{ marginTop: '4px' }} // Ensure gap matches item gap
                 >
                   <Plus className={`w-4 h-4 mr-2 ${theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
-                  {t('sceneList.createNode', 'Criar...')}
+                  {t('sceneList.createNode', 'Criar Vinheta ou Cena')}
                 </button>
               </div>
             );

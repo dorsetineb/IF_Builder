@@ -104,7 +104,7 @@
     "title": "Configurações Globais",
     "subtitle": "Gerencie suas preferências e perfil.",
     "logout": "Sair da Conta",
-    "appearance": "Aparência e Idioma",
+    "appearance": "Aparência",
     "themes": {
       "dark": "Noite",
       "light": "Dia",
@@ -113,8 +113,9 @@
       "windows": "W95"
     },
     "sceneList": {
-      "search": "Buscar cenas...",
+      "search": "Buscar...",
       "addScene": "+ Criar",
+      "createNode": "Criar Vinheta ou Cena",
       "start": "Início",
       "deleteScene": "Deletar cena",
       "nodeSelection": {
@@ -122,6 +123,7 @@
         "scene": {
           "title": "Cena",
           "description": "Momentos de divergência. Onde o jogador faz escolhas e o destino muda.",
+          "lockedDesc": "Crie uma vinheta de abertura\npara habilitar cenas.",
           "tags": [
             "DECISÃO",
             "RAMIFICAÇÃO",
@@ -131,16 +133,20 @@
         "vignette": {
           "title": "Vinheta",
           "description": "Uma ponte narrativa. Conecte pontos da história sem interrupções.",
+          "openingRequired": "Comece sua história aqui.\nA primeira vinheta de abertura.",
           "tags": [
             "LINEAR",
             "FIXO",
             "ATMOSFERA"
+          ],
+          "tags_opening": [
+            "ABERTURA"
           ]
         }
       }
     },
     "language": {
-      "label": "Idioma da Interface",
+      "label": "Idioma",
       "description": "Selecione o idioma em que deseja usar o editor."
     },
     "data_management": {
@@ -205,7 +211,7 @@
     "logout": "Sair da Conta"
   },
   "sidebar": {
-    "sceneEditor": "Editor de Cenas",
+    "sceneEditor": "Narrativa",
     "sceneMap": "Mapa de Cenas",
     "objects": "Objetos",
     "trackers": "Rastreadores",
@@ -595,8 +601,8 @@
     "multimediaTitle": "MULTIMÍDIA",
     "suggestedResVertical": "720x1280 sugerido",
     "suggestedResHorizontal": "1280x720 sugerido",
-    "changeBtn": "Trocar",
     "removeBtn": "Remover",
+    "alreadyHasOpening": "Já existe uma vinheta de abertura.",
     "loadImage": "Carregar Imagem de Fundo",
     "overlayLabel": "Efeito Visual (Overlay)",
     "effects": {

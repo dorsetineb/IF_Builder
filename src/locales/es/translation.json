@@ -104,7 +104,7 @@
     "title": "Ajustes Globales",
     "subtitle": "Gestiona tus preferencias y perfil.",
     "logout": "Cerrar sesión",
-    "appearance": "Apariencia e Idioma",
+    "appearance": "Apariencia",
     "themes": {
       "dark": "Noche",
       "light": "Día",
@@ -113,7 +113,7 @@
       "windows": "W95"
     },
     "language": {
-      "label": "Idioma de la Interfaz",
+      "label": "Idioma",
       "description": "Selecciona el idioma en el que deseas usar el editor."
     },
     "data_management": {

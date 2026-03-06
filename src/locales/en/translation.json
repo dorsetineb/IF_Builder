@@ -304,7 +304,7 @@
     "title": "Global Settings",
     "subtitle": "Manage your preferences and profile.",
     "logout": "Log Out",
-    "appearance": "Appearance & Language",
+    "appearance": "Appearance",
     "themes": {
       "dark": "Night",
       "light": "Day",
@@ -313,7 +313,7 @@
       "windows": "W95"
     },
     "language": {
-      "label": "Interface Language",
+      "label": "Language",
       "description": "Select the language you want to use the editor in."
     },
     "data_management": {

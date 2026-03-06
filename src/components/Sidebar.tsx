@@ -88,7 +88,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               : 'text-muted-foreground hover:bg-zinc-800 hover:text-white'
               } ${isCollapsed ? 'justify-center px-0 py-3' : ''}`}
             onClick={handleToggleScenes}
-            title={isCollapsed ? t('sidebar.sceneEditor', 'Editor de Cenas') : undefined}
+            title={isCollapsed ? t('sidebar.sceneEditor', 'Narrativa') : undefined}
           >
             {/* Hover Glow Effect */}
             <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${isScenesExpanded ? 'translate-x-0' : ''}`} />
@@ -96,7 +96,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             <BookOpen className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && (
               <>
-                <span className="truncate relative z-10 flex-1 text-left">{t('sidebar.sceneEditor', 'Editor de Cenas')}</span>
+                <span className="truncate relative z-10 flex-1 text-left">{t('sidebar.sceneEditor', 'Narrativa')}</span>
                 {/* Counter */}
                 <span className="bg-black/30 text-white text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-white/20 shadow-sm relative z-10">
                   {scenes.length}
