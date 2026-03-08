@@ -8,6 +8,7 @@ import Editor from './components/Editor';
 import { ThemeProvider } from './components/ThemeProvider';
 import { ToastProvider } from './components/ToastContext';
 import AboutProject from './pages/AboutProject';
+import Analytics from './components/Analytics';
 
 const App: React.FC = () => {
     const { t, i18n } = useTranslation();
@@ -20,6 +21,7 @@ const App: React.FC = () => {
         <ThemeProvider defaultTheme="dark" storageKey="if-builder-theme">
             <ToastProvider>
                 <Router>
+                    <Analytics />
                     <Routes>
                         {/* Landing Page Route */}
                         <Route path="/" element={<Auth />} />
