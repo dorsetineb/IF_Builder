@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Escapa de la Mazmorra</title>
+    <!-- Same styles and structure, just localized strings -->
+    <style>
+        :root {
+            --bg-color: #0d1117;
+            --container-bg: rgba(22, 27, 34, 0.8);
+            --text-color: #c9d1d9;
+            --accent-color: #58a6ff;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+            --action-button-bg: #21262d;
+            --action-button-hover: #30363d;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        #game-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+            position: relative;
+            background: var(--container-bg);
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+        }
+
+        #scene-image-container {
+            width: 100%;
+            height: 40vh;
+            position: relative;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #scene-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: opacity 0.5s;
+        }
+
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        #scene-description {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            line-height: 1.6;
+            font-size: 1.1rem;
+            mask-image: linear-gradient(to bottom, transparent, black 20px, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 20px, black 90%, transparent);
+        }
+
+        .input-area {
+            padding: 15px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        #verb-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .action-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 10px;
+            background: #161b22;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .action-btn {
+            background: var(--action-button-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s;
+        }
+
+        .action-btn:hover {
+            background: var(--action-button-hover);
+            border-color: #8b949e;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .modal.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: #161b22;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+            padding: 25px;
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #8b949e;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Mobile specific */
+        @media (max-height: 600px) {
+            #scene-image-container {
+                height: 30vh;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="game-container">
+        <div id="scene-image-container">
+            <img id="scene-image" src="" alt="Escena">
+            <div id="overlay-effect" class="overlay"></div>
+        </div>
+
+        <div id="scene-description">
+            <!-- Content generated by game.js -->
+        </div>
+
+        <div id="action-popup" class="modal-content hidden"
+            style="position: absolute; bottom: 130px; left: 5%; width: 90%; z-index: 50; background: #21262d;"></div>
+
+        <div id="standard-action-bar">
+            <div class="input-area">
+                <span style="color: var(--accent-color); font-weight: bold;">></span>
+                <input type="text" id="verb-input" placeholder="¿Qué vas a hacer?" autocomplete="off"
+                    spellcheck="false">
+            </div>
+
+            <div class="action-bar">
+                <button class="action-btn" id="diary-btn">Diario</button>
+                <button class="action-btn" id="inventory-btn">Mochila</button>
+                <button class="action-btn" id="suggestions-btn">Ayuda</button>
+            </div>
+        </div>
+
+        <div id="ending-action-bar" class="action-bar hidden">
+            <button class="action-btn" id="restart-btn"
+                style="width: 100%; justify-content: center; padding: 15px;">Reiniciar</button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div id="inventory-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 id="inventory-modal-title">Inventario</h2>
+            <div id="inventory-list"></div>
+        </div>
+    </div>
+
+    <div id="item-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <h2 id="item-modal-name">Item</h2>
+            <div id="item-modal-image-container" class="hidden">
+                <img id="item-modal-image" src="" style="width: 100%; border-radius: 8px; margin-bottom: 15px;">
+            </div>
+            <div id="item-modal-description"></div>
+        </div>
+    </div>
+
+    <div id="diary-modal" class="modal">
+        <div class="modal-content" style="max-width: 600px; width: 95%;">
+            <span class="modal-close">&times;</span>
+            <h2 id="diary-modal-title">Diario</h2>
+            <div id="diary-log" style="max-height: 60vh; overflow-y: auto;"></div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+    <script>
+        // Set basic title
+        document.title = "Escapa de la Mazmorra";
+    </script>
+</body>
+
+</html>
