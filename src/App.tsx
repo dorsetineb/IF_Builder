@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Auth } from './components/Auth';
 import PlatformLayout from './components/layouts/PlatformLayout';
@@ -10,35 +10,49 @@ import { ToastProvider } from './components/ToastContext';
 import AboutProject from './pages/AboutProject';
 import Analytics from './components/Analytics';
 
-const App: React.FC = () => {
+const AppContent: React.FC = () => {
     const { t, i18n } = useTranslation();
+    const location = useLocation();
 
     useEffect(() => {
-        document.title = t('app.title', 'IF Builder / Ficções Interativas');
-    }, [i18n.language, t]);
+        const path = location.pathname;
+        if (path === '/about') {
+            document.title = t('app.aboutTitle', 'IF Builder / Sobre o Projeto');
+        } else if (path === '/editor' || path === '/settings') {
+            document.title = t('app.editorTitle', 'IF Builder / Editor de Narrativa');
+        } else {
+            document.title = t('app.title', 'IF Builder / Ficções Interativas');
+        }
+    }, [location.pathname, i18n.language, t]);
 
+    return (
+        <Routes>
+            {/* Landing Page Route */}
+            <Route path="/" element={<Auth />} />
+
+            {/* Platform Routes */}
+            <Route element={<PlatformLayout />}>
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/about" element={<AboutProject />} />
+                <Route path="/projects" element={<div className="p-8 text-white">Página de Projetos (Em construção)</div>} />
+            </Route>
+
+            {/* Editor Route */}
+            <Route path="/editor" element={<Editor />} />
+
+            {/* Catch all */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+    );
+};
+
+const App: React.FC = () => {
     return (
         <ThemeProvider defaultTheme="dark" storageKey="if-builder-theme">
             <ToastProvider>
                 <Router>
                     <Analytics />
-                    <Routes>
-                        {/* Landing Page Route */}
-                        <Route path="/" element={<Auth />} />
-
-                        {/* Platform Routes */}
-                        <Route element={<PlatformLayout />}>
-                            <Route path="/settings" element={<Settings />} />
-                            <Route path="/about" element={<AboutProject />} />
-                            <Route path="/projects" element={<div className="p-8 text-white">Página de Projetos (Em construção)</div>} />
-                        </Route>
-
-                        {/* Editor Route */}
-                        <Route path="/editor" element={<Editor />} />
-
-                        {/* Catch all */}
-                        <Route path="*" element={<Navigate to="/" replace />} />
-                    </Routes>
+                    <AppContent />
                 </Router>
             </ToastProvider>
         </ThemeProvider>

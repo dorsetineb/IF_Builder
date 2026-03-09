@@ -1,6 +1,9 @@
 {
   "app": {
-    "title": "IF Builder / Ficções Interativas"
+    "title": "IF Builder / Ficções Interativas",
+    "editorTitle": "IF Builder / Editor de Narrativa",
+    "guideTitle": "IF Builder / Guia Rápido",
+    "aboutTitle": "IF Builder / Sobre o Projeto"
   },
   "auth": {
     "errors": {

@@ -842,6 +842,7 @@ const Editor: React.FC = () => {
   const { theme: appTheme } = useTheme();
   const navigate = useNavigate();
 
+
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -969,6 +970,17 @@ const Editor: React.FC = () => {
   const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
   const [previewSceneId, setPreviewSceneId] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<View>('scenes');
+
+  // Update page title based on current view
+  useEffect(() => {
+    if (currentView === 'guide') {
+      document.title = t('app.guideTitle', 'IF Builder / Guia Rápido');
+    } else if (currentView === 'about') {
+      document.title = t('app.aboutTitle', 'IF Builder / Sobre o Projeto');
+    } else {
+      document.title = t('app.editorTitle', 'IF Builder / Editor de Narrativa');
+    }
+  }, [currentView, t]);
   const [isPreviewing, setIsPreviewing] = useState(false);
 
   const [confirmationModal, setConfirmationModal] = useState({
