@@ -7,9 +7,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let isGameEnded = false;
     let isPrinting = false;
     let actionLog = [];
+    let renderSessionId = 0;
     let activePopupType = null;
     let gameChances = gameData.gameMaxChances || 3;
-    const typeSpeedBase = 20;
+    const typeSpeedBase = Math.max(5, 120 - ((gameData.gameTextSpeed || 5) * 22));
 
     const sceneImage = document.getElementById('scene-image');
     const sceneDescription = document.getElementById('scene-description');
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderScene = (scene) => {
         sceneImage.src = scene.image;
         sceneDescription.innerHTML = '';
+        renderSessionId++;
         printOutput(scene.description);
         applyOverlay(scene.overlayEffect);
     };
@@ -77,15 +79,61 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const printOutput = (text) => {
+        const textAnimType = gameData.gameTextAnimationType || 'fade';
         const p = document.createElement('p');
-        p.innerHTML = formatText(text);
-        p.className = 'scene-paragraph';
-        sceneDescription.appendChild(p);
-        setupHighlights(p);
-        sceneDescription.scrollTop = sceneDescription.scrollHeight;
+        const formattedHTML = formatText(text);
+        actionLog.push({ type: 'output', text: text });
+
+        if (textAnimType === 'typewriter') {
+            isPrinting = true;
+            renderSessionId++;
+            const mySessionId = renderSessionId;
+            p.className = 'scene-paragraph typewriter-cursor';
+            p.style.opacity = '1';
+            p.innerHTML = formattedHTML;
+            sceneDescription.appendChild(p);
+
+            const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
+            let node; const textNodes = []; while (node = walker.nextNode()) textNodes.push(node);
+            const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
+            let nodeIdx = 0; let charIdx = 0;
+
+            const type = () => {
+                if (mySessionId !== renderSessionId) return;
+                if (nodeIdx >= textNodes.length) {
+                    p.classList.remove('typewriter-cursor');
+                    setupHighlights(p);
+                    isPrinting = false;
+                    sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                    verbInput.focus();
+                    return;
+                }
+                const currentNode = textNodes[nodeIdx];
+                const fullText = fullTexts[nodeIdx];
+                if (charIdx < fullText.length) {
+                    currentNode.nodeValue += fullText[charIdx];
+                    charIdx++;
+                    sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                    setTimeout(type, typeSpeedBase);
+                } else {
+                    nodeIdx++;
+                    charIdx = 0;
+                    type();
+                }
+            };
+            type();
+        } else {
+            p.innerHTML = formattedHTML;
+            p.className = 'scene-paragraph';
+            sceneDescription.appendChild(p);
+            setupHighlights(p);
+            sceneDescription.scrollTop = sceneDescription.scrollHeight;
+            isPrinting = false;
+        }
     };
 
     const handleInput = () => {
+        if (isPrinting) return;
         const input = verbInput.value.trim();
         if (input) {
             processCommand(input);
@@ -137,7 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const obj = gameData.globalObjects[interaction.target];
             if (obj) addToInventory(obj);
         }
-        if (interaction.goToScene) loadScene(interaction.goToScene, true);
+        const targetId = interaction.goToScene || interaction.targetSceneId;
+        if (targetId) loadScene(targetId, true);
     };
 
     const getObjectsForScene = (sceneId) => {
