@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DitherShader } from '@/components/ui/dither-shader';
-import { Download, X, Gamepad2 } from 'lucide-react';
+import { X } from 'lucide-react';
 import { NewProjectModal } from './NewProjectModal';
 import { GameData } from '../types';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,7 @@ interface WelcomePlaceholderProps {
     theme?: string;
 }
 
-export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreateScene, onDownloadExample, onMeetProject, theme = 'dark' }) => {
+export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreateScene, onDownloadExample, theme = 'dark' }) => {
     const { t, i18n } = useTranslation();
     const [isFlashing, setIsFlashing] = useState(false);
     const [showDownloadHelp, setShowDownloadHelp] = useState(false);
@@ -71,7 +71,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
             <div className="relative z-10 flex flex-col items-center justify-center text-center p-8">
                 <h2 className="text-3xl font-bold text-white mb-4">{t('welcome.title', 'Bem-vindo ao IF Builder')}</h2>
                 <p className="max-w-md text-zinc-300 mb-12"><b>{t('welcome.subtitle', 'O que você quer fazer?')}</b></p>
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 w-full max-w-6xl">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
                     {/* Botão 1: Começar a Criar */}
                     <button
                         onClick={() => setIsNewProjectModalOpen(true)}
@@ -102,14 +102,6 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         <span className={`font-bold text-lg transition-colors ${isFlashing ? (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>{t('welcome.downloadExample', 'Baixe um exemplo')}</span>
                     </button>
 
-                    {/* Botão 4: Conheça o projeto */}
-                    <button
-                        onClick={onMeetProject}
-                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-zinc-600 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
-                    >
-                        <img src="/icons/apoie.svg" alt="" className="w-10 h-10 invert opacity-60 group-hover:opacity-100 transition-opacity" />
-                        <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.meetProject', 'Conheça o projeto')}</span>
-                    </button>
                 </div>
             </div>
 
@@ -125,22 +117,17 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         </button>
 
                         <h3 className="text-2xl font-bold text-white mb-8 text-center">{t('welcome.helpTItle', 'Como usar o exemplo baixado')}</h3>
-
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="flex flex-col items-center text-center p-6 bg-zinc-950/50 rounded-lg border border-zinc-800">
-                                <div className="w-12 h-12 bg-blue-500/10 rounded-full flex items-center justify-center mb-4">
-                                    <Gamepad2 className="w-6 h-6 text-blue-500" />
-                                </div>
-                                <h4 className="text-lg font-semibold text-white mb-2">{t('welcome.helpPlayTitle', 'Para Jogar')}</h4>
-                                <p className="text-left text-zinc-400 text-sm" dangerouslySetInnerHTML={{ __html: t('welcome.helpPlayDesc', `Extraia o conteúdo do arquivo <strong>${i18n.language.startsWith('en') ? 'escape_the_dungeon.zip' : 'fuja_da_masmorra.zip'}</strong> no seu computador, e abra o arquivo <strong>index.html</strong> para acessar a ficção de modo offline.`) }} />
+                            <div className="group relative flex flex-col items-center text-center p-8 bg-zinc-950/50 rounded-2xl border border-zinc-800 overflow-hidden shadow-lg transition-all duration-300 hover:bg-zinc-950">
+                                <div className="absolute inset-0 bg-gradient-to-b from-blue-500/0 via-blue-500/0 to-blue-500/5 group-hover:to-blue-500/10 transition-colors" />
+                                <h4 className="text-xl font-bold text-white mb-4 relative z-10">{t('welcome.helpPlayTitle', 'Offline')}</h4>
+                                <p className="text-left text-zinc-400 text-sm relative z-10" dangerouslySetInnerHTML={{ __html: t('welcome.helpPlayDesc', 'Extraia o conteúdo do <strong>arquivo.zip</strong> e abra o arquivo <strong>index.html</strong> para acessar a ficção interativa de modo offline.') }} />
                             </div>
 
-                            <div className="flex flex-col items-center text-center p-6 bg-zinc-950/50 rounded-lg border border-zinc-800">
-                                <div className="w-12 h-12 bg-purple-500/10 rounded-full flex items-center justify-center mb-4">
-                                    <Download className="w-6 h-6 text-purple-500" />
-                                </div>
-                                <h4 className="text-lg font-semibold text-white mb-2">{t('welcome.helpEditTitle', 'Para Editar')}</h4>
-                                <p className="text-left text-zinc-400 text-sm" dangerouslySetInnerHTML={{ __html: t('welcome.helpEditDesc', 'Clique no botão <strong>IMPORTAR</strong> no canto superior direito do editor para acessar o projeto aqui na interface.') }} />
+                            <div className="group relative flex flex-col items-center text-center p-8 bg-zinc-950/50 rounded-2xl border border-zinc-800 overflow-hidden shadow-lg transition-all duration-300 hover:bg-zinc-950">
+                                <div className="absolute inset-0 bg-gradient-to-b from-purple-500/0 via-purple-500/0 to-purple-500/5 group-hover:to-purple-500/10 transition-colors" />
+                                <h4 className="text-xl font-bold text-white mb-4 relative z-10">{t('welcome.helpEditTitle', 'Online')}</h4>
+                                <p className="text-left text-zinc-400 text-sm relative z-10" dangerouslySetInnerHTML={{ __html: t('welcome.helpEditDesc', 'Clique no botão <strong>CARREGAR</strong> no canto esquerdo do cabeçalho para acessar e editar o projeto no IF Builder.') }} />
                             </div>
                         </div>
 

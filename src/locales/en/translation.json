@@ -108,10 +108,10 @@
     "playDemo": "Play the demo",
     "meetProject": "Meet the project",
     "helpTItle": "How to use the downloaded example",
-    "helpPlayTitle": "To Play",
-    "helpPlayDesc": "Extract the contents of the <strong>fuja_da_masmorra.zip</strong> file on your computer, and open the <strong>index.html</strong> file to access the fiction offline.",
-    "helpEditTitle": "To Edit",
-    "helpEditDesc": "Click the <strong>IMPORT</strong> button in the top right corner of the editor to access the project here in the interface."
+    "helpPlayTitle": "Offline",
+    "helpPlayDesc": "Extract the contents of <strong>file.zip</strong> and open the <strong>index.html</strong> file to access the interactive fiction offline.",
+    "helpEditTitle": "Online",
+    "helpEditDesc": "Click the <strong>LOAD</strong> button on the left side of the header to access and edit the project in IF Builder."
   },
   "newProject": {
     "title": "New Fiction",
@@ -386,6 +386,24 @@
     "aboutProject": "About Project",
     "settings": "Settings",
     "openEditor": "Open Editor"
+  },
+  "sceneList": {
+    "search": "Search...",
+    "start": "Start",
+    "deleteScene": "Delete scene",
+    "createNode": "Create Vignette or Scene"
+  },
+  "sceneMap": {
+    "instruction": "Visualize and organize your game structure.",
+    "victory": "Victory",
+    "minusOneLife": "(-1 Life)",
+    "vignette": "Vignette",
+    "noName": "(No name)",
+    "noTitle": "(No Title)",
+    "opening": "Opening",
+    "conclusion": "Conclusion",
+    "ending": "Final",
+    "action": "Action"
   },
   "objectEditor": {
     "newObject": "New Object",

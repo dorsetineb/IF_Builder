@@ -188,6 +188,24 @@
     "settings": "Ajustes",
     "openEditor": "Abrir Editor"
   },
+  "sceneList": {
+    "search": "Buscar...",
+    "start": "Inicio",
+    "deleteScene": "Eliminar escena",
+    "createNode": "Crear Viñeta o Escena"
+  },
+  "sceneMap": {
+    "instruction": "Visualiza y organiza la estructura de tu juego.",
+    "victory": "Victoria",
+    "minusOneLife": "(-1 Vida)",
+    "vignette": "Viñeta",
+    "noName": "(Sin nombre)",
+    "noTitle": "(Sin Título)",
+    "opening": "Apertura",
+    "conclusion": "Conclusión",
+    "ending": "Final",
+    "action": "Acción"
+  },
   "welcome": {
     "title": "Bienvenido a IF Builder",
     "subtitle": "¿Qué quieres hacer?",
@@ -196,10 +214,10 @@
     "playDemo": "Jugar la demo",
     "meetProject": "Conoce el proyecto",
     "helpTItle": "Cómo usar el ejemplo descargado",
-    "helpPlayTitle": "Para Jugar",
-    "helpPlayDesc": "Extraye el contenido del archivo <strong>fuja_da_masmorra.zip</strong> en tu computadora y abre el archivo <strong>index.html</strong> para acceder a la ficción sin conexión.",
-    "helpEditTitle": "Para Editar",
-    "helpEditDesc": "Haz clic en el botón <strong>IMPORTAR</strong> en la esquina superior derecha del editor para acceder al proyecto aquí en la interfaz."
+    "helpPlayTitle": "Offline",
+    "helpPlayDesc": "Extrae el contenido de <strong>archivo.zip</strong> y abre el archivo <strong>index.html</strong> para acceder a la ficción interactiva sin conexión.",
+    "helpEditTitle": "Online",
+    "helpEditDesc": "Haz clic en el botón <strong>CARGAR</strong> en el lado izquierdo del encabezado para acceder y editar el proyecto en IF Builder."
   },
   "newProject": {
     "title": "Nueva Ficción",

@@ -116,9 +116,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
           items.push({
             id: `link-ending-${scene.id}`,
             targetId: 'VNT_VICTORY',
-            label: 'Vitória',
-            type: 'vignette'
-          });
+              label: t('sceneMap.victory', 'Vitória'),
+              type: 'vignette'
+            });
         }
       }
 
@@ -132,8 +132,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
           items.push({
             id: `link-defeat-${scene.id}`,
             targetId: defeatTargetId,
-            label: '(-1 Vida)',
-            type: defeatScene ? 'scene' : 'vignette'
+              label: t('sceneMap.minusOneLife', '(-1 Vida)'),
+              type: defeatScene ? 'scene' : 'vignette'
           });
         }
       }
@@ -157,7 +157,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
             items.push({
               id: i.id,
               targetId: i.vignetteId,
-              label: i.verbs?.[0] || 'Vinheta',
+              label: i.verbs?.[0] || t('sceneMap.vignette', 'Vinheta'),
               type: 'vignette',
               original: i
             });
@@ -220,7 +220,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
       allNodesMap.set(vig.id, {
         id: vig.id,
         type: 'vignette',
-        name: vig.name || '(Sem nome)',
+        name: vig.name || t('sceneMap.noName', '(Sem nome)'),
         title: vig.title || '',
         image: vig.image,
         data: vig
@@ -570,7 +570,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
     <div className="h-full flex flex-col relative">
       <div className="mb-4 flex-shrink-0">
         <p className="text-zinc-500 mt-1 text-xs font-medium">
-          Visualize e organize a estrutura do seu jogo.
+          {t('sceneMap.instruction', 'Visualize e organize a estrutura do seu jogo.')}
         </p>
       </div>
       <div
@@ -670,10 +670,10 @@ const SceneMap: React.FC<SceneMapProps> = ({
                       <div className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${node.id}-R`) ? anchorColorClass : 'bg-zinc-950 border-zinc-700'}`} />
                     )}
 
-                    <h3 className="font-bold text-zinc-100 truncate text-sm">{node.title || '(Sem Título)'}</h3>
+                    <h3 className="font-bold text-zinc-100 truncate text-sm">{node.title || t('sceneMap.noTitle', '(Sem Título)')}</h3>
                     <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider truncate">(ID: {node.id})</p>
-                    {isOpening && <p className="text-[10px] font-bold text-sky-400 mt-1 uppercase tracking-widest">Abertura</p>}
-                    {isConclusion && <p className="text-[10px] font-bold text-zinc-400 mt-1 uppercase tracking-widest">Conclusão</p>}
+                    {isOpening && <p className="text-[10px] font-bold text-sky-400 mt-1 uppercase tracking-widest">{t('sceneMap.opening', 'Abertura')}</p>}
+                    {isConclusion && <p className="text-[10px] font-bold text-zinc-400 mt-1 uppercase tracking-widest">{t('sceneMap.conclusion', 'Conclusão')}</p>}
                   </div>
 
                   {node.image && (
@@ -740,7 +740,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
                   <h3 className="font-bold text-zinc-100 truncate text-sm">{node.name}</h3>
                   <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-wider">(ID: {node.id})</p>
-                  {isEnding && <p className="text-[10px] font-bold text-green-400 mt-1 uppercase tracking-widest">Final</p>}
+                  {isEnding && <p className="text-[10px] font-bold text-green-400 mt-1 uppercase tracking-widest">{t('sceneMap.ending', 'Final')}</p>}
                 </div>
 
                 {node.image && (
@@ -764,7 +764,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                       // Logic for detailed label recovery if needed for Parser
                       if (gameInteractionType === 'parser' && item.original) {
                         const inter = item.original;
-                        const actionText = inter.verbs?.[0] || 'Ação';
+                        const actionText = inter.verbs?.[0] || t('sceneMap.action', 'Ação');
                         const reqObj = inter.requiresInInventory ? globalObjects[inter.requiresInInventory] : null;
                         const targetObj = inter.target ? globalObjects[inter.target] : null;
                         displayLabel = `${actionText}${reqObj ? ' ' + reqObj.name : ''}${targetObj ? ' ' + targetObj.name : ''}`;

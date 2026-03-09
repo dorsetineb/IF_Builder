@@ -100,6 +100,24 @@
       "p4": ", e seria muito legal conversar com você por lá também!"
     }
   },
+  "sceneList": {
+    "search": "Buscar...",
+    "start": "Início",
+    "deleteScene": "Deletar cena",
+    "createNode": "Criar Vinheta ou Cena"
+  },
+  "sceneMap": {
+    "instruction": "Visualize e organize a estrutura do seu jogo.",
+    "victory": "Vitória",
+    "minusOneLife": "(-1 Vida)",
+    "vignette": "Vinheta",
+    "noName": "(Sem nome)",
+    "noTitle": "(Sem Título)",
+    "opening": "Abertura",
+    "conclusion": "Conclusão",
+    "ending": "Final",
+    "action": "Ação"
+  },
   "settings": {
     "title": "Configurações Globais",
     "subtitle": "Gerencie suas preferências e perfil.",
@@ -111,39 +129,6 @@
       "cream": "Creme",
       "terminal": "Terminal",
       "windows": "W95"
-    },
-    "sceneList": {
-      "search": "Buscar...",
-      "addScene": "+ Criar",
-      "createNode": "Criar Vinheta ou Cena",
-      "start": "Início",
-      "deleteScene": "Deletar cena",
-      "nodeSelection": {
-        "title": "SELECIONE O TIPO DE NÓ",
-        "scene": {
-          "title": "Cena",
-          "description": "Momentos de divergência. Onde o jogador faz escolhas e o destino muda.",
-          "lockedDesc": "Crie uma vinheta de abertura\npara habilitar cenas.",
-          "tags": [
-            "DECISÃO",
-            "RAMIFICAÇÃO",
-            "COMPLEXIDADE"
-          ]
-        },
-        "vignette": {
-          "title": "Vinheta",
-          "description": "Uma ponte narrativa. Conecte pontos da história sem interrupções.",
-          "openingRequired": "Comece sua história aqui.\nA primeira vinheta de abertura.",
-          "tags": [
-            "LINEAR",
-            "FIXO",
-            "ATMOSFERA"
-          ],
-          "tags_opening": [
-            "ABERTURA"
-          ]
-        }
-      }
     },
     "language": {
       "label": "Idioma",
@@ -230,10 +215,10 @@
     "playDemo": "Acesse a demo",
     "meetProject": "Conheça o projeto",
     "helpTItle": "Como usar o exemplo baixado",
-    "helpPlayTitle": "Para Jogar",
-    "helpPlayDesc": "Extraia o conteúdo do arquivo <strong>fuja_da_masmorra.zip</strong> no seu computador, e abra o arquivo <strong>index.html</strong> para acessar a ficção de modo offline.",
-    "helpEditTitle": "Para Editar",
-    "helpEditDesc": "Clique no botão <strong>IMPORTAR</strong> no canto superior direito do editor para acessar o projeto aqui na interface."
+    "helpPlayTitle": "Offline",
+    "helpPlayDesc": "Extraia o conteúdo do <strong>arquivo.zip</strong> e abra o arquivo <strong>index.html</strong> para acessar a ficção interativa de modo offline.",
+    "helpEditTitle": "Online",
+    "helpEditDesc": "Clique no botão <strong>CARREGAR</strong> no canto esquerdo do cabeçalho para acessar e editar o projeto no IF Builder."
   },
   "newProject": {
     "title": "Nova Ficção",
