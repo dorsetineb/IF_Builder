@@ -1,3 +1,0 @@
-mensagem_falha_padrao: Isso não parece ter nenhum efeito.
-positiveEndingDescription: Você conseguiu fugir da masmorra!
-negativeEndingDescription: Você morreu...

@@ -713,14 +713,8 @@ DATE:        ${exportDate.toLocaleString()}
   };
 
   const handleDownloadExample = () => {
-    const lang = i18n.language;
-    let filename = 'fuja_da_masmorra.zip'; // Default PT
-
-    if (lang.startsWith('en')) {
-      filename = 'escape_the_dungeon.zip';
-    } else if (lang.startsWith('es')) {
-      filename = 'escapa_la_mazmorra.zip';
-    }
+    const isEnglish = i18n.language.startsWith('en');
+    const filename = isEnglish ? 'escape_the_dungeon.zip' : 'fuja_da_masmorra.zip';
 
     const element = document.createElement('a');
     element.href = `/${filename}?v=${Date.now()}`;
