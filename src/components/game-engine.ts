@@ -135,8 +135,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const textSpeedVal = gameData.gameTextSpeed || 3; 
     const imgSpeedVal = gameData.gameImageSpeed || 3;
-    const typeSpeedBase = Math.max(5, 120 - (textSpeedVal * 22)); 
-    const textAnimDuration = Math.max(0.01, 3.0 - (textSpeedVal * 0.58)) + 's';
+    const typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
+    const textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
     const imageAnimDuration = Math.max(0.3, 5.0 - (imgSpeedVal * 0.9)) + 's';
     
     document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
@@ -1657,8 +1657,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (objInScene) { addToInventory(objInScene); flagObjectAsRemoved(currentSceneId, objInScene.id); }
         } else if (interaction.removesTargetFromScene && interaction.target) flagObjectAsRemoved(currentSceneId, interaction.target);
         if (interaction.soundEffect) playSound(interaction.soundEffect);
-        const targetId = interaction.goToScene || interaction.targetSceneId;
-        if (targetId) loadScene(targetId, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage);
+        if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage);
         else {
             const scene = gameData.cenas[currentSceneId];
             if (interaction.newSceneDescription) { 
@@ -1697,12 +1696,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 else { nodeIdx++; charIdx = 0; type(); }
             };
             type();
+            type();
         } else {
             // Also respecting session ID for safety though printOutput is usually atomic-ish or one-off
             if (textAnimType === 'typewriter') {
                  // Already handled by if block above
             } else {
-                p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight; isPrinting = false;
+                p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
             }
         }
     };
