@@ -416,7 +416,7 @@
     "inThisScene": "Nesta Cena ({{count}})",
     "linkOptions": "Vincular ({{count}})",
     "searchPlaceholder": "Buscar objetos...",
-    "createNewBtn": "Novo Objeto",
+    "createNewBtn": "Criar Novo Objeto",
     "linkToSceneTooltip": "Vincular à cena",
     "propertiesTitle": "Propriedades do Objeto",
     "unlinkConfirm": "Tem certeza? Isso removerá o objeto desta cena, mas ele ainda existirá no projeto.",
@@ -435,7 +435,7 @@
   },
   "globalObjectsEditor": {
     "deleteConfirm": "Tem certeza? Isso excluirá o objeto de todo o jogo.",
-    "headerDesc": "Crie objetos e use-os em qualquer cena.",
+    "headerDesc": "Gerenciador Global: Objetos criados aqui podem ser usados em qualquer cena.",
     "unsavedChanges": "Alterações não salvas",
     "undoBtn": "Desfazer",
     "saveBtn": "Salvar Alterações",

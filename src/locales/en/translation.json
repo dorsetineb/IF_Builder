@@ -414,7 +414,7 @@
     "inThisScene": "In This Scene ({{count}})",
     "linkOptions": "Link ({{count}})",
     "searchPlaceholder": "Search objects...",
-    "createNewBtn": "New Object",
+    "createNewBtn": "Create New Object",
     "linkToSceneTooltip": "Link to scene",
     "propertiesTitle": "Object Properties",
     "unlinkConfirm": "Are you sure? This will remove the object from this scene, but it will still exist in the project.",
@@ -433,7 +433,7 @@
   },
   "globalObjectsEditor": {
     "deleteConfirm": "Are you sure? This will delete the object from the entire game.",
-    "headerDesc": "Create objects and use them in any scene.",
+    "headerDesc": "Global Manager: Objects created here can be used in any scene.",
     "unsavedChanges": "Unsaved changes",
     "undoBtn": "Undo",
     "saveBtn": "Save Changes",
