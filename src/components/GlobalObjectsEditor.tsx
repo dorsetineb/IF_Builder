@@ -179,8 +179,8 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         <div className="flex flex-col h-full space-y-6" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* Header with Save/Undo actions */}
             <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-border">
-                <p className="text-muted-foreground text-xs font-medium max-w-lg">
-                    {t('globalObjectsEditor.headerDesc', 'Gerenciador Global: Objetos criados aqui podem ser usados em qualquer cena.')}
+                <p className="text-muted-foreground text-xs font-medium">
+                    {t('globalObjectsEditor.headerDesc', 'Crie objetos e use-os em qualquer cena.')}
                 </p>
                 <div className="flex items-center gap-3">
                     {isDirty && (
@@ -258,7 +258,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                             className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-2 shadow-sm"
                         >
                             <Plus className="w-4 h-4 mr-1" />
-                            {t('objectEditor.createNewBtn', 'Criar Novo Objeto')}
+                            {t('objectEditor.createNewBtn', 'Novo Objeto')}
                         </button>
                     </div>
                 </div>
