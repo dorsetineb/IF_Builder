@@ -380,9 +380,9 @@ DATE:        ${exportDate.toLocaleString()}
         .replace(/__ACTION_BUTTON_COLOR__/g, exportData.gameActionButtonColor || '#ffffff')
         .replace(/__SPLASH_BUTTON_TEXT_COLOR__/g, exportData.gameSplashButtonTextColor || '#ffffff')
         .replace(/__ACTION_BUTTON_TEXT_COLOR__/g, exportData.gameActionButtonTextColor || '#0d1117')
-        .replace(/__FRAME_BOOK_COLOR__/g, exportData.gameFrameColor || '#FFFFFF')
-        .replace(/__FRAME_TRADING_CARD_COLOR__/g, exportData.gameFrameColor || '#FFFFFF')
-        .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, exportData.gameFrameColor || '#FFFFFF')
+        .replace(/__FRAME_BOOK_COLOR__/g, exportData.frameBookColor || exportData.gameFrameColor || '#FFFFFF')
+        .replace(/__FRAME_TRADING_CARD_COLOR__/g, exportData.frameTradingCardColor || exportData.gameFrameColor || '#FFFFFF')
+        .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, exportData.frameRoundedTopColor || exportData.gameFrameColor || '#FFFFFF')
         .replace(/__SCENE_NAME_OVERLAY_BG__/g, exportData.gameSceneNameOverlayBg || '#0d1117')
         .replace(
           /__SCENE_NAME_OVERLAY_TEXT_COLOR__/g,

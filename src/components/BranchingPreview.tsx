@@ -11,37 +11,51 @@ interface BranchingPreviewProps {
 const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allScenes }) => {
     const { t } = useTranslation();
 
+    const getNodeColor = (scene: Scene | { vignetteType?: string, isEndingScene?: boolean }) => {
+        if (scene.isEndingScene || scene.vignetteType === 'conclusion') return 'green';
+        if (scene.vignetteType === 'opening' || scene.vignetteType === 'transition') return 'blue';
+        return 'amber';
+    };
+
     // Calculate Inputs (Scenes that link TO this scene)
     const incomingConnections = useMemo(() => {
-        const sources = new Set<string>();
+        const sources = new Map<string, { name: string, color: string }>();
         allScenes.forEach(scene => {
             if (scene.id === currentScene.id) return;
+            let linked = false;
             // Check interactions
             scene.interactions.forEach(inter => {
-                if (inter.goToScene === currentScene.id) sources.add(scene.name);
+                if (inter.goToScene === currentScene.id) linked = true;
             });
             // Check choices
             if (scene.choices) {
                 scene.choices.forEach(choice => {
-                    if (choice.targetSceneId === currentScene.id) sources.add(scene.name);
+                    if (choice.targetSceneId === currentScene.id) linked = true;
                 });
             }
             // Check vignette
             if (scene.vignetteNextSceneId === currentScene.id) {
-                sources.add(scene.name);
+                linked = true;
+            }
+
+            if (linked) {
+                sources.set(scene.id, {
+                    name: scene.name,
+                    color: getNodeColor(scene)
+                });
             }
         });
-        return Array.from(sources).slice(0, 5); // Limit to 5 for display
+        return Array.from(sources.values()).slice(0, 5); // Limit to 5 for display
     }, [allScenes, currentScene.id]);
 
     // Calculate Outputs (Scenes linked FROM this scene)
     const outgoingConnections = useMemo(() => {
-        const targets = new Set<string>();
+        const targets = new Map<string, { name: string, color: string }>();
         // Interactions
         currentScene.interactions.forEach(inter => {
             if (inter.goToScene) {
                 const targetScene = allScenes.find(s => s.id === inter.goToScene);
-                if (targetScene) targets.add(targetScene.name);
+                if (targetScene) targets.set(targetScene.id, { name: targetScene.name, color: getNodeColor(targetScene) });
             }
         });
         // Choices
@@ -49,21 +63,31 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
             currentScene.choices.forEach(choice => {
                 if (choice.targetSceneId) {
                     const targetScene = allScenes.find(s => s.id === choice.targetSceneId);
-                    if (targetScene) targets.add(targetScene.name);
+                    if (targetScene) targets.set(targetScene.id, { name: targetScene.name, color: getNodeColor(targetScene) });
                 }
             });
         }
         // Vignette
         if (currentScene.vignetteNextSceneId) {
             if (currentScene.vignetteNextSceneId === 'END_GAME') {
-                targets.add(t('branchingPreview.endGame', 'Fim de Jogo'));
+                targets.set('END_GAME', {
+                    name: t('branchingPreview.endGame', 'Fim de Jogo'),
+                    color: 'green'
+                });
             } else {
                 const targetScene = allScenes.find(s => s.id === currentScene.vignetteNextSceneId);
-                if (targetScene) targets.add(targetScene.name);
+                if (targetScene) targets.set(targetScene.id, { name: targetScene.name, color: getNodeColor(targetScene) });
             }
         }
-        return Array.from(targets).slice(0, 5); // Limit to 5 for display
+        return Array.from(targets.values()).slice(0, 5); // Limit to 5 for display
     }, [currentScene, allScenes]);
+
+    const currentColor = getNodeColor(currentScene);
+    const currentColorClasses = {
+        border: currentColor === 'amber' ? 'border-amber-500/50' : currentColor === 'blue' ? 'border-blue-500/50' : 'border-green-500/50',
+        text: currentColor === 'amber' ? 'text-amber-400' : currentColor === 'blue' ? 'text-blue-400' : 'text-green-400',
+        shadow: currentColor === 'amber' ? 'shadow-[0_0_15px_rgba(245,158,11,0.15)]' : currentColor === 'blue' ? 'shadow-[0_0_15_rgba(59,130,246,0.15)]' : 'shadow-[0_0_15_rgba(34,197,94,0.15)]',
+    };
 
     return (
         <div className="relative w-full min-h-[240px] bg-zinc-950/50 rounded-lg border border-zinc-800 flex items-center justify-center overflow-hidden py-4">
@@ -79,9 +103,12 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                 {/* Inputs Node */}
                 <div className="flex flex-col gap-2 items-end w-1/4">
                     {incomingConnections.length > 0 ? (
-                        incomingConnections.map((name, i) => (
-                            <div key={i} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-[10px] text-zinc-400 truncate max-w-full text-center shadow-lg w-full">
-                                {name}
+                        incomingConnections.map((node, i) => (
+                            <div key={i} className={`px-3 py-2 border rounded text-[10px] truncate max-w-full text-center shadow-lg w-full
+                                ${node.color === 'amber' ? 'bg-amber-500/10 border-amber-500/30 text-amber-200/70' :
+                                    node.color === 'blue' ? 'bg-blue-500/10 border-blue-500/30 text-blue-200/70' :
+                                        'bg-green-500/10 border-green-500/30 text-green-200/70'}`}>
+                                {node.name}
                             </div>
                         ))
                     ) : (
@@ -103,8 +130,8 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
 
                 {/* Current Scene Node - Center Stage */}
                 <div className="w-1/4 flex-shrink-0 z-20">
-                    <div className="px-4 py-3 bg-zinc-900 border-2 border-purple-500/50 rounded-lg shadow-[0_0_15px_rgba(168,85,247,0.15)] flex flex-col items-center">
-                        <span className="text-[10px] font-bold text-purple-400 uppercase tracking-widest whitespace-nowrap">
+                    <div className={`px-4 py-3 bg-zinc-900 border-2 rounded-lg flex flex-col items-center ${currentColorClasses.border} ${currentColorClasses.shadow}`}>
+                        <span className={`text-[10px] font-bold uppercase tracking-widest whitespace-nowrap ${currentColorClasses.text}`}>
                             {currentScene.vignetteType && currentScene.vignetteType !== 'none'
                                 ? t('branchingPreview.thisVignette', 'Esta Vinheta')
                                 : t('branchingPreview.thisScene', 'Esta Cena')}
@@ -123,9 +150,12 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                 {/* Outputs Node */}
                 <div className="flex flex-col gap-2 items-start w-1/4">
                     {outgoingConnections.length > 0 ? (
-                        outgoingConnections.map((name, i) => (
-                            <div key={i} className="px-3 py-2 bg-zinc-800 border border-zinc-700 rounded text-[10px] text-zinc-400 truncate max-w-full text-center shadow-lg w-full">
-                                {name}
+                        outgoingConnections.map((node, i) => (
+                            <div key={i} className={`px-3 py-2 border rounded text-[10px] truncate max-w-full text-center shadow-lg w-full
+                                ${node.color === 'amber' ? 'bg-amber-500/10 border-amber-500/30 text-amber-200/70' :
+                                    node.color === 'blue' ? 'bg-blue-500/10 border-blue-500/30 text-blue-200/70' :
+                                        'bg-green-500/10 border-green-500/30 text-green-200/70'}`}>
+                                {node.name}
                             </div>
                         ))
                     ) : (

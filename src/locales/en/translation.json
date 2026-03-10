@@ -664,6 +664,7 @@
     },
     "tabs": {
       "layout": "Layout",
+      "config": "Workspace",
       "sistemas": "Systems",
       "textos": "Texts",
       "aparencia": "Style"
@@ -810,6 +811,9 @@
     },
     "aparencia": {
       "structure": "STRUCTURE",
+      "scenes": "SCENES",
+      "vinhetas": "VIGNETTES",
+      "frameColor": "Color",
       "styleTheme": "STYLE & THEME",
       "light": "Light",
       "predefinedThemes": "Predefined Themes",
@@ -843,7 +847,8 @@
       "sampleDesc2": ".",
       "sampleCommand": "SAMPLE COMMAND",
       "action": "ACTION",
-      "homeButton": "START BUTTON"
+      "homeButton": "START BUTTON",
+      "sampleVignetteDesc": "This is a sample description for the vignette."
     }
   },
   "ThemeEditor": {

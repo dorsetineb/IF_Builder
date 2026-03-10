@@ -116,9 +116,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
           items.push({
             id: `link-ending-${scene.id}`,
             targetId: 'VNT_VICTORY',
-              label: t('sceneMap.victory', 'Vitória'),
-              type: 'vignette'
-            });
+            label: t('sceneMap.victory', 'Vitória'),
+            type: 'vignette'
+          });
         }
       }
 
@@ -132,8 +132,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
           items.push({
             id: `link-defeat-${scene.id}`,
             targetId: defeatTargetId,
-              label: t('sceneMap.minusOneLife', '(-1 Vida)'),
-              type: defeatScene ? 'scene' : 'vignette'
+            label: t('sceneMap.minusOneLife', '(-1 Vida)'),
+            type: defeatScene ? 'scene' : 'vignette'
           });
         }
       }
@@ -701,8 +701,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
             // --- STANDARD SCENE NODE STYLE ---
             const scene = node.data as Scene;
 
-            // Color Rules: Opening = Blue, Conclusion = Green, Ending = Green, Normal = Amber
+            // Color Rules: Opening = Blue, Transition = Blue, Conclusion = Green, Ending = Green, Normal = Amber
             const isVignetteOpening = scene.vignetteType === 'opening';
+            const isVignetteTransition = scene.vignetteType === 'transition';
             const isVignetteConclusion = scene.vignetteType === 'conclusion';
             const isEnding = scene.isEndingScene;
             const isOrphan = highlightOrphans && orphanIds.has(node.id);
@@ -710,7 +711,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
             // Determine color base
             let colorBase = 'amber';
             if (isOrphan) colorBase = 'red';
-            else if (isVignetteOpening) colorBase = 'blue';
+            else if (isVignetteOpening || isVignetteTransition) colorBase = 'blue';
             else if (isVignetteConclusion || isEnding) colorBase = 'green';
 
             const borderColorClass = isOrphan ? 'border-red-500 animate-pulse' : isVignetteOpening ? 'border-blue-500 border-4' : isVignetteConclusion ? 'border-green-500 border-4' : isEnding ? 'border-green-500' : `border-${colorBase}-500`;

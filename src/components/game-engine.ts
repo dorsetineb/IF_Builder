@@ -806,6 +806,18 @@ document.addEventListener('DOMContentLoaded', () => {
         
         viewEndingButton.addEventListener('click', () => {
              const isWin = isGameEnded === 'win';
+             // For defeat: check if there's a defeat scene/vignette to navigate to
+             if (!isWin) {
+                 const defeatSceneId = Object.keys(gameData.cenas).find(id => gameData.cenas[id].isDefeatOutcome);
+                 if (defeatSceneId) {
+                     // Reset UI back to standard action bar for the defeat vignette
+                     standardActionBar.classList.remove('hidden');
+                     endingActionBar.classList.add('hidden');
+                     isGameEnded = false;
+                     loadScene(defeatSceneId, true);
+                     return;
+                 }
+             }
              const endScreen = isWin ? positiveEndingScreen : negativeEndingScreen;
              const endMusic = isWin ? gameData.positiveEndingMusic : gameData.negativeEndingMusic;
              if (endMusic) playBgm(endMusic); else playBgm("");
@@ -1585,12 +1597,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const gameOver = () => { 
-        const defeatSceneId = Object.keys(gameData.cenas).find(id => gameData.cenas[id].isDefeatOutcome);
-        if (defeatSceneId) {
-            loadScene(defeatSceneId, true);
-        } else {
-            activateEndingUI('lose'); 
-        }
+        activateEndingUI('lose'); 
     };
     const handleInput = () => { if (isPrinting) return; const input = verbInput.value.trim(); if (input) { processCommand(input); verbInput.value = ''; } };
     const hasWord = (word, text) => {

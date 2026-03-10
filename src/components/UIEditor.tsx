@@ -294,7 +294,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localLoadMenuTitle, setLocalLoadMenuTitle] = useState(gameLoadMenuTitle);
     const [localMainMenuButtonText, setLocalMainMenuButtonText] = useState(gameMainMenuButtonText);
     const [localViewEndingButtonText, setLocalViewEndingButtonText] = useState(gameViewEndingButtonText);
-    const [activeTab, setActiveTab] = useState<'layout' | 'sistemas' | 'aparencia' | 'textos' | 'config'>('config');
+    const [activeTab, setActiveTab] = useState<'sistemas' | 'aparencia' | 'textos' | 'config'>('config');
     const [originalTheme, setOriginalTheme] = useState(theme);
     const [localLanguage, setLocalLanguage] = useState(i18n.language || 'pt');
     const handleAppThemeChange = (newTheme: string) => {
@@ -361,8 +361,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed);
 
     const TABS = {
-        config: t('settings.workspace', 'Área de trabalho'),
-        layout: t('UIEditor.tabs.layout'),
+        config: t('UIEditor.tabs.config', 'Área de trabalho'),
         aparencia: t('UIEditor.tabs.aparencia'),
         sistemas: t('UIEditor.tabs.sistemas'),
         textos: t('UIEditor.tabs.textos'),
@@ -372,7 +371,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         estrutura: true,
         estilo: true,
         texto: true,
-        cores: false
+        cores: false,
+        vinhetas: true
     });
 
     const toggleSection = (section: keyof typeof activeSections) => {
@@ -934,7 +934,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         switch (frame) {
             case 'rounded-top':
                 panelStyles.padding = '5px';
-                panelStyles.backgroundColor = localGameFrameColor || '#FFFFFF';
+                panelStyles.backgroundColor = localFrameRoundedTopColor || '#FFFFFF';
                 panelStyles.border = 'none';
                 panelStyles.borderRadius = '40px 40px 4px 4px';
                 containerStyles.borderRadius = '35px 35px 0 0';
@@ -943,12 +943,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 break;
             case 'book-cover':
                 panelStyles.padding = '5px';
-                panelStyles.backgroundColor = localGameFrameColor || '#FFFFFF';
+                panelStyles.backgroundColor = localFrameBookColor || '#FFFFFF';
                 panelStyles.border = 'none';
                 panelClass = 'frame-preview-book';
                 break;
             case 'trading-card':
-                panelStyles.backgroundColor = localGameFrameColor || '#FFFFFF';
+                panelStyles.backgroundColor = localFrameTradingCardColor || '#FFFFFF';
                 panelStyles.borderRadius = '12px';
                 panelStyles.padding = '4px';
                 containerStyles.border = 'none';
@@ -1015,197 +1015,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 </div>
 
                 <div className={`bg-muted/10 -mt-px py-8 grid grid-cols-1 gap-8 items-start`}>
-                    {activeTab === 'layout' && (
-                        <div className="space-y-6">
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                                {/* --- LEFT COLUMN: SETTINGS --- */}
-                                <div className="col-span-1 lg:col-span-5 space-y-6">
-                                    {/* Vinhetas Settings */}
-                                    <div className="w-full p-6 bg-card border border-border rounded-2xl shadow-sm flex flex-col space-y-6">
-                                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2 mb-2">
-                                            <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                                            {t('UIEditor.layout.splashScreen')}
-                                        </h3>
-                                        <div className="space-y-6">
-                                            <div>
-                                                <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.layout.contentAlignment')}</label>
-                                                <select
-                                                    id="splashContentAlignment"
-                                                    value={localSplashContentAlignment}
-                                                    onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background"
-                                                >
-                                                    <option value="right">{t('UIEditor.layout.alignRight')}</option>
-                                                    <option value="left">{t('UIEditor.layout.alignLeft')}</option>
-                                                </select>
-                                            </div>
-                                            <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}>
-                                                <input
-                                                    type="checkbox"
-                                                    id="omitSplashTitle"
-                                                    checked={localOmitSplashTitle}
-                                                    onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
-                                                    className="custom-checkbox"
-                                                />
-                                                <label htmlFor="omitSplashTitle" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('UIEditor.layout.hideTitleDesc')}</label>
-                                            </div>
-                                        </div>
-                                    </div>
 
-                                    {/* Cenas Settings */}
-                                    <div className="w-full p-6 bg-card border border-border rounded-2xl shadow-sm flex flex-col space-y-6">
-                                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2 mb-2">
-                                            <Split className="w-4 h-4 text-muted-foreground" />
-                                            {t('UIEditor.layout.gameLayout')}
-                                        </h3>
-                                        <div className="space-y-4">
-                                            <div>
-                                                <label htmlFor="orientation-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.layout.orientation')}</label>
-                                                <select
-                                                    id="orientation-select"
-                                                    value={localLayoutOrientation}
-                                                    onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
-                                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background"
-                                                >
-                                                    <option value="vertical">{t('UIEditor.layout.vertical')}</option>
-                                                    <option value="horizontal">{t('UIEditor.layout.horizontal')}</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label htmlFor="order-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.layout.imagePosition')}</label>
-                                                <select
-                                                    id="order-select"
-                                                    value={localLayoutOrder}
-                                                    onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
-                                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background"
-                                                >
-                                                    <option value="image-first">{localLayoutOrientation === 'vertical' ? t('UIEditor.layout.posLeft') : t('UIEditor.layout.posAbove')}</option>
-                                                    <option value="image-last">{localLayoutOrientation === 'vertical' ? t('UIEditor.layout.posRight') : t('UIEditor.layout.posBelow')}</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                <label htmlFor="frame-select" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.layout.frameType')}</label>
-                                                <select
-                                                    id="frame-select"
-                                                    value={localImageFrame}
-                                                    onChange={(e) => setLocalImageFrame(e.target.value as GameData['gameImageFrame'])}
-                                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background"
-                                                >
-                                                    <option value="none">{t('UIEditor.layout.frameNone')}</option>
-                                                    <option value="rounded-top">{t('UIEditor.layout.framePortal')}</option>
-                                                    <option value="book-cover">{t('UIEditor.layout.frameSquare')}</option>
-                                                    <option value="trading-card">{t('UIEditor.layout.frameRounded')}</option>
-                                                </select>
-                                            </div>
-                                            <div>
-                                                {localImageFrame === 'rounded-top' && (
-                                                    <ColorInput label={t('UIEditor.layout.frameColor')} id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
-                                                )}
-                                                {localImageFrame === 'book-cover' && (
-                                                    <ColorInput label={t('UIEditor.layout.frameColor')} id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
-                                                )}
-                                                {localImageFrame === 'trading-card' && (
-                                                    <ColorInput label={t('UIEditor.layout.frameColor')} id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* --- RIGHT COLUMN: PREVIEWS --- */}
-                                <div className="col-span-1 lg:col-span-7">
-                                    <div className="space-y-8 flex flex-col pt-2">
-                                        {/* Preview Vinheta */}
-                                        <div className="space-y-4 w-full">
-                                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">{t('UIEditor.layout.preview')}</p>
-                                            <div className="flex items-center justify-center w-full">
-                                                <div
-                                                    className="relative w-full aspect-video bg-muted border border-border rounded-xl flex flex-col justify-end overflow-hidden p-6 box-border shadow-sm"
-                                                    style={{
-                                                        alignItems: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
-                                                        textAlign: localSplashContentAlignment === 'left' ? 'left' : 'right'
-                                                    }}
-                                                >
-                                                    <div className="absolute inset-0 opacity-60">
-                                                        <DitherShader
-                                                            src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
-                                                            gridSize={2}
-                                                            ditherMode="bayer"
-                                                            colorMode="duotone"
-                                                            primaryColor={ditherColors.primary}
-                                                            secondaryColor={ditherColors.secondary}
-                                                            className="w-full h-full"
-                                                            objectFit="cover"
-                                                        />
-                                                    </div>
-                                                    <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center justify-center">
-                                                        <div className="text-secondary-foreground font-black text-[9px] uppercase tracking-[0.2em] border border-secondary-foreground/20 px-3 py-1 rounded backdrop-blur-sm z-0">{t('UIEditor.layout.backgroundImage')}</div>
-                                                    </div>
-                                                    <div className={`relative z-10 w-full flex flex-col gap-2 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
-                                                        {!localOmitSplashTitle && (
-                                                            <div className="text-[12px] text-foreground font-bold uppercase tracking-widest drop-shadow-md">{t('UIEditor.layout.titleAndDesc')}</div>
-                                                        )}
-                                                        <div className={`w-3/4 h-1.5 bg-foreground/50 rounded-full drop-shadow-sm`}></div>
-                                                        <div className={`w-1/2 h-1.5 bg-foreground/50 rounded-full mb-1 drop-shadow-sm`}></div>
-
-                                                        <div className="px-4 py-1.5 bg-primary text-primary-foreground rounded flex items-center justify-center text-[8px] font-bold uppercase tracking-widest shadow-md mt-1">{t('common.button', 'Botão')}</div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* Preview Cena (Scene) */}
-                                        <div className="space-y-4 w-full">
-                                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">{t('UIEditor.layout.layoutPreview')}</p>
-                                            <div className="flex items-center justify-center w-full">
-                                                <div
-                                                    className="w-full aspect-video border border-border bg-muted rounded-xl flex p-4 gap-4 transition-all overflow-hidden relative shadow-sm"
-                                                    style={{ flexDirection: localLayoutOrientation === 'horizontal' ? 'column' : 'row' }}
-                                                >
-                                                    <div
-                                                        className={`flex items-center justify-center ${localLayoutOrder === 'image-first' ? 'order-1' : 'order-2'} transition-all duration-300 ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'}`}
-                                                        style={getFramePreviewStyles(localImageFrame).panelStyles}
-                                                    >
-                                                        <div
-                                                            className={`flex-1 w-full h-full rounded-lg flex flex-col items-center justify-center text-center p-3 font-black uppercase tracking-[0.2em] text-muted-foreground border border-border bg-card shadow-inner overflow-hidden relative`}
-                                                            style={{
-                                                                ...getFramePreviewStyles(localImageFrame).containerStyles,
-                                                                backgroundColor: undefined
-                                                            }}
-                                                        >
-                                                            <div className="absolute inset-0 opacity-60">
-                                                                <DitherShader
-                                                                    src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
-                                                                    gridSize={2}
-                                                                    ditherMode="bayer"
-                                                                    colorMode="duotone"
-                                                                    primaryColor={ditherColors.primary}
-                                                                    secondaryColor={ditherColors.secondary}
-                                                                    className="w-full h-full"
-                                                                    objectFit="cover"
-                                                                />
-                                                            </div>
-                                                            <div className="absolute top-3 left-3 z-10 bg-background/80 border border-secondary-foreground/20 px-2 py-0.5 rounded backdrop-blur-sm text-[8px] font-black uppercase tracking-[0.2em] pointer-events-none text-secondary-foreground truncate max-w-[90%]">{t('UIEditor.layout.previewPhoto')}</div>
-                                                        </div>
-                                                    </div>
-                                                    <div className={`flex-1 bg-card border border-border rounded-lg flex flex-col justify-center text-[8px] p-5 text-foreground font-black uppercase tracking-[0.2em] ${localLayoutOrder === 'image-first' ? 'order-2' : 'order-1'} ${localLayoutOrientation === 'horizontal' ? 'w-full h-1/2' : 'w-1/2 h-full'} text-left overflow-hidden`}>
-                                                        <div className="font-bold text-[9px] mb-3">{t('UIEditor.layout.previewText')}</div>
-                                                        <div className="space-y-2 opacity-70 w-full">
-                                                            <div className="h-1.5 bg-foreground/20 rounded w-full"></div>
-                                                            <div className="h-1.5 bg-foreground/20 rounded w-5/6"></div>
-                                                            <div className="h-1.5 bg-foreground/20 rounded w-4/6"></div>
-                                                            <div className="h-1.5 bg-foreground/20 rounded w-full mt-3"></div>
-                                                            <div className="h-1.5 bg-foreground/20 rounded w-3/4"></div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
 
                     {activeTab === 'sistemas' && (
                         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -1219,7 +1029,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             <div className="flex items-center gap-3">
                                                 <LayoutTemplate className="w-5 h-5 text-muted-foreground" />
                                                 <div>
-                                                    <h4 className="text-sm font-bold uppercase tracking-wide text-foreground">{t('UIEditor.sistemas.gameStyle')}</h4>
+                                                    <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.sistemas.gameStyle')}</h4>
                                                     <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.gameStyleDesc')}</p>
                                                 </div>
                                             </div>
@@ -1266,7 +1076,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <div className="flex items-center gap-3">
                                                             <ImageIcon className="w-5 h-5 text-muted-foreground" />
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.imagesInScenes')}</h4>
+                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.imagesInScenes')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.imagesInScenesDesc')}</p>
                                                             </div>
                                                         </div>
@@ -1323,7 +1133,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <div className="flex items-center gap-3">
                                                             <Type className="w-5 h-5 text-muted-foreground" />
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.textControl')}</h4>
+                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.textControl')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.textControlDesc')}</p>
                                                             </div>
                                                         </div>
@@ -1391,7 +1201,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <div className="flex items-center gap-3">
                                                             <Lightbulb className="w-5 h-5 text-muted-foreground" />
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableSuggestions ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.suggestions', 'Sugestões')}</h4>
+                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableSuggestions ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.suggestions', 'Sugestões')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.suggestionsDesc', 'Ativa o botão de sugestões de ações.')}</p>
                                                             </div>
                                                         </div>
@@ -1421,7 +1231,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <div className="flex items-center gap-3">
                                                             <Heart className="w-5 h-5 text-muted-foreground" />
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.lifeSystem')}</h4>
+                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.lifeSystem')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.lifeSystemDesc')}</p>
                                                             </div>
                                                         </div>
@@ -1497,7 +1307,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <div className="flex items-center gap-3">
                                                             <Package className="w-5 h-5 text-muted-foreground" />
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
+                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.inventoryDesc')}</p>
                                                             </div>
                                                         </div>
@@ -1524,7 +1334,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <div className="flex items-center gap-3">
                                                             <Book className="w-5 h-5 text-muted-foreground" />
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.diary')}</h4>
+                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.diary')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.diaryDesc')}</p>
                                                             </div>
                                                         </div>
@@ -1559,7 +1369,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <div className="flex items-center gap-3">
                                                             <SlidersHorizontal className="w-5 h-5 text-muted-foreground" />
                                                             <div>
-                                                                <h4 className={`text-sm font-bold uppercase tracking-wide transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.trackers')}</h4>
+                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.trackers')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.trackersDesc')}</p>
                                                             </div>
                                                         </div>
@@ -1761,7 +1571,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="break-inside-avoid p-6 bg-card border border-border rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
                                         <Hand className="w-5 h-5 text-muted-foreground" />
-                                        <h4 className="text-sm font-bold uppercase tracking-wide text-foreground">{t('UIEditor.textos.sections.actions')}</h4>
+                                        <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.actions')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
@@ -1787,7 +1597,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="break-inside-avoid p-6 bg-card border border-border rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
                                         <Lightbulb className="w-5 h-5 text-muted-foreground" />
-                                        <h4 className="text-sm font-bold uppercase tracking-wide text-foreground">{t('UIEditor.textos.sections.suggestions')}</h4>
+                                        <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.suggestions')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
@@ -1816,7 +1626,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="break-inside-avoid p-6 bg-card border border-border rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
                                         <Package className="w-5 h-5 text-muted-foreground" />
-                                        <h4 className="text-sm font-bold uppercase tracking-wide text-foreground">{t('UIEditor.textos.sections.inventory')}</h4>
+                                        <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.inventory')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
@@ -1846,7 +1656,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="break-inside-avoid p-6 bg-card border border-border rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
                                         <Book className="w-5 h-5 text-muted-foreground" />
-                                        <h4 className="text-sm font-bold uppercase tracking-wide text-foreground">{t('UIEditor.textos.sections.diary')}</h4>
+                                        <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.diary')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
@@ -1864,7 +1674,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="break-inside-avoid p-6 bg-card border border-border rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
                                         <Wrench className="w-5 h-5 text-muted-foreground" />
-                                        <h4 className="text-sm font-bold uppercase tracking-wide text-foreground">{t('UIEditor.textos.sections.system')}</h4>
+                                        <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.system')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
@@ -1910,7 +1720,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
                                         >
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <LayoutTemplate className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.structure')}
+                                                <LayoutTemplate className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.scenes', 'Cenas')}
                                             </h3>
                                             {activeSections.estrutura ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
                                         </button>
@@ -1956,22 +1766,79 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     </div>
                                                 </div>
 
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.frameType')}</label>
+                                                        <div className="relative">
+                                                            <select
+                                                                value={localImageFrame}
+                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                                onChange={(e) => setLocalImageFrame(e.target.value as any)}
+                                                                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
+                                                            >
+                                                                <option value="none">{t('UIEditor.layout.frameNone')}</option>
+                                                                <option value="rounded-top">{t('UIEditor.layout.framePortal')}</option>
+                                                                <option value="book-cover">{t('UIEditor.layout.frameSquare')}</option>
+                                                                <option value="trading-card">{t('UIEditor.layout.frameRounded')}</option>
+                                                            </select>
+                                                            <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                                        </div>
+                                                    </div>
+                                                    {localImageFrame && localImageFrame !== 'none' && (
+                                                        <div className="space-y-2">
+                                                            {localImageFrame === 'rounded-top' && (
+                                                                <ColorInput label={t('UIEditor.aparencia.frameColor', 'Cor')} id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
+                                                            )}
+                                                            {localImageFrame === 'book-cover' && (
+                                                                <ColorInput label={t('UIEditor.aparencia.frameColor', 'Cor')} id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
+                                                            )}
+                                                            {localImageFrame === 'trading-card' && (
+                                                                <ColorInput label={t('UIEditor.aparencia.frameColor', 'Cor')} id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
+                                                            )}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* SECTION: VINHETAS */}
+                                    <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                                        <button
+                                            onClick={() => toggleSection('vinhetas')}
+                                            className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
+                                        >
+                                            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                                                <ArrowRight className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.vinhetas', 'Vinhetas')}
+                                            </h3>
+                                            {activeSections.vinhetas ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                                        </button>
+
+                                        {activeSections.vinhetas && (
+                                            <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.frameType')}</label>
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.contentAlignment')}</label>
                                                     <div className="relative">
                                                         <select
-                                                            value={localImageFrame}
-                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                            onChange={(e) => setLocalImageFrame(e.target.value as any)}
-                                                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
+                                                            value={localSplashContentAlignment}
+                                                            onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
+                                                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
                                                         >
-                                                            <option value="none">{t('UIEditor.layout.frameNone')}</option>
-                                                            <option value="rounded-top">{t('UIEditor.layout.framePortal')}</option>
-                                                            <option value="book-cover">{t('UIEditor.layout.frameSquare')}</option>
-                                                            <option value="trading-card">{t('UIEditor.layout.frameRounded')}</option>
+                                                            <option value="right">{t('UIEditor.layout.alignRight')}</option>
+                                                            <option value="left">{t('UIEditor.layout.alignLeft')}</option>
                                                         </select>
                                                         <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                                                     </div>
+                                                </div>
+                                                <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}>
+                                                    <input
+                                                        type="checkbox"
+                                                        id="omitSplashTitle"
+                                                        checked={localOmitSplashTitle}
+                                                        onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
+                                                        className="custom-checkbox"
+                                                    />
+                                                    <label htmlFor="omitSplashTitle" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('UIEditor.layout.hideTitleDesc')}</label>
                                                 </div>
                                             </div>
                                         )}
@@ -2152,7 +2019,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                 {/* Right Column: Preview (Expanded width) */}
                                 <div className="col-span-1 lg:col-span-7 relative">
-                                    <div className="sticky top-28 space-y-2 h-[calc(100vh-140px)] flex flex-col pt-2">
+                                    <div className="space-y-6 flex flex-col pt-2">
                                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center mb-2">{t('UIEditor.layout.layoutPreview')}</p>
 
                                         <div
@@ -2247,7 +2114,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <p className="leading-relaxed" style={{ color: localTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize }}>
                                                             {t('UIEditor.aparencia.sampleDesc1')} <span style={{ color: localTitleColor, fontWeight: 'bold' }}>{t('UIEditor.aparencia.sampleDescHighlight')}</span> {t('UIEditor.aparencia.sampleDesc2')}
                                                         </p>
-                                                        <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: '0.85em' }}>
+                                                        <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize }}>
                                                             {'>'} {t('UIEditor.aparencia.sampleCommand')}
                                                         </p>
                                                     </div>
@@ -2293,6 +2160,47 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         </div>
 
                                         {/* Footer text removed as per request */}
+
+                                        {/* Preview Vinheta */}
+                                        <div className="space-y-4 w-full">
+                                            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest text-center">{t('UIEditor.layout.preview')}</p>
+                                            <div className="flex items-center justify-center w-full">
+                                                <div
+                                                    className="relative w-full aspect-video bg-muted border border-border rounded-xl flex flex-col justify-end overflow-hidden p-6 box-border shadow-sm"
+                                                    style={{
+                                                        alignItems: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
+                                                        textAlign: localSplashContentAlignment === 'left' ? 'left' : 'right'
+                                                    }}
+                                                >
+                                                    <div className="absolute inset-0 opacity-60">
+                                                        <DitherShader
+                                                            src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
+                                                            gridSize={2}
+                                                            ditherMode="bayer"
+                                                            colorMode="duotone"
+                                                            primaryColor={ditherColors.primary}
+                                                            secondaryColor={ditherColors.secondary}
+                                                            className="w-full h-full"
+                                                            objectFit="cover"
+                                                        />
+                                                    </div>
+                                                    <div className={`relative z-10 w-full flex flex-col gap-2 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
+                                                        {!localOmitSplashTitle && (
+                                                            <>
+                                                                <div className="font-bold uppercase tracking-widest drop-shadow-md" style={{ color: localTitleColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sceneName', 'Título da vinheta')}</div>
+                                                                <p className="leading-relaxed drop-shadow-sm" style={{ color: localTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sampleVignetteDesc', 'Esta é uma descrição de exemplo para a vinheta.')}</p>
+                                                            </>
+                                                        )}
+                                                        <button
+                                                            className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate text-[11px] mt-1"
+                                                            style={{ backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor, fontFamily: localFontFamily }}
+                                                        >
+                                                            {localSplashButtonText || t('UIEditor.aparencia.homeButton', 'Começar')}
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>

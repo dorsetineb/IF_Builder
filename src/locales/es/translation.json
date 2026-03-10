@@ -665,6 +665,7 @@
     },
     "tabs": {
       "layout": "Diseño",
+      "config": "Área de trabajo",
       "sistemas": "Sistemas",
       "textos": "Textos",
       "aparencia": "Estilo"
@@ -811,6 +812,9 @@
     },
     "aparencia": {
       "structure": "ESTRUCTURA",
+      "scenes": "ESCENAS",
+      "vinhetas": "VIÑETAS",
+      "frameColor": "Color",
       "styleTheme": "ESTILO Y TEMA",
       "light": "Claro",
       "predefinedThemes": "Temas Predefinidos",
@@ -844,7 +848,8 @@
       "sampleDesc2": " elegidos.",
       "sampleCommand": "COMANDO DE EJEMPLO",
       "action": "ACCIÓN",
-      "homeButton": "BOTÓN DE INICIO"
+      "homeButton": "BOTÓN DE INICIO",
+      "sampleVignetteDesc": "Esta es una descripción de ejemplo para la viñeta."
     }
   },
   "ThemeEditor": {
