@@ -639,15 +639,15 @@ body.with-spacing .main-wrapper { height: 100%; }
 
 body.frame-none .image-panel { border: none; }
 
-body.frame-rounded-top.game-container.image-panel { padding: 5px; background: __FRAME_ROUNDED_TOP_COLOR__; border: none; border-radius: 40px 40px 4px 4px; box-shadow: none; }
-body.frame-rounded-top.game-container.image-container { border-radius: 35px 35px 0 0; }
-body.frame-book-cover.game-container.image-panel { padding: 5px; background: __FRAME_BOOK_COLOR__; border: none; }
-body.frame-book-cover.game-container.image-container { box-shadow: none; border-radius: 0 !important; }
+body.frame-rounded-top .game-container .image-panel { padding: 5px; background: __FRAME_ROUNDED_TOP_COLOR__; border: none; border-radius: 40px 40px 4px 4px; box-shadow: none; }
+body.frame-rounded-top .game-container .image-container { border-radius: 35px 35px 0 0; }
+body.frame-book-cover .game-container .image-panel { padding: 5px; background: __FRAME_BOOK_COLOR__; border: none; }
+body.frame-book-cover .game-container .image-container { box-shadow: none; border-radius: 0 !important; }
 body.frame-book-cover #scene-image, body.frame-book-cover #scene-image-back { border-radius: 0 !important; }
-body.frame-trading-card.image-panel { padding: 4px; background: __FRAME_TRADING_CARD_COLOR__; border-radius: 12px; }
-body.frame-trading-card.game-container:not(.layout-image-last).image-panel { border-right-color: transparent; }
-body.frame-trading-card.game-container.layout-image-last.image-panel { border-left-color: transparent; }
-body.frame-trading-card.image-container { border: none; border-radius: 8px; }
+body.frame-trading-card .image-panel { padding: 4px; background: __FRAME_TRADING_CARD_COLOR__; border-radius: 12px; }
+body.frame-trading-card .game-container:not(.layout-image-last) .image-panel { border-right-color: transparent; }
+body.frame-trading-card .game-container.layout-image-last .image-panel { border-left-color: transparent; }
+body.frame-trading-card .image-container { border: none; border-radius: 8px; }
 #scene-image { border-radius: 0px; }
 #scene-image-back { border-radius: 0px; }
 body.font-adjust-gothic { font-size: 1.1em; }
@@ -674,27 +674,27 @@ body.font-adjust-gothic { font-size: 1.1em; }
     body.frame-none.with-spacing {
         padding: 0 !important;
     }
-    body.frame-none.main-wrapper {
+    body.frame-none .main-wrapper {
         max-width: none !important;
         margin: 0 !important;
         height: 100vh !important;
     }
-    body.frame-none.game-container {
+    body.frame-none .game-container {
         height: 100vh !important;
     }
-    body.frame-none.image-panel {
+    body.frame-none .image-panel {
         height: 100vh !important;
         border-right: none !important;
         padding: 0 !important;
     }
     /* Manteve borda apenas se layout for Horizontal */
-    body.frame-none.game-container.layout-horizontal.image-panel {
+    body.frame-none .game-container.layout-horizontal .image-panel {
         width: 100% !important;
         flex-basis: auto !important;
         height: 45vh !important; /* Ajuste para horizontal */
     }
     /* Ajuste para Image-Last (Imagem na direita) */
-    body.frame-none.game-container.layout-image-last.image-panel {
+    body.frame-none .game-container.layout-image-last .image-panel {
         border-left: none !important;
     }
 }

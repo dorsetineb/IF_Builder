@@ -144,6 +144,26 @@ DATE:        ${exportDate.toLocaleString()}
     let fontStylesheet = '';
     let finalCss = exportData.gameCSS;
 
+    // Sanitize legacy CSS: fix broken frame selectors (missing spaces in descendant selectors)
+    const frameCssFixes: [string, string][] = [
+      ['body.frame-rounded-top.game-container.image-panel', 'body.frame-rounded-top .game-container .image-panel'],
+      ['body.frame-rounded-top.game-container.image-container', 'body.frame-rounded-top .game-container .image-container'],
+      ['body.frame-book-cover.game-container.image-panel', 'body.frame-book-cover .game-container .image-panel'],
+      ['body.frame-book-cover.game-container.image-container', 'body.frame-book-cover .game-container .image-container'],
+      ['body.frame-trading-card.image-panel', 'body.frame-trading-card .image-panel'],
+      ['body.frame-trading-card.game-container:not(.layout-image-last).image-panel', 'body.frame-trading-card .game-container:not(.layout-image-last) .image-panel'],
+      ['body.frame-trading-card.game-container.layout-image-last.image-panel', 'body.frame-trading-card .game-container.layout-image-last .image-panel'],
+      ['body.frame-trading-card.image-container', 'body.frame-trading-card .image-container'],
+      ['body.frame-none.main-wrapper', 'body.frame-none .main-wrapper'],
+      ['body.frame-none.game-container {', 'body.frame-none .game-container {'],
+      ['body.frame-none.image-panel', 'body.frame-none .image-panel'],
+      ['body.frame-none.game-container.layout-horizontal.image-panel', 'body.frame-none .game-container.layout-horizontal .image-panel'],
+      ['body.frame-none.game-container.layout-image-last.image-panel', 'body.frame-none .game-container.layout-image-last .image-panel'],
+    ];
+    for (const [from, to] of frameCssFixes) {
+      finalCss = finalCss.replaceAll(from, to);
+    }
+
     if (fontName) {
       const googleFontName = fontName.replace(/ /g, '+');
       const fontCssUrl = `https://fonts.googleapis.com/css2?family=${googleFontName}:wght@400;700&display=swap`;
