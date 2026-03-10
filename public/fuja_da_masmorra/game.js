@@ -2,6 +2,7 @@ window.embeddedGameData = {"cena_inicial":"VNT_OPENING","cenas":{"scn_bh0":{"id"
 
 
 document.addEventListener('DOMContentLoaded', () => {
+
     const ICONS = {
         heart: '<svg fill="%COLOR%" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
         circle: '<svg fill="%COLOR%" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
@@ -30,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentBgmSrc = "";
     let isPrinting = false;
     let activePopupType = null;
+    let renderSessionId = 0; // Prevent race conditions in rendering
 
     const textSpeedVal = gameData.gameTextSpeed || 3; 
     const imgSpeedVal = gameData.gameImageSpeed || 3;
@@ -42,12 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
 
-    const splashScreen = document.getElementById('splash-screen');
     const positiveEndingScreen = document.getElementById('positive-ending-screen');
     const negativeEndingScreen = document.getElementById('negative-ending-screen');
-    const splashStartButton = document.getElementById('splash-start-button');
-    const continueButton = document.getElementById('continue-button');
-    const endingRestartButtons = document.querySelectorAll('.ending-restart-button');
+    const endingRestartButtons = document.querySelectorAll('.ending-restart-button:not(#vignette-continue-button)');
     
     const gameContainer = document.getElementById('game-container');
     const imageContainer = document.getElementById('image-container');
@@ -112,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     vDiv.className = 'splash-screen hidden';
     // Use inline styles as a fallback to guarantee the look matches splash button even if CSS is missing
     const btnStyle = 'font-family: var(--font-family); padding: 12px 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; background-color: var(--splash-button-bg);';
-    vDiv.innerHTML = '<div id="vignette-overlay" class="scene-overlay"></div><div class="splash-content" style="z-index: 10;"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '">Continuar</button></div></div>';
+    vDiv.innerHTML = '<div id="vignette-overlay" class="scene-overlay"></div><div class="splash-content" style="z-index: 10;"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '"></button></div></div>';
     document.body.appendChild(vDiv);
     vignetteScreen = vDiv;
 
@@ -324,6 +323,351 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const rainEffect = new RainEffect();
 
+    // Confetti Effect Classes
+    class Vector2 {
+        constructor(x, y) { this.x = x; this.y = y; }
+        Length() { return Math.sqrt(this.x * this.x + this.y * this.y); }
+        Add(v) { this.x += v.x; this.y += v.y; }
+        Sub(v) { this.x -= v.x; this.y -= v.y; }
+        Div(f) { this.x /= f; this.y /= f; }
+        Mul(f) { this.x *= f; this.y *= f; }
+        Normalize() {
+            const len = this.Length();
+            if (len !== 0) { this.x /= len; this.y /= len; }
+        }
+        static Sub(v0, v1) { return new Vector2(v0.x - v1.x, v0.y - v1.y); }
+    }
+
+    class EulerMass {
+        constructor(x, y, mass, drag) {
+            this.position = new Vector2(x, y);
+            this.mass = mass; this.drag = drag;
+            this.force = new Vector2(0, 0);
+            this.velocity = new Vector2(0, 0);
+        }
+        AddForce(f) { this.force.Add(f); }
+        Integrate(dt) {
+            const acc = new Vector2(this.force.x, this.force.y);
+            const speed = this.velocity.Length();
+            const dragVel = new Vector2(this.velocity.x, this.velocity.y);
+            dragVel.Mul(this.drag * this.mass * speed);
+            acc.Sub(dragVel);
+            acc.Div(this.mass);
+            const posDelta = new Vector2(this.velocity.x, this.velocity.y);
+            posDelta.Mul(dt);
+            this.position.Add(posDelta);
+            acc.Mul(dt);
+            this.velocity.Add(acc);
+            this.force = new Vector2(0, 0);
+        }
+    }
+
+    class ConfettiPaper {
+        constructor(x, y, effect) {
+            this.effect = effect;
+            this.pos = new Vector2(x, y);
+            this.rotationSpeed = Math.random() * 600 + 800;
+            this.angle = (Math.PI / 180) * Math.random() * 360;
+            this.rotation = (Math.PI / 180) * Math.random() * 360;
+            this.cosA = 1.0;
+            this.size = 5.0;
+            this.oscillationSpeed = Math.random() * 1.5 + 0.5;
+            this.xSpeed = 40.0;
+            this.ySpeed = Math.random() * 60 + 50.0;
+            this.corners = [];
+            this.time = Math.random();
+            const colors = [["#df0049","#660671"],["#00e857","#005291"],["#2bebbc","#05798a"],["#ffd200","#b06c00"]];
+            const ci = Math.round(Math.random() * (colors.length - 1));
+            this.frontColor = colors[ci][0];
+            this.backColor = colors[ci][1];
+            for (let i = 0; i < 4; i++) {
+                this.corners[i] = new Vector2(
+                    Math.cos(this.angle + (Math.PI / 180) * (i * 90 + 45)),
+                    Math.sin(this.angle + (Math.PI / 180) * (i * 90 + 45))
+                );
+            }
+        }
+        Update(dt) {
+            this.time += dt;
+            this.rotation += this.rotationSpeed * dt;
+            this.cosA = Math.cos((Math.PI / 180) * this.rotation);
+            this.pos.x += Math.cos(this.time * this.oscillationSpeed) * this.xSpeed * dt;
+            this.pos.y += this.ySpeed * dt;
+            if (this.pos.y > this.effect.canvasHeight) {
+                this.pos.x = Math.random() * this.effect.canvasWidth;
+                this.pos.y = 0;
+            }
+        }
+        Draw(g) {
+            const retina = window.devicePixelRatio || 1;
+            g.fillStyle = this.cosA > 0 ? this.frontColor : this.backColor;
+            g.beginPath();
+            g.moveTo((this.pos.x + this.corners[0].x * this.size) * retina, (this.pos.y + this.corners[0].y * this.size * this.cosA) * retina);
+            for (let i = 1; i < 4; i++) {
+                g.lineTo((this.pos.x + this.corners[i].x * this.size) * retina, (this.pos.y + this.corners[i].y * this.size * this.cosA) * retina);
+            }
+            g.closePath();
+            g.fill();
+        }
+    }
+
+    class ConfettiRibbon {
+        constructor(x, y, count, dist, thickness, angle, mass, drag, effect) {
+            this.effect = effect;
+            this.particleDist = dist; this.particleCount = count;
+            this.particleMass = mass; this.particleDrag = drag;
+            this.particles = [];
+            const colors = [["#df0049","#660671"],["#00e857","#005291"],["#2bebbc","#05798a"],["#ffd200","#b06c00"]];
+            const ci = Math.round(Math.random() * (colors.length - 1));
+            this.frontColor = colors[ci][0]; this.backColor = colors[ci][1];
+            this.xOff = Math.cos((Math.PI / 180) * angle) * thickness;
+            this.yOff = Math.sin((Math.PI / 180) * angle) * thickness;
+            this.position = new Vector2(x, y);
+            this.prevPosition = new Vector2(x, y);
+            this.velocityInherit = Math.random() * 2 + 4;
+            this.time = Math.random() * 100;
+            this.oscillationSpeed = Math.random() * 2 + 2;
+            this.oscillationDistance = Math.random() * 40 + 40;
+            this.ySpeed = Math.random() * 40 + 80;
+            for (let i = 0; i < this.particleCount; i++) {
+                this.particles[i] = new EulerMass(x, y - i * this.particleDist, this.particleMass, this.particleDrag);
+            }
+        }
+        Update(dt) {
+            this.time += dt * this.oscillationSpeed;
+            this.position.y += this.ySpeed * dt;
+            this.position.x += Math.cos(this.time) * this.oscillationDistance * dt;
+            this.particles[0].position = this.position;
+            const dX = this.prevPosition.x - this.position.x;
+            const dY = this.prevPosition.y - this.position.y;
+            const delta = Math.sqrt(dX * dX + dY * dY);
+            this.prevPosition = new Vector2(this.position.x, this.position.y);
+            for (let i = 1; i < this.particleCount; i++) {
+                const dirP = Vector2.Sub(this.particles[i - 1].position, this.particles[i].position);
+                dirP.Normalize();
+                dirP.Mul((delta / dt) * this.velocityInherit);
+                this.particles[i].AddForce(dirP);
+            }
+            for (let i = 1; i < this.particleCount; i++) {
+                this.particles[i].Integrate(dt);
+            }
+            for (let i = 1; i < this.particleCount; i++) {
+                const rp2 = new Vector2(this.particles[i].position.x, this.particles[i].position.y);
+                rp2.Sub(this.particles[i - 1].position);
+                rp2.Normalize();
+                rp2.Mul(this.particleDist);
+                rp2.Add(this.particles[i - 1].position);
+                this.particles[i].position = rp2;
+            }
+            if (this.position.y > this.effect.canvasHeight + this.particleDist * this.particleCount) {
+                this.Reset();
+            }
+        }
+        Reset() {
+            this.position.y = -Math.random() * this.effect.canvasHeight;
+            this.position.x = Math.random() * this.effect.canvasWidth;
+            this.prevPosition = new Vector2(this.position.x, this.position.y);
+            this.velocityInherit = Math.random() * 2 + 4;
+            this.time = Math.random() * 100;
+            this.oscillationSpeed = Math.random() * 2.0 + 1.5;
+            this.oscillationDistance = Math.random() * 40 + 40;
+            this.ySpeed = Math.random() * 40 + 80;
+            const colors = [["#df0049","#660671"],["#00e857","#005291"],["#2bebbc","#05798a"],["#ffd200","#b06c00"]];
+            const ci = Math.round(Math.random() * (colors.length - 1));
+            this.frontColor = colors[ci][0]; this.backColor = colors[ci][1];
+            this.particles = [];
+            for (let i = 0; i < this.particleCount; i++) {
+                this.particles[i] = new EulerMass(this.position.x, this.position.y - i * this.particleDist, this.particleMass, this.particleDrag);
+            }
+        }
+        Side(x1, y1, x2, y2, x3, y3) { return (x1 - x2) * (y3 - y2) - (y1 - y2) * (x3 - x2); }
+        Draw(g) {
+            const retina = window.devicePixelRatio || 1;
+            for (let i = 0; i < this.particleCount - 1; i++) {
+                const p0 = new Vector2(this.particles[i].position.x + this.xOff, this.particles[i].position.y + this.yOff);
+                const p1 = new Vector2(this.particles[i + 1].position.x + this.xOff, this.particles[i + 1].position.y + this.yOff);
+                g.fillStyle = this.Side(this.particles[i].position.x, this.particles[i].position.y, this.particles[i + 1].position.x, this.particles[i + 1].position.y, p1.x, p1.y) < 0 ? this.frontColor : this.backColor;
+                g.strokeStyle = g.fillStyle;
+                g.beginPath();
+                g.moveTo(this.particles[i].position.x * retina, this.particles[i].position.y * retina);
+                g.lineTo(this.particles[i + 1].position.x * retina, this.particles[i + 1].position.y * retina);
+                g.lineTo(p1.x * retina, p1.y * retina);
+                g.lineTo(p0.x * retina, p0.y * retina);
+                g.closePath();
+                g.stroke();
+                g.fill();
+            }
+        }
+    }
+
+    class ConfettiEffect {
+        constructor() {
+            this.canvas = null; this.ctx = null;
+            this.papers = []; this.ribbons = [];
+            this.animationFrameId = null;
+            this.overlay = null;
+            this.canvasWidth = 0; this.canvasHeight = 0;
+            this.started = false;
+            this.duration = 1.0 / 50;
+        }
+        init(targetId) {
+            this.overlay = document.getElementById(targetId);
+            if (!this.overlay) return;
+            let canvas = this.overlay.querySelector('.confetti-canvas');
+            if (!canvas) {
+                this.canvas = document.createElement('canvas');
+                this.canvas.className = 'confetti-canvas';
+                this.overlay.appendChild(this.canvas);
+            } else {
+                this.canvas = canvas;
+            }
+            this.ctx = this.canvas.getContext('2d');
+            this.resizer();
+            window.addEventListener('resize', () => this.resizer());
+        }
+        start(targetId = 'scene-overlay') {
+            if (this.started && this.currentTargetId === targetId) return;
+            if (this.started) this.stop();
+            this.currentTargetId = targetId;
+            this.init(targetId);
+            if (!this.ctx) return;
+            this.started = true;
+            this.loop();
+        }
+        stop() {
+            this.started = false;
+            if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+            if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+        resizer() {
+            if (!this.canvas || !this.overlay) return;
+            const retina = window.devicePixelRatio || 1;
+            this.canvasWidth = this.overlay.clientWidth;
+            this.canvasHeight = this.overlay.clientHeight;
+            this.canvas.width = this.canvasWidth * retina;
+            this.canvas.height = this.canvasHeight * retina;
+            this.papers = [];
+            for (let i = 0; i < 95; i++) {
+                this.papers.push(new ConfettiPaper(Math.random() * this.canvasWidth, Math.random() * this.canvasHeight, this));
+            }
+            this.ribbons = [];
+            for (let i = 0; i < 11; i++) {
+                this.ribbons.push(new ConfettiRibbon(Math.random() * this.canvasWidth, -Math.random() * this.canvasHeight * 2, 30, 8.0, 8.0, 45, 1, 0.05, this));
+            }
+        }
+        loop() {
+            if (!this.started || !this.ctx || !this.canvas) return;
+            this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+            for (let i = 0; i < this.papers.length; i++) {
+                this.papers[i].Update(this.duration);
+                this.papers[i].Draw(this.ctx);
+            }
+            for (let i = 0; i < this.ribbons.length; i++) {
+                this.ribbons[i].Update(this.duration);
+                this.ribbons[i].Draw(this.ctx);
+            }
+            this.animationFrameId = requestAnimationFrame(() => this.loop());
+        }
+    }
+
+    const confettiEffect = new ConfettiEffect();
+
+    class GlitchEffect {
+        constructor() {
+            this.canvas = null; this.ctx = null;
+            this.animationFrameId = null;
+            this.overlay = null;
+            this.started = false;
+            this.width = 0; this.height = 0;
+        }
+
+        init(targetId) {
+            this.overlay = document.getElementById(targetId);
+            if (!this.overlay) return;
+            
+            let canvas = this.overlay.querySelector('.glitch-canvas');
+            if (!canvas) {
+                this.canvas = document.createElement('canvas');
+                this.canvas.className = 'glitch-canvas';
+                this.overlay.appendChild(this.canvas);
+            } else {
+                this.canvas = canvas;
+            }
+            this.ctx = this.canvas.getContext('2d');
+            this.resize();
+            window.addEventListener('resize', () => this.resize());
+        }
+
+        resize() {
+            if (!this.canvas || !this.overlay) return;
+            this.width = this.canvas.width = this.overlay.clientWidth;
+            this.height = this.canvas.height = this.overlay.clientHeight;
+        }
+
+        start(targetId = 'scene-overlay') {
+            if (this.started && this.currentTargetId === targetId) return;
+            if (this.started) this.stop();
+            this.currentTargetId = targetId;
+            this.init(targetId);
+            if (!this.ctx || !this.overlay) return;
+            
+            this.overlay.classList.add('overlay-glitch');
+            this.started = true;
+            this.loop();
+        }
+
+        stop() {
+            this.started = false;
+            if (this.overlay) this.overlay.classList.remove('overlay-glitch');
+            if (this.animationFrameId) cancelAnimationFrame(this.animationFrameId);
+            if (this.ctx && this.canvas) this.ctx.clearRect(0, 0, this.width, this.height);
+        }
+
+        loop() {
+            if (!this.started || !this.ctx) return;
+            
+            this.ctx.clearRect(0, 0, this.width, this.height);
+
+            // 1. Random horizontal slice displacements
+            if (Math.random() > 0.9) {
+                const sliceHeight = Math.random() * 50 + 5;
+                const sliceY = Math.random() * this.height;
+                
+                this.ctx.fillStyle = 'rgba(' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ',' + (Math.random() * 0.5) + ')';
+                this.ctx.fillRect(0, sliceY, this.width, sliceHeight);
+
+                if (Math.random() > 0.5) {
+                   this.ctx.clearRect(0, Math.random() * this.height, this.width, Math.random() * 10);
+                }
+            }
+
+            // 2. RGB Shift / Blocks
+            if (Math.random() > 0.8) {
+                const blockW = Math.random() * 200 + 50;
+                const blockH = Math.random() * 50 + 10;
+                const blockX = Math.random() * this.width;
+                const blockY = Math.random() * this.height;
+
+                this.ctx.globalCompositeOperation = 'color-dodge';
+                this.ctx.fillStyle = '#ff0000';
+                this.ctx.fillRect(blockX - 5, blockY, blockW, blockH);
+                this.ctx.fillStyle = '#0000ff';
+                this.ctx.fillRect(blockX + 5, blockY, blockW, blockH);
+                this.ctx.globalCompositeOperation = 'source-over';
+            }
+
+            // 3. Scanline jitter
+            if (Math.random() > 0.95) {
+                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+                this.ctx.fillRect(0, 0, this.width, this.height);
+            }
+
+            this.animationFrameId = requestAnimationFrame(() => this.loop());
+        }
+    }
+
+    const glitchEffect = new GlitchEffect();
+
     const init = () => {
         if (gameData.gameBackgroundMusic) {
             playBgm(gameData.gameBackgroundMusic);
@@ -339,7 +683,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mousedown', startAudioOnInteraction);
         document.addEventListener('keydown', startAudioOnInteraction);
 
-        const hasAutoSave = localStorage.getItem('if_builder_autosave_' + document.title);
+        const hasAutoSave = localStorage.getItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
         // Auto-start game, bypassing splash screen
         startGame();
         endingRestartButtons.forEach(btn => btn.addEventListener('click', () => {
@@ -350,9 +694,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
         submitVerb.addEventListener('click', handleInput);
         verbInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleInput(); });
-        suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
-        inventoryButton.addEventListener('click', () => togglePopup('inventory'));
-        diaryButton.addEventListener('click', showDiary);
+        if (suggestionsButton) suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
+        if (inventoryButton) inventoryButton.addEventListener('click', () => togglePopup('inventory'));
+        if (diaryButton) diaryButton.addEventListener('click', showDiary);
         if (trackersButton) trackersButton.addEventListener('click', showTrackers);
         if (systemButton) systemButton.addEventListener('click', toggleSystemMenu);
         closeButtons.forEach(btn => btn.addEventListener('click', (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); }));
@@ -376,17 +720,14 @@ document.addEventListener('DOMContentLoaded', () => {
         
         btnMainMenu.onclick = (e) => {
             systemModal.classList.add('hidden');
-            splashScreen.classList.remove('fade-out');
-            splashScreen.classList.remove('hidden');
             isGameEnded = false; 
-            if (gameData.gameBackgroundMusic) playBgm(gameData.gameBackgroundMusic);
-            else playBgm("");
+            startGame();
         };
         if (window.isSceneTest) startGame();
     };
 
     const startGame = () => {
-        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + document.title);
+        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
         currentSceneId = gameData.cena_inicial; 
         inventory = []; 
         visitedScenes = []; 
@@ -397,13 +738,16 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameEnded = false;
         (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
         
-        // Fix Audio Persistence: If the starting scene has no specific music, 
-        // fallback to Global Music (or silence) to stop any lingering Conclusion music.
-        // If it DOES have music, loadScene will handle it.
+        // Fix Audio Persistence: If the starting scene has no specific music.
+        // If it is a SCENE TEST, we do NOT fallback to global music (keep it silent/clean).
         const startScene = gameData.cenas[currentSceneId];
         if (startScene) {
             if (!startScene.backgroundMusic) {
-                playBgm(gameData.gameBackgroundMusic || "");
+                if (!window.isSceneTest) {
+                    playBgm(gameData.gameBackgroundMusic || "");
+                } else {
+                    playBgm(""); 
+                }
             }
             loadScene(currentSceneId, false);
         } else {
@@ -413,10 +757,41 @@ document.addEventListener('DOMContentLoaded', () => {
         standardActionBar.classList.remove('hidden');
         endingActionBar.classList.add('hidden');
         
-        // Restore smooth transition
-        splashScreen.classList.remove('hidden');
-        splashScreen.classList.add('fade-out');
-        setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
+        const isVignette = startScene && startScene.vignetteType && startScene.vignetteType !== 'none';
+        
+        if (!isVignette) {
+            gameContainer.classList.remove('hidden');
+            if (window.isSceneTest) {
+                const hasImage = startScene && startScene.image && gameData.enableImages !== false;
+                
+                const showGame = () => {
+                     gameContainer.classList.add('ready');
+                };
+
+                if (hasImage) {
+                     const img = document.getElementById('scene-image');
+                     if (img && img instanceof HTMLImageElement) {
+                         if (img.complete && img.naturalHeight !== 0) {
+                             showGame();
+                         } else {
+                             img.onload = showGame;
+                             img.onerror = showGame;
+                             // Safety timeout
+                             setTimeout(showGame, 2000);
+                         }
+                     } else {
+                         showGame();
+                     }
+                } else {
+                     // Small delay to ensure layout frames are ready
+                     setTimeout(showGame, 50);
+                }
+
+            } else {
+                // Unhide game container instantly in standard play
+                gameContainer.classList.add('ready');
+            }
+        }
     };
 
     const loadGameFromData = (jsonString) => {
@@ -435,8 +810,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 endingActionBar.classList.add('hidden');
                 systemModal.classList.add('hidden');
                 loadScene(currentSceneId, false);
-                splashScreen.classList.add('fade-out');
-                setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
+                gameContainer.classList.remove('hidden');
+                gameContainer.classList.add('ready');
             }
         } catch (e) { startGame(); }
     };
@@ -445,7 +820,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.isPreview) return; 
         if (isGameEnded) return;
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
-        localStorage.setItem('if_builder_autosave_' + document.title, JSON.stringify(save));
+        localStorage.setItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'), JSON.stringify(save));
     };
 
     const toggleSystemMenu = () => {
@@ -459,7 +834,7 @@ document.addEventListener('DOMContentLoaded', () => {
         systemMenuMain.classList.add('hidden'); systemSlotsContainer.classList.remove('hidden'); slotsList.innerHTML = '';
         systemModalTitle.textContent = mode === 'save' ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') : (gameData.gameLoadMenuTitle || 'Carregar Jogo');
         for (let i = 1; i <= 3; i++) {
-            const slotKey = 'if_builder_slot_' + i + '_' + document.title;
+            const slotKey = 'if_builder_slot_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
             const savedData = localStorage.getItem(slotKey);
             const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
             let contentHtml = '';
@@ -479,7 +854,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const performSave = (slotIndex) => {
-        const slotKey = 'if_builder_slot_' + slotIndex + '_' + document.title;
+        const slotKey = 'if_builder_slot_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
         localStorage.setItem(slotKey, JSON.stringify(save)); renderSlots('save');
     };
@@ -520,7 +895,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (vignetteDescription) vignetteDescription.textContent = scene.description || '';
         
         // Set button text
-        const buttonText = scene.vignetteButtonText || (scene.vignetteType === 'conclusion' ? 'Reiniciar' : 'Continuar');
+        const buttonText = scene.vignetteButtonText || (scene.vignetteType === 'conclusion' ? (gameData.gameRestartButtonText || 'Restart') : (gameData.gameContinueButtonText || 'Continue'));
         if (vignetteContinueButton) vignetteContinueButton.textContent = buttonText;
         
         // Set background image
@@ -560,6 +935,7 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (scene.vignetteNextSceneId) {
                 // Go to next scene: Load it FIRST (behind the vignette), then fade out
                 gameContainer.classList.remove('hidden');
+                gameContainer.classList.add('ready'); // Ensure gameContainer visually appears
                 loadScene(scene.vignetteNextSceneId, false);
                 
                 vignetteScreen.classList.add('fade-out');
@@ -571,6 +947,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // No next scene defined, just hide vignette and show game
                 vignetteScreen.classList.add('hidden');
                 gameContainer.classList.remove('hidden');
+                gameContainer.classList.add('ready'); // Ensure gameContainer visually appears
             }
         };
         
@@ -620,6 +997,125 @@ document.addEventListener('DOMContentLoaded', () => {
                     vOverlay.appendChild(chromaticContainer);
                 }
             });
+        }
+
+        // TV Effect Logic for Vignette (deferred to ensure element has dimensions)
+        if (scene.overlayEffect === 'tv') {
+            requestAnimationFrame(() => {
+                const vOverlay = document.getElementById('vignette-overlay');
+                if (vOverlay) {
+                    // Use CSS class - filter is applied via ::before pseudo-element to only affect background
+                    vignetteScreen.classList.add('tv-active');
+
+                    // Clear any existing TV container first
+                    const existing = vOverlay.querySelector('.tv-overlay-container');
+                    if (existing) existing.remove();
+                    
+                    const tvContainer = document.createElement('div');
+                    tvContainer.className = 'tv-overlay-container';
+                    tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-glow"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
+                    vOverlay.appendChild(tvContainer);
+                }
+            });
+        } else {
+            // Remove CSS class
+            vignetteScreen.classList.remove('tv-active');
+            const vOverlay = document.getElementById('vignette-overlay');
+            if (vOverlay) {
+                vOverlay.parentElement?.classList.remove('tv-distortion-active-lg');
+            }
+        }
+
+        // Confetti Effect Logic for Vignette (deferred to ensure element has dimensions)
+        if (scene.overlayEffect === 'confetti') {
+            requestAnimationFrame(() => {
+                if (typeof confettiEffect !== 'undefined') confettiEffect.start('vignette-overlay');
+            });
+        } else {
+            if (typeof confettiEffect !== 'undefined') confettiEffect.stop();
+        }
+
+        // Glitch Effect Logic for Vignette - Inject SVG filter and apply to background
+        if (scene.overlayEffect === 'glitch') {
+            requestAnimationFrame(() => {
+                // Ensure SVG filter exists
+                if (!document.getElementById('glitch-distortion-filter')) {
+                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.setAttribute('style', 'position:absolute;width:0;height:0;');
+                    svg.innerHTML = '<defs><filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%"><feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset"><animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset"><animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" /><feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/><feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/><feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/><feBlend in="red" in2="green" mode="screen" result="rg"/><feBlend in="rg" in2="blue" mode="screen" result="rgb"/><feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5"><animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>';
+                    document.body.appendChild(svg);
+                }
+                // Use CSS class - filter is applied via ::before pseudo-element
+                vignetteScreen.classList.add('glitch-active');
+                if (typeof glitchEffect !== 'undefined') glitchEffect.start('vignette-overlay');
+            });
+        } else {
+            // Remove CSS class
+            vignetteScreen.classList.remove('glitch-active');
+            if (typeof glitchEffect !== 'undefined') glitchEffect.stop();
+        }
+
+        // Nosferatu Effect Logic for Vignette
+        if (scene.overlayEffect === 'nosferatu') {
+            requestAnimationFrame(() => {
+                const vOverlay = document.getElementById('vignette-overlay');
+                if (vOverlay) {
+                    // Clear any existing nosferatu container first
+                    const existing = vOverlay.querySelector('.nosferatu-container');
+                    if (existing) existing.remove();
+                    
+                    const nosferatuContainer = document.createElement('div');
+                    nosferatuContainer.className = 'nosferatu-container';
+                    nosferatuContainer.innerHTML = '<div class="nosferatu-cinema"></div><div class="nosferatu-scratch"></div><div class="nosferatu-effect-scratch"></div><div class="nosferatu-grain"></div><div class="nosferatu-vignette"></div>';
+                    vOverlay.appendChild(nosferatuContainer);
+                }
+                // CSS class handles the background filter via ::before pseudo-element
+                vignetteScreen.classList.add('nosferatu-active');
+            });
+        } else {
+            // Remove nosferatu filter if not active and not other filter effect
+            if (scene.overlayEffect !== 'tv' && scene.overlayEffect !== 'glitch') {
+                vignetteScreen.style.filter = '';
+            }
+            vignetteScreen.classList.remove('nosferatu-active');
+            if (vOverlay) {
+                const existing = vOverlay.querySelector('.nosferatu-container');
+                if (existing) existing.remove();
+            }
+        }
+
+        // Wiggle Effect Logic for Vignette
+        if (scene.overlayEffect === 'wiggle') {
+            requestAnimationFrame(() => {
+                // CSS class handles the background animation via ::before pseudo-element
+                vignetteScreen.classList.add('wiggle-active');
+            });
+        } else {
+            vignetteScreen.classList.remove('wiggle-active');
+        }
+
+        // Fog Effect Logic for Vignette
+        if (scene.overlayEffect === 'fog') {
+            requestAnimationFrame(() => {
+                const vOverlay = document.getElementById('vignette-overlay');
+                if (vOverlay) {
+                    const existing = vOverlay.querySelector('.fog-container');
+                    if (existing) existing.remove();
+                    
+                    const fogContainer = document.createElement('div');
+                    fogContainer.className = 'fog-container';
+                    fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
+                    vOverlay.appendChild(fogContainer);
+                    vOverlay.classList.add('overlay-fog');
+                }
+            });
+        } else {
+            const vOverlay = document.getElementById('vignette-overlay');
+            if (vOverlay) {
+                vOverlay.classList.remove('overlay-fog');
+                const existing = vOverlay.querySelector('.fog-container');
+                if (existing) existing.remove();
+            }
         }
     };
 
@@ -675,7 +1171,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const renderScene = (scene, successPrefix = null) => {
-        if (scene.image && gameData.enableImages !== false) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
+        if (scene.image) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
         else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
         if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
         
@@ -687,6 +1183,12 @@ document.addEventListener('DOMContentLoaded', () => {
             if (existingBlur) existingBlur.remove();
             const existingChromatic = sceneOverlay.querySelector('.chromatic-overlay-container');
             if (existingChromatic) existingChromatic.remove();
+            const existingTV = sceneOverlay.querySelector('.tv-overlay-container');
+            if (existingTV) existingTV.remove();
+            const existingConfetti = sceneOverlay.querySelector('.confetti-overlay-container');
+            if (existingConfetti) existingConfetti.remove();
+            const existingGlitch = sceneOverlay.querySelector('.glitch-canvas');
+            if (existingGlitch) existingGlitch.remove();
             
             if (scene.overlayEffect) {
                 sceneOverlay.classList.add('overlay-' + scene.overlayEffect);
@@ -714,19 +1216,113 @@ document.addEventListener('DOMContentLoaded', () => {
                 chromaticContainer.innerHTML = '<div class="chromatic-jerk-wrapper"><div class="chromatic-layer chromatic-red"></div><div class="chromatic-layer chromatic-green"></div><div class="chromatic-layer chromatic-blue"></div><div class="chromatic-flicker"></div></div><div class="chromatic-scanlines"></div>';
                 sceneOverlay.appendChild(chromaticContainer);
             }
+
+            // TV Effect Logic - Inject DOM structure
+            if (scene.overlayEffect === 'tv') {
+                sceneOverlay.parentElement?.classList.add('tv-distortion-active');
+                
+                const tvContainer = document.createElement('div');
+                tvContainer.className = 'tv-overlay-container';
+                tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-glow"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
+                sceneOverlay.appendChild(tvContainer);
+            } else {
+                sceneOverlay.parentElement?.classList.remove('tv-distortion-active');
+            }
+
+            // Confetti Effect Logic - Inject canvas and start animation
+            if (scene.overlayEffect === 'confetti') {
+                if (typeof confettiEffect !== 'undefined') confettiEffect.start('scene-overlay');
+            } else {
+                if (typeof confettiEffect !== 'undefined') confettiEffect.stop();
+            }
+
+            // Glitch Effect Logic - Inject SVG filter and apply to image
+            if (scene.overlayEffect === 'glitch') {
+                // Ensure SVG filter exists
+                if (!document.getElementById('glitch-distortion-filter')) {
+                    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    svg.setAttribute('style', 'position:absolute;width:0;height:0;');
+                    svg.innerHTML = '<defs><filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%"><feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset"><animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset"><animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/></feOffset><feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" /><feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/><feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/><feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/><feBlend in="red" in2="green" mode="screen" result="rg"/><feBlend in="rg" in2="blue" mode="screen" result="rgb"/><feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5"><animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/></feTurbulence><feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G"/></filter></defs>';
+                    document.body.appendChild(svg);
+                }
+                // Apply filter directly to images
+                if (sceneImage) sceneImage.style.filter = 'url(#glitch-distortion-filter)';
+                if (sceneImageBack) sceneImageBack.style.filter = 'url(#glitch-distortion-filter)';
+                sceneOverlay.parentElement?.classList.add('glitch-distortion-active');
+                if (typeof glitchEffect !== 'undefined') glitchEffect.start('scene-overlay');
+            } else {
+                // Remove filter from images
+                if (sceneImage) sceneImage.style.filter = '';
+                if (sceneImageBack) sceneImageBack.style.filter = '';
+                sceneOverlay.parentElement?.classList.remove('glitch-distortion-active');
+                if (typeof glitchEffect !== 'undefined') glitchEffect.stop();
+            }
+        }
+
+        // Nosferatu Effect Logic for Scene
+        if (scene.overlayEffect === 'nosferatu') {
+            // Clear any existing nosferatu container first
+            const existing = sceneOverlay.querySelector('.nosferatu-container');
+            if (existing) existing.remove();
+            
+            const nosferatuContainer = document.createElement('div');
+            nosferatuContainer.className = 'nosferatu-container';
+            nosferatuContainer.innerHTML = '<div class="nosferatu-cinema"></div><div class="nosferatu-scratch"></div><div class="nosferatu-effect-scratch"></div><div class="nosferatu-grain"></div><div class="nosferatu-vignette"></div>';
+            sceneOverlay.appendChild(nosferatuContainer);
+            
+            if (sceneImage) sceneImage.style.filter = 'sepia(0.8) contrast(1.1) brightness(0.9)';
+            if (sceneImageBack) sceneImageBack.style.filter = 'sepia(0.8) contrast(1.1) brightness(0.9)';
+            sceneOverlay.parentElement?.classList.add('nosferatu-active');
+        } else {
+            // Remove nosferatu effects if not active
+            const existing = sceneOverlay.querySelector('.nosferatu-container');
+            if (existing) existing.remove();
+            sceneOverlay.parentElement?.classList.remove('nosferatu-active');
+            // Only clear filter if not another filter effect
+            if (scene.overlayEffect !== 'glitch' && scene.overlayEffect !== 'tv') {
+                if (sceneImage) sceneImage.style.filter = '';
+                if (sceneImageBack) sceneImageBack.style.filter = '';
+            }
+        }
+
+        // Wiggle Effect Logic for Scene
+        if (scene.overlayEffect === 'wiggle') {
+            sceneOverlay.parentElement?.classList.add('wiggle-active');
+        } else {
+            sceneOverlay.parentElement?.classList.remove('wiggle-active');
+        }
+
+        // Fog Effect Logic for Scene
+        if (scene.overlayEffect === 'fog') {
+             const existing = sceneOverlay.querySelector('.fog-container');
+             if (existing) existing.remove();
+
+             const fogContainer = document.createElement('div');
+             fogContainer.className = 'fog-container';
+             fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
+             sceneOverlay.appendChild(fogContainer);
+             sceneOverlay.classList.add('overlay-fog');
+        } else {
+             sceneOverlay.classList.remove('overlay-fog');
+             const existing = sceneOverlay.querySelector('.fog-container');
+             if (existing) existing.remove();
         }
 
         sceneDescription.innerHTML = '';
         
         let fullDescription = scene.description;
-        if (successPrefix) fullDescription = successPrefix + "\n\n" + fullDescription;
+        if (successPrefix) fullDescription = successPrefix + "\\n\\n" + fullDescription;
 
-        const paragraphs = fullDescription.split('\n').filter(p => p.trim().length > 0);
+        const paragraphs = fullDescription.split('\\n').filter(p => p.trim().length > 0);
         let pIndex = 0; const textAnimType = (gameData.enableTextControl !== false) ? (gameData.gameTextAnimationType || 'fade') : 'none';
         const isImmersive = document.body.classList.contains('behavior-immersive') && window.innerWidth <= 768;
 
         isPrinting = true;
         sceneDescription.classList.add('typewriting-active');
+        
+        // Loop protection
+        renderSessionId++;
+        const mySessionId = renderSessionId;
 
         const renderNextParagraph = () => {
             if (pIndex >= paragraphs.length) { 
@@ -744,6 +1340,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
                 let nodeIdx = 0; let charIdx = 0;
                 const type = () => {
+                    if (mySessionId !== renderSessionId) return; // Stop if new render started
                     if (nodeIdx >= textNodes.length) { p.classList.remove('typewriter-cursor'); setupHighlights(p); finishParagraph(); return; }
                     const currentNode = textNodes[nodeIdx]; const fullText = fullTexts[nodeIdx];
                     if (charIdx < fullText.length) { currentNode.nodeValue += fullText[charIdx]; charIdx++; if (sceneDescription) sceneDescription.scrollTop = sceneDescription.scrollHeight; setTimeout(type, typeSpeedBase); }
@@ -758,7 +1355,9 @@ document.addEventListener('DOMContentLoaded', () => {
             if (pIndex < paragraphs.length) {
                 if (gameData.gameTextReadingFlow === 'continuous') {
                     // Bypass pause for continuous flow
-                    setTimeout(renderNextParagraph, 30);
+                    setTimeout(() => {
+                        if (mySessionId === renderSessionId) renderNextParagraph();
+                    }, 30);
                     return;
                 }
                 const continueBtn = document.createElement('div'); continueBtn.className = 'continue-indicator'; continueBtn.innerHTML = '<span>▼</span>';
@@ -774,7 +1373,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     sceneDescription.removeEventListener('click', continueHandler); 
                     window.removeEventListener('keydown', continueHandler);
-                    renderNextParagraph(); 
+                    if (mySessionId === renderSessionId) renderNextParagraph(); 
                 };
                 continueBtn.addEventListener('click', continueHandler); 
                 sceneDescription.addEventListener('click', continueHandler);
@@ -787,7 +1386,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (chances <= 0) gameOver(); else { verbInput.focus(); if (scene.isEndingScene) activateEndingUI('win'); }
             }
         };
-        renderNextParagraph();
+        // Small delay to ensure any previous clear/setup settles? No, direct call is fine but verify ID.
+        // renderNextParagraph called immediately
+        if (mySessionId === renderSessionId) renderNextParagraph();
         
         const chancesContainer = document.getElementById('chances-container');
         if (chancesContainer) {
@@ -880,7 +1481,7 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameEnded = type;
         standardActionBar.classList.add('hidden');
         endingActionBar.classList.remove('hidden');
-        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + document.title);
+        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
     };
 
     const gameOver = () => { 
@@ -960,7 +1561,7 @@ document.addEventListener('DOMContentLoaded', () => {
         else {
             const scene = gameData.cenas[currentSceneId];
             if (interaction.newSceneDescription) { 
-                if (interaction.successMessage) scene.description = interaction.successMessage + "\n\n" + interaction.newSceneDescription;
+                if (interaction.successMessage) scene.description = interaction.successMessage + "\\n\\n" + interaction.newSceneDescription;
                 else scene.description = interaction.newSceneDescription;
                 renderScene(scene); 
             } else if (interaction.successMessage) printOutput(interaction.successMessage);
@@ -995,8 +1596,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 else { nodeIdx++; charIdx = 0; type(); }
             };
             type();
+            type();
         } else {
-            p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
+            // Also respecting session ID for safety though printOutput is usually atomic-ish or one-off
+            if (textAnimType === 'typewriter') {
+                 // Already handled by if block above
+            } else {
+                p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
+            }
         }
     };
 
@@ -1018,34 +1625,59 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const showSuggestions = () => {
         actionPopup.classList.remove('hidden'); actionPopup.innerHTML = '';
-        const sceneObjects = getObjectsForScene(currentSceneId); const container = document.createElement('div'); container.className = 'action-popup-container';
-        const row1 = document.createElement('div'); row1.className = 'action-popup-row';
-        sceneObjects.forEach(obj => { const btn = document.createElement('button'); btn.textContent = obj.name; btn.addEventListener('click', () => { 
-            verbInput.value = 'examinar ' + obj.name; 
-            actionPopup.classList.add('hidden'); 
-            activePopupType = null; 
-            handleInput(); 
-        }); row1.appendChild(btn); });
-        container.appendChild(row1);
-        const row2 = document.createElement('div'); row2.className = 'action-popup-row';
-        ['Examinar', 'Pegar', 'Usar', 'Falar', 'Abrir'].forEach(v => { const btn = document.createElement('button'); btn.textContent = v; btn.addEventListener('click', () => { 
-            verbInput.value = v.toLowerCase() + ' '; 
-            verbInput.focus(); 
-            actionPopup.classList.add('hidden'); 
-            activePopupType = null; 
-        }); row2.appendChild(btn); });
-        container.appendChild(row2); actionPopup.appendChild(container);
+        const currentSceneData = gameData.cenas[currentSceneId];
+        const sceneSuggestions = currentSceneData.suggestions || [];
+        
+        const container = document.createElement('div'); container.className = 'action-popup-container';
+        
+        if (sceneSuggestions.length === 0) {
+            const row1 = document.createElement('div'); row1.className = 'action-popup-row mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            row1.textContent = gameData.gameSuggestionsEmptyFeedback || 'não há sugestões';
+            container.appendChild(row1);
+        } else {
+
+            const row1 = document.createElement('div'); row1.className = 'action-popup-row max-w-full flex-wrap justify-center';
+            sceneSuggestions.forEach(v => { 
+                const btn = document.createElement('button'); btn.textContent = v; 
+                btn.addEventListener('click', () => { 
+                    verbInput.value = v.toLowerCase() + ' '; 
+                    verbInput.focus(); 
+                    actionPopup.classList.add('hidden'); 
+                    activePopupType = null; 
+                }); 
+                row1.appendChild(btn); 
+            });
+            container.appendChild(row1); 
+        }
+        actionPopup.appendChild(container);
     };
     const showInventory = () => {
-        actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; const list = document.createElement('div'); list.className = 'action-popup-list';
-        if (inventory.length === 0) { const msg = document.createElement('p'); msg.textContent = 'Seu inventário está vazio.'; list.appendChild(msg); }
-        else { inventory.forEach(item => { const btn = document.createElement('button'); btn.textContent = item.name; btn.addEventListener('click', () => { 
-            openItemModal(item); 
-            actionPopup.classList.add('hidden'); 
-            activePopupType = null; 
-        }); list.appendChild(btn); }); }
-        actionPopup.appendChild(list);
+        actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; 
+        const container = document.createElement('div'); container.className = 'action-popup-container';
+        if (inventory.length === 0) { 
+            const msg = document.createElement('div'); 
+            msg.className = 'action-popup-row mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            msg.textContent = gameData.gameInventoryEmptyFeedback || 'não há itens no inventário'; 
+            container.appendChild(msg); 
+        }
+        else { 
+            const list = document.createElement('div');
+            list.className = 'action-popup-list';
+            inventory.forEach(item => { 
+                const btn = document.createElement('button'); 
+                btn.textContent = item.name; 
+                btn.addEventListener('click', () => { 
+                    openItemModal(item); 
+                    actionPopup.classList.add('hidden'); 
+                    activePopupType = null; 
+                }); 
+                list.appendChild(btn); 
+            }); 
+            container.appendChild(list);
+        }
+        actionPopup.appendChild(container);
     };
+
     const openItemModal = (item) => {
         itemModalName.textContent = item.name; itemModalDescription.innerHTML = formatText(item.examineDescription);
         setupHighlights(itemModalDescription);

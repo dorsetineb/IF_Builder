@@ -177,11 +177,9 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         <div className="flex-1 min-h-0">
                             <iframe
                                 src={
-                                    i18n.language.startsWith('en')
-                                        ? "/escape_the_dungeon/index.html"
-                                        : i18n.language.startsWith('es')
-                                            ? "/escapa_la_mazmorra/index.html"
-                                            : "/fuja_da_masmorra/index.html"
+                                    i18n.language.startsWith('pt')
+                                        ? "/fuja_da_masmorra/index.html"
+                                        : "/escape_the_dungeon/index.html"
                                 }
                                 className="w-full h-full border-0"
                                 title="Demo"

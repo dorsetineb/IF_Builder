@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         square: '<svg fill="%COLOR%" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>',
         diamond: '<svg fill="%COLOR%" viewBox="0 0 24 24"><path d="M12 2l10 10-10 10L2 12z"/></svg>'
     };
-
+    
     const ICONS_OUTLINE = {
         heart: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
         circle: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
@@ -22,35 +22,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameData = window.embeddedGameData;
     let currentSceneId = gameData.cena_inicial;
     let inventory = [];
-    let visitedScenes = [];
-    let actionLog = [];
+    let visitedScenes = []; 
+    let actionLog = []; 
     let chances = gameData.gameMaxChances || 3;
     let isGameEnded = false;
     let trackers = {};
-    let removedObjectsFromScenes = {};
+    let removedObjectsFromScenes = {}; 
     let currentBgmSrc = "";
     let isPrinting = false;
     let activePopupType = null;
     let renderSessionId = 0; // Prevent race conditions in rendering
 
-    const textSpeedVal = gameData.gameTextSpeed || 3;
+    const textSpeedVal = gameData.gameTextSpeed || 3; 
     const imgSpeedVal = gameData.gameImageSpeed || 3;
-    const typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15));
+    const typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
     const textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
     const imageAnimDuration = Math.max(0.3, 5.0 - (imgSpeedVal * 0.9)) + 's';
-
+    
     document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
     document.documentElement.style.setProperty('--image-anim-speed', imageAnimDuration);
 
     (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
 
-    const splashScreen = document.getElementById('splash-screen');
     const positiveEndingScreen = document.getElementById('positive-ending-screen');
     const negativeEndingScreen = document.getElementById('negative-ending-screen');
-    const splashStartButton = document.getElementById('splash-start-button');
-    const continueButton = document.getElementById('continue-button');
-    const endingRestartButtons = document.querySelectorAll('.ending-restart-button');
-
+    const endingRestartButtons = document.querySelectorAll('.ending-restart-button:not(#vignette-continue-button)');
+    
     const gameContainer = document.getElementById('game-container');
     const imageContainer = document.getElementById('image-container');
     const sceneImage = document.getElementById('scene-image');
@@ -76,11 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const soundEffectAudio = document.getElementById('scene-sound-effect');
     const bgmAudio = document.getElementById('bgm-audio');
-
+    
     const standardActionBar = document.getElementById('standard-action-bar');
     const endingActionBar = document.getElementById('ending-action-bar');
     const viewEndingButton = document.getElementById('view-ending-button');
-
+    
     const diaryModal = document.getElementById('diary-modal');
     const diaryLog = document.getElementById('diary-log');
     const trackersModal = document.getElementById('trackers-modal');
@@ -90,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemModalImageContainer = document.getElementById('item-modal-image-container');
     const itemModalImage = document.getElementById('item-modal-image');
     const itemModalDescription = document.getElementById('item-modal-description');
-
+    
     const systemModal = document.getElementById('system-modal');
     const systemModalTitle = document.getElementById('system-modal-title');
     const systemMenuMain = document.getElementById('system-menu-main');
@@ -100,7 +97,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnLoadMenu = document.getElementById('btn-load-menu');
     const btnMainMenu = document.getElementById('btn-main-menu');
     const btnBackSystem = document.getElementById('btn-back-system');
-
+    
     const closeButtons = document.querySelectorAll('.modal-close-button');
 
     // Vignette screen elements detection and injection
@@ -114,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
     vDiv.className = 'splash-screen hidden';
     // Use inline styles as a fallback to guarantee the look matches splash button even if CSS is missing
     const btnStyle = 'font-family: var(--font-family); padding: 12px 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; background-color: var(--splash-button-bg);';
-    vDiv.innerHTML = '<div id="vignette-overlay" class="scene-overlay"></div><div class="splash-content" style="z-index: 10;"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '">Continuar</button></div></div>';
+    vDiv.innerHTML = '<div id="vignette-overlay" class="scene-overlay"></div><div class="splash-content" style="z-index: 10;"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '"></button></div></div>';
     document.body.appendChild(vDiv);
     vignetteScreen = vDiv;
 
@@ -122,18 +119,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const vignetteDescription = document.getElementById('vignette-description');
     const vignetteContinueButton = document.getElementById('vignette-continue-button');
 
-    const playSound = (src) => { if (src && soundEffectAudio) { soundEffectAudio.src = src; soundEffectAudio.play().catch(e => { }); } };
+    const playSound = (src) => { if (src && soundEffectAudio) { soundEffectAudio.src = src; soundEffectAudio.play().catch(e => {}); } };
 
     let bgmFadeInterval = null;
     const playBgm = (src) => {
         if (!bgmAudio) return;
         if (src === currentBgmSrc) {
             if (bgmAudio.paused && src) {
-                bgmAudio.play().catch(e => { });
+                bgmAudio.play().catch(e => {});
             }
             return;
         }
-
+        
         const fadeOut = (callback) => {
             if (bgmFadeInterval) clearInterval(bgmFadeInterval);
             let vol = bgmAudio.volume;
@@ -153,7 +150,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const fadeIn = () => {
             if (bgmFadeInterval) clearInterval(bgmFadeInterval);
             bgmAudio.volume = 0;
-            bgmAudio.play().catch(e => { });
+            bgmAudio.play().catch(e => {});
             let vol = 0;
             bgmFadeInterval = setInterval(() => {
                 vol += 0.1;
@@ -199,14 +196,14 @@ document.addEventListener('DOMContentLoaded', () => {
         init(targetId) {
             this.overlay = document.getElementById(targetId);
             if (!this.overlay) return;
-
+            
             // Check if canvas already exists
             let canvas = this.overlay.querySelector('.rain-canvas');
             if (!canvas) {
                 this.canvas = document.createElement('canvas');
                 this.canvas.className = 'rain-canvas';
                 this.overlay.appendChild(this.canvas);
-
+                
                 // Add Lightning Layer
                 const lightning = document.createElement('div');
                 lightning.className = 'lightning-layer';
@@ -215,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.canvas = canvas;
             }
             this.ctx = this.canvas.getContext('2d');
-
+            
             // Resize immediately
             this.resizer();
             window.addEventListener('resize', () => this.resizer());
@@ -247,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const height = this.overlay.clientHeight;
             this.canvas.width = width;
             this.canvas.height = height;
-
+            
             const drop_count = Math.floor(width * this.rain_weight * 1.5);
             this.drops = [];
             for (let i = 0; i < drop_count; i++) {
@@ -271,7 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.effect = effect;
             this.reset();
         }
-
+        
         reset() {
             const canvas = this.effect.canvas;
             this.r = this.effect.randomFrom(0.8, 1.6);
@@ -292,13 +289,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (width <= 0 || this.l <= 0) return null;
             canv.setAttribute('width', width);
             canv.setAttribute('height', this.l);
-
+            
             ctx.beginPath();
             const drip = ctx.createLinearGradient(0, 0, 0, this.l);
             drip.addColorStop(0, 'rgba(' + this.effect.rain_color + ', 0)');
             drip.addColorStop(1, 'rgba(' + this.effect.rain_color + ', ' + this.opacity + ')');
             ctx.fillStyle = drip;
-
+            
             const startX = (this.offset >= 0) ? 0 : Math.abs(this.offset);
             ctx.moveTo(startX, 0);
             ctx.lineTo(startX + this.r, 0);
@@ -379,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.ySpeed = Math.random() * 60 + 50.0;
             this.corners = [];
             this.time = Math.random();
-            const colors = [["#df0049", "#660671"], ["#00e857", "#005291"], ["#2bebbc", "#05798a"], ["#ffd200", "#b06c00"]];
+            const colors = [["#df0049","#660671"],["#00e857","#005291"],["#2bebbc","#05798a"],["#ffd200","#b06c00"]];
             const ci = Math.round(Math.random() * (colors.length - 1));
             this.frontColor = colors[ci][0];
             this.backColor = colors[ci][1];
@@ -420,7 +417,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.particleDist = dist; this.particleCount = count;
             this.particleMass = mass; this.particleDrag = drag;
             this.particles = [];
-            const colors = [["#df0049", "#660671"], ["#00e857", "#005291"], ["#2bebbc", "#05798a"], ["#ffd200", "#b06c00"]];
+            const colors = [["#df0049","#660671"],["#00e857","#005291"],["#2bebbc","#05798a"],["#ffd200","#b06c00"]];
             const ci = Math.round(Math.random() * (colors.length - 1));
             this.frontColor = colors[ci][0]; this.backColor = colors[ci][1];
             this.xOff = Math.cos((Math.PI / 180) * angle) * thickness;
@@ -475,7 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.oscillationSpeed = Math.random() * 2.0 + 1.5;
             this.oscillationDistance = Math.random() * 40 + 40;
             this.ySpeed = Math.random() * 40 + 80;
-            const colors = [["#df0049", "#660671"], ["#00e857", "#005291"], ["#2bebbc", "#05798a"], ["#ffd200", "#b06c00"]];
+            const colors = [["#df0049","#660671"],["#00e857","#005291"],["#2bebbc","#05798a"],["#ffd200","#b06c00"]];
             const ci = Math.round(Math.random() * (colors.length - 1));
             this.frontColor = colors[ci][0]; this.backColor = colors[ci][1];
             this.particles = [];
@@ -587,7 +584,7 @@ document.addEventListener('DOMContentLoaded', () => {
         init(targetId) {
             this.overlay = document.getElementById(targetId);
             if (!this.overlay) return;
-
+            
             let canvas = this.overlay.querySelector('.glitch-canvas');
             if (!canvas) {
                 this.canvas = document.createElement('canvas');
@@ -613,7 +610,7 @@ document.addEventListener('DOMContentLoaded', () => {
             this.currentTargetId = targetId;
             this.init(targetId);
             if (!this.ctx || !this.overlay) return;
-
+            
             this.overlay.classList.add('overlay-glitch');
             this.started = true;
             this.loop();
@@ -628,19 +625,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
         loop() {
             if (!this.started || !this.ctx) return;
-
+            
             this.ctx.clearRect(0, 0, this.width, this.height);
 
             // 1. Random horizontal slice displacements
             if (Math.random() > 0.9) {
                 const sliceHeight = Math.random() * 50 + 5;
                 const sliceY = Math.random() * this.height;
-
+                
                 this.ctx.fillStyle = 'rgba(' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ',' + Math.floor(Math.random() * 255) + ',' + (Math.random() * 0.5) + ')';
                 this.ctx.fillRect(0, sliceY, this.width, sliceHeight);
 
                 if (Math.random() > 0.5) {
-                    this.ctx.clearRect(0, Math.random() * this.height, this.width, Math.random() * 10);
+                   this.ctx.clearRect(0, Math.random() * this.height, this.width, Math.random() * 10);
                 }
             }
 
@@ -686,64 +683,61 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mousedown', startAudioOnInteraction);
         document.addEventListener('keydown', startAudioOnInteraction);
 
-        const hasAutoSave = localStorage.getItem('if_builder_autosave_' + document.title);
+        const hasAutoSave = localStorage.getItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
         // Auto-start game, bypassing splash screen
         startGame();
         endingRestartButtons.forEach(btn => btn.addEventListener('click', () => {
-            positiveEndingScreen.classList.add('hidden');
-            negativeEndingScreen.classList.add('hidden');
-            gameContainer.classList.remove('fade-out');
-            startGame();
+             positiveEndingScreen.classList.add('hidden'); 
+             negativeEndingScreen.classList.add('hidden'); 
+             gameContainer.classList.remove('fade-out');
+             startGame();
         }));
         submitVerb.addEventListener('click', handleInput);
         verbInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleInput(); });
-        suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
-        inventoryButton.addEventListener('click', () => togglePopup('inventory'));
-        diaryButton.addEventListener('click', showDiary);
+        if (suggestionsButton) suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
+        if (inventoryButton) inventoryButton.addEventListener('click', () => togglePopup('inventory'));
+        if (diaryButton) diaryButton.addEventListener('click', showDiary);
         if (trackersButton) trackersButton.addEventListener('click', showTrackers);
         if (systemButton) systemButton.addEventListener('click', toggleSystemMenu);
         closeButtons.forEach(btn => btn.addEventListener('click', (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); }));
         btnSaveMenu.addEventListener('click', () => renderSlots('save'));
         btnLoadMenu.addEventListener('click', () => renderSlots('load'));
         btnBackSystem.addEventListener('click', () => { systemSlotsContainer.classList.add('hidden'); systemMenuMain.classList.remove('hidden'); systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema'; });
-
+        
         viewEndingButton.addEventListener('click', () => {
-            const isWin = isGameEnded === 'win';
-            const endScreen = isWin ? positiveEndingScreen : negativeEndingScreen;
-            const endMusic = isWin ? gameData.positiveEndingMusic : gameData.negativeEndingMusic;
-            if (endMusic) playBgm(endMusic); else playBgm("");
-            endScreen.style.zIndex = '0';
-            endScreen.classList.remove('hidden');
-            gameContainer.classList.add('fade-out');
-            setTimeout(() => {
+             const isWin = isGameEnded === 'win';
+             const endScreen = isWin ? positiveEndingScreen : negativeEndingScreen;
+             const endMusic = isWin ? gameData.positiveEndingMusic : gameData.negativeEndingMusic;
+             if (endMusic) playBgm(endMusic); else playBgm("");
+             endScreen.style.zIndex = '0';
+             endScreen.classList.remove('hidden');
+             gameContainer.classList.add('fade-out');
+             setTimeout(() => {
                 gameContainer.classList.add('hidden');
-                endScreen.style.zIndex = '';
-            }, 1000);
+                endScreen.style.zIndex = ''; 
+             }, 1000);
         });
-
+        
         btnMainMenu.onclick = (e) => {
             systemModal.classList.add('hidden');
-            splashScreen.classList.remove('fade-out');
-            splashScreen.classList.remove('hidden');
-            isGameEnded = false;
-            if (gameData.gameBackgroundMusic) playBgm(gameData.gameBackgroundMusic);
-            else playBgm("");
+            isGameEnded = false; 
+            startGame();
         };
         if (window.isSceneTest) startGame();
     };
 
     const startGame = () => {
-        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + document.title);
-        currentSceneId = gameData.cena_inicial;
-        inventory = [];
-        visitedScenes = [];
-        actionLog = [];
-        chances = gameData.gameMaxChances || 3;
-        trackers = {};
+        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+        currentSceneId = gameData.cena_inicial; 
+        inventory = []; 
+        visitedScenes = []; 
+        actionLog = []; 
+        chances = gameData.gameMaxChances || 3; 
+        trackers = {}; 
         removedObjectsFromScenes = {};
         isGameEnded = false;
         (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
-
+        
         // Fix Audio Persistence: If the starting scene has no specific music.
         // If it is a SCENE TEST, we do NOT fallback to global music (keep it silent/clean).
         const startScene = gameData.cenas[currentSceneId];
@@ -752,59 +746,51 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!window.isSceneTest) {
                     playBgm(gameData.gameBackgroundMusic || "");
                 } else {
-                    playBgm("");
+                    playBgm(""); 
                 }
             }
             loadScene(currentSceneId, false);
         } else {
-            console.error("Start scene not found:", currentSceneId);
+             console.error("Start scene not found:", currentSceneId);
         }
 
         standardActionBar.classList.remove('hidden');
         endingActionBar.classList.add('hidden');
-
-        // Handle Splash Screen visibility
-        if (window.isSceneTest) {
-            // In test mode, immediately hide splash and show game to avoid freezing/delays
-            splashScreen.classList.add('hidden');
-            splashScreen.style.display = 'none';
-            splashScreen.classList.remove('fade-out');
-
-            // Allow game container to be visible in layout (display:block) but keep opacity 0 until ready
+        
+        const isVignette = startScene && startScene.vignetteType && startScene.vignetteType !== 'none';
+        
+        if (!isVignette) {
             gameContainer.classList.remove('hidden');
+            if (window.isSceneTest) {
+                const hasImage = startScene && startScene.image && gameData.enableImages !== false;
+                
+                const showGame = () => {
+                     gameContainer.classList.add('ready');
+                };
 
-            const startScene = gameData.cenas[currentSceneId];
-            const hasImage = startScene && startScene.image && gameData.enableImages !== false;
-
-            const showGame = () => {
-                gameContainer.classList.add('ready');
-            };
-
-            if (hasImage) {
-                const img = document.getElementById('scene-image');
-                if (img && img instanceof HTMLImageElement) {
-                    if (img.complete && img.naturalHeight !== 0) {
-                        showGame();
-                    } else {
-                        img.onload = showGame;
-                        img.onerror = showGame;
-                        // Safety timeout
-                        setTimeout(showGame, 2000);
-                    }
+                if (hasImage) {
+                     const img = document.getElementById('scene-image');
+                     if (img && img instanceof HTMLImageElement) {
+                         if (img.complete && img.naturalHeight !== 0) {
+                             showGame();
+                         } else {
+                             img.onload = showGame;
+                             img.onerror = showGame;
+                             // Safety timeout
+                             setTimeout(showGame, 2000);
+                         }
+                     } else {
+                         showGame();
+                     }
                 } else {
-                    showGame();
+                     // Small delay to ensure layout frames are ready
+                     setTimeout(showGame, 50);
                 }
-            } else {
-                // Small delay to ensure layout frames are ready
-                setTimeout(showGame, 50);
-            }
 
-        } else {
-            // Restore smooth transition for normal play
-            splashScreen.style.display = '';
-            splashScreen.classList.remove('hidden');
-            splashScreen.classList.add('fade-out');
-            setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
+            } else {
+                // Unhide game container instantly in standard play
+                gameContainer.classList.add('ready');
+            }
         }
     };
 
@@ -812,29 +798,29 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             const save = JSON.parse(jsonString);
             if (save) {
-                currentSceneId = save.currentSceneId;
-                inventory = save.inventory;
-                visitedScenes = save.visitedScenes || [];
-                actionLog = save.actionLog || [];
-                chances = save.chances;
-                trackers = save.trackers || {};
+                currentSceneId = save.currentSceneId; 
+                inventory = save.inventory; 
+                visitedScenes = save.visitedScenes || []; 
+                actionLog = save.actionLog || []; 
+                chances = save.chances; 
+                trackers = save.trackers || {}; 
                 removedObjectsFromScenes = save.removedObjectsFromScenes || {};
                 isGameEnded = false;
                 standardActionBar.classList.remove('hidden');
                 endingActionBar.classList.add('hidden');
                 systemModal.classList.add('hidden');
                 loadScene(currentSceneId, false);
-                splashScreen.classList.add('fade-out');
-                setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
+                gameContainer.classList.remove('hidden');
+                gameContainer.classList.add('ready');
             }
         } catch (e) { startGame(); }
     };
 
     const autoSaveGame = () => {
-        if (window.isPreview) return;
+        if (window.isPreview) return; 
         if (isGameEnded) return;
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
-        localStorage.setItem('if_builder_autosave_' + document.title, JSON.stringify(save));
+        localStorage.setItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'), JSON.stringify(save));
     };
 
     const toggleSystemMenu = () => {
@@ -848,7 +834,7 @@ document.addEventListener('DOMContentLoaded', () => {
         systemMenuMain.classList.add('hidden'); systemSlotsContainer.classList.remove('hidden'); slotsList.innerHTML = '';
         systemModalTitle.textContent = mode === 'save' ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') : (gameData.gameLoadMenuTitle || 'Carregar Jogo');
         for (let i = 1; i <= 3; i++) {
-            const slotKey = 'if_builder_slot_' + i + '_' + document.title;
+            const slotKey = 'if_builder_slot_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
             const savedData = localStorage.getItem(slotKey);
             const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
             let contentHtml = '';
@@ -868,20 +854,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const performSave = (slotIndex) => {
-        const slotKey = 'if_builder_slot_' + slotIndex + '_' + document.title;
+        const slotKey = 'if_builder_slot_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
         localStorage.setItem(slotKey, JSON.stringify(save)); renderSlots('save');
     };
 
     const getObjectsForScene = (sceneId) => {
-        const scene = gameData.cenas[sceneId];
+        const scene = gameData.cenas[sceneId]; 
         if (!scene) return [];
         let objects = (scene.objectIds || []).map(id => gameData.globalObjects[id]).filter(Boolean).map(o => JSON.parse(JSON.stringify(o)));
         const removedIds = removedObjectsFromScenes[sceneId] || [];
         objects = objects.filter(o => !removedIds.includes(o.id));
         return objects;
     };
-
+    
     const flagObjectAsRemoved = (sceneId, objectId) => {
         if (!removedObjectsFromScenes[sceneId]) removedObjectsFromScenes[sceneId] = [];
         if (!removedObjectsFromScenes[sceneId].includes(objectId)) {
@@ -903,15 +889,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const showVignetteScreen = (scene) => {
         // Hide game container and show vignette screen
         gameContainer.classList.add('hidden');
-
+        
         // Set vignette content
         if (vignetteTitle) vignetteTitle.textContent = scene.name || '';
         if (vignetteDescription) vignetteDescription.textContent = scene.description || '';
-
+        
         // Set button text
         const buttonText = scene.vignetteButtonText || (scene.vignetteType === 'conclusion' ? (gameData.gameRestartButtonText || 'Restart') : (gameData.gameContinueButtonText || 'Continue'));
         if (vignetteContinueButton) vignetteContinueButton.textContent = buttonText;
-
+        
         // Set background image
         if (scene.image) {
             vignetteScreen.style.backgroundImage = 'url(' + scene.image + ')';
@@ -922,23 +908,23 @@ document.addEventListener('DOMContentLoaded', () => {
         // Overlay Effect for Vignette
         const vOverlay = document.getElementById('vignette-overlay');
         if (vOverlay) {
-            vOverlay.className = 'scene-overlay';
+            vOverlay.className = 'scene-overlay'; 
             if (scene.overlayEffect) {
                 vOverlay.classList.add('overlay-' + scene.overlayEffect);
             }
 
         }
-
+        
         // Play background music for this vignette scene
         if (scene.backgroundMusic) {
             playBgm(scene.backgroundMusic);
         }
-
+        
         // Handle button click
         const handleVignetteClick = () => {
             vignetteContinueButton.removeEventListener('click', handleVignetteClick);
             if (typeof rainEffect !== 'undefined') rainEffect.stop();
-
+            
             if (scene.vignetteType === 'conclusion') {
                 // Restart game: Reset music FIRST, hide vignette, show splash
                 playBgm(gameData.gameBackgroundMusic || "");
@@ -949,8 +935,9 @@ document.addEventListener('DOMContentLoaded', () => {
             } else if (scene.vignetteNextSceneId) {
                 // Go to next scene: Load it FIRST (behind the vignette), then fade out
                 gameContainer.classList.remove('hidden');
+                gameContainer.classList.add('ready'); // Ensure gameContainer visually appears
                 loadScene(scene.vignetteNextSceneId, false);
-
+                
                 vignetteScreen.classList.add('fade-out');
                 setTimeout(() => {
                     vignetteScreen.classList.add('hidden');
@@ -960,14 +947,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 // No next scene defined, just hide vignette and show game
                 vignetteScreen.classList.add('hidden');
                 gameContainer.classList.remove('hidden');
+                gameContainer.classList.add('ready'); // Ensure gameContainer visually appears
             }
         };
-
+        
         vignetteContinueButton.addEventListener('click', handleVignetteClick);
-
+        
         // Show the vignette screen FIRST, then start rain effect after it's visible
         vignetteScreen.classList.remove('hidden');
-
+        
         // Rain Effect Logic for Vignette (deferred to ensure element has dimensions)
         if (scene.overlayEffect === 'rain') {
             requestAnimationFrame(() => {
@@ -985,7 +973,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Clear any existing blur container first
                     const existing = vOverlay.querySelector('.blur-overlay-container');
                     if (existing) existing.remove();
-
+                    
                     const blurContainer = document.createElement('div');
                     blurContainer.className = 'blur-overlay-container';
                     blurContainer.innerHTML = '<div class="blur-rumble-layer"></div><div class="blur-flicker-layer"></div><div class="blur-grain-layer"></div><div class="blur-vignette-layer"></div>';
@@ -1002,7 +990,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Clear any existing chromatic container first
                     const existing = vOverlay.querySelector('.chromatic-overlay-container');
                     if (existing) existing.remove();
-
+                    
                     const chromaticContainer = document.createElement('div');
                     chromaticContainer.className = 'chromatic-overlay-container';
                     chromaticContainer.innerHTML = '<div class="chromatic-jerk-wrapper"><div class="chromatic-layer chromatic-red"></div><div class="chromatic-layer chromatic-green"></div><div class="chromatic-layer chromatic-blue"></div><div class="chromatic-flicker"></div></div><div class="chromatic-scanlines"></div>';
@@ -1022,7 +1010,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Clear any existing TV container first
                     const existing = vOverlay.querySelector('.tv-overlay-container');
                     if (existing) existing.remove();
-
+                    
                     const tvContainer = document.createElement('div');
                     tvContainer.className = 'tv-overlay-container';
                     tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-glow"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
@@ -1075,7 +1063,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Clear any existing nosferatu container first
                     const existing = vOverlay.querySelector('.nosferatu-container');
                     if (existing) existing.remove();
-
+                    
                     const nosferatuContainer = document.createElement('div');
                     nosferatuContainer.className = 'nosferatu-container';
                     nosferatuContainer.innerHTML = '<div class="nosferatu-cinema"></div><div class="nosferatu-scratch"></div><div class="nosferatu-effect-scratch"></div><div class="nosferatu-grain"></div><div class="nosferatu-vignette"></div>';
@@ -1113,7 +1101,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (vOverlay) {
                     const existing = vOverlay.querySelector('.fog-container');
                     if (existing) existing.remove();
-
+                    
                     const fogContainer = document.createElement('div');
                     fogContainer.className = 'fog-container';
                     fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
@@ -1134,19 +1122,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
         const scene = gameData.cenas[sceneId]; if (!scene) return;
         if (scene.backgroundMusic) playBgm(scene.backgroundMusic);
-        if (scene.removesChanceOnEntry && gameData.enableChances) chances--;
+        if (scene.removesChanceOnEntry && gameData.enableChances) chances--; 
         if (scene.restoresChanceOnEntry && gameData.enableChances) chances = Math.min(chances + 1, gameData.gameMaxChances);
         currentSceneId = sceneId;
         if (!visitedScenes.includes(sceneId)) visitedScenes.push(sceneId);
         actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
-
+        
         // Check if this is a vignette scene
         if (scene.vignetteType && scene.vignetteType !== 'none') {
             showVignetteScreen(scene);
             autoSaveGame();
             return;
         }
-
+        
         let effectiveTransition = !transitionType || transitionType === 'none' ? (gameData.gameImageTransitionType || 'fade') : transitionType;
         if (effectiveTransition === 'none') transition = false;
         if (transitionSpeed !== null) {
@@ -1157,12 +1145,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
         }
         if (transition && sceneImage && sceneImageBack && gameData.enableImages !== false) {
-            sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
-            if (sceneImage.src) {
-                sceneImage.classList.remove('hidden'); const animClass = 'trans-' + effectiveTransition + '-out'; sceneImage.classList.add(animClass);
-                const durationMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--image-anim-speed')) * 1000;
-                setTimeout(() => { renderScene(scene, successPrefix); sceneImage.classList.remove(animClass); sceneImageBack.src = ''; sceneImageBack.classList.add('hidden'); }, durationMs + 50);
-            } else renderScene(scene, successPrefix);
+             sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
+             if (sceneImage.src) {
+                 sceneImage.classList.remove('hidden'); const animClass = 'trans-' + effectiveTransition + '-out'; sceneImage.classList.add(animClass);
+                 const durationMs = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--image-anim-speed')) * 1000;
+                 setTimeout(() => { renderScene(scene, successPrefix); sceneImage.classList.remove(animClass); sceneImageBack.src = ''; sceneImageBack.classList.add('hidden'); }, durationMs + 50);
+             } else renderScene(scene, successPrefix);
         } else { renderScene(scene, successPrefix); }
         autoSaveGame();
     };
@@ -1173,7 +1161,7 @@ document.addEventListener('DOMContentLoaded', () => {
         element.querySelectorAll('.highlight-word').forEach(span => {
             span.addEventListener('click', (e) => {
                 e.stopPropagation();
-                if (isPrinting) return;
+                if (isPrinting) return; 
                 const word = span.dataset.word;
                 const currentVal = verbInput.value.trim();
                 verbInput.value = currentVal ? (currentVal + ' ' + word) : word;
@@ -1186,7 +1174,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (scene.image) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
         else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
         if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
-
+        
         // Handle Overlay Effect
         if (sceneOverlay) {
             sceneOverlay.className = 'scene-overlay'; // Reset
@@ -1201,7 +1189,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (existingConfetti) existingConfetti.remove();
             const existingGlitch = sceneOverlay.querySelector('.glitch-canvas');
             if (existingGlitch) existingGlitch.remove();
-
+            
             if (scene.overlayEffect) {
                 sceneOverlay.classList.add('overlay-' + scene.overlayEffect);
             }
@@ -1232,7 +1220,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // TV Effect Logic - Inject DOM structure
             if (scene.overlayEffect === 'tv') {
                 sceneOverlay.parentElement?.classList.add('tv-distortion-active');
-
+                
                 const tvContainer = document.createElement('div');
                 tvContainer.className = 'tv-overlay-container';
                 tvContainer.innerHTML = '<div class="tv-screen-wrapper"><div class="tv-rgb-grid"></div><div class="tv-scanlines"></div><div class="tv-vignette"></div><div class="tv-glow"></div><div class="tv-flicker"></div><div class="tv-interference"></div></div>';
@@ -1276,12 +1264,12 @@ document.addEventListener('DOMContentLoaded', () => {
             // Clear any existing nosferatu container first
             const existing = sceneOverlay.querySelector('.nosferatu-container');
             if (existing) existing.remove();
-
+            
             const nosferatuContainer = document.createElement('div');
             nosferatuContainer.className = 'nosferatu-container';
             nosferatuContainer.innerHTML = '<div class="nosferatu-cinema"></div><div class="nosferatu-scratch"></div><div class="nosferatu-effect-scratch"></div><div class="nosferatu-grain"></div><div class="nosferatu-vignette"></div>';
             sceneOverlay.appendChild(nosferatuContainer);
-
+            
             if (sceneImage) sceneImage.style.filter = 'sepia(0.8) contrast(1.1) brightness(0.9)';
             if (sceneImageBack) sceneImageBack.style.filter = 'sepia(0.8) contrast(1.1) brightness(0.9)';
             sceneOverlay.parentElement?.classList.add('nosferatu-active');
@@ -1306,49 +1294,49 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Fog Effect Logic for Scene
         if (scene.overlayEffect === 'fog') {
-            const existing = sceneOverlay.querySelector('.fog-container');
-            if (existing) existing.remove();
+             const existing = sceneOverlay.querySelector('.fog-container');
+             if (existing) existing.remove();
 
-            const fogContainer = document.createElement('div');
-            fogContainer.className = 'fog-container';
-            fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
-            sceneOverlay.appendChild(fogContainer);
-            sceneOverlay.classList.add('overlay-fog');
+             const fogContainer = document.createElement('div');
+             fogContainer.className = 'fog-container';
+             fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
+             sceneOverlay.appendChild(fogContainer);
+             sceneOverlay.classList.add('overlay-fog');
         } else {
-            sceneOverlay.classList.remove('overlay-fog');
-            const existing = sceneOverlay.querySelector('.fog-container');
-            if (existing) existing.remove();
+             sceneOverlay.classList.remove('overlay-fog');
+             const existing = sceneOverlay.querySelector('.fog-container');
+             if (existing) existing.remove();
         }
 
         sceneDescription.innerHTML = '';
-
+        
         let fullDescription = scene.description;
-        if (successPrefix) fullDescription = successPrefix + "\n\n" + fullDescription;
+        if (successPrefix) fullDescription = successPrefix + "\\n\\n" + fullDescription;
 
-        const paragraphs = fullDescription.split('\n').filter(p => p.trim().length > 0);
+        const paragraphs = fullDescription.split('\\n').filter(p => p.trim().length > 0);
         let pIndex = 0; const textAnimType = (gameData.enableTextControl !== false) ? (gameData.gameTextAnimationType || 'fade') : 'none';
         const isImmersive = document.body.classList.contains('behavior-immersive') && window.innerWidth <= 768;
 
         isPrinting = true;
         sceneDescription.classList.add('typewriting-active');
-
+        
         // Loop protection
         renderSessionId++;
         const mySessionId = renderSessionId;
 
         const renderNextParagraph = () => {
-            if (pIndex >= paragraphs.length) {
+            if (pIndex >= paragraphs.length) { 
                 isPrinting = false;
                 sceneDescription.classList.remove('typewriting-active');
                 if (chances <= 0) gameOver(); else if (scene.isEndingScene) activateEndingUI('win');
-                return;
+                return; 
             }
 
             const p = document.createElement('p'); const formattedHTML = formatText(paragraphs[pIndex]);
             if (textAnimType === 'typewriter') {
                 p.className = 'scene-paragraph typewriter-cursor'; p.style.opacity = '1'; p.innerHTML = formattedHTML; sceneDescription.appendChild(p);
                 const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
-                let node; const textNodes = []; while (node = walker.nextNode()) textNodes.push(node);
+                let node; const textNodes = []; while(node = walker.nextNode()) textNodes.push(node);
                 const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
                 let nodeIdx = 0; let charIdx = 0;
                 const type = () => {
@@ -1373,35 +1361,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
                 const continueBtn = document.createElement('div'); continueBtn.className = 'continue-indicator'; continueBtn.innerHTML = '<span>▼</span>';
-                const continueHandler = (e) => {
+                const continueHandler = (e) => { 
                     if (e) { if (e.type === 'keydown' && e.key !== 'Enter') return; e.stopPropagation(); if (e.type === 'keydown') e.preventDefault(); }
-
+                    
                     // NO MODO IMERSIVO MOBILE: Limpa tudo ANTES de renderizar o próximo parágrafo
                     if (isImmersive) {
                         sceneDescription.innerHTML = '';
                     } else {
                         continueBtn.remove();
                     }
-
-                    sceneDescription.removeEventListener('click', continueHandler);
+                    
+                    sceneDescription.removeEventListener('click', continueHandler); 
                     window.removeEventListener('keydown', continueHandler);
-                    if (mySessionId === renderSessionId) renderNextParagraph();
+                    if (mySessionId === renderSessionId) renderNextParagraph(); 
                 };
-                continueBtn.addEventListener('click', continueHandler);
+                continueBtn.addEventListener('click', continueHandler); 
                 sceneDescription.addEventListener('click', continueHandler);
                 window.addEventListener('keydown', continueHandler);
                 sceneDescription.appendChild(continueBtn); sceneDescription.scrollTop = sceneDescription.scrollHeight;
-            } else {
+            } else { 
                 isPrinting = false;
                 sceneDescription.classList.remove('typewriting-active');
-                sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                sceneDescription.scrollTop = sceneDescription.scrollHeight; 
                 if (chances <= 0) gameOver(); else { verbInput.focus(); if (scene.isEndingScene) activateEndingUI('win'); }
             }
         };
         // Small delay to ensure any previous clear/setup settles? No, direct call is fine but verify ID.
         // renderNextParagraph called immediately
         if (mySessionId === renderSessionId) renderNextParagraph();
-
+        
         const chancesContainer = document.getElementById('chances-container');
         if (chancesContainer) {
             chancesContainer.innerHTML = '';
@@ -1412,7 +1400,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 icon.innerHTML = i < chances ? iconSvg : iconOutlineSvg; chancesContainer.appendChild(icon);
             }
         }
-
+        
         // CHOICE MODE HANDLING
         if (gameData.gameInteractionType === 'choice') {
             const inputArea = document.querySelector('.input-area');
@@ -1420,7 +1408,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Hide Suggestions and Inventory in IF/Choice mode
             if (suggestionsButton) suggestionsButton.classList.add('hidden');
             if (inventoryButton) inventoryButton.classList.add('hidden');
-
+            
             // Create choices container and append to action-bar (same location as input-area)
             const choicesContainer = document.createElement('div');
             choicesContainer.className = 'choices-container';
@@ -1430,7 +1418,7 @@ document.addEventListener('DOMContentLoaded', () => {
             choicesContainer.style.flexDirection = 'column';
             choicesContainer.style.gap = '10px';
             choicesContainer.style.marginTop = '10px';
-
+            
             if (scene.choices && scene.choices.length > 0) {
                 scene.choices.forEach(choice => {
                     const btn = document.createElement('button');
@@ -1454,12 +1442,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     btn.style.textTransform = 'uppercase';
 
                     btn.onmouseover = () => {
-                        btn.style.filter = 'brightness(0.9)';
-                        btn.style.transform = 'translateY(-2px)';
+                         btn.style.filter = 'brightness(0.9)';
+                         btn.style.transform = 'translateY(-2px)';
                     };
-                    btn.onmouseout = () => {
-                        btn.style.borderColor = 'var(--border-color, rgba(255,255,255,0.2))';
-                        btn.style.transform = 'none';
+                    btn.onmouseout = () => { 
+                         btn.style.borderColor = 'var(--border-color, rgba(255,255,255,0.2))'; 
+                         btn.style.transform = 'none'; 
                     };
 
                     btn.onclick = () => {
@@ -1493,27 +1481,18 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameEnded = type;
         standardActionBar.classList.add('hidden');
         endingActionBar.classList.remove('hidden');
-        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + document.title);
+        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
     };
 
-    const gameOver = () => {
+    const gameOver = () => { 
         const defeatSceneId = Object.keys(gameData.cenas).find(id => gameData.cenas[id].isDefeatOutcome);
         if (defeatSceneId) {
             loadScene(defeatSceneId, true);
         } else {
-            activateEndingUI('lose');
+            activateEndingUI('lose'); 
         }
     };
-    const handleInput = () => {
-        console.log('Action Button Clicked / Enter Pressed. isPrinting:', isPrinting);
-        if (isPrinting) return;
-        const input = verbInput.value.trim();
-        if (input) {
-            console.log('Processing input:', input);
-            processCommand(input);
-            verbInput.value = '';
-        }
-    };
+    const handleInput = () => { if (isPrinting) return; const input = verbInput.value.trim(); if (input) { processCommand(input); verbInput.value = ''; } };
     const hasWord = (word, text) => {
         if (!word || !text) return false;
         const normalizedWord = word.toLowerCase().trim();
@@ -1533,8 +1512,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const inputLower = input.toLowerCase().trim();
         const echo = document.createElement('p'); echo.className = 'verb-echo'; echo.textContent = '> ' + input; sceneDescription.appendChild(echo);
         sceneDescription.scrollTop = sceneDescription.scrollHeight; actionLog.push({ type: 'input', text: '> ' + input });
-        const scene = gameData.cenas[currentSceneId];
-        const sceneObjects = getObjectsForScene(currentSceneId);
+        const scene = gameData.cenas[currentSceneId]; 
+        const sceneObjects = getObjectsForScene(currentSceneId); 
         for (const fv of (gameData.fixedVerbs || [])) { if (fv.verbs.some(v => hasWord(v, inputLower))) { printOutput(fv.description); return; } }
         let foundInteraction = scene.interactions.find(i => {
             if (!i.verbs.some(v => hasWord(v, inputLower))) return false;
@@ -1556,18 +1535,18 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
         if (foundInteraction) { executeInteraction(foundInteraction); return; }
-        if (hasWord('inventory', inputLower) || hasWord('inv', inputLower) || hasWord('i', inputLower)) {
+        if (hasWord('inventario', inputLower) || hasWord('i', inputLower)) { 
             if (gameData.enableInventory) { actionPopup.classList.add('hidden'); activePopupType = null; togglePopup('inventory'); }
-            else { printOutput("The inventory system is disabled."); }
-            return;
+            else { printOutput("O sistema de inventário está desativado."); }
+            return; 
         }
-        const lookVerbs = ['olhar', 'examinar', 'ver', 'ler', 'look', 'examine', 'read'];
+        const lookVerbs = ['olhar', 'examinar', 'ver', 'ler'];
         if (lookVerbs.some(v => hasWord(v, inputLower))) {
-            const obj = sceneObjects.find(o => hasWord(o.name.toLowerCase(), inputLower)) || inventory.find(o => hasWord(o.name.toLowerCase(), inputLower));
-            if (obj) { printOutput(obj.examineDescription); return; }
-            printOutput(scene.description); return;
+             const obj = sceneObjects.find(o => hasWord(o.name.toLowerCase(), inputLower)) || inventory.find(o => hasWord(o.name.toLowerCase(), inputLower));
+             if (obj) { printOutput(obj.examineDescription); return; }
+             printOutput(scene.description); return;
         }
-        printOutput(gameData.mensagem_falha_padrao || "That does not seem to have any effect.");
+        printOutput(gameData.mensagem_falha_padrao || "Não aconteceu nada.");
     };
 
     const executeInteraction = (interaction) => {
@@ -1581,36 +1560,36 @@ document.addEventListener('DOMContentLoaded', () => {
         if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage);
         else {
             const scene = gameData.cenas[currentSceneId];
-            if (interaction.newSceneDescription) {
-                if (interaction.successMessage) scene.description = interaction.successMessage + "\n\n" + interaction.newSceneDescription;
+            if (interaction.newSceneDescription) { 
+                if (interaction.successMessage) scene.description = interaction.successMessage + "\\n\\n" + interaction.newSceneDescription;
                 else scene.description = interaction.newSceneDescription;
-                renderScene(scene);
+                renderScene(scene); 
             } else if (interaction.successMessage) printOutput(interaction.successMessage);
         }
     };
 
     const printOutput = (text) => {
         const textAnimType = gameData.gameTextAnimationType || 'fade';
-        const p = document.createElement('p');
+        const p = document.createElement('p'); 
         const formattedHTML = formatText(text);
         actionLog.push({ type: 'output', text: text });
         if (textAnimType === 'typewriter') {
             isPrinting = true;
             sceneDescription.classList.add('typewriting-active');
-            p.className = 'scene-paragraph typewriter-cursor';
-            p.style.opacity = '1';
-            p.innerHTML = formattedHTML;
+            p.className = 'scene-paragraph typewriter-cursor'; 
+            p.style.opacity = '1'; 
+            p.innerHTML = formattedHTML; 
             sceneDescription.appendChild(p);
             const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
-            let node; const textNodes = []; while (node = walker.nextNode()) textNodes.push(node);
+            let node; const textNodes = []; while(node = walker.nextNode()) textNodes.push(node);
             const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
             let nodeIdx = 0; let charIdx = 0;
             const type = () => {
-                if (nodeIdx >= textNodes.length) {
+                if (nodeIdx >= textNodes.length) { 
                     p.classList.remove('typewriter-cursor'); setupHighlights(p); isPrinting = false;
                     sceneDescription.classList.remove('typewriting-active');
                     sceneDescription.scrollTop = sceneDescription.scrollHeight; verbInput.focus();
-                    return;
+                    return; 
                 }
                 const currentNode = textNodes[nodeIdx]; const fullText = fullTexts[nodeIdx];
                 if (charIdx < fullText.length) { currentNode.nodeValue += fullText[charIdx]; charIdx++; if (sceneDescription) sceneDescription.scrollTop = sceneDescription.scrollHeight; setTimeout(type, typeSpeedBase); }
@@ -1621,9 +1600,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             // Also respecting session ID for safety though printOutput is usually atomic-ish or one-off
             if (textAnimType === 'typewriter') {
-                // Already handled by if block above
+                 // Already handled by if block above
             } else {
-                p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight; isPrinting = false;
+                p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
             }
         }
     };
@@ -1632,56 +1611,73 @@ document.addEventListener('DOMContentLoaded', () => {
     const findItemName = (id) => (findItemInInventoryById(id) || gameData.globalObjects[id])?.name || 'item';
     const addToInventory = (obj) => { if (!inventory.some(o => o.id === obj.id)) inventory.push(obj); };
     const removeFromInventory = (id) => { inventory = inventory.filter(i => i.id !== id); };
-
-    const togglePopup = (type) => {
-        if (!actionPopup.classList.contains('hidden') && activePopupType === type) {
-            actionPopup.classList.add('hidden');
+    
+    const togglePopup = (type) => { 
+        if (!actionPopup.classList.contains('hidden') && activePopupType === type) { 
+            actionPopup.classList.add('hidden'); 
             activePopupType = null;
-        } else {
-            if (type === 'suggestions') showSuggestions();
-            if (type === 'inventory') showInventory();
+        } else { 
+            if (type === 'suggestions') showSuggestions(); 
+            if (type === 'inventory') showInventory(); 
             activePopupType = type;
-        }
+        } 
     };
 
     const showSuggestions = () => {
         actionPopup.classList.remove('hidden'); actionPopup.innerHTML = '';
-        const sceneObjects = getObjectsForScene(currentSceneId); const container = document.createElement('div'); container.className = 'action-popup-container';
-        const row1 = document.createElement('div'); row1.className = 'action-popup-row';
-        sceneObjects.forEach(obj => {
-            const btn = document.createElement('button'); btn.textContent = obj.name; btn.addEventListener('click', () => {
-                verbInput.value = 'examine ' + obj.name;
-                actionPopup.classList.add('hidden');
-                activePopupType = null;
-                handleInput();
-            }); row1.appendChild(btn);
-        });
-        container.appendChild(row1);
-        const row2 = document.createElement('div'); row2.className = 'action-popup-row';
-        ['Examine', 'Get', 'Use', 'Talk', 'Open'].forEach(v => {
-            const btn = document.createElement('button'); btn.textContent = v; btn.addEventListener('click', () => {
-                verbInput.value = v.toLowerCase() + ' ';
-                verbInput.focus();
-                actionPopup.classList.add('hidden');
-                activePopupType = null;
-            }); row2.appendChild(btn);
-        });
-        container.appendChild(row2); actionPopup.appendChild(container);
+        const currentSceneData = gameData.cenas[currentSceneId];
+        const sceneSuggestions = currentSceneData.suggestions || [];
+        
+        const container = document.createElement('div'); container.className = 'action-popup-container';
+        
+        if (sceneSuggestions.length === 0) {
+            const row1 = document.createElement('div'); row1.className = 'action-popup-row mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            row1.textContent = gameData.gameSuggestionsEmptyFeedback || 'não há sugestões';
+            container.appendChild(row1);
+        } else {
+
+            const row1 = document.createElement('div'); row1.className = 'action-popup-row max-w-full flex-wrap justify-center';
+            sceneSuggestions.forEach(v => { 
+                const btn = document.createElement('button'); btn.textContent = v; 
+                btn.addEventListener('click', () => { 
+                    verbInput.value = v.toLowerCase() + ' '; 
+                    verbInput.focus(); 
+                    actionPopup.classList.add('hidden'); 
+                    activePopupType = null; 
+                }); 
+                row1.appendChild(btn); 
+            });
+            container.appendChild(row1); 
+        }
+        actionPopup.appendChild(container);
     };
     const showInventory = () => {
-        actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; const list = document.createElement('div'); list.className = 'action-popup-list';
-        if (inventory.length === 0) { const msg = document.createElement('p'); msg.textContent = 'Your inventory is empty.'; list.appendChild(msg); }
-        else {
-            inventory.forEach(item => {
-                const btn = document.createElement('button'); btn.textContent = item.name; btn.addEventListener('click', () => {
-                    openItemModal(item);
-                    actionPopup.classList.add('hidden');
-                    activePopupType = null;
-                }); list.appendChild(btn);
-            });
+        actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; 
+        const container = document.createElement('div'); container.className = 'action-popup-container';
+        if (inventory.length === 0) { 
+            const msg = document.createElement('div'); 
+            msg.className = 'action-popup-row mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            msg.textContent = gameData.gameInventoryEmptyFeedback || 'não há itens no inventário'; 
+            container.appendChild(msg); 
         }
-        actionPopup.appendChild(list);
+        else { 
+            const list = document.createElement('div');
+            list.className = 'action-popup-list';
+            inventory.forEach(item => { 
+                const btn = document.createElement('button'); 
+                btn.textContent = item.name; 
+                btn.addEventListener('click', () => { 
+                    openItemModal(item); 
+                    actionPopup.classList.add('hidden'); 
+                    activePopupType = null; 
+                }); 
+                list.appendChild(btn); 
+            }); 
+            container.appendChild(list);
+        }
+        actionPopup.appendChild(container);
     };
+
     const openItemModal = (item) => {
         itemModalName.textContent = item.name; itemModalDescription.innerHTML = formatText(item.examineDescription);
         setupHighlights(itemModalDescription);
@@ -1695,14 +1691,14 @@ document.addEventListener('DOMContentLoaded', () => {
             if (entry.type === 'scene') {
                 const div = document.createElement('div'); div.className = 'diary-entry';
                 if (entry.image) { const img = document.createElement('img'); img.src = entry.image; div.appendChild(img); }
-                const txt = document.createElement('div'); txt.className = 'text-container';
+                const txt = document.createElement('div'); txt.className = 'text-container'; 
                 txt.innerHTML = '<span class="scene-name">' + entry.name + '</span><p>' + formatText(entry.description) + '</p>';
                 div.appendChild(txt); diaryLog.appendChild(div);
                 setupHighlights(txt);
                 currentInterContainer = document.createElement('div'); currentInterContainer.className = 'diary-interactions-container'; txt.appendChild(currentInterContainer);
             } else {
                 if (currentInterContainer) {
-                    const p = document.createElement('p'); p.className = 'diary-' + entry.type;
+                    const p = document.createElement('p'); p.className = 'diary-' + entry.type; 
                     if (entry.type === 'output') { p.innerHTML = formatText(entry.text); setupHighlights(p); } else p.textContent = entry.text;
                     currentInterContainer.appendChild(p);
                 }

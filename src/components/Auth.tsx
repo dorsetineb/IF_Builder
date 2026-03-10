@@ -168,7 +168,7 @@ export function Auth() {
                 {/* Game iframe */}
                 <div className="flex-1 min-h-0">
                     <iframe
-                        src={window.localStorage.getItem('i18nextLng')?.startsWith('en') || navigator.language.startsWith('en') ? "/escape_the_dungeon/index.html" : "/fuja_da_masmorra/index.html"}
+                        src={window.localStorage.getItem('i18nextLng')?.startsWith('pt') || (!window.localStorage.getItem('i18nextLng') && navigator.language.startsWith('pt')) ? "/fuja_da_masmorra/index.html" : "/escape_the_dungeon/index.html"}
                         className="w-full h-full border-0"
                         title="Demo"
                     />
