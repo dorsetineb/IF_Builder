@@ -97,6 +97,19 @@ async function rebuild() {
                 console.log(`  [OK] Sanitized style.css (fixed frames)`);
             }
 
+            // B2. Cache Busting in index.html
+            const indexHtmlPath = path.join(demoPath, 'index.html');
+            if (fs.existsSync(indexHtmlPath)) {
+                let htmlContent = fs.readFileSync(indexHtmlPath, 'utf-8');
+                const timestamp = Date.now();
+                // Replace style.css and game.js with versioned versions
+                // Using regex to handle various quoting styles or existing queries
+                htmlContent = htmlContent.replace(/href=["']style\.css(\?v=[0-9]+)?["']/g, `href="style.css?v=${timestamp}"`);
+                htmlContent = htmlContent.replace(/src=["']game\.js(\?v=[0-9]+)?["']/g, `src="game.js?v=${timestamp}"`);
+                fs.writeFileSync(indexHtmlPath, htmlContent);
+                console.log(`  [OK] Added cache busting to index.html (v=${timestamp})`);
+            }
+
             // C. Update ZIP file (Using tar)
             const zipPath = path.join(PUBLIC_DIR, `${demoName}.zip`);
             console.log(`  [ZIP] Updating ${demoName}.zip...`);
