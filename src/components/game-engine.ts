@@ -776,7 +776,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const startAudioOnInteraction = () => {
-            if (gameData.gameBackgroundMusic && bgmAudio.paused && !isGameEnded) {
+            if (bgmAudio.paused && !isGameEnded && bgmAudio.src && bgmAudio.src !== window.location.href && bgmAudio.src !== "") {
+                bgmAudio.play().catch(e => {});
+            } else if (gameData.gameBackgroundMusic && bgmAudio.paused && !isGameEnded) {
                 playBgm(gameData.gameBackgroundMusic);
             }
             document.removeEventListener('mousedown', startAudioOnInteraction);

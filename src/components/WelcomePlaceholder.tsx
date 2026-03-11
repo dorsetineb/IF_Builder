@@ -179,6 +179,8 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                                 src={
                                     i18n.language.startsWith('pt')
                                         ? "/fuja_da_masmorra/index.html"
+                                        : i18n.language.startsWith('es')
+                                        ? "/escapa_la_mazmorra/index.html"
                                         : "/escape_the_dungeon/index.html"
                                 }
                                 className="w-full h-full border-0"

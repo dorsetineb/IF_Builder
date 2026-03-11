@@ -280,7 +280,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
             const reader = new FileReader();
             reader.onload = (event) => {
                 if (event.target && typeof event.target.result === 'string') {
-                    updateLocalScene('backgroundMusic', event.target.result);
+                    setLocalScene(prev => ({
+                        ...prev,
+                        backgroundMusic: event.target?.result as string,
+                        backgroundMusicName: file.name
+                    }));
                 }
             };
             reader.readAsDataURL(file);
@@ -717,40 +721,42 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(({
                                         </select>
                                     </div>
 
-                                    {/* Audio Section */}
-                                    <div className="space-y-2">
-                                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.audioLabel')}</label>
-                                        <div className="flex items-center gap-3 p-3 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors">
-                                            <div className="w-8 h-8 rounded-full bg-background border border-border flex items-center justify-center flex-shrink-0">
-                                                <Music className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-primary' : 'text-muted-foreground'} `} />
-                                            </div>
-                                            <div className="flex-grow min-w-0">
-                                                {localScene.backgroundMusic ? (
-                                                    <div className="flex flex-col">
-                                                        <span className="text-xs text-foreground truncate">{t('sceneEditor.customAudioSet')}</span>
-                                                        <span className="text-[10px] text-green-500">{t('sceneEditor.audioLoaded')}</span>
-                                                    </div>
-                                                ) : (
-                                                    <div className="flex flex-col">
-                                                        <span className="text-xs text-muted-foreground italic">{t('sceneEditor.noAudio')}</span>
-                                                        <span className="text-[9px] text-muted-foreground/60">{t('sceneEditor.leaveEmptyAudio')}</span>
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="flex-shrink-0">
-                                                {localScene.backgroundMusic ? (
-                                                    <button onClick={() => updateLocalScene('backgroundMusic', undefined)} className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all" title={t('sceneEditor.removeBtn')}>
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                ) : (
-                                                    <label htmlFor="music-upload" className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-primary">
-                                                        {t('sceneEditor.loadBtn')}
-                                                        <input id="music-upload" type="file" accept="audio/*" onChange={handleMusicUpload} className="hidden" />
-                                                    </label>
-                                                )}
+                                    {/* Audio Section - Hidden for opening vignettes as browsers block autoplay without interaction */}
+                                    {localScene.vignetteType !== 'opening' && (
+                                        <div className="space-y-2">
+                                            <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.audioLabel')}</label>
+                                            <div className="flex items-center gap-3 p-3 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors">
+                                                <div className="w-8 h-8 rounded-full bg-background border border-border flex items-center justify-center flex-shrink-0">
+                                                    <Music className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-primary' : 'text-muted-foreground'} `} />
+                                                </div>
+                                                <div className="flex-grow min-w-0">
+                                                    {localScene.backgroundMusic ? (
+                                                        <div className="flex flex-col">
+                                                            <span className="text-xs text-foreground truncate">{t('sceneEditor.customAudioSet')}</span>
+                                                            <span className="text-[10px] text-green-500 truncate">{localScene.backgroundMusicName || t('sceneEditor.audioLoaded')}</span>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="flex flex-col">
+                                                            <span className="text-xs text-muted-foreground italic">{t('sceneEditor.noAudio')}</span>
+                                                            <span className="text-[9px] text-muted-foreground/60">{t('sceneEditor.leaveEmptyAudio')}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex-shrink-0">
+                                                    {localScene.backgroundMusic ? (
+                                                        <button onClick={() => setLocalScene(prev => ({ ...prev, backgroundMusic: undefined, backgroundMusicName: undefined }))} className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all" title={t('sceneEditor.removeBtn')}>
+                                                            <Trash2 className="w-4 h-4" />
+                                                        </button>
+                                                    ) : (
+                                                        <label htmlFor="music-upload" className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-primary">
+                                                            {t('sceneEditor.loadBtn')}
+                                                            <input id="music-upload" type="file" accept="audio/*" onChange={handleMusicUpload} className="hidden" />
+                                                        </label>
+                                                    )}
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
+                                    )}
                                 </div>
 
 

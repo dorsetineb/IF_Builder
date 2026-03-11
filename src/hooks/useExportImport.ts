@@ -736,6 +736,8 @@ DATE:        ${exportDate.toLocaleString()}
     const lang = i18n.language;
     const filename = lang.startsWith('pt')
       ? 'fuja_da_masmorra.zip'
+      : lang.startsWith('es')
+      ? 'escapa_la_mazmorra.zip'
       : 'escape_the_dungeon.zip';
 
     const element = document.createElement('a');

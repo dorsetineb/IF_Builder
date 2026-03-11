@@ -55,6 +55,7 @@ export interface Scene {
   image: string; // URL or base64 string
   description: string;
   backgroundMusic?: string; // Base64 data URL for BGM
+  backgroundMusicName?: string; // Filename of the uploaded BGM
   objectIds: string[]; // References to GameData.globalObjects
   objects?: GameObject[]; // Deprecated: Kept for migration types
   interactions: Interaction[];

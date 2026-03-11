@@ -19,7 +19,7 @@ const PROJECT_ROOT = process.cwd();
 const PUBLIC_DIR = path.join(PROJECT_ROOT, 'public');
 const ENGINE_FILE = path.join(PROJECT_ROOT, 'src', 'components', 'game-engine.ts');
 
-const demos = ['fuja_da_masmorra', 'escape_the_dungeon'];
+const demos = ['fuja_da_masmorra', 'escape_the_dungeon', 'escapa_la_mazmorra'];
 
 // 1. Get current engine code
 function getEngineCode() {
