@@ -8,7 +8,7 @@ import { useTheme } from './ThemeProvider';
 type LandingView = 'landing' | 'about' | 'play';
 
 export function Auth() {
-    const { t } = useTranslation();
+    const { t, i18n } = useTranslation();
     const navigate = useNavigate();
     const [isClosing, setIsClosing] = useState(false);
 
@@ -146,7 +146,11 @@ export function Auth() {
                 <div className="bg-muted border-b border-border px-4 py-3 flex items-center justify-between flex-shrink-0">
                     <div className="flex items-center gap-3">
                         <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
-                            TERM.V2.EXE - REMOTE CONNECTION
+                            {i18n.language.startsWith('pt')
+                                ? "FUJA_DA_MASMORRA.EXE"
+                                : i18n.language.startsWith('es')
+                                ? "ESCAPA_LA_MAZMORRA.EXE"
+                                : "ESCAPE_THE_DUNGEON.EXE"}
                         </span>
                     </div>
                     <div className="flex items-center">
@@ -168,7 +172,13 @@ export function Auth() {
                 {/* Game iframe */}
                 <div className="flex-1 min-h-0">
                     <iframe
-                        src={window.localStorage.getItem('i18nextLng')?.startsWith('pt') || (!window.localStorage.getItem('i18nextLng') && navigator.language.startsWith('pt')) ? "/fuja_da_masmorra/index.html" : "/escape_the_dungeon/index.html"}
+                        src={
+                            i18n.language.startsWith('pt')
+                                ? "/fuja_da_masmorra/index.html"
+                                : i18n.language.startsWith('es')
+                                ? "/escapa_la_mazmorra/index.html"
+                                : "/escape_the_dungeon/index.html"
+                        }
                         className="w-full h-full border-0"
                         title="Demo"
                     />
