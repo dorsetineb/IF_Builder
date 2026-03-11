@@ -322,9 +322,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localTextColorLight, setLocalTextColorLight] = useState(textColorLight);
     const [localTitleColorLight, setLocalTitleColorLight] = useState(titleColorLight);
     const [localFocusColorLight, setLocalFocusColorLight] = useState(focusColorLight);
-    const [localFrameBookColor, setLocalFrameBookColor] = useState(frameBookColor);
-    const [localFrameTradingCardColor, setLocalFrameTradingCardColor] = useState(frameTradingCardColor);
-    const [localFrameRoundedTopColor, setLocalFrameRoundedTopColor] = useState(frameRoundedTopColor);
+
     const [localGameSceneNameOverlayBg, setLocalGameSceneNameOverlayBg] = useState(gameSceneNameOverlayBg);
     const [localGameSceneNameOverlayTextColor, setLocalGameSceneNameOverlayTextColor] = useState(gameSceneNameOverlayTextColor);
     const [localGameFrameColor, setLocalGameFrameColor] = useState(gameFrameColor);
@@ -456,9 +454,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalTextColorLight(textColorLight); }, [textColorLight]);
     useEffect(() => { setLocalTitleColorLight(titleColorLight); }, [titleColorLight]);
     useEffect(() => { setLocalFocusColorLight(focusColorLight); }, [focusColorLight]);
-    useEffect(() => { setLocalFrameBookColor(frameBookColor); }, [frameBookColor]);
-    useEffect(() => { setLocalFrameTradingCardColor(frameTradingCardColor); }, [frameTradingCardColor]);
-    useEffect(() => { setLocalFrameRoundedTopColor(frameRoundedTopColor); }, [frameRoundedTopColor]);
+
     useEffect(() => { setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg); }, [gameSceneNameOverlayBg]);
     useEffect(() => { setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor); }, [gameSceneNameOverlayTextColor]);
     useEffect(() => { setLocalGameFrameColor(gameFrameColor); }, [gameFrameColor]);
@@ -540,8 +536,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor,
         localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceLossMessage,
         localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight,
-        localTitleColorLight, localFocusColorLight, localFrameBookColor, localFrameTradingCardColor,
-        localFrameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
+        localTitleColorLight, localFocusColorLight, localGameFrameColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
         localGameContinueIndicatorColor, localTitle, localLogo, localOmitSplashTitle, localSplashImage,
         localSplashContentAlignment, localSplashContentVerticalAlignment, localSplashDescription,
         localBackgroundMusic, localPositiveEndingImage, localPositiveEndingContentAlignment,
@@ -591,8 +586,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor,
         localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceLossMessage,
         localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight,
-        localTitleColorLight, localFocusColorLight, localFrameBookColor, localFrameTradingCardColor,
-        localFrameRoundedTopColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
+        localTitleColorLight, localFocusColorLight, localGameFrameColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
         localGameContinueIndicatorColor, localTitle, localLogo, localOmitSplashTitle, localSplashImage,
         localSplashContentAlignment, localSplashContentVerticalAlignment, localSplashDescription,
         localBackgroundMusic, localPositiveEndingImage, localPositiveEndingContentAlignment,
@@ -651,12 +645,15 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localTextColorLight !== textColorLight) onUpdate('textColorLight', localTextColorLight, true);
         if (localTitleColorLight !== titleColorLight) onUpdate('titleColorLight', localTitleColorLight, true);
         if (localFocusColorLight !== focusColorLight) onUpdate('focusColorLight', localFocusColorLight, true);
-        if (localFrameBookColor !== frameBookColor) onUpdate('frameBookColor', localFrameBookColor, true);
-        if (localFrameTradingCardColor !== frameTradingCardColor) onUpdate('frameTradingCardColor', localFrameTradingCardColor, true);
-        if (localFrameRoundedTopColor !== frameRoundedTopColor) onUpdate('frameRoundedTopColor', localFrameRoundedTopColor, true);
+
         if (localGameSceneNameOverlayBg !== gameSceneNameOverlayBg) onUpdate('gameSceneNameOverlayBg', localGameSceneNameOverlayBg, true);
         if (localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor) onUpdate('gameSceneNameOverlayTextColor', localGameSceneNameOverlayTextColor, true);
-        if (localGameFrameColor !== gameFrameColor) onUpdate('gameFrameColor', localGameFrameColor, true);
+        if (localGameFrameColor !== gameFrameColor) {
+            onUpdate('gameFrameColor', localGameFrameColor, false);
+            onUpdate('frameBookColor', localGameFrameColor, false);
+            onUpdate('frameTradingCardColor', localGameFrameColor, false);
+            onUpdate('frameRoundedTopColor', localGameFrameColor, true);
+        }
         if (localGameContinueIndicatorColor !== gameContinueIndicatorColor) onUpdate('gameContinueIndicatorColor', localGameContinueIndicatorColor, true);
         if (localSplashImage !== splashImage) onUpdate('gameSplashImage', localSplashImage, true);
         if (localOmitSplashTitle !== omitSplashTitle) onUpdate('gameOmitSplashTitle', localOmitSplashTitle, true);
@@ -757,9 +754,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalTextColorLight(textColorLight);
         setLocalTitleColorLight(titleColorLight);
         setLocalFocusColorLight(focusColorLight);
-        setLocalFrameBookColor(frameBookColor);
-        setLocalFrameTradingCardColor(frameTradingCardColor);
-        setLocalFrameRoundedTopColor(frameRoundedTopColor);
+
         setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg);
         setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor);
         setLocalGameFrameColor(gameFrameColor);
@@ -818,9 +813,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const handleThemeChange = (theme: 'dark' | 'light') => {
         setLocalGameTheme(theme);
         const newFrameColor = '#FFFFFF';
-        setLocalFrameBookColor(newFrameColor);
-        setLocalFrameTradingCardColor(newFrameColor);
-        setLocalFrameRoundedTopColor(newFrameColor);
+
         setLocalGameFrameColor(newFrameColor);
     };
 
@@ -842,12 +835,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalGameSceneNameOverlayBg('#000000');
         setLocalGameSceneNameOverlayTextColor('#FFFFFF');
 
-        setLocalGameSceneNameOverlayTextColor('#FFFFFF');
+
 
         const newFrameColor = '#FFFFFF';
-        setLocalFrameBookColor(newFrameColor);
-        setLocalFrameTradingCardColor(newFrameColor);
-        setLocalFrameRoundedTopColor(newFrameColor);
+
+
+
         setLocalGameFrameColor(newFrameColor);
     };
 
@@ -930,7 +923,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         switch (frame) {
             case 'rounded-top':
                 panelStyles.padding = '5px';
-                panelStyles.backgroundColor = localFrameRoundedTopColor || '#FFFFFF';
+                panelStyles.backgroundColor = localGameFrameColor || '#FFFFFF';
                 panelStyles.border = 'none';
                 panelStyles.borderRadius = '40px 40px 4px 4px';
                 containerStyles.borderRadius = '35px 35px 0 0';
@@ -939,12 +932,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 break;
             case 'book-cover':
                 panelStyles.padding = '5px';
-                panelStyles.backgroundColor = localFrameBookColor || '#FFFFFF';
+                panelStyles.backgroundColor = localGameFrameColor || '#FFFFFF';
                 panelStyles.border = 'none';
                 panelClass = 'frame-preview-book';
                 break;
             case 'trading-card':
-                panelStyles.backgroundColor = localFrameTradingCardColor || '#FFFFFF';
+                panelStyles.backgroundColor = localGameFrameColor || '#FFFFFF';
                 panelStyles.borderRadius = '12px';
                 panelStyles.padding = '4px';
                 containerStyles.border = 'none';
@@ -1611,7 +1604,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
                                             <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.suggestionsButton')}</label>
-                                            <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText || ''} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.suggestionsPlaceholder')} />
+                                            <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText || ''} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.suggestionsPlaceholder')} disabled={!localEnableSuggestions} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="suggestionsEmptyFeedback" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.suggestionsEmptyFeedbackLabel')}</label>
@@ -1624,8 +1617,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     setLocalSuggestionsEmptyFeedback(val);
                                                     onUpdate('gameSuggestionsEmptyFeedback', val);
                                                 }}
-                                                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all"
+                                                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                                                 placeholder={t('UIEditor.textos.suggestionsEmptyFeedbackPlaceholder')}
+                                                disabled={!localEnableSuggestions}
                                             />
                                         </div>
                                     </div>
@@ -1670,11 +1664,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
                                             <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.diaryButton')}</label>
-                                            <input type="text" id="diaryButtonText" value={localDiaryButtonText || ''} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.diaryPlaceholder')} />
+                                            <input type="text" id="diaryButtonText" value={localDiaryButtonText || ''} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.diaryPlaceholder')} disabled={!localEnableDiary} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.diaryPlayerName')}</label>
-                                            <input type="text" id="diaryPlayerName" value={localDiaryPlayerName || ''} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.diaryPlayerNamePlaceholder')} />
+                                            <input type="text" id="diaryPlayerName" value={localDiaryPlayerName || ''} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.diaryPlayerNamePlaceholder')} disabled={!localEnableDiary} />
                                         </div>
                                     </div>
                                 </div>
@@ -1791,13 +1785,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 {localImageFrame && localImageFrame !== 'none' && (
                                                     <div className="space-y-2">
                                                         {localImageFrame === 'rounded-top' && (
-                                                            <ColorInput label={t('UIEditor.aparencia.frameColor', 'Cor')} id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#FFFFFF" />
+                                                            <ColorInput label={t('UIEditor.aparencia.frameColor', 'Cor')} id="frameRoundedTopColor" value={localGameFrameColor} onChange={setLocalGameFrameColor} placeholder="#FFFFFF" />
                                                         )}
                                                         {localImageFrame === 'book-cover' && (
-                                                            <ColorInput label={t('UIEditor.aparencia.frameColor', 'Cor')} id="frameBookColor" value={localFrameBookColor} onChange={setLocalFrameBookColor} placeholder="#FFFFFF" />
+                                                            <ColorInput label={t('UIEditor.aparencia.frameColor', 'Cor')} id="frameBookColor" value={localGameFrameColor} onChange={setLocalGameFrameColor} placeholder="#FFFFFF" />
                                                         )}
                                                         {localImageFrame === 'trading-card' && (
-                                                            <ColorInput label={t('UIEditor.aparencia.frameColor', 'Cor')} id="frameTradingCardColor" value={localFrameTradingCardColor} onChange={setLocalFrameTradingCardColor} placeholder="#FFFFFF" />
+                                                            <ColorInput label={t('UIEditor.aparencia.frameColor', 'Cor')} id="frameTradingCardColor" value={localGameFrameColor} onChange={setLocalGameFrameColor} placeholder="#FFFFFF" />
                                                         )}
                                                     </div>
                                                 )}
@@ -1898,7 +1892,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     ))}
                                                 </div>
                                                 <div className="pt-2">
-                                                    <div 
+                                                    <div
                                                         className="flex items-center justify-between w-full text-left bg-muted/10 p-3 rounded-lg cursor-pointer hover:bg-muted/20 transition-colors"
                                                         onClick={() => setIsColorsExpanded(!isColorsExpanded)}
                                                     >
@@ -1908,43 +1902,43 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         </div>
                                                     </div>
                                                     {isColorsExpanded && (
-                                                    <div className="mt-3 space-y-6 animate-in fade-in slide-in-from-top-1 px-1">
-                                                        <div className="space-y-4">
-                                                            <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.sceneDesc')}</h4>
-                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                <ColorInput label={t('UIEditor.aparencia.defaultText')} id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
-                                                                <ColorInput label={t('UIEditor.aparencia.titleHighlight')} id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
-                                                                <ColorInput label={t('UIEditor.aparencia.focusHighlight')} id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#FFFFFF" />
-                                                                <ColorInput label={t('UIEditor.aparencia.indicatorArrow')} id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
+                                                        <div className="mt-3 space-y-6 animate-in fade-in slide-in-from-top-1 px-1">
+                                                            <div className="space-y-4">
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.sceneDesc')}</h4>
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                                                    <ColorInput label={t('UIEditor.aparencia.defaultText')} id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.titleHighlight')} id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.focusHighlight')} id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.indicatorArrow')} id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <div className="space-y-4">
-                                                            <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.uiButtons')}</h4>
-                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                <ColorInput label={t('UIEditor.aparencia.splashButton')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
-                                                                <ColorInput label={t('UIEditor.aparencia.splashButtonTextColor')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
-                                                                <ColorInput label={t('UIEditor.aparencia.splashButtonHover')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
-                                                                <ColorInput label={t('UIEditor.aparencia.actionButton')} id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
-                                                                <ColorInput label={t('UIEditor.aparencia.actionButtonTextColor')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
+                                                            <div className="space-y-4">
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.uiButtons')}</h4>
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                                                    <ColorInput label={t('UIEditor.aparencia.splashButton')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.splashButtonTextColor')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.splashButtonHover')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.actionButton')} id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.actionButtonTextColor')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <div className="space-y-4">
-                                                            <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.sceneNameBox')}</h4>
-                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                <ColorInput label={t('UIEditor.aparencia.bgColor')} id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
-                                                                <ColorInput label={t('UIEditor.aparencia.text')} id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
+                                                            <div className="space-y-4">
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.sceneNameBox')}</h4>
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                                                    <ColorInput label={t('UIEditor.aparencia.bgColor')} id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
+                                                                    <ColorInput label={t('UIEditor.aparencia.text')} id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
+                                                                </div>
                                                             </div>
-                                                        </div>
 
-                                                        <div className="space-y-4">
-                                                            <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.others')}</h4>
-                                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                <ColorInput label={t('UIEditor.aparencia.mainBg')} id="frameRoundedTopColor" value={localFrameRoundedTopColor} onChange={setLocalFrameRoundedTopColor} placeholder="#000000" />
+                                                            <div className="space-y-4">
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.others')}</h4>
+                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                                                    <ColorInput label={t('UIEditor.aparencia.mainBg')} id="gameFrameColor" value={localGameFrameColor} onChange={setLocalGameFrameColor} placeholder="#000000" />
+                                                                </div>
                                                             </div>
                                                         </div>
-                                                    </div>
                                                     )}
                                                 </div>              </div>
 
@@ -2003,7 +1997,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         </div>
 
                                         <div className="flex items-center justify-start gap-3 mb-2">
-                                            <span className="text-[10px] font-bold text-muted-foreground uppercase">{t('UIEditor.aparencia.previewLabel', 'Exemplo de:')}</span>
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase">{t('UIEditor.aparencia.previewLabel', 'Exemplo de')}</span>
                                             <div className="flex bg-background rounded-lg p-1 border border-border w-48">
                                                 <button
                                                     onClick={() => setPreviewType('scene')}
@@ -2190,7 +2184,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 </div>
                                             </div>
                                         )}
-                                        
+
                                     </div>
                                 </div>
                             </div>
