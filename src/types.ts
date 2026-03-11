@@ -72,6 +72,8 @@ export interface Scene {
   vignetteNextSceneId?: string;
   overlayEffect?: string;
   suggestions?: string[];
+  omitSplashTitle?: boolean;
+  omitSplashDescription?: boolean;
 }
 
 export interface FixedVerb {
@@ -143,6 +145,7 @@ export interface GameData {
   gameTitleColor?: string;
   gameHideTitle?: boolean;
   gameOmitSplashTitle?: boolean;
+  gameOmitSplashDescription?: boolean;
   gameInteractionType?: 'parser' | 'choice';
   gameSplashContentAlignment?: 'left' | 'right';
   gameSplashContentVerticalAlignment?: 'top' | 'bottom';

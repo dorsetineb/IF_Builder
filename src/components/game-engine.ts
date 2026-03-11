@@ -36,6 +36,8 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 vignetteNextSceneId: scene.vignetteNextSceneId,
                 overlayEffect: scene.overlayEffect,
                 isDefeatOutcome: scene.isDefeatOutcome,
+                omitSplashTitle: scene.omitSplashTitle,
+                omitSplashDescription: scene.omitSplashDescription,
                 suggestions: scene.suggestions || []
             };
         }
@@ -1003,8 +1005,14 @@ document.addEventListener('DOMContentLoaded', () => {
         gameContainer.classList.add('hidden');
         
         // Set vignette content
-        if (vignetteTitle) vignetteTitle.textContent = scene.name || '';
-        if (vignetteDescription) vignetteDescription.textContent = scene.description || '';
+        if (vignetteTitle) {
+            vignetteTitle.textContent = scene.name || '';
+            vignetteTitle.classList.toggle('hidden', !!scene.omitSplashTitle);
+        }
+        if (vignetteDescription) {
+            vignetteDescription.textContent = scene.description || '';
+            vignetteDescription.classList.toggle('hidden', !!scene.omitSplashDescription);
+        }
         
         // Set button text
         const buttonText = scene.vignetteButtonText || (scene.vignetteType === 'conclusion' ? (gameData.gameRestartButtonText || 'Restart') : (gameData.gameContinueButtonText || 'Continue'));

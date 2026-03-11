@@ -1350,6 +1350,7 @@ const Editor: React.FC = () => {
                     title={gameData.gameTitle || ''}
                     logo={gameData.gameLogo || ''}
                     omitSplashTitle={!!gameData.gameOmitSplashTitle}
+                    omitSplashDescription={!!gameData.gameOmitSplashDescription}
                     splashImage={gameData.gameSplashImage || ''}
                     splashContentAlignment={gameData.gameSplashContentAlignment || 'right'}
                     splashDescription={gameData.gameSplashDescription || ''}
