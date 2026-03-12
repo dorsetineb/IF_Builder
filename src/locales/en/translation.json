@@ -710,7 +710,7 @@
     "sistemas": {
       "activeSystems": "Active Systems",
       "activeSystemsDesc": "Enable and configure systems available in your game. You can mix multiple systems.",
-      "gameStyle": "Game Style",
+      "gameStyle": "Decision Style",
       "gameStyleDesc": "Defines the main player interaction",
       "parser": "Parser (Type Commands)",
       "parserDesc": "The player types actions like \"take key\" or \"look table\"",

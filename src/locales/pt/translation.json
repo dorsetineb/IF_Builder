@@ -685,7 +685,7 @@
     "sistemas": {
       "activeSystems": "Sistemas Ativos",
       "activeSystemsDesc": "Habilite e configure os sistemas que estarão disponíveis no seu jogo. Você pode combinar múltiplos sistemas.",
-      "gameStyle": "Estilo de Jogo",
+      "gameStyle": "Estilo de Decisão",
       "gameStyleDesc": "Define a interação principal do jogador",
       "parser": "Parser (Descreva Comandos)",
       "parserDesc": "O jogador digita ações como \"pegar chave\" ou \"olhar mesa\"",

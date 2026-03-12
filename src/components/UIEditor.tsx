@@ -1012,55 +1012,55 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 {/* --- BENTO BOX LAYOUT: FULL WIDTH HEADER + 2 INDEPENDENT COLUMNS + FOOTER --- */}
                                 <div className="space-y-6">
 
-                                    {/* --- ROW 1: GAME STYLE (Full Width) --- */}
-                                    <div className={`w-full p-6 bg-card border ${localGameInteractionType ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
-                                        <div className="flex justify-between items-start mb-6">
-                                            <div className="flex items-center gap-3">
-                                                <LayoutTemplate className="w-5 h-5 text-muted-foreground" />
-                                                <div>
-                                                    <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.sistemas.gameStyle')}</h4>
-                                                    <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.gameStyleDesc')}</p>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <button
-                                                onClick={() => setLocalGameInteractionType('parser')}
-                                                className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/5 text-primary' : 'border-border bg-muted text-muted-foreground hover:border-primary/30'}`}
-                                            >
-                                                <div className={`p-3 rounded-lg ${localGameInteractionType === 'parser' ? 'bg-primary/20' : 'bg-background/40'}`}>
-                                                    <Type className="w-6 h-6" />
-                                                </div>
-                                                <div>
-                                                    <span className="text-xs font-bold uppercase block">{t('UIEditor.sistemas.parser')}</span>
-                                                    <span className="text-[10px] opacity-70 mt-0.5">{t('UIEditor.sistemas.parserDesc')}</span>
-                                                </div>
-                                            </button>
-                                            <button
-                                                onClick={() => {
-                                                    setLocalGameInteractionType('choice');
-                                                    setLocalEnableInventory(false);
-                                                }}
-                                                className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-primary bg-primary/5 text-primary' : 'border-border bg-muted text-muted-foreground hover:border-primary/30'}`}
-                                            >
-                                                <div className={`p-3 rounded-lg ${localGameInteractionType === 'choice' ? 'bg-primary/20' : 'bg-background/40'}`}>
-                                                    <List className="w-6 h-6" />
-                                                </div>
-                                                <div>
-                                                    <span className="text-xs font-bold uppercase block">{t('UIEditor.sistemas.choice')}</span>
-                                                    <span className="text-[10px] opacity-70 mt-0.5">{t('UIEditor.sistemas.choiceDesc')}</span>
-                                                </div>
-                                            </button>
-                                        </div>
-                                    </div>
-
                                     <div className="flex flex-col md:flex-row gap-6 items-start">
                                         {/* --- LEFT COLUMN --- */}
                                         <div className="flex-1 w-full space-y-6">
+                                            {/* --- GAME STYLE --- */}
+                                            <div className={`w-full p-6 bg-card border-2 ${localGameInteractionType ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
+                                                <div className="flex justify-between items-start mb-6">
+                                                    <div className="flex items-center gap-3">
+                                                        <LayoutTemplate className="w-5 h-5 text-muted-foreground" />
+                                                        <div>
+                                                            <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.sistemas.gameStyle')}</h4>
+                                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.gameStyleDesc')}</p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 gap-4">
+                                                    <button
+                                                        onClick={() => setLocalGameInteractionType('parser')}
+                                                        className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/10 shadow-sm opacity-100' : 'border-border bg-muted/30 hover:border-primary/30 opacity-50'}`}
+                                                    >
+                                                        <div className={`p-3 rounded-lg ${localGameInteractionType === 'parser' ? 'bg-primary/20 text-primary' : 'bg-background/40 text-muted-foreground'}`}>
+                                                            <Type className="w-6 h-6" />
+                                                        </div>
+                                                        <div>
+                                                            <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'parser' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.parser')}</span>
+                                                            <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.parserDesc')}</span>
+                                                        </div>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => {
+                                                            setLocalGameInteractionType('choice');
+                                                            setLocalEnableInventory(false);
+                                                        }}
+                                                        className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-primary bg-primary/10 shadow-sm opacity-100' : 'border-border bg-muted/30 hover:border-primary/30 opacity-50'}`}
+                                                    >
+                                                        <div className={`p-3 rounded-lg ${localGameInteractionType === 'choice' ? 'bg-primary/20 text-primary' : 'bg-background/40 text-muted-foreground'}`}>
+                                                            <List className="w-6 h-6" />
+                                                        </div>
+                                                        <div>
+                                                            <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'choice' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.choice')}</span>
+                                                            <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.choiceDesc')}</span>
+                                                        </div>
+                                                    </button>
+                                                </div>
+                                            </div>
+
                                             {/* IMAGES */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableImages ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableImages ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <ImageIcon className="w-5 h-5 text-muted-foreground" />
@@ -1117,7 +1117,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* TEXT CONTROL */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableTextControl ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableTextControl ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Type className="w-5 h-5 text-muted-foreground" />
@@ -1182,40 +1182,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     )}
                                                 </div>
                                             </div>
-
-                                            {/* SUGGESTOES */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableSuggestions ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <Lightbulb className="w-5 h-5 text-muted-foreground" />
-                                                            <div>
-                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableSuggestions ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.suggestions', 'Sugestões')}</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.suggestionsDesc', 'Ativa o botão de sugestões de ações.')}</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={localEnableSuggestions}
-                                                                onChange={(e) => setLocalEnableSuggestions(e.target.checked)}
-                                                                disabled={localGameInteractionType === 'choice'}
-                                                                className="sr-only peer"
-                                                            />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableSuggestions ? 'translateX(16px)' : 'translateX(0)' }}></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
 
                                         {/* --- RIGHT COLUMN --- */}
                                         <div className="flex-1 w-full space-y-6">
                                             {/* CHANCES/VIDAS */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableChances ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableChances ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Heart className="w-5 h-5 text-muted-foreground" />
@@ -1289,9 +1262,36 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 </div>
                                             </div>
 
+                                            {/* SUGGESTOES */}
+                                            <div className="w-full">
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableSuggestions ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <Lightbulb className="w-5 h-5 text-muted-foreground" />
+                                                            <div>
+                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableSuggestions ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.suggestions', 'Sugestões')}</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.suggestionsDesc', 'Ativa o botão de sugestões de ações.')}</p>
+                                                            </div>
+                                                        </div>
+                                                        <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={localEnableSuggestions}
+                                                                onChange={(e) => setLocalEnableSuggestions(e.target.checked)}
+                                                                disabled={localGameInteractionType === 'choice'}
+                                                                className="sr-only peer"
+                                                            />
+                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableSuggestions ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
                                             {/* INVENTORY */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableInventory ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableInventory ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Package className="w-5 h-5 text-muted-foreground" />
@@ -1318,7 +1318,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* DIARY */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableDiary ? 'border-primary/30 ring-1 ring-primary/10' : 'border-border'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-6`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableDiary ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Book className="w-5 h-5 text-muted-foreground" />
@@ -1335,15 +1335,15 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         </label>
                                                     </div>
                                                     {localEnableDiary && (
-                                                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                            <div className="space-y-3">
-                                                                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-muted-foreground/50">
-                                                                    <span className="text-[11px] text-muted-foreground">{t('UIEditor.sistemas.showSceneImage')}</span>
+                                                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                                            <div className="flex flex-row items-center gap-6">
+                                                                <div className="flex items-center gap-2 cursor-pointer" onClick={() => setLocalDiaryShowSceneImage(!localDiaryShowSceneImage)}>
                                                                     <input type="checkbox" checked={localDiaryShowSceneImage} onChange={(e) => setLocalDiaryShowSceneImage(e.target.checked)} className="custom-checkbox" />
+                                                                    <span className="text-[11px] text-muted-foreground">{t('UIEditor.sistemas.showSceneImage')}</span>
                                                                 </div>
-                                                                <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border border-muted-foreground/50">
-                                                                    <span className="text-[11px] text-muted-foreground">{t('UIEditor.sistemas.showPlayerAction')}</span>
+                                                                <div className="flex items-center gap-2 cursor-pointer" onClick={() => setLocalDiaryShowPlayerAction(!localDiaryShowPlayerAction)}>
                                                                     <input type="checkbox" checked={localDiaryShowPlayerAction} onChange={(e) => setLocalDiaryShowPlayerAction(e.target.checked)} className="custom-checkbox" />
+                                                                    <span className="text-[11px] text-muted-foreground">{t('UIEditor.sistemas.showPlayerAction')}</span>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -1353,7 +1353,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* TRACKERS */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border ${localEnableTrackers ? 'border-primary/30 ring-1 ring-primary/10' : 'border-muted-foreground/50'} rounded-2xl transition-all hover:shadow-lg group shadow-sm flex flex-col gap-4`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableTrackers ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <SlidersHorizontal className="w-5 h-5 text-muted-foreground" />
