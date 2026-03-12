@@ -1036,7 +1036,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             <Type className="w-6 h-6" />
                                                         </div>
                                                         <div>
-                                                            <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'parser' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.parser')}</span>
+                                                            <span className={`text-xs font-bold uppercase block transition-colors ${(theme === 'light' || theme === 'cream') && localGameInteractionType === 'parser' ? 'text-primary' : localGameInteractionType === 'parser' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.parser')}</span>
                                                             <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.parserDesc')}</span>
                                                         </div>
                                                     </button>
@@ -1051,7 +1051,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             <List className="w-6 h-6" />
                                                         </div>
                                                         <div>
-                                                            <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'choice' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.choice')}</span>
+                                                            <span className={`text-xs font-bold uppercase block transition-colors ${(theme === 'light' || theme === 'cream') && localGameInteractionType === 'choice' ? 'text-primary' : localGameInteractionType === 'choice' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.choice')}</span>
                                                             <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.choiceDesc')}</span>
                                                         </div>
                                                     </button>
