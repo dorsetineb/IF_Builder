@@ -160,7 +160,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                 >
                     <div
                         className="bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300"
-                        style={{ width: '80vw', height: '70vh' }}
+                        style={{ width: '98vw', height: '95vh' }}
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="bg-zinc-800 border-b border-zinc-700 px-4 py-3 flex items-center justify-between flex-shrink-0">

@@ -106,8 +106,14 @@ async function rebuild() {
                 // Using regex to handle various quoting styles or existing queries
                 htmlContent = htmlContent.replace(/href=["']style\.css(\?v=[0-9]+)?["']/g, `href="style.css?v=${timestamp}"`);
                 htmlContent = htmlContent.replace(/src=["']game\.js(\?v=[0-9]+)?["']/g, `src="game.js?v=${timestamp}"`);
+
+                // B3. Add is-demo class to body
+                if (!htmlContent.includes('is-demo')) {
+                    htmlContent = htmlContent.replace(/<body([^>]+)class=["']([^"']+)["']/, '<body$1class="$2 is-demo"');
+                }
+
                 fs.writeFileSync(indexHtmlPath, htmlContent);
-                console.log(`  [OK] Added cache busting to index.html (v=${timestamp})`);
+                console.log(`  [OK] Added cache busting and is-demo class to index.html (v=${timestamp})`);
             }
 
             // C. Update ZIP file (Using tar)
