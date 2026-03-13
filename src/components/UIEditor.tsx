@@ -1028,18 +1028,18 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 </div>
 
                                                 <div className="grid grid-cols-1 gap-4">
-                                                    <button
-                                                        onClick={() => setLocalGameInteractionType('parser')}
-                                                        className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/10 shadow-sm opacity-100' : 'border-border bg-muted/30 hover:border-primary/30 opacity-50'}`}
-                                                    >
-                                                        <div className={`p-3 rounded-lg ${localGameInteractionType === 'parser' ? 'bg-primary/20 text-primary' : 'bg-background/40 text-muted-foreground'}`}>
-                                                            <Type className="w-6 h-6" />
-                                                        </div>
-                                                        <div>
-                                                            <span className={`text-xs font-bold uppercase block transition-colors ${(theme === 'light' || theme === 'cream') && localGameInteractionType === 'parser' ? 'text-primary' : localGameInteractionType === 'parser' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.parser')}</span>
-                                                            <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.parserDesc')}</span>
-                                                        </div>
-                                                    </button>
+                                                        <button
+                                                            onClick={() => setLocalGameInteractionType('parser')}
+                                                            className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/10 shadow-sm opacity-100' : 'border-border bg-muted/30 hover:border-primary/30 opacity-50'}`}
+                                                        >
+                                                            <div className={`p-3 rounded-lg ${localGameInteractionType === 'parser' ? 'bg-primary/20 text-primary' : 'bg-background/40 text-muted-foreground'}`}>
+                                                                <Type className="w-6 h-6" />
+                                                            </div>
+                                                            <div>
+                                                                <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'parser' ? (theme === 'light' || theme === 'cream' ? 'text-foreground' : 'text-white') : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.parser')}</span>
+                                                                <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.parserDesc')}</span>
+                                                            </div>
+                                                        </button>
                                                     <button
                                                         onClick={() => {
                                                             setLocalGameInteractionType('choice');
@@ -1051,7 +1051,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             <List className="w-6 h-6" />
                                                         </div>
                                                         <div>
-                                                            <span className={`text-xs font-bold uppercase block transition-colors ${(theme === 'light' || theme === 'cream') && localGameInteractionType === 'choice' ? 'text-primary' : localGameInteractionType === 'choice' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.choice')}</span>
+                                                            <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'choice' ? (theme === 'light' || theme === 'cream' ? 'text-foreground' : 'text-white') : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.choice')}</span>
                                                             <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.choiceDesc')}</span>
                                                         </div>
                                                     </button>
@@ -1072,7 +1072,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableImages} onChange={(e) => setLocalEnableImages(e.target.checked)} className="sr-only peer" />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableImages ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                <div 
+                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableImages ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
+                                                                    style={{ transform: localEnableImages ? 'translateX(16px)' : 'translateX(0)' }}
+                                                                ></div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -1129,7 +1132,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableTextControl} onChange={(e) => setLocalEnableTextControl(e.target.checked)} className="sr-only peer" />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableTextControl ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                <div 
+                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableTextControl ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
+                                                                    style={{ transform: localEnableTextControl ? 'translateX(16px)' : 'translateX(0)' }}
+                                                                ></div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -1200,7 +1206,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableChances} onChange={(e) => setLocalEnableChances(e.target.checked)} className="sr-only peer" />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableChances ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                <div 
+                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableChances ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
+                                                                    style={{ transform: localEnableChances ? 'translateX(16px)' : 'translateX(0)' }}
+                                                                ></div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -1282,7 +1291,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 className="sr-only peer"
                                                             />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableSuggestions ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                <div 
+                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableSuggestions ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
+                                                                    style={{ transform: localEnableSuggestions ? 'translateX(16px)' : 'translateX(0)' }}
+                                                                ></div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -1309,7 +1321,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 className="sr-only peer"
                                                             />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableInventory ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                <div 
+                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableInventory ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
+                                                                    style={{ transform: localEnableInventory ? 'translateX(16px)' : 'translateX(0)' }}
+                                                                ></div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -1330,7 +1345,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableDiary} onChange={(e) => setLocalEnableDiary(e.target.checked)} className="sr-only peer" />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableDiary ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                <div 
+                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableDiary ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
+                                                                    style={{ transform: localEnableDiary ? 'translateX(16px)' : 'translateX(0)' }}
+                                                                ></div>
                                                             </div>
                                                         </label>
                                                     </div>
@@ -1365,7 +1383,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <label className="relative inline-flex items-center cursor-pointer">
                                                             <input type="checkbox" checked={localEnableTrackers} onChange={(e) => setLocalEnableTrackers(e.target.checked)} className="sr-only peer" />
                                                             <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div className="absolute top-1 left-1 bg-foreground w-3 h-3 rounded-[2px] shadow-sm transition-all peer-checked:bg-white" style={{ transform: localEnableTrackers ? 'translateX(16px)' : 'translateX(0)' }}></div>
+                                                                <div 
+                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableTrackers ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
+                                                                    style={{ transform: localEnableTrackers ? 'translateX(16px)' : 'translateX(0)' }}
+                                                                ></div>
                                                             </div>
                                                         </label>
                                                     </div>

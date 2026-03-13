@@ -50,10 +50,10 @@ export function Auth() {
         <div className="w-96 flex flex-col h-full relative z-20 transition-all duration-300">
             <div className="flex-1 flex flex-col justify-center w-full pl-12 pr-6 space-y-12">
                 {/* Tagline */}
-                <div className="text-sm text-muted-foreground leading-relaxed text-left space-y-1 drop-shadow-md">
+                <div className="text-sm text-primary-foreground/80 leading-relaxed text-left space-y-1 drop-shadow-md">
                     <p>{t('auth.sidebar.line1', 'Em uma caverna escura.')}</p>
                     <p>{t('auth.sidebar.line2', 'Monitores CRT iluminam o mofo.')}</p>
-                    <p className="text-primary font-bold mt-2 drop-shadow-md">&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
+                    <p className={`${(theme === 'cream' || theme === 'light') ? 'text-white' : 'text-primary'} font-bold mt-2 drop-shadow-md`}>&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
                 </div>
 
                 {/* Navigation Buttons */}
@@ -67,7 +67,11 @@ export function Auth() {
                             e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
                         }}
                         onClick={() => navigate('/editor')}
-                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden bg-primary border-primary text-primary-foreground shadow-xl hover:scale-[1.02]`}
+                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden shadow-xl hover:scale-[1.02] ${
+                            (theme === 'cream' || theme === 'light') 
+                            ? 'bg-white border-primary text-primary' 
+                            : 'bg-primary border-primary text-primary-foreground'
+                        }`}
                     >
                         <div
                             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
@@ -80,7 +84,7 @@ export function Auth() {
                     </button>
 
                     {/* Secret Hint Text */}
-                    <div className="text-sm text-muted-foreground leading-relaxed text-left space-y-1 pt-8 opacity-50 drop-shadow-md">
+                    <div className="text-sm text-primary-foreground/80 leading-relaxed text-left space-y-1 pt-8 opacity-50 drop-shadow-md">
                         <p>{t('auth.sidebar.hint1', 'Algo pode acontecer,')}</p>
                         <p>{t('auth.sidebar.hint2', 'Se você clicar nos computadores.')}</p>
                     </div>
