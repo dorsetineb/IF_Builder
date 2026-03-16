@@ -141,8 +141,8 @@ export function Auth() {
                     }`}
                 style={{
                     // Wide popup - fills most of viewport
-                    width: '80vw',
-                    height: '70vh',
+                    width: '90vw',
+                    height: '90vh',
                 }}
                 onClick={(e) => e.stopPropagation()}
             >
