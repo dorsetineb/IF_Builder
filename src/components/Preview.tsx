@@ -135,17 +135,6 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .chance-icon svg { width: 24px; height: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); display: block; }
             .chance-icon.lost svg { opacity: 0.3; }
 
-            /* VIGNETTE TEXT PADDING FIX */
-            /* Original CSS has: padding: 5vw 225px - horizontal is too large */
-            /* Fix: Use equal padding on all sides */
-            .splash-content {
-                padding: 10vw !important;
-            }
-            #positive-ending-screen .content,
-            #negative-ending-screen .content {
-                padding: 10vw !important;
-            }
-
             /* Mobile Responsive Fix */
             @media (max-width: 768px) {
                 #scene-description { padding: 15px !important; }

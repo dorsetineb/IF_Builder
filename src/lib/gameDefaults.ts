@@ -252,7 +252,7 @@ body.dark-theme { --bg-color: #0d1117; --panel-bg: #161b22; --border-color: #303
 body.light-theme { --bg-color: #ffffff; --panel-bg: #f6f8fa; --border-color: #d0d7de; --text-color: __GAME_TEXT_COLOR_LIGHT__; --text-dim-color: #57606a; --accent-color: __GAME_TITLE_COLOR_LIGHT__; --danger-color: #cf222e; --danger-hover-bg: #a40e26; --highlight-color: __GAME_FOCUS_COLOR_LIGHT__; --input-bg: #ffffff; --button-bg: #f6f8fa; --button-hover-bg: #e5e7eb; }
 :root { --font-family: __FONT_FAMILY__; --font-size-base: __GAME_FONT_SIZE__; --scale-factor: 1; --font-size: calc(var(--font-size-base) * var(--scale-factor)); --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: __CONTINUE_INDICATOR_COLOR__; --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
 body.is-demo { --scale-factor: 0.7; }
-body.is-demo .splash-content { padding-left: calc(225px * var(--scale-factor)); padding-right: calc(225px * var(--scale-factor)); gap: calc(20px * var(--scale-factor)); }
+body.is-demo .splash-content { gap: calc(20px * var(--scale-factor)); }
 body.is-demo .splash-logo { max-height: calc(150px * var(--scale-factor)); }
 body.is-demo #splash-start-button, body.is-demo .ending-restart-button, body.is-demo #continue-button, body.is-demo #vignette-continue-button { padding: calc(8px * var(--scale-factor)) calc(16px * var(--scale-factor)); max-width: calc(350px * var(--scale-factor)); }
 body.is-demo .action-buttons button { padding: calc(6px * var(--scale-factor)) calc(10px * var(--scale-factor)); }
@@ -269,7 +269,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); background-size: cover; background-position: center; z-index: 2000; padding: 0; display: flex; align-items: var(--splash-align-items); justify-content: var(--splash-justify-content); transition: opacity 1s ease-in-out; }
 .splash-screen.fade-out { opacity: 0; pointer-events: none; }
 .splash-screen.align-left { --splash-justify-content: flex-start; --splash-align-items: flex-start; --splash-text-align: left; --splash-content-align-items: flex-start; }
-.splash-content { text-align: var(--splash-text-align); display: flex; flex-direction: column; align-items: var(--splash-content-align-items); gap: 20px; width: 100%; padding: 5vw 225px; position: relative; }
+.splash-content { text-align: var(--splash-text-align); display: flex; flex-direction: column; align-items: var(--splash-content-align-items); gap: 20px; width: 100%; padding: 5vh max(40px, 6vw); position: relative; }
 .splash-logo { max-height: 150px; width: auto; margin-bottom: 20px; }
 .splash-text h1 { font-size: 2em; color: var(--accent-color); margin: 0; text-shadow: none; }
 .splash-text p { font-size: 0.95em; margin-top: 10px; color: var(--text-color); max-width: 60ch; white-space: pre-wrap; }
