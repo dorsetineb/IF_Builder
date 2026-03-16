@@ -147,9 +147,9 @@ export function Auth() {
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Fake Browser Header */}
-                <div className="bg-muted border-b border-border px-4 py-3 flex items-center justify-between flex-shrink-0">
+                <div className={`px-4 py-3 border-b flex items-center justify-between flex-shrink-0 ${theme === 'light' ? 'bg-white border-zinc-200' : 'bg-primary border-primary'}`}>
                     <div className="flex items-center gap-3">
-                        <span className="font-mono text-xs text-muted-foreground uppercase tracking-widest">
+                        <span className={`font-mono text-xs uppercase tracking-widest ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground opacity-90'}`}>
                             {i18n.language.startsWith('pt')
                                 ? "FUJA_DA_MASMORRA.EXE"
                                 : i18n.language.startsWith('es')
@@ -158,17 +158,17 @@ export function Auth() {
                         </span>
                     </div>
                     <div className="flex items-center">
-                        <button className="h-6 w-8 flex items-center justify-center hover:bg-foreground/10 transition-colors rounded-sm">
-                            <Minus className="w-3 h-3 text-muted-foreground" />
+                        <button className="h-6 w-8 flex items-center justify-center hover:bg-black/10 transition-colors rounded-sm">
+                            <Minus className={`w-3 h-3 ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground/70'}`} />
                         </button>
-                        <button className="h-6 w-8 flex items-center justify-center hover:bg-foreground/10 transition-colors rounded-sm">
-                            <Square className="w-2.5 h-2.5 text-muted-foreground" />
+                        <button className="h-6 w-8 flex items-center justify-center hover:bg-black/10 transition-colors rounded-sm">
+                            <Square className={`w-2.5 h-2.5 ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground/70'}`} />
                         </button>
                         <button
-                            className="h-6 w-8 flex items-center justify-center hover:bg-destructive transition-colors group rounded-sm"
+                            className="h-6 w-8 flex items-center justify-center hover:bg-red-500 transition-colors group rounded-sm"
                             onClick={resetToLanding}
                         >
-                            <X className="w-3.5 h-3.5 text-muted-foreground group-hover:text-destructive-foreground" />
+                            <X className={`w-3.5 h-3.5 group-hover:text-white ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground/70'}`} />
                         </button>
                     </div>
                 </div>

@@ -163,9 +163,9 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         style={{ width: '90vw', height: '90vh' }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className="bg-zinc-800 border-b border-zinc-700 px-4 py-3 flex items-center justify-between flex-shrink-0">
+                        <div className={`px-4 py-3 border-b flex items-center justify-between flex-shrink-0 ${theme === 'light' ? 'bg-white border-zinc-200' : 'bg-primary border-primary'}`}>
                             <div className="flex items-center gap-3">
-                                <span className="font-mono text-xs text-zinc-500 uppercase tracking-widest">
+                                <span className={`font-mono text-xs uppercase tracking-widest ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground opacity-90'}`}>
                                     {i18n.language.startsWith('pt')
                                         ? "FUJA_DA_MASMORRA.EXE"
                                         : i18n.language.startsWith('es')
@@ -177,7 +177,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                                 className="h-6 w-8 flex items-center justify-center hover:bg-red-500 transition-colors group rounded-sm"
                                 onClick={() => setIsGamePopupOpen(false)}
                             >
-                                <X className="w-3.5 h-3.5 text-zinc-500 group-hover:text-white" />
+                                <X className={`w-3.5 h-3.5 group-hover:text-white ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground/70'}`} />
                             </button>
                         </div>
                         <div className="flex-1 min-h-0">
