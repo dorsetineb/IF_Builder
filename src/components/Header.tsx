@@ -80,7 +80,7 @@ const Header: React.FC<{
           </div>
         )}
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 ml-auto">
           {(!['about', 'guide', 'settings'].includes(currentView)) && (
             <>
               {/* Hidden Import Input */}

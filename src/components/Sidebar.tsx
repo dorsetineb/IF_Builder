@@ -48,10 +48,10 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
   // Platform Sidebar Style Button Class
   const getButtonClass = (view: View) =>
-    `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${currentView === view
+    `flex items-center gap-3 px-4 h-[42px] rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${currentView === view
       ? `bg-primary text-primary-foreground font-bold shadow-sm`
       : 'text-muted-foreground hover:bg-zinc-800 hover:text-white'
-    } ${isCollapsed ? 'justify-center px-0 py-3' : ''}`;
+    } ${isCollapsed ? 'justify-center px-0' : ''}`;
 
   const handleToggleScenes = () => {
     if (currentView !== 'scenes' && currentView !== 'map') {
@@ -83,10 +83,10 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         {/* Scene Editor - Accordion */}
         <div className={`flex flex-col ${(isScenesExpanded && !isCollapsed) ? 'flex-grow min-h-0' : ''}`}>
           <button
-            className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${isScenesExpanded
+            className={`flex items-center gap-3 px-4 h-[42px] rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${isScenesExpanded
               ? `bg-primary text-primary-foreground font-bold shadow-sm`
               : 'text-muted-foreground hover:bg-zinc-800 hover:text-white'
-              } ${isCollapsed ? 'justify-center px-0 py-3' : ''}`}
+              } ${isCollapsed ? 'justify-center px-0' : ''}`}
             onClick={handleToggleScenes}
             title={isCollapsed ? t('sidebar.sceneEditor', 'Narrativa') : undefined}
           >
@@ -115,13 +115,13 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
           {/* Expanded Content */}
           {(!isCollapsed && isScenesExpanded) && (
-            <div className="pl-4 mt-1 mb-2 animate-in slide-in-from-top-2 duration-200 flex-grow min-h-0 flex flex-col">
+            <div className="pl-4 mt-3 mb-2 animate-in slide-in-from-top-2 duration-200 flex-grow min-h-0 flex flex-col">
               <div className="pl-3 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[2px] before:bg-[image:repeating-linear-gradient(to_bottom,var(--primary)_0,var(--primary)_2px,transparent_2px,transparent_10px)] before:opacity-60 flex flex-col gap-1 flex-grow min-h-0">
                 <SceneList scenes={scenes} isDirty={isDirty} theme={theme} {...sceneListProps} />
 
                 {/* Map Button inside accordion */}
                 <button
-                  className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-all text-xs font-medium text-left mt-1 flex-shrink-0 ${currentView === 'map'
+                  className={`flex items-center gap-2 px-3 h-[42px] rounded-lg transition-all text-xs font-medium text-left mt-1 flex-shrink-0 ${currentView === 'map'
                     ? 'bg-primary/20 text-primary border border-primary/30'
                     : 'text-muted-foreground hover:bg-zinc-800 hover:text-white border border-transparent'}`}
                   onClick={() => onSetView('map')}

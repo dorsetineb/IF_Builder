@@ -79,7 +79,7 @@ const SceneList: React.FC<SceneListProps> = ({
   };
 
   const getAddButtonClass = () => {
-    const baseClass = "w-full flex items-center justify-start px-2 py-2 font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent mt-2 flex-shrink-0";
+    const baseClass = "w-full flex items-center justify-start px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent mt-2 flex-shrink-0";
 
     if (theme === 'light') {
       return `${baseClass} bg-black text-white hover:bg-zinc-800`;
@@ -106,7 +106,7 @@ const SceneList: React.FC<SceneListProps> = ({
       <div style={style}>
         <div
           onClick={() => onSelectScene(scene.id)}
-          className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-lg transition-all overflow-hidden cursor-pointer h-[36px] ${selectedSceneId === scene.id
+          className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center rounded-lg transition-all overflow-hidden cursor-pointer h-[42px] mb-2 ${selectedSceneId === scene.id
             ? isDirty
               ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold'
               : 'bg-primary/20 text-primary border border-primary/30'
@@ -159,22 +159,22 @@ const SceneList: React.FC<SceneListProps> = ({
   return (
     <div className="flex flex-col gap-0 h-full">
       {/* Search Input */}
-      <div className="relative flex-shrink-0 mb-1">
+      <div className="relative flex-shrink-0 mb-3">
         <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <input
           type="text"
           placeholder={t('sceneList.search', 'Buscar...')}
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full pl-8 pr-2 py-1.5 text-xs rounded-md bg-input border border-border focus:outline-none focus:ring-1 focus:ring-primary"
+          className="w-full pl-8 pr-2 py-2 text-xs rounded-md bg-input border border-border focus:outline-none focus:ring-1 focus:ring-primary h-[42px]"
         />
       </div>
 
       <div className="flex-grow min-h-0">
         <AutoSizer>
           {({ height, width }: { height: number; width: number }) => {
-            const itemSize = 40; // Fixed row height
-            const buttonHeight = 36; // Approx height of add button + margins
+            const itemSize = 50; // Fixed row height + margin
+            const buttonHeight = 44; // Approx height of add button + margins
             const contentHeight = filteredScenes.length * itemSize;
 
             // Calculate maximum space available for the list
