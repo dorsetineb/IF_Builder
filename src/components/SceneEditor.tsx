@@ -412,7 +412,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
     return (
       <div className="space-y-6">
         <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-muted-foreground/50">
-          <p className="text-muted-foreground text-xs font-medium max-w-lg">
+          <p className="text-muted-foreground text-xs font-medium">
             {t('sceneEditor.headerDesc')}
           </p>
           <div className="flex items-center gap-2">

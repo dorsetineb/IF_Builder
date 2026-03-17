@@ -956,7 +956,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         <div className="space-y-6 pb-8">
             {/* Header with Save/Undo actions */}
             <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/50">
-                <p className="text-muted-foreground text-xs font-medium max-w-lg">
+                <p className="text-muted-foreground text-xs font-medium">
                     {t('UIEditor.header.description')}
                 </p>
                 <div className="flex items-center gap-3">

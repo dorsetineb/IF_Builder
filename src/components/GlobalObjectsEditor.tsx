@@ -179,7 +179,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         <div className="flex flex-col h-full space-y-6" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* Header with Save/Undo actions */}
             <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-muted-foreground/50">
-                <p className="text-muted-foreground text-xs font-medium max-w-lg">
+                <p className="text-muted-foreground text-xs font-medium">
                     {t('globalObjectsEditor.headerDesc', 'Gerenciador Global: Objetos criados aqui podem ser usados em qualquer cena.')}
                 </p>
                 <div className="flex items-center gap-3">
@@ -218,7 +218,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                 placeholder={t('globalObjectsEditor.searchPlaceholder', 'Buscar objetos globais...')}
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-input border border-input rounded-lg pl-8 pr-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-muted-foreground"
+                                className="w-full bg-input border border-muted-foreground/50 rounded-lg pl-8 pr-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-muted-foreground"
                             />
                         </div>
                         <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider px-1">
