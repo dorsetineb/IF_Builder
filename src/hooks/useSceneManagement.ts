@@ -39,12 +39,27 @@ export const useSceneManagement = ({
         const existingSceneCount = gameData.sceneOrder.length;
         const initialMapX = existingSceneCount * (NODE_WIDTH + X_GAP);
 
-        const hasOpeningVignette = Object.values(gameData.scenes).some(s => s.vignetteType === 'opening');
+        const sceneValues = Object.values(gameData.scenes);
+        const hasOpeningVignette = sceneValues.some(s => s.vignetteType === 'opening');
         const isVignette = type === 'vignette' || !hasOpeningVignette;
+
+        const vignetteCount = sceneValues.filter(s => s.vignetteType && s.vignetteType !== 'none').length + 1;
+        const sceneCount = sceneValues.filter(s => !s.vignetteType || s.vignetteType === 'none').length + 1;
+
+        let defaultName = '';
+        if (isVignette) {
+            if (!hasOpeningVignette) {
+                defaultName = t('editor.newOpeningVignetteName', 'Abertura');
+            } else {
+                defaultName = `${t('editor.newVignetteNamePrefix', 'Vinheta #')}${vignetteCount}`;
+            }
+        } else {
+            defaultName = `${t('editor.newSceneNamePrefix', 'Cena #')}${sceneCount}`;
+        }
 
         const newScene: Scene = {
             id: newId,
-            name: isVignette ? t('editor.newVignetteName', 'Nova Vinheta') : t('editor.newSceneName', 'Nova Cena'),
+            name: defaultName,
             image: '',
             description: isVignette ? t('editor.newVignetteDescription', 'Descrição da nova vinheta.') : t('editor.newSceneDescription', 'Descrição da nova cena.'),
             objectIds: [],

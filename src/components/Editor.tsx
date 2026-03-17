@@ -37,6 +37,7 @@ import Sidebar from './Sidebar';
 import SceneEditor from './SceneEditor';
 import Header from './Header';
 import { WelcomePlaceholder } from './WelcomePlaceholder';
+import SceneList from './SceneList';
 // import VignettesEditor from './VignettesEditor'; // Removed as integrated into SceneEditor
 import Preview from './Preview';
 import { LoadingOverlay } from './LoadingOverlay';
@@ -842,9 +843,9 @@ const Editor: React.FC = () => {
   const { theme: appTheme } = useTheme();
   const navigate = useNavigate();
 
-
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [isNarrativeMenuOpen, setIsNarrativeMenuOpen] = useState(true);
 
   // Save Project States
   const [isSaving, setIsSaving] = useState(false);
@@ -855,8 +856,6 @@ const Editor: React.FC = () => {
   const [biosStep, setBiosStep] = useState(0); // 0: Info, 1: Prompt Wait, 2: Typing
   const [typedCommand, setTypedCommand] = useState('');
   const [isBiosFinished, setIsBiosFinished] = useState(false);
-
-
 
   const [importKey, setImportKey] = useState(0);
 
@@ -969,7 +968,7 @@ const Editor: React.FC = () => {
 
   const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
   const [previewSceneId, setPreviewSceneId] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<View>('scenes');
+  const [currentView, setCurrentView] = useState<View>('welcome');
 
   // Update page title based on current view
   useEffect(() => {
@@ -987,8 +986,8 @@ const Editor: React.FC = () => {
     isOpen: false,
     title: '',
     message: '',
-    onConfirm: () => { },
-    onCancel: () => { },
+    onConfirm: () => {},
+    onCancel: () => {},
     isDanger: false,
   });
 
@@ -1046,7 +1045,7 @@ const Editor: React.FC = () => {
   }, [gameData.scenes, selectedSceneId]);
 
   const hasOpeningVignette = useMemo(() => {
-    return scenesList.some(s => s.vignetteType === 'opening');
+    return scenesList.some((s) => s.vignetteType === 'opening');
   }, [scenesList]);
 
   // handleUpdateGameData coming from hook
@@ -1321,11 +1320,33 @@ const Editor: React.FC = () => {
               }}
               isCollapsed={sidebarCollapsed}
               onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+              isNarrativeMenuOpen={isNarrativeMenuOpen}
+              onToggleNarrative={() => setIsNarrativeMenuOpen(!isNarrativeMenuOpen)}
               isDirty={isDirty}
               theme={appTheme}
             />
+            {isNarrativeMenuOpen && (currentView === 'scenes' || currentView === 'map') && (
+              <div className="w-64 flex-shrink-0 bg-primary/30 flex flex-col pt-4 pl-2 pr-0 pb-2 transition-all z-10 shadow-lg border-r border-primary/20">
+                <SceneList
+                  scenes={scenesList}
+                  startSceneId={gameData.startScene}
+                  selectedSceneId={selectedSceneId}
+                  onSelectScene={handleSelectScene}
+                  onAddScene={() => setIsNodeTypeModalOpen(true)}
+                  onDeleteScene={handleDeleteScene}
+                  onReorderScenes={handleReorderScenes}
+                  isDirty={isDirty}
+                  theme={appTheme}
+                  currentView={currentView}
+                  isLateralMenu={true}
+                  onAddNode={handleAddNodeType}
+                  hasOpeningVignette={hasOpeningVignette}
+                  onViewMap={() => handleSetView('map')}
+                />
+              </div>
+            )}
             <main
-              className={`flex-1 overflow-y-auto relative bg-background ${currentView === 'scenes' && !selectedScene ? 'p-0' : 'p-6'}`}
+              className={`flex-1 overflow-y-auto relative bg-background ${(currentView === 'scenes' && !selectedScene) || currentView === 'map' ? 'p-0' : 'p-6'}`}
             >
               {/* currentView === 'vignettes' block removed */}
               {currentView === 'interface' && (
@@ -1463,7 +1484,7 @@ const Editor: React.FC = () => {
                     handleUpdateGameData('gameSplashButtonText', text)
                   }
                 />
-              ) : currentView === 'scenes' ? (
+              ) : currentView === 'welcome' || (currentView === 'scenes' && !selectedScene) ? (
                 <WelcomePlaceholder
                   onCreateScene={handleCreateNewProject}
                   onDownloadExample={handleDownloadExample}
@@ -1488,6 +1509,8 @@ const Editor: React.FC = () => {
                     onUpdateVignettePosition={handleUpdateVignettePosition}
                     onReorganizeScenes={handleReorganizeScenes}
                     gameInteractionType={gameData.gameInteractionType || 'parser'}
+                    onAddNode={handleAddNodeType}
+                    hasOpeningVignette={hasOpeningVignette}
                   />
                 </Suspense>
               )}

@@ -379,7 +379,7 @@
     "logout": "Log Out"
   },
   "sidebar": {
-    "sceneEditor": "Scene Editor",
+    "sceneEditor": "Narrative",
     "sceneMap": "Scene Map",
     "objects": "Objects",
     "trackers": "Trackers",
@@ -614,20 +614,12 @@
         "scene": {
           "title": "Scene",
           "description": "Moments of divergence. Where the player makes choices and destiny changes.",
-          "tags": [
-            "DECISION",
-            "BRANCHING",
-            "COMPLEXITY"
-          ]
+          "tags": ["DECISION", "BRANCHING", "COMPLEXITY"]
         },
         "vignette": {
           "title": "Vignette",
           "description": "A narrative bridge. Connect points of the story without interruptions.",
-          "tags": [
-            "LINEAR",
-            "FIXED",
-            "ATMOSPHERE"
-          ]
+          "tags": ["LINEAR", "FIXED", "ATMOSPHERE"]
         }
       }
     },

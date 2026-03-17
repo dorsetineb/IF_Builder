@@ -180,7 +180,7 @@
     "logout": "Cerrar sesión"
   },
   "sidebar": {
-    "sceneEditor": "Editor de Escenas",
+    "sceneEditor": "Narrativa",
     "sceneMap": "Mapa de Escenas",
     "objects": "Objetos",
     "trackers": "Rastreadores",
@@ -615,20 +615,12 @@
         "scene": {
           "title": "Escena",
           "description": "Momentos de divergencia. Donde el jugador toma decisiones y el destino cambia.",
-          "tags": [
-            "DECISIÓN",
-            "RAMIFICACIÓN",
-            "COMPLEJIDAD"
-          ]
+          "tags": ["DECISIÓN", "RAMIFICACIÓN", "COMPLEJIDAD"]
         },
         "vignette": {
           "title": "Viñeta",
           "description": "Un puente narrativo. Conecta puntos de la historia sin interrupciones.",
-          "tags": [
-            "LINEAL",
-            "FIJO",
-            "ATMÓSFERA"
-          ]
+          "tags": ["LINEAL", "FIJO", "ATMÓSFERA"]
         }
       }
     },

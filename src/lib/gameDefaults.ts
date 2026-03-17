@@ -1433,10 +1433,23 @@ export const OVERLAY_CSS = `
 `;
 
 export const initialGameData: GameData = {
-    startScene: '',
-    scenes: {},
+    startScene: 'SCN_OPENING',
+    scenes: {
+        'SCN_OPENING': {
+            id: 'SCN_OPENING',
+            name: 'Abertura',
+            description: 'Descrição da nova vinheta.',
+            image: '',
+            interactions: [],
+            objectIds: [],
+            vignetteType: 'opening',
+            vignetteButtonText: 'COMEÇAR',
+            mapX: 0,
+            mapY: 0
+        }
+    },
     globalObjects: {},
-    sceneOrder: [],
+    sceneOrder: ['SCN_OPENING'],
     defaultFailureMessage: '',
     gameHTML: gameHTML,
     gameCSS: gameCSS + OVERLAY_CSS,

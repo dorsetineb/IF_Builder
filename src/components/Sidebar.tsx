@@ -5,7 +5,24 @@ import { Link } from 'react-router-dom';
 import SceneList from './SceneList';
 import { Scene, View, GameData } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Code, BookOpen, Map, Box, SlidersHorizontal, Settings, Info, CircleHelp, ChevronLeft, ChevronRight, MessageSquare, Gamepad2, ChevronDown, MonitorPlay, Zap, Command } from 'lucide-react';
+import {
+  Code,
+  BookOpen,
+  Map,
+  Box,
+  SlidersHorizontal,
+  Settings,
+  Info,
+  CircleHelp,
+  ChevronLeft,
+  ChevronRight,
+  MessageSquare,
+  Gamepad2,
+  ChevronDown,
+  MonitorPlay,
+  Zap,
+  Command,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface SidebarProps {
@@ -27,76 +44,91 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   isDirty?: boolean;
   theme?: string;
+  isNarrativeMenuOpen?: boolean;
+  onToggleNarrative?: () => void;
 }
 
 const Sidebar: React.FC<SidebarProps> = (props) => {
   const { t } = useTranslation();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { onExit, onNavigate, currentView, onSetView, scenes, gameData, isCollapsed, onToggleCollapse, isDirty, theme = 'dark', ...sceneListProps } = props;
-  const [isScenesExpanded, setIsScenesExpanded] = useState(false);
-
+  const {
+    onExit,
+    onNavigate,
+    currentView,
+    onSetView,
+    scenes,
+    gameData,
+    isCollapsed,
+    onToggleCollapse,
+    isDirty,
+    theme = 'dark',
+    isNarrativeMenuOpen,
+    onToggleNarrative,
+  } = props;
 
   // Sync accordion state with current view
   // Sync accordion state with current view
   useEffect(() => {
     // Only force collapse if we leave scenes/map view.
-    // We do NOT force expand anymore, as the user wants it to start closed.
     if (currentView !== 'scenes' && currentView !== 'map') {
-      setIsScenesExpanded(false);
+      if (isNarrativeMenuOpen && onToggleNarrative) {
+          onToggleNarrative();
+      }
     }
   }, [currentView]); // Removed scenes.length dependency
 
   // Platform Sidebar Style Button Class
   const getButtonClass = (view: View) =>
-    `flex items-center gap-3 px-4 h-[42px] rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${currentView === view
-      ? `bg-primary text-primary-foreground font-bold shadow-sm`
-      : 'text-muted-foreground hover:bg-zinc-800 hover:text-white'
-    } ${isCollapsed ? 'justify-center px-0' : ''}`;
+    `flex items-center gap-3 pl-4 pr-3 h-[42px] transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${
+      currentView === view
+        ? `bg-primary text-primary-foreground font-bold shadow-sm rounded-l-lg`
+        : 'text-muted-foreground hover:bg-zinc-800 hover:text-white rounded-lg mr-3'
+    } ${isCollapsed ? 'justify-center px-0 pl-0 pr-0 mr-0 rounded-lg' : ''}`;
 
   const handleToggleScenes = () => {
     if (currentView !== 'scenes' && currentView !== 'map') {
-      onSetView('scenes');
-      setIsScenesExpanded(true);
-    } else {
-      setIsScenesExpanded(!isScenesExpanded);
+      onSetView('map');
     }
+    if (onToggleNarrative) onToggleNarrative();
   };
 
   const handleSetView = (view: View) => {
     onSetView(view);
-    setIsScenesExpanded(false);
   };
 
   return (
-    <aside className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full`}>
-
-
-      <nav className={`flex flex-col gap-1 flex-grow px-3 py-4 ${isScenesExpanded ? 'overflow-hidden' : 'overflow-y-auto overflow-x-hidden'}`}>
+    <aside
+      className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full`}
+    >
+      <nav
+        className={`flex flex-col gap-1 flex-grow pl-3 pr-0 py-4 overflow-y-auto overflow-x-hidden`}
+      >
         {/* Community Button - REMOVED AS REQUESTED */}
 
-
-
-
-
-
-
-        {/* Scene Editor - Accordion */}
-        <div className={`flex flex-col ${(isScenesExpanded && !isCollapsed) ? 'flex-grow min-h-0' : ''}`}>
+        {/* Scene Editor - Button */}
+        <div
+          className={`flex flex-col`}
+        >
           <button
-            className={`flex items-center gap-3 px-4 h-[42px] rounded-lg transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${isScenesExpanded
-              ? `bg-primary text-primary-foreground font-bold shadow-sm`
-              : 'text-muted-foreground hover:bg-zinc-800 hover:text-white'
-              } ${isCollapsed ? 'justify-center px-0' : ''}`}
+            className={`flex items-center gap-3 pl-4 pr-3 h-[42px] transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${
+              isNarrativeMenuOpen && (currentView === 'scenes' || currentView === 'map')
+                ? `bg-primary text-primary-foreground font-bold shadow-sm rounded-l-lg`
+                : 'text-muted-foreground hover:bg-zinc-800 hover:text-white rounded-lg mr-3'
+            } ${isCollapsed ? 'justify-center px-0 pl-0 pr-0 mr-0 rounded-lg' : ''}`}
             onClick={handleToggleScenes}
             title={isCollapsed ? t('sidebar.sceneEditor', 'Narrativa') : undefined}
           >
             {/* Hover Glow Effect */}
-            <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${isScenesExpanded ? 'translate-x-0' : ''}`} />
+            <div
+              className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${isNarrativeMenuOpen && (currentView === 'scenes' || currentView === 'map') ? 'translate-x-0' : ''}`}
+            />
 
             <BookOpen className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && (
               <>
-                <span className="truncate relative z-10 flex-1 text-left">{t('sidebar.sceneEditor', 'Narrativa')}</span>
+                <span className="truncate relative z-10 flex-1 text-left">
+                  {t('sidebar.sceneEditor', 'Narrativa')}
+                </span>
                 {/* Counter */}
                 <span className="bg-black/30 text-white text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-white/20 shadow-sm relative z-10">
                   {scenes.length}
@@ -112,28 +144,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
               </div>
             )}
           </button>
-
-          {/* Expanded Content */}
-          {(!isCollapsed && isScenesExpanded) && (
-            <div className="pl-4 mt-3 mb-2 animate-in slide-in-from-top-2 duration-200 flex-grow min-h-0 flex flex-col">
-              <div className="pl-3 relative before:absolute before:left-0 before:top-0 before:bottom-0 before:w-[2px] before:bg-[image:repeating-linear-gradient(to_bottom,var(--primary)_0,var(--primary)_2px,transparent_2px,transparent_10px)] before:opacity-60 flex flex-col gap-1 flex-grow min-h-0">
-                <SceneList scenes={scenes} isDirty={isDirty} theme={theme} {...sceneListProps} />
-
-                {/* Map Button inside accordion */}
-                <button
-                  className={`flex items-center gap-2 px-3 h-[42px] rounded-lg transition-all text-xs font-medium text-left mt-1 flex-shrink-0 ${currentView === 'map'
-                    ? 'bg-primary/20 text-primary border border-primary/30'
-                    : 'text-muted-foreground hover:bg-zinc-800 hover:text-white border border-transparent'}`}
-                  onClick={() => onSetView('map')}
-                >
-                  <Map size={14} />
-                  <span>{t('sidebar.sceneMap', 'Mapa de Cenas')}</span>
-                </button>
-              </div>
-            </div>
-          )}
         </div>
-
 
         {/* Vinhetas */}
         {/* Vignettes button removed */}
@@ -144,9 +155,13 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             onClick={() => handleSetView('global_objects')}
             title={isCollapsed ? t('sidebar.objects', 'Objetos') : undefined}
           >
-            <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'global_objects' ? 'translate-x-0' : ''}`} />
+            <div
+              className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'global_objects' ? 'translate-x-0' : ''}`}
+            />
             <Box className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-            {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.objects', 'Objetos')}</span>}
+            {!isCollapsed && (
+              <span className="truncate relative z-10">{t('sidebar.objects', 'Objetos')}</span>
+            )}
           </button>
         )}
         <button
@@ -154,9 +169,16 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           onClick={() => handleSetView('trackers')}
           title={isCollapsed ? t('sidebar.trackers', 'Rastreadores') : undefined}
         >
-          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'trackers' ? 'translate-x-0' : ''}`} />
-          <SlidersHorizontal className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.trackers', 'Rastreadores')}</span>}
+          <div
+            className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'trackers' ? 'translate-x-0' : ''}`}
+          />
+          <SlidersHorizontal
+            className={`flex-shrink-0 relative z-10`}
+            size={isCollapsed ? 20 : 16}
+          />
+          {!isCollapsed && (
+            <span className="truncate relative z-10">{t('sidebar.trackers', 'Rastreadores')}</span>
+          )}
         </button>
 
         {(gameData.gameInteractionType || 'parser') !== 'choice' && (
@@ -165,9 +187,15 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             onClick={() => handleSetView('global_commands')}
             title={isCollapsed ? t('sidebar.globalCommands', 'Comandos Globais') : undefined}
           >
-            <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'global_commands' ? 'translate-x-0' : ''}`} />
+            <div
+              className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'global_commands' ? 'translate-x-0' : ''}`}
+            />
             <Command className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-            {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.globalCommands', 'Comandos Globais')}</span>}
+            {!isCollapsed && (
+              <span className="truncate relative z-10">
+                {t('sidebar.globalCommands', 'Comandos Globais')}
+              </span>
+            )}
           </button>
         )}
 
@@ -177,26 +205,30 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           onClick={() => handleSetView('interface')}
           title={isCollapsed ? t('sidebar.settings', 'Configurações') : undefined}
         >
-          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`} />
+          <div
+            className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'interface' ? 'translate-x-0' : ''}`}
+          />
           <Settings className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.settings', 'Configurações')}</span>}
+          {!isCollapsed && (
+            <span className="truncate relative z-10">{t('sidebar.settings', 'Configurações')}</span>
+          )}
         </button>
-
-
-
       </nav>
 
       {/* Bottom Menu Items - Pinned to Bottom */}
-      <div className="mt-auto pt-2 pb-4 px-3 flex flex-col gap-1 relative border-t border-muted-foreground/50 bg-card z-20 flex-shrink-0">
-
+      <div className="mt-auto pt-2 pb-4 pl-3 pr-0 flex flex-col gap-1 relative border-t border-muted-foreground/50 bg-card z-20 flex-shrink-0">
         <button
           onClick={() => onSetView('guide')}
           className={getButtonClass('guide')}
           title={isCollapsed ? t('sidebar.quickGuide', 'Guia Rápido') : undefined}
         >
-          <div className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'guide' ? 'translate-x-0' : ''}`} />
+          <div
+            className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'guide' ? 'translate-x-0' : ''}`}
+          />
           <CircleHelp className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.quickGuide', 'Guia Rápido')}</span>}
+          {!isCollapsed && (
+            <span className="truncate relative z-10">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
+          )}
         </button>
 
         <button
@@ -204,16 +236,18 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           className={getButtonClass('about')}
           title={isCollapsed ? t('sidebar.aboutProject', 'Sobre o Projeto') : undefined}
         >
-          <div className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'about' ? 'translate-x-0' : ''}`} />
+          <div
+            className={`absolute inset-0 bg-primary/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'about' ? 'translate-x-0' : ''}`}
+          />
           <Zap className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && <span className="truncate relative z-10">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>}
+          {!isCollapsed && (
+            <span className="truncate relative z-10">
+              {t('sidebar.aboutProject', 'Sobre o Projeto')}
+            </span>
+          )}
         </button>
-
-
       </div>
-
-
-    </aside >
+    </aside>
   );
 };
 

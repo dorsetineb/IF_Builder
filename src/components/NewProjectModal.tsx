@@ -237,8 +237,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
         vignettes: [{
             id: 'VNT_OPENING',
-            name: t('editor.newVignetteName', 'Nova Vinheta'),
-            title: title || t('editor.newVignetteName', 'Nova Vinheta'),
+            name: t('editor.newOpeningVignetteName', 'Abertura'),
+            title: title || t('editor.newOpeningVignetteName', 'Abertura'),
             description: description || t('editor.newVignetteDescription', 'Descrição da nova vinheta.'),
             buttonText: startButtonText,
             showTitle: true,
@@ -251,7 +251,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     const handleCreate = () => {
         const startSceneId = 'SCN_OPENING';
 
-        const defaultTitle = t('editor.newVignetteName', 'Nova Vinheta');
+        const defaultTitle = t('editor.newOpeningVignetteName', 'Abertura');
         const defaultDescription = t('editor.newVignetteDescription', 'Descrição da nova vinheta.');
         const finalTitle = title || defaultTitle;
         const finalDescription = description || defaultDescription;
