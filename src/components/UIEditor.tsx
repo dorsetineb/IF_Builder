@@ -2224,9 +2224,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                     <div className="space-y-4">
                                         <div className="space-y-2">
-                                            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 block">
-                                                {t('settings.language.select', 'Idioma')}
-                                            </label>
                                             <select
                                                 value={localLanguage}
                                                 onChange={(e) => setLocalLanguage(e.target.value)}
