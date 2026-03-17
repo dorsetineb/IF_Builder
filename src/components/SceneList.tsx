@@ -318,7 +318,7 @@ const SceneList: React.FC<SceneListProps> = ({
                     }}
                     className={`${getAddButtonClass()} flex-1 h-[32px] px-2 text-[11px] min-h-0 w-auto justify-center`}
                   >
-                    <ArrowRight className={`w-3.5 h-3.5 mr-1.5 ${theme === 'light' || theme === 'cream' ? 'text-zinc-900' : theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
+                    <ArrowRight className="w-3.5 h-3.5 mr-1.5 currentColor" />
                     {t('sceneList.nodeSelection.vignette.title', 'Criar Vinheta')}
                   </button>
 
@@ -340,7 +340,7 @@ const SceneList: React.FC<SceneListProps> = ({
                       !hasOpeningVignette ? 'opacity-50 cursor-not-allowed grayscale' : ''
                     }`}
                   >
-                    <Split className={`w-3.5 h-3.5 mr-1.5 ${theme === 'light' || theme === 'cream' ? 'text-zinc-900' : theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
+                    <Split className="w-3.5 h-3.5 mr-1.5 currentColor" />
                     {t('sceneList.nodeSelection.scene.title', 'Criar Cena')}
                   </button>
                 </div>
