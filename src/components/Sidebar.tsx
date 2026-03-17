@@ -82,7 +82,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
     `flex items-center gap-3 pl-4 pr-3 h-[42px] transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${
       currentView === view
         ? `bg-primary text-primary-foreground font-bold shadow-sm rounded-l-lg`
-        : 'text-muted-foreground hover:bg-zinc-800 hover:text-white rounded-lg mr-3'
+        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg mr-3'
     } ${isCollapsed ? 'justify-center px-0 pl-0 pr-0 mr-0 rounded-lg' : ''}`;
 
   const handleToggleScenes = () => {
@@ -113,7 +113,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             className={`flex items-center gap-3 pl-4 pr-3 h-[42px] transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${
               isNarrativeMenuOpen && (currentView === 'scenes' || currentView === 'map')
                 ? `bg-primary text-primary-foreground font-bold shadow-sm rounded-l-lg`
-                : 'text-muted-foreground hover:bg-zinc-800 hover:text-white rounded-lg mr-3'
+                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground rounded-lg mr-3'
             } ${isCollapsed ? 'justify-center px-0 pl-0 pr-0 mr-0 rounded-lg' : ''}`}
             onClick={handleToggleScenes}
             title={isCollapsed ? t('sidebar.sceneEditor', 'Narrativa') : undefined}

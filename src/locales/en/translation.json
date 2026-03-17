@@ -394,7 +394,17 @@
     "search": "Search...",
     "start": "Start",
     "deleteScene": "Delete scene",
-    "createNode": "Create Vignette or Scene"
+    "createNode": "Create Vignette or Scene",
+    "viewMap": "View Scene Map",
+    "nodeSelection": {
+      "vignette": {
+        "title": "Create Vignette"
+      },
+      "scene": {
+        "title": "Create Scene",
+        "lockedDesc": "Create an opening vignette to enable scenes."
+      }
+    }
   },
   "sceneMap": {
     "instruction": "Visualize and organize your game structure.",

@@ -107,7 +107,17 @@
     "search": "Buscar...",
     "start": "Início",
     "deleteScene": "Deletar cena",
-    "createNode": "Criar Vinheta ou Cena"
+    "createNode": "Criar Vinheta ou Cena",
+    "viewMap": "Ver mapa de cenas",
+    "nodeSelection": {
+      "vignette": {
+        "title": "Criar Vinheta"
+      },
+      "scene": {
+        "title": "Criar Cena",
+        "lockedDesc": "Crie uma vinheta de abertura para habilitar cenas."
+      }
+    }
   },
   "sceneMap": {
     "instruction": "Visualize e organize a estrutura do seu jogo.",

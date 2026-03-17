@@ -101,18 +101,30 @@ const SceneList: React.FC<SceneListProps> = ({
     dragOverItem.current = null;
   };
 
-  const getVignetteIcon = (scene: Scene) => {
-    if (!scene.vignetteType || scene.vignetteType === 'none') return null;
-    switch (scene.vignetteType) {
-      case 'opening':
-        return null;
-      case 'transition':
-        return <ArrowRight className="w-3 h-3 text-blue-400" />;
-      case 'conclusion':
-        return <Flag className="w-3 h-3 text-red-400" />;
-      default:
-        return null;
+  const getVignetteLabel = (scene: Scene) => {
+    if (!scene.vignetteType || scene.vignetteType === 'none' || scene.vignetteType === 'opening') return null;
+    
+    const isTransition = scene.vignetteType === 'transition';
+    const label = isTransition 
+      ? t('sceneEditor.vignetteTypes.transition', 'Transição')
+      : t('sceneEditor.vignetteTypes.conclusion', 'Conclusão');
+
+    const isSelected = selectedSceneId === scene.id && currentView === 'scenes';
+
+    let colorClasses = '';
+    if (isLateralMenu && isSelected) {
+      colorClasses = 'bg-primary-foreground text-primary border-primary-foreground/50';
+    } else if (isSelected && isDirty) {
+      colorClasses = 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
+    } else {
+      colorClasses = 'bg-primary text-primary-foreground border-primary/50';
     }
+
+    return (
+      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${colorClasses}`}>
+        {label}
+      </span>
+    );
   };
 
   const getAddButtonClass = () => {
@@ -120,10 +132,10 @@ const SceneList: React.FC<SceneListProps> = ({
       'w-full flex items-center justify-start px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent mt-2 flex-shrink-0';
 
     if (theme === 'light') {
-      return `${baseClass} bg-black text-white hover:bg-zinc-800`;
+      return `${baseClass} bg-zinc-200 text-zinc-900 hover:bg-zinc-300`;
     }
     if (theme === 'cream') {
-      return `${baseClass} bg-[#5c4033] text-white hover:bg-[#4a332a]`;
+      return `${baseClass} bg-[#e8dcc4] text-[#4a332a] hover:bg-[#d5c6aa]`;
     }
     // Default / Dark
     return `${baseClass} bg-white text-zinc-950 hover:bg-zinc-200`;
@@ -181,7 +193,7 @@ const SceneList: React.FC<SceneListProps> = ({
             <div className="flex items-center justify-between w-full min-w-0">
               <span className="truncate font-medium text-xs">{scene.name}</span>
               <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
-                {getVignetteIcon(scene)}
+                {getVignetteLabel(scene)}
                 {startSceneId === scene.id && (
                   <span
                     className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${
@@ -303,7 +315,7 @@ const SceneList: React.FC<SceneListProps> = ({
                     }}
                     className={`${getAddButtonClass()} flex-1 h-[32px] px-2 text-[11px] min-h-0 w-auto justify-center`}
                   >
-                    <ArrowRight className={`w-3.5 h-3.5 mr-1.5 ${theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
+                    <ArrowRight className={`w-3.5 h-3.5 mr-1.5 ${theme === 'light' || theme === 'cream' ? 'text-zinc-900' : theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
                     {t('sceneList.nodeSelection.vignette.title', 'Criar Vinheta')}
                   </button>
 
@@ -325,7 +337,7 @@ const SceneList: React.FC<SceneListProps> = ({
                       !hasOpeningVignette ? 'opacity-50 cursor-not-allowed grayscale' : ''
                     }`}
                   >
-                    <Split className={`w-3.5 h-3.5 mr-1.5 ${theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
+                    <Split className={`w-3.5 h-3.5 mr-1.5 ${theme === 'light' || theme === 'cream' ? 'text-zinc-900' : theme === 'dark' ? 'text-zinc-950' : 'text-white'}`} />
                     {t('sceneList.nodeSelection.scene.title', 'Criar Cena')}
                   </button>
                 </div>

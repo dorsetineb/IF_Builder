@@ -1511,6 +1511,7 @@ const Editor: React.FC = () => {
                     gameInteractionType={gameData.gameInteractionType || 'parser'}
                     onAddNode={handleAddNodeType}
                     hasOpeningVignette={hasOpeningVignette}
+                    theme={appTheme}
                   />
                 </Suspense>
               )}

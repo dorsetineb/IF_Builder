@@ -15,6 +15,7 @@ interface SceneMapProps {
   gameInteractionType?: 'parser' | 'choice';
   onAddNode?: (type: 'scene' | 'vignette') => void;
   hasOpeningVignette?: boolean;
+  theme?: string;
 }
 
 const NODE_WIDTH = 250;
@@ -64,6 +65,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
   gameInteractionType = 'parser',
   onAddNode,
   hasOpeningVignette = false,
+  theme = 'dark',
 }) => {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -514,6 +516,30 @@ const SceneMap: React.FC<SceneMapProps> = ({
     };
   }, [allScenesMap, vignettes, startSceneId, getLinkingItems]);
 
+  const handleViewAll = useCallback(() => {
+    if (!containerRef.current || initialNodes.length === 0) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const padding = 100;
+
+    // Calculate content bounds
+    const contentWidth = bounds.maxX - bounds.minX;
+    const contentHeight = bounds.maxY - bounds.minY;
+
+    // Calculate scale to fit
+    // Check if width or height is valid to avoid division by zero
+    if (contentWidth <= 0 || contentHeight <= 0) return;
+
+    const scaleX = (rect.width - padding * 2) / contentWidth;
+    const scaleY = (rect.height - padding * 2) / contentHeight;
+    const newScale = Math.min(scaleX, scaleY, 1); // Cap at 1x
+
+    // Calculate position to center
+    const newX = rect.width / 2 - (bounds.minX + contentWidth / 2) * newScale;
+    const newY = rect.height / 2 - (bounds.minY + contentHeight / 2) * newScale;
+
+    setView({ x: newX, y: newY, scale: newScale });
+  }, [initialNodes, bounds]);
+
   const [nodes, setNodes] = useState(initialNodes);
   const [highlightOrphans, setHighlightOrphans] = useState(false);
 
@@ -521,24 +547,20 @@ const SceneMap: React.FC<SceneMapProps> = ({
     if (!dragInfo) setNodes(initialNodes);
   }, [initialNodes, dragInfo]);
 
-  useEffect(() => {
-    if (containerRef.current && initialNodes.length > 0) {
-      // Logic: Center on Opening if exists, else Start Scene
-      const opening = initialNodes.find((n) => n.id === 'VNT_OPENING');
-      const startNode = initialNodes.find((n) => n.id === startSceneId);
-      const target = opening || startNode;
+  const hasInitialFitted = useRef(false);
 
-      if (target) {
-        setView((v) => ({
-          ...v,
-          x: 50,
-          y: containerRef.current!.offsetHeight / 2 - target.height / 2,
-        }));
-      } else {
-        setView((v) => ({ ...v, x: 50, y: 50 }));
+  useEffect(() => {
+    if (hasInitialFitted.current) return;
+    
+    // Small timeout to ensure container has bounds before measuring
+    const timer = setTimeout(() => {
+      if (containerRef.current && initialNodes.length > 0) {
+        handleViewAll();
+        hasInitialFitted.current = true;
       }
-    }
-  }, []);
+    }, 10);
+    return () => clearTimeout(timer);
+  }, [handleViewAll, initialNodes.length]);
 
   const handleZoom = useCallback(
     (direction: 'in' | 'out') => {
@@ -603,27 +625,6 @@ const SceneMap: React.FC<SceneMapProps> = ({
     }
     setIsPanning(false);
   }, [dragInfo, nodes, onUpdateScenePosition, onUpdateVignettePosition]);
-
-  const handleViewAll = useCallback(() => {
-    if (!containerRef.current || nodes.length === 0) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const padding = 100;
-
-    // Calculate content bounds
-    const contentWidth = bounds.maxX - bounds.minX;
-    const contentHeight = bounds.maxY - bounds.minY;
-
-    // Calculate scale to fit
-    const scaleX = (rect.width - padding * 2) / contentWidth;
-    const scaleY = (rect.height - padding * 2) / contentHeight;
-    const newScale = Math.min(scaleX, scaleY, 1); // Cap at 1x
-
-    // Calculate position to center
-    const newX = rect.width / 2 - (bounds.minX + contentWidth / 2) * newScale;
-    const newY = rect.height / 2 - (bounds.minY + contentHeight / 2) * newScale;
-
-    setView({ x: newX, y: newY, scale: newScale });
-  }, [nodes, bounds]);
 
   const handleToggleOrphans = useCallback(() => {
     setHighlightOrphans((prev) => !prev);
@@ -988,14 +989,26 @@ const SceneMap: React.FC<SceneMapProps> = ({
       <div className="absolute bottom-6 left-6 z-10 flex items-center gap-3">
         <button
           onClick={onReorganizeScenes}
-          className="flex items-center px-4 py-2 bg-zinc-800 text-zinc-200 font-bold rounded-lg hover:bg-zinc-700 transition-all shadow-xl active:scale-95 text-xs border border-zinc-600"
+          className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
+            theme === 'light'
+              ? 'bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-100'
+              : theme === 'cream'
+                ? 'bg-[#fdfbf7] text-[#4a332a] border-[#e8dcc4] hover:bg-[#f5ebd8]'
+                : 'bg-zinc-800 text-zinc-200 border-zinc-600 hover:bg-zinc-700'
+          }`}
         >
           <LayoutGrid className="w-4 h-4 mr-2" />
           Reorganizar
         </button>
         <button
           onClick={handleViewAll}
-          className="flex items-center px-4 py-2 bg-zinc-800 text-zinc-200 font-bold rounded-lg hover:bg-zinc-700 transition-all shadow-xl active:scale-95 text-xs border border-zinc-600"
+          className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
+            theme === 'light'
+              ? 'bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-100'
+              : theme === 'cream'
+                ? 'bg-[#fdfbf7] text-[#4a332a] border-[#e8dcc4] hover:bg-[#f5ebd8]'
+                : 'bg-zinc-800 text-zinc-200 border-zinc-600 hover:bg-zinc-700'
+          }`}
         >
           <Maximize2 className="w-4 h-4 mr-2" />
           Ver Tudo
@@ -1005,7 +1018,11 @@ const SceneMap: React.FC<SceneMapProps> = ({
           className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
             highlightOrphans
               ? 'bg-red-600 text-white border-red-500 hover:bg-red-700'
-              : 'bg-zinc-800 text-zinc-200 border-zinc-600 hover:bg-zinc-700'
+              : theme === 'light'
+                ? 'bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-100'
+                : theme === 'cream'
+                  ? 'bg-[#fdfbf7] text-[#4a332a] border-[#e8dcc4] hover:bg-[#f5ebd8]'
+                  : 'bg-zinc-800 text-zinc-200 border-zinc-600 hover:bg-zinc-700'
           }`}
         >
           <AlertTriangle className="w-4 h-4 mr-2" />
@@ -1013,41 +1030,73 @@ const SceneMap: React.FC<SceneMapProps> = ({
         </button>
       </div>
       <div className="absolute bottom-6 right-6 z-10 flex flex-col items-end gap-4 pointer-events-none">
-        <div className="bg-zinc-950/80 backdrop-blur-md p-4 rounded-xl border border-zinc-800 shadow-xl pointer-events-auto">
-          <h4 className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest mb-3">
+        <div className={`backdrop-blur-md p-4 rounded-xl shadow-xl pointer-events-auto border ${
+          theme === 'light'
+            ? 'bg-white/80 border-zinc-200'
+            : theme === 'cream'
+              ? 'bg-[#fdfbf7]/80 border-[#e8dcc4]'
+              : 'bg-zinc-950/80 border-zinc-800'
+        }`}>
+          <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${
+            theme === 'light' || theme === 'cream' ? 'text-zinc-600' : 'text-zinc-500'
+          }`}>
             Legenda
           </h4>
           <ul className="space-y-2">
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full border-2 border-blue-500 bg-blue-500/20"></div>
-              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                theme === 'light' || theme === 'cream' ? 'text-zinc-700' : 'text-zinc-400'
+              }`}>
                 Abertura
               </span>
             </li>
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full border-2 border-amber-500 bg-amber-500/20"></div>
-              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                theme === 'light' || theme === 'cream' ? 'text-zinc-700' : 'text-zinc-400'
+              }`}>
                 Cena / Vinheta
               </span>
             </li>
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full border-2 border-green-500 bg-green-500/20"></div>
-              <span className="text-[10px] font-bold text-zinc-400 uppercase tracking-wider">
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${
+                theme === 'light' || theme === 'cream' ? 'text-zinc-700' : 'text-zinc-400'
+              }`}>
                 Final
               </span>
             </li>
           </ul>
         </div>
-        <div className="flex bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden shadow-xl pointer-events-auto">
+        <div className={`flex rounded-lg overflow-hidden shadow-xl pointer-events-auto border ${
+          theme === 'light'
+            ? 'bg-white border-zinc-200'
+            : theme === 'cream'
+              ? 'bg-[#fdfbf7] border-[#e8dcc4]'
+              : 'bg-zinc-950 border-zinc-800'
+        }`}>
           <button
             onClick={() => handleZoom('in')}
-            className="w-10 h-10 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all border-r border-zinc-800"
+            className={`w-10 h-10 flex items-center justify-center transition-all border-r ${
+              theme === 'light'
+                ? 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 border-zinc-200'
+                : theme === 'cream'
+                  ? 'text-[#4a332a]/80 hover:text-[#4a332a] hover:bg-[#f5ebd8] border-[#e8dcc4]'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900 border-zinc-800'
+            }`}
           >
             <Plus className="w-4 h-4" />
           </button>
           <button
             onClick={() => handleZoom('out')}
-            className="w-10 h-10 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-900 transition-all"
+            className={`w-10 h-10 flex items-center justify-center transition-all ${
+              theme === 'light'
+                ? 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
+                : theme === 'cream'
+                  ? 'text-[#4a332a]/80 hover:text-[#4a332a] hover:bg-[#f5ebd8]'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
+            }`}
           >
             <Minus className="w-4 h-4" />
           </button>
