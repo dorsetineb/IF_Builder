@@ -165,7 +165,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
         return (
             <div className="flex flex-col h-full" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
                 {/* Header */}
-                <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-muted/50 shrink-0">
+                <div className="px-6 py-4 border-b border-muted-foreground/50 flex justify-between items-center bg-muted/50 shrink-0">
                     <div>
                         <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
                             {(() => {
@@ -194,7 +194,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                         <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                             <Target className="w-3 h-3" /> {t('interactionEditor.triggersConditions', 'Gatilhos & Condições')}
                         </h4>
-                        <div className="bg-muted/20 p-4 rounded-lg border border-border space-y-6">
+                        <div className="bg-muted/20 p-4 rounded-lg border border-muted-foreground/50 space-y-6">
 
                             {/* Row 1: Icon, Verbs, Target */}
                             <div className="flex gap-4 items-start">
@@ -215,7 +215,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                     </button>
 
                                     {isIconPickerOpen && (
-                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-card border border-border rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-card border border-muted-foreground/50 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
                                             <button
                                                 onClick={() => { handleInteractionChange('icon', undefined); setIsIconPickerOpen(false); }}
                                                 className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${!selectedInteraction.icon ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
@@ -266,7 +266,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                             </div>
 
                             {/* Row 2: Requirements & Consequences Checkboxes */}
-                            <div className="flex gap-4 items-start pt-2 border-t border-zinc-800/50">
+                            <div className="flex gap-4 items-start pt-2 border-t border-muted-foreground/50">
                                 {/* Require Item */}
                                 <div className="w-[45%] space-y-1.5">
                                     <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.requiresItemLabel', 'Requer Item (Inventário)')}</label>
@@ -328,7 +328,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                         <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                             <CheckCircle2 className="w-3 h-3" /> {t('interactionEditor.outcomeTitle', 'Resultado')}
                         </h4>
-                        <div className="bg-muted/20 p-4 rounded-lg border border-border space-y-4">
+                        <div className="bg-muted/20 p-4 rounded-lg border border-muted-foreground/50 space-y-4">
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div className="col-span-2">
@@ -366,7 +366,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 </div>
 
                                 {/* Trackers - Full Width */}
-                                <div className="col-span-2 pt-2 border-t border-zinc-800/50">
+                                <div className="col-span-2 pt-2 border-t border-muted-foreground/50">
                                     <div className="flex justify-between items-center mb-2">
                                         <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.trackersLabel', 'Rastreadores')}</label>
                                         <button onClick={handleAddTrackerEffect} className="flex items-center gap-1.5 px-2 py-1 bg-green-500/10 text-green-500 rounded text-[10px] font-bold hover:bg-green-500/20 hover:text-green-400 transition-colors uppercase">
@@ -381,7 +381,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                                     <option value="">{t('interactionEditor.selectTracker', 'Selecione um rastreador...')}</option>
                                                     {consequenceTrackers.map(tOption => <option key={tOption.id} value={tOption.id}>{tOption.name}</option>)}
                                                 </select>
-                                                <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-border">
+                                                <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-muted-foreground/50">
                                                     <span className="text-[10px] text-zinc-500">{t('interactionEditor.valueLabel', 'Valor:')}</span>
                                                     <input type="number" value={effect.valueChange} onChange={e => handleTrackerEffectChange(i, 'valueChange', parseInt(e.target.value))} className="w-12 bg-transparent border-none text-xs h-auto p-0 text-right text-foreground font-mono focus:ring-0" />
                                                 </div>
@@ -389,7 +389,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                             </div>
                                         ))}
                                         {(selectedInteraction.trackerEffects || []).length === 0 && (
-                                            <div className="text-center py-4 border border-dashed border-border rounded bg-muted/20">
+                                            <div className="text-center py-4 border border-dashed border-muted-foreground/50 rounded bg-muted/20">
                                                 <p className="text-[10px] text-zinc-600 italic">{t('interactionEditor.noTrackerEffects', 'Nenhum efeito em rastreadores configurado.')}</p>
                                             </div>
                                         )}
@@ -404,11 +404,11 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
     };
 
     return (
-        <div className="flex h-[600px] border border-muted-foreground/20 rounded-xl overflow-hidden bg-card shadow-sm">
+        <div className="flex h-[600px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card shadow-sm">
             {/* LEFT SIDEBAR - List */}
-            <div className="w-1/3 min-w-[250px] border-r border-border flex flex-col bg-muted/30">
+            <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/30">
                 {/* Header/Search */}
-                <div className="p-4 border-b border-muted-foreground/10 space-y-3">
+                <div className="p-4 border-b border-muted-foreground/50 space-y-3">
                     <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('interactionEditor.interactionsCount', 'Interações ({{count}})', { count: filteredInteractions.length })}</span>
                     </div>
@@ -431,7 +431,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                             <button
                                 key={inter.id}
                                 onClick={() => setSelectedIndex(index)}
-                                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left group ${selectedIndex === index ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-muted hover:border-border'}`}
+                                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left group ${selectedIndex === index ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-muted hover:border-muted-foreground/50'}`}
                             >
                                 <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${selectedIndex === index ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
                                     {(() => {

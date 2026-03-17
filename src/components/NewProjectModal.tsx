@@ -21,7 +21,7 @@ type Tab = 'info' | 'system' | 'appearance';
 const ColorInput: React.FC<{ label: string, id: string, value: string, onChange: (val: string) => void, placeholder?: string }> = ({ label, id, value, onChange, placeholder }) => (
     <div className="space-y-1">
         <label htmlFor={id} className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{label}</label>
-        <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-zinc-800 rounded-lg focus-within:border-primary/50 transition-all h-9 w-full">
+        <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all h-9 w-full">
             <input
                 type="color"
                 id={`${id}-picker`}
@@ -296,10 +296,10 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
     return (
         <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div onClick={(e) => e.stopPropagation()} className="bg-zinc-950 border border-zinc-500 w-full max-w-6xl h-[90vh] rounded-2xl flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+            <div onClick={(e) => e.stopPropagation()} className="bg-zinc-950 border border-muted-foreground/50 w-full max-w-6xl h-[90vh] rounded-2xl flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
 
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-zinc-800 bg-zinc-950/50">
+                <div className="flex items-center justify-between p-6 border-b border-muted-foreground/50 bg-zinc-950/50">
                     <div className="flex items-center gap-4">
                         <div className="p-3 bg-primary/10 rounded-xl border border-primary/20">
                             <BookOpen className="w-6 h-6 text-primary" />
@@ -318,9 +318,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                 <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
 
                     {/* Left Column: FormTabs */}
-                    <div className="w-full lg:w-1/2 flex flex-col border-r border-zinc-800 bg-zinc-900/30">
+                    <div className="w-full lg:w-1/2 flex flex-col border-r border-muted-foreground/50 bg-zinc-900/30">
                         {/* Tabs Navigation */}
-                        <div className="flex border-b border-zinc-800">
+                        <div className="flex border-b border-muted-foreground/50">
                             <button
                                 onClick={() => setTab('info')}
                                 className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'info' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
@@ -349,7 +349,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     <div className="grid grid-cols-1 gap-4">
                                         <button
                                             onClick={() => setInteractionType('parser')}
-                                            className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'parser' ? 'bg-primary/10 border-primary ring-1 ring-primary/50' : 'bg-black/30 border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900'}`}
+                                            className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'parser' ? 'bg-primary/10 border-primary ring-1 ring-primary/50' : 'bg-black/30 border-muted-foreground/50 hover:border-muted-foreground/50 hover:bg-zinc-900'}`}
                                         >
                                             <div className={`p-4 rounded-xl ${interactionType === 'parser' ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-300'}`}>
                                                 <Terminal className="w-8 h-8" />
@@ -364,7 +364,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
                                         <button
                                             onClick={() => setInteractionType('choice')}
-                                            className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'choice' ? 'bg-primary/10 border-primary ring-1 ring-primary/50' : 'bg-black/30 border-zinc-800 hover:border-zinc-600 hover:bg-zinc-900'}`}
+                                            className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'choice' ? 'bg-primary/10 border-primary ring-1 ring-primary/50' : 'bg-black/30 border-muted-foreground/50 hover:border-muted-foreground/50 hover:bg-zinc-900'}`}
                                         >
                                             <div className={`p-4 rounded-xl ${interactionType === 'choice' ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-300'}`}>
                                                 <MousePointerClick className="w-8 h-8" />
@@ -381,7 +381,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     <div className="w-full h-px bg-zinc-800 my-2"></div>
 
                                     <div className="grid grid-cols-1 gap-4">
-                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-zinc-800 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
                                             <div className="flex items-center gap-4">
                                                 <div className={`p-3 rounded-lg ${enableInventory ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
                                                     <Package className="w-6 h-6" />
@@ -400,7 +400,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             </button>
                                         </div>
 
-                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-zinc-800 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
                                             <div className="flex items-center gap-4">
                                                 <div className={`p-3 rounded-lg ${enableDiary ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
                                                     <BookText className="w-6 h-6" />
@@ -418,7 +418,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             </button>
                                         </div>
 
-                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-zinc-800 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
                                             <div className="flex items-center gap-4">
                                                 <div className={`p-3 rounded-lg ${enableChances ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
                                                     <Heart className="w-6 h-6" />
@@ -436,7 +436,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             </button>
                                         </div>
 
-                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-zinc-800 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
                                             <div className="flex items-center gap-4">
                                                 <div className={`p-3 rounded-lg ${enableTrackers ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
                                                     <SlidersHorizontal className="w-6 h-6" />
@@ -465,7 +465,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             type="text"
                                             value={title}
                                             onChange={(e) => setTitle(e.target.value)}
-                                            className="w-full bg-black/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-700 font-bold"
+                                            className="w-full bg-black/50 border border-muted-foreground/50 rounded-lg px-4 py-3 text-sm text-white focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-700 font-bold"
                                             placeholder={t('newProject.info.gameTitlePlaceholder', 'Ex: A Caverna dos Dragões')}
                                         />
                                     </div>
@@ -475,7 +475,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                         <textarea
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
-                                            className="w-full h-32 bg-black/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all resize-none placeholder:text-zinc-700 leading-relaxed"
+                                            className="w-full h-32 bg-black/50 border border-muted-foreground/50 rounded-lg px-4 py-3 text-sm text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all resize-none placeholder:text-zinc-700 leading-relaxed"
                                             placeholder={t('newProject.info.descriptionPlaceholder', 'Uma breve descrição da sua história...')}
                                         />
                                     </div>
@@ -486,13 +486,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             type="text"
                                             value={startButtonText}
                                             onChange={(e) => setStartButtonText(e.target.value)}
-                                            className="w-full bg-black/50 border border-zinc-800 rounded-lg px-4 py-3 text-sm text-white focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-700 font-bold"
+                                            className="w-full bg-black/50 border border-muted-foreground/50 rounded-lg px-4 py-3 text-sm text-white focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-700 font-bold"
                                             placeholder={t('newProject.info.startButtonPlaceholder', 'Ex: Iniciar Aventura')}
                                         />
                                     </div>
 
-                                    <div className="flex gap-4 items-start bg-zinc-900/50 p-4 rounded-xl border border-zinc-800/50">
-                                        <div className="relative w-24 h-24 bg-black/50 border border-zinc-800 rounded-lg overflow-hidden shrink-0 group hover:border-zinc-600 transition-colors">
+                                    <div className="flex gap-4 items-start bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/50">
+                                        <div className="relative w-24 h-24 bg-black/50 border border-muted-foreground/50 rounded-lg overflow-hidden shrink-0 group hover:border-muted-foreground/50 transition-colors">
                                             {splashImage ? (
                                                 <>
                                                     <img src={splashImage} alt="Capa" className="w-full h-full object-cover" />
@@ -525,7 +525,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                 <div className="space-y-4 animate-in slide-in-from-left-4 duration-300">
 
                                     {/* SECTION: ESTRUTURA */}
-                                    <div className="bg-black/30 border border-zinc-800 rounded-xl p-4">
+                                    <div className="bg-black/30 border border-muted-foreground/50 rounded-xl p-4">
                                         <button
                                             onClick={() => toggleSection('estrutura')}
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
@@ -544,7 +544,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                         value={layoutOrientation}
                                                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                         onChange={(e) => setLayoutOrientation(e.target.value as any)}
-                                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                     >
                                                         <option value="vertical">{t('newProject.appearance.vertical', 'Vertical')}</option>
                                                         <option value="horizontal">{t('newProject.appearance.horizontal', 'Horizontal')}</option>
@@ -556,7 +556,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                         value={layoutOrder}
                                                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                         onChange={(e) => setLayoutOrder(e.target.value as any)}
-                                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                     >
                                                         {layoutOrientation === 'vertical' ? (
                                                             <>
@@ -577,7 +577,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                         value={imageFrame}
                                                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                         onChange={(e) => setImageFrame(e.target.value as any)}
-                                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                     >
                                                         <option value="none">{t('newProject.appearance.frameNone', 'Sem moldura')}</option>
                                                         <option value="rounded-top">{t('newProject.appearance.framePortal', 'Portal')}</option>
@@ -590,7 +590,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     </div>
 
                                     {/* SECTION: ESTILO & TEMA */}
-                                    <div className="bg-black/30 border border-zinc-800 rounded-xl p-4">
+                                    <div className="bg-black/30 border border-muted-foreground/50 rounded-xl p-4">
                                         <button
                                             onClick={() => toggleSection('estilo')}
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
@@ -605,7 +605,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
                                                     <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('ThemeEditor.uiTheme', 'Cor da Interface')}</label>
-                                                    <div className="flex bg-zinc-950 rounded-lg p-1 border border-zinc-800">
+                                                    <div className="flex bg-zinc-950 rounded-lg p-1 border border-muted-foreground/50">
                                                         <button
                                                             onClick={() => setTheme('dark')}
                                                             className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${theme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
@@ -628,7 +628,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                             <button
                                                                 key={theme.nameKey}
                                                                 onClick={() => handleApplyTheme(theme)}
-                                                                className="flex flex-col items-center gap-1 p-2 rounded border border-zinc-800 hover:bg-zinc-800 hover:border-zinc-600 transition-all text-center group"
+                                                                className="flex flex-col items-center gap-1 p-2 rounded border border-muted-foreground/50 hover:bg-zinc-800 hover:border-muted-foreground/50 transition-all text-center group"
                                                             >
                                                                 <div className="flex gap-1 justify-center">
                                                                     <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.focusColor }}></div>
@@ -642,7 +642,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 </div>
 
                                                 {/* Expandable Color Controls (Optional) */}
-                                                <div className="pt-2 border-t border-zinc-800/50">
+                                                <div className="pt-2 border-t border-muted-foreground/50">
                                                     <button
                                                         onClick={() => toggleSection('cores')}
                                                         className="flex items-center justify-between w-full text-left py-2 hover:bg-zinc-800/50 px-2 rounded transition-colors"
@@ -667,7 +667,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     </div>
 
                                     {/* SECTION: FONTES & TEXTO */}
-                                    <div className="bg-black/30 border border-zinc-800 rounded-xl p-4">
+                                    <div className="bg-black/30 border border-muted-foreground/50 rounded-xl p-4">
                                         <button
                                             onClick={() => toggleSection('texto')}
                                             className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
@@ -685,7 +685,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <select
                                                         value={fontFamily}
                                                         onChange={(e) => setFontFamily(e.target.value)}
-                                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                     >
                                                         {FONTS.map(font => (
                                                             <option key={font.name} value={font.family}>{font.name}</option>
@@ -697,7 +697,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <select
                                                         value={fontSize}
                                                         onChange={(e) => setFontSize(e.target.value)}
-                                                        className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                     >
                                                         <option value="12">{t('newProject.appearance.sizeSmall', 'Pequeno')}</option>
                                                         <option value="14">{t('newProject.appearance.sizeMedium', 'Médico')}</option>
@@ -714,8 +714,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                     </div>
 
                     {/* Right Column: Live Preview */}
-                    <div className="w-full lg:w-1/2 bg-black border-l border-zinc-800 flex flex-col">
-                        <div className="flex border-b border-zinc-800 bg-zinc-950/50">
+                    <div className="w-full lg:w-1/2 bg-black border-l border-muted-foreground/50 flex flex-col">
+                        <div className="flex border-b border-muted-foreground/50 bg-zinc-950/50">
                             <div className="flex-1 py-4 px-6 text-xs font-bold uppercase tracking-widest border-b-2 border-transparent text-zinc-500 flex items-center justify-between">
                                 <h3>{t('newProject.preview', 'Pré-visualização')}</h3>
                             </div>
@@ -784,7 +784,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     <div
                                         className={`
                                         rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300
-                                        ${theme === 'dark' ? 'bg-zinc-950 border-zinc-900' : 'bg-white border-zinc-200'}
+                                        ${theme === 'dark' ? 'bg-zinc-950 border-muted-foreground/50' : 'bg-white border-muted-foreground/50'}
                                         w-full h-full
                                     `}
                                         style={{ fontFamily: fontFamily }}
@@ -874,29 +874,29 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                         </div>
 
                                         {/* Preview Footer (Input OR Choices) */}
-                                        <div className={`p-3 border-t backdrop-blur-sm flex-shrink-0 space-y-2 ${theme === 'dark' ? 'border-zinc-900 bg-zinc-950/80' : 'border-zinc-200 bg-white/80'}`}>
+                                        <div className={`p-3 border-t backdrop-blur-sm flex-shrink-0 space-y-2 ${theme === 'dark' ? 'border-muted-foreground/50 bg-zinc-950/80' : 'border-muted-foreground/50 bg-white/80'}`}>
 
                                             {/* System Buttons Row */}
                                             <div className="flex gap-2 pb-1">
                                                 {/* Suggestions Button - Only show in Parser mode */}
                                                 {interactionType === 'parser' && (
-                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
+                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-muted-foreground/50 text-zinc-400' : 'border-muted-foreground/50 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
                                                         {t('newProject.previewOverlay.suggestions', 'Sugestões')}
                                                     </button>
                                                 )}
 
                                                 {enableInventory && (
-                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
+                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-muted-foreground/50 text-zinc-400' : 'border-muted-foreground/50 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
                                                         {t('newProject.features.inventory', 'Inventário')}
                                                     </button>
                                                 )}
                                                 {enableDiary && (
-                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
+                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-muted-foreground/50 text-zinc-400' : 'border-muted-foreground/50 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
                                                         {t('newProject.features.diary', 'Diário de Bordo')}
                                                     </button>
                                                 )}
                                                 {enableTrackers && (
-                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-zinc-700 text-zinc-400' : 'border-zinc-300 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
+                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-muted-foreground/50 text-zinc-400' : 'border-muted-foreground/50 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
                                                         {t('newProject.features.trackers', 'Rastreadores')}
                                                     </button>
                                                 )}
@@ -905,7 +905,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             {/* Input Area */}
                                             {interactionType === 'parser' ? (
                                                 <div className="flex gap-2">
-                                                    <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${theme === 'dark' ? 'bg-zinc-900/50 border-zinc-800' : 'bg-zinc-100 border-zinc-200'}`}>
+                                                    <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${theme === 'dark' ? 'bg-zinc-900/50 border-muted-foreground/50' : 'bg-zinc-100 border-muted-foreground/50'}`}>
                                                         <span className="font-mono truncate" style={{ fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily, color: theme === 'dark' ? '#52525b' : '#a1a1aa' }}>{verbInputPlaceholder}</span>
                                                     </div>
                                                     <button
@@ -952,7 +952,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                         </div>
 
                         {/* Footer Actions */}
-                        <div className="p-6 border-t border-zinc-800 bg-zinc-950/50 flex justify-between items-center z-10">
+                        <div className="p-6 border-t border-muted-foreground/50 bg-zinc-950/50 flex justify-between items-center z-10">
                             <button
                                 onClick={onClose}
                                 className="px-6 py-2.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors"

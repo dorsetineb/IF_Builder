@@ -411,7 +411,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
     return (
       <div className="space-y-6">
-        <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-border">
+        <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-muted-foreground/50">
           <p className="text-muted-foreground text-xs font-medium max-w-lg">
             {t('sceneEditor.headerDesc')}
           </p>
@@ -425,7 +425,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
             <button
               onClick={handlePreview}
-              className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 rounded-lg"
+              className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg"
               title={t('sceneEditor.testTooltip')}
             >
               <Eye className="w-3.5 h-3.5" />
@@ -502,7 +502,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                 {/* Left Column: Details & Rules */}
                 <div className="space-y-6">
                   {/* Scene Details Card */}
-                  <div className="bg-card border border-border rounded-xl p-6">
+                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                       <FileText className="w-4 h-4 text-muted-foreground" />
                       {isVignetteMode
@@ -548,7 +548,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                   className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border transition-all ${
                                     localScene.vignetteType === type.id
                                       ? 'bg-primary/20 border-primary text-primary'
-                                      : 'bg-muted/30 border-border text-muted-foreground hover:bg-muted hover:text-foreground'
+                                      : 'bg-muted/30 border-muted-foreground/50 text-muted-foreground hover:bg-muted hover:text-foreground'
                                   }`}
                                 >
                                   <type.icon className="w-4 h-4" />
@@ -678,7 +678,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                   </div>
 
                                   {localScene.vignetteType === 'conclusion' && (
-                                    <label className="flex items-center gap-2 cursor-pointer p-2 rounded border border-border bg-muted/30 hover:bg-muted/50 transition-colors self-end">
+                                    <label className="flex items-center gap-2 cursor-pointer p-2 rounded border border-muted-foreground/50 bg-muted/30 hover:bg-muted/50 transition-colors self-end">
                                       <input
                                         type="checkbox"
                                         checked={!!localScene.isDefeatOutcome}
@@ -734,7 +734,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   </div>
 
                   {/* Branching Preview Card */}
-                  <div className="bg-card border border-border rounded-xl p-6">
+                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                         <GitBranch className="w-4 h-4 text-muted-foreground" />
@@ -761,7 +761,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                 {/* Right Column: Rules & Preview */}
                 <div className="space-y-6">
                   {/* Multimedia Card */}
-                  <div className="bg-card border border-border rounded-xl p-6">
+                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                         <ImageIcon className="w-4 h-4 text-muted-foreground" />
@@ -775,7 +775,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                     </div>
 
                     {/* Image Preview Area */}
-                    <div className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-border group mb-6">
+                    <div className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group mb-6">
                       <style>{OVERLAY_CSS}</style>
 
                       {localScene.image ? (
@@ -856,7 +856,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                           htmlFor="image-upload-input"
                           className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/5 transition-colors group"
                         >
-                          <div className="w-12 h-12 rounded-full bg-background border border-border flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
+                          <div className="w-12 h-12 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
                             <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
                           </div>
                           <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
@@ -904,7 +904,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                           {t('sceneEditor.audioLabel')}
                         </label>
                         <div className="flex items-center gap-3 p-3 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors">
-                          <div className="w-8 h-8 rounded-full bg-background border border-border flex items-center justify-center flex-shrink-0">
+                          <div className="w-8 h-8 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center flex-shrink-0">
                             <Music
                               className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-primary' : 'text-muted-foreground'} `}
                             />
@@ -968,7 +968,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                   {/* Narrative Rules Card - Renamed to Chance Rules */}
                   {(enableChances || gameSystemEnabled === 'chances') && (
-                    <div className="bg-card border border-border rounded-xl p-6">
+                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
                       <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                         <Scroll className="w-4 h-4 text-muted-foreground" />
                         {t('sceneEditor.chancesTitle')}
@@ -976,7 +976,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                       <div className="space-y-3">
                         {/* Chance Removal */}
                         <label
-                          className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.removesChanceOnEntry ? 'bg-red-500/5 border-red-500/30' : 'bg-transparent border-muted-foreground/20 hover:bg-muted/10'} `}
+                          className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.removesChanceOnEntry ? 'bg-red-500/5 border-red-500/30' : 'bg-transparent border-muted-foreground/50 hover:bg-muted/10'} `}
                         >
                           <div className="relative flex items-center mt-0.5">
                             <input
@@ -1003,7 +1003,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                         {/* Chance Restoration */}
                         <label
-                          className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.restoresChanceOnEntry ? 'bg-green-500/5 border-green-500/30' : 'bg-transparent border-muted-foreground/20 hover:bg-muted/10'} `}
+                          className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.restoresChanceOnEntry ? 'bg-green-500/5 border-green-500/30' : 'bg-transparent border-muted-foreground/50 hover:bg-muted/10'} `}
                         >
                           <div className="relative flex items-center mt-0.5">
                             <input
@@ -1062,10 +1062,10 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             )}
 
             {activeTab === 'choices' && (
-              <div className="flex h-[600px] border border-border rounded-xl overflow-hidden bg-card">
+              <div className="flex h-[600px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card">
                 {/* LEFT LIST PANEL */}
-                <div className="w-1/3 min-w-[250px] border-r border-border flex flex-col bg-muted/10">
-                  <div className="p-4 border-b border-muted-foreground/10 space-y-4">
+                <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/10">
+                  <div className="p-4 border-b border-muted-foreground/50 space-y-4">
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
                         {t('sceneEditor.choicesCount', { count: localScene.choices?.length || 0 })}
@@ -1086,7 +1086,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                           onClick={() => setSelectedChoiceId(choice.id)}
                           className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedChoiceId === choice.id ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-accent hover:border-accent'} `}
                         >
-                          <div className="w-8 h-8 rounded bg-muted border border-border flex items-center justify-center overflow-hidden shrink-0">
+                          <div className="w-8 h-8 rounded bg-muted border border-muted-foreground/50 flex items-center justify-center overflow-hidden shrink-0">
                             <ArrowRight
                               className={`w-4 h-4 ${selectedChoiceId === choice.id ? 'text-primary' : 'text-muted-foreground'} `}
                             />
@@ -1108,7 +1108,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                     )}
                   </div>
 
-                  <div className="p-3 border-t border-border bg-muted/30">
+                  <div className="p-3 border-t border-muted-foreground/50 bg-muted/30">
                     <button
                       onClick={() => {
                         const newId = `choice_${Date.now()} `;
@@ -1139,7 +1139,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                       const choice = localScene.choices![choiceIndex];
                       return (
                         <div className="flex flex-col h-full">
-                          <div className="px-6 py-4 border-b border-border flex justify-between items-center bg-muted/50">
+                          <div className="px-6 py-4 border-b border-muted-foreground/50 flex justify-between items-center bg-muted/50">
                             <div className="flex items-center gap-2">
                               <ArrowRight className="w-4 h-4 text-purple-500" />
                               <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">

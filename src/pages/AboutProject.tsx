@@ -33,7 +33,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 onClick={handleClick}
                 className={`w-full py-3 rounded-lg font-bold text-white shadow-lg flex items-center justify-center gap-2 transition-all hover:-translate-y-0.5 ${variant === 'primary'
                     ? 'bg-primary hover:bg-primary/90 shadow-primary/40 text-xs'
-                    : 'bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-xs'
+                    : 'bg-zinc-800 hover:bg-zinc-700 border border-muted-foreground/50 text-xs'
                     }`}
             >
                 {Icon && <Icon className="w-4 h-4" />}
@@ -46,7 +46,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
         <div className="min-h-full font-sans text-xs bg-background flex flex-col">
             {/* Header matches Platform Header style */}
             {!hideHeader && (
-                <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-20 shrink-0">
+                <div className="h-[61px] border-b border-muted-foreground/50 flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-20 shrink-0">
                     <div className="flex flex-col justify-center h-full">
                         <h1 className="text-xl font-bold text-foreground">{t('about.title', 'Sobre o IF Builder')}</h1>
                         <p className="text-[10px] text-muted-foreground hidden md:block">{t('about.subtitle', 'Saiba mais sobre o If Builder.')}</p>
@@ -145,7 +145,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     <div className="flex flex-col md:flex-row gap-8">
                                         {/* Avatar Refined */}
                                         <div className="flex-shrink-0 flex flex-col items-center">
-                                            <div className="w-32 h-32 rounded-full border-4 border-zinc-700 overflow-hidden flex items-center justify-center">
+                                            <div className="w-32 h-32 rounded-full border-4 border-muted-foreground/50 overflow-hidden flex items-center justify-center">
                                                 <img
                                                     src="/rodrigo-profile.png"
                                                     alt="Rodrigo Benites"
@@ -184,7 +184,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 {t('about.support.sidebar.desc', 'Este site é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX! ou um Ko-fi!')}
                             </p>
 
-                            <div className="flex bg-zinc-900/50 p-1 rounded-lg mb-6 border border-zinc-800">
+                            <div className="flex bg-zinc-900/50 p-1 rounded-lg mb-6 border border-muted-foreground/50">
                                 <button
                                     onClick={() => setSupportMethod('pix')}
                                     className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${supportMethod === 'pix' ? 'bg-primary text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
@@ -218,7 +218,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     </button>
                                 </>
                             ) : (
-                                <div className="w-full flex justify-center rounded-lg overflow-hidden border border-zinc-800 bg-transparent min-h-[450px]">
+                                <div className="w-full flex justify-center rounded-lg overflow-hidden border border-muted-foreground/50 bg-transparent min-h-[450px]">
                                     <iframe
                                         id='kofiframe'
                                         src='https://ko-fi.com/ifbuildr/?hidefeed=true&widget=true&embed=true&preview=true'
@@ -255,7 +255,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                 {t('about.support.modal.desc', 'Chave aleatória se preferir não escanear o QR Code.')}
                             </p>
 
-                            <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-xl mb-6 relative group cursor-pointer" onClick={handleCopyPix}>
+                            <div className="p-4 bg-zinc-900 border border-muted-foreground/50 rounded-xl mb-6 relative group cursor-pointer" onClick={handleCopyPix}>
                                 <p className="text-xs font-mono break-all text-primary/80">
                                     4f489a50-c458-4adf-b211-62075adebf13
                                 </p>

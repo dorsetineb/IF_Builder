@@ -19,11 +19,11 @@ export const GuideView: React.FC = () => {
                 <p className="text-muted-foreground max-w-3xl text-sm leading-relaxed mb-6" dangerouslySetInnerHTML={{ __html: t('guide.intro', 'O IF Builder permite criar ficções interativas, narrativas textuais onde o jogador interage com a história por meio de escolhas ou comandos (verbos). A ficção é composta por <strong>Cenas</strong>, onde o usuário lê descrições, observa imagens e toma decisões para interagir com <strong>objetos</strong> e <strong>navegar pelo mundo</strong>.') }}></p>
 
                 {/* Table of Contents Listbox */}
-                <div className="p-4 bg-muted/30 rounded-lg border border-muted-foreground/10">
+                <div className="p-4 bg-muted/30 rounded-lg border border-muted-foreground/50">
                     <label className="text-xs font-medium text-muted-foreground mb-2 block uppercase tracking-wider">{t('guide.toc', 'Índice do Guia')}</label>
                     <div className="relative">
                         <select
-                            className="w-full bg-background border border-border rounded-md px-3 py-2 text-sm appearance-none focus:ring-1 focus:ring-primary outline-none text-foreground cursor-pointer shadow-sm"
+                            className="w-full bg-background border border-muted-foreground/50 rounded-md px-3 py-2 text-sm appearance-none focus:ring-1 focus:ring-primary outline-none text-foreground cursor-pointer shadow-sm"
                             onChange={(e) => {
                                 scrollToSection(e.target.value);
                                 e.target.value = ""; // Reset selection nicely
@@ -105,7 +105,7 @@ export const GuideView: React.FC = () => {
                                     <li dangerouslySetInnerHTML={{ __html: t('guide.sections.interactions.item3', '<strong>Requisito:</strong> Item necessário no inventário (ex: Chave).') }}></li>
                                     <li dangerouslySetInnerHTML={{ __html: t('guide.sections.interactions.item4', '<strong>Resultado:</strong> Ir para cena, mudar texto, ou tocar vinheta.') }}></li>
                                 </ul>
-                                <div className="text-xs space-y-1 pt-2 border-t border-muted-foreground/10">
+                                <div className="text-xs space-y-1 pt-2 border-t border-muted-foreground/50">
                                     <p className="font-medium text-foreground">{t('guide.sections.interactions.advancedOptions', 'Opções Avançadas:')}</p>
                                     <ul className="space-y-0.5 opacity-80">
                                         <li>{t('guide.sections.interactions.advanced1', '• Adicionar ao Inventário')}</li>
@@ -124,7 +124,7 @@ export const GuideView: React.FC = () => {
                                     {t('guide.sections.interactions.practicalExample', 'Exemplo Prático:')}
                                 </p>
                                 <div className="space-y-3 relative z-10">
-                                    <div className="bg-background/80 backdrop-blur-sm border border-border rounded-lg p-3 font-mono text-foreground/90 shadow-sm">
+                                    <div className="bg-background/80 backdrop-blur-sm border border-muted-foreground/50 rounded-lg p-3 font-mono text-foreground/90 shadow-sm">
                                         <span className="text-muted-foreground select-none me-2">&gt;</span>
                                         &quot;{t('guide.sections.interactions.exampleCommand', 'Destrancar porta com a chave')}&quot;
                                     </div>
@@ -235,7 +235,7 @@ export const GuideView: React.FC = () => {
                     </div>
                     <div className="text-sm text-muted-foreground pl-12">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
-                            <div className="bg-card border border-border p-4 rounded-xl shadow-sm hover:border-slate-400/30 transition-colors group">
+                            <div className="bg-card border border-muted-foreground/50 p-4 rounded-xl shadow-sm hover:border-slate-400/30 transition-colors group">
                                 <div className="flex items-center gap-2 mb-3 text-slate-500 group-hover:text-slate-400 transition-colors">
                                     <Box className="w-4 h-4" />
                                     <p className="font-bold text-foreground">{t('guide.sections.settings.layout', 'Layout')}</p>
@@ -246,7 +246,7 @@ export const GuideView: React.FC = () => {
                                     <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-slate-400"></div>{t('guide.sections.settings.layoutitem3', 'Fontes e cores')}</li>
                                 </ul>
                             </div>
-                            <div className="bg-card border border-border p-4 rounded-xl shadow-sm hover:border-slate-400/30 transition-colors group">
+                            <div className="bg-card border border-muted-foreground/50 p-4 rounded-xl shadow-sm hover:border-slate-400/30 transition-colors group">
                                 <div className="flex items-center gap-2 mb-3 text-slate-500 group-hover:text-slate-400 transition-colors">
                                     <Activity className="w-4 h-4" />
                                     <p className="font-bold text-foreground">{t('guide.sections.settings.systems', 'Sistemas')}</p>
@@ -257,7 +257,7 @@ export const GuideView: React.FC = () => {
                                     <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-slate-400"></div>{t('guide.sections.settings.systemsitem3', 'Verbos fixos')}</li>
                                 </ul>
                             </div>
-                            <div className="bg-card border border-border p-4 rounded-xl shadow-sm hover:border-slate-400/30 transition-colors group">
+                            <div className="bg-card border border-muted-foreground/50 p-4 rounded-xl shadow-sm hover:border-slate-400/30 transition-colors group">
                                 <div className="flex items-center gap-2 mb-3 text-slate-500 group-hover:text-slate-400 transition-colors">
                                     <Play className="w-4 h-4" />
                                     <p className="font-bold text-foreground">{t('guide.sections.settings.animations', 'Animações')}</p>
@@ -290,7 +290,7 @@ export const GuideView: React.FC = () => {
                 </div>
 
                 {/* 10. Exportação */}
-                <div id="section-export" className="space-y-3 pt-6 border-t border-muted-foreground/10 scroll-mt-24">
+                <div id="section-export" className="space-y-3 pt-6 border-t border-muted-foreground/50 scroll-mt-24">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-zinc-500/10 rounded-lg text-zinc-500">
                             <Download className="w-5 h-5" />

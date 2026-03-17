@@ -16,7 +16,7 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
             case 'terminal':
                 return { primary: '#0d1117', secondary: '#4af626' };
             case 'light':
-                return { primary: '#000000', secondary: '#ffffff' };
+                return { primary: '#2563eb', secondary: '#ffffff' };
             case 'windows':
                 return { primary: '#0f0f0f', secondary: '#008080' };
             default: // dark

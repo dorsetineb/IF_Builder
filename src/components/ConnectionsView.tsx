@@ -47,7 +47,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                   <p className="font-bold text-foreground text-xs">{scene.name}</p>
                   <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-tighter">{scene.id}</p>
                 </button>
-                <div className="mt-3 pt-3 border-t border-muted-foreground/50/50 text-xs space-y-2">
+                <div className="mt-3 pt-3 border-t border-muted-foreground/50 text-xs space-y-2">
                   {interactions.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 text-[9px] font-bold text-muted-foreground uppercase tracking-widest px-2 mb-1">
                       <span>{t('connectionsView.verbs', 'Verbos')}</span>
@@ -59,7 +59,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                     const targetObject = allObjectsMap.get(inter.target);
                     const targetName = targetObject ? targetObject.name : (inter.target || '-');
                     return (
-                      <div key={inter.id} className="grid grid-cols-3 gap-2 text-muted-foreground bg-background/80 p-2 rounded-md border border-muted-foreground/50/50 items-center text-[11px]">
+                      <div key={inter.id} className="grid grid-cols-3 gap-2 text-muted-foreground bg-background/80 p-2 rounded-md border border-muted-foreground/50 items-center text-[11px]">
                         <span className="truncate font-medium text-purple-400" title={inter.verbs.join(', ')}>{inter.verbs.join(', ')}</span>
                         <span className="truncate" title={targetName}>{targetName}</span>
                         <span className="truncate italic text-muted-foreground/70" title={inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory) ? allObjectsMap.get(inter.requiresInInventory)!.name : '-'}>
@@ -74,7 +74,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
               </div>
             ))
           ) : (
-            <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/20 rounded-xl italic">{t('connectionsView.noneBring', 'Nenhuma cena traz o jogador para cá.')}</p>
+            <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/50 rounded-xl italic">{t('connectionsView.noneBring', 'Nenhuma cena traz o jogador para cá.')}</p>
           )}
         </div>
       </div>
@@ -101,7 +101,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                   <p className="font-bold text-foreground text-xs">{scene.name}</p>
                   <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-tighter">{scene.id}</p>
                 </button>
-                <div className="mt-3 pt-3 border-t border-muted-foreground/50/50 text-xs space-y-2">
+                <div className="mt-3 pt-3 border-t border-muted-foreground/50 text-xs space-y-2">
                   {interactions.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 text-[9px] font-bold text-muted-foreground uppercase tracking-widest px-2 mb-1">
                       <span>{t('connectionsView.verbs', 'Verbos')}</span>
@@ -113,7 +113,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
                     const targetObject = allObjectsMap.get(inter.target);
                     const targetName = targetObject ? targetObject.name : (inter.target || '-');
                     return (
-                      <div key={inter.id} className="grid grid-cols-3 gap-2 text-muted-foreground bg-background/80 p-2 rounded-md border border-muted-foreground/50/50 items-center text-[11px]">
+                      <div key={inter.id} className="grid grid-cols-3 gap-2 text-muted-foreground bg-background/80 p-2 rounded-md border border-muted-foreground/50 items-center text-[11px]">
                         <span className="truncate font-medium text-purple-400" title={inter.verbs.join(', ')}>{inter.verbs.join(', ')}</span>
                         <span className="truncate" title={targetName}>{targetName}</span>
                         <span className="truncate italic text-muted-foreground/70" title={inter.requiresInInventory && allObjectsMap.has(inter.requiresInInventory) ? allObjectsMap.get(inter.requiresInInventory)!.name : '-'}>
@@ -128,7 +128,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
               </div>
             ))
           ) : (
-            <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/20 rounded-xl italic">
+            <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/50 rounded-xl italic">
               {currentScene.vignetteType && currentScene.vignetteType !== 'none'
                 ? t('connectionsView.noneConnectVignette', 'Esta vinheta não se conecta a nenhuma outra.')
                 : t('connectionsView.noneConnect', 'Esta cena não se conecta a nenhuma outra.')}

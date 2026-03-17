@@ -101,7 +101,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
       className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full`}
     >
       <nav
-        className={`flex flex-col gap-1 flex-grow pl-3 pr-0 py-4 overflow-y-auto overflow-x-hidden`}
+        className={`flex flex-col flex-grow pl-3 pr-0 py-4 overflow-y-auto overflow-x-hidden`}
       >
         {/* Community Button - REMOVED AS REQUESTED */}
 
@@ -129,19 +129,8 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                 <span className="truncate relative z-10 flex-1 text-left">
                   {t('sidebar.sceneEditor', 'Narrativa')}
                 </span>
-                {/* Counter */}
-                <span className="bg-black/30 text-white text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-white/20 shadow-sm relative z-10">
-                  {scenes.length}
-                </span>
                 {/* Arrow removed as requested */}
               </>
-            )}
-
-            {/* Show tiny counter badge if collapsed */}
-            {isCollapsed && (
-              <div className="absolute top-1 right-1 w-4 h-4 bg-black/30 text-white rounded-md flex items-center justify-center text-[8px] font-bold border border-white/20 z-20 shadow-sm">
-                {scenes.length}
-              </div>
             )}
           </button>
         </div>

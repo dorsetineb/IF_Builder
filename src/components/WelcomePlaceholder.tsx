@@ -33,7 +33,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
             case 'terminal':
                 return { primary: '#0d1117', secondary: '#4af626' };
             case 'light':
-                return { primary: '#000000', secondary: '#ffffff' };
+                return { primary: '#2563eb', secondary: '#ffffff' };
             case 'windows':
                 return { primary: '#0f0f0f', secondary: '#008080' };
             default: // dark
@@ -75,7 +75,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     {/* Botão 1: Começar a Criar */}
                     <button
                         onClick={() => setIsNewProjectModalOpen(true)}
-                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-zinc-600 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20"
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-muted-foreground/50 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20"
                     >
                         <img src="/icons/criar.svg" alt="" className="w-10 h-10 invert opacity-60 group-hover:opacity-100 transition-opacity" />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.createNew', 'Crie uma ficção')}</span>
@@ -84,7 +84,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     {/* Botão 2: Jogar a Demo */}
                     <button
                         onClick={() => setIsGamePopupOpen(true)}
-                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-zinc-600 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-muted-foreground/50 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
                     >
                         <img src="/icons/demo.svg" alt="" className="w-10 h-10 invert opacity-60 group-hover:opacity-100 transition-opacity" />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.playDemo', 'Acesse a demo')}</span>
@@ -95,7 +95,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         onClick={handleDownloadClick}
                         className={`group flex flex-col items-center justify-center gap-4 p-8 rounded-xl border hover:scale-[1.02] transition-all duration-300 ${isFlashing
                             ? 'bg-white border-white scale-[1.02]'
-                            : 'bg-black/40 backdrop-blur-sm border-zinc-600 hover:border-white hover:bg-black/50'
+                            : 'bg-black/40 backdrop-blur-sm border-muted-foreground/50 hover:border-white hover:bg-black/50'
                             }`}
                     >
                         <img src="/icons/exemplo.svg" alt="" className={`w-10 h-10 transition-all ${isFlashing ? 'opacity-100' : 'invert opacity-60 group-hover:opacity-100'}`} />
@@ -108,7 +108,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
             {/* Modal de Ajuda do Download */}
             {showDownloadHelp && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-                    <div className="relative bg-zinc-900 border border-zinc-700 rounded-xl p-8 max-w-3xl w-full shadow-2xl">
+                    <div className="relative bg-zinc-900 border border-muted-foreground/50 rounded-xl p-8 max-w-3xl w-full shadow-2xl">
                         <button
                             onClick={() => setShowDownloadHelp(false)}
                             className="absolute top-4 right-4 text-zinc-400 hover:text-white transition-colors"
@@ -118,14 +118,14 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
 
                         <h3 className="text-2xl font-bold text-white mb-8 text-center">{t('welcome.helpTItle', 'Como usar o exemplo baixado')}</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="group relative flex flex-col items-center text-center p-8 bg-zinc-950/50 rounded-2xl border border-zinc-800 overflow-hidden shadow-lg transition-all duration-300 hover:bg-zinc-950">
+                            <div className="group relative flex flex-col items-center text-center p-8 bg-zinc-950/50 rounded-2xl border border-muted-foreground/50 overflow-hidden shadow-lg transition-all duration-300 hover:bg-zinc-950">
                                 <div className="absolute inset-0 bg-gradient-to-b from-[#008080]/0 to-[#008080]/20 group-hover:to-[#008080]/40 transition-colors" />
                                 <Monitor className="w-12 h-12 text-[#008080] mb-4 relative z-10 group-hover:scale-110 transition-transform duration-300" />
                                 <h4 className="text-xl font-bold text-white mb-4 relative z-10">{t('welcome.helpPlayTitle', 'Offline')}</h4>
                                 <p className="text-left text-zinc-400 text-sm relative z-10" dangerouslySetInnerHTML={{ __html: t('welcome.helpPlayDesc', 'Extraia o conteúdo do <strong>arquivo.zip</strong> e abra o arquivo <strong>index.html</strong> para acessar a ficção interativa de modo offline.') }} />
                             </div>
 
-                            <div className="group relative flex flex-col items-center text-center p-8 bg-zinc-950/50 rounded-2xl border border-zinc-800 overflow-hidden shadow-lg transition-all duration-300 hover:bg-zinc-950">
+                            <div className="group relative flex flex-col items-center text-center p-8 bg-zinc-950/50 rounded-2xl border border-muted-foreground/50 overflow-hidden shadow-lg transition-all duration-300 hover:bg-zinc-950">
                                 <div className="absolute inset-0 bg-gradient-to-b from-blue-500/0 to-blue-500/20 group-hover:to-blue-500/40 transition-colors" />
                                 <Cloud className="w-12 h-12 text-blue-500 mb-4 relative z-10 group-hover:scale-110 transition-transform duration-300" />
                                 <h4 className="text-xl font-bold text-white mb-4 relative z-10">{t('welcome.helpEditTitle', 'Online')}</h4>
@@ -159,11 +159,11 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     onClick={() => setIsGamePopupOpen(false)}
                 >
                     <div
-                        className="bg-zinc-900 border border-zinc-700 rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300"
+                        className="bg-zinc-900 border border-muted-foreground/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col animate-in zoom-in-95 duration-300"
                         style={{ width: '90vw', height: '90vh' }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className={`px-4 py-3 border-b flex items-center justify-between flex-shrink-0 ${theme === 'light' ? 'bg-white border-zinc-200' : 'bg-primary border-primary'}`}>
+                        <div className={`px-4 py-3 border-b flex items-center justify-between flex-shrink-0 ${theme === 'light' ? 'bg-white border-muted-foreground/50' : 'bg-primary border-primary'}`}>
                             <div className="flex items-center gap-3">
                                 <span className={`font-mono text-xs uppercase tracking-widest ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground opacity-90'}`}>
                                     {i18n.language.startsWith('pt')

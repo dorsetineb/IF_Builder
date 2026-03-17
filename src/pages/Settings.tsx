@@ -57,7 +57,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
             {/* Standard Header */}
             {!hideHeader && (
-                <div className="h-[61px] border-b border-border flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
+                <div className="h-[61px] border-b border-muted-foreground/50 flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-10 shrink-0">
                     <div className="flex flex-col justify-center h-full">
                         <h1 className="text-xl font-bold text-foreground">{t('settings.title', 'Configurações')}</h1>
                         <p className="text-[10px] text-muted-foreground hidden md:block">{t('settings.subtitle', 'Gerencie suas preferências.')}</p>
@@ -77,7 +77,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 </div>
 
                 {/* Theme Section */}
-                <div className="bg-card border border-border rounded-lg p-4 mb-4">
+                <div className="bg-card border border-muted-foreground/50 rounded-lg p-4 mb-4">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2 text-primary">
                             <Sun size={16} />
@@ -88,7 +88,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                         <button
                             onClick={() => handleThemeChange('windows')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'windows' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'windows' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
                         >
                             <Monitor size={16} className={theme === 'windows' ? 'text-primary' : 'text-muted-foreground'} />
                             <span className={`font-medium text-xs ${theme === 'windows' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.windows', 'W95')}</span>
@@ -96,7 +96,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                         <button
                             onClick={() => handleThemeChange('dark')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
                         >
                             <Moon size={16} className={theme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
                             <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.dark', 'Noite')}</span>
@@ -104,7 +104,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                         <button
                             onClick={() => handleThemeChange('light')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
                         >
                             <Sun size={16} className={theme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
                             <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.light', 'Dia')}</span>
@@ -112,7 +112,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                         <button
                             onClick={() => handleThemeChange('cream')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
                         >
                             <Coffee size={16} className={theme === 'cream' ? 'text-primary' : 'text-muted-foreground'} />
                             <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.cream', 'Creme')}</span>
@@ -120,14 +120,14 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                         <button
                             onClick={() => handleThemeChange('terminal')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
                         >
                             <Terminal size={16} className={theme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
                             <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
                         </button>
                     </div>
 
-                    <div className="space-y-4 pt-4 border-t border-border mt-4">
+                    <div className="space-y-4 pt-4 border-t border-muted-foreground/50 mt-4">
                         <div className="space-y-2 text-left">
                             <label className="block text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-2">
                                 <Globe size={12} />

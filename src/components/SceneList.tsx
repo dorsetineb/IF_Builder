@@ -132,7 +132,7 @@ const SceneList: React.FC<SceneListProps> = ({
       'w-full flex items-center justify-start px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent mt-2 flex-shrink-0';
 
     if (theme === 'light') {
-      return `${baseClass} bg-zinc-200 text-zinc-900 hover:bg-zinc-300`;
+      return `${baseClass} bg-white text-zinc-900 border-muted-foreground/50 shadow-sm hover:bg-zinc-50`;
     }
     if (theme === 'cream') {
       return `${baseClass} bg-[#e8dcc4] text-[#4a332a] hover:bg-[#d5c6aa]`;
@@ -157,7 +157,7 @@ const SceneList: React.FC<SceneListProps> = ({
       <div style={style}>
         <div
           onClick={() => onSelectScene(scene.id)}
-          className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center transition-all overflow-hidden cursor-pointer h-[42px] mb-2 ${
+          className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center transition-all overflow-hidden cursor-pointer h-[42px] ${
               isLateralMenu 
                 ? selectedSceneId === scene.id && currentView === 'scenes'
                     ? `bg-primary text-primary-foreground font-bold shadow-md rounded-l-lg rounded-r-none` // Selected: 100% opaque primary
@@ -252,7 +252,10 @@ const SceneList: React.FC<SceneListProps> = ({
             }`}
           >
             <Map className="w-4 h-4 flex-shrink-0" />
-            <span className="truncate">{t('sceneList.viewMap', 'Ver mapa de cenas')}</span>
+            <span className="truncate flex-1 text-left">{t('sceneList.viewMap', 'Ver mapa de cenas')}</span>
+            <span className="bg-black/30 text-white text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-white/20 shadow-sm">
+              {scenes.length}
+            </span>
           </button>
         </div>
       )}
@@ -268,7 +271,7 @@ const SceneList: React.FC<SceneListProps> = ({
           className={`w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] ${
             isLateralMenu 
               ? 'bg-background/50 text-foreground placeholder-muted-foreground border border-primary/50 focus:border-primary focus:bg-background' 
-              : 'bg-input text-foreground border border-border'
+              : 'bg-input text-foreground border border-muted-foreground/50'
           }`}
         />
       </div>
@@ -276,7 +279,7 @@ const SceneList: React.FC<SceneListProps> = ({
       <div className="flex-grow min-h-0">
         <AutoSizer>
           {({ height, width }: { height: number; width: number }) => {
-            const itemSize = 50; // Fixed row height + margin
+            const itemSize = 42; // Fixed row height
             const buttonHeight = 32; // Approx height of add button
             const margins = 32; // mt-2 (8px) + mb-6 (24px)
             const contentHeight = filteredScenes.length * itemSize;
@@ -296,7 +299,7 @@ const SceneList: React.FC<SceneListProps> = ({
                   <List
                     height={listHeight}
                     itemCount={filteredScenes.length}
-                    itemSize={50}
+                    itemSize={42}
                     width="100%"
                     ref={listRef}
                     itemData={filteredScenes}

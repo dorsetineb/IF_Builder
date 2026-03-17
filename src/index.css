@@ -92,7 +92,7 @@
 /* Base Styles */
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-muted-foreground/50 outline-ring/50;
   }
 
   body {

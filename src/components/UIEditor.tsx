@@ -137,7 +137,7 @@ const ColorInput: React.FC<{
 }> = memo(({ label, id, value, onChange, placeholder }) => (
     <div>
         <label htmlFor={id} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{label}</label>
-        <div className="flex items-center gap-2 p-1 bg-background border border-border rounded-lg focus-within:border-primary/50 transition-all">
+        <div className="flex items-center gap-2 p-1 bg-background border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all">
             <input
                 type="color"
                 id={`${id}-picker`}
@@ -182,7 +182,7 @@ const FixedVerbItem: React.FC<{
     };
 
     return (
-        <div className="relative p-6 bg-muted/30 rounded-xl border border-border hover:border-primary/30 transition-all group">
+        <div className="relative p-6 bg-muted/30 rounded-xl border border-muted-foreground/50 hover:border-primary/30 transition-all group">
             <button
                 onClick={() => onRemove(verb.id)}
                 className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100"
@@ -200,7 +200,7 @@ const FixedVerbItem: React.FC<{
                         onChange={e => setLocalVerbs(e.target.value)}
                         onBlur={handleVerbsBlur}
                         placeholder="ex: ajuda, help, ?"
-                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 transition-all"
+                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 transition-all"
                     />
                 </div>
                 <div className="flex flex-col h-full">
@@ -211,7 +211,7 @@ const FixedVerbItem: React.FC<{
                         onChange={e => onUpdate(verb.id, 'description', e.target.value)}
                         placeholder="Texto que será exibido para o jogador."
                         rows={3}
-                        className="w-full flex-grow bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 transition-all resize-none"
+                        className="w-full flex-grow bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 transition-all resize-none"
                     />
                 </div>
             </div>
@@ -232,7 +232,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
             case 'terminal':
                 return { primary: '#0d1117', secondary: '#4af626' };
             case 'light':
-                return { primary: '#000000', secondary: '#ffffff' };
+                return { primary: '#2563eb', secondary: '#ffffff' };
             case 'windows':
                 return { primary: '#0f0f0f', secondary: '#008080' };
             default: // dark
@@ -955,7 +955,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     return (
         <div className="space-y-6 pb-8">
             {/* Header with Save/Undo actions */}
-            <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-border">
+            <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/50">
                 <p className="text-muted-foreground text-xs font-medium max-w-lg">
                     {t('UIEditor.header.description')}
                 </p>
@@ -983,7 +983,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 </div>
             </div>
             <div>
-                <div className="border-b border-border flex items-center justify-between pr-4">
+                <div className="border-b border-muted-foreground/50 flex items-center justify-between pr-4">
                     <div className="flex space-x-1 overflow-x-auto">
                         {Object.entries(TABS).map(([key, name]) => {
                             return (
@@ -1016,7 +1016,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         {/* --- LEFT COLUMN --- */}
                                         <div className="flex-1 w-full space-y-6">
                                             {/* --- GAME STYLE --- */}
-                                            <div className={`w-full p-6 bg-card border-2 ${localGameInteractionType ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
+                                            <div className={`w-full p-6 bg-card border-2 ${localGameInteractionType ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
                                                 <div className="flex justify-between items-start mb-6">
                                                     <div className="flex items-center gap-3">
                                                         <LayoutTemplate className="w-5 h-5 text-muted-foreground" />
@@ -1030,7 +1030,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 <div className="grid grid-cols-1 gap-4">
                                                         <button
                                                             onClick={() => setLocalGameInteractionType('parser')}
-                                                            className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/10 shadow-sm opacity-100' : 'border-border bg-muted/30 hover:border-primary/30 opacity-50'}`}
+                                                            className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/10 shadow-sm opacity-100' : 'border-muted-foreground/50 bg-muted/30 hover:border-primary/30 opacity-50'}`}
                                                         >
                                                             <div className={`p-3 rounded-lg ${localGameInteractionType === 'parser' ? 'bg-primary/20 text-primary' : 'bg-background/40 text-muted-foreground'}`}>
                                                                 <Type className="w-6 h-6" />
@@ -1045,7 +1045,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             setLocalGameInteractionType('choice');
                                                             setLocalEnableInventory(false);
                                                         }}
-                                                        className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-primary bg-primary/10 shadow-sm opacity-100' : 'border-border bg-muted/30 hover:border-primary/30 opacity-50'}`}
+                                                        className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-primary bg-primary/10 shadow-sm opacity-100' : 'border-muted-foreground/50 bg-muted/30 hover:border-primary/30 opacity-50'}`}
                                                     >
                                                         <div className={`p-3 rounded-lg ${localGameInteractionType === 'choice' ? 'bg-primary/20 text-primary' : 'bg-background/40 text-muted-foreground'}`}>
                                                             <List className="w-6 h-6" />
@@ -1060,7 +1060,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* IMAGES */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableImages ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableImages ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <ImageIcon className="w-5 h-5 text-muted-foreground" />
@@ -1088,7 +1088,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                     value={localImageTransitionType}
                                                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                                     onChange={(e) => setLocalImageTransitionType(e.target.value as any)}
-                                                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
+                                                                    className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
                                                                 >
                                                                     <option value="fade">{t('UIEditor.sistemas.transFade')}</option>
                                                                     <option value="slide">{t('UIEditor.sistemas.transSlide')}</option>
@@ -1120,7 +1120,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* TEXT CONTROL */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableTextControl ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableTextControl ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Type className="w-5 h-5 text-muted-foreground" />
@@ -1148,7 +1148,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         id="textAnimationType"
                                                                         value={localTextAnimationType}
                                                                         onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
-                                                                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
+                                                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
                                                                     >
                                                                         <option value="fade">{t('UIEditor.sistemas.animFade')}</option>
                                                                         <option value="typewriter">{t('UIEditor.sistemas.animTypewriter')}</option>
@@ -1160,7 +1160,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         id="textReadingFlow"
                                                                         value={localTextReadingFlow}
                                                                         onChange={(e) => setLocalTextReadingFlow(e.target.value as 'continuous' | 'paused')}
-                                                                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
+                                                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
                                                                     >
                                                                         <option value="paused">{t('UIEditor.sistemas.flowPaused')}</option>
                                                                         <option value="continuous">{t('UIEditor.sistemas.flowContinuous')}</option>
@@ -1194,7 +1194,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="flex-1 w-full space-y-6">
                                             {/* CHANCES/VIDAS */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableChances ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableChances ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Heart className="w-5 h-5 text-muted-foreground" />
@@ -1235,7 +1235,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 </div>
                                                                 <div className="space-y-1 flex-1 min-w-0">
                                                                     <label htmlFor="chanceColor" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.color')}</label>
-                                                                    <div className="flex items-center gap-2 p-1 bg-background border border-border rounded-lg focus-within:border-primary/50 transition-all h-9 w-full">
+                                                                    <div className="flex items-center gap-2 p-1 bg-background border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all h-9 w-full">
                                                                         <input
                                                                             type="color"
                                                                             id="chanceColor-picker"
@@ -1273,7 +1273,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* SUGGESTOES */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableSuggestions ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableSuggestions ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Lightbulb className="w-5 h-5 text-muted-foreground" />
@@ -1303,7 +1303,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* INVENTORY */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableInventory ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableInventory ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Package className="w-5 h-5 text-muted-foreground" />
@@ -1333,7 +1333,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* DIARY */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableDiary ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableDiary ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Book className="w-5 h-5 text-muted-foreground" />
@@ -1371,7 +1371,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* TRACKERS */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableTrackers ? 'border-primary shadow-md opacity-100' : 'border-border opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableTrackers ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <SlidersHorizontal className="w-5 h-5 text-muted-foreground" />
@@ -1427,7 +1427,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             id="gameTitle"
                                             value={localTitle}
                                             onChange={(e) => setLocalTitle(e.target.value)}
-                                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-primary/50 transition-all font-bold placeholder:text-muted-foreground"
+                                            className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-primary/50 transition-all font-bold placeholder:text-muted-foreground"
                                             placeholder={t('UIEditor.sistemas.gameTitlePlaceholder')}
                                         />
                                     </div>
@@ -1437,7 +1437,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             id="splashDescription"
                                             value={localSplashDescription}
                                             onChange={(e) => setLocalSplashDescription(e.target.value)}
-                                            className="w-full flex-1 bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-primary/50 transition-all resize-none leading-relaxed placeholder:text-muted-foreground h-full"
+                                            className="w-full flex-1 bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-primary/50 transition-all resize-none leading-relaxed placeholder:text-muted-foreground h-full"
                                             placeholder={t('UIEditor.sistemas.gameDescriptionPlaceholder')}
                                         />
                                     </div>
@@ -1449,7 +1449,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 {/* RIGHT COLUMN: Preview & Image Settings */}
                                 <div className="flex flex-col h-full gap-2">
                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.layout.backgroundImage')}</label>
-                                    <div className="relative w-full aspect-video bg-muted/50 border border-border rounded-xl overflow-hidden shadow-2xl group flex-shrink-0">
+                                    <div className="relative w-full aspect-video bg-muted/50 border border-muted-foreground/50 rounded-xl overflow-hidden shadow-2xl group flex-shrink-0">
                                         {/* Background Image Layer */}
                                         {localSplashImage ? (
                                             <div className="absolute inset-0 w-full h-full">
@@ -1538,7 +1538,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     id="splashContentAlignment"
                                                     value={localSplashContentAlignment}
                                                     onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background shadow-lg"
+                                                    className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background shadow-lg"
                                                 >
                                                     <option value="right">{t('UIEditor.layout.alignRight')}</option>
                                                     <option value="left">{t('UIEditor.layout.alignLeft')}</option>
@@ -1547,7 +1547,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     id="splashContentVerticalAlignment"
                                                     value={localSplashContentVerticalAlignment}
                                                     onChange={(e) => setLocalSplashContentVerticalAlignment(e.target.value as 'top' | 'bottom')}
-                                                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background shadow-lg"
+                                                    className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background shadow-lg"
                                                 >
                                                     <option value="bottom">{t('UIEditor.sistemas.alignBottom')}</option>
                                                     <option value="top">{t('UIEditor.sistemas.alignTop')}</option>
@@ -1591,7 +1591,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         activeTab === 'textos' && (
                             <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6 content-start">
                                 {/* SECTION: AÇÕES & INTERAÇÃO */}
-                                <div className="break-inside-avoid p-6 bg-card border border-border rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
+                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
                                         <Hand className="w-5 h-5 text-muted-foreground" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.actions')}</h4>
@@ -1599,25 +1599,25 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
                                             <label htmlFor="actionButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.actionButtonText')}</label>
-                                            <input type="text" id="actionButtonText" value={localActionButtonText || ''} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.actionButtonPlaceholder')} />
+                                            <input type="text" id="actionButtonText" value={localActionButtonText || ''} onChange={(e) => setLocalActionButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.actionButtonPlaceholder')} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="verbInputPlaceholder" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.commandInputPlaceholder')}</label>
-                                            <input type="text" id="verbInputPlaceholder" value={localVerbInputPlaceholder || ''} onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.commandInputValue')} />
+                                            <input type="text" id="verbInputPlaceholder" value={localVerbInputPlaceholder || ''} onChange={(e) => setLocalVerbInputPlaceholder(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.commandInputValue')} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="continueButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.continueButtonText')}</label>
-                                            <input type="text" id="continueButtonText" value={localContinueButtonText || ''} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.continueButtonPlaceholder')} />
+                                            <input type="text" id="continueButtonText" value={localContinueButtonText || ''} onChange={(e) => setLocalContinueButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.continueButtonPlaceholder')} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.restartButtonText')}</label>
-                                            <input type="text" id="restartButtonText" value={localRestartButtonText || ''} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.restartButtonPlaceholder')} />
+                                            <input type="text" id="restartButtonText" value={localRestartButtonText || ''} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.restartButtonPlaceholder')} />
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* SECTION: SUGESTÕES */}
-                                <div className="break-inside-avoid p-6 bg-card border border-border rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
+                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
                                         <Lightbulb className="w-5 h-5 text-muted-foreground" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.suggestions')}</h4>
@@ -1625,7 +1625,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
                                             <label htmlFor="suggestionsButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.suggestionsButton')}</label>
-                                            <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText || ''} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.suggestionsPlaceholder')} disabled={!localEnableSuggestions} />
+                                            <input type="text" id="suggestionsButtonText" value={localSuggestionsButtonText || ''} onChange={e => setLocalSuggestionsButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.suggestionsPlaceholder')} disabled={!localEnableSuggestions} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="suggestionsEmptyFeedback" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.suggestionsEmptyFeedbackLabel')}</label>
@@ -1638,7 +1638,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     setLocalSuggestionsEmptyFeedback(val);
                                                     onUpdate('gameSuggestionsEmptyFeedback', val);
                                                 }}
-                                                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                                className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                                                 placeholder={t('UIEditor.textos.suggestionsEmptyFeedbackPlaceholder')}
                                                 disabled={!localEnableSuggestions}
                                             />
@@ -1647,7 +1647,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
 
                                 {/* SECTION: INVENTÁRIO */}
-                                <div className="break-inside-avoid p-6 bg-card border border-border rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
+                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
                                         <Package className="w-5 h-5 text-muted-foreground" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.inventory')}</h4>
@@ -1655,7 +1655,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
                                             <label htmlFor="inventoryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.inventoryButton')}</label>
-                                            <input type="text" id="inventoryButtonText" value={localInventoryButtonText || ''} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.inventoryPlaceholder')} disabled={!localEnableInventory} />
+                                            <input type="text" id="inventoryButtonText" value={localInventoryButtonText || ''} onChange={e => setLocalInventoryButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.inventoryPlaceholder')} disabled={!localEnableInventory} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="inventoryEmptyFeedback" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.inventoryEmptyFeedbackLabel')}</label>
@@ -1668,7 +1668,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     setLocalInventoryEmptyFeedback(val);
                                                     onUpdate('gameInventoryEmptyFeedback', val);
                                                 }}
-                                                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                                                className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                                                 placeholder={t('UIEditor.textos.inventoryEmptyFeedbackPlaceholder')}
                                                 disabled={!localEnableInventory}
                                             />
@@ -1677,7 +1677,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
 
                                 {/* SECTION: DIÁRIO & NARRATIVA */}
-                                <div className="break-inside-avoid p-6 bg-card border border-border rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
+                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
                                         <Book className="w-5 h-5 text-muted-foreground" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.diary')}</h4>
@@ -1685,17 +1685,17 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
                                             <label htmlFor="diaryButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.diaryButton')}</label>
-                                            <input type="text" id="diaryButtonText" value={localDiaryButtonText || ''} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.diaryPlaceholder')} disabled={!localEnableDiary} />
+                                            <input type="text" id="diaryButtonText" value={localDiaryButtonText || ''} onChange={e => setLocalDiaryButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.diaryPlaceholder')} disabled={!localEnableDiary} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="diaryPlayerName" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.diaryPlayerName')}</label>
-                                            <input type="text" id="diaryPlayerName" value={localDiaryPlayerName || ''} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.diaryPlayerNamePlaceholder')} disabled={!localEnableDiary} />
+                                            <input type="text" id="diaryPlayerName" value={localDiaryPlayerName || ''} onChange={(e) => setLocalDiaryPlayerName(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.diaryPlayerNamePlaceholder')} disabled={!localEnableDiary} />
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* SECTION: INTERFACE & SISTEMA */}
-                                <div className="break-inside-avoid p-6 bg-card border border-border rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
+                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
                                         <Wrench className="w-5 h-5 text-muted-foreground" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.system')}</h4>
@@ -1703,27 +1703,27 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
                                             <label htmlFor="systemButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.systemButton')}</label>
-                                            <input type="text" id="systemButtonText" value={localSystemButtonText || ''} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.systemPlaceholder')} />
+                                            <input type="text" id="systemButtonText" value={localSystemButtonText || ''} onChange={e => setLocalSystemButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.systemPlaceholder')} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="trackersButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.trackersButton')}</label>
-                                            <input type="text" id="trackersButtonText" value={localTrackersButtonText || ''} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.trackersPlaceholder')} disabled={!localEnableTrackers} />
+                                            <input type="text" id="trackersButtonText" value={localTrackersButtonText || ''} onChange={e => setLocalTrackersButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all disabled:opacity-30 disabled:cursor-not-allowed" placeholder={t('UIEditor.textos.trackersPlaceholder')} disabled={!localEnableTrackers} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="mainMenuButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.mainMenuButton')}</label>
-                                            <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText || ''} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.mainMenuPlaceholder')} />
+                                            <input type="text" id="mainMenuButtonText" value={localMainMenuButtonText || ''} onChange={e => setLocalMainMenuButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.mainMenuPlaceholder')} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="viewEndingButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.viewEndingButton')}</label>
-                                            <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText || ''} onChange={e => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.viewEndingPlaceholder')} />
+                                            <input type="text" id="viewEndingButtonText" value={localViewEndingButtonText || ''} onChange={e => setLocalViewEndingButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.viewEndingPlaceholder')} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="saveMenuTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.saveMenuTitle')}</label>
-                                            <input type="text" id="saveMenuTitle" value={localSaveMenuTitle || ''} onChange={e => setLocalSaveMenuTitle(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.saveMenuPlaceholder')} />
+                                            <input type="text" id="saveMenuTitle" value={localSaveMenuTitle || ''} onChange={e => setLocalSaveMenuTitle(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.saveMenuPlaceholder')} />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="loadMenuTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.loadMenuTitle')}</label>
-                                            <input type="text" id="loadMenuTitle" value={localLoadMenuTitle || ''} onChange={e => setLocalLoadMenuTitle(e.target.value)} className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.loadMenuPlaceholder')} />
+                                            <input type="text" id="loadMenuTitle" value={localLoadMenuTitle || ''} onChange={e => setLocalLoadMenuTitle(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.loadMenuPlaceholder')} />
                                         </div>
                                     </div>
                                 </div>
@@ -1738,7 +1738,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="col-span-1 lg:col-span-5 space-y-8 custom-scrollbar pb-20">
 
                                     {/* SECTION: ESTRUTURA */}
-                                    <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
                                         <div className="flex items-center w-full text-left">
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
                                                 <LayoutTemplate className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.scenes', 'Cenas')}
@@ -1752,7 +1752,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     <select
                                                         value={localLayoutOrientation}
                                                         onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
-                                                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
+                                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
                                                     >
                                                         <option value="vertical">{t('UIEditor.layout.vertical')}</option>
                                                         <option value="horizontal">{t('UIEditor.layout.horizontal')}</option>
@@ -1767,7 +1767,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     <select
                                                         value={localLayoutOrder}
                                                         onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
-                                                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
+                                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
                                                     >
                                                         {localLayoutOrientation === 'vertical' ? (
                                                             <>
@@ -1793,7 +1793,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             value={localImageFrame}
                                                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                                             onChange={(e) => setLocalImageFrame(e.target.value as any)}
-                                                            className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
+                                                            className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
                                                         >
                                                             <option value="none">{t('UIEditor.layout.frameNone')}</option>
                                                             <option value="rounded-top">{t('UIEditor.layout.framePortal')}</option>
@@ -1821,7 +1821,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     </div>
 
                                     {/* SECTION: VINHETAS */}
-                                    <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
                                         <div className="flex items-center w-full text-left">
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
                                                 <ArrowRight className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.vinhetas', 'Vinhetas')}
@@ -1835,7 +1835,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     <select
                                                         value={localSplashContentAlignment}
                                                         onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                                        className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
+                                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
                                                     >
                                                         <option value="right">{t('UIEditor.layout.alignRight')}</option>
                                                         <option value="left">{t('UIEditor.layout.alignLeft')}</option>
@@ -1869,7 +1869,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     </div>
 
                                     {/* SECTION: ESTILO & TEMA */}
-                                    <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
                                         <div className="flex items-center w-full text-left">
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
                                                 <Palette className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.styleTheme')}
@@ -1879,7 +1879,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="space-y-6 pt-4">
                                             <div className="space-y-2">
                                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('ThemeEditor.uiTheme', 'Cor da Interface')}</label>
-                                                <div className="flex bg-background rounded-lg p-1 border border-border">
+                                                <div className="flex bg-background rounded-lg p-1 border border-muted-foreground/50">
                                                     <button
                                                         onClick={() => handleThemeChange('dark')}
                                                         className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
@@ -1902,7 +1902,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                         <button
                                                             key={theme.nameKey}
                                                             onClick={() => applyTheme(theme)}
-                                                            className="flex flex-col items-center justify-center p-3 rounded-lg border border-border bg-background hover:border-primary/50 hover:bg-muted/80 transition-all gap-2 group"
+                                                            className="flex flex-col items-center justify-center p-3 rounded-lg border border-muted-foreground/50 bg-background hover:border-primary/50 hover:bg-muted/80 transition-all gap-2 group"
                                                         >
                                                             <div className="flex -space-x-1">
                                                                 <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.textColorLight }}></div>
@@ -1925,7 +1925,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     {isColorsExpanded && (
                                                         <div className="mt-3 space-y-6 animate-in fade-in slide-in-from-top-1 px-1">
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.sceneDesc')}</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.sceneDesc')}</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                                     <ColorInput label={t('UIEditor.aparencia.defaultText')} id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
                                                                     <ColorInput label={t('UIEditor.aparencia.titleHighlight')} id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
@@ -1935,7 +1935,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             </div>
 
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.uiButtons')}</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.uiButtons')}</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                                     <ColorInput label={t('UIEditor.aparencia.splashButton')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
                                                                     <ColorInput label={t('UIEditor.aparencia.splashButtonTextColor')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
@@ -1946,7 +1946,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             </div>
 
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.sceneNameBox')}</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.sceneNameBox')}</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                                     <ColorInput label={t('UIEditor.aparencia.bgColor')} id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
                                                                     <ColorInput label={t('UIEditor.aparencia.text')} id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
@@ -1954,7 +1954,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             </div>
 
                                                             <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-border pb-1">{t('UIEditor.aparencia.others')}</h4>
+                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.others')}</h4>
                                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                                     <ColorInput label={t('UIEditor.aparencia.mainBg')} id="gameFrameColor" value={localGameFrameColor} onChange={setLocalGameFrameColor} placeholder="#000000" />
                                                                 </div>
@@ -1974,7 +1974,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="col-span-1 lg:col-span-7 relative">
                                     <div className="space-y-6 flex flex-col pt-2">
                                         {/* SECTION: UI TEXT (Moved here) */}
-                                        <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                                        <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
                                             <div className="flex items-center w-full text-left">
                                                 <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
                                                     <Type className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.fontsText')}
@@ -1989,7 +1989,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             <select
                                                                 value={localFontFamily}
                                                                 onChange={(e) => setLocalFontFamily(e.target.value)}
-                                                                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
+                                                                className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
                                                             >
                                                                 {FONTS.map(font => (
                                                                     <option key={font.name} value={font.family}>{font.name}</option>
@@ -2004,7 +2004,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             <select
                                                                 value={localGameFontSize}
                                                                 onChange={(e) => setLocalGameFontSize(e.target.value)}
-                                                                className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
+                                                                className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
                                                             >
                                                                 <option value="12">{t('UIEditor.aparencia.sizeSmall')}</option>
                                                                 <option value="14">{t('UIEditor.aparencia.sizeMedium')}</option>
@@ -2019,7 +2019,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                         <div className="flex items-center justify-start gap-3 mb-2">
                                             <span className="text-[10px] font-bold text-muted-foreground uppercase">{t('UIEditor.aparencia.previewLabel', 'Exemplo de')}</span>
-                                            <div className="flex bg-background rounded-lg p-1 border border-border w-48">
+                                            <div className="flex bg-background rounded-lg p-1 border border-muted-foreground/50 w-48">
                                                 <button
                                                     onClick={() => setPreviewType('scene')}
                                                     className={`flex-1 py-1 rounded-md text-[10px] font-bold uppercase transition-all ${previewType === 'scene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
@@ -2039,7 +2039,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             <div
                                                 className={`
                                                     rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300 flex-1 w-full
-                                                    ${localGameTheme === 'dark' ? 'bg-background border-border' : 'bg-zinc-100 border-zinc-300'}
+                                                    ${localGameTheme === 'dark' ? 'bg-background border-muted-foreground/50' : 'bg-zinc-100 border-muted-foreground/50'}
                                                     ${localLayoutOrientation === 'horizontal' ? 'aspect-[9/16]' : 'aspect-video'}
                                                 `}
                                                 style={{ fontFamily: localFontFamily, maxHeight: '500px' }}
@@ -2153,7 +2153,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                                         {/* Input + Action */}
                                                         <div className="flex gap-1.5 pt-1.5 flex-shrink-0">
-                                                            <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${localGameTheme === 'dark' ? 'bg-muted/50 border-border' : 'bg-white border-zinc-300'}`}>
+                                                            <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${localGameTheme === 'dark' ? 'bg-muted/50 border-muted-foreground/50' : 'bg-white border-muted-foreground/50'}`}>
                                                                 <span className="font-mono truncate" style={{ fontSize: '11px', fontFamily: localFontFamily, color: localGameTheme === 'dark' ? '#52525b' : '#a1a1aa' }}>{t('UIEditor.textos.commandInputValue')}</span>
                                                             </div>
                                                             <button
@@ -2169,7 +2169,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         ) : (
                                             <div className="flex items-center justify-center w-full flex-1">
                                                 <div
-                                                    className="relative w-full aspect-video bg-muted border border-border rounded-xl flex flex-col justify-end overflow-hidden p-6 box-border shadow-2xl"
+                                                    className="relative w-full aspect-video bg-muted border border-muted-foreground/50 rounded-xl flex flex-col justify-end overflow-hidden p-6 box-border shadow-2xl"
                                                     style={{
                                                         alignItems: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
                                                         textAlign: localSplashContentAlignment === 'left' ? 'left' : 'right',
@@ -2216,7 +2216,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         activeTab === 'config' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 {/* Idioma Section */}
-                                <div className="bg-card border border-border rounded-xl p-6 shadow-sm hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
                                     <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
                                         <Globe className="w-4 h-4 text-muted-foreground" />
                                         {t('settings.language.label', 'Idioma')}
@@ -2230,7 +2230,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             <select
                                                 value={localLanguage}
                                                 onChange={(e) => setLocalLanguage(e.target.value)}
-                                                className="w-full bg-input border border-border rounded-lg px-3 py-2.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
+                                                className="w-full bg-input border border-muted-foreground/50 rounded-lg px-3 py-2.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
                                             >
                                                 <option value="pt">{t('common.languages.pt', 'Português')}</option>
                                                 <option value="en">{t('common.languages.en', 'English')}</option>
@@ -2244,7 +2244,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
 
                                 {/* Aparência Section */}
-                                <div className="bg-card border border-border rounded-xl p-6 shadow-sm hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
                                     <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
                                         <Palette className="w-4 h-4 text-muted-foreground" />
                                         {t('settings.appearance', 'Aparência')}
@@ -2254,21 +2254,21 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="grid grid-cols-3 gap-3">
                                             <button
                                                 onClick={() => handleAppThemeChange('dark')}
-                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
                                             >
                                                 <Moon size={16} className="text-muted-foreground" />
                                                 <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.dark', 'Noite')}</span>
                                             </button>
                                             <button
                                                 onClick={() => handleAppThemeChange('windows')}
-                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'windows' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'windows' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
                                             >
                                                 <Monitor size={16} className="text-muted-foreground" />
                                                 <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'windows' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.windows', 'W95')}</span>
                                             </button>
                                             <button
                                                 onClick={() => handleAppThemeChange('terminal')}
-                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
                                             >
                                                 <Terminal size={16} className="text-muted-foreground" />
                                                 <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
@@ -2277,14 +2277,14 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="grid grid-cols-2 gap-3 max-w-[66%] mx-auto">
                                             <button
                                                 onClick={() => handleAppThemeChange('light')}
-                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
                                             >
                                                 <Sun size={16} className="text-muted-foreground" />
                                                 <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.light', 'Dia')}</span>
                                             </button>
                                             <button
                                                 onClick={() => handleAppThemeChange('cream')}
-                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/10' : 'border-border bg-card hover:bg-muted'}`}
+                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
                                             >
                                                 <Coffee size={16} className="text-muted-foreground" />
                                                 <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.cream', 'Creme')}</span>

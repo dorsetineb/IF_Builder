@@ -106,7 +106,7 @@ const ColorInput: React.FC<{
     return (
         <div>
             <label htmlFor={id} className="block text-xs font-bold text-zinc-500 uppercase tracking-wider mb-2">{label}</label>
-            <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-zinc-700 transition-all">
+            <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-muted-foreground/50 transition-all">
                 <input
                     type="color"
                     id={`${id}-picker`}
@@ -482,7 +482,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                 <div className="flex flex-col">
                     <p className="text-[10px] text-zinc-600 mb-4 text-center font-bold uppercase tracking-widest">{t('ThemeEditor.livePreview')}</p>
                     <div
-                        className={`flex-1 border p-6 flex flex-col justify-between transition-colors shadow-2xl rounded-xl ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-muted-foreground/50' : 'bg-white border-zinc-200'}`}
+                        className={`flex-1 border p-6 flex flex-col justify-between transition-colors shadow-2xl rounded-xl ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-muted-foreground/50' : 'bg-white border-muted-foreground/50'}`}
                         style={{ fontFamily: localFontFamily }}
                     >
                         <div className="flex justify-between items-start">

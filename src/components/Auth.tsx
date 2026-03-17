@@ -24,7 +24,7 @@ export function Auth() {
             case 'terminal':
                 return { primary: '#0d1117', secondary: '#4af626' };
             case 'light':
-                return { primary: '#000000', secondary: '#ffffff' };
+                return { primary: '#2563eb', secondary: '#ffffff' };
             case 'windows':
                 return { primary: '#0f0f0f', secondary: '#008080' };
             default: // dark
@@ -95,7 +95,7 @@ export function Auth() {
 
     const renderAboutPanel = () => (
         <div
-            className={`w-full max-w-2xl bg-card/80 border border-border backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl text-card-foreground ${isClosing
+            className={`w-full max-w-2xl bg-card/80 border border-muted-foreground/50 backdrop-blur-xl overflow-hidden rounded-2xl shadow-2xl text-card-foreground ${isClosing
                 ? 'animate-out fade-out zoom-out-95 duration-300'
                 : 'animate-in fade-in zoom-in-95 duration-300'
                 }`}
@@ -135,7 +135,7 @@ export function Auth() {
         >
             {/* 4:3 Container - scales proportionally with viewport */}
             <div
-                className={`bg-card border border-border rounded-2xl shadow-2xl overflow-hidden flex flex-col ${isClosing
+                className={`bg-card border border-muted-foreground/50 rounded-2xl shadow-2xl overflow-hidden flex flex-col ${isClosing
                     ? 'animate-out zoom-out-95 duration-300'
                     : 'animate-in zoom-in-95 duration-300'
                     }`}
@@ -147,7 +147,7 @@ export function Auth() {
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Fake Browser Header */}
-                <div className={`px-4 py-3 border-b flex items-center justify-between flex-shrink-0 ${theme === 'light' ? 'bg-white border-zinc-200' : 'bg-primary border-primary'}`}>
+                <div className={`px-4 py-3 border-b flex items-center justify-between flex-shrink-0 ${theme === 'light' ? 'bg-white border-muted-foreground/50' : 'bg-primary border-primary'}`}>
                     <div className="flex items-center gap-3">
                         <span className={`font-mono text-xs uppercase tracking-widest ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground opacity-90'}`}>
                             {i18n.language.startsWith('pt')
@@ -248,7 +248,7 @@ export function Auth() {
                 <h1 className="text-[120px] font-black text-foreground tracking-tighter italic leading-[0.8] notranslate" translate="no" style={{ fontFamily: 'Inter, sans-serif' }}>
                     IF
                 </h1>
-                <div className="font-mono text-[10px] text-muted-foreground tracking-wider pr-2 mt-2 border-r-2 border-border text-right">
+                <div className="font-mono text-[10px] text-muted-foreground tracking-wider pr-2 mt-2 border-r-2 border-muted-foreground/50 text-right">
                     <p>SYS.STATUS: ONLINE</p>
                     <p>NODE: ALPHA-7</p>
                 </div>

@@ -28,11 +28,11 @@ const NodeTypeModal: React.FC<NodeTypeModalProps> = ({ isOpen, onClose, onSelect
                         {/* Vignette Option - NOW FIRST */}
                         <button
                             onClick={() => onSelect('vignette')}
-                            className="bg-card hover:bg-muted border border-border rounded-3xl group flex flex-col items-center justify-center p-12 text-center transition-all duration-300 relative overflow-hidden shadow-2xl"
+                            className="bg-card hover:bg-muted border border-muted-foreground/50 rounded-3xl group flex flex-col items-center justify-center p-12 text-center transition-all duration-300 relative overflow-hidden shadow-2xl"
                         >
                             <div className="absolute inset-0 bg-gradient-to-b from-purple-500/0 via-purple-500/0 to-purple-500/5 group-hover:to-purple-500/10 transition-colors" />
 
-                            <div className="w-16 h-16 rounded-2xl bg-background border border-border flex items-center justify-center mb-6 group-hover:scale-110 group-hover:border-purple-500/30 transition-all duration-300">
+                            <div className="w-16 h-16 rounded-2xl bg-background border border-muted-foreground/50 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:border-purple-500/30 transition-all duration-300">
                                 <ArrowRight size={32} className="text-muted-foreground group-hover:text-purple-400 transition-colors" />
                             </div>
 
@@ -65,12 +65,12 @@ const NodeTypeModal: React.FC<NodeTypeModalProps> = ({ isOpen, onClose, onSelect
                         <button
                             onClick={() => hasOpeningVignette && onSelect('scene')}
                             disabled={!hasOpeningVignette}
-                            className={`bg-card border border-border rounded-3xl group flex flex-col items-center justify-center p-12 text-center transition-all duration-300 relative overflow-hidden shadow-2xl ${!hasOpeningVignette ? 'opacity-50 cursor-not-allowed grayscale' : 'hover:bg-muted'
+                            className={`bg-card border border-muted-foreground/50 rounded-3xl group flex flex-col items-center justify-center p-12 text-center transition-all duration-300 relative overflow-hidden shadow-2xl ${!hasOpeningVignette ? 'opacity-50 cursor-not-allowed grayscale' : 'hover:bg-muted'
                                 }`}
                         >
                             <div className="absolute inset-0 bg-gradient-to-b from-blue-500/0 via-blue-500/0 to-blue-500/5 group-hover:to-blue-500/10 transition-colors" />
 
-                            <div className="w-16 h-16 rounded-2xl bg-background border border-border flex items-center justify-center mb-6 group-hover:scale-110 group-hover:border-blue-500/30 transition-all duration-300">
+                            <div className="w-16 h-16 rounded-2xl bg-background border border-muted-foreground/50 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:border-blue-500/30 transition-all duration-300">
                                 <Split size={32} className="text-muted-foreground group-hover:text-blue-400 transition-colors" />
                             </div>
 
@@ -86,7 +86,7 @@ const NodeTypeModal: React.FC<NodeTypeModalProps> = ({ isOpen, onClose, onSelect
 
                             <div className="flex flex-wrap items-center justify-center gap-2 mt-auto">
                                 {(t('sceneList.nodeSelection.scene.tags', { returnObjects: true, defaultValue: ['DECISÃO', 'RAMIFICAÇÃO', 'COMPLEXIDADE'] }) as string[]).map((tag: string, index: number) => (
-                                    <span key={index} className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded border ${!hasOpeningVignette ? 'text-zinc-500 bg-zinc-500/10 border-zinc-500/20' : 'text-blue-500 bg-blue-500/10 border-blue-500/20'
+                                    <span key={index} className={`text-[10px] uppercase font-bold tracking-wider px-2 py-1 rounded border ${!hasOpeningVignette ? 'text-zinc-500 bg-zinc-500/10 border-muted-foreground/50/20' : 'text-blue-500 bg-blue-500/10 border-blue-500/20'
                                         }`}>
                                         {tag}
                                     </span>

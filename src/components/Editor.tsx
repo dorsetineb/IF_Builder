@@ -1230,7 +1230,7 @@ const Editor: React.FC = () => {
                             50% { box-shadow: 0 0 40px 0px #ffffff; }
                         }
                     `}</style>
-          <div className="bg-zinc-900 border border-zinc-500 rounded-lg p-8 flex flex-col items-center gap-6 animate-[pulse-glow_2s_ease-in-out_infinite] min-w-[300px]">
+          <div className="bg-zinc-900 border border-muted-foreground/50 rounded-lg p-8 flex flex-col items-center gap-6 animate-[pulse-glow_2s_ease-in-out_infinite] min-w-[300px]">
             {/* Pixel Animation (Rotates: Bull -> Man -> Computer) */}
             <div className="grid grid-cols-[repeat(20,minmax(0,1fr))] gap-0.5 w-40 h-24 p-2 rounded-sm">
               {Array.from({ length: 240 }).map((_, i) => {
@@ -1294,8 +1294,9 @@ const Editor: React.FC = () => {
             onExport={() => setShowSaveModal(true)}
             onImport={handleImportFile}
             onHome={() => {
-              setCurrentView('scenes');
+              setCurrentView('welcome');
               setSelectedSceneId(null);
+              setIsNarrativeMenuOpen(false);
             }}
             currentView={currentView}
           />
@@ -1346,7 +1347,7 @@ const Editor: React.FC = () => {
               </div>
             )}
             <main
-              className={`flex-1 overflow-y-auto relative bg-background ${(currentView === 'scenes' && !selectedScene) || currentView === 'map' ? 'p-0' : 'p-6'}`}
+              className={`flex-1 overflow-y-auto relative bg-background ${currentView === 'welcome' || (currentView === 'scenes' && !selectedScene) || currentView === 'map' ? 'p-0' : 'p-6'}`}
             >
               {/* currentView === 'vignettes' block removed */}
               {currentView === 'interface' && (
@@ -1562,8 +1563,8 @@ const Editor: React.FC = () => {
 
             {showSaveModal && (
               <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                <div className="bg-background border border-border rounded-lg shadow-xl w-[400px] max-w-[90vw] overflow-hidden">
-                  <div className="flex justify-between items-center p-4 border-b border-border bg-muted/30">
+                <div className="bg-background border border-muted-foreground/50 rounded-lg shadow-xl w-[400px] max-w-[90vw] overflow-hidden">
+                  <div className="flex justify-between items-center p-4 border-b border-muted-foreground/50 bg-muted/30">
                     <h3 className="font-semibold text-lg">
                       {t('editor.save_project', 'Salvar Projeto')}
                     </h3>
@@ -1597,7 +1598,7 @@ const Editor: React.FC = () => {
                       />
                     </div>
                   </div>
-                  <div className="flex justify-end gap-3 p-4 border-t border-border bg-muted/30">
+                  <div className="flex justify-end gap-3 p-4 border-t border-muted-foreground/50 bg-muted/30">
                     <button
                       onClick={() => setShowSaveModal(false)}
                       className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
@@ -1629,7 +1630,7 @@ const Editor: React.FC = () => {
                                         50% { box-shadow: 0 0 40px 0px #ffffff; }
                                     }
                                 `}</style>
-                <div className="bg-zinc-900 border border-zinc-500 rounded-lg p-8 flex flex-col items-center gap-6 animate-[pulse-glow-save_2s_ease-in-out_infinite] min-w-[300px]">
+                <div className="bg-zinc-900 border border-muted-foreground/50 rounded-lg p-8 flex flex-col items-center gap-6 animate-[pulse-glow-save_2s_ease-in-out_infinite] min-w-[300px]">
                   {/* Pixel Animation (Rotates: Bull -> Man -> Floppy) */}
                   <div className="grid grid-cols-[repeat(20,minmax(0,1fr))] gap-0.5 w-40 h-24 p-2 rounded-sm">
                     {Array.from({ length: 240 }).map((_, i) => {

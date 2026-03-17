@@ -85,17 +85,16 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
     const currentColor = getNodeColor(currentScene);
     const currentColorClasses = {
         border: currentColor === 'amber' ? 'border-amber-500/50' : currentColor === 'blue' ? 'border-blue-500/50' : 'border-green-500/50',
-        text: currentColor === 'amber' ? 'text-amber-400' : currentColor === 'blue' ? 'text-blue-400' : 'text-green-400',
+        text: currentColor === 'amber' ? 'text-amber-600 dark:text-amber-400' : currentColor === 'blue' ? 'text-blue-600 dark:text-blue-400' : 'text-green-600 dark:text-green-400',
         shadow: currentColor === 'amber' ? 'shadow-[0_0_15px_rgba(245,158,11,0.15)]' : currentColor === 'blue' ? 'shadow-[0_0_15_rgba(59,130,246,0.15)]' : 'shadow-[0_0_15_rgba(34,197,94,0.15)]',
     };
 
     return (
-        <div className="relative w-full min-h-[240px] bg-zinc-950/50 rounded-lg border border-zinc-800 flex items-center justify-center overflow-hidden py-4">
+        <div className="relative w-full min-h-[240px] bg-background rounded-lg border border-muted-foreground/50 flex items-center justify-center overflow-hidden py-4">
             {/* Background Grid Pattern */}
-            <div className="absolute inset-0" style={{
-                backgroundImage: 'radial-gradient(circle, #3f3f46 1px, transparent 1px)',
-                backgroundSize: '20px 20px',
-                opacity: 0.2
+            <div className="absolute inset-0 opacity-20 pointer-events-none" style={{
+                backgroundImage: 'radial-gradient(circle, currentColor 1.5px, transparent 1px)',
+                backgroundSize: '24px 24px'
             }}></div>
 
             <div className="relative z-10 flex items-center justify-between w-full px-8 max-w-2xl">
@@ -105,32 +104,32 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                     {incomingConnections.length > 0 ? (
                         incomingConnections.map((node, i) => (
                             <div key={i} className={`px-3 py-2 border rounded text-[10px] truncate max-w-full text-center shadow-lg w-full
-                                ${node.color === 'amber' ? 'bg-amber-500/10 border-amber-500/30 text-amber-200/70' :
-                                    node.color === 'blue' ? 'bg-blue-500/10 border-blue-500/30 text-blue-200/70' :
-                                        'bg-green-500/10 border-green-500/30 text-green-200/70'}`}>
+                                ${node.color === 'amber' ? 'bg-amber-500/10 border-amber-500/50 text-amber-600 dark:text-amber-400 font-medium' :
+                                    node.color === 'blue' ? 'bg-blue-500/10 border-blue-500/50 text-blue-600 dark:text-blue-400 font-medium' :
+                                        'bg-green-500/10 border-green-500/50 text-green-600 dark:text-green-400 font-medium'}`}>
                                 {node.name}
                             </div>
                         ))
                     ) : (
-                        <div className="px-3 py-2 bg-zinc-900/50 border border-zinc-800 border-dashed rounded text-[10px] text-zinc-600 italic w-full text-center">
+                        <div className="px-3 py-2 bg-muted/50 border border-muted-foreground/50 border-dashed rounded text-[10px] text-muted-foreground italic w-full text-center">
                             {t('branchingPreview.noOrigin', 'Sem origem')}
                         </div>
                     )}
-                    {incomingConnections.length >= 5 && <div className="text-[9px] text-zinc-600 text-center">...</div>}
+                    {incomingConnections.length >= 5 && <div className="text-[9px] text-muted-foreground text-center">...</div>}
                 </div>
 
                 {/* Connection Lines (Simplified SVG) */}
                 <div className="flex-grow mx-4 relative h-10">
-                    <svg className="absolute inset-0 w-full h-full overflow-visible">
+                    <svg className="absolute inset-0 w-full h-full overflow-visible text-muted-foreground">
                         {/* Left to Center */}
-                        <path d="M 0,20 L 100%,20" vectorEffect="non-scaling-stroke" stroke="#52525b" strokeWidth="1" strokeDasharray="4 4" fill="none" />
-                        <circle cx="50%" cy="20" r="3" fill="#52525b" />
+                        <path d="M 0,20 L 100%,20" vectorEffect="non-scaling-stroke" stroke="currentColor" strokeWidth="1" strokeDasharray="4 4" fill="none" />
+                        <circle cx="50%" cy="20" r="3" fill="currentColor" />
                     </svg>
                 </div>
 
                 {/* Current Scene Node - Center Stage */}
                 <div className="w-1/4 flex-shrink-0 z-20">
-                    <div className={`px-4 py-3 bg-zinc-900 border-2 rounded-lg flex flex-col items-center ${currentColorClasses.border} ${currentColorClasses.shadow}`}>
+                    <div className={`px-4 py-3 bg-card border-2 rounded-lg flex flex-col items-center ${currentColorClasses.border} ${currentColorClasses.shadow}`}>
                         <span className={`text-[10px] font-bold uppercase tracking-widest whitespace-nowrap ${currentColorClasses.text}`}>
                             {currentScene.vignetteType && currentScene.vignetteType !== 'none'
                                 ? t('branchingPreview.thisVignette', 'Esta Vinheta')
@@ -141,9 +140,9 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
 
                 {/* Connection Lines Right */}
                 <div className="flex-grow mx-4 relative h-10">
-                    <svg className="absolute inset-0 w-full h-full overflow-visible">
-                        <path d="M 0,20 L 100%,20" vectorEffect="non-scaling-stroke" stroke="#52525b" strokeWidth="1" strokeDasharray="4 4" fill="none" />
-                        <circle cx="50%" cy="20" r="3" fill="#52525b" />
+                    <svg className="absolute inset-0 w-full h-full overflow-visible text-muted-foreground">
+                        <path d="M 0,20 L 100%,20" vectorEffect="non-scaling-stroke" stroke="currentColor" strokeWidth="1" strokeDasharray="4 4" fill="none" />
+                        <circle cx="50%" cy="20" r="3" fill="currentColor" />
                     </svg>
                 </div>
 
@@ -152,18 +151,18 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                     {outgoingConnections.length > 0 ? (
                         outgoingConnections.map((node, i) => (
                             <div key={i} className={`px-3 py-2 border rounded text-[10px] truncate max-w-full text-center shadow-lg w-full
-                                ${node.color === 'amber' ? 'bg-amber-500/10 border-amber-500/30 text-amber-200/70' :
-                                    node.color === 'blue' ? 'bg-blue-500/10 border-blue-500/30 text-blue-200/70' :
-                                        'bg-green-500/10 border-green-500/30 text-green-200/70'}`}>
+                                ${node.color === 'amber' ? 'bg-amber-500/10 border-amber-500/50 text-amber-600 dark:text-amber-400 font-medium' :
+                                    node.color === 'blue' ? 'bg-blue-500/10 border-blue-500/50 text-blue-600 dark:text-blue-400 font-medium' :
+                                        'bg-green-500/10 border-green-500/50 text-green-600 dark:text-green-400 font-medium'}`}>
                                 {node.name}
                             </div>
                         ))
                     ) : (
-                        <div className="px-3 py-2 bg-zinc-900/50 border border-zinc-800 border-dashed rounded text-[10px] text-zinc-600 italic w-full text-center">
+                        <div className="px-3 py-2 bg-muted/50 border border-muted-foreground/50 border-dashed rounded text-[10px] text-muted-foreground italic w-full text-center">
                             {t('branchingPreview.noDestination', 'Sem destino')}
                         </div>
                     )}
-                    {outgoingConnections.length >= 5 && <div className="text-[9px] text-zinc-600 text-center">...</div>}
+                    {outgoingConnections.length >= 5 && <div className="text-[9px] text-muted-foreground text-center">...</div>}
                 </div>
             </div>
         </div>

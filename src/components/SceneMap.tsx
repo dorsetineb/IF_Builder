@@ -672,7 +672,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                 markerHeight="6"
                 orient="auto-start-reverse"
               >
-                <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffffff" fillOpacity="0.6" />
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#ffffff" fillOpacity="1" />
               </marker>
             </defs>
             {edges.map((edge, i) => {
@@ -682,14 +682,28 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
               const linkingItems = getLinkingItems(sourceNode);
               const itemIndex = linkingItems.findIndex((item) => item.id === edge.sourceItemId);
+              const getBorderWidth = (n: typeof sourceNode) => {
+                if (n.type === 'vignette') return 4;
+                if (n.type === 'scene') {
+                  const s = n.data as Scene;
+                  if (s.vignetteType === 'opening' || s.vignetteType === 'conclusion') return 4;
+                  return 2;
+                }
+                return 0;
+              };
+
+              const sBorder = getBorderWidth(sourceNode);
+              const tBorder = getBorderWidth(targetNode);
+
               const imagePadding = sourceNode.image ? THUMBNAIL_HEIGHT : 0;
               const y1_offset =
+                sBorder +
                 NODE_HEADER_HEIGHT +
                 imagePadding +
                 PADDING_TOP +
                 itemIndex * (INTERACTION_ITEM_HEIGHT + INTERACTION_ITEM_MARGIN_Y) +
-                INTERACTION_ITEM_HEIGHT / 2;
-              const y2_offset = NODE_HEADER_HEIGHT / 2;
+                INTERACTION_ITEM_HEIGHT / 2 + 1;
+              const y2_offset = tBorder + NODE_HEADER_HEIGHT / 2;
 
               const realX1 = sourceNode.x + (edge.sSide === 'L' ? 0 : NODE_WIDTH);
               const realY1 = sourceNode.y + y1_offset;
@@ -709,7 +723,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   d={`M ${realX1} ${realY1} C ${cx1} ${realY1}, ${cx2} ${realY2}, ${realX2} ${realY2}`}
                   stroke="#ffffff"
                   strokeWidth="2"
-                  strokeOpacity="0.4"
+                  strokeOpacity="1"
                   strokeDasharray={edge.isBackward ? '6 4' : undefined}
                   fill="none"
                   markerEnd="url(#arrow-white)"
@@ -765,12 +779,12 @@ const SceneMap: React.FC<SceneMapProps> = ({
                     {/* Anchors */}
                     {!isOpening && (
                       <div
-                        className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${node.id}-L`) ? anchorColorClass : 'bg-zinc-950 border-zinc-700'}`}
+                        className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
                       />
                     )}
                     {!isOpening && (
                       <div
-                        className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${node.id}-R`) ? anchorColorClass : 'bg-zinc-950 border-zinc-700'}`}
+                        className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
                       />
                     )}
 
@@ -808,7 +822,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
                   {/* Outgoing Links (Next Scene) */}
                   {linkingItems.length > 0 && (
-                    <div className="flex flex-col gap-1 pt-1 pb-2 border-t border-zinc-800/50">
+                    <div className="flex flex-col gap-1 pt-1 pb-2 border-t border-muted-foreground/50">
                       {linkingItems.map((item) => (
                         <div
                           key={item.id}
@@ -816,13 +830,13 @@ const SceneMap: React.FC<SceneMapProps> = ({
                           style={{ height: INTERACTION_ITEM_HEIGHT }}
                         >
                           <div
-                            className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${item.id}-L`) ? anchorColorClass : 'bg-zinc-950 border-zinc-700'}`}
+                            className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
                           />
                           <span className="truncate px-4 text-center w-full text-[10px] uppercase tracking-wider">
                             {item.label}
                           </span>
                           <div
-                            className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${item.id}-R`) ? anchorColorClass : 'bg-zinc-950 border-zinc-700'}`}
+                            className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
                           />
                         </div>
                       ))}
@@ -896,7 +910,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   {/* Anchor Points Visualization */}
                   {!node.isStart && (
                     <div
-                      className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${activeAnchors.has(`${node.id}-L`) ? `bg-${colorBase}-500 border-${colorBase}-400` : 'bg-zinc-950 border-zinc-700'}`}
+                      className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
                     />
                   )}
                   {/* Although anchors are strictly computed, we show right anchor visually if there are inputs from right? No, inputs always Left. Outputs always Right. */}
@@ -927,7 +941,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                 )}
 
                 {linkingItems.length > 0 && (
-                  <div className="flex flex-col gap-1 pt-1 pb-2 border-t border-zinc-800/50">
+                  <div className="flex flex-col gap-1 pt-1 pb-2 border-t border-muted-foreground/50">
                     {linkingItems.map((item) => {
                       let displayLabel = item.label;
                       // Logic for detailed label recovery if needed for Parser
@@ -962,7 +976,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                         >
                           {isLeftActive && (
                             <div
-                              className={`absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${anchorColor}`}
+                              className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
                             />
                           )}
                           <span
@@ -973,7 +987,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                           </span>
                           {isRightActive && (
                             <div
-                              className={`absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-4 h-4 rounded-full z-20 transition-colors border-2 ${anchorColor}`}
+                              className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
                             />
                           )}
                         </div>
@@ -991,10 +1005,10 @@ const SceneMap: React.FC<SceneMapProps> = ({
           onClick={onReorganizeScenes}
           className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
             theme === 'light'
-              ? 'bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-100'
+              ? 'bg-white text-zinc-900 border-muted-foreground/50 hover:bg-zinc-100'
               : theme === 'cream'
                 ? 'bg-[#fdfbf7] text-[#4a332a] border-[#e8dcc4] hover:bg-[#f5ebd8]'
-                : 'bg-zinc-800 text-zinc-200 border-zinc-600 hover:bg-zinc-700'
+                : 'bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700'
           }`}
         >
           <LayoutGrid className="w-4 h-4 mr-2" />
@@ -1004,10 +1018,10 @@ const SceneMap: React.FC<SceneMapProps> = ({
           onClick={handleViewAll}
           className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
             theme === 'light'
-              ? 'bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-100'
+              ? 'bg-white text-zinc-900 border-muted-foreground/50 hover:bg-zinc-100'
               : theme === 'cream'
                 ? 'bg-[#fdfbf7] text-[#4a332a] border-[#e8dcc4] hover:bg-[#f5ebd8]'
-                : 'bg-zinc-800 text-zinc-200 border-zinc-600 hover:bg-zinc-700'
+                : 'bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700'
           }`}
         >
           <Maximize2 className="w-4 h-4 mr-2" />
@@ -1019,10 +1033,10 @@ const SceneMap: React.FC<SceneMapProps> = ({
             highlightOrphans
               ? 'bg-red-600 text-white border-red-500 hover:bg-red-700'
               : theme === 'light'
-                ? 'bg-white text-zinc-900 border-zinc-200 hover:bg-zinc-100'
+                ? 'bg-white text-zinc-900 border-muted-foreground/50 hover:bg-zinc-100'
                 : theme === 'cream'
                   ? 'bg-[#fdfbf7] text-[#4a332a] border-[#e8dcc4] hover:bg-[#f5ebd8]'
-                  : 'bg-zinc-800 text-zinc-200 border-zinc-600 hover:bg-zinc-700'
+                  : 'bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700'
           }`}
         >
           <AlertTriangle className="w-4 h-4 mr-2" />
@@ -1032,10 +1046,10 @@ const SceneMap: React.FC<SceneMapProps> = ({
       <div className="absolute bottom-6 right-6 z-10 flex flex-col items-end gap-4 pointer-events-none">
         <div className={`backdrop-blur-md p-4 rounded-xl shadow-xl pointer-events-auto border ${
           theme === 'light'
-            ? 'bg-white/80 border-zinc-200'
+            ? 'bg-white/80 border-muted-foreground/50'
             : theme === 'cream'
               ? 'bg-[#fdfbf7]/80 border-[#e8dcc4]'
-              : 'bg-zinc-950/80 border-zinc-800'
+              : 'bg-zinc-950/80 border-muted-foreground/50'
         }`}>
           <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${
             theme === 'light' || theme === 'cream' ? 'text-zinc-600' : 'text-zinc-500'
@@ -1071,19 +1085,19 @@ const SceneMap: React.FC<SceneMapProps> = ({
         </div>
         <div className={`flex rounded-lg overflow-hidden shadow-xl pointer-events-auto border ${
           theme === 'light'
-            ? 'bg-white border-zinc-200'
+            ? 'bg-white border-muted-foreground/50'
             : theme === 'cream'
               ? 'bg-[#fdfbf7] border-[#e8dcc4]'
-              : 'bg-zinc-950 border-zinc-800'
+              : 'bg-zinc-950 border-muted-foreground/50'
         }`}>
           <button
             onClick={() => handleZoom('in')}
             className={`w-10 h-10 flex items-center justify-center transition-all border-r ${
               theme === 'light'
-                ? 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 border-zinc-200'
+                ? 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 border-muted-foreground/50'
                 : theme === 'cream'
                   ? 'text-[#4a332a]/80 hover:text-[#4a332a] hover:bg-[#f5ebd8] border-[#e8dcc4]'
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900 border-zinc-800'
+                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900 border-muted-foreground/50'
             }`}
           >
             <Plus className="w-4 h-4" />
