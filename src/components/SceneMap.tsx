@@ -642,7 +642,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
         onMouseLeave={handleMouseUp}
       >
         <div
-          className="absolute inset-0 pointer-events-none opacity-20"
+          className="absolute inset-0 pointer-events-none opacity-10"
           style={{
             backgroundImage: 'radial-gradient(circle, currentColor 1.5px, transparent 1px)',
             backgroundSize: `${24 * view.scale}px ${24 * view.scale}px`,
@@ -779,12 +779,12 @@ const SceneMap: React.FC<SceneMapProps> = ({
                     {/* Anchors */}
                     {!isOpening && (
                       <div
-                        className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
+                        className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
                       />
                     )}
                     {!isOpening && (
                       <div
-                        className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
+                        className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
                       />
                     )}
 
@@ -830,13 +830,13 @@ const SceneMap: React.FC<SceneMapProps> = ({
                           style={{ height: INTERACTION_ITEM_HEIGHT }}
                         >
                           <div
-                            className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
+                            className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
                           />
                           <span className="truncate px-4 text-center w-full text-[10px] uppercase tracking-wider">
                             {item.label}
                           </span>
                           <div
-                            className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
+                            className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
                           />
                         </div>
                       ))}
@@ -910,7 +910,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   {/* Anchor Points Visualization */}
                   {!node.isStart && (
                     <div
-                      className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
+                      className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
                     />
                   )}
                   {/* Although anchors are strictly computed, we show right anchor visually if there are inputs from right? No, inputs always Left. Outputs always Right. */}
@@ -976,7 +976,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                         >
                           {isLeftActive && (
                             <div
-                              className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
+                              className="absolute top-1/2 -translate-y-1/2 left-0 -translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
                             />
                           )}
                           <span
@@ -987,7 +987,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                           </span>
                           {isRightActive && (
                             <div
-                              className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 border-2 bg-white border-background"
+                              className="absolute top-1/2 -translate-y-1/2 right-0 translate-x-1/2 w-3.5 h-3.5 rounded-[2px] z-20 bg-white"
                             />
                           )}
                         </div>
