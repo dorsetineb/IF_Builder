@@ -138,7 +138,7 @@
       "recommendedDimensions": "Recommended: 1920x1080"
     },
     "system": {
-      "parserTitle": "Parser (Describe commands)",
+      "parserTitle": "Parser (Describe verbs)",
       "parserDesc": "The player types actions like 'take key' or 'look at table'.",
       "choiceTitle": "IF (Choose an option)",
       "choiceDesc": "The player chooses from pre-defined options to advance the story."
@@ -199,7 +199,7 @@
   },
   "guide": {
     "title": "Quick Guide",
-    "intro": "IF Builder allows you to create interactive fictions, text-based narratives where the player interacts with the story through choices or commands. The fiction is composed of <strong>Scenes</strong>, where the user reads descriptions, observes images, and makes decisions to interact with <strong>objects</strong> and <strong>navigate the world</strong>.",
+    "intro": "IF Builder allows you to create interactive fictions, text-based narratives where the player interacts with the story through choices or verbs. The fiction is composed of <strong>Scenes</strong>, where the user reads descriptions, observes images, and makes decisions to interact with <strong>objects</strong> and <strong>navigate the world</strong>.",
     "toc": "Guide Index",
     "tocSelect": "Select a chapter to navigate...",
     "sections": {
@@ -222,7 +222,7 @@
       },
       "interactions": {
         "title": "3. Interactions (The heart of the game)",
-        "desc": "Defines what happens when the player types a command.",
+        "desc": "Defines what happens when the player types a verb.",
         "item1": "<strong>Verbs:</strong> Words that trigger the action (e.g. open, use, take).",
         "item2": "<strong>Target:</strong> Scene object affected (e.g. Door).",
         "item3": "<strong>Requirement:</strong> Item needed in inventory (e.g. Key).",
@@ -242,10 +242,10 @@
         "tip": "The system understands various orders (e.g. \"Use key on door\")."
       },
       "globals": {
-        "title": "4. Global Commands",
-        "desc": "Commands that work in <strong>any scene</strong> of the game.",
+        "title": "4. Global Verbs",
+        "desc": "Verbs that work in <strong>any scene</strong> of the game.",
         "item1": "<strong>Fixed Verbs:</strong> Universal keywords (e.g. \"help\", \"inventory\").",
-        "item2": "<strong>Description:</strong> Standard response for each global command."
+        "item2": "<strong>Description:</strong> Standard response for each global verb."
       },
       "vignettes": {
         "title": "5. Vignettes",
@@ -291,7 +291,7 @@
         "title": "9. Preview and Test",
         "item1": "Use the <strong>Preview</strong> button to test the whole experience.",
         "item2": "Test from any scene you are editing.",
-        "item3": "Check if commands and interactions work as expected."
+        "item3": "Check if verbs and interactions work as expected."
       },
       "export": {
         "title": "10. Finalization and Export",
@@ -383,7 +383,7 @@
     "sceneMap": "Scene Map",
     "objects": "Objects",
     "trackers": "Trackers",
-    "globalCommands": "Global Commands",
+    "globalCommands": "Global Verbs",
     "interface": "Interface",
     "quickGuide": "Quick Guide",
     "aboutProject": "About Project",
@@ -424,7 +424,7 @@
     "inThisScene": "In This Scene ({{count}})",
     "linkOptions": "Link ({{count}})",
     "searchPlaceholder": "Search objects...",
-    "createNewBtn": "Create New Object",
+    "createNewBtn": "Create Object",
     "linkToSceneTooltip": "Link to scene",
     "propertiesTitle": "Object Properties",
     "unlinkConfirm": "Are you sure? This will remove the object from this scene, but it will still exist in the project.",
@@ -487,23 +487,23 @@
     "noTrackerDesc": "Select a tracker from the list to edit its properties."
   },
   "globalCommandsEditor": {
-    "headerDesc1": "Configure verbs and commands that will always be available to the player (e.g., help, tutorial).",
+    "headerDesc1": "Configure the verbs that will always be available to the player (e.g., help, tutorial).",
     "headerDesc2": "The verbs <1>\"look\", \"examine\", \"see\"</1> and <3>\"read\"</3> will always be available for the user to trigger an object's description.",
-    "searchPlaceholder": "Search commands...",
-    "commandList": "Command List",
+    "searchPlaceholder": "Search verbs...",
+    "commandList": "Verb List",
     "noVerbs": "(no verbs)",
     "noDescription": "(no description)",
-    "newCommand": "New Command",
-    "createCommandBtn": "Create Command",
-    "editCommandTitle": "Edit Command",
-    "deleteCommandTooltip": "Delete command",
+    "newCommand": "New Verb",
+    "createCommandBtn": "Create Verb",
+    "editCommandTitle": "Edit Verb",
+    "deleteCommandTooltip": "Delete verb",
     "verbsLabel": "Verbs (comma separated)",
     "chooseIconTooltip": "Choose icon",
     "verbsPlaceholder": "e.g.: help, ?",
-    "verbsDesc": "Words that activate this command. E.g.: \"help\" or \"?\".",
+    "verbsDesc": "Words that activate this verb. E.g.: \"help\" or \"?\".",
     "descriptionLabel": "Description / Response",
-    "descriptionPlaceholder": "Text that will be displayed to the player when using this command.",
-    "noCommandSelected": "Select a command to edit",
+    "descriptionPlaceholder": "Text that will be displayed to the player when using this verb.",
+    "noCommandSelected": "Select a verb to edit",
     "noCommandDesc": "or create a new one by clicking the button below"
   },
   "interactionEditor": {
@@ -624,12 +624,20 @@
         "scene": {
           "title": "Scene",
           "description": "Moments of divergence. Where the player makes choices and destiny changes.",
-          "tags": ["DECISION", "BRANCHING", "COMPLEXITY"]
+          "tags": [
+            "DECISION",
+            "BRANCHING",
+            "COMPLEXITY"
+          ]
         },
         "vignette": {
           "title": "Vignette",
           "description": "A narrative bridge. Connect points of the story without interruptions.",
-          "tags": ["LINEAR", "FIXED", "ATMOSPHERE"]
+          "tags": [
+            "LINEAR",
+            "FIXED",
+            "ATMOSPHERE"
+          ]
         }
       }
     },
@@ -714,7 +722,7 @@
       "activeSystemsDesc": "Enable and configure systems available in your game. You can mix multiple systems.",
       "gameStyle": "Decision Style",
       "gameStyleDesc": "Defines the main player interaction",
-      "parser": "Parser (Type Commands)",
+      "parser": "Parser (Type Verbs)",
       "parserDesc": "The player types actions like \"take key\" or \"look table\"",
       "choice": "IF (Choose an option)",
       "choiceDesc": "The player chooses from predefined options on screen",
@@ -767,7 +775,7 @@
       "interfaceTexts": "Interface Texts",
       "actionButtonText": "Action Button Text",
       "actionButtonPlaceholder": "Action",
-      "commandInputPlaceholder": "Command Field Text",
+      "commandInputPlaceholder": "Verb Field Text",
       "commandInputValue": "What do you do?",
       "viewEndingButtonText": "\"View Ending\" Button Text",
       "viewEndingButton": "View Ending Button",
@@ -892,8 +900,8 @@
     "livePreview": "Live Preview",
     "previewTitle": "Game Title",
     "previewDesc": "This is a sample description for the scene. It uses the default text color you define.",
-    "previewCommand": "sample command",
-    "commandField": "Command field",
+    "previewCommand": "sample verb",
+    "commandField": "Verb field",
     "action": "Action",
     "startButton": "Start Button",
     "undoChanges": "Undo changes",
@@ -978,7 +986,7 @@
   "manualModal": {
     "title": "User Manual",
     "subtitle": "Learn how to create your interactive adventure",
-    "intro": "The <strong className=\"text-white\">IF Builder</strong> allows you to create Interactive Fiction games. The game is composed of <strong>Scenes</strong>, where the player reads descriptions, looks at images, and types commands (verbs) to interact with <strong>Objects</strong> and navigate the world.",
+    "intro": "The <strong className=\"text-white\">IF Builder</strong> allows you to create Interactive Fiction games. The game is composed of <strong>Scenes</strong>, where the player reads descriptions, looks at images, and types verbs (verbs) to interact with <strong>Objects</strong> and navigate the world.",
     "section1Title": "1. Scene Editor",
     "section1Intro": "Each scene is a location or moment in your game. Configure:",
     "section1Item1": "<strong className=\"text-zinc-200\">Interactive Text:</strong> Use the <code>&lt;word&gt;</code> syntax in the description. This will make the word clickable in the game.",
@@ -988,7 +996,7 @@
     "section2Intro": "Objects are items that can be in a scene. They are <strong className=\"text-white\">global</strong>: you create an object once and can link it to multiple scenes.",
     "section2Item1": "<strong className=\"text-zinc-200\">Examine:</strong> Define a detailed description that the player will see.",
     "section3Title": "3. Interactions",
-    "section3Intro": "Interactions define what happens when the player types a command.",
+    "section3Intro": "Interactions define what happens when the player types a verb.",
     "verbsTitle": "Verbs",
     "verbsDesc": "List of words that trigger the action (e.g., <code>open, unlock, use</code>).",
     "targetTitle": "Target",
@@ -996,8 +1004,8 @@
     "reqTitle": "Requirement",
     "reqDesc": "The item the player MUST have in their inventory (e.g., <code>Key</code>).",
     "resTitle": "Result",
-    "resDesc": "What happens after the command (e.g., go to another scene).",
-    "exampleCommandTitle": "Player command example:",
+    "resDesc": "What happens after the verb (e.g., go to another scene).",
+    "exampleCommandTitle": "Player verb example:",
     "exampleCommand": "\"Unlock door with key\"",
     "verbVal": "Unlock",
     "targetVal": "Door",

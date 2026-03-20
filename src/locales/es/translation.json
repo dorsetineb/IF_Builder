@@ -184,7 +184,7 @@
     "sceneMap": "Mapa de Escenas",
     "objects": "Objetos",
     "trackers": "Rastreadores",
-    "globalCommands": "Comandos Globales",
+    "globalCommands": "Verbos Globales",
     "interface": "Interfaz",
     "quickGuide": "Guía Rápida",
     "aboutProject": "Sobre el Proyecto",
@@ -254,7 +254,7 @@
       "recommendedDimensions": "Recomendado: 1920x1080"
     },
     "system": {
-      "parserTitle": "Parser (Escribir comandos)",
+      "parserTitle": "Parser (Escribir verbos)",
       "parserDesc": "El jugador escribe acciones como \"coger llave\" o \"mirar mesa\".",
       "choiceTitle": "IF (Elegir una opción)",
       "choiceDesc": "El jugador elige entre opciones predefinidas para avanzar en la historia."
@@ -315,7 +315,7 @@
   },
   "guide": {
     "title": "Guía Rápida",
-    "intro": "IF Builder permite crear ficciones interactivas, narrativas textuales donde el jugador interactúa con la historia mediante elecciones o comandos (verbos). La ficción está compuesta por <strong>Escenas</strong>, donde el usuario lee descripciones, observa imágenes y toma decisiones para interactuar con <strong>objetos</strong> y <strong>navegar por el mundo</strong>.",
+    "intro": "IF Builder permite crear ficciones interactivas, narrativas textuales donde el jugador interactúa con la historia mediante elecciones o verbos (verbos). La ficción está compuesta por <strong>Escenas</strong>, donde el usuario lee descripciones, observa imágenes y toma decisiones para interactuar con <strong>objetos</strong> y <strong>navegar por el mundo</strong>.",
     "toc": "Índice de la Guía",
     "tocSelect": "Selecciona un capítulo para navegar...",
     "sections": {
@@ -338,7 +338,7 @@
       },
       "interactions": {
         "title": "3. Interacciones (El corazón del juego)",
-        "desc": "Definen qué ocurre cuando el jugador escribe un comando.",
+        "desc": "Definen qué ocurre cuando el jugador escribe un verbo.",
         "item1": "<strong>Verbos:</strong> Palabras que activan la acción (ej: abrir, usar, coger).",
         "item2": "<strong>Objetivo:</strong> Objeto de la escena afectado (ej: Puerta).",
         "item3": "<strong>Requisito:</strong> Objeto necesario en el inventario (ej: Llave).",
@@ -358,10 +358,10 @@
         "tip": "El sistema entiende órdenes variadas (ej: \"Usar llave en la puerta\")."
       },
       "globals": {
-        "title": "4. Comandos Globales",
-        "desc": "Comandos que funcionan en <strong>cualquier escena</strong> del juego.",
+        "title": "4. Verbos Globales",
+        "desc": "Verbos que funcionan en <strong>cualquier escena</strong> del juego.",
         "item1": "<strong>Verbos Fijos:</strong> Palabras clave universales (ej: \"ayuda\", \"inventario\").",
-        "item2": "<strong>Descripción:</strong> Respuesta por defecto para cada comando global."
+        "item2": "<strong>Descripción:</strong> Respuesta por defecto para cada verbo global."
       },
       "vignettes": {
         "title": "5. Viñetas",
@@ -407,7 +407,7 @@
         "title": "9. Vista Previa y Prueba",
         "item1": "Usa el botón <strong>Vista Previa</strong> para probar toda la experiencia.",
         "item2": "Prueba a partir de cualquier escena que estés editando.",
-        "item3": "Verifica si los comandos e interacciones funcionan como se espera."
+        "item3": "Verifica si los verbos e interacciones funcionan como se espera."
       },
       "export": {
         "title": "10. Finalización y Exportación",
@@ -425,7 +425,7 @@
     "inThisScene": "En esta Escena ({{count}})",
     "linkOptions": "Vincular ({{count}})",
     "searchPlaceholder": "Buscar objetos...",
-    "createNewBtn": "Crear Nuevo Objeto",
+    "createNewBtn": "Crear Objeto",
     "linkToSceneTooltip": "Vincular a la escena",
     "propertiesTitle": "Propiedades del Objeto",
     "unlinkConfirm": "¿Estás seguro? Esto eliminará el objeto de esta escena, pero seguirá existiendo en el proyecto.",
@@ -488,23 +488,23 @@
     "noTrackerDesc": "Selecciona un rastreador de la lista al lado para editar sus propiedades."
   },
   "globalCommandsEditor": {
-    "headerDesc1": "Configura verbos y comandos que siempre estarán disponibles para el jugador (ej: ayuda, tutorial).",
+    "headerDesc1": "Configura los verbos que siempre estarán disponibles para el jugador (ej: ayuda, tutorial).",
     "headerDesc2": "Los verbos <1>\"mirar\", \"examinar\", \"ver\"</1> y <3>\"leer\"</3> siempre estarán disponibles para que el usuario accione la descripción de un objeto.",
-    "searchPlaceholder": "Buscar comandos...",
-    "commandList": "Lista de Comandos",
+    "searchPlaceholder": "Buscar verbos...",
+    "commandList": "Lista de Verbos",
     "noVerbs": "(sin verbos)",
     "noDescription": "(sin descripción)",
-    "newCommand": "Nuevo Comando",
-    "createCommandBtn": "Crear Comando",
-    "editCommandTitle": "Editar Comando",
-    "deleteCommandTooltip": "Eliminar comando",
+    "newCommand": "Nuevo Verbo",
+    "createCommandBtn": "Crear Verbo",
+    "editCommandTitle": "Editar Verbo",
+    "deleteCommandTooltip": "Eliminar verbo",
     "verbsLabel": "Verbos (separados por coma)",
     "chooseIconTooltip": "Elegir icono",
     "verbsPlaceholder": "ej: ayuda, help, ?",
-    "verbsDesc": "Palabras que activan este comando. Ej: \"ayuda\" o \"help\".",
+    "verbsDesc": "Palabras que activan este verbo. Ej: \"ayuda\" o \"help\".",
     "descriptionLabel": "Descripción / Respuesta",
-    "descriptionPlaceholder": "Texto que se mostrará al jugador al usar este comando.",
-    "noCommandSelected": "Selecciona un comando para editar",
+    "descriptionPlaceholder": "Texto que se mostrará al jugador al usar este verbo.",
+    "noCommandSelected": "Selecciona un verbo para editar",
     "noCommandDesc": "o crea uno nuevo haciendo clic en el botón de abajo"
   },
   "interactionEditor": {
@@ -625,12 +625,20 @@
         "scene": {
           "title": "Escena",
           "description": "Momentos de divergencia. Donde el jugador toma decisiones y el destino cambia.",
-          "tags": ["DECISIÓN", "RAMIFICACIÓN", "COMPLEJIDAD"]
+          "tags": [
+            "DECISIÓN",
+            "RAMIFICACIÓN",
+            "COMPLEJIDAD"
+          ]
         },
         "vignette": {
           "title": "Viñeta",
           "description": "Un puente narrativo. Conecta puntos de la historia sin interrupciones.",
-          "tags": ["LINEAL", "FIJO", "ATMÓSFERA"]
+          "tags": [
+            "LINEAL",
+            "FIJO",
+            "ATMÓSFERA"
+          ]
         }
       }
     },
@@ -715,7 +723,7 @@
       "activeSystemsDesc": "Habilita y configura los sistemas que estarán disponibles en tu juego. Puedes combinar múltiples sistemas.",
       "gameStyle": "Estilo de Decisión",
       "gameStyleDesc": "Define la interacción principal del jugador",
-      "parser": "Parser (Escribir Comandos)",
+      "parser": "Parser (Escribir Verbos)",
       "parserDesc": "El jugador escribe acciones como \"coger llave\" o \"mirar mesa\"",
       "choice": "IF (Elegir una opción)",
       "choiceDesc": "El jugador elige entre opciones predefinidas en pantalla",
@@ -768,7 +776,7 @@
       "interfaceTexts": "Textos de la Interfaz",
       "actionButtonText": "Texto del Botón de Acción",
       "actionButtonPlaceholder": "Acción",
-      "commandInputPlaceholder": "Texto del Campo de Comando",
+      "commandInputPlaceholder": "Texto del Campo de Verbo",
       "commandInputValue": "¿Qué haces?",
       "viewEndingButtonText": "Texto del Botón \"Ver Final\"",
       "viewEndingButton": "Botón Ver Final",
@@ -893,8 +901,8 @@
     "livePreview": "Vista previa en vivo",
     "previewTitle": "Título del Juego",
     "previewDesc": "Esta es una descripción de ejemplo para la escena. Usa el color de texto predeterminado que definas.",
-    "previewCommand": "comando de ejemplo",
-    "commandField": "Campo de comando",
+    "previewCommand": "verbo de ejemplo",
+    "commandField": "Campo de verbo",
     "action": "Acción",
     "startButton": "Botón de Inicio",
     "undoChanges": "Deshacer cambios",
@@ -979,17 +987,17 @@
   "manualModal": {
     "title": "Manual de Uso",
     "subtitle": "Aprende a crear tu aventura interactiva",
-    "intro": "El <strong className=\"text-white\">IF Builder</strong> te permite crear juegos de ficción interactiva (Interactive Fiction). El juego está compuesto por <strong>Escenas</strong>, donde el jugador lee descripciones, observa imágenes y escribe comandos (verbos) para interactuar con <strong>Objetos</strong> y navegar por el mundo.",
+    "intro": "El <strong className=\"text-white\">IF Builder</strong> te permite crear juegos de ficción interactiva (Interactive Fiction). El juego está compuesto por <strong>Escenas</strong>, donde el jugador lee descripciones, observa imágenes y escribe verbos (verbos) para interactuar con <strong>Objetos</strong> y navegar por el mundo.",
     "section1Title": "1. Editor de Escenas",
     "section1Intro": "Cada escena es un lugar o momento en tu juego. Configura:",
-    "section1Item1": "<strong className=\"text-zinc-200\">Texto Interactivo:</strong> Usa la sintaxis <code>&lt;palabra&gt;</code> en la descripción. Esto hará que la palabra sea clicable en el juego, facilitando la introducción de comandos para el jugador.",
+    "section1Item1": "<strong className=\"text-zinc-200\">Texto Interactivo:</strong> Usa la sintaxis <code>&lt;palabra&gt;</code> en la descripción. Esto hará que la palabra sea clicable en el juego, facilitando la introducción de verbos para el jugador.",
     "section1Item2": "<strong className=\"text-zinc-200\">Imagen y Música:</strong> Cada escena puede tener una imagen de fondo única y una pista de sonido que comienza a sonar al entrar en ella.",
     "section1Item3": "<strong className=\"text-zinc-200\">Escena Inicial:</strong> Define qué escena será el punto de partida de tu juego en el menú lateral.",
     "section2Title": "2. Biblioteca de Objetos",
     "section2Intro": "Los objetos son elementos que pueden estar en una escena. Son <strong className=\"text-white\">globales</strong>: creas un objeto una vez (ej: \"Llave de Oro\") y puedes vincularlo a múltiples escenas o usarlo en interacciones en cualquier parte del juego.",
-    "section2Item1": "<strong className=\"text-zinc-200\">Examen:</strong> Define una descripción detallada que el jugador verá al usar el comando \"mirar\" o \"examinar\" el objeto.",
+    "section2Item1": "<strong className=\"text-zinc-200\">Examen:</strong> Define una descripción detallada que el jugador verá al usar el verbo \"mirar\" o \"examinar\" el objeto.",
     "section3Title": "3. Interacciones",
-    "section3Intro": "Las interacciones definen qué sucede cuando el jugador escribe un comando.",
+    "section3Intro": "Las interacciones definen qué sucede cuando el jugador escribe un verbo.",
     "verbsTitle": "Verbos",
     "verbsDesc": "Lista de palabras que activan la acción (ej: <code>abrir, desbloquear, usar</code>).",
     "targetTitle": "Objetivo",
@@ -997,8 +1005,8 @@
     "reqTitle": "Requisito",
     "reqDesc": "El objeto que el jugador NECESITA tener en el inventario (ej: <code>Llave</code>).",
     "resTitle": "Resultado",
-    "resDesc": "Lo que sucede tras el comando (ej: ir a otra escena).",
-    "exampleCommandTitle": "Ejemplo de comando del jugador:",
+    "resDesc": "Lo que sucede tras el verbo (ej: ir a otra escena).",
+    "exampleCommandTitle": "Ejemplo de verbo del jugador:",
     "exampleCommand": "\"Desbloquear puerta con la llave\"",
     "verbVal": "Desbloquear",
     "targetVal": "Puerta",

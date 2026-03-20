@@ -127,113 +127,129 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
 
 
     return (
-        <div className="flex flex-col h-full space-y-6" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
-            {/* Header with Save/Undo actions */}
-            <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/50">
-                <div className="text-muted-foreground text-xs font-medium w-full space-y-1">
-                    <p>{t('globalCommandsEditor.headerDesc1', 'Configure verbos e comandos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).')}</p>
-                    <p>
-                        <Trans i18nKey="globalCommandsEditor.headerDesc2">
-                            Os verbos <strong>&quot;olhar&quot;, &quot;examinar&quot;, &quot;ver&quot;</strong> e <strong>&quot;ler&quot;</strong> sempre estarão disponíveis para o usuário acionar a descrição de um objeto.
-                        </Trans>
-                    </p>
+        <div className="flex w-full h-full overflow-hidden bg-background" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
+            {/* LEFT SIDEBAR (Standardized Layout) */}
+            <div className="w-72 flex-shrink-0 bg-muted-foreground/20 flex flex-col pt-4 pl-2 pr-0 pb-2 transition-all z-10 shadow-lg border-r border-primary/20">
+                {/* Search Header */}
+                <div className="relative mb-4 mt-2 px-2 flex-shrink-0">
+                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground font-bold" />
+                    <input
+                        type="text"
+                        placeholder={t('globalCommandsEditor.searchPlaceholder', 'Buscar comandos...')}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full bg-transparent border border-muted-foreground/50 rounded-lg pl-10 pr-4 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-muted-foreground/70 transition-all font-medium"
+                    />
                 </div>
-                <div className="flex items-center gap-3 shrink-0">
-                    {isDirty && (
-                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
-                            <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
-                            {t('globalObjectsEditor.unsavedChanges', 'Alterações não salvas')}
-                        </div>
+                <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider px-3 mb-2">
+                    <span>{t('globalCommandsEditor.commandList', 'Lista de Verbos')}</span>
+                </div>
+
+                {/* Command List */}
+                <div className="flex-1 overflow-y-auto p-0 space-y-0 relative">
+                    {filteredVerbs.length > 0 && (
+                        filteredVerbs.map(verb => {
+                            const IconComponent = COMMAND_ICONS.find(i => i.name === verb.icon)?.component || MessageSquare;
+                            return (
+                                <div key={verb.id} className="w-full mb-1">
+                                    <div
+                                        onClick={() => setSelectedVerbId(verb.id)}
+                                        className={`group relative flex items-center transition-all overflow-hidden cursor-pointer w-full ${
+                                            selectedVerbId === verb.id
+                                                ? 'bg-primary text-primary-foreground shadow-md rounded-l-lg rounded-r-none'
+                                                : 'text-foreground hover:bg-primary/10 hover:shadow-sm rounded-lg mr-2'
+                                        }`}
+                                    >
+                                        <div className="flex items-start gap-3 p-3 w-full">
+                                            <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${selectedVerbId === verb.id ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-card border border-muted-foreground/50 text-muted-foreground group-hover:border-border/80'}`}>
+                                                <IconComponent className="w-4 h-4 shadow-sm" />
+                                            </div>
+                                            <div className="flex-1 min-w-0 pr-8">
+                                                <p className={`text-xs text-left font-bold truncate ${selectedVerbId === verb.id ? 'text-primary-foreground' : 'text-foreground'}`}>
+                                                    {verb.verbs.length > 0 ? verb.verbs.join(', ') : t('globalCommandsEditor.noVerbs', '(sem verbos)')}
+                                                </p>
+                                                <p className={`text-[10px] text-left truncate mt-0.5 ${selectedVerbId === verb.id ? 'text-primary-foreground/80' : 'text-muted-foreground'}`}>
+                                                    {verb.description || t('globalCommandsEditor.noDescription', '(sem descrição)')}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(verb.id);
+                                            }}
+                                            className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
+                                                selectedVerbId === verb.id
+                                                    ? 'bg-red-500 rounded-none' // flush with right edge
+                                                    : 'bg-red-500 rounded-r-lg' // match the rounded-lg of container
+                                            }`}
+                                            title={t('globalCommandsEditor.deleteCommandTooltip', 'Excluir comando')}
+                                        >
+                                            <Trash2 className="w-5 h-5 pointer-events-none" />
+                                        </button>
+                                    </div>
+                                </div>
+                            );
+                        })
                     )}
-                    <button
-                        onClick={handleUndo}
-                        disabled={!isDirty}
-                        className="px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors"
-                    >
-                        {t('globalObjectsEditor.undoBtn', 'Desfazer')}
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={!isDirty}
-                        className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed shadow-sm"
-                    >
-                        {t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
-                    </button>
+                    <div className="pr-2 mt-2 pb-4">
+                        <button
+                            onClick={handleCreate}
+                            className="w-full flex items-center justify-start px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-zinc-200 mt-2 flex-shrink-0"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            {t('globalCommandsEditor.newCommand', 'Criar Verbo')}
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div className="flex flex-1 min-h-0 border border-muted-foreground/50 rounded-xl overflow-hidden bg-card shadow-sm">
-                {/* LEFT SIDEBAR - Command List */}
-                <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/30">
-                    {/* Sidebar Header */}
-                    <div className="p-4 border-b border-muted-foreground/50 space-y-4">
-                        <div className="relative">
-                            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-                            <input
-                                type="text"
-                                placeholder={t('globalCommandsEditor.searchPlaceholder', 'Buscar comandos...')}
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full bg-input border border-muted-foreground/50 rounded-lg pl-8 pr-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-muted-foreground"
-                            />
-                        </div>
-                        <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider px-1">
-                            <span>{t('globalCommandsEditor.commandList', 'Lista de Comandos')}</span>
-                            <span>{filteredVerbs.length}</span>
-                        </div>
+            {/* RIGHT MAIN PANEL */}
+            <div className="flex-1 overflow-y-auto relative bg-background p-6 space-y-6">
+                {/* Header with Save/Undo actions */}
+                <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/50 shadow-sm">
+                    <div className="text-muted-foreground text-xs font-medium space-y-1">
+                        <p>{t('globalCommandsEditor.headerDesc1', 'Configure os verbos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).')}</p>
+                        <p>
+                            <Trans i18nKey="globalCommandsEditor.headerDesc2">
+                                Os verbos <strong>&quot;olhar&quot;, &quot;examinar&quot;, &quot;ver&quot;</strong> e <strong>&quot;ler&quot;</strong> sempre estarão disponíveis para o usuário acionar a descrição de um objeto.
+                            </Trans>
+                        </p>
                     </div>
-
-                    {/* Command List */}
-                    <div className="flex-1 overflow-y-auto p-2 space-y-1">
-                        {filteredVerbs.length > 0 && (
-                            filteredVerbs.map(verb => {
-                                const IconComponent = COMMAND_ICONS.find(i => i.name === verb.icon)?.component || MessageSquare;
-                                return (
-                                    <button
-                                        key={verb.id}
-                                        onClick={() => setSelectedVerbId(verb.id)}
-                                        className={`relative w-full flex items-start gap-3 p-3 rounded-xl border transition-all text-left group ${selectedVerbId === verb.id ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-muted hover:border-muted-foreground/50'}`}
-                                    >
-                                        <div className={`flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center ${selectedVerbId === verb.id ? 'bg-primary/20 text-primary' : 'bg-card border border-muted-foreground/50 text-muted-foreground'}`}>
-                                            <IconComponent className="w-4 h-4" />
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className={`text-xs font-bold truncate ${selectedVerbId === verb.id ? 'text-primary' : 'text-foreground'}`}>
-                                                {verb.verbs.length > 0 ? verb.verbs.join(', ') : t('globalCommandsEditor.noVerbs', '(sem verbos)')}
-                                            </p>
-                                            <p className="text-[10px] text-muted-foreground truncate mt-0.5">
-                                                {verb.description || t('globalCommandsEditor.noDescription', '(sem descrição)')}
-                                            </p>
-                                        </div>
-                                    </button>
-                                );
-                            })
+                    <div className="flex items-center gap-3 shrink-0 pl-4">
+                        {isDirty && (
+                            <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
+                                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
+                                {t('globalObjectsEditor.unsavedChanges', 'Alterações não salvas')}
+                            </div>
                         )}
                         <button
-                            onClick={handleCreate}
-                            className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm transform hover:-translate-y-0.5 mt-2"
+                            onClick={handleUndo}
+                            disabled={!isDirty}
+                            className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
                         >
-                            <Plus className="w-4 h-4 mr-1" />
-                            {t('globalCommandsEditor.newCommand', 'Novo Comando')}
+                            {t('globalObjectsEditor.undoBtn', 'Desfazer')}
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={!isDirty}
+                            className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed shadow-sm"
+                        >
+                            {t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
                         </button>
                     </div>
                 </div>
 
-                {/* RIGHT PANEL - Command Editor */}
-                <div className="flex-1 flex flex-col bg-background/50 min-w-0">
+                <div className="pt-6 pb-8 w-full">
                     {selectedVerb ? (
-                        <>
-                            <div className="px-6 py-4 border-b border-muted-foreground/50 flex items-center justify-between bg-muted/50 shrink-0">
-                                <h3 className="text-sm font-bold text-foreground">{t('globalCommandsEditor.editCommandTitle', 'Editar Comando')}</h3>
-                                <button
-                                    onClick={() => handleDelete(selectedVerb.id)}
-                                    className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors rounded-lg"
-                                    title={t('globalCommandsEditor.deleteCommandTooltip', 'Excluir comando')}
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
-                            </div>
-                            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                        <div className="space-y-6">
+                            <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
+                                <h3 className="text-sm font-bold text-foreground flex items-center gap-2 uppercase tracking-wide mb-6">
+                                    <MessageSquare className="w-4 h-4" />
+                                    {t('globalCommandsEditor.editCommandTitle', 'Propriedades do Verbo')}
+                                </h3>
+                                <div className="space-y-6">
                                 <div className="space-y-2">
                                     <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
                                         {t('globalCommandsEditor.verbsLabel', 'Verbos (separados por vírgula)')}
@@ -281,7 +297,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                         />
                                     </div>
                                     <p className="text-[10px] text-muted-foreground">
-                                        {t('globalCommandsEditor.verbsDesc', 'Palavras que ativam este comando. Ex: "ajuda" ou "help".')}
+                                        {t('globalCommandsEditor.verbsDesc', 'Palavras que ativam este verbo. Ex: "ajuda" ou "help".')}
                                     </p>
                                 </div>
                                 <div className="space-y-2 flex-1">
@@ -291,27 +307,18 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                     <textarea
                                         value={selectedVerb.description}
                                         onChange={(e) => handleVerbChange(selectedVerb.id, 'description', e.target.value)}
-                                        placeholder={t('globalCommandsEditor.descriptionPlaceholder', 'Texto que será exibido para o jogador quando usar este comando.')}
+                                        placeholder={t('globalCommandsEditor.descriptionPlaceholder', 'Texto que será exibido para o jogador quando usar este verbo.')}
                                         rows={8}
                                         className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary/30 transition-all resize-none"
                                     />
                                 </div>
+                                </div>
                             </div>
-                        </>
+                        </div>
                     ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
-                            <div className="w-16 h-16 rounded-2xl bg-muted/30 border border-border/50 flex items-center justify-center mb-4">
-                                <Command className="w-8 h-8 text-muted-foreground/50" />
-                            </div>
-                            <p className="text-sm text-foreground font-medium">{t('globalCommandsEditor.noCommandSelected', 'Selecione um comando para editar')}</p>
-                            <p className="text-[10px] text-muted-foreground mt-0.5">{t('globalCommandsEditor.emptyDesc', 'Adicione comandos como &quot;olhar&quot;, &quot;pegar&quot; ou &quot;inventário&quot; e o texto que será respondido ao jogador.')}</p>
-                            <button
-                                onClick={handleCreate}
-                                className="mt-4 px-4 py-2 bg-white text-zinc-950 rounded-lg text-xs font-bold hover:bg-zinc-200 transition-all"
-                            >
-                                <Plus className="w-4 h-4 inline-block mr-1" />
-                                {t('globalCommandsEditor.createCommandBtn', 'Criar Comando')}
-                            </button>
+                        <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center mt-20">
+                            <MessageSquare className="w-12 h-12 mb-4 opacity-20" />
+                            <h4 className="text-sm font-bold text-muted-foreground mb-1">{t('globalCommandsEditor.noCommandSelected', 'Selecione um verbo para editar')}</h4>
                         </div>
                     )}
                 </div>

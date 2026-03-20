@@ -34,7 +34,7 @@ export const GuideView: React.FC = () => {
                             <option value="section-scenes">{t('guide.sections.scenes.title', '1. Editor de Cenas')}</option>
                             <option value="section-objects">{t('guide.sections.objects.title', '2. Biblioteca de Objetos')}</option>
                             <option value="section-interactions">{t('guide.sections.interactions.title', '3. Interações')}</option>
-                            <option value="section-globals">{t('guide.sections.globals.title', '4. Comandos Globais')}</option>
+                            <option value="section-globals">{t('guide.sections.globals.title', '4. Verbos Globais')}</option>
                             <option value="section-vignettes">{t('guide.sections.vignettes.title', '5. Vinhetas')}</option>
                             <option value="section-trackers">{t('guide.sections.trackers.title', '6. Rastreadores de Consequência')}</option>
                             <option value="section-map">{t('guide.sections.map.title', '7. Mapa de Conexões')}</option>
@@ -158,10 +158,10 @@ export const GuideView: React.FC = () => {
                         <div className="p-2 bg-cyan-500/10 rounded-lg text-cyan-500">
                             <Command className="w-5 h-5" />
                         </div>
-                        <h3 className="text-lg font-bold text-foreground">{t('guide.sections.globals.title', '4. Comandos Globais')}</h3>
+                        <h3 className="text-lg font-bold text-foreground">{t('guide.sections.globals.title', '4. Verbos Globais')}</h3>
                     </div>
                     <div className="text-sm text-muted-foreground space-y-2 pl-12">
-                        <p dangerouslySetInnerHTML={{ __html: t('guide.sections.globals.desc', 'Comandos que funcionam em <strong>qualquer cena</strong> do jogo.') }}></p>
+                        <p dangerouslySetInnerHTML={{ __html: t('guide.sections.globals.desc', 'Verbos que funcionam em <strong>qualquer cena</strong> do jogo.') }}></p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.globals.item1', '<strong>Verbos Fixos:</strong> Palavras-chave universais (ex: "ajuda", "inventário").') }}></li>
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.globals.item2', '<strong>Descrição:</strong> Resposta padrão para cada comando global.') }}></li>

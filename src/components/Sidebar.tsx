@@ -174,15 +174,15 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           <button
             className={getButtonClass('global_commands')}
             onClick={() => handleSetView('global_commands')}
-            title={isCollapsed ? t('sidebar.globalCommands', 'Comandos Globais') : undefined}
+            title={isCollapsed ? t('sidebar.globalCommands', 'Verbos Globais') : undefined}
           >
             <div
               className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'global_commands' ? 'translate-x-0' : ''}`}
             />
-            <Command className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+            <MessageSquare className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
             {!isCollapsed && (
               <span className="truncate relative z-10">
-                {t('sidebar.globalCommands', 'Comandos Globais')}
+                {t('sidebar.globalCommands', 'Verbos Globais')}
               </span>
             )}
           </button>

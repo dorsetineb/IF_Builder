@@ -383,7 +383,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                                 </select>
                                                 <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-muted-foreground/50">
                                                     <span className="text-[10px] text-zinc-500">{t('interactionEditor.valueLabel', 'Valor:')}</span>
-                                                    <input type="number" value={effect.valueChange} onChange={e => handleTrackerEffectChange(i, 'valueChange', parseInt(e.target.value))} className="w-12 bg-transparent border-none text-xs h-auto p-0 text-right text-foreground font-mono focus:ring-0" />
+                                                    <input type="number" value={effect.valueChange} onChange={e => handleTrackerEffectChange(i, 'valueChange', e.target.value === '' ? '' : Number(e.target.value))} className="w-12 bg-transparent border-none text-xs h-auto p-0 text-right text-foreground font-mono focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]" />
                                                 </div>
                                                 <button onClick={() => handleRemoveTrackerEffect(i)} className="p-1 text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                                             </div>

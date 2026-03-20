@@ -504,7 +504,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   {/* Scene Details Card */}
                   <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-                      <FileText className="w-4 h-4 text-muted-foreground" />
+                      <FileText className="w-4 h-4" />
                       {isVignetteMode
                         ? t('sceneEditor.vignetteNarrativeTitle', 'Detalhes da Vinheta')
                         : t('sceneEditor.narrativeTitle')}
@@ -737,7 +737,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                        <GitBranch className="w-4 h-4 text-muted-foreground" />
+                        <GitBranch className="w-4 h-4" />
                         {t('sceneEditor.connectionsTitle')}
                       </h3>
                       {/* Optional: Link to full map if needed, but simplistic for now */}
@@ -764,7 +764,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                        <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                        <ImageIcon className="w-4 h-4" />
                         {t('sceneEditor.multimediaTitle')}
                       </h3>
                       <span className="text-[10px] text-muted-foreground">
@@ -970,7 +970,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   {(enableChances || gameSystemEnabled === 'chances') && (
                     <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
                       <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-                        <Scroll className="w-4 h-4 text-muted-foreground" />
+                        <Scroll className="w-4 h-4" />
                         {t('sceneEditor.chancesTitle')}
                       </h3>
                       <div className="space-y-3">

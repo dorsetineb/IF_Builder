@@ -1327,7 +1327,7 @@ const Editor: React.FC = () => {
               theme={appTheme}
             />
             {isNarrativeMenuOpen && (currentView === 'scenes' || currentView === 'map') && (
-              <div className="w-72 flex-shrink-0 bg-gradient-to-r from-card to-primary/30 flex flex-col pt-4 pl-2 pr-0 pb-2 transition-all z-10 shadow-lg border-r border-primary/20">
+              <div className="w-72 flex-shrink-0 bg-muted-foreground/20 flex flex-col pt-4 pl-2 pr-0 pb-2 transition-all z-10 shadow-lg border-r border-primary/20">
                 <SceneList
                   scenes={scenesList}
                   startSceneId={gameData.startScene}
@@ -1347,7 +1347,7 @@ const Editor: React.FC = () => {
               </div>
             )}
             <main
-              className={`flex-1 overflow-y-auto relative bg-background ${currentView === 'welcome' || (currentView === 'scenes' && !selectedScene) || currentView === 'map' ? 'p-0' : 'p-6'}`}
+              className={`flex-1 overflow-y-auto relative bg-background ${['welcome', 'map', 'global_objects', 'trackers', 'global_commands'].includes(currentView) || (currentView === 'scenes' && !selectedScene) ? 'p-0' : 'p-6'}`}
             >
               {/* currentView === 'vignettes' block removed */}
               {currentView === 'interface' && (
@@ -1547,7 +1547,7 @@ const Editor: React.FC = () => {
               )}
 
               {currentView === 'global_commands' && (
-                <Suspense fallback={<LoadingOverlay message="Carregando Comandos..." />}>
+                <Suspense fallback={<LoadingOverlay message="Carregando Verbos..." />}>
                   <GlobalCommandsEditor
                     fixedVerbs={gameData.fixedVerbs || []}
                     onUpdate={handleUpdateGameData}

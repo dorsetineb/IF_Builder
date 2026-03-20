@@ -1015,7 +1015,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             <div className={`w-full p-6 bg-card border-2 ${localGameInteractionType ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
                                                 <div className="flex justify-between items-start mb-6">
                                                     <div className="flex items-center gap-3">
-                                                        <LayoutTemplate className="w-5 h-5 text-muted-foreground" />
+                                                        <LayoutTemplate className="w-5 h-5" />
                                                         <div>
                                                             <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.sistemas.gameStyle')}</h4>
                                                             <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.gameStyleDesc')}</p>
@@ -1059,7 +1059,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 <div className={`w-full p-6 bg-card border-2 ${localEnableImages ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                                                            <ImageIcon className="w-5 h-5" />
                                                             <div>
                                                                 <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.imagesInScenes')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.imagesInScenesDesc')}</p>
@@ -1119,7 +1119,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 <div className={`w-full p-6 bg-card border-2 ${localEnableTextControl ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <Type className="w-5 h-5 text-muted-foreground" />
+                                                            <Type className="w-5 h-5" />
                                                             <div>
                                                                 <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.textControl')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.textControlDesc')}</p>
@@ -1193,7 +1193,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 <div className={`w-full p-6 bg-card border-2 ${localEnableChances ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <Heart className="w-5 h-5 text-muted-foreground" />
+                                                            <Heart className="w-5 h-5" />
                                                             <div>
                                                                 <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.lifeSystem')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.lifeSystemDesc')}</p>
@@ -1272,7 +1272,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 <div className={`w-full p-6 bg-card border-2 ${localEnableSuggestions ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <Lightbulb className="w-5 h-5 text-muted-foreground" />
+                                                            <Lightbulb className="w-5 h-5" />
                                                             <div>
                                                                 <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableSuggestions ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.suggestions', 'Sugestões')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.suggestionsDesc', 'Ativa o botão de sugestões de ações.')}</p>
@@ -1302,7 +1302,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 <div className={`w-full p-6 bg-card border-2 ${localEnableInventory ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <Package className="w-5 h-5 text-muted-foreground" />
+                                                            <Package className="w-5 h-5" />
                                                             <div>
                                                                 <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.inventoryDesc')}</p>
@@ -1332,7 +1332,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 <div className={`w-full p-6 bg-card border-2 ${localEnableDiary ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <Book className="w-5 h-5 text-muted-foreground" />
+                                                            <Book className="w-5 h-5" />
                                                             <div>
                                                                 <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.diary')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.diaryDesc')}</p>
@@ -1370,7 +1370,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 <div className={`w-full p-6 bg-card border-2 ${localEnableTrackers ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4`}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
-                                                            <SlidersHorizontal className="w-5 h-5 text-muted-foreground" />
+                                                            <SlidersHorizontal className="w-5 h-5" />
                                                             <div>
                                                                 <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.trackers')}</h4>
                                                                 <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.trackersDesc')}</p>
@@ -1589,7 +1589,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 {/* SECTION: AÇÕES & INTERAÇÃO */}
                                 <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
-                                        <Hand className="w-5 h-5 text-muted-foreground" />
+                                        <Hand className="w-5 h-5" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.actions')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
@@ -1615,7 +1615,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 {/* SECTION: SUGESTÕES */}
                                 <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
-                                        <Lightbulb className="w-5 h-5 text-muted-foreground" />
+                                        <Lightbulb className="w-5 h-5" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.suggestions')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
@@ -1645,7 +1645,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 {/* SECTION: INVENTÁRIO */}
                                 <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
-                                        <Package className="w-5 h-5 text-muted-foreground" />
+                                        <Package className="w-5 h-5" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.inventory')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
@@ -1675,7 +1675,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 {/* SECTION: DIÁRIO & NARRATIVA */}
                                 <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
-                                        <Book className="w-5 h-5 text-muted-foreground" />
+                                        <Book className="w-5 h-5" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.diary')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
@@ -1693,7 +1693,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 {/* SECTION: INTERFACE & SISTEMA */}
                                 <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
                                     <div className="flex items-center gap-3">
-                                        <Wrench className="w-5 h-5 text-muted-foreground" />
+                                        <Wrench className="w-5 h-5" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.system')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
@@ -1737,7 +1737,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
                                         <div className="flex items-center w-full text-left">
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <LayoutTemplate className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.scenes', 'Cenas')}
+                                                <LayoutTemplate className="w-4 h-4" /> {t('UIEditor.aparencia.scenes', 'Cenas')}
                                             </h3>
                                         </div>
 
@@ -1820,7 +1820,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
                                         <div className="flex items-center w-full text-left">
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <ArrowRight className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.vinhetas', 'Vinhetas')}
+                                                <ArrowRight className="w-4 h-4" /> {t('UIEditor.aparencia.vinhetas', 'Vinhetas')}
                                             </h3>
                                         </div>
 
@@ -1868,7 +1868,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
                                         <div className="flex items-center w-full text-left">
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <Palette className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.styleTheme')}
+                                                <Palette className="w-4 h-4" /> {t('UIEditor.aparencia.styleTheme')}
                                             </h3>
                                         </div>
 
@@ -1973,7 +1973,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
                                             <div className="flex items-center w-full text-left">
                                                 <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                    <Type className="w-4 h-4 text-muted-foreground" /> {t('UIEditor.aparencia.fontsText')}
+                                                    <Type className="w-4 h-4" /> {t('UIEditor.aparencia.fontsText')}
                                                 </h3>
                                             </div>
 
@@ -2212,9 +2212,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         activeTab === 'config' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 {/* Idioma Section */}
-                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm flex flex-col h-full">
+                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm transition-all duration-300 flex flex-col h-full">
                                     <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
-                                        <Globe className="w-4 h-4 text-muted-foreground" />
+                                        <Globe className="w-4 h-4" />
                                         {t('settings.language.label', 'Idioma')}
                                     </h3>
 
@@ -2237,9 +2237,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
 
                                 {/* Aparência Section */}
-                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm flex flex-col h-full">
+                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm transition-all duration-300 flex flex-col h-full">
                                     <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
-                                        <Palette className="w-4 h-4 text-muted-foreground" />
+                                        <Palette className="w-4 h-4" />
                                         {t('settings.appearance', 'Aparência')}
                                     </h3>
 

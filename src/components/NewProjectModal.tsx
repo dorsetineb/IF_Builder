@@ -856,7 +856,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                         {t('newProject.previewOverlay.exampleDesc', 'Esta é uma descrição de exemplo para a cena. O texto flui conforme as')} <span style={{ color: colors.titleColor, fontWeight: 'bold' }}>{t('newProject.previewOverlay.exampleDescBold', 'CONFIGURAÇÕES')}</span> {t('newProject.previewOverlay.exampleDesc2', 'escolhidas.')}
                                                     </p>
                                                     <p className="mt-4 opacity-70" style={{ color: colors.textColor, fontFamily: fontFamily, fontSize: '0.85em' }}>
-                                                        {'>'} {t('newProject.previewOverlay.exampleCommand', 'COMANDO DE EXEMPLO')}
+                                                        {'>'} {t('newProject.previewOverlay.exampleCommand', 'VERBO DE EXEMPLO')}
                                                     </p>
                                                 </div>
 

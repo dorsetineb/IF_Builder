@@ -642,7 +642,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
         onMouseLeave={handleMouseUp}
       >
         <div
-          className="absolute inset-0 pointer-events-none opacity-10"
+          className="absolute inset-0 pointer-events-none opacity-30"
           style={{
             backgroundImage: 'radial-gradient(circle, currentColor 1.5px, transparent 1px)',
             backgroundSize: `${24 * view.scale}px ${24 * view.scale}px`,

@@ -168,7 +168,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                                 {obj.image ? (
                                                     <img src={obj.image} alt="" className="w-full h-full object-cover" />
                                                 ) : (
-                                                    <IconComponent className="w-4 h-4 text-muted-foreground" />
+                                                    <IconComponent className="w-4 h-4" />
                                                 )}
                                             </div>
                                             <div className="min-w-0">
