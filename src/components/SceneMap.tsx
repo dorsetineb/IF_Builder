@@ -519,7 +519,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
   const handleViewAll = useCallback(() => {
     if (!containerRef.current || initialNodes.length === 0) return;
     const rect = containerRef.current.getBoundingClientRect();
-    const padding = 100;
+    const paddingX = Math.min(100, rect.width * 0.1);
+    const paddingY = Math.min(100, rect.height * 0.1);
 
     // Calculate content bounds
     const contentWidth = bounds.maxX - bounds.minX;
@@ -529,8 +530,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
     // Check if width or height is valid to avoid division by zero
     if (contentWidth <= 0 || contentHeight <= 0) return;
 
-    const scaleX = (rect.width - padding * 2) / contentWidth;
-    const scaleY = (rect.height - padding * 2) / contentHeight;
+    const scaleX = (rect.width - paddingX * 2) / contentWidth;
+    const scaleY = (rect.height - paddingY * 2) / contentHeight;
     const newScale = Math.min(scaleX, scaleY, 1); // Cap at 1x
 
     // Calculate position to center
@@ -654,7 +655,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
         <div
           className="transition-transform duration-100"
-          style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})` }}
+          style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})`, transformOrigin: '0 0' }}
         >
           <svg
             className="absolute"

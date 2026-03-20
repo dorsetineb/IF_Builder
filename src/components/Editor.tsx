@@ -1093,7 +1093,7 @@ const Editor: React.FC = () => {
     });
     setIsDirty(false);
     setImportKey((prev) => prev + 1);
-    setCurrentView('scenes'); // Or 'interface' if you prefer to land on settings
+    setCurrentView('map'); 
     toast(
       t('editor.newProjectSuccessTitle', 'Nova Ficção Criada'),
       t('editor.newProjectSuccessDesc', 'Projeto iniciado com sucesso!'),
@@ -1119,11 +1119,7 @@ const Editor: React.FC = () => {
       });
       setIsDirty(false);
       setImportKey((prev) => prev + 1);
-      // If vignettes are created, switch to vignettes view? Or just interface?
-      // User said: "generate at least one opening vignette".
-      // So if vignettes exist, maybe show them? Or show Interface (UIEditor) as requested "decisions... reflected there".
-      // Interface view allows configuring Appearance.
-      setCurrentView('interface');
+      setCurrentView('map');
     };
 
     if (hasScenes) {
@@ -1445,6 +1441,7 @@ const Editor: React.FC = () => {
                     gameInventoryEmptyFeedback={gameData.gameInventoryEmptyFeedback}
                     textAnimationType={gameData.gameTextAnimationType || 'fade'}
                     textSpeed={gameData.gameTextSpeed || 5}
+                    textReadingFlow={gameData.gameTextReadingFlow || 'paused'}
                     imageTransitionType={gameData.gameImageTransitionType || 'fade'}
                     imageSpeed={gameData.gameImageSpeed || 5}
                     onNavigateToTrackers={() => handleSetView('trackers')}

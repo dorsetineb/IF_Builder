@@ -528,13 +528,7 @@ DATE:        ${exportDate.toLocaleString()}
         });
       }
 
-      const migratedData: GameData = {
-        ...data,
-        scenes: cleanedScenes,
-        startScene: newStartSceneId,
-        sceneOrder: newSceneOrder,
-        vignettes: [],
-      };
+
 
       // Only sanitize truly legacy projects (before metadata field was added).
       // Modern exports already have proper text values baked in.
@@ -593,7 +587,7 @@ DATE:        ${exportDate.toLocaleString()}
         t('editor.projectImportedDesc', 'Projeto carregado e migrado com sucesso.'),
         'success'
       );
-      setCurrentView('scenes');
+      setCurrentView('map');
     },
     [
       gameData.scenes,

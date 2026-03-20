@@ -72,7 +72,6 @@ export const useSceneManagement = ({
         setGameData(prev => {
             const newScenes = { ...prev.scenes, [newId]: newScene };
             const updatedOrder = [...prev.sceneOrder, newId];
-            const isFirstScene = updatedOrder.length === 1;
 
             // Auto-link: If there's an opening vignette without vignetteNextSceneId, link it to this new scene
             if (existingSceneCount === 1) {

@@ -1432,10 +1432,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         sceneDescription.innerHTML = '';
         
-        let fullDescription = scene.description;
+        let fullDescription = scene.description || '';
         if (successPrefix) fullDescription = successPrefix + "\\n\\n" + fullDescription;
 
-        const paragraphs = fullDescription.split('\\n').filter(p => p.trim().length > 0);
+        const paragraphs = fullDescription.split(/\\n|\\\\n/).filter(p => p.trim().length > 0);
         let pIndex = 0; const textAnimType = (gameData.enableTextControl !== false) ? (gameData.gameTextAnimationType || 'fade') : 'none';
         const isImmersive = document.body.classList.contains('behavior-immersive') && window.innerWidth <= 768;
 
