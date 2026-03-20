@@ -85,7 +85,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         <button
                             onClick={() => handleThemeChange('windows')}
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'windows' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
@@ -100,22 +100,6 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         >
                             <Moon size={16} className={theme === 'dark' ? 'text-primary' : 'text-muted-foreground'} />
                             <span className={`font-medium text-xs ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.dark', 'Noite')}</span>
-                        </button>
-
-                        <button
-                            onClick={() => handleThemeChange('light')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
-                        >
-                            <Sun size={16} className={theme === 'light' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.light', 'Dia')}</span>
-                        </button>
-
-                        <button
-                            onClick={() => handleThemeChange('cream')}
-                            className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
-                        >
-                            <Coffee size={16} className={theme === 'cream' ? 'text-primary' : 'text-muted-foreground'} />
-                            <span className={`font-medium text-xs ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.cream', 'Creme')}</span>
                         </button>
 
                         <button

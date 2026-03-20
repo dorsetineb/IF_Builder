@@ -28,12 +28,8 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
 
     const getDitherColors = () => {
         switch (theme) {
-            case 'cream':
-                return { primary: '#5c4033', secondary: '#fdfbf7' };
             case 'terminal':
                 return { primary: '#0d1117', secondary: '#4af626' };
-            case 'light':
-                return { primary: '#2563eb', secondary: '#ffffff' };
             case 'windows':
                 return { primary: '#0f0f0f', secondary: '#008080' };
             default: // dark
@@ -99,7 +95,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                             }`}
                     >
                         <img src="/icons/exemplo.svg" alt="" className={`w-10 h-10 transition-all ${isFlashing ? 'opacity-100' : 'invert opacity-60 group-hover:opacity-100'}`} />
-                        <span className={`font-bold text-lg transition-colors ${isFlashing ? (theme === 'cream' || theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>{t('welcome.downloadExample', 'Baixe um exemplo')}</span>
+                        <span className={`font-bold text-lg transition-colors ${isFlashing ? (theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>{t('welcome.downloadExample', 'Baixe um exemplo')}</span>
                     </button>
 
                 </div>
@@ -163,9 +159,9 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         style={{ width: '90vw', height: '90vh' }}
                         onClick={(e) => e.stopPropagation()}
                     >
-                        <div className={`px-4 py-3 border-b flex items-center justify-between flex-shrink-0 ${theme === 'light' ? 'bg-white border-muted-foreground/50' : 'bg-primary border-primary'}`}>
+                        <div className={`px-4 py-3 border-b flex items-center justify-between flex-shrink-0 bg-primary border-primary`}>
                             <div className="flex items-center gap-3">
-                                <span className={`font-mono text-xs uppercase tracking-widest ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground opacity-90'}`}>
+                                <span className={`font-mono text-xs uppercase tracking-widest text-primary-foreground opacity-90`}>
                                     {i18n.language.startsWith('pt')
                                         ? "FUJA_DA_MASMORRA.EXE"
                                         : i18n.language.startsWith('es')
@@ -177,7 +173,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                                 className="h-6 w-8 flex items-center justify-center hover:bg-red-500 transition-colors group rounded-sm"
                                 onClick={() => setIsGamePopupOpen(false)}
                             >
-                                <X className={`w-3.5 h-3.5 group-hover:text-white ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground/70'}`} />
+                                <X className={`w-3.5 h-3.5 group-hover:text-white text-primary-foreground/70`} />
                             </button>
                         </div>
                         <div className="flex-1 min-h-0">

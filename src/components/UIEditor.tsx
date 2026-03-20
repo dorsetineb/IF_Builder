@@ -227,12 +227,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
     const getDitherColors = () => {
         switch (theme) {
-            case 'cream':
-                return { primary: '#5c4033', secondary: '#fdfbf7' };
             case 'terminal':
                 return { primary: '#0d1117', secondary: '#4af626' };
-            case 'light':
-                return { primary: '#2563eb', secondary: '#ffffff' };
             case 'windows':
                 return { primary: '#0f0f0f', secondary: '#008080' };
             default: // dark
@@ -1036,7 +1032,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 <Type className="w-6 h-6" />
                                                             </div>
                                                             <div>
-                                                                <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'parser' ? (theme === 'light' || theme === 'cream' ? 'text-foreground' : 'text-white') : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.parser')}</span>
+                                                                <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'parser' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.parser')}</span>
                                                                 <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.parserDesc')}</span>
                                                             </div>
                                                         </button>
@@ -1051,7 +1047,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             <List className="w-6 h-6" />
                                                         </div>
                                                         <div>
-                                                            <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'choice' ? (theme === 'light' || theme === 'cream' ? 'text-foreground' : 'text-white') : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.choice')}</span>
+                                                            <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'choice' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.choice')}</span>
                                                             <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.choiceDesc')}</span>
                                                         </div>
                                                     </button>
@@ -2216,7 +2212,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         activeTab === 'config' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 {/* Idioma Section */}
-                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm flex flex-col h-full">
                                     <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
                                         <Globe className="w-4 h-4 text-muted-foreground" />
                                         {t('settings.language.label', 'Idioma')}
@@ -2241,7 +2237,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
 
                                 {/* Aparência Section */}
-                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm hover:border-primary/20 transition-all duration-300 flex flex-col h-full">
+                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm flex flex-col h-full">
                                     <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
                                         <Palette className="w-4 h-4 text-muted-foreground" />
                                         {t('settings.appearance', 'Aparência')}
@@ -2269,22 +2265,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             >
                                                 <Terminal size={16} className="text-muted-foreground" />
                                                 <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
-                                            </button>
-                                        </div>
-                                        <div className="grid grid-cols-2 gap-3 max-w-[66%] mx-auto">
-                                            <button
-                                                onClick={() => handleAppThemeChange('light')}
-                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'light' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
-                                            >
-                                                <Sun size={16} className="text-muted-foreground" />
-                                                <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'light' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.light', 'Dia')}</span>
-                                            </button>
-                                            <button
-                                                onClick={() => handleAppThemeChange('cream')}
-                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'cream' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
-                                            >
-                                                <Coffee size={16} className="text-muted-foreground" />
-                                                <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'cream' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.cream', 'Creme')}</span>
                                             </button>
                                         </div>
                                     </div>

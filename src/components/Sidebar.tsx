@@ -98,7 +98,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
   return (
     <aside
-      className={`${isCollapsed ? 'w-20' : 'w-64'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full`}
+      className={`${isCollapsed ? 'w-20' : 'w-56'} bg-card border-r border-muted-foreground/50 flex flex-col transition-all duration-300 relative flex-shrink-0 h-full`}
     >
       <nav
         className={`flex flex-col flex-grow pl-3 pr-0 py-4 overflow-y-auto overflow-x-hidden`}

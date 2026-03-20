@@ -1003,26 +1003,14 @@ const SceneMap: React.FC<SceneMapProps> = ({
       <div className="absolute bottom-6 left-6 z-10 flex items-center gap-3">
         <button
           onClick={onReorganizeScenes}
-          className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
-            theme === 'light'
-              ? 'bg-white text-zinc-900 border-muted-foreground/50 hover:bg-zinc-100'
-              : theme === 'cream'
-                ? 'bg-[#fdfbf7] text-[#4a332a] border-[#e8dcc4] hover:bg-[#f5ebd8]'
-                : 'bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700'
-          }`}
+          className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
         >
           <LayoutGrid className="w-4 h-4 mr-2" />
           Reorganizar
         </button>
         <button
           onClick={handleViewAll}
-          className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
-            theme === 'light'
-              ? 'bg-white text-zinc-900 border-muted-foreground/50 hover:bg-zinc-100'
-              : theme === 'cream'
-                ? 'bg-[#fdfbf7] text-[#4a332a] border-[#e8dcc4] hover:bg-[#f5ebd8]'
-                : 'bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700'
-          }`}
+          className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
         >
           <Maximize2 className="w-4 h-4 mr-2" />
           Ver Tudo
@@ -1032,11 +1020,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
           className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
             highlightOrphans
               ? 'bg-red-600 text-white border-red-500 hover:bg-red-700'
-              : theme === 'light'
-                ? 'bg-white text-zinc-900 border-muted-foreground/50 hover:bg-zinc-100'
-                : theme === 'cream'
-                  ? 'bg-[#fdfbf7] text-[#4a332a] border-[#e8dcc4] hover:bg-[#f5ebd8]'
-                  : 'bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700'
+              : 'bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700'
           }`}
         >
           <AlertTriangle className="w-4 h-4 mr-2" />
@@ -1044,73 +1028,41 @@ const SceneMap: React.FC<SceneMapProps> = ({
         </button>
       </div>
       <div className="absolute bottom-6 right-6 z-10 flex flex-col items-end gap-4 pointer-events-none">
-        <div className={`backdrop-blur-md p-4 rounded-xl shadow-xl pointer-events-auto border ${
-          theme === 'light'
-            ? 'bg-white/80 border-muted-foreground/50'
-            : theme === 'cream'
-              ? 'bg-[#fdfbf7]/80 border-[#e8dcc4]'
-              : 'bg-zinc-950/80 border-muted-foreground/50'
-        }`}>
-          <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${
-            theme === 'light' || theme === 'cream' ? 'text-zinc-600' : 'text-zinc-500'
-          }`}>
+        <div className={`backdrop-blur-md p-4 rounded-xl shadow-xl pointer-events-auto border bg-zinc-950/80 border-muted-foreground/50`}>
+          <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 text-zinc-500`}>
             Legenda
           </h4>
           <ul className="space-y-2">
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full border-2 border-blue-500 bg-blue-500/20"></div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                theme === 'light' || theme === 'cream' ? 'text-zinc-700' : 'text-zinc-400'
-              }`}>
+              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
                 Abertura
               </span>
             </li>
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full border-2 border-amber-500 bg-amber-500/20"></div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                theme === 'light' || theme === 'cream' ? 'text-zinc-700' : 'text-zinc-400'
-              }`}>
+              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
                 Cena / Vinheta
               </span>
             </li>
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full border-2 border-green-500 bg-green-500/20"></div>
-              <span className={`text-[10px] font-bold uppercase tracking-wider ${
-                theme === 'light' || theme === 'cream' ? 'text-zinc-700' : 'text-zinc-400'
-              }`}>
+              <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
                 Final
               </span>
             </li>
           </ul>
         </div>
-        <div className={`flex rounded-lg overflow-hidden shadow-xl pointer-events-auto border ${
-          theme === 'light'
-            ? 'bg-white border-muted-foreground/50'
-            : theme === 'cream'
-              ? 'bg-[#fdfbf7] border-[#e8dcc4]'
-              : 'bg-zinc-950 border-muted-foreground/50'
-        }`}>
+        <div className={`flex rounded-lg overflow-hidden shadow-xl pointer-events-auto border bg-zinc-950 border-muted-foreground/50`}>
           <button
             onClick={() => handleZoom('in')}
-            className={`w-10 h-10 flex items-center justify-center transition-all border-r ${
-              theme === 'light'
-                ? 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100 border-muted-foreground/50'
-                : theme === 'cream'
-                  ? 'text-[#4a332a]/80 hover:text-[#4a332a] hover:bg-[#f5ebd8] border-[#e8dcc4]'
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900 border-muted-foreground/50'
-            }`}
+            className={`w-10 h-10 flex items-center justify-center transition-all border-r text-zinc-400 hover:text-white hover:bg-zinc-900 border-muted-foreground/50`}
           >
             <Plus className="w-4 h-4" />
           </button>
           <button
             onClick={() => handleZoom('out')}
-            className={`w-10 h-10 flex items-center justify-center transition-all ${
-              theme === 'light'
-                ? 'text-zinc-600 hover:text-zinc-900 hover:bg-zinc-100'
-                : theme === 'cream'
-                  ? 'text-[#4a332a]/80 hover:text-[#4a332a] hover:bg-[#f5ebd8]'
-                  : 'text-zinc-400 hover:text-white hover:bg-zinc-900'
-            }`}
+            className={`w-10 h-10 flex items-center justify-center transition-all text-zinc-400 hover:text-white hover:bg-zinc-900`}
           >
             <Minus className="w-4 h-4" />
           </button>

@@ -19,12 +19,8 @@ export function Auth() {
 
     const getDitherColors = () => {
         switch (theme) {
-            case 'cream':
-                return { primary: '#5c4033', secondary: '#fdfbf7' };
             case 'terminal':
                 return { primary: '#0d1117', secondary: '#4af626' };
-            case 'light':
-                return { primary: '#2563eb', secondary: '#ffffff' };
             case 'windows':
                 return { primary: '#0f0f0f', secondary: '#008080' };
             default: // dark
@@ -53,7 +49,7 @@ export function Auth() {
                 <div className="text-sm text-primary-foreground/80 leading-relaxed text-left space-y-1 drop-shadow-md">
                     <p>{t('auth.sidebar.line1', 'Em uma caverna escura.')}</p>
                     <p>{t('auth.sidebar.line2', 'Monitores CRT iluminam o mofo.')}</p>
-                    <p className={`${(theme === 'cream' || theme === 'light') ? 'text-white' : 'text-primary'} font-bold mt-2 drop-shadow-md`}>&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
+                    <p className={`text-primary font-bold mt-2 drop-shadow-md`}>&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
                 </div>
 
                 {/* Navigation Buttons */}
@@ -67,11 +63,7 @@ export function Auth() {
                             e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
                         }}
                         onClick={() => navigate('/editor')}
-                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden shadow-xl hover:scale-[1.02] ${
-                            (theme === 'cream' || theme === 'light') 
-                            ? 'bg-white border-primary text-primary' 
-                            : 'bg-primary border-primary text-primary-foreground'
-                        }`}
+                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden shadow-xl hover:scale-[1.02] bg-primary border-primary text-primary-foreground`}
                     >
                         <div
                             className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
@@ -147,9 +139,9 @@ export function Auth() {
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Fake Browser Header */}
-                <div className={`px-4 py-3 border-b flex items-center justify-between flex-shrink-0 ${theme === 'light' ? 'bg-white border-muted-foreground/50' : 'bg-primary border-primary'}`}>
+                <div className={`px-4 py-3 border-b flex items-center justify-between flex-shrink-0 bg-primary border-primary`}>
                     <div className="flex items-center gap-3">
-                        <span className={`font-mono text-xs uppercase tracking-widest ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground opacity-90'}`}>
+                        <span className={`font-mono text-xs uppercase tracking-widest text-primary-foreground opacity-90`}>
                             {i18n.language.startsWith('pt')
                                 ? "FUJA_DA_MASMORRA.EXE"
                                 : i18n.language.startsWith('es')
@@ -159,16 +151,16 @@ export function Auth() {
                     </div>
                     <div className="flex items-center">
                         <button className="h-6 w-8 flex items-center justify-center hover:bg-black/10 transition-colors rounded-sm">
-                            <Minus className={`w-3 h-3 ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground/70'}`} />
+                            <Minus className={`w-3 h-3 text-primary-foreground/70`} />
                         </button>
                         <button className="h-6 w-8 flex items-center justify-center hover:bg-black/10 transition-colors rounded-sm">
-                            <Square className={`w-2.5 h-2.5 ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground/70'}`} />
+                            <Square className={`w-2.5 h-2.5 text-primary-foreground/70`} />
                         </button>
                         <button
                             className="h-6 w-8 flex items-center justify-center hover:bg-red-500 transition-colors group rounded-sm"
                             onClick={resetToLanding}
                         >
-                            <X className={`w-3.5 h-3.5 group-hover:text-white ${theme === 'light' ? 'text-zinc-500' : 'text-primary-foreground/70'}`} />
+                            <X className={`w-3.5 h-3.5 group-hover:text-white text-primary-foreground/70`} />
                         </button>
                     </div>
                 </div>

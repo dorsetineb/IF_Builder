@@ -1327,7 +1327,7 @@ const Editor: React.FC = () => {
               theme={appTheme}
             />
             {isNarrativeMenuOpen && (currentView === 'scenes' || currentView === 'map') && (
-              <div className="w-64 flex-shrink-0 bg-primary/30 flex flex-col pt-4 pl-2 pr-0 pb-2 transition-all z-10 shadow-lg border-r border-primary/20">
+              <div className="w-72 flex-shrink-0 bg-gradient-to-r from-card to-primary/30 flex flex-col pt-4 pl-2 pr-0 pb-2 transition-all z-10 shadow-lg border-r border-primary/20">
                 <SceneList
                   scenes={scenesList}
                   startSceneId={gameData.startScene}

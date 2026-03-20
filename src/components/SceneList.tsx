@@ -131,12 +131,6 @@ const SceneList: React.FC<SceneListProps> = ({
     const baseClass =
       'w-full flex items-center justify-start px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent mt-2 flex-shrink-0';
 
-    if (theme === 'light') {
-      return `${baseClass} bg-white text-zinc-900 border-muted-foreground/50 shadow-sm hover:bg-zinc-50`;
-    }
-    if (theme === 'cream') {
-      return `${baseClass} bg-[#e8dcc4] text-[#4a332a] hover:bg-[#d5c6aa]`;
-    }
     // Default / Dark
     return `${baseClass} bg-white text-zinc-950 hover:bg-zinc-200`;
   };
@@ -253,9 +247,6 @@ const SceneList: React.FC<SceneListProps> = ({
           >
             <Map className="w-4 h-4 flex-shrink-0" />
             <span className="truncate flex-1 text-left">{t('sceneList.viewMap', 'Ver mapa de cenas')}</span>
-            <span className="bg-black/30 text-white text-[10px] font-bold rounded-md px-1.5 py-0.5 border border-white/20 shadow-sm">
-              {scenes.length}
-            </span>
           </button>
         </div>
       )}
