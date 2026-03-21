@@ -654,6 +654,32 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                             </div>
                           )}
 
+                          {gameInteractionType !== 'choice' && !isVignetteMode && (
+                            <div className="pt-4 mt-4">
+                              <div className="flex justify-between items-center mb-1.5">
+                                <label
+                                  htmlFor="sceneNegativeFeedback"
+                                  className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest"
+                                >
+                                  {t('sceneEditor.negativeFeedbackLabel', 'FEEDBACK NEGATIVO')}
+                                </label>
+                                <span className="text-[9px] text-muted-foreground font-medium tracking-wider">
+                                  {t('sceneEditor.negativeFeedbackHint', 'Deixe em branco para o padrão global')}
+                                </span>
+                              </div>
+                              <textarea
+                                id="sceneNegativeFeedback"
+                                value={localScene.negativeFeedback || ''}
+                                onChange={(e) => updateLocalScene('negativeFeedback', e.target.value)}
+                                className="w-full h-16 bg-input border border-input rounded-lg px-4 py-3 text-sm text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
+                                placeholder={t(
+                                  'sceneEditor.negativeFeedbackPlaceholder',
+                                  'Isso não parece ter nenhum efeito.'
+                                )}
+                              />
+                            </div>
+                          )}
+
                           {isVignetteMode && (
                             <div className="mt-2">
                               <div className="animate-in fade-in slide-in-from-top-2 space-y-4">

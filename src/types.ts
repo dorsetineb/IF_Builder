@@ -73,6 +73,7 @@ export interface Scene {
   vignetteNextSceneId?: string;
   overlayEffect?: string;
   suggestions?: string[];
+  negativeFeedback?: string;
   omitSplashTitle?: boolean;
   omitSplashDescription?: boolean;
 }

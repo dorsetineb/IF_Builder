@@ -38,7 +38,8 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 isDefeatOutcome: scene.isDefeatOutcome,
                 omitSplashTitle: scene.omitSplashTitle,
                 omitSplashDescription: scene.omitSplashDescription,
-                suggestions: scene.suggestions || []
+                suggestions: scene.suggestions || [],
+                negativeFeedback: scene.negativeFeedback
             };
         }
     }
@@ -1663,7 +1664,7 @@ document.addEventListener('DOMContentLoaded', () => {
              if (obj) { printOutput(obj.examineDescription); return; }
              printOutput(scene.description); return;
         }
-        printOutput(gameData.mensagem_falha_padrao || "Não aconteceu nada.");
+        printOutput(scene.negativeFeedback || gameData.mensagem_falha_padrao || "Não aconteceu nada.");
     };
 
     const executeInteraction = (interaction) => {
