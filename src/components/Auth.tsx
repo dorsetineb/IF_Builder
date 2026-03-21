@@ -46,7 +46,7 @@ export function Auth() {
         <div className="w-96 flex flex-col h-full relative z-20 transition-all duration-300">
             <div className="flex-1 flex flex-col justify-center w-full pl-12 pr-6 space-y-12">
                 {/* Tagline */}
-                <div className="text-sm text-primary-foreground/80 leading-relaxed text-left space-y-1 drop-shadow-md">
+                <div className="text-sm text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md">
                     <p>{t('auth.sidebar.line1', 'Em uma caverna escura.')}</p>
                     <p>{t('auth.sidebar.line2', 'Monitores CRT iluminam o mofo.')}</p>
                     <p className={`text-primary font-bold mt-2 drop-shadow-md`}>&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
@@ -76,7 +76,7 @@ export function Auth() {
                     </button>
 
                     {/* Secret Hint Text */}
-                    <div className="text-sm text-primary-foreground/80 leading-relaxed text-left space-y-1 pt-8 opacity-50 drop-shadow-md">
+                    <div className="text-sm text-white/80 leading-relaxed text-left space-y-1 pt-8 opacity-50 drop-shadow-md">
                         <p>{t('auth.sidebar.hint1', 'Algo pode acontecer,')}</p>
                         <p>{t('auth.sidebar.hint2', 'Se você clicar nos computadores.')}</p>
                     </div>

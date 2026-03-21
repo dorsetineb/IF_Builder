@@ -131,14 +131,14 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
             {/* LEFT SIDEBAR (Standardized Layout) */}
             <div className="w-72 flex-shrink-0 bg-muted-foreground/20 flex flex-col pt-4 pl-2 pr-0 pb-2 transition-all z-10 shadow-lg border-r border-primary/20">
                 {/* Search Header */}
-                <div className="relative mb-4 mt-2 px-2 flex-shrink-0">
-                    <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground font-bold" />
+                <div className="relative mb-3 mt-2 pr-2 flex-shrink-0">
+                    <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                         type="text"
                         placeholder={t('globalCommandsEditor.searchPlaceholder', 'Buscar comandos...')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full bg-transparent border border-muted-foreground/50 rounded-lg pl-10 pr-4 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/50 focus:border-primary/50 placeholder:text-muted-foreground/70 transition-all font-medium"
+                        className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-input text-foreground border border-muted-foreground/50"
                     />
                 </div>
                 <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider px-3 mb-2">

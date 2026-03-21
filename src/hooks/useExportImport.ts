@@ -364,7 +364,10 @@ DATE:        ${exportDate.toLocaleString()}
     const css =
       finalCss
         .replace(/__FONT_FAMILY__/g, fontFamily)
-        .replace(/__GAME_FONT_SIZE__/g, exportData.gameFontSize || '1em')
+        .replace(/__GAME_FONT_SIZE__/g, (() => {
+          const size = exportData.gameFontSize || '1em';
+          return /^\\d+$/.test(size) ? `${size}px` : size;
+        })())
         .replace(/__GAME_TEXT_COLOR__/g, exportData.gameTextColor || '#c9d1d9')
         .replace(/__GAME_TITLE_COLOR__/g, exportData.gameTitleColor || '#58a6ff')
         .replace(/__GAME_FOCUS_COLOR__/g, exportData.gameFocusColor || '#58a6ff')
