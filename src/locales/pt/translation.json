@@ -577,6 +577,9 @@
     "suggestionsLabel": "SUGESTÕES",
     "suggestionsHint": "Use vírgula para separar",
     "suggestionsPlaceholder": "Sugestões (ex: Olhar, Pegar)",
+    "negativeFeedbackLabel": "FEEDBACK NEGATIVO",
+    "negativeFeedbackHint": "Deixe em branco para o padrão global",
+    "negativeFeedbackPlaceholder": "Isso não parece ter nenhum efeito.",
     "diaryPlaceholder": "Diário (ex: Meus Registros)",
     "vignetteTypes": {
       "opening": "Abertura",

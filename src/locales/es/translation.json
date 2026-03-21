@@ -576,6 +576,9 @@
     "suggestionsLabel": "SUGERENCIAS",
     "suggestionsHint": "Usa comas para separar",
     "suggestionsPlaceholder": "Sugerencias (ej: mirar, coger)",
+    "negativeFeedbackLabel": "FEEDBACK NEGATIVO",
+    "negativeFeedbackHint": "Dejar en blanco para el predeterminado global",
+    "negativeFeedbackPlaceholder": "Eso no parece tener ningún efecto.",
     "isVignette": "¿Esta escena es una viñeta?",
     "vignetteTypes": {
       "opening": "Apertura",

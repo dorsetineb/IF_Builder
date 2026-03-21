@@ -575,6 +575,9 @@
     "suggestionsLabel": "SUGGESTIONS",
     "suggestionsHint": "Use comma to separate",
     "suggestionsPlaceholder": "Suggestions (e.g.: look, take)",
+    "negativeFeedbackLabel": "NEGATIVE FEEDBACK",
+    "negativeFeedbackHint": "Leave blank for the global default",
+    "negativeFeedbackPlaceholder": "That doesn't seem to have any effect.",
     "isVignette": "Is this scene a vignette?",
     "vignetteTypes": {
       "opening": "Opening",
