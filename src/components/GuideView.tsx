@@ -298,13 +298,17 @@ export const GuideView: React.FC = () => {
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.export.title', '10. Finalização e Exportação')}</h3>
                     </div>
                     <div className="text-sm text-muted-foreground pl-12 space-y-3">
-                        <p>{t('guide.sections.export.desc', 'Quando seu jogo estiver pronto:')}</p>
+                        <p>{t('guide.sections.export.desc', 'Quando seu jogo estiver pronto (ou para guardar seu progresso):')}</p>
                         <ol className="list-decimal pl-4 space-y-1">
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item1', 'Salve seu progresso (<code className="bg-muted px-1 rounded">Ctrl+S</code>).') }}></li>
-                            <li>{t('guide.sections.export.item2', 'Teste completamente todas as cenas e finais.')}</li>
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item3', 'Clique em <strong>Exportar Jogo</strong> para baixar um arquivo .zip.') }}></li>
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item4', 'Extraia o zip e abra <strong>index.html</strong> para jogar ou compartilhar!') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item1', '<strong>Teste completamente todas as cenas</strong> e finais utilizando a Pré-visualização.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item2', '<strong>Clique no botão Salvar</strong> (ícone de disquete) no menu superior.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item3', 'Dê um nome ao projeto. O editor irá baixar um arquivo <strong>.zip</strong> unificado.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item4', '<strong>Para jogar/compartilhar:</strong> Extraia o .zip e abra <strong>index.html</strong>.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item5', '<strong>Para continuar editando:</strong> Use o botão <strong>Carregar</strong> repassando este mesmo arquivo .zip.') }}></li>
                         </ol>
+                        <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-500 dark:text-red-400 mt-4">
+                            <p dangerouslySetInnerHTML={{ __html: t('guide.sections.export.warning', '<strong>IMPORTANTE:</strong> Lembre-se de <strong>SEMPRE salvar o seu projeto</strong>, pois o editor não grava nenhuma sessão. Se você sair sem salvar, assim como ocorria em programas no passado, você perderá <strong>TODO</strong> seu progresso!') }}></p>
+                        </div>
                     </div>
                 </div>
 

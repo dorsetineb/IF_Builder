@@ -417,12 +417,14 @@
         "item3": "Verifique se os verbos e interações funcionam como esperado."
       },
       "export": {
-        "title": "10. Finalização e Exportação",
-        "desc": "Quando seu jogo estiver pronto:",
-        "item1": "Salve seu progresso (<code className=\"bg-muted px-1 rounded\">Ctrl+S</code>).",
-        "item2": "Teste completamente todas as cenas e finais.",
-        "item3": "Clique em <strong>Exportar Jogo</strong> para baixar um arquivo .zip.",
-        "item4": "Extraia o zip e abra <strong>index.html</strong> para jogar ou compartilhar!"
+        "title": "10. Salvar e Carregar Projetos",
+        "warning": "<strong>IMPORTANTE:</strong> Lembre-se de <strong>SEMPRE salvar o seu projeto</strong>, pois o editor não grava nenhuma sessão. Se você sair sem salvar, assim como ocorria em programas no passado, você perderá <strong>TODO</strong> seu progresso!",
+        "desc": "Quando seu jogo estiver pronto (ou para guardar seu progresso):",
+        "item1": "<strong>Teste completamente todas as cenas</strong> e finais utilizando a Pré-visualização.",
+        "item2": "<strong>Clique no botão Salvar</strong> (ícone de disquete) no menu superior.",
+        "item3": "Dê um nome ao projeto. O editor irá baixar um arquivo <strong>.zip</strong> unificado.",
+        "item4": "<strong>Para jogar/compartilhar:</strong> Extraia o .zip e abra <strong>index.html</strong>.",
+        "item5": "<strong>Para continuar editando:</strong> Use o botão <strong>Carregar</strong> repassando este mesmo arquivo .zip."
       }
     }
   },
