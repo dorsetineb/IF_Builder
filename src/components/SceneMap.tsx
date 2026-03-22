@@ -1007,14 +1007,14 @@ const SceneMap: React.FC<SceneMapProps> = ({
           className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
         >
           <LayoutGrid className="w-4 h-4 mr-2" />
-          Reorganizar
+          {t('sceneMap.reorganize', 'Reorganizar')}
         </button>
         <button
           onClick={handleViewAll}
           className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
         >
           <Maximize2 className="w-4 h-4 mr-2" />
-          Ver Tudo
+          {t('sceneMap.viewAll', 'Ver Tudo')}
         </button>
         <button
           onClick={handleToggleOrphans}
@@ -1025,31 +1025,31 @@ const SceneMap: React.FC<SceneMapProps> = ({
           }`}
         >
           <AlertTriangle className="w-4 h-4 mr-2" />
-          Órfãs {orphanIds.size > 0 && `(${orphanIds.size})`}
+          {t('sceneMap.orphans', 'Órfãs')} {orphanIds.size > 0 && `(${orphanIds.size})`}
         </button>
       </div>
       <div className="absolute bottom-6 right-6 z-10 flex flex-col items-end gap-4 pointer-events-none">
         <div className={`backdrop-blur-md p-4 rounded-xl shadow-xl pointer-events-auto border bg-zinc-950/80 border-muted-foreground/50`}>
           <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 text-zinc-500`}>
-            Legenda
+            {t('sceneMap.legend', 'Legenda')}
           </h4>
           <ul className="space-y-2">
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full border-2 border-blue-500 bg-blue-500/20"></div>
               <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
-                Abertura
+                {t('sceneMap.opening', 'Abertura')}
               </span>
             </li>
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full border-2 border-amber-500 bg-amber-500/20"></div>
               <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
-                Cena / Vinheta
+                {t('sceneMap.sceneVignette', 'Cena / Vinheta')}
               </span>
             </li>
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full border-2 border-green-500 bg-green-500/20"></div>
               <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
-                Final
+                {t('sceneMap.ending', 'Final')}
               </span>
             </li>
           </ul>

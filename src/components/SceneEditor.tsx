@@ -1088,7 +1088,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             )}
 
             {activeTab === 'choices' && (
-              <div className="flex h-[600px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card">
+              <div className="flex h-[calc(100vh-260px)] min-h-[450px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card">
                 {/* LEFT LIST PANEL */}
                 <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/10">
                   <div className="p-4 border-b border-muted-foreground/50 space-y-4">

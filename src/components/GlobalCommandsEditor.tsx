@@ -95,11 +95,12 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
 
     const handleCreate = () => {
         const existingIds = localVerbs.map(v => v.id);
+        const verbCount = existingIds.length + 1;
         const newId = generateUniqueId('verb', existingIds);
         const newVerb: FixedVerb = {
             id: newId,
             verbs: [],
-            description: '',
+            description: `${t('globalCommandsEditor.newCommand', 'Novo Verbo ')}#${verbCount}`,
             icon: 'message'
         };
         setLocalVerbs(prev => [...prev, newVerb]);
@@ -138,7 +139,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                         placeholder={t('globalCommandsEditor.searchPlaceholder', 'Buscar comandos...')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-input text-foreground border border-muted-foreground/50"
+                        className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-primary/50 focus:border-primary focus:bg-background"
                     />
                 </div>
                 <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider px-3 mb-2">

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { ConfirmationModal } from './ConfirmationModal';
 import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect, Vignette } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Plus, Trash2, Upload, Search, MousePointer2, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
@@ -59,6 +60,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
 }) => {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(interactions.length > 0 ? 0 : null);
     const [searchTerm, setSearchTerm] = useState('');
+    const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; index: number | null }>({ isOpen: false, index: null });
     const { t } = useTranslation();
 
     const handleAdd = () => {
@@ -73,15 +75,20 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
     };
 
     const handleRemove = (index: number) => {
-        if (window.confirm(t('interactionEditor.deleteConfirm', 'Tem certeza que deseja remover esta interação?'))) {
-            const newInteractions = interactions.filter((_, i) => i !== index);
-            onUpdateInteractions(newInteractions);
-            if (selectedIndex === index) {
-                setSelectedIndex(null);
-            } else if (selectedIndex !== null && selectedIndex > index) {
-                setSelectedIndex(selectedIndex - 1);
-            }
+        setDeleteModal({ isOpen: true, index });
+    };
+
+    const confirmRemove = () => {
+        if (deleteModal.index === null) return;
+        const index = deleteModal.index;
+        const newInteractions = interactions.filter((_, i) => i !== index);
+        onUpdateInteractions(newInteractions);
+        if (selectedIndex === index) {
+            setSelectedIndex(null);
+        } else if (selectedIndex !== null && selectedIndex > index) {
+            setSelectedIndex(selectedIndex - 1);
         }
+        setDeleteModal({ isOpen: false, index: null });
     };
 
     const handleUpdate = (index: number, updatedInteraction: Interaction) => {
@@ -176,13 +183,6 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                         </h3>
                     </div>
                     <div>
-                        <button
-                            onClick={() => handleRemove(selectedIndex)}
-                            className="p-2 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md transition-all"
-                            title={t('interactionEditor.removeInteraction', 'Remover Interação')}
-                        >
-                            <Trash2 className="w-4 h-4" />
-                        </button>
                     </div>
                 </div>
 
@@ -404,59 +404,70 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
     };
 
     return (
-        <div className="flex h-[600px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card shadow-sm">
+        <div className="flex h-[calc(100vh-260px)] min-h-[450px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card shadow-sm">
             {/* LEFT SIDEBAR - List */}
             <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/30">
                 {/* Header/Search */}
-                <div className="p-4 border-b border-muted-foreground/50 space-y-3">
-                    <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">{t('interactionEditor.interactionsCount', 'Interações ({{count}})', { count: filteredInteractions.length })}</span>
-                    </div>
+                <div className="px-2 py-4 border-b border-muted-foreground/50 space-y-3">
                     <div className="relative">
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                        <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <input
                             type="text"
                             placeholder={t('interactionEditor.searchPlaceholder', 'Buscar verbos...')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-input border border-input rounded-lg pl-8 pr-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/50 placeholder:text-muted-foreground"
+                            className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-primary/50 focus:border-primary focus:bg-background"
                         />
                     </div>
                 </div>
 
                 {/* List */}
-                <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                <div className="flex-1 overflow-y-auto pl-2 py-4 pr-0 space-y-0 flex flex-col items-stretch">
                     {filteredInteractions.length > 0 && (
                         filteredInteractions.map(({ inter, index }) => (
                             <button
                                 key={inter.id}
                                 onClick={() => setSelectedIndex(index)}
-                                className={`w-full flex items-center gap-3 p-3 rounded-lg border transition-all text-left group ${selectedIndex === index ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-muted hover:border-muted-foreground/50'}`}
+                                className={`relative overflow-hidden flex items-center gap-3 h-[42px] px-2 rounded-lg border-transparent transition-all text-left group flex-shrink-0 ${selectedIndex === index ? 'bg-primary text-primary-foreground font-bold shadow-md rounded-r-none mr-0' : 'text-foreground hover:bg-primary/10 hover:shadow-sm mr-2'}`}
                             >
-                                <div className={`w-8 h-8 rounded flex items-center justify-center shrink-0 ${selectedIndex === index ? 'bg-primary/20 text-primary' : 'bg-muted text-muted-foreground'}`}>
+                                <div className={`flex items-center justify-center shrink-0 ${selectedIndex === index ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
                                     {(() => {
                                         const Icon = INTERACTION_ICONS.find(i => i.name === inter.icon)?.component || MousePointer2;
                                         return <Icon className="w-4 h-4" />;
                                     })()}
                                 </div>
                                 <div className="min-w-0 flex-1">
-                                    <div className={`text-xs font-bold truncate ${selectedIndex === index ? 'text-primary' : 'text-foreground'}`}>
+                                    <div className={`text-xs font-bold truncate ${selectedIndex === index ? 'text-primary-foreground' : 'text-foreground'}`}>
                                         {inter.verbs.join(', ')}
                                     </div>
-                                    <div className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
+                                    <div className={`text-[10px] truncate flex items-center gap-1 ${selectedIndex === index ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
                                         {inter.target ? `${t('interactionEditor.targetPrefix', 'Alvo: ')}${sceneObjects.find(o => o.id === inter.target)?.name || '?'}` : t('interactionEditor.generalTarget', 'Geral')}
                                     </div>
+                                </div>
+                                <div
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleRemove(index);
+                                    }}
+                                    className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-[calc(100%+2px)] group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
+                                        selectedIndex === index ? 'bg-red-500 rounded-none' : 'bg-red-500 rounded-r-lg'
+                                    }`}
+                                    title={t('interactionEditor.removeInteraction', 'Remover Interação')}
+                                >
+                                    <Trash2 className="w-5 h-5 pointer-events-none" />
                                 </div>
                             </button>
                         ))
                     )}
-                    <button
-                        onClick={handleAdd}
-                        className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-2 shadow-sm"
-                    >
-                        <Plus className="w-4 h-4 mr-1" />
-                        {t('interactionEditor.newInteractionBtn', 'Nova Interação')}
-                    </button>
+                    <div className="pr-2 mt-2">
+                        <button
+                            onClick={handleAdd}
+                            className="w-full h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
+                        >
+                            <Plus className="w-4 h-4 mr-1" />
+                            {t('interactionEditor.newInteractionBtn', 'Criar Interação')}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -472,6 +483,17 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                     </div>
                 )}
             </div>
+            
+            <ConfirmationModal
+                isOpen={deleteModal.isOpen}
+                title={t('interactionEditor.removeInteraction', 'Remover Interação')}
+                message={t('interactionEditor.deleteConfirm', 'Tem certeza que deseja remover esta interação?')}
+                confirmText={t('common.confirm', 'Confirmar')}
+                cancelText={t('common.cancel', 'Cancelar')}
+                isDanger={true}
+                onConfirm={confirmRemove}
+                onCancel={() => setDeleteModal({ isOpen: false, index: null })}
+            />
         </div>
     );
 };

@@ -1,13 +1,52 @@
-
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { GameData, Scene, GameObject, Interaction, ConsequenceTracker, FixedVerb, Vignette } from '../types';
 import { initialGameData } from '../lib/gameDefaults';
 import DOMPurify from 'dompurify';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const getLocalizedInitialGameData = (t: any): GameData => {
+    const data = JSON.parse(JSON.stringify(initialGameData));
+    if (data.scenes && data.scenes['SCN_OPENING']) {
+        data.scenes['SCN_OPENING'].name = t('editor.newOpeningVignetteName', 'Abertura');
+        data.scenes['SCN_OPENING'].description = t('editor.newVignetteDescription', 'Descrição da nova vinheta.');
+        data.scenes['SCN_OPENING'].vignetteButtonText = t('editor.defaultStartButton', 'COMEÇAR');
+    }
+    return data;
+};
+
 export const useGameData = () => {
-    const [gameData, setGameData] = useState<GameData>(initialGameData);
+    const { t } = useTranslation();
+    const [gameData, setGameData] = useState<GameData>(() => getLocalizedInitialGameData(t));
     const [isDirty, setIsDirty] = useState(false);
+
+    useEffect(() => {
+        setGameData(prev => {
+            if (!isDirty && Object.keys(prev.scenes || {}).length === 1 && prev.scenes['SCN_OPENING'] && !prev.gameTitle) {
+                const newName = t('editor.newOpeningVignetteName', 'Abertura');
+                const newDesc = t('editor.newVignetteDescription', 'Descrição da nova vinheta.');
+                const newBtn = t('editor.defaultStartButton', 'COMEÇAR');
+                
+                const scn = prev.scenes['SCN_OPENING'];
+                if (scn.name !== newName || scn.description !== newDesc || scn.vignetteButtonText !== newBtn) {
+                    return {
+                        ...prev,
+                        scenes: {
+                            ...prev.scenes,
+                            'SCN_OPENING': {
+                                ...scn,
+                                name: newName,
+                                description: newDesc,
+                                vignetteButtonText: newBtn
+                            }
+                        }
+                    };
+                }
+            }
+            return prev;
+        });
+    }, [t, isDirty]);
 
     // --- State Accessors (Memoized) ---
     const scenesList = useMemo(() => {

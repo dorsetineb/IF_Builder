@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React, { useRef, CSSProperties, useState, useMemo } from 'react';
+import React, { useRef, CSSProperties, useState, useMemo, useCallback } from 'react';
 import { Scene, View } from '../types';
-import { Plus, Trash2, Menu, Play, ArrowRight, Flag, Search, Split, Map } from 'lucide-react';
+import { Trash2, Menu, ArrowRight, Search, Split, Map } from 'lucide-react';
 import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +22,146 @@ interface SceneListProps {
   currentView?: View;
   isLateralMenu?: boolean;
 }
+
+interface SceneRowData {
+  filteredScenes: Scene[];
+  searchTerm: string;
+  startSceneId: string;
+  selectedSceneId: string | null;
+  currentView: View | undefined;
+  isDirty: boolean | undefined;
+  isLateralMenu: boolean | undefined;
+  onSelectScene: (id: string) => void;
+  onDeleteScene: (id: string) => void;
+  handleDragStart: (e: React.DragEvent<HTMLDivElement>, position: number) => void;
+  handleDragEnter: (e: React.DragEvent<HTMLDivElement>, position: number) => void;
+  handleDragEnd: () => void;
+  t: any;
+}
+
+const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<SceneRowData>) => {
+  const {
+    filteredScenes, searchTerm, startSceneId, selectedSceneId, currentView,
+    isDirty, isLateralMenu, onSelectScene, onDeleteScene, handleDragStart,
+    handleDragEnter, handleDragEnd, t
+  } = data;
+
+  const scene = filteredScenes[index];
+  if (!scene) return null;
+
+  const isDraggable = !searchTerm && scene.id !== startSceneId;
+
+  const getVignetteLabel = (scene: Scene) => {
+    if (!scene.vignetteType || scene.vignetteType === 'none' || scene.vignetteType === 'opening') return null;
+    
+    const isTransition = scene.vignetteType === 'transition';
+    const label = isTransition 
+      ? t('sceneEditor.vignetteTypes.transition', 'Transição')
+      : t('sceneEditor.vignetteTypes.conclusion', 'Conclusão');
+
+    const isSelected = selectedSceneId === scene.id && currentView === 'scenes';
+
+    let colorClasses = '';
+    if (isLateralMenu && isSelected) {
+      colorClasses = 'bg-primary-foreground text-primary border-primary-foreground/50';
+    } else if (isSelected && isDirty) {
+      colorClasses = 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
+    } else {
+      colorClasses = 'bg-primary text-primary-foreground border-primary/50';
+    }
+
+    return (
+      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${colorClasses}`}>
+        {label}
+      </span>
+    );
+  };
+
+  return (
+    <div style={style}>
+      <div
+        onClick={() => onSelectScene(scene.id)}
+        className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center transition-all overflow-hidden cursor-pointer h-[42px] ${
+            isLateralMenu 
+              ? selectedSceneId === scene.id && currentView === 'scenes'
+                  ? `bg-primary text-primary-foreground font-bold shadow-md rounded-l-lg rounded-r-none` // Selected: 100% opaque primary
+                  : `text-foreground hover:bg-primary/10 hover:shadow-sm rounded-lg mr-2` // Unselected: normal text, subtle primary hover
+              : selectedSceneId === scene.id && currentView === 'scenes'
+                  ? isDirty
+                      ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold rounded-lg'
+                      : 'bg-primary/20 text-primary border border-primary/30 rounded-lg'
+                  : 'hover:bg-muted/50 border border-transparent rounded-lg'
+        }`}
+        onDragStart={(e) => !searchTerm && scene.id !== startSceneId && handleDragStart(e, index)}
+        onDragEnter={(e) => !searchTerm && scene.id !== startSceneId && handleDragEnter(e, index)}
+        onDragEnd={handleDragEnd}
+        onDragOver={(e) => e.preventDefault()}
+        draggable={!searchTerm && scene.id !== startSceneId}
+      >
+        <div className={`flex items-center flex-grow p-2`}>
+          {/* Always reserve space for the icon to ensure alignment */}
+          {scene.id !== startSceneId && (
+            <Menu
+              className={`w-4 h-4 mr-2 flex-shrink-0 ${isDraggable ? 'cursor-move' : 'cursor-default opacity-50'} ${
+                 isLateralMenu 
+                   ? selectedSceneId === scene.id && currentView === 'scenes' 
+                      ? 'text-primary-foreground/70' 
+                      : 'text-muted-foreground'
+                   : selectedSceneId === scene.id && currentView === 'scenes' 
+                      ? (isDirty ? 'text-yellow-500' : 'text-primary') 
+                      : 'text-muted-foreground'
+              }`}
+            />
+          )}
+
+          <div className="flex items-center justify-between w-full min-w-0">
+            <span className="truncate font-medium text-xs">{scene.name}</span>
+            <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
+              {getVignetteLabel(scene)}
+              {startSceneId === scene.id && (
+                <span
+                  className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${
+                     isLateralMenu 
+                       ? selectedSceneId === scene.id && currentView === 'scenes'
+                          ? 'bg-primary-foreground text-primary border-primary-foreground/50' 
+                          : 'bg-primary text-primary-foreground border-primary/50'                
+                       : selectedSceneId === scene.id && currentView === 'scenes'
+                          ? isDirty
+                            ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
+                            : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
+                          : 'bg-primary text-primary-foreground border-primary/50' // Inactive Start
+                  }`}
+                >
+                  {t('sceneList.start', 'Início')}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {startSceneId !== scene.id && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeleteScene(scene.id);
+            }}
+            className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
+              isLateralMenu 
+                ? selectedSceneId === scene.id && currentView === 'scenes'
+                  ? 'bg-red-500 rounded-none' // flush with right edge
+                  : 'bg-red-500 rounded-r-lg' // match the rounded-lg of container
+                : 'bg-red-500 rounded-r-lg' 
+            }`}
+            title={t('sceneList.deleteScene', 'Deletar cena')}
+          >
+            <Trash2 className="w-5 h-5 pointer-events-none" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+});
+SceneRow.displayName = 'SceneRow';
 
 const SceneList: React.FC<SceneListProps> = ({
   scenes,
@@ -69,16 +209,16 @@ const SceneList: React.FC<SceneListProps> = ({
   const dragItem = useRef<number | null>(null);
   const dragOverItem = useRef<number | null>(null);
 
-  const handleDragStart = (e: React.DragEvent<HTMLDivElement>, position: number) => {
+  const handleDragStart = useCallback((e: React.DragEvent<HTMLDivElement>, position: number) => {
     // Prevent dragging the opening vignette (index 0 if it exists)
     const scene = filteredScenes[position];
     if (scene && scene.vignetteType === 'opening') return e.preventDefault();
 
     dragItem.current = position;
     e.dataTransfer.effectAllowed = 'move';
-  };
+  }, [filteredScenes]);
 
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>, position: number) => {
+  const handleDragEnter = useCallback((e: React.DragEvent<HTMLDivElement>, position: number) => {
     dragOverItem.current = position;
     const list = scenes.map((s) => s.id);
     const dragItemContent = list[dragItem.current!];
@@ -94,38 +234,12 @@ const SceneList: React.FC<SceneListProps> = ({
 
     // Optimistic update
     onReorderScenes(list);
-  };
+  }, [filteredScenes, scenes, onReorderScenes]);
 
-  const handleDragEnd = () => {
+  const handleDragEnd = useCallback(() => {
     dragItem.current = null;
     dragOverItem.current = null;
-  };
-
-  const getVignetteLabel = (scene: Scene) => {
-    if (!scene.vignetteType || scene.vignetteType === 'none' || scene.vignetteType === 'opening') return null;
-    
-    const isTransition = scene.vignetteType === 'transition';
-    const label = isTransition 
-      ? t('sceneEditor.vignetteTypes.transition', 'Transição')
-      : t('sceneEditor.vignetteTypes.conclusion', 'Conclusão');
-
-    const isSelected = selectedSceneId === scene.id && currentView === 'scenes';
-
-    let colorClasses = '';
-    if (isLateralMenu && isSelected) {
-      colorClasses = 'bg-primary-foreground text-primary border-primary-foreground/50';
-    } else if (isSelected && isDirty) {
-      colorClasses = 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30';
-    } else {
-      colorClasses = 'bg-primary text-primary-foreground border-primary/50';
-    }
-
-    return (
-      <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${colorClasses}`}>
-        {label}
-      </span>
-    );
-  };
+  }, []);
 
   const getAddButtonClass = () => {
     const baseClass =
@@ -135,102 +249,25 @@ const SceneList: React.FC<SceneListProps> = ({
     return `${baseClass} bg-white text-zinc-950 hover:bg-zinc-200`;
   };
 
-  // Row Component for react-window
-  const Row = ({ index, style }: ListChildComponentProps) => {
-
-    // Determine which item to render from filtered list
-    // Note: React Window's index corresponds to the filtered list index
-    const scene = filteredScenes[index];
-
-    // If scene is undefined (sync issue), return null
-    if (!scene) return null;
-
-    const isDraggable = !searchTerm && scene.id !== startSceneId;
-
-    return (
-      <div style={style}>
-        <div
-          onClick={() => onSelectScene(scene.id)}
-          className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center transition-all overflow-hidden cursor-pointer h-[42px] ${
-              isLateralMenu 
-                ? selectedSceneId === scene.id && currentView === 'scenes'
-                    ? `bg-primary text-primary-foreground font-bold shadow-md rounded-l-lg rounded-r-none` // Selected: 100% opaque primary
-                    : `text-foreground hover:bg-primary/10 hover:shadow-sm rounded-lg mr-2` // Unselected: normal text, subtle primary hover
-                : selectedSceneId === scene.id && currentView === 'scenes'
-                    ? isDirty
-                        ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold rounded-lg'
-                        : 'bg-primary/20 text-primary border border-primary/30 rounded-lg'
-                    : 'hover:bg-muted/50 border border-transparent rounded-lg'
-          }`}
-          onDragStart={(e) => !searchTerm && scene.id !== startSceneId && handleDragStart(e, index)}
-          onDragEnter={(e) => !searchTerm && scene.id !== startSceneId && handleDragEnter(e, index)}
-          onDragEnd={handleDragEnd}
-          onDragOver={(e) => e.preventDefault()}
-          draggable={!searchTerm && scene.id !== startSceneId}
-        >
-          <div className={`flex items-center flex-grow p-2`}>
-            {/* Always reserve space for the icon to ensure alignment */}
-            {scene.id !== startSceneId && (
-              <Menu
-                className={`w-4 h-4 mr-2 flex-shrink-0 ${isDraggable ? 'cursor-move' : 'cursor-default opacity-50'} ${
-                   isLateralMenu 
-                     ? selectedSceneId === scene.id && currentView === 'scenes' 
-                        ? 'text-primary-foreground/70' 
-                        : 'text-muted-foreground'
-                     : selectedSceneId === scene.id && currentView === 'scenes' 
-                        ? (isDirty ? 'text-yellow-500' : 'text-primary') 
-                        : 'text-muted-foreground'
-                }`}
-              />
-            )}
-
-            <div className="flex items-center justify-between w-full min-w-0">
-              <span className="truncate font-medium text-xs">{scene.name}</span>
-              <div className="flex items-center gap-1.5 flex-shrink-0 ml-2">
-                {getVignetteLabel(scene)}
-                {startSceneId === scene.id && (
-                  <span
-                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${
-                       isLateralMenu 
-                         ? selectedSceneId === scene.id && currentView === 'scenes'
-                            ? 'bg-primary-foreground text-primary border-primary-foreground/50' 
-                            : 'bg-primary text-primary-foreground border-primary/50'                
-                         : selectedSceneId === scene.id && currentView === 'scenes'
-                            ? isDirty
-                              ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
-                              : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
-                            : 'bg-primary text-primary-foreground border-primary/50' // Inactive Start
-                    }`}
-                  >
-                    {t('sceneList.start', 'Início')}
-                  </span>
-                )}
-              </div>
-            </div>
-          </div>
-
-          {startSceneId !== scene.id && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onDeleteScene(scene.id);
-              }}
-              className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
-                isLateralMenu 
-                  ? selectedSceneId === scene.id && currentView === 'scenes'
-                    ? 'bg-red-500 rounded-none' // flush with right edge
-                    : 'bg-red-500 rounded-r-lg' // match the rounded-lg of container
-                  : 'bg-red-500 rounded-r-lg' 
-              }`}
-              title={t('sceneList.deleteScene', 'Deletar cena')}
-            >
-              <Trash2 className="w-5 h-5 pointer-events-none" />
-            </button>
-          )}
-        </div>
-      </div>
-    );
-  };
+  const itemData = useMemo<SceneRowData>(() => ({
+    filteredScenes,
+    searchTerm,
+    startSceneId,
+    selectedSceneId,
+    currentView,
+    isDirty,
+    isLateralMenu,
+    onSelectScene,
+    onDeleteScene,
+    handleDragStart,
+    handleDragEnter,
+    handleDragEnd,
+    t
+  }), [
+    filteredScenes, searchTerm, startSceneId, selectedSceneId, currentView,
+    isDirty, isLateralMenu, onSelectScene, onDeleteScene, handleDragStart,
+    handleDragEnter, handleDragEnd, t
+  ]);
 
   return (
     <div className={`flex flex-col gap-0 h-full`}>
@@ -293,10 +330,10 @@ const SceneList: React.FC<SceneListProps> = ({
                     itemSize={42}
                     width="100%"
                     ref={listRef}
-                    itemData={filteredScenes}
+                    itemData={itemData}
                     className="scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent"
                   >
-                    {Row}
+                    {SceneRow}
                   </List>
                 </div>
                 

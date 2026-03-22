@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { GameData, GameObject, Scene } from '../types';
 import { Plus, Trash2, Upload, Search, Box, Link, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, Image } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ConfirmationModal } from './ConfirmationModal';
 
 const TRACKER_ICONS = [
     { name: 'activity', component: Activity },
@@ -60,7 +61,17 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     const [selectedObjectId, setSelectedObjectId] = useState<string | null>(sortedObjects.length > 0 ? sortedObjects[0].id : null);
     const [searchTerm, setSearchTerm] = useState('');
     const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+    const [pendingAction, setPendingAction] = useState<{ run: () => void } | null>(null);
     const { t } = useTranslation();
+
+    const attemptAction = (action: () => void) => {
+        const isDifferent = JSON.stringify(localObjects) !== JSON.stringify(sortedObjects);
+        if (isDifferent || isDirty) {
+            setPendingAction({ run: action });
+        } else {
+            action();
+        }
+    };
 
     useEffect(() => {
         // Deep compare to avoid unnecessary updates and infinite loops
@@ -121,10 +132,11 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         const allLocalIds = localObjects.map(o => o.id);
         const combinedIds = Array.from(new Set([...allIds, ...allLocalIds]));
 
+        const objectCount = combinedIds.length + 1;
         const newId = generateUniqueId('obj', combinedIds);
         const newObject: GameObject = {
             id: newId,
-            name: t('objectEditor.newObject', 'Novo Objeto'),
+            name: `${t('objectEditor.newObject', 'Novo Objeto ')}#${objectCount}`,
             examineDescription: t('objectEditor.newObjectDesc', 'Descrição do novo objeto.'),
         };
 
@@ -200,7 +212,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                         filteredObjects.map(obj => (
                             <div key={obj.id} className="w-full mb-1">
                                 <div
-                                    onClick={() => setSelectedObjectId(obj.id)}
+                                    onClick={() => attemptAction(() => setSelectedObjectId(obj.id))}
                                     className={`group relative flex items-center transition-all overflow-hidden cursor-pointer w-full ${
                                         selectedObjectId === obj.id
                                             ? 'bg-primary text-primary-foreground shadow-md rounded-l-lg rounded-r-none'
@@ -226,7 +238,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            handleDelete(obj.id);
+                                            attemptAction(() => handleDelete(obj.id));
                                         }}
                                         className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
                                             selectedObjectId === obj.id
@@ -243,7 +255,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     )}
                     <div className="pr-2 mt-2 pb-4">
                         <button
-                            onClick={handleCreate}
+                            onClick={() => attemptAction(handleCreate)}
                             className="w-full flex items-center justify-start px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-zinc-200 mt-2 flex-shrink-0"
                         >
                             <Plus className="w-4 h-4 mr-2" />
@@ -463,6 +475,22 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     )}
                 </div>
             </div>
+
+            <ConfirmationModal
+                isOpen={pendingAction !== null}
+                title={t('editor.unsavedChanges', 'Alterações não salvas')}
+                message={t('editor.unsavedChangesMessage', 'Você tem alterações não salvas. Se sair agora, elas serão perdidas. Deseja continuar?')}
+                confirmText={t('editor.confirmLeave', 'Sair sem salvar')}
+                cancelText={t('editor.cancelLeave', 'Cancelar')}
+                onConfirm={() => {
+                    if (pendingAction) {
+                        setLocalObjects(sortedObjects);
+                        pendingAction.run();
+                        setPendingAction(null);
+                    }
+                }}
+                onCancel={() => setPendingAction(null)}
+            />
         </div>
     );
 };

@@ -128,6 +128,7 @@
       },
       "restore": {
         "title": "Restaurar desde una Copia de Seguridad",
+        "loadingDescription": "Comprobando la consistencia de los datos del proyecto... Esto puede tomar un momento.",
         "description": "Reemplaza TODOS los datos actuales del proyecto por el contenido de un archivo de copia de seguridad (.json).",
         "button": "Importar Archivo (.json)"
       },
@@ -192,11 +193,11 @@
     "openEditor": "Abrir Editor"
   },
   "sceneList": {
-    "search": "Buscar...",
+    "search": "Buscar narrativa...",
     "start": "Inicio",
     "deleteScene": "Eliminar escena",
     "createNode": "Crear Viñeta o Escena",
-    "viewMap": "Ver mapa de escenas",
+    "viewMap": "Ver mapa narrativo",
     "nodeSelection": {
       "vignette": {
         "title": "Crear Viñeta"
@@ -217,7 +218,12 @@
     "opening": "Apertura",
     "conclusion": "Conclusión",
     "ending": "Final",
-    "action": "Acción"
+    "action": "Acción",
+    "reorganize": "Reorganizar",
+    "viewAll": "Ver Todo",
+    "orphans": "Huérfanas",
+    "legend": "Leyenda",
+    "sceneVignette": "Escena / Viñeta"
   },
   "welcome": {
     "title": "Bienvenido a IF Builder",
@@ -424,12 +430,13 @@
     "newObjectDesc": "Descripción del nuevo objeto.",
     "inThisScene": "En esta Escena ({{count}})",
     "linkOptions": "Vincular ({{count}})",
-    "searchPlaceholder": "Buscar objetos...",
+    "searchPlaceholder": "Buscar objeto...",
     "createNewBtn": "Crear Objeto",
     "linkToSceneTooltip": "Vincular a la escena",
     "propertiesTitle": "Propiedades del Objeto",
     "unlinkConfirm": "¿Estás seguro? Esto eliminará el objeto de esta escena, pero seguirá existiendo en el proyecto.",
     "unlinkBtn": "Desvincular",
+    "unlinkTitle": "Desvincular Objeto",
     "linkNowBtn": "Vincular Ahora",
     "objectNameLabel": "Nombre del Objeto",
     "uniqueIdLabel": "ID Único",
@@ -444,11 +451,11 @@
   },
   "globalObjectsEditor": {
     "deleteConfirm": "¿Estás seguro? Esto eliminará el objeto de todo el juego.",
-    "headerDesc": "Gestor Global: Los objetos creados aquí se pueden usar en cualquier escena.",
+    "headerDesc": "Crea y modifica objetos que se usarán en las escenas. Las actualizaciones realizadas aquí se reflejarán en las escenas donde se utilizan los objetos.",
     "unsavedChanges": "Cambios no guardados",
     "undoBtn": "Deshacer",
     "saveBtn": "Guardar Cambios",
-    "searchPlaceholder": "Buscar objetos globales...",
+    "searchPlaceholder": "Buscar objeto...",
     "objectList": "Lista de Objetos",
     "deleteBtn": "Eliminar Objeto",
     "imageHint": "Esta imagen aparece en el pop-up de detalles del objeto durante el juego.",
@@ -490,7 +497,7 @@
   "globalCommandsEditor": {
     "headerDesc1": "Configura los verbos que siempre estarán disponibles para el jugador (ej: ayuda, tutorial).",
     "headerDesc2": "Los verbos <1>\"mirar\", \"examinar\", \"ver\"</1> y <3>\"leer\"</3> siempre estarán disponibles para que el usuario accione la descripción de un objeto.",
-    "searchPlaceholder": "Buscar verbos...",
+    "searchPlaceholder": "Buscar comandos...",
     "commandList": "Lista de Verbos",
     "noVerbs": "(sin verbos)",
     "noDescription": "(sin descripción)",
@@ -498,6 +505,7 @@
     "createCommandBtn": "Crear Verbo",
     "editCommandTitle": "Editar Verbo",
     "deleteCommandTooltip": "Eliminar verbo",
+    "deleteConfirm": "¿Estás seguro? Esto eliminará este comando global y todas sus configuraciones.",
     "verbsLabel": "Verbos (separados por coma)",
     "chooseIconTooltip": "Elegir icono",
     "verbsPlaceholder": "ej: ayuda, help, ?",
@@ -538,8 +546,8 @@
     "valueLabel": "Valor:",
     "noTrackerEffects": "Ningún efecto en rastreadores configurado.",
     "interactionsCount": "Interacciones ({{count}})",
-    "searchPlaceholder": "Buscar verbos...",
-    "newInteractionBtn": "Nueva Interacción",
+    "searchPlaceholder": "Buscar interacción...",
+    "newInteractionBtn": "Crear Interacción",
     "noInteractionSelected": "Ninguna interacción seleccionada",
     "noInteractionDesc": "Selecciona una interacción de la lista para editar o crea una nueva.",
     "targetPrefix": "Objetivo: ",
@@ -942,6 +950,16 @@
     }
   },
   "editor": {
+    "unsavedChanges": "Cambios no guardados",
+    "unsavedChangesMessage": "Tienes cambios sin guardar. Si sales ahora, se perderán. ¿Deseas continuar?",
+    "confirmLeave": "Salir sin guardar",
+    "cancelLeave": "Cancelar",
+    "newOpeningVignetteName": "Apertura",
+    "newVignetteNamePrefix": "Viñeta #",
+    "newSceneNamePrefix": "Escena #",
+    "newVignetteDescription": "Descripción de la nueva viñeta.",
+    "newSceneDescription": "Descripción de la nueva escena.",
+    "defaultStartButton": "EMPEZAR",
     "actionNotAllowed": "Acción no permitida",
     "deleteStartSceneError": "No puedes eliminar la escena inicial. Define otra escena como inicial antes de eliminar esta.",
     "sceneDeletedTitle": "Escena eliminada",

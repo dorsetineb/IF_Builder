@@ -391,11 +391,11 @@
     "openEditor": "Open Editor"
   },
   "sceneList": {
-    "search": "Search...",
+    "search": "Search narrative...",
     "start": "Start",
     "deleteScene": "Delete scene",
     "createNode": "Create Vignette or Scene",
-    "viewMap": "View Scene Map",
+    "viewMap": "View narrative map",
     "nodeSelection": {
       "vignette": {
         "title": "Create Vignette"
@@ -416,19 +416,25 @@
     "opening": "Opening",
     "conclusion": "Conclusion",
     "ending": "Final",
-    "action": "Action"
+    "action": "Action",
+    "reorganize": "Reorganize",
+    "viewAll": "View All",
+    "orphans": "Orphans",
+    "legend": "Legend",
+    "sceneVignette": "Scene / Vignette"
   },
   "objectEditor": {
     "newObject": "New Object",
     "newObjectDesc": "Description for the new object.",
     "inThisScene": "In This Scene ({{count}})",
     "linkOptions": "Link ({{count}})",
-    "searchPlaceholder": "Search objects...",
+    "searchPlaceholder": "Search object...",
     "createNewBtn": "Create Object",
     "linkToSceneTooltip": "Link to scene",
     "propertiesTitle": "Object Properties",
     "unlinkConfirm": "Are you sure? This will remove the object from this scene, but it will still exist in the project.",
     "unlinkBtn": "Unlink",
+    "unlinkTitle": "Unlink Object",
     "linkNowBtn": "Link Now",
     "objectNameLabel": "Object Name",
     "uniqueIdLabel": "Unique ID",
@@ -443,11 +449,11 @@
   },
   "globalObjectsEditor": {
     "deleteConfirm": "Are you sure? This will delete the object from the entire game.",
-    "headerDesc": "Global Manager: Objects created here can be used in any scene.",
+    "headerDesc": "Create and modify objects to be used in scenes. Updates made here will be reflected in the scenes where the objects are used.",
     "unsavedChanges": "Unsaved changes",
     "undoBtn": "Undo",
     "saveBtn": "Save Changes",
-    "searchPlaceholder": "Search global objects...",
+    "searchPlaceholder": "Search object...",
     "objectList": "Object List",
     "deleteBtn": "Delete Object",
     "imageHint": "This image appears in the object details pop-up during the game.",
@@ -482,6 +488,7 @@
     "interactionsLabel": "Interactions modifying this tracker",
     "actionAction": "Action",
     "actionOn": " on ",
+    "loadingDescription": "Checking project data consistency... This may take a moment.",
     "noInteractions": "No interaction modifies this tracker yet.",
     "noTrackerSelected": "No tracker selected",
     "noTrackerDesc": "Select a tracker from the list to edit its properties."
@@ -489,7 +496,7 @@
   "globalCommandsEditor": {
     "headerDesc1": "Configure the verbs that will always be available to the player (e.g., help, tutorial).",
     "headerDesc2": "The verbs <1>\"look\", \"examine\", \"see\"</1> and <3>\"read\"</3> will always be available for the user to trigger an object's description.",
-    "searchPlaceholder": "Search verbs...",
+    "searchPlaceholder": "Search commands...",
     "commandList": "Verb List",
     "noVerbs": "(no verbs)",
     "noDescription": "(no description)",
@@ -497,6 +504,7 @@
     "createCommandBtn": "Create Verb",
     "editCommandTitle": "Edit Verb",
     "deleteCommandTooltip": "Delete verb",
+    "deleteConfirm": "Are you sure? This will delete this global command and all its settings.",
     "verbsLabel": "Verbs (comma separated)",
     "chooseIconTooltip": "Choose icon",
     "verbsPlaceholder": "e.g.: help, ?",
@@ -537,8 +545,8 @@
     "valueLabel": "Value:",
     "noTrackerEffects": "No tracker effects configured.",
     "interactionsCount": "Interactions ({{count}})",
-    "searchPlaceholder": "Search verbs...",
-    "newInteractionBtn": "New Interaction",
+    "searchPlaceholder": "Search interaction...",
+    "newInteractionBtn": "Create Interaction",
     "noInteractionSelected": "No interaction selected",
     "noInteractionDesc": "Select an interaction from the list to edit or create a new one.",
     "targetPrefix": "Target: ",
@@ -941,6 +949,16 @@
     }
   },
   "editor": {
+    "unsavedChanges": "Unsaved changes",
+    "unsavedChangesMessage": "You have unsaved changes. If you leave now, they will be lost. Do you wish to continue?",
+    "confirmLeave": "Leave without saving",
+    "cancelLeave": "Cancel",
+    "newOpeningVignetteName": "Opening",
+    "newVignetteNamePrefix": "Vignette #",
+    "newSceneNamePrefix": "Scene #",
+    "newVignetteDescription": "Description of the new vignette.",
+    "newSceneDescription": "Description of the new scene.",
+    "defaultStartButton": "START",
     "actionNotAllowed": "Action not allowed",
     "deleteStartSceneError": "You cannot delete the start scene. Set another scene as the start scene before deleting this one.",
     "sceneDeletedTitle": "Scene deleted",

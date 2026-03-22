@@ -174,9 +174,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         objectIds: [],
         // Explicitly set vignetteType for the engine to render it as a vignette
         vignetteType: 'opening',
-        vignetteButtonText: startButtonText,
+        vignetteButtonText: startButtonText || t('editor.defaultStartButton', 'COMEÇAR'),
         vignetteNextSceneId: 'preview_scene'
-    }), [splashImage, description, startButtonText, title]);
+    }), [splashImage, description, startButtonText, title, t]);
 
     const previewGameData: GameData = useMemo(() => ({
         ...initialGameData,
@@ -265,7 +265,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             interactions: [],
             objectIds: [],
             vignetteType: 'opening',
-            vignetteButtonText: startButtonText,
+            vignetteButtonText: startButtonText || t('editor.defaultStartButton', 'COMEÇAR'),
             mapX: 0,
             mapY: 0
         };

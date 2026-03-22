@@ -1,5 +1,5 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React, { useState, DragEvent, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
+import { ConfirmationModal } from './ConfirmationModal';
 import { GameObject } from '../types';
 import { Plus, Trash2, Upload, Search, Link as LinkIcon, Unlink, Box, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
@@ -55,6 +55,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
     const [searchTerm, setSearchTerm] = useState('');
     const [isLinkMode, setIsLinkMode] = useState(false); // Toggle between "My Objects" and "Link Existing"
     const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
+    const [unlinkModal, setUnlinkModal] = useState<{ isOpen: boolean; objectId: string | null }>({ isOpen: false, objectId: null });
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -118,11 +119,11 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
     };
 
     return (
-        <div className="flex h-[600px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card shadow-sm" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
+        <div className="flex h-[calc(100vh-260px)] min-h-[450px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card shadow-sm" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* LEFT SIDEBAR */}
             <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/30">
                 {/* Sidebar Header */}
-                <div className="p-4 border-b border-muted-foreground/50 space-y-4">
+                <div className="px-2 py-4 border-b border-muted-foreground/50 space-y-4">
                     <div className="flex bg-muted rounded-lg p-1 border border-muted-foreground/50">
                         <button
                             onClick={() => setIsLinkMode(false)}
@@ -139,19 +140,19 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                     </div>
 
                     <div className="relative">
-                        <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                        <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <input
                             type="text"
                             placeholder={t('objectEditor.searchPlaceholder', 'Buscar objetos...')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full bg-input border border-input rounded-lg pl-8 pr-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary placeholder:text-muted-foreground"
+                            className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-primary/50 focus:border-primary focus:bg-background"
                         />
                     </div>
                 </div>
 
                 {/* Object List */}
-                <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                <div className="flex-1 overflow-y-auto pl-2 py-4 pr-0 space-y-0 flex flex-col items-stretch">
                     {!isLinkMode ? (
                         /* CURRENT SCENE OBJECTS */
                         <>
@@ -162,30 +163,44 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                         <button
                                             key={obj.id}
                                             onClick={() => setSelectedObjectId(obj.id)}
-                                            className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedObjectId === obj.id ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-accent hover:border-accent'}`}
+                                            className={`relative overflow-hidden flex items-center gap-3 h-[42px] px-2 rounded-lg border-transparent transition-all text-left group flex-shrink-0 ${selectedObjectId === obj.id ? 'bg-primary text-primary-foreground font-bold shadow-md rounded-r-none mr-0' : 'text-foreground hover:bg-primary/10 hover:shadow-sm mr-2'}`}
                                         >
-                                            <div className="w-10 h-10 rounded bg-muted border border-muted-foreground/50 flex items-center justify-center overflow-hidden shrink-0">
+                                            <div className={`w-7 h-7 rounded border flex items-center justify-center overflow-hidden shrink-0 ${selectedObjectId === obj.id ? 'bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground' : 'bg-muted border-muted-foreground/50 text-muted-foreground'}`}>
                                                 {obj.image ? (
                                                     <img src={obj.image} alt="" className="w-full h-full object-cover" />
                                                 ) : (
                                                     <IconComponent className="w-4 h-4" />
                                                 )}
                                             </div>
-                                            <div className="min-w-0">
-                                                <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-primary' : 'text-foreground'}`}>{obj.name}</div>
-                                                <div className="text-[10px] text-muted-foreground font-mono truncate">#{obj.id}</div>
+                                            <div className="min-w-0 flex-1">
+                                                <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-primary-foreground' : 'text-foreground'}`}>{obj.name}</div>
+                                                <div className={`text-[10px] font-mono truncate ${selectedObjectId === obj.id ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>#{obj.id}</div>
+                                            </div>
+                                            <div
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setUnlinkModal({ isOpen: true, objectId: obj.id });
+                                                }}
+                                                className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-[calc(100%+2px)] group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
+                                                    selectedObjectId === obj.id ? 'bg-red-500 rounded-none' : 'bg-red-500 rounded-r-lg'
+                                                }`}
+                                                title={t('objectEditor.unlinkBtn', 'Desvincular')}
+                                            >
+                                                <Unlink className="w-5 h-5 pointer-events-none" />
                                             </div>
                                         </button>
                                     );
                                 })
                             )}
-                            <button
-                                onClick={handleCreateNewObject}
-                                className="w-full py-2.5 bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] mt-2 shadow-sm"
-                            >
-                                <Plus className="w-4 h-4 mr-1" />
-                                {t('objectEditor.createNewBtn', 'Criar Novo Objeto')}
-                            </button>
+                            <div className="pr-2 mt-2">
+                                <button
+                                    onClick={handleCreateNewObject}
+                                    className="w-full h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
+                                >
+                                    <Plus className="w-4 h-4 mr-1" />
+                                    {t('objectEditor.createNewBtn', 'Criar Novo Objeto')}
+                                </button>
+                            </div>
                         </>
                     ) : (
                         /* AVAILABLE TO LINK OBJECTS */
@@ -196,14 +211,14 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                     return (
                                         <div
                                             key={obj.id}
-                                            className="w-full flex items-center justify-between gap-2 p-2 rounded-lg border border-dashed border-muted-foreground/50 hover:bg-accent transition-all text-left group"
+                                            className="flex items-center justify-between gap-2 h-[42px] px-2 mr-2 rounded-lg border border-dashed border-muted-foreground/50 hover:bg-accent transition-all text-left group flex-shrink-0"
                                         >
-                                            <div className="flex items-center gap-3 min-w-0" onClick={() => setSelectedObjectId(obj.id)}>
-                                                <div className="w-8 h-8 rounded bg-muted border border-muted-foreground/50 flex items-center justify-center overflow-hidden shrink-0 opacity-50">
+                                            <div className="flex items-center gap-3 min-w-0 cursor-pointer" onClick={() => setSelectedObjectId(obj.id)}>
+                                                <div className="w-7 h-7 rounded bg-muted border border-muted-foreground/50 flex items-center justify-center overflow-hidden shrink-0 opacity-50">
                                                     {obj.image ? (
                                                         <img src={obj.image} alt="" className="w-full h-full object-cover" />
                                                     ) : (
-                                                        <IconComponent className="w-3 h-3 text-muted-foreground" />
+                                                        <IconComponent className="w-4 h-4 text-muted-foreground" />
                                                     )}
                                                 </div>
                                                 <div className="min-w-0">
@@ -239,20 +254,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
 
                             {/* Context Actions */}
                             <div className="flex items-center gap-2">
-                                {isSelectedObjectLinked ? (
-                                    <button
-                                        onClick={() => {
-                                            if (window.confirm(t('objectEditor.unlinkConfirm', 'Tem certeza? Isso removerá o objeto desta cena, mas ele ainda existirá no projeto.'))) {
-                                                onUnlinkObject(sceneId, selectedObject.id);
-                                                setSelectedObjectId(null);
-                                            }
-                                        }}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
-                                    >
-                                        <Unlink className="w-3.5 h-3.5" />
-                                        {t('objectEditor.unlinkBtn', 'Desvincular')}
-                                    </button>
-                                ) : (
+                                {!isSelectedObjectLinked && (
                                     <button
                                         onClick={() => handleLinkExistingObject(selectedObject.id)}
                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-[10px] font-bold uppercase transition-all shadow-sm"
@@ -370,6 +372,23 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                     </div>
                 )}
             </div>
+
+            <ConfirmationModal
+                isOpen={unlinkModal.isOpen}
+                title={t('objectEditor.unlinkTitle', 'Desvincular Objeto')}
+                message={t('objectEditor.unlinkConfirm', 'Tem certeza? Isso removerá o objeto desta cena, mas ele ainda existirá no projeto.')}
+                confirmText={t('common.confirm', 'Confirmar')}
+                cancelText={t('common.cancel', 'Cancelar')}
+                isDanger={true}
+                onConfirm={() => {
+                    if (unlinkModal.objectId) {
+                        onUnlinkObject(sceneId, unlinkModal.objectId);
+                        if (selectedObjectId === unlinkModal.objectId) setSelectedObjectId(null);
+                    }
+                    setUnlinkModal({ isOpen: false, objectId: null });
+                }}
+                onCancel={() => setUnlinkModal({ isOpen: false, objectId: null })}
+            />
         </div>
     );
 };

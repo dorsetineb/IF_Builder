@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo, useEffect, lazy, Suspense } from
 import { useNavigate } from 'react-router-dom';
 
 import { useToast } from './ToastContext';
-import { useGameData } from '../hooks/useGameData';
+import { useGameData, getLocalizedInitialGameData } from '../hooks/useGameData';
 import { useSceneManagement } from '../hooks/useSceneManagement';
 import { useExportImport } from '../hooks/useExportImport';
 import {
@@ -58,8 +58,6 @@ import UserManualModal from './UserManualModal';
 import NodeTypeModal from './NodeTypeModal';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { gameJS, prepareGameDataForEngine } from './game-engine';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { gameHTML, gameCSS, initialGameData } from '../lib/gameDefaults';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Info, Settings as SettingsIcon, CircleHelp, X, Save } from 'lucide-react';
 import Settings from '../pages/Settings';
@@ -916,13 +914,50 @@ const Editor: React.FC = () => {
   }, [isBiosFinished]);
 
   const handleNavigate = (path: string) => {
+    setShowSaveModal(false);
     setIsTransitioning(true);
     setTimeout(() => {
       navigate(path);
     }, 3000); // 3s duration (was 2s)
   };
 
-  const handleExit = () => handleNavigate('/dashboard');
+  type PendingNavigation = 
+    | { type: 'scene'; id: string } 
+    | { type: 'view'; view: View } 
+    | { type: 'navigate'; path: string } 
+    | { type: 'exit' }
+    | { type: 'action'; action: () => void };
+
+  const [pendingNavigation, setPendingNavigation] = useState<PendingNavigation | null>(null);
+  const [hasUnsavedTabChanges, setHasUnsavedTabChanges] = useState(false);
+
+  const executeNavigation = (navData: PendingNavigation) => {
+    setHasUnsavedTabChanges(false); // Clear draft state
+    setPendingNavigation(null);
+    if (navData.type === 'scene') {
+      setCurrentView('scenes');
+      setSelectedSceneId(navData.id);
+    } else if (navData.type === 'view') {
+      setCurrentView(navData.view);
+      if (navData.view === 'scenes' && !selectedSceneId && scenesList.length > 0) {
+        setSelectedSceneId(scenesList[0].id);
+      }
+    } else if (navData.type === 'navigate') {
+      handleNavigate(navData.path);
+    } else if (navData.type === 'exit') {
+      handleNavigate('/dashboard'); // Original handleExit logic
+    } else if (navData.type === 'action') {
+      navData.action();
+    }
+  };
+
+  const attemptNavigation = (navData: PendingNavigation) => {
+    if (hasUnsavedTabChanges) {
+      setPendingNavigation(navData);
+    } else {
+      executeNavigation(navData);
+    }
+  };
 
   // --- Game Data Hook ---
   const {
@@ -989,6 +1024,8 @@ const Editor: React.FC = () => {
     onConfirm: () => {},
     onCancel: () => {},
     isDanger: false,
+    confirmText: t('common.confirm', 'Confirmar'),
+    cancelText: t('common.cancel', 'Cancelar'),
   });
 
   const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
@@ -1053,15 +1090,11 @@ const Editor: React.FC = () => {
   // Scene handlers and Reorder handlers moved to useSceneManagement
 
   const handleSelectScene = (id: string) => {
-    setCurrentView('scenes');
-    setSelectedSceneId(id);
+    attemptNavigation({ type: 'scene', id });
   };
 
   const handleSetView = (view: View) => {
-    setCurrentView(view);
-    if (view === 'scenes' && !selectedSceneId && scenesList.length > 0) {
-      setSelectedSceneId(scenesList[0].id);
-    }
+    attemptNavigation({ type: 'view', view });
   };
 
   const handleNewGame = () => {
@@ -1079,6 +1112,8 @@ const Editor: React.FC = () => {
           setIsNewProjectModalOpen(true);
         },
         onCancel: closeConfirmationModal,
+        confirmText: t('common.continue', 'Continuar'),
+        cancelText: t('common.cancel', 'Cancelar'),
       });
     } else {
       setIsNewProjectModalOpen(true);
@@ -1088,7 +1123,7 @@ const Editor: React.FC = () => {
   const handleProjectCreated = (newGameData: Partial<GameData>) => {
     setIsNewProjectModalOpen(false);
     setGameData({
-      ...initialGameData,
+      ...getLocalizedInitialGameData(t),
       ...newGameData,
     });
     setIsDirty(false);
@@ -1112,7 +1147,7 @@ const Editor: React.FC = () => {
 
     const createProject = () => {
       setGameData({
-        ...initialGameData,
+        ...getLocalizedInitialGameData(t),
         ...overrideData,
         // Ensure unique ID for start scene if not provided (though initialData serves base)
         // But we usually want fresh state.
@@ -1133,6 +1168,8 @@ const Editor: React.FC = () => {
           createProject();
         },
         onCancel: closeConfirmationModal,
+        confirmText: t('common.continue', 'Continuar'),
+        cancelText: t('common.cancel', 'Cancelar'),
       });
     } else {
       createProject();
@@ -1265,10 +1302,10 @@ const Editor: React.FC = () => {
             isPreviewing={isPreviewing}
             onTogglePreview={() => setIsPreviewing(false)}
             onNewGame={handleNewGame}
-            onHome={() => {
+            onHome={() => attemptNavigation({ type: 'action', action: () => {
               setCurrentView('scenes');
               setSelectedSceneId(null);
-            }}
+            }})}
             onExport={() => setShowSaveModal(true)}
             onImport={handleImportFile}
             currentView={currentView}
@@ -1289,11 +1326,11 @@ const Editor: React.FC = () => {
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
             onExport={() => setShowSaveModal(true)}
             onImport={handleImportFile}
-            onHome={() => {
+            onHome={() => attemptNavigation({ type: 'action', action: () => {
               setCurrentView('welcome');
               setSelectedSceneId(null);
               setIsNarrativeMenuOpen(false);
-            }}
+            }})}
             currentView={currentView}
           />
           <div className="flex flex-1 overflow-hidden">
@@ -1308,8 +1345,8 @@ const Editor: React.FC = () => {
               onDeleteScene={handleDeleteScene}
               onReorderScenes={handleReorderScenes}
               onSetView={handleSetView}
-              onExit={handleExit}
-              onNavigate={handleNavigate}
+              onExit={() => attemptNavigation({ type: 'exit' })}
+              onNavigate={(path) => attemptNavigation({ type: 'navigate', path })}
               onImportGame={handleImportGame}
               onTogglePreview={() => {
                 setPreviewSceneId(null);
@@ -1332,13 +1369,13 @@ const Editor: React.FC = () => {
                   onAddScene={() => setIsNodeTypeModalOpen(true)}
                   onDeleteScene={handleDeleteScene}
                   onReorderScenes={handleReorderScenes}
-                  isDirty={isDirty}
+                  isDirty={hasUnsavedTabChanges}
                   theme={appTheme}
                   currentView={currentView}
                   isLateralMenu={true}
                   onAddNode={handleAddNodeType}
                   hasOpeningVignette={hasOpeningVignette}
-                  onViewMap={() => handleSetView('map')}
+                  onViewMap={() => attemptNavigation({ type: 'view', view: 'map' })}
                 />
               </div>
             )}
@@ -1363,8 +1400,8 @@ const Editor: React.FC = () => {
                     html={gameData.gameHTML}
                     css={gameData.gameCSS}
                     onUpdate={handleUpdateGameData}
-                    isDirty={isDirty}
-                    onSetDirty={setIsDirty}
+                    isDirty={hasUnsavedTabChanges}
+                    onSetDirty={setHasUnsavedTabChanges}
                     title={gameData.gameTitle || ''}
                     logo={gameData.gameLogo || ''}
                     omitSplashTitle={!!gameData.gameOmitSplashTitle}
@@ -1469,14 +1506,14 @@ const Editor: React.FC = () => {
                     setIsPreviewing(true);
                   }}
                   onSelectScene={handleSelectScene}
-                  isDirty={isDirty}
-                  onSetDirty={setIsDirty}
+                  isDirty={hasUnsavedTabChanges}
+                  onSetDirty={setHasUnsavedTabChanges}
                   layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
                   consequenceTrackers={consequenceTrackers}
                   isStartScene={selectedScene.id === gameData.startScene}
                   gameInteractionType={gameData.gameInteractionType || 'parser'}
                   vignettes={gameData.vignettes || []}
-                  onViewMap={() => handleSetView('map')}
+                  onViewMap={() => attemptNavigation({ type: 'view', view: 'map' })}
                   globalSplashButtonText={gameData.gameSplashButtonText || ''}
                   onUpdateGlobalSplashButtonText={(text) =>
                     handleUpdateGameData('gameSplashButtonText', text)
@@ -1523,8 +1560,8 @@ const Editor: React.FC = () => {
                     onDeleteObject={handleDeleteGlobalObject}
                     onCreateObject={handleCreateGlobalObject}
                     onSelectScene={handleSelectScene}
-                    isDirty={isDirty}
-                    onSetDirty={setIsDirty}
+                    isDirty={hasUnsavedTabChanges}
+                    onSetDirty={setHasUnsavedTabChanges}
                   />
                 </Suspense>
               )}
@@ -1536,8 +1573,8 @@ const Editor: React.FC = () => {
                     onUpdateTrackers={handleUpdateTrackers}
                     allScenes={scenesList}
                     allTrackerIds={(gameData.consequenceTrackers || []).map((t) => t.id)}
-                    isDirty={isDirty}
-                    onSetDirty={setIsDirty}
+                    isDirty={hasUnsavedTabChanges}
+                    onSetDirty={setHasUnsavedTabChanges}
                     onSelectScene={handleSelectScene}
                   />
                 </Suspense>
@@ -1548,8 +1585,8 @@ const Editor: React.FC = () => {
                   <GlobalCommandsEditor
                     fixedVerbs={gameData.fixedVerbs || []}
                     onUpdate={handleUpdateGameData}
-                    isDirty={isDirty}
-                    onSetDirty={setIsDirty}
+                    isDirty={hasUnsavedTabChanges}
+                    onSetDirty={setHasUnsavedTabChanges}
                   />
                 </Suspense>
               )}
@@ -1668,6 +1705,21 @@ const Editor: React.FC = () => {
         onConfirm={confirmationModal.onConfirm}
         onCancel={confirmationModal.onCancel}
         isDanger={confirmationModal.isDanger}
+        confirmText={confirmationModal.confirmText}
+        cancelText={confirmationModal.cancelText}
+      />
+
+      <ConfirmationModal
+        isOpen={pendingNavigation !== null}
+        title={t('editor.unsavedChanges', 'Alterações não salvas')}
+        message={t('editor.unsavedChangesMessage', 'Você tem alterações não salvas. Se sair agora, elas serão perdidas. Deseja continuar?')}
+        onConfirm={() => {
+          if (pendingNavigation) executeNavigation(pendingNavigation);
+        }}
+        onCancel={() => setPendingNavigation(null)}
+        isDanger={true}
+        confirmText={t('editor.confirmLeave', 'Sair sem salvar')}
+        cancelText={t('editor.cancelLeave', 'Cancelar')}
       />
       <NewProjectModal
         isOpen={isNewProjectModalOpen}
