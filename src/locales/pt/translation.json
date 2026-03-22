@@ -322,7 +322,7 @@
   },
   "guide": {
     "title": "Guia Rápido",
-    "intro": "O IF Builder permite criar ficções interativas, narrativas textuais onde o jogador interage com a história por meio de escolhas ou verbos (verbos). A ficção é composta por <strong>Cenas</strong>, onde o usuário lê descrições, observa imagens e toma decisões para interagir com <strong>objetos</strong> e <strong>navegar pelo mundo</strong>.",
+    "intro": "O IF Builder permite criar ficções interativas, narrativas textuais onde o jogador interage com a história por meio de escolhas ou verbos. A ficção é composta por <strong>Cenas</strong>, onde o usuário lê descrições, observa imagens e toma decisões para interagir com <strong>objetos</strong> e <strong>navegar pelo mundo</strong>.",
     "toc": "Índice do Guia",
     "tocSelect": "Selecione um capítulo para navegar...",
     "sections": {
@@ -992,7 +992,7 @@
   "manualModal": {
     "title": "Manual de Uso",
     "subtitle": "Aprenda a criar sua aventura interativa",
-    "intro": "O <strong className=\"text-white\">IF Builder</strong> permite criar jogos de ficção interativa (Interactive Fiction). O jogo é composto por <strong>Cenas</strong>, onde o jogador lê descrições, observa imagens e digita verbos (verbos) para interagir com <strong>Objetos</strong> e navegar pelo mundo.",
+    "intro": "O <strong className=\"text-white\">IF Builder</strong> permite criar jogos de ficção interativa (Interactive Fiction). O jogo é composto por <strong>Cenas</strong>, onde o jogador lê descrições, observa imagens e digita verbos para interagir com <strong>Objetos</strong> e navegar pelo mundo.",
     "section1Title": "1. Editor de Cenas",
     "section1Intro": "Cada cena é um local ou momento no seu jogo. Configure:",
     "section1Item1": "<strong className=\"text-zinc-200\">Texto Interativo:</strong> Use a sintaxe <code>&lt;palavra&gt;</code> na descrição. Isso tornará a palavra clicável no jogo, facilitando a digitação de verbos para o jogador.",

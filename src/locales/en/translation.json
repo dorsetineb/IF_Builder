@@ -1011,7 +1011,7 @@
   "manualModal": {
     "title": "User Manual",
     "subtitle": "Learn how to create your interactive adventure",
-    "intro": "The <strong className=\"text-white\">IF Builder</strong> allows you to create Interactive Fiction games. The game is composed of <strong>Scenes</strong>, where the player reads descriptions, looks at images, and types verbs (verbs) to interact with <strong>Objects</strong> and navigate the world.",
+    "intro": "The <strong className=\"text-white\">IF Builder</strong> allows you to create Interactive Fiction games. The game is composed of <strong>Scenes</strong>, where the player reads descriptions, looks at images, and types verbs to interact with <strong>Objects</strong> and navigate the world.",
     "section1Title": "1. Scene Editor",
     "section1Intro": "Each scene is a location or moment in your game. Configure:",
     "section1Item1": "<strong className=\"text-zinc-200\">Interactive Text:</strong> Use the <code>&lt;word&gt;</code> syntax in the description. This will make the word clickable in the game.",

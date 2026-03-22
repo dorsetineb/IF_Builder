@@ -321,7 +321,7 @@
   },
   "guide": {
     "title": "Guía Rápida",
-    "intro": "IF Builder permite crear ficciones interactivas, narrativas textuales donde el jugador interactúa con la historia mediante elecciones o verbos (verbos). La ficción está compuesta por <strong>Escenas</strong>, donde el usuario lee descripciones, observa imágenes y toma decisiones para interactuar con <strong>objetos</strong> y <strong>navegar por el mundo</strong>.",
+    "intro": "IF Builder permite crear ficciones interactivas, narrativas textuales donde el jugador interactúa con la historia mediante elecciones o verbos. La ficción está compuesta por <strong>Escenas</strong>, donde el usuario lee descripciones, observa imágenes y toma decisiones para interactuar con <strong>objetos</strong> y <strong>navegar por el mundo</strong>.",
     "toc": "Índice de la Guía",
     "tocSelect": "Selecciona un capítulo para navegar...",
     "sections": {
@@ -1012,7 +1012,7 @@
   "manualModal": {
     "title": "Manual de Uso",
     "subtitle": "Aprende a crear tu aventura interactiva",
-    "intro": "El <strong className=\"text-white\">IF Builder</strong> te permite crear juegos de ficción interactiva (Interactive Fiction). El juego está compuesto por <strong>Escenas</strong>, donde el jugador lee descripciones, observa imágenes y escribe verbos (verbos) para interactuar con <strong>Objetos</strong> y navegar por el mundo.",
+    "intro": "El <strong className=\"text-white\">IF Builder</strong> te permite crear juegos de ficción interactiva (Interactive Fiction). El juego está compuesto por <strong>Escenas</strong>, donde el jugador lee descripciones, observa imágenes y escribe verbos para interactuar con <strong>Objetos</strong> y navegar por el mundo.",
     "section1Title": "1. Editor de Escenas",
     "section1Intro": "Cada escena es un lugar o momento en tu juego. Configura:",
     "section1Item1": "<strong className=\"text-zinc-200\">Texto Interactivo:</strong> Usa la sintaxis <code>&lt;palabra&gt;</code> en la descripción. Esto hará que la palabra sea clicable en el juego, facilitando la introducción de verbos para el jugador.",
