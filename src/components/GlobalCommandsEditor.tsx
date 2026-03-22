@@ -136,7 +136,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                     <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                         type="text"
-                        placeholder={t('globalCommandsEditor.searchPlaceholder', 'Buscar comandos...')}
+                        placeholder={t('globalCommandsEditor.searchPlaceholder', 'Buscar verbo...')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-primary/50 focus:border-primary focus:bg-background"
@@ -200,7 +200,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                             className="w-full flex items-center justify-start px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-zinc-200 mt-2 flex-shrink-0"
                         >
                             <Plus className="w-4 h-4 mr-2" />
-                            {t('globalCommandsEditor.newCommand', 'Criar Verbo')}
+                            {t('globalCommandsEditor.createCommandBtn', 'Criar Verbo')}
                         </button>
                     </div>
                 </div>

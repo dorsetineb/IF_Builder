@@ -199,7 +199,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                         placeholder={t('globalObjectsEditor.searchPlaceholder', 'Buscar objetos globais...')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-input text-foreground border border-muted-foreground/50"
+                        className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-primary/50 focus:border-primary focus:bg-background"
                     />
                 </div>
                 <div className="flex justify-between items-center text-[10px] text-muted-foreground font-bold uppercase tracking-wider px-3 mb-2">

@@ -462,9 +462,9 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                     <div className="pr-2 mt-2">
                         <button
                             onClick={handleAdd}
-                            className="w-full h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
+                            className="w-full flex items-center justify-start px-3 h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
                         >
-                            <Plus className="w-4 h-4 mr-1" />
+                            <Plus className="w-4 h-4 mr-2" />
                             {t('interactionEditor.newInteractionBtn', 'Criar Interação')}
                         </button>
                     </div>

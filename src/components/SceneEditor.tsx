@@ -1107,14 +1107,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                   {/* List */}
                   <div className="flex-1 overflow-y-auto pl-2 py-4 pr-0 space-y-0 flex flex-col items-stretch">
-                    {(localScene.choices || []).length === 0 ? (
-                      <div className="text-center py-8 text-muted-foreground">
-                        <p className="text-xs italic">{t('sceneEditor.noChoices')}</p>
-                      </div>
-                    ) : (
-                      (localScene.choices || [])
-                        .filter((c) => !choicesSearchQuery || c.label.toLowerCase().includes(choicesSearchQuery.toLowerCase()))
-                        .map((choice) => (
+                    {(localScene.choices || [])
+                      .filter((c) => !choicesSearchQuery || c.label.toLowerCase().includes(choicesSearchQuery.toLowerCase()))
+                      .map((choice) => (
                         <button
                           key={choice.id}
                           onClick={() => setSelectedChoiceId(choice.id)}
@@ -1155,7 +1150,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                           </div>
                         </button>
                       ))
-                    )}
+                    }
                     <div className="pr-2 mt-2">
                         <button
                           onClick={() => {
@@ -1168,10 +1163,10 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                             updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
                             setSelectedChoiceId(newId);
                           }}
-                          className="w-full h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
+                          className="w-full flex items-center justify-start px-3 h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
                         >
-                          <Plus className="w-4 h-4 mr-1" />
-                          {t('sceneEditor.createChoiceBtn')}
+                          <Plus className="w-4 h-4 mr-2" />
+                          {t('sceneEditor.createChoiceBtn', 'Criar Decisão')}
                         </button>
                     </div>
                   </div>

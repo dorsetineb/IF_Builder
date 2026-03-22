@@ -240,7 +240,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                             className="w-full flex items-center justify-start px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-zinc-200 mt-2 flex-shrink-0"
                         >
                             <Plus className="w-4 h-4 mr-2" />
-                            {t('trackersEditor.createBtn', 'Novo Rastreador')}
+                            {t('trackersEditor.createBtn', 'Criar Rastreador')}
                         </button>
                     </div>
                 </div>
