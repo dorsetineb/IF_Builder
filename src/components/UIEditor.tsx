@@ -1258,7 +1258,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                         onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
                                                                         min="1"
                                                                         max="10"
-                                                                        className="w-full h-9 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-2 text-sm font-bold text-center text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all"
+                                                                        className="w-full h-9 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-2 text-xs font-bold text-center text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all"
                                                                     />
                                                                 </div>
                                                             </div>

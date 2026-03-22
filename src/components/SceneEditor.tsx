@@ -2,7 +2,6 @@ import React, { useState, useEffect, DragEvent, useRef, useMemo, memo } from 're
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   Scene,
-  FixedVerb,
   Interaction,
   Vignette,
   GameObject,
@@ -30,10 +29,10 @@ import {
   FileText,
   Scroll,
   GitBranch,
-  Play,
   Copy,
   RotateCcw,
   Save,
+  Search,
 } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useTranslation, Trans } from 'react-i18next';
@@ -133,10 +132,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
       'properties' | 'objects' | 'interactions' | 'choices'
     >('properties');
     const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
+    const [choicesSearchQuery, setChoicesSearchQuery] = useState('');
     const [suggestionsInput, setSuggestionsInput] = useState('');
+    const [isDraggingOver, setIsDraggingOver] = useState(false);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
-    const [isDraggingOver, setIsDraggingOver] = useState(false);
     const initialSceneJson = useRef(JSON.stringify(getCleanSceneState(scene)));
 
     // Reset local state when scene ID changes (switching scenes)
@@ -577,7 +577,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                             id="sceneName"
                             value={localScene.name}
                             onChange={handleNameChange}
-                            className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground"
+                            className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground"
                             placeholder={t('sceneEditor.titlePlaceholder')}
                           />
                         </div>
@@ -623,7 +623,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                             id="sceneDescription"
                             value={localScene.description}
                             onChange={handleDescriptionChange}
-                            className="w-full h-32 md:h-40 bg-input border border-input rounded-lg px-4 py-3 text-sm text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
+                            className="w-full h-32 md:h-40 bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
                             placeholder={t('sceneEditor.descPlaceholder')}
                           />
 
@@ -645,7 +645,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                 value={suggestionsInput}
                                 onChange={handleSuggestionsChange}
                                 onBlur={handleSuggestionsBlur}
-                                className="w-full h-16 bg-input border border-input rounded-lg px-4 py-3 text-sm text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
+                                className="w-full h-16 bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
                                 placeholder={t(
                                   'sceneEditor.suggestionsPlaceholder',
                                   'Ex: examinar, pegar, usar, falar'
@@ -671,7 +671,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                 id="sceneNegativeFeedback"
                                 value={localScene.negativeFeedback || ''}
                                 onChange={(e) => updateLocalScene('negativeFeedback', e.target.value)}
-                                className="w-full h-16 bg-input border border-input rounded-lg px-4 py-3 text-sm text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
+                                className="w-full h-16 bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
                                 placeholder={t(
                                   'sceneEditor.negativeFeedbackPlaceholder',
                                   'Isso não parece ter nenhum efeito.'
@@ -1091,66 +1091,89 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
               <div className="flex h-[calc(100vh-260px)] min-h-[450px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card">
                 {/* LEFT LIST PANEL */}
                 <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/10">
+                  {/* Search and Header */}
                   <div className="p-4 border-b border-muted-foreground/50 space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-                        {t('sceneEditor.choicesCount', { count: localScene.choices?.length || 0 })}
-                      </span>
+                    <div className="relative">
+                      <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <input
+                        type="text"
+                        value={choicesSearchQuery || ''}
+                        onChange={(e) => setChoicesSearchQuery?.(e.target.value)}
+                        placeholder={t('sceneEditor.searchChoicesPlaceholder', 'Buscar decisão...')}
+                        className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-primary/50 focus:border-primary focus:bg-background"
+                      />
                     </div>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto p-2 space-y-1">
+                  {/* List */}
+                  <div className="flex-1 overflow-y-auto pl-2 py-4 pr-0 space-y-0 flex flex-col items-stretch">
                     {(localScene.choices || []).length === 0 ? (
                       <div className="text-center py-8 text-muted-foreground">
                         <p className="text-xs italic">{t('sceneEditor.noChoices')}</p>
                       </div>
                     ) : (
-                      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                      (localScene.choices || []).map((choice, index) => (
+                      (localScene.choices || [])
+                        .filter((c) => !choicesSearchQuery || c.label.toLowerCase().includes(choicesSearchQuery.toLowerCase()))
+                        .map((choice) => (
                         <button
                           key={choice.id}
                           onClick={() => setSelectedChoiceId(choice.id)}
-                          className={`w-full flex items-center gap-3 p-2 rounded-lg border transition-all text-left ${selectedChoiceId === choice.id ? 'bg-primary/10 border-primary/40' : 'bg-transparent border-transparent hover:bg-accent hover:border-accent'} `}
+                          className={`relative overflow-hidden flex items-center gap-3 h-[42px] px-2 rounded-lg border-transparent transition-all text-left group flex-shrink-0 ${selectedChoiceId === choice.id ? 'bg-primary text-primary-foreground font-bold shadow-md rounded-r-none mr-0' : 'text-foreground hover:bg-primary/10 hover:shadow-sm mr-2'} `}
                         >
-                          <div className="w-8 h-8 rounded bg-muted border border-muted-foreground/50 flex items-center justify-center overflow-hidden shrink-0">
-                            <ArrowRight
-                              className={`w-4 h-4 ${selectedChoiceId === choice.id ? 'text-primary' : 'text-muted-foreground'} `}
-                            />
+                          <div className={`flex items-center justify-center shrink-0 ${selectedChoiceId === choice.id ? 'text-primary-foreground/70' : 'text-muted-foreground'} `}>
+                            <ArrowRight className="w-4 h-4" />
                           </div>
-                          <div className="min-w-0">
+                          <div className="min-w-0 flex-1">
                             <div
-                              className={`text-xs font-bold truncate ${selectedChoiceId === choice.id ? 'text-primary' : 'text-foreground'} `}
+                              className={`text-xs font-bold truncate ${selectedChoiceId === choice.id ? 'text-primary-foreground' : 'text-foreground'} `}
                             >
                               {choice.label || t('sceneEditor.newChoice')}
                             </div>
-                            <div className="text-[10px] text-zinc-500 font-mono truncate">
+                            <div className={`text-[10px] truncate flex items-center gap-1 ${selectedChoiceId === choice.id ? 'text-primary-foreground/70' : 'text-muted-foreground'} `}>
                               {choice.targetSceneId
-                                ? `-> ${allScenes.find((s) => s.id === choice.targetSceneId)?.name || choice.targetSceneId} `
+                                ? `${t('sceneEditor.targetPrefix', 'Destino: ')}${allScenes.find((s) => s.id === choice.targetSceneId)?.name || choice.targetSceneId} `
                                 : t('sceneEditor.noDestination')}
                             </div>
+                          </div>
+                          <div
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (window.confirm(t('sceneEditor.removeChoiceConfirm'))) {
+                                const newChoices = localScene.choices!.filter(
+                                  (c) => c.id !== choice.id
+                                );
+                                updateLocalScene('choices', newChoices);
+                                setSelectedChoiceId(null);
+                              }
+                            }}
+                            className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-[calc(100%+2px)] group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
+                              selectedChoiceId === choice.id ? 'bg-red-500 rounded-none' : 'bg-red-500 rounded-r-lg'
+                            }`}
+                            title={t('sceneEditor.removeBtn')}
+                          >
+                            <Trash2 className="w-5 h-5 pointer-events-none" />
                           </div>
                         </button>
                       ))
                     )}
-                  </div>
-
-                  <div className="p-3 border-t border-muted-foreground/50 bg-muted/30">
-                    <button
-                      onClick={() => {
-                        const newId = `choice_${Date.now()} `;
-                        const newChoice: Choice = {
-                          id: newId,
-                          label: t('sceneEditor.newChoice'),
-                          targetSceneId: '',
-                        };
-                        updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
-                        setSelectedChoiceId(newId);
-                      }}
-                      className="w-full py-2 bg-white hover:bg-zinc-200 text-zinc-950 font-bold rounded-lg text-xs flex items-center justify-center transition-colors shadow-none"
-                    >
-                      <Plus className="w-3.5 h-3.5 mr-2" />
-                      {t('sceneEditor.createChoiceBtn')}
-                    </button>
+                    <div className="pr-2 mt-2">
+                        <button
+                          onClick={() => {
+                            const newId = `choice_${Date.now()} `;
+                            const newChoice: Choice = {
+                              id: newId,
+                              label: t('sceneEditor.newChoice'),
+                              targetSceneId: '',
+                            };
+                            updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
+                            setSelectedChoiceId(newId);
+                          }}
+                          className="w-full h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold flex items-center justify-center gap-2 transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          {t('sceneEditor.createChoiceBtn')}
+                        </button>
+                    </div>
                   </div>
                 </div>
 
@@ -1172,21 +1195,6 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                 {t('sceneEditor.choiceDetails')}
                               </span>
                             </div>
-                            <button
-                              onClick={() => {
-                                if (window.confirm(t('sceneEditor.removeChoiceConfirm'))) {
-                                  const newChoices = localScene.choices!.filter(
-                                    (c) => c.id !== selectedChoiceId
-                                  );
-                                  updateLocalScene('choices', newChoices);
-                                  setSelectedChoiceId(null);
-                                }
-                              }}
-                              className="flex items-center gap-1.5 px-3 py-1.5 bg-red-500/10 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-md text-[10px] font-bold uppercase transition-all"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                              {t('sceneEditor.removeBtn')}
-                            </button>
                           </div>
 
                           <div className="flex-1 overflow-y-auto p-6">
@@ -1203,7 +1211,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                     newChoices[choiceIndex] = { ...choice, label: e.target.value };
                                     updateLocalScene('choices', newChoices);
                                   }}
-                                  className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary"
+                                  className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary"
                                   placeholder={t('sceneEditor.buttonTextChoicePlaceholder')}
                                 />
                               </div>
@@ -1223,7 +1231,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                       };
                                       updateLocalScene('choices', newChoices);
                                     }}
-                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground pr-8 appearance-none focus:ring-1 focus:ring-primary [&>option]:bg-card"
+                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground pr-8 appearance-none focus:ring-1 focus:ring-primary [&>option]:bg-card"
                                   >
                                     <option value="">{t('sceneEditor.selectPlaceholder')}</option>
                                     {allScenes.map((s) => (

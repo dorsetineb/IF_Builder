@@ -1622,7 +1622,7 @@ const Editor: React.FC = () => {
                         value={saveFilename}
                         onChange={(e) => setSaveFilename(e.target.value)}
                         placeholder={t('editor.project_filename_placeholder', 'meu_jogo')}
-                        className="w-full bg-input border border-input-border rounded px-3 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-primary font-mono text-sm"
+                        className="w-full bg-input border border-input-border rounded px-3 py-2 text-foreground focus:outline-none focus:ring-1 focus:ring-primary font-mono text-xs"
                         autoFocus
                         onKeyDown={(e) => {
                           if (e.key === 'Enter' && saveFilename.trim()) {

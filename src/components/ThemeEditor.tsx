@@ -504,7 +504,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                 <input
                                     type="text"
                                     placeholder={t('ThemeEditor.commandField')}
-                                    className="flex-1 border-2 rounded p-2 text-sm transition-colors focus:ring-0"
+                                    className="flex-1 border-2 rounded p-2 text-xs transition-colors focus:ring-0"
                                     style={{
                                         backgroundColor: localGameTheme === 'dark' ? '#010409' : '#f6f8fa',
                                         color: localGameTheme === 'dark' ? localTextColor : localTextColorLight,

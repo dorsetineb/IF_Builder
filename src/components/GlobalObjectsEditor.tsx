@@ -348,7 +348,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                         type="text"
                                                         value={selectedObject.name}
                                                         onChange={(e) => handleObjectChange(selectedObject.id, 'name', e.target.value)}
-                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary transition-all placeholder:text-muted-foreground"
+                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all placeholder:text-muted-foreground"
                                                         placeholder={t('objectEditor.namePlaceholder', 'Nome do objeto')}
                                                     />
                                                 </div>
@@ -377,7 +377,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                 rows={8}
                                                 value={selectedObject.examineDescription}
                                                 onChange={(e) => handleObjectChange(selectedObject.id, 'examineDescription', e.target.value)}
-                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary resize-none min-h-[160px]"
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary resize-none min-h-[160px]"
                                                 placeholder={t('objectEditor.examinePlaceholder', 'O que o jogador vê ao examinar este objeto?')}
                                             />
                                         </div>

@@ -307,7 +307,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                                 type="text"
                                                 value={selectedObject.name}
                                                 onChange={(e) => onUpdateGlobalObject(selectedObject.id, { name: e.target.value })}
-                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary"
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary"
                                             />
                                         </div>
                                     </div>                                    <div className="col-span-1 space-y-1.5">
@@ -328,7 +328,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                             rows={6}
                                             value={selectedObject.examineDescription}
                                             onChange={(e) => onUpdateGlobalObject(selectedObject.id, { examineDescription: e.target.value })}
-                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-sm text-foreground focus:ring-1 focus:ring-primary resize-none flex-1 min-h-[150px]"
+                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary resize-none flex-1 min-h-[150px]"
                                             placeholder={t('objectEditor.examinePlaceholder', 'O que o jogador vê ao examinar este objeto?')}
                                         />
                                     </div>

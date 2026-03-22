@@ -294,7 +294,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                                 handleVerbChange(selectedVerb.id, 'verbs', cleanedVerbs);
                                             }}
                                             placeholder={t('globalCommandsEditor.verbsPlaceholder', 'ex: ajuda, help, ?')}
-                                            className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary/30 transition-all"
+                                            className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all"
                                         />
                                     </div>
                                     <p className="text-[10px] text-muted-foreground">
@@ -310,7 +310,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                         onChange={(e) => handleVerbChange(selectedVerb.id, 'description', e.target.value)}
                                         placeholder={t('globalCommandsEditor.descriptionPlaceholder', 'Texto que será exibido para o jogador quando usar este verbo.')}
                                         rows={8}
-                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary/30 transition-all resize-none"
+                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all resize-none"
                                     />
                                 </div>
                                 </div>

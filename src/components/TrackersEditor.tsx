@@ -328,7 +328,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                         type="text"
                                                         value={selectedTracker.name}
                                                         onChange={(e) => handleTrackerChange(selectedTracker.id, 'name', e.target.value)}
-                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-muted-foreground"
+                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-muted-foreground"
                                                         placeholder={t('trackersEditor.noName', 'Sem nome')}
                                                     />
                                                 </div>
@@ -362,7 +362,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                     type="number"
                                                     value={selectedTracker.invertBar ? selectedTracker.maxValue : selectedTracker.initialValue}
                                                     onChange={e => handleTrackerChange(selectedTracker.id, selectedTracker.invertBar ? 'maxValue' : 'initialValue', e.target.value === '' ? '' : Number(e.target.value))}
-                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-all [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
+                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/50 transition-all [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
                                                 />
                                             </div>
 
@@ -377,7 +377,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                     type="number"
                                                     value={selectedTracker.invertBar ? selectedTracker.initialValue : selectedTracker.maxValue}
                                                     onChange={e => handleTrackerChange(selectedTracker.id, selectedTracker.invertBar ? 'initialValue' : 'maxValue', e.target.value === '' ? '' : Number(e.target.value))}
-                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-sm text-foreground focus:ring-1 focus:ring-primary/50 transition-all [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
+                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/50 transition-all [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
                                                 />
                                             </div>
                                         </div>

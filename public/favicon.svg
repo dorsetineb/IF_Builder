@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 22 22">
+  <rect x="0" y="0" width="22" height="22" rx="4" fill="#9d4edd" />
+  <g transform="translate(1, 5)">
+    <path fill="#ffffff" shape-rendering="crispEdges" d="M 7 0 h 6 v 1 h -6 Z M 6 1 h 1 v 1 h -1 Z M 13 1 h 1 v 1 h -1 Z M 6 2 h 1 v 1 h -1 Z M 8 2 h 1 v 1 h -1 Z M 11 2 h 1 v 1 h -1 Z M 13 2 h 1 v 1 h -1 Z M 6 3 h 1 v 1 h -1 Z M 13 3 h 1 v 1 h -1 Z M 6 4 h 1 v 1 h -1 Z M 8 4 h 4 v 1 h -4 Z M 13 4 h 1 v 1 h -1 Z M 6 5 h 1 v 1 h -1 Z M 13 5 h 1 v 1 h -1 Z M 6 6 h 8 v 1 h -8 Z M 9 7 h 2 v 1 h -2 Z M 5 8 h 10 v 1 h -10 Z M 5 9 h 1 v 1 h -1 Z M 7 9 h 1 v 1 h -1 Z M 9 9 h 1 v 1 h -1 Z M 11 9 h 1 v 1 h -1 Z M 13 9 h 2 v 1 h -2 Z M 5 10 h 10 v 1 h -10 Z" />
+  </g>
+</svg>
