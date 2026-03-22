@@ -1520,12 +1520,13 @@ const Editor: React.FC = () => {
                   }
                 />
               ) : currentView === 'welcome' || (currentView === 'scenes' && !selectedScene) ? (
-                <WelcomePlaceholder
-                  onCreateScene={handleCreateNewProject}
-                  onDownloadExample={handleDownloadExample}
-                  onMeetProject={() => setCurrentView('about')}
-                  theme={appTheme}
-                />
+                  <WelcomePlaceholder
+                    onCreateScene={handleCreateNewProject}
+                    onDownloadExample={handleDownloadExample}
+                    onMeetProject={() => setCurrentView('about')}
+                    onGuidePage={() => setCurrentView('guide')}
+                    theme={appTheme}
+                  />
               ) : currentView === 'guide' ? (
                 <Suspense fallback={<LoadingOverlay message="Carregando Guia..." />}>
                   <GuideView />

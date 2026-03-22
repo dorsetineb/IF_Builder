@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { DitherShader } from '@/components/ui/dither-shader';
-import { X, Monitor, Cloud } from 'lucide-react';
+import { X, Monitor, Cloud, CircleHelp, Zap } from 'lucide-react';
 import { NewProjectModal } from './NewProjectModal';
 import { GameData } from '../types';
 import { useTranslation } from 'react-i18next';
@@ -9,10 +9,11 @@ interface WelcomePlaceholderProps {
     onCreateScene: (data?: Partial<GameData>) => void;
     onDownloadExample: () => void;
     onMeetProject: () => void;
+    onGuidePage: () => void;
     theme?: string;
 }
 
-export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreateScene, onDownloadExample, theme = 'dark' }) => {
+export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreateScene, onDownloadExample, onMeetProject, onGuidePage, theme = 'dark' }) => {
     const { t, i18n } = useTranslation();
     const [isFlashing, setIsFlashing] = useState(false);
     const [showDownloadHelp, setShowDownloadHelp] = useState(false);
@@ -98,6 +99,27 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         <span className={`font-bold text-lg transition-colors ${isFlashing ? (theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>{t('welcome.downloadExample', 'Baixe um exemplo')}</span>
                     </button>
 
+                </div>
+
+                {/* Secondary Actions Block (Guide & About) */}
+                <div className="flex flex-col md:flex-row justify-center gap-6 w-full max-w-5xl mt-6">
+                    {/* Botão: Guia Rápido */}
+                    <button
+                        onClick={onGuidePage}
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-muted-foreground/50 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full md:w-[calc(33.333%-16px)]"
+                    >
+                        <CircleHelp className="w-10 h-10 text-zinc-400 group-hover:text-white transition-colors" />
+                        <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
+                    </button>
+
+                    {/* Botão: Sobre o Projeto */}
+                    <button
+                        onClick={onMeetProject}
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-muted-foreground/50 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full md:w-[calc(33.333%-16px)]"
+                    >
+                        <Zap className="w-10 h-10 text-zinc-400 group-hover:text-white transition-colors" />
+                        <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
+                    </button>
                 </div>
             </div>
 
