@@ -18,7 +18,6 @@ interface SceneListProps {
   onDeleteScene: (id: string) => void;
   onReorderScenes: (newOrder: string[]) => void;
   isDirty?: boolean;
-  theme?: string;
   currentView?: View;
   isLateralMenu?: boolean;
 }
@@ -36,6 +35,7 @@ interface SceneRowData {
   handleDragStart: (e: React.DragEvent<HTMLDivElement>, position: number) => void;
   handleDragEnter: (e: React.DragEvent<HTMLDivElement>, position: number) => void;
   handleDragEnd: () => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   t: any;
 }
 
@@ -168,14 +168,12 @@ const SceneList: React.FC<SceneListProps> = ({
   startSceneId,
   selectedSceneId,
   onSelectScene,
-  onAddScene,
   onAddNode,
   hasOpeningVignette = false,
   onViewMap,
   onDeleteScene,
   onReorderScenes,
   isDirty,
-  theme = 'dark',
   currentView,
   isLateralMenu,
 }) => {

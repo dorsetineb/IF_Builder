@@ -1103,9 +1103,8 @@ const Editor: React.FC = () => {
     if (hasScenes) {
       setConfirmationModal({
         isOpen: true,
-        title: 'Novo Jogo',
-        message:
-          'Existem cenas criadas neste projeto. Ao criar uma nova ficção, todas as alterações não salvas serão perdidas. Deseja continuar?',
+        title: t('newProject.title', 'Nova Ficção'),
+        message: t('newProject.warningMessage', 'O novo projeto irá substituir o atual.\\n\\nDeseja prosseguir?'),
         isDanger: true,
         onConfirm: () => {
           closeConfirmationModal();
@@ -1160,8 +1159,8 @@ const Editor: React.FC = () => {
     if (hasScenes) {
       setConfirmationModal({
         isOpen: true,
-        title: 'Novo Projeto',
-        message: 'Deseja iniciar um novo projeto? O projeto atual (não exportado) será perdido.',
+        title: t('newProject.title', 'Nova Ficção'),
+        message: t('newProject.warningMessage', 'O novo projeto irá substituir o atual.\\n\\nDeseja prosseguir?'),
         isDanger: true,
         onConfirm: () => {
           closeConfirmationModal();

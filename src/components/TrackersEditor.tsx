@@ -42,7 +42,7 @@ const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
 };
 
 
-const optionDimClasses = "bg-card text-muted-foreground";
+
 
 const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrackers, allScenes, allTrackerIds, isDirty, onSetDirty, onSelectScene }) => {
     const sortedTrackers = useMemo(() => {

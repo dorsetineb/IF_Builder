@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, Vignette } from '../types';
-import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split } from 'lucide-react';
+import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface SceneMapProps {
@@ -63,9 +63,6 @@ const SceneMap: React.FC<SceneMapProps> = ({
   onUpdateVignettePosition,
   onReorganizeScenes,
   gameInteractionType = 'parser',
-  onAddNode,
-  hasOpeningVignette = false,
-  theme = 'dark',
 }) => {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -88,6 +85,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
           targetId: string;
           label: string;
           type: MapNodeType;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           original?: any;
         }[] = [];
 
@@ -749,7 +747,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
               const borderClass = `border-${colorBase}-500 border-4`;
               const shadowClass = `hover:shadow-${colorBase}-500/10 hover:border-${colorBase}-400`;
-              const anchorColorClass = `bg-${colorBase}-500 border-${colorBase}-400`;
+
 
               return (
                 <div
@@ -961,9 +959,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                       const linkColor = isVignetteLink
                         ? 'text-amber-500 bg-amber-500/5'
                         : `text-${colorBase}-400 bg-${colorBase}-500/5`;
-                      const anchorColor = isVignetteLink
-                        ? 'bg-amber-500 border-amber-400'
-                        : `bg-${colorBase}-500 border-${colorBase}-400`;
+
 
                       // Determine anchor side based on which is active
                       const isLeftActive = activeAnchors.has(`${item.id}-L`);

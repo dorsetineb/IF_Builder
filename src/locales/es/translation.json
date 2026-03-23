@@ -240,6 +240,7 @@
   },
   "newProject": {
     "title": "Nueva Ficción",
+    "warningMessage": "El nuevo proyecto reemplazará al actual.\n\n¿Deseas continuar?",
     "subtitle": "Configura los detalles iniciales de tu aventura",
     "tabs": {
       "info": "Información",

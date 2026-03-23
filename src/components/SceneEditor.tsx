@@ -134,7 +134,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
     const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
     const [choicesSearchQuery, setChoicesSearchQuery] = useState('');
     const [suggestionsInput, setSuggestionsInput] = useState('');
-    const [isDraggingOver, setIsDraggingOver] = useState(false);
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
     const initialSceneJson = useRef(JSON.stringify(getCleanSceneState(scene)));
@@ -338,7 +338,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
     const handleDrop = (e: DragEvent<HTMLLabelElement>) => {
       e.preventDefault();
       e.stopPropagation();
-      setIsDraggingOver(false);
+
       if (e.dataTransfer.files && e.dataTransfer.files[0]) {
         const file = e.dataTransfer.files[0];
         if (file.size > MAX_IMAGE_SIZE) {

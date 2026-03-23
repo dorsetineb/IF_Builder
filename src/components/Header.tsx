@@ -106,7 +106,7 @@ const Header: React.FC<{
 
                   <button
                     onClick={onExport}
-                    className="flex items-center justify-center px-3 py-2 text-primary hover:text-primary/80 transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
+                    className="flex items-center justify-center px-3 py-2 text-primary hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
                     title={t('header.saveGame', 'Salvar Jogo')}
                   >
                     <Save className="w-4 h-4" /> {t('header.saveGameBtn', 'Salvar')}
@@ -114,7 +114,7 @@ const Header: React.FC<{
 
                   <button
                     onClick={() => importInputRef.current?.click()}
-                    className="flex items-center justify-center px-3 py-2 text-primary hover:text-primary/80 transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
+                    className="flex items-center justify-center px-3 py-2 text-primary hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
                     title={t('header.loadGame', 'Carregar')}
                   >
                     <Download className="w-4 h-4" /> {t('header.loadGameBtn', 'Carregar')}

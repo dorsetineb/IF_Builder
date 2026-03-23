@@ -1,7 +1,7 @@
 
-// @ts-ignore
+// @ts-expect-error - Supabase Deno environment
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-// @ts-ignore
+// @ts-expect-error - Supabase Deno environment
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
 const corsHeaders = {
@@ -23,9 +23,9 @@ serve(async (req: Request) => {
         }
 
         const supabaseClient = createClient(
-            // @ts-ignore
+            // @ts-expect-error - Supabase Deno environment
             Deno.env.get('SUPABASE_URL') ?? '',
-            // @ts-ignore
+            // @ts-expect-error - Supabase Deno environment
             Deno.env.get('SUPABASE_ANON_KEY') ?? '',
             { global: { headers: { Authorization: authHeader } } }
         )
@@ -47,9 +47,9 @@ serve(async (req: Request) => {
 
         // 3. Admin Client for DB insert (bypass RLS)
         const supabaseAdmin = createClient(
-            // @ts-ignore
+            // @ts-expect-error - Supabase Deno environment
             Deno.env.get('SUPABASE_URL') ?? '',
-            // @ts-ignore
+            // @ts-expect-error - Supabase Deno environment
             Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
         )
 
@@ -71,9 +71,15 @@ serve(async (req: Request) => {
             }
         )
 
-    } catch (error: any) {
+    } catch (error: unknown) {
+        let errorMessage = 'An unknown error occurred';
+        if (error instanceof Error) {
+            errorMessage = error.message;
+        } else if (typeof error === 'string') {
+            errorMessage = error;
+        }
         return new Response(
-            JSON.stringify({ error: error.message }),
+            JSON.stringify({ error: errorMessage }),
             {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
                 status: 400,

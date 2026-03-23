@@ -74,7 +74,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         onClick={() => setIsNewProjectModalOpen(true)}
                         className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-muted-foreground/50 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20"
                     >
-                        <img src="/icons/criar.svg" alt="" className="w-10 h-10 invert opacity-60 group-hover:opacity-100 transition-opacity" />
+                        <div className="w-10 h-10 bg-primary group-hover:bg-white transition-colors" style={{ maskImage: 'url(/icons/criar.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/criar.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.createNew', 'Crie uma ficção')}</span>
                     </button>
 
@@ -83,7 +83,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         onClick={() => setIsGamePopupOpen(true)}
                         className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-muted-foreground/50 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
                     >
-                        <img src="/icons/demo.svg" alt="" className="w-10 h-10 invert opacity-60 group-hover:opacity-100 transition-opacity" />
+                        <div className="w-10 h-10 bg-primary group-hover:bg-white transition-colors" style={{ maskImage: 'url(/icons/demo.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/demo.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.playDemo', 'Acesse a demo')}</span>
                     </button>
 
@@ -95,7 +95,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                             : 'bg-black/40 backdrop-blur-sm border-muted-foreground/50 hover:border-white hover:bg-black/50'
                             }`}
                     >
-                        <img src="/icons/exemplo.svg" alt="" className={`w-10 h-10 transition-all ${isFlashing ? 'opacity-100' : 'invert opacity-60 group-hover:opacity-100'}`} />
+                        <div className={`w-10 h-10 transition-colors ${isFlashing ? 'bg-white' : 'bg-primary group-hover:bg-white'}`} style={{ maskImage: 'url(/icons/exemplo.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/exemplo.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
                         <span className={`font-bold text-lg transition-colors ${isFlashing ? (theme === 'terminal' || theme === 'dark' ? 'text-primary-foreground' : 'text-black') : 'text-zinc-200 group-hover:text-white'}`}>{t('welcome.downloadExample', 'Baixe um exemplo')}</span>
                     </button>
 
@@ -108,7 +108,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         onClick={onGuidePage}
                         className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-muted-foreground/50 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full md:w-[calc(33.333%-16px)]"
                     >
-                        <CircleHelp className="w-10 h-10 text-zinc-400 group-hover:text-white transition-colors" />
+                        <CircleHelp className="w-10 h-10 text-primary group-hover:text-white transition-colors" />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
                     </button>
 
@@ -117,7 +117,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         onClick={onMeetProject}
                         className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-muted-foreground/50 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full md:w-[calc(33.333%-16px)]"
                     >
-                        <Zap className="w-10 h-10 text-zinc-400 group-hover:text-white transition-colors" />
+                        <Zap className="w-10 h-10 text-primary group-hover:text-white transition-colors" />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
                     </button>
                 </div>

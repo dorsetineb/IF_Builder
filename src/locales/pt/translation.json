@@ -241,6 +241,7 @@
   },
   "newProject": {
     "title": "Nova Ficção",
+    "warningMessage": "O novo projeto irá substituir o atual.\n\nDeseja prosseguir?",
     "subtitle": "Configure os detalhes iniciais da sua aventura",
     "tabs": {
       "info": "Informações",

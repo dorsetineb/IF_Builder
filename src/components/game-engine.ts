@@ -222,14 +222,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const vignetteDescription = document.getElementById('vignette-description');
     const vignetteContinueButton = document.getElementById('vignette-continue-button');
 
-    const playSound = (src) => { if (src && soundEffectAudio) { soundEffectAudio.src = src; soundEffectAudio.play().catch(e => {}); } };
+    const playSound = (src) => { if (src && soundEffectAudio) { soundEffectAudio.src = src; soundEffectAudio.play().catch(() => {}); } };
 
     let bgmFadeInterval = null;
     const playBgm = (src) => {
         if (!bgmAudio) return;
         if (src === currentBgmSrc) {
             if (bgmAudio.paused && src) {
-                bgmAudio.play().catch(e => {});
+                bgmAudio.play().catch(() => {});
             }
             return;
         }
@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const fadeIn = () => {
             if (bgmFadeInterval) clearInterval(bgmFadeInterval);
             bgmAudio.volume = 0;
-            bgmAudio.play().catch(e => {});
+            bgmAudio.play().catch(() => {});
             let vol = 0;
             bgmFadeInterval = setInterval(() => {
                 vol += 0.1;
@@ -778,7 +778,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const startAudioOnInteraction = () => {
             if (bgmAudio.paused && !isGameEnded && bgmAudio.src && bgmAudio.src !== window.location.href && bgmAudio.src !== "") {
-                bgmAudio.play().catch(e => {});
+                bgmAudio.play().catch(() => {});
             } else if (gameData.gameBackgroundMusic && bgmAudio.paused && !isGameEnded) {
                 playBgm(gameData.gameBackgroundMusic);
             }
@@ -788,7 +788,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mousedown', startAudioOnInteraction);
         document.addEventListener('keydown', startAudioOnInteraction);
 
-        const hasAutoSave = localStorage.getItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
         // Auto-start game, bypassing splash screen
         startGame();
         endingRestartButtons.forEach(btn => btn.addEventListener('click', () => {
@@ -994,7 +993,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateTrackers = (effects) => {
         if (!effects) return;
-        effects.forEach(effect => { if (trackers.hasOwnProperty(effect.trackerId)) trackers[effect.trackerId] += effect.valueChange; });
+        effects.forEach(effect => { if (Object.prototype.hasOwnProperty.call(trackers, effect.trackerId)) trackers[effect.trackerId] += effect.valueChange; });
         checkTrackers();
     };
 
@@ -1459,7 +1458,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (textAnimType === 'typewriter') {
                 p.className = 'scene-paragraph typewriter-cursor'; p.style.opacity = '1'; p.innerHTML = formattedHTML; sceneDescription.appendChild(p);
                 const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
-                let node; const textNodes = []; while(node = walker.nextNode()) textNodes.push(node);
+                let node; const textNodes = []; while((node = walker.nextNode())) textNodes.push(node);
                 const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
                 let nodeIdx = 0; let charIdx = 0;
                 const type = () => {
@@ -1699,7 +1698,7 @@ document.addEventListener('DOMContentLoaded', () => {
             p.innerHTML = formattedHTML; 
             sceneDescription.appendChild(p);
             const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
-            let node; const textNodes = []; while(node = walker.nextNode()) textNodes.push(node);
+            let node; const textNodes = []; while((node = walker.nextNode())) textNodes.push(node);
             const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
             let nodeIdx = 0; let charIdx = 0;
             const type = () => {
@@ -1726,7 +1725,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const findItemInInventoryById = (id) => inventory.find(o => o.id === id) || null;
-    const findItemName = (id) => (findItemInInventoryById(id) || gameData.globalObjects[id])?.name || 'item';
     const addToInventory = (obj) => { if (!inventory.some(o => o.id === obj.id)) inventory.push(obj); };
     const removeFromInventory = (id) => { inventory = inventory.filter(i => i.id !== id); };
     
@@ -1794,6 +1792,26 @@ document.addEventListener('DOMContentLoaded', () => {
             container.appendChild(list);
         }
         actionPopup.appendChild(container);
+    };
+
+    const showTrackers = () => {
+        trackersContent.innerHTML = '';
+        const definitions = gameData.consequenceTrackers || [];
+        if (definitions.length === 0) {
+            const msg = document.createElement('p');
+            msg.className = 'text-center text-zinc-400 p-4';
+            msg.textContent = 'Não há rastreadores ativos';
+            trackersContent.appendChild(msg);
+        } else {
+            definitions.forEach(def => {
+                const currentVal = trackers[def.id] || 0;
+                const div = document.createElement('div');
+                div.className = 'tracker-row flex justify-between p-2 border-b border-zinc-700/50';
+                div.innerHTML = \`<span style="color: \${def.color || '#fff'}">\${def.name}</span><span>\${currentVal} / \${def.maxValue}</span>\`;
+                trackersContent.appendChild(div);
+            });
+        }
+        trackersModal.classList.remove('hidden');
     };
 
     const openItemModal = (item) => {
