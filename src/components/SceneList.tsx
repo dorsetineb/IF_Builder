@@ -20,6 +20,7 @@ interface SceneListProps {
   isDirty?: boolean;
   currentView?: View;
   isLateralMenu?: boolean;
+  theme?: string;
 }
 
 interface SceneRowData {
