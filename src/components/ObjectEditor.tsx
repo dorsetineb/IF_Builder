@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ConfirmationModal } from './ConfirmationModal';
 import { GameObject } from '../types';
-import { Plus, Trash2, Upload, Search, Link as LinkIcon, Unlink, Box, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
+import { Plus, Trash2, Upload, Search, Link as LinkIcon, Unlink, Box, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, ImageIcon } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const TRACKER_ICONS = [
@@ -64,9 +64,10 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
 
     const handleCreateNewObject = () => {
         const allIds = allGlobalObjects.map(o => o.id);
+        const objectCount = allIds.length + 1;
         const newObject: GameObject = {
             id: generateUniqueId('obj', allIds),
-            name: t('objectEditor.newObject', 'Novo Objeto'),
+            name: `${t('objectEditor.newObject', 'Novo Objeto ')}#${objectCount}`,
             examineDescription: t('objectEditor.newObjectDesc', 'Descrição do novo objeto.'),
         };
         onCreateGlobalObject(newObject, sceneId);
@@ -123,17 +124,17 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
             {/* LEFT SIDEBAR */}
             <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/30">
                 {/* Sidebar Header */}
-                <div className="px-2 py-4 border-b border-muted-foreground/50 space-y-4">
+                <div className="px-2 pt-4 pb-3 space-y-4">
                     <div className="flex bg-muted rounded-lg p-1 border border-muted-foreground/50">
                         <button
                             onClick={() => setIsLinkMode(false)}
-                            className={`flex-1 py-2 text-xs font-bold uppercase tracking-wide rounded-md transition-all ${!isLinkMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wide rounded-md transition-all ${!isLinkMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             {t('objectEditor.inThisScene', 'Nesta Cena ({{count}})', { count: objects.length })}
                         </button>
                         <button
                             onClick={() => setIsLinkMode(true)}
-                            className={`flex-1 py-2 text-xs font-bold uppercase tracking-wide rounded-md transition-all ${isLinkMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                            className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wide rounded-md transition-all ${isLinkMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
                             {t('objectEditor.linkOptions', 'Vincular ({{count}})', { count: availableObjectsToLink.length })}
                         </button>
@@ -152,7 +153,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                 </div>
 
                 {/* Object List */}
-                <div className="flex-1 overflow-y-auto pl-2 py-4 pr-0 space-y-0 flex flex-col items-stretch">
+                <div className="flex-1 overflow-y-auto pl-2 pb-4 pr-0 flex flex-col items-stretch">
                     {!isLinkMode ? (
                         /* CURRENT SCENE OBJECTS */
                         <>
@@ -245,32 +246,25 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
             <div className="flex-1 flex flex-col bg-background/50 min-w-0">
                 {selectedObject ? (
                     <div className="flex flex-col h-full">
-                        {/* Header */}
-                        <div className="px-6 py-4 border-b border-muted-foreground/50 flex justify-between items-center bg-muted/50 shrink-0">
-                            <div className="flex items-center gap-2">
-                                <Box className="w-4 h-4 text-primary" />
-                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">{t('objectEditor.propertiesTitle', 'Propriedades do Objeto')}</span>
+                        {/* Link Action at Top (Optional) */}
+                        {!isSelectedObjectLinked && (
+                            <div className="px-6 pt-6 pb-0 flex justify-end shrink-0">
+                                <button
+                                    onClick={() => handleLinkExistingObject(selectedObject.id)}
+                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-[10px] font-bold uppercase transition-all shadow-sm"
+                                >
+                                    <LinkIcon className="w-3.5 h-3.5" />
+                                    {t('objectEditor.linkNowBtn', 'Vincular Agora')}
+                                </button>
                             </div>
-
-                            {/* Context Actions */}
-                            <div className="flex items-center gap-2">
-                                {!isSelectedObjectLinked && (
-                                    <button
-                                        onClick={() => handleLinkExistingObject(selectedObject.id)}
-                                        className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-[10px] font-bold uppercase transition-all shadow-sm"
-                                    >
-                                        <LinkIcon className="w-3.5 h-3.5" />
-                                        {t('objectEditor.linkNowBtn', 'Vincular Agora')}
-                                    </button>
-                                )}
-                            </div>
-                        </div>
+                        )}
 
                         {/* Edit Form */}
                         <div className="flex-1 overflow-y-auto p-6">
-                            <div className="max-w-2xl mx-auto space-y-10">
+                            <div className="max-w-xl mx-auto flex flex-col gap-6">
+                                
+                                {/* Basic Info Row */}
                                 <div className="grid grid-cols-3 gap-x-6 gap-y-4">
-                                    {/* Basic Info */}
                                     <div className="col-span-2 space-y-1.5">
                                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.objectNameLabel', 'Nome do Objeto')}</label>
                                         <div className="flex gap-2">
@@ -310,7 +304,8 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                                 className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary"
                                             />
                                         </div>
-                                    </div>                                    <div className="col-span-1 space-y-1.5">
+                                    </div>
+                                    <div className="col-span-1 space-y-1.5">
                                         <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.uniqueIdLabel', 'ID Único')}</label>
                                         <input
                                             type="text"
@@ -320,47 +315,99 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                             title={t('objectEditor.idTooltip', 'O ID é gerado automaticamente e não pode ser alterado.')}
                                         />
                                     </div>
-
-                                    {/* Description field */}
-                                    <div className="col-span-2 space-y-1.5 flex flex-col">
-                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.examineDescriptionLabel', 'Descrição ao Examinar')}</label>
-                                        <textarea
-                                            rows={6}
-                                            value={selectedObject.examineDescription}
-                                            onChange={(e) => onUpdateGlobalObject(selectedObject.id, { examineDescription: e.target.value })}
-                                            className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary resize-none flex-1 min-h-[150px]"
-                                            placeholder={t('objectEditor.examinePlaceholder', 'O que o jogador vê ao examinar este objeto?')}
-                                        />
-                                    </div>
-
-                                    {/* Image Preview & Upload */}
-                                    <div className="col-span-1 space-y-1.5">
-                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.objectImageLabel', 'Imagem do Objeto')}</label>
-                                        <div className="relative w-full aspect-square bg-muted rounded-lg overflow-hidden border border-input group">
-                                            {selectedObject.image ? (
-                                                <>
-                                                    <img src={selectedObject.image} alt={selectedObject.name} className="w-full h-full object-cover" />
-                                                    <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all gap-2">
-                                                        <label className="p-2 bg-white/20 rounded-full cursor-pointer hover:bg-white/40 text-white transition-all">
-                                                            <Upload className="w-4 h-4" />
-                                                            <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                                        </label>
-                                                        <button onClick={() => onUpdateGlobalObject(selectedObject.id, { image: '' })} className="p-2 bg-red-500/20 rounded-full cursor-pointer hover:bg-red-500/40 text-red-500 transition-all">
-                                                            <Trash2 className="w-4 h-4" />
-                                                        </button>
-                                                    </div>
-                                                </>
-                                            ) : (
-                                                <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-accent/50 transition-colors">
-                                                    <Upload className="w-6 h-6 text-muted-foreground mb-2" />
-                                                    <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{t('objectEditor.uploadBtn', 'Carregar')}</span>
-                                                    <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-                                                </label>
-                                            )}
-                                        </div>
-                                    </div>
                                 </div>
-                                <p className="text-[10px] text-muted-foreground text-center mt-6 italic">{t('objectEditor.objectsHint', 'Objetos aparecem no inventário ou na lista de \'coisas aqui\'.')}</p>
+
+                                {/* Description field */}
+                                <div className="space-y-1.5 flex flex-col">
+                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.examineDescriptionLabel', 'Descrição ao Examinar')}</label>
+                                    <textarea
+                                        rows={6}
+                                        value={selectedObject.examineDescription}
+                                        onChange={(e) => onUpdateGlobalObject(selectedObject.id, { examineDescription: e.target.value })}
+                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary resize-y min-h-[120px]"
+                                        placeholder={t('objectEditor.examinePlaceholder', 'O que o jogador vê ao examinar este objeto?')}
+                                    />
+                                </div>
+
+                                {/* Image Preview & Upload */}
+                                <div className="space-y-1.5">
+                                    <div className="flex justify-between items-center">
+                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('objectEditor.objectImageLabel', 'Imagem do Objeto')}</label>
+                                        <span className="text-[10px] text-muted-foreground">
+                                            {t('globalObjectsEditor.suggestedRes', '300x300 sugerido')}
+                                        </span>
+                                    </div>
+                                    
+                                    <div className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group">
+                                      {selectedObject.image ? (
+                                        <>
+                                          <img
+                                            src={selectedObject.image}
+                                            alt={selectedObject.name}
+                                            className="w-full h-full object-cover"
+                                          />
+
+                                          {/* Hover buttons */}
+                                          <div
+                                            className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm"
+                                            style={{ zIndex: 20 }}
+                                          >
+                                            <label
+                                              htmlFor="object-image-upload-input"
+                                              className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-primary transition-colors"
+                                            >
+                                              <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
+                                                <Upload className="w-5 h-5" />
+                                              </div>
+                                              <span className="text-[10px] font-bold uppercase tracking-wider">
+                                                {t('sceneEditor.changeBtn', 'Trocar')}
+                                              </span>
+                                              <input
+                                                id="object-image-upload-input"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                                className="hidden"
+                                              />
+                                            </label>
+                                            <button
+                                              onClick={() => onUpdateGlobalObject(selectedObject.id, { image: '' })}
+                                              className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors"
+                                            >
+                                              <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
+                                                <Trash2 className="w-5 h-5" />
+                                              </div>
+                                              <span className="text-[10px] font-bold uppercase tracking-wider">
+                                                {t('sceneEditor.removeBtn', 'Remover')}
+                                              </span>
+                                            </button>
+                                          </div>
+                                        </>
+                                      ) : (
+                                        <label
+                                          htmlFor="object-image-upload-input"
+                                          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/5 transition-colors group"
+                                        >
+                                          <div className="w-12 h-12 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
+                                            <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+                                          </div>
+                                          <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
+                                            {t('sceneEditor.loadImage', 'Carregar Imagem')}
+                                          </span>
+                                          <input
+                                            id="object-image-upload-input"
+                                            type="file"
+                                            accept="image/*"
+                                            onChange={handleImageUpload}
+                                            className="hidden"
+                                          />
+                                        </label>
+                                      )}
+                                    </div>
+                                    <p className="text-[10px] text-muted-foreground text-center mt-4 pt-2 italic">
+                                        {t('objectEditor.objectsHint', 'Esta imagem será exibida quando o usuário clicar no objeto a partir do Inventário.')}
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -376,7 +423,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
             <ConfirmationModal
                 isOpen={unlinkModal.isOpen}
                 title={t('objectEditor.unlinkTitle', 'Desvincular Objeto')}
-                message={t('objectEditor.unlinkConfirm', 'Tem certeza? Isso removerá o objeto desta cena, mas ele ainda existirá no projeto.')}
+                message={t('objectEditor.unlinkConfirm', 'Tem certeza?\\n\\nIsso removerá o objeto desta cena, mas ele ainda existirá no projeto.')}
                 confirmText={t('common.confirm', 'Confirmar')}
                 cancelText={t('common.cancel', 'Cancelar')}
                 isDanger={true}

@@ -62,6 +62,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     const [searchTerm, setSearchTerm] = useState('');
     const [isIconPickerOpen, setIsIconPickerOpen] = useState(false);
     const [pendingAction, setPendingAction] = useState<{ run: () => void } | null>(null);
+    const [deleteModal, setDeleteModal] = useState<{isOpen: boolean, objectId: string | null}>({isOpen: false, objectId: null});
     const { t } = useTranslation();
 
     const attemptAction = (action: () => void) => {
@@ -144,13 +145,18 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         setSelectedObjectId(newId);
     };
 
-    const handleDelete = (id: string) => {
-        if (window.confirm(t('globalObjectsEditor.deleteConfirm', 'Tem certeza? Isso excluirá o objeto de todo o jogo.'))) {
-            onDeleteObject(id);
-            if (selectedObjectId === id) {
+    const handleDeleteClick = (id: string) => {
+        setDeleteModal({ isOpen: true, objectId: id });
+    };
+
+    const confirmDelete = () => {
+        if (deleteModal.objectId) {
+            onDeleteObject(deleteModal.objectId);
+            if (selectedObjectId === deleteModal.objectId) {
                 setSelectedObjectId(null);
             }
         }
+        setDeleteModal({ isOpen: false, objectId: null });
     };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -238,7 +244,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            attemptAction(() => handleDelete(obj.id));
+                                            attemptAction(() => handleDeleteClick(obj.id));
                                         }}
                                         className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
                                             selectedObjectId === obj.id
@@ -479,7 +485,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
             <ConfirmationModal
                 isOpen={pendingAction !== null}
                 title={t('editor.unsavedChanges', 'Alterações não salvas')}
-                message={t('editor.unsavedChangesMessage', 'Você tem alterações não salvas. Se sair agora, elas serão perdidas. Deseja continuar?')}
+                message={t('editor.unsavedChangesMessage', 'Você tem alterações não salvas.\\n\\nSe sair agora, elas serão perdidas.\\n\\nDeseja continuar?')}
                 confirmText={t('editor.confirmLeave', 'Sair sem salvar')}
                 cancelText={t('editor.cancelLeave', 'Cancelar')}
                 onConfirm={() => {
@@ -490,6 +496,17 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     }
                 }}
                 onCancel={() => setPendingAction(null)}
+            />
+
+            <ConfirmationModal
+                isOpen={deleteModal.isOpen}
+                title={t('globalObjectsEditor.deleteTitle', 'Excluir Objeto')}
+                message={t('globalObjectsEditor.deleteConfirm', 'Tem certeza?\\n\\nIsso excluirá o objeto de todo o jogo.')}
+                confirmText={t('editor.delete', 'Excluir')}
+                cancelText={t('editor.cancelLeave', 'Cancelar')}
+                onConfirm={confirmDelete}
+                onCancel={() => setDeleteModal({ isOpen: false, objectId: null })}
+                isDanger={true}
             />
         </div>
     );

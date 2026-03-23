@@ -449,7 +449,7 @@
     "examinePlaceholder": "O que o jogador vê ao examinar este objeto?",
     "objectImageLabel": "Imagem do Objeto",
     "uploadBtn": "Carregar",
-    "objectsHint": "Objetos aparecem no inventário ou na lista de 'coisas aqui'.",
+    "objectsHint": "Esta imagem será exibida quando o usuário clicar no objeto a partir do Inventário.",
     "noObjectSelected": "Nenhum objeto selecionado",
     "noObjectDesc": "Selecione um objeto da lista ao lado para editar suas propriedades ou vincule um novo objeto à cena."
   },
@@ -466,7 +466,7 @@
     "createBtn": "Criar Novo Objeto",
     "newObject": "Novo Objeto ",
     "newObjectDesc": "Descrição do novo objeto.",
-    "imageHint": "Esta imagem aparece no pop-up de detalhes do objeto durante o jogo.",
+    "imageHint": "Esta imagem será exibida quando o usuário clicar no objeto a partir do Inventário.",
     "usedInScenes": "Usado nas cenas",
     "notUsedAnywhere": "Este objeto ainda não foi adicionado a nenhuma cena.",
     "noObjectDesc": "Selecione um objeto da lista ao lado para editar suas propriedades globais."
@@ -537,9 +537,9 @@
     "noTarget": "Nenhum (Ação no ambiente)",
     "requiresItemLabel": "Requer Item (Inventário)",
     "noItemRequired": "Não requer item",
-    "removesTarget": "Remove Alvo da Cena",
-    "addsToInventory": "Adiciona ao Inventário",
-    "consumesItem": "Consome Item Usado",
+    "removesTarget": "Remove Alvo",
+    "addsToInventory": "Adiciona ao inventário",
+    "consumesItem": "Consome item",
     "outcomeTitle": "Resultado",
     "goToSceneLabel": "Ir para Cena",
     "stayInScene": "(Permanecer na cena)",
@@ -552,7 +552,7 @@
     "addBtn": "Adicionar",
     "selectTracker": "Selecione um rastreador...",
     "valueLabel": "Valor:",
-    "noTrackerEffects": "Nenhum efeito em rastreadores configurado.",
+    "noTrackerEffects": "Em Rastreadores, crie um rastreador que verifique esta interação",
     "interactionsCount": "Interações ({{count}})",
     "searchPlaceholder": "Buscar interação...",
     "newInteractionBtn": "Criar Interação",
@@ -971,6 +971,7 @@
     "imageLimitExceeded": "A imagem excede o limite de {{size}}MB."
   },
   "common": {
+    "continue": "Continuar",
     "cancel": "Cancelar",
     "save": "Salvar",
     "confirm": "Confirmar",

@@ -154,7 +154,7 @@ export const useSceneManagement = ({
         setConfirmationModal({
             isOpen: true,
             title: "Deletar Cena",
-            message: "Tem certeza que deseja deletar esta cena? Esta ação não pode ser desfeita e removerá todas as referências a ela.",
+            message: "Tem certeza que deseja deletar esta cena?\\n\\nEsta ação não pode ser desfeita e removerá todas as referências a ela.",
             isDanger: true,
             onConfirm: proceedWithDelete,
             onCancel: closeConfirmationModal

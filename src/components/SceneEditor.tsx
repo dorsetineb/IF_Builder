@@ -418,7 +418,6 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
           <div className="flex items-center gap-2">
             {isDirty && (
               <div className="flex items-center gap-1 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-1">
-                <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
                 <span className="hidden sm:inline">{t('sceneEditor.unsavedChanges')}</span>
               </div>
             )}
@@ -489,9 +488,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                 })}
               </div>
               {activeTab === 'objects' && (
-                <span className="text-xs text-yellow-400 mb-2 italic">
-                  {t('sceneEditor.objectWarning')}
-                </span>
+                <div className="flex-1 min-w-[150px] ml-4 mb-2 text-right">
+                  <span className="text-[10px] text-yellow-400 italic break-words leading-tight">
+                    {t('sceneEditor.objectWarning')}
+                  </span>
+                </div>
               )}
             </div>
           )}
@@ -500,9 +501,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             {activeTab === 'properties' && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Left Column: Details & Rules */}
-                <div className="space-y-6">
+                <div className="space-y-6 flex flex-col h-full">
                   {/* Scene Details Card */}
-                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
+                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 flex flex-col flex-1">
                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                       <FileText className="w-4 h-4" />
                       {isVignetteMode
@@ -510,7 +511,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                         : t('sceneEditor.narrativeTitle')}
                     </h3>
 
-                    <div className="space-y-4">
+                    <div className="space-y-4 flex-1 flex flex-col">
                       {isVignetteMode && localScene.vignetteType !== 'opening' && (
                         <div className="mb-6">
                           <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
@@ -568,9 +569,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                             htmlFor="sceneName"
                             className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5"
                           >
-                            {isVignetteMode
-                              ? t('sceneEditor.vignetteTitleLabel', 'NOME DA VINHETA')
-                              : t('sceneEditor.titleLabel')}
+                            {t('sceneEditor.titleLabel')}
                           </label>
                           <input
                             type="text"
@@ -602,7 +601,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                         </div>
                       </div>
 
-                      <div className="pt-2">
+                      <div className="pt-2 flex-1 flex flex-col">
                         <div className="flex justify-between items-center mb-1.5">
                           <label
                             htmlFor="sceneDescription"
@@ -610,20 +609,20 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                           >
                             {localScene.isEndingScene
                               ? t('sceneEditor.endingMessage')
-                              : isVignetteMode
-                                ? t('sceneEditor.vignetteDescription', 'TEXTO DA VINHETA')
-                                : t('sceneEditor.description')}
+                              : t('sceneEditor.description')}
                           </label>
-                          <span className="text-[9px] text-muted-foreground font-medium tracking-wider">
-                            {t('sceneEditor.highlightTip')}
-                          </span>
+                          {!isVignetteMode && (
+                            <span className="text-[9px] text-muted-foreground font-medium tracking-wider">
+                              {t('sceneEditor.highlightTip')}
+                            </span>
+                          )}
                         </div>
-                        <div className="relative">
+                        <div className="relative flex-1 flex flex-col">
                           <textarea
                             id="sceneDescription"
                             value={localScene.description}
                             onChange={handleDescriptionChange}
-                            className="w-full h-32 md:h-40 bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
+                            className="w-full flex-1 min-h-[160px] bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
                             placeholder={t('sceneEditor.descPlaceholder')}
                           />
 
@@ -681,13 +680,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                           )}
 
                           {isVignetteMode && (
-                            <div className="mt-2">
-                              <div className="animate-in fade-in slide-in-from-top-2 space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
-                                  <div>
-                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                                      {t('sceneEditor.buttonTextLabel')}
-                                    </label>
+                            <div className="mt-4 animate-in fade-in slide-in-from-top-2 flex flex-col gap-4">
+                              <div>
+                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                                  {t('sceneEditor.buttonTextLabel')}
+                                </label>
                                     <input
                                       type="text"
                                       value={localScene.vignetteButtonText || ''}
@@ -704,7 +701,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                   </div>
 
                                   {localScene.vignetteType === 'conclusion' && (
-                                    <label className="flex items-center gap-2 cursor-pointer p-2 rounded border border-muted-foreground/50 bg-muted/30 hover:bg-muted/50 transition-colors self-end">
+                                    <label className="flex items-center gap-2 cursor-pointer p-2 rounded border border-muted-foreground/50 bg-muted/30 hover:bg-muted/50 transition-colors">
                                       <input
                                         type="checkbox"
                                         checked={!!localScene.isDefeatOutcome}
@@ -750,8 +747,6 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                       </select>
                                     </div>
                                   )}
-                                </div>
-                              </div>
                             </div>
                           )}
                         </div>
@@ -759,29 +754,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                     </div>
                   </div>
 
-                  {/* Branching Preview Card */}
-                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                        <GitBranch className="w-4 h-4" />
-                        {t('sceneEditor.connectionsTitle')}
-                      </h3>
-                      {/* Optional: Link to full map if needed, but simplistic for now */}
-                      <button
-                        onClick={() => onViewMap?.()}
-                        className="text-[10px] text-primary hover:text-primary/80 font-bold uppercase tracking-widest transition-colors flex items-center gap-1"
-                        title={t('sceneEditor.viewFullMapTooltip')}
-                      >
-                        {t('sceneEditor.viewFullMap')}
-                      </button>
-                    </div>
 
-                    <BranchingPreview currentScene={localScene} allScenes={allScenes} />
-
-                    <p className="text-[10px] text-zinc-500 text-center mt-3">
-                      {t('sceneEditor.connectionsDesc')}
-                    </p>
-                  </div>
                 </div>
 
                 {/* Right Column: Rules & Preview */}
@@ -990,6 +963,29 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                         </div>
                       </div>
                     )}
+                  </div>
+                  {/* Branching Preview Card */}
+                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                        <GitBranch className="w-4 h-4" />
+                        {t('sceneEditor.connectionsTitle')}
+                      </h3>
+                      {/* Optional: Link to full map if needed, but simplistic for now */}
+                      <button
+                        onClick={() => onViewMap?.()}
+                        className="text-[10px] text-primary hover:text-primary/80 font-bold uppercase tracking-widest transition-colors flex items-center gap-1"
+                        title={t('sceneEditor.viewFullMapTooltip')}
+                      >
+                        {t('sceneEditor.viewFullMap')}
+                      </button>
+                    </div>
+
+                    <BranchingPreview currentScene={localScene} allScenes={allScenes} />
+
+                    <p className="text-[10px] text-zinc-500 text-center mt-3">
+                      {t('sceneEditor.connectionsDesc')}
+                    </p>
                   </div>
 
                   {/* Narrative Rules Card - Renamed to Chance Rules */}

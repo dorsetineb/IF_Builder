@@ -171,230 +171,208 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
 
         return (
             <div className="flex flex-col h-full" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
-                {/* Header */}
-                <div className="px-6 py-4 border-b border-muted-foreground/50 flex justify-between items-center bg-muted/50 shrink-0">
-                    <div>
-                        <h3 className="text-sm font-bold text-zinc-100 flex items-center gap-2">
-                            {(() => {
-                                const Icon = INTERACTION_ICONS.find(i => i.name === selectedInteraction.icon)?.component || MousePointer2;
-                                return <Icon className="w-4 h-4 text-green-500" />;
-                            })()}
-                            {t('interactionEditor.editingInteraction', 'Editando Interação #{{index}}', { index: selectedIndex + 1 })}
-                        </h3>
-                    </div>
-                    <div>
-                    </div>
-                </div>
-
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto p-6 space-y-8">
+                <div className="flex-1 overflow-y-auto p-6">
+                    <div className="max-w-xl mx-auto flex flex-col gap-6">
+                        {/* Row 1: Icon & Verbs */}
+                        <div className="flex gap-4 items-start">
+                            {/* Icon Picker */}
+                            <div className="space-y-1.5 shrink-0 relative">
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.iconLabel', 'Ícone')}</label>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsIconPickerOpen(!isIconPickerOpen);
+                                    }}
+                                    className="w-10 h-10 flex items-center justify-center bg-input border border-input rounded-lg text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
+                                >
+                                    {(() => {
+                                        const Icon = INTERACTION_ICONS.find(i => i.name === selectedInteraction.icon)?.component || MousePointer2;
+                                        return <Icon className="w-5 h-5" />;
+                                    })()}
+                                </button>
 
-                    {/* GATILHOS (Triggers) */}
-                    <div className="space-y-4">
-                        <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                            <Target className="w-3 h-3" /> {t('interactionEditor.triggersConditions', 'Gatilhos & Condições')}
-                        </h4>
-                        <div className="bg-muted/20 p-4 rounded-lg border border-muted-foreground/50 space-y-6">
-
-                            {/* Row 1: Icon, Verbs, Target */}
-                            <div className="flex gap-4 items-start">
-                                {/* Icon Picker */}
-                                <div className="space-y-1.5 shrink-0 relative">
-                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.iconLabel', 'Ícone')}</label>
-                                    <button
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setIsIconPickerOpen(!isIconPickerOpen);
-                                        }}
-                                        className="w-10 h-10 flex items-center justify-center bg-input border border-input rounded-lg text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
-                                    >
-                                        {(() => {
-                                            const Icon = INTERACTION_ICONS.find(i => i.name === selectedInteraction.icon)?.component || MousePointer2;
-                                            return <Icon className="w-5 h-5" />;
-                                        })()}
-                                    </button>
-
-                                    {isIconPickerOpen && (
-                                        <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-card border border-muted-foreground/50 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                {isIconPickerOpen && (
+                                    <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-card border border-input rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                        <button
+                                            onClick={() => { handleInteractionChange('icon', undefined); setIsIconPickerOpen(false); }}
+                                            className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${!selectedInteraction.icon ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
+                                            title={t('interactionEditor.defaultIcon', 'Padrão')}
+                                        >
+                                            <MousePointer2 className="w-4 h-4" />
+                                        </button>
+                                        {TRACKER_ICONS.map(icon => (
                                             <button
-                                                onClick={() => { handleInteractionChange('icon', undefined); setIsIconPickerOpen(false); }}
-                                                className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${!selectedInteraction.icon ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
-                                                title={t('interactionEditor.defaultIcon', 'Padrão')}
+                                                key={icon.name}
+                                                onClick={() => { handleInteractionChange('icon', icon.name); setIsIconPickerOpen(false); }}
+                                                className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedInteraction.icon === icon.name ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
+                                                title={icon.name}
                                             >
-                                                <MousePointer2 className="w-4 h-4" />
+                                                <icon.component className="w-4 h-4" />
                                             </button>
-                                            {TRACKER_ICONS.map(icon => (
-                                                <button
-                                                    key={icon.name}
-                                                    onClick={() => { handleInteractionChange('icon', icon.name); setIsIconPickerOpen(false); }}
-                                                    className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedInteraction.icon === icon.name ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
-                                                    title={icon.name}
-                                                >
-                                                    <icon.component className="w-4 h-4" />
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-
-                                {/* Verbs */}
-                                <div className="flex-1 space-y-1.5">
-                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.verbsLabel', 'Verbos (separados por vírgula)')}</label>
-                                    <input
-                                        type="text"
-                                        value={verbsInput}
-                                        onChange={e => setVerbsInput(e.target.value)}
-                                        onBlur={handleVerbsBlur}
-                                        className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/50 placeholder:text-muted-foreground"
-                                        placeholder={t('interactionEditor.verbsPlaceholder', 'ex: pegar, usar, abrir')}
-                                    />
-                                    <p className="text-[10px] text-zinc-600">{t('interactionEditor.verbsDesc', 'O jogador deve digitar um destes para iniciar a ação.')}</p>
-                                </div>
-
-                                {/* Target */}
-                                <div className="w-[30%] space-y-1.5">
-                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.targetLabel', 'Alvo da Ação (Opcional)')}</label>
-                                    <select
-                                        value={selectedInteraction.target}
-                                        onChange={e => handleInteractionChange('target', e.target.value)}
-                                        className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground"
-                                    >
-                                        <option value="">{t('interactionEditor.noTarget', 'Nenhum (Ação no ambiente)')}</option>
-                                        {sceneObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
-                                    </select>
-                                </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Row 2: Requirements & Consequences Checkboxes */}
-                            <div className="flex gap-4 items-start pt-2 border-t border-muted-foreground/50">
-                                {/* Require Item */}
-                                <div className="w-[45%] space-y-1.5">
-                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.requiresItemLabel', 'Requer Item (Inventário)')}</label>
-                                    <select
-                                        value={selectedInteraction.requiresInInventory || ''}
-                                        onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)}
-                                        className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground"
-                                    >
-                                        <option value="">{t('interactionEditor.noItemRequired', 'Não requer item')}</option>
-                                        {allTakableObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
-                                    </select>
-                                </div>
+                            {/* Verbs */}
+                            <div className="flex-1 space-y-1.5">
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.verbsLabel', 'Verbos (separados por vírgula)')}</label>
+                                <input
+                                    type="text"
+                                    value={verbsInput}
+                                    onChange={e => setVerbsInput(e.target.value)}
+                                    onBlur={handleVerbsBlur}
+                                    className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/50 placeholder:text-muted-foreground"
+                                    placeholder={t('interactionEditor.verbsPlaceholder', 'ex: pegar, usar, abrir')}
+                                />
+                                <p className="text-[10px] text-zinc-600">{t('interactionEditor.verbsDesc', 'O jogador deve digitar um destes para iniciar a ação.')}</p>
+                            </div>
+                        </div>
 
-                                {/* Checkboxes */}
-                                <div className="flex-1 flex flex-row items-center gap-4 pt-6 flex-wrap">
-                                    <label className="flex items-center gap-2 cursor-pointer group">
-                                        <div className="relative flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={!!selectedInteraction.removesTargetFromScene}
-                                                onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)}
-                                                className="custom-checkbox"
-                                            />
-                                        </div>
-                                        <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.removesTarget', 'Remove Alvo da Cena')}</span>
-                                    </label>
+                        {/* Row 2: Requirement & Checkboxes */}
+                        <div className="flex gap-4 items-end">
+                            <div className="flex-1 space-y-1.5">
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.requiresItemLabel', 'Requer Item (Inventário)')}</label>
+                                <select
+                                    value={selectedInteraction.requiresInInventory || ''}
+                                    onChange={e => handleInteractionChange('requiresInInventory', e.target.value || undefined)}
+                                    className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground"
+                                >
+                                    <option value="">{t('interactionEditor.noItemRequired', 'Não requer item')}</option>
+                                    {allTakableObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
+                                </select>
+                            </div>
 
-                                    <label className="flex items-center gap-2 cursor-pointer group">
-                                        <div className="relative flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={!!selectedInteraction.addsToInventory}
-                                                onChange={e => handleInteractionChange('addsToInventory', e.target.checked)}
-                                                className="custom-checkbox"
-                                            />
-                                        </div>
-                                        <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.addsToInventory', 'Adiciona ao Inventário')}</span>
-                                    </label>
+                            <div className="pb-2.5 pr-2">
+                                <label className={`flex items-center gap-2 cursor-pointer group ${!selectedInteraction.requiresInInventory && 'opacity-30 pointer-events-none'}`}>
+                                    <div className="relative flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!selectedInteraction.consumesItem}
+                                            onChange={e => handleInteractionChange('consumesItem', e.target.checked)}
+                                            disabled={!selectedInteraction.requiresInInventory}
+                                            className="custom-checkbox"
+                                        />
+                                    </div>
+                                    <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.consumesItem', 'Consome item')}</span>
+                                </label>
+                            </div>
+                        </div>
 
-                                    <label className={`flex items-center gap-2 cursor-pointer group ${!selectedInteraction.requiresInInventory && 'opacity-30 pointer-events-none'}`}>
-                                        <div className="relative flex items-center">
-                                            <input
-                                                type="checkbox"
-                                                checked={!!selectedInteraction.consumesItem}
-                                                onChange={e => handleInteractionChange('consumesItem', e.target.checked)}
-                                                disabled={!selectedInteraction.requiresInInventory}
-                                                className="custom-checkbox"
-                                            />
-                                        </div>
-                                        <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.consumesItem', 'Consome Item Usado')}</span>
+                        {/* Row 3: Target */}
+                        <div className="space-y-3">
+                            <div className="space-y-1.5">
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.targetLabel', 'Alvo da Ação (Opcional)')}</label>
+                                <select
+                                    value={selectedInteraction.target}
+                                    onChange={e => handleInteractionChange('target', e.target.value)}
+                                    className="w-full bg-input border border-input rounded-lg p-2.5 text-xs text-foreground"
+                                >
+                                    <option value="">{t('interactionEditor.noTarget', 'Nenhum (Ação no ambiente)')}</option>
+                                    {sceneObjects.map(obj => <option key={obj.id} value={obj.id}>{obj.name}</option>)}
+                                </select>
+                            </div>
+
+                            {/* Target Checkboxes */}
+                            <div className="flex flex-row items-center gap-6">
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <div className="relative flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!selectedInteraction.removesTargetFromScene}
+                                            onChange={e => handleInteractionChange('removesTargetFromScene', e.target.checked)}
+                                            className="custom-checkbox"
+                                        />
+                                    </div>
+                                    <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.removesTarget', 'Remove alvo')}</span>
+                                </label>
+
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <div className="relative flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!selectedInteraction.addsToInventory}
+                                            onChange={e => handleInteractionChange('addsToInventory', e.target.checked)}
+                                            className="custom-checkbox"
+                                        />
+                                    </div>
+                                    <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.addsToInventory', 'Adiciona ao inventário')}</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        {/* Row 5: Go To Scene & Sound Effect */}
+                        <div className="flex gap-4 items-start">
+                            <div className="w-2/3 space-y-1.5">
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.goToSceneLabel', 'Ir para Cena')}</label>
+                                <select value={selectedInteraction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className="w-full bg-input border border-input rounded p-2.5 text-xs text-foreground h-[42px]">
+                                    <option value="">{t('interactionEditor.stayInScene', '(Permanecer na cena)')}</option>
+                                    {allScenes.filter(s => s.id !== currentSceneId).map(s => <option key={s.id} value={s.id}>{s.name} ({s.id})</option>)}
+                                </select>
+                            </div>
+                            <div className="w-1/3 space-y-1.5">
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.soundEffectLabel', 'Efeito Sonoro (.mp3)')}</label>
+                                <div className="flex items-center gap-2 h-[42px]">
+                                    <label className="flex-1 h-full flex items-center justify-center px-3 py-2 bg-input border border-input rounded hover:bg-muted cursor-pointer text-xs font-medium transition-colors">
+                                        <Upload className="w-3 h-3 mr-2 text-muted-foreground" /> {selectedInteraction.soundEffect ? t('interactionEditor.changeBtn', 'Alterar') : t('interactionEditor.uploadBtn', 'Upload')}
+                                        <input type="file" accept="audio/*" onChange={handleSoundUpload} className="hidden" />
                                     </label>
+                                    {selectedInteraction.soundEffect && (
+                                        <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="h-full px-3 bg-red-500/10 text-red-500 rounded border border-red-500/20 hover:bg-red-500/20"><Trash2 className="w-4 h-4" /></button>
+                                    )}
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* CONSEQUÊNCIAS (Outcomes) */}
-                    <div className="space-y-4">
-                        <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                            <CheckCircle2 className="w-3 h-3" /> {t('interactionEditor.outcomeTitle', 'Resultado')}
-                        </h4>
-                        <div className="bg-muted/20 p-4 rounded-lg border border-muted-foreground/50 space-y-4">
+                        {/* Row 6: Update Scene Description */}
+                        <div className="space-y-1.5">
+                            <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.updateSceneDescLabel', 'Atualizar descrição da cena')}</label>
+                            <textarea
+                                value={selectedInteraction.successMessage || ''} // Using legacy field for backward compatibility, UI says "Description"
+                                onChange={e => handleInteractionChange('successMessage', e.target.value)}
+                                rows={2}
+                                className="w-full bg-input border border-input rounded p-2.5 text-xs text-foreground resize-y min-h-[40px] max-h-[250px]"
+                                placeholder={t('interactionEditor.updateSceneDescPlaceholder', 'Descreve o que acontece...')}
+                            />
+                        </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="col-span-2">
-                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">{t('interactionEditor.goToSceneLabel', 'Ir para Cena')}</label>
-                                    <select value={selectedInteraction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className="w-full bg-input border border-input rounded p-2 text-xs text-foreground">
-                                        <option value="">{t('interactionEditor.stayInScene', '(Permanecer na cena)')}</option>
-                                        {allScenes.filter(s => s.id !== currentSceneId).map(s => <option key={s.id} value={s.id}>{s.name} ({s.id})</option>)}
-                                    </select>
-                                </div>
-
-                                {/* Success Message aka Update Description */}
-                                <div className="col-span-1">
-                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">{t('interactionEditor.updateSceneDescLabel', 'Atualizar descrição da cena')}</label>
-                                    <textarea
-                                        value={selectedInteraction.successMessage || ''} // Using legacy field for backward compatibility, UI says "Description"
-                                        onChange={e => handleInteractionChange('successMessage', e.target.value)}
-                                        rows={2}
-                                        className="w-full bg-input border border-input rounded p-2 text-xs text-foreground resize-none"
-                                        placeholder={t('interactionEditor.updateSceneDescPlaceholder', 'Descreve o que acontece...')}
-                                    />
-                                </div>
-
-                                {/* Sound Effect - Moved Next to Description */}
-                                <div className="col-span-1">
-                                    <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-1.5">{t('interactionEditor.soundEffectLabel', 'Efeito Sonoro (.mp3)')}</label>
-                                    <div className="flex items-center gap-2 h-[50px]">
-                                        <label className="flex-1 h-full flex items-center justify-center px-3 py-2 bg-input border border-input rounded hover:bg-muted cursor-pointer text-xs font-medium transition-colors">
-                                            <Upload className="w-3 h-3 mr-2 text-muted-foreground" /> {selectedInteraction.soundEffect ? t('interactionEditor.changeBtn', 'Alterar') : t('interactionEditor.uploadBtn', 'Upload')}
-                                            <input type="file" accept="audio/*" onChange={handleSoundUpload} className="hidden" />
-                                        </label>
-                                        {selectedInteraction.soundEffect && (
-                                            <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="h-full px-3 bg-red-500/10 text-red-500 rounded border border-red-500/20 hover:bg-red-500/20"><Trash2 className="w-4 h-4" /></button>
-                                        )}
+                        {/* Row 7: Trackers */}
+                        <div className="space-y-2">
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.trackersLabel', 'Rastreadores')}</label>
+                                <button 
+                                    onClick={handleAddTrackerEffect} 
+                                    disabled={consequenceTrackers.length === 0}
+                                    className={`flex items-center gap-1.5 px-2 py-1 rounded text-[10px] font-bold uppercase transition-colors ${
+                                        consequenceTrackers.length === 0
+                                            ? 'bg-zinc-500/10 text-zinc-500 cursor-not-allowed opacity-50'
+                                            : 'bg-green-500/10 text-green-500 hover:bg-green-500/20 hover:text-green-400'
+                                    }`}
+                                >
+                                    <Plus className="w-3 h-3" /> {t('interactionEditor.addBtn', 'Adicionar')}
+                                </button>
+                            </div>
+                            <div className="space-y-2">
+                                {(selectedInteraction.trackerEffects || []).map((effect, i) => (
+                                    <div key={i} className="flex items-center gap-2 bg-input p-2 rounded border border-input">
+                                        <Activity className="w-3 h-3 text-muted-foreground" />
+                                        <select value={effect.trackerId} onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)} className="flex-1 bg-transparent border-none text-xs text-zinc-200 focus:ring-0 p-0">
+                                            <option value="">{t('interactionEditor.selectTracker', 'Selecione um rastreador...')}</option>
+                                            {consequenceTrackers.map(tOption => <option key={tOption.id} value={tOption.id}>{tOption.name}</option>)}
+                                        </select>
+                                        <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-muted-foreground/50">
+                                            <span className="text-[10px] text-zinc-500">{t('interactionEditor.valueLabel', 'Valor:')}</span>
+                                            <input type="number" value={effect.valueChange} onChange={e => handleTrackerEffectChange(i, 'valueChange', e.target.value === '' ? '' : Number(e.target.value))} className="w-12 bg-transparent border-none text-xs h-auto p-0 text-right text-foreground font-mono focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]" />
+                                        </div>
+                                        <button onClick={() => handleRemoveTrackerEffect(i)} className="p-1 text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                                     </div>
-                                </div>
-
-                                {/* Trackers - Full Width */}
-                                <div className="col-span-2 pt-2 border-t border-muted-foreground/50">
-                                    <div className="flex justify-between items-center mb-2">
-                                        <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.trackersLabel', 'Rastreadores')}</label>
-                                        <button onClick={handleAddTrackerEffect} className="flex items-center gap-1.5 px-2 py-1 bg-green-500/10 text-green-500 rounded text-[10px] font-bold hover:bg-green-500/20 hover:text-green-400 transition-colors uppercase">
-                                            <Plus className="w-3 h-3" /> {t('interactionEditor.addBtn', 'Adicionar')}
-                                        </button>
+                                ))}
+                                {(selectedInteraction.trackerEffects || []).length === 0 && (
+                                    <div className="text-center py-4 border border-dashed border-muted-foreground/50 rounded bg-muted/20">
+                                        <p className="text-[10px] text-zinc-600 italic">{t('interactionEditor.noTrackerEffects', 'Em Rastreadores, crie um rastreador que verifique esta interação')}</p>
                                     </div>
-                                    <div className="space-y-2">
-                                        {(selectedInteraction.trackerEffects || []).map((effect, i) => (
-                                            <div key={i} className="flex items-center gap-2 bg-input p-2 rounded border border-input">
-                                                <Activity className="w-3 h-3 text-muted-foreground" />
-                                                <select value={effect.trackerId} onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)} className="flex-1 bg-transparent border-none text-xs text-zinc-200 focus:ring-0 p-0">
-                                                    <option value="">{t('interactionEditor.selectTracker', 'Selecione um rastreador...')}</option>
-                                                    {consequenceTrackers.map(tOption => <option key={tOption.id} value={tOption.id}>{tOption.name}</option>)}
-                                                </select>
-                                                <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-muted-foreground/50">
-                                                    <span className="text-[10px] text-zinc-500">{t('interactionEditor.valueLabel', 'Valor:')}</span>
-                                                    <input type="number" value={effect.valueChange} onChange={e => handleTrackerEffectChange(i, 'valueChange', e.target.value === '' ? '' : Number(e.target.value))} className="w-12 bg-transparent border-none text-xs h-auto p-0 text-right text-foreground font-mono focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]" />
-                                                </div>
-                                                <button onClick={() => handleRemoveTrackerEffect(i)} className="p-1 text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
-                                            </div>
-                                        ))}
-                                        {(selectedInteraction.trackerEffects || []).length === 0 && (
-                                            <div className="text-center py-4 border border-dashed border-muted-foreground/50 rounded bg-muted/20">
-                                                <p className="text-[10px] text-zinc-600 italic">{t('interactionEditor.noTrackerEffects', 'Nenhum efeito em rastreadores configurado.')}</p>
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -408,7 +386,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
             {/* LEFT SIDEBAR - List */}
             <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/30">
                 {/* Header/Search */}
-                <div className="px-2 py-4 border-b border-muted-foreground/50 space-y-3">
+                <div className="px-2 pt-4 pb-3">
                     <div className="relative">
                         <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <input
@@ -422,7 +400,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                 </div>
 
                 {/* List */}
-                <div className="flex-1 overflow-y-auto pl-2 py-4 pr-0 space-y-0 flex flex-col items-stretch">
+                <div className="flex-1 overflow-y-auto pl-2 pb-4 pr-0 flex flex-col items-stretch">
                     {filteredInteractions.length > 0 && (
                         filteredInteractions.map(({ inter, index }) => (
                             <button

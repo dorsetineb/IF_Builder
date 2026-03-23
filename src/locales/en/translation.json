@@ -990,6 +990,7 @@
     "imageLimitExceeded": "The image exceeds the {{size}}MB limit."
   },
   "common": {
+    "continue": "Continue",
     "cancel": "Cancel",
     "save": "Save",
     "confirm": "Confirm",

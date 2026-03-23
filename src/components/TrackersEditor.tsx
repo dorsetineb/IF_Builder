@@ -96,7 +96,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
     };
 
     const handleRemoveTracker = (id: string) => {
-        if (window.confirm(t('trackersEditor.deleteConfirm', 'Tem certeza? Isso excluirá o rastreador. Interações que o usam podem quebrar.'))) {
+        if (window.confirm(t('trackersEditor.deleteConfirm', 'Tem certeza?\\n\\nIsso excluirá o rastreador. Interações que o usam podem quebrar.'))) {
             setLocalTrackers(localTrackers.filter(t => t.id !== id));
             if (selectedTrackerId === id) {
                 setSelectedTrackerId(null);
