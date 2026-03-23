@@ -300,7 +300,6 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                 <div className="flex items-center gap-4 flex-shrink-0 mt-1">
                     {isDirty && (
                         <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse bg-yellow-500/10 px-2 py-0.5 rounded-full border border-yellow-500/20">
-                            <div className="w-1.5 h-1.5 bg-yellow-500 rounded-full"></div>
                             <span>{t('ThemeEditor.unsavedChanges')}</span>
                         </div>
                     )}
