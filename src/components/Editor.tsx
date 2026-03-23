@@ -891,10 +891,10 @@ const Editor: React.FC = () => {
     }, 1500);
 
     // Finish: End animation after typing completes
-    // 1.5s (start) + ~1s (typing) + 0.5s (pause) = 3s
+    // 1.5s (start) + ~1s (typing) + 2.5s (pause) = 5s
     const timer3 = setTimeout(() => {
       setIsBiosFinished(true);
-    }, 3000);
+    }, 5000);
 
     return () => {
       clearTimeout(timer1);
