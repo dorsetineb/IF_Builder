@@ -9,6 +9,7 @@ import {
   OVERLAY_CSS,
   sanitizeLegacyI18n,
 } from '../lib/gameDefaults';
+import { FONTS } from '../constants';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import DOMPurify from 'dompurify';
 import { useTranslation } from 'react-i18next';
@@ -365,8 +366,12 @@ DATE:        ${exportDate.toLocaleString()}
       finalCss
         .replace(/__FONT_FAMILY__/g, fontFamily)
         .replace(/__GAME_FONT_SIZE__/g, (() => {
-          const size = exportData.gameFontSize || '1em';
-          return /^\\d+$/.test(size) ? `${size}px` : size;
+          const size = exportData.gameFontSize || '14';
+          const isNumeric = /^\\d+$/.test(size);
+          if (!isNumeric) return size;
+          const fontInfo = FONTS.find(f => f.family === fontFamily);
+          const multiplier = fontInfo?.sizeAdjust || 1.0;
+          return `${Math.round(parseInt(size) * multiplier)}px`;
         })())
         .replace(/__GAME_TEXT_COLOR__/g, exportData.gameTextColor || '#c9d1d9')
         .replace(/__GAME_TITLE_COLOR__/g, exportData.gameTitleColor || '#58a6ff')
@@ -679,8 +684,12 @@ DATE:        ${exportDate.toLocaleString()}
       finalCss
         .replace(/__FONT_FAMILY__/g, fontFamily)
         .replace(/__GAME_FONT_SIZE__/g, (() => {
-          const size = exportData.gameFontSize || '1em';
-          return /^\\d+$/.test(size) ? `${size}px` : size;
+          const size = exportData.gameFontSize || '14';
+          const isNumeric = /^\\d+$/.test(size);
+          if (!isNumeric) return size;
+          const fontInfo = FONTS.find(f => f.family === fontFamily);
+          const multiplier = fontInfo?.sizeAdjust || 1.0;
+          return `${Math.round(parseInt(size) * multiplier)}px`;
         })())
         .replace(/__GAME_TEXT_COLOR__/g, exportData.gameTextColor || '#c9d1d9')
         .replace(/__GAME_TITLE_COLOR__/g, exportData.gameTitleColor || '#58a6ff')

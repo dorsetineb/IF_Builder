@@ -30,16 +30,20 @@ interface ThemeEditorProps {
 }
 
 const FONTS = [
-    { name: 'Pixel (Padrão)', family: "'Silkscreen', sans-serif" },
-    { name: 'Pixel (Arcade)', family: "'Press Start 2P', cursive" },
-    { name: 'Pixel (Terminal)', family: "'VT323', monospace" },
-    { name: 'Pixel (Gótico)', family: "'DotGothic16', sans-serif" },
-    { name: 'Máquina de Escrever', family: "'Special Elite', cursive" },
-    { name: 'Mono (Arredondada)', family: "'Cutive Mono', monospace" },
-    { name: 'Mono (Técnica)', family: "'Share Tech Mono', monospace" },
-    { name: 'Mono (Console)', family: "'Inconsolata', monospace" },
-    { name: 'Mono (Moderna)', family: "'Roboto Mono', monospace" },
-    { name: 'Mono (Clássica)', family: "'Anonymous Pro', monospace" },
+    { name: 'Silkscreen', family: "'Silkscreen', sans-serif" },
+    { name: 'DotGothic16', family: "'DotGothic16', sans-serif" },
+    { name: 'Cutive Mono', family: "'Cutive Mono', monospace" },
+    { name: 'Space Mono', family: "'Space Mono', monospace" },
+    { name: 'IBM Plex Mono', family: "'IBM Plex Mono', monospace" },
+    { name: 'Roboto Mono', family: "'Roboto Mono', monospace" },
+    { name: 'Space Grotesk', family: "'Space Grotesk', sans-serif" },
+    { name: 'Urbanist', family: "'Urbanist', sans-serif" },
+    { name: 'Chakra Petch', family: "'Chakra Petch', sans-serif" },
+    { name: 'Archivo', family: "'Archivo', sans-serif" },
+    { name: 'Zilla Slab', family: "'Zilla Slab', serif" },
+    { name: 'Arvo', family: "'Arvo', serif" },
+    { name: 'Cardo', family: "'Cardo', serif" },
+    { name: 'Rock Salt', family: "'Rock Salt', cursive" },
 ];
 
 const PREDEFINED_THEMES = [
@@ -337,8 +341,8 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                 style={{ fontFamily: localFontFamily }}
                             >
                                 {FONTS.map(font => (
-                                    <option key={font.family} value={font.family} style={{ fontFamily: font.family }}>
-                                        {t(`ThemeEditor.fonts.${font.name.replace(/[^a-zA-Z]/g, '')}`, { defaultValue: font.name })}
+                                    <option key={font.name} value={font.family} style={{ fontFamily: font.family }}>
+                                        {t(`fonts.${font.name.replace(/[^a-zA-Z]/g, '')}`, { defaultValue: font.name })} · {t(`fonts.categories.${font.category}`, { defaultValue: font.category })}
                                     </option>
                                 ))}
                             </select>

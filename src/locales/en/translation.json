@@ -572,7 +572,7 @@
       "choices": "Choices"
     },
     "objectWarning": "Changes made here affect the same object if used in other scenes.",
-    "narrativeTitle": "NARRATIVE",
+    "narrativeTitle": "SCENE DETAILS",
     "vignetteNarrativeTitle": "VIGNETTE DETAILS",
     "vignetteTitleLabel": "VIGNETTE NAME",
     "vignetteDescription": "VIGNETTE TEXT",
@@ -838,8 +838,8 @@
     },
     "aparencia": {
       "structure": "STRUCTURE",
-      "scenes": "SCENES",
-      "vinhetas": "VIGNETTES",
+      "scenes": "SCENE LAYOUT",
+      "vinhetas": "VIGNETTE LAYOUT",
       "frameColor": "Color",
       "styleTheme": "STYLE & THEME",
       "light": "Light",
@@ -870,9 +870,9 @@
       "sizeLarge": "Large",
       "sceneName": "Scene Name",
       "sampleDesc1": "This is a sample description for the scene. The text flows according to the chosen ",
-      "sampleDescHighlight": "SETTINGS",
+      "sampleDescHighlight": "Settings",
       "sampleDesc2": ".",
-      "sampleCommand": "SAMPLE COMMAND",
+      "sampleCommand": "Sample Command",
       "action": "ACTION",
       "homeButton": "START BUTTON",
       "sampleVignetteDesc": "This is a sample description for the vignette."
@@ -926,18 +926,6 @@
     "saveThemeChanges": "Save theme changes",
     "noChangesToSave": "No changes to save",
     "save": "Save",
-    "fonts": {
-      "PixelPadro": "Pixel (Default)",
-      "PixelArcade": "Pixel (Arcade)",
-      "PixelTerminal": "Pixel (Terminal)",
-      "PixelGtico": "Pixel (Gothic)",
-      "MquinadeEscrever": "Typewriter",
-      "MonoArredondada": "Mono (Rounded)",
-      "MonoTcnica": "Mono (Technical)",
-      "MonoConsole": "Mono (Console)",
-      "MonoModerna": "Mono (Modern)",
-      "MonoClssica": "Mono (Classic)"
-    },
     "themes": {
       "MeiaNoite": "Midnight",
       "Floresta": "Forest",
@@ -1085,5 +1073,37 @@
     "oesteLabel": "West",
     "acimaLabel": "Up",
     "abaixoLabel": "Down"
+  },
+  "fonts": {
+    "Silkscreen": "Silkscreen",
+    "DotGothic": "DotGothic",
+    "PixelifySans": "Pixelify Sans",
+    "SpaceMono": "Space Mono",
+    "SpaceGrotesk": "Space Grotesk",
+    "Urbanist": "Urbanist",
+    "ChakraPetch": "Chakra Petch",
+    "Archivo": "Archivo",
+    "Asimovian": "Asimovian",
+    "Offside": "Offside",
+    "Tomorrow": "Tomorrow",
+    "FunnelDisplay": "Funnel Display",
+    "Geo": "Geo",
+    "ZillaSlab": "Zilla Slab",
+    "Arvo": "Arvo",
+    "Cardo": "Cardo",
+    "Texturina": "Texturina",
+    "IMFellEnglish": "IM Fell English",
+    "RockSalt": "Rock Salt",
+    "Astloch": "Astloch",
+    "categories": {
+      "pixel": "Pixel",
+      "mono": "Mono",
+      "sans-serif": "Sans-serif",
+      "serifada": "Serif",
+      "manuscrita": "Handwriting",
+      "futurista": "Futuristic",
+      "display": "Display",
+      "decorativa": "Decorative"
+    }
   }
 }

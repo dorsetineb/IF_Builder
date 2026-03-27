@@ -476,11 +476,10 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       onClick={() => !isTabDisabled && setActiveTab(key as any)}
                       disabled={isTabDisabled}
-                      className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 ${
-                        activeTab === key
+                      className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 ${activeTab === key
                           ? 'border-primary text-primary bg-primary/5'
                           : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
-                      } ${isTabDisabled ? 'opacity-30 cursor-not-allowed' : ''} `}
+                        } ${isTabDisabled ? 'opacity-30 cursor-not-allowed' : ''} `}
                     >
                       {name}
                     </button>
@@ -538,7 +537,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                       const updates: Partial<Scene> = {
                                         vignetteType: type.id as 'opening' | 'transition' | 'conclusion'
                                       };
-                                      
+
                                       if (type.id === 'conclusion' && localScene.name.startsWith(t('editor.newVignetteNamePrefix', 'Vinheta #'))) {
                                         updates.name = t('editor.newConclusionVignetteName', 'Conclusão');
                                       }
@@ -546,11 +545,10 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                       setLocalScene((prev) => ({ ...prev, ...updates }));
                                     }
                                   }}
-                                  className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border transition-all ${
-                                    localScene.vignetteType === type.id
+                                  className={`flex flex-col items-center justify-center gap-2 p-3 rounded-lg border transition-all ${localScene.vignetteType === type.id
                                       ? 'bg-primary/20 border-primary text-primary'
                                       : 'bg-muted/30 border-muted-foreground/50 text-muted-foreground hover:bg-muted hover:text-foreground'
-                                  }`}
+                                    }`}
                                 >
                                   <type.icon className="w-4 h-4" />
                                   <span className="text-[10px] font-bold uppercase">
@@ -685,68 +683,68 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
                                   {t('sceneEditor.buttonTextLabel')}
                                 </label>
-                                    <input
-                                      type="text"
-                                      value={localScene.vignetteButtonText || ''}
-                                      onChange={(e) =>
-                                        updateLocalScene('vignetteButtonText', e.target.value)
-                                      }
-                                      placeholder={
-                                        localScene.vignetteType === 'conclusion'
-                                          ? t('sceneEditor.restart', 'Reiniciar')
-                                          : t('UIEditor.textos.splashButtonPlaceholder', 'Iniciar')
-                                      }
-                                      className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all placeholder:text-muted-foreground"
-                                    />
+                                <input
+                                  type="text"
+                                  value={localScene.vignetteButtonText || ''}
+                                  onChange={(e) =>
+                                    updateLocalScene('vignetteButtonText', e.target.value)
+                                  }
+                                  placeholder={
+                                    localScene.vignetteType === 'conclusion'
+                                      ? t('sceneEditor.restart', 'Reiniciar')
+                                      : t('UIEditor.textos.splashButtonPlaceholder', 'Iniciar')
+                                  }
+                                  className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all placeholder:text-muted-foreground"
+                                />
+                              </div>
+
+                              {localScene.vignetteType === 'conclusion' && (
+                                <label className="flex items-center gap-2 cursor-pointer p-2 rounded border border-muted-foreground/50 bg-muted/30 hover:bg-muted/50 transition-colors">
+                                  <input
+                                    type="checkbox"
+                                    checked={!!localScene.isDefeatOutcome}
+                                    onChange={(e) =>
+                                      updateLocalScene('isDefeatOutcome', e.target.checked)
+                                    }
+                                    className="custom-checkbox"
+                                  />
+                                  <div>
+                                    <span className="block text-[10px] font-bold text-zinc-300 uppercase tracking-widest">
+                                      {t('sceneEditor.negativeOutcome')}
+                                    </span>
+                                    <span className="block text-[9px] text-muted-foreground">
+                                      {t('sceneEditor.negativeOutcomeDesc')}
+                                    </span>
                                   </div>
+                                </label>
+                              )}
 
-                                  {localScene.vignetteType === 'conclusion' && (
-                                    <label className="flex items-center gap-2 cursor-pointer p-2 rounded border border-muted-foreground/50 bg-muted/30 hover:bg-muted/50 transition-colors">
-                                      <input
-                                        type="checkbox"
-                                        checked={!!localScene.isDefeatOutcome}
-                                        onChange={(e) =>
-                                          updateLocalScene('isDefeatOutcome', e.target.checked)
-                                        }
-                                        className="custom-checkbox"
-                                      />
-                                      <div>
-                                        <span className="block text-[10px] font-bold text-zinc-300 uppercase tracking-widest">
-                                          {t('sceneEditor.negativeOutcome')}
-                                        </span>
-                                        <span className="block text-[9px] text-muted-foreground">
-                                          {t('sceneEditor.negativeOutcomeDesc')}
-                                        </span>
-                                      </div>
-                                    </label>
-                                  )}
-
-                                  {localScene.vignetteType !== 'conclusion' && (
-                                    <div>
-                                      <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                                        {t('sceneEditor.goToLabel')}
-                                      </label>
-                                      <select
-                                        value={localScene.vignetteNextSceneId || ''}
-                                        onChange={(e) =>
-                                          updateLocalScene('vignetteNextSceneId', e.target.value)
-                                        }
-                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
-                                      >
-                                        <option value="">{t('sceneEditor.justClose')}</option>
-                                        <option value="END_GAME">{t('sceneEditor.endGame')}</option>
-                                        <optgroup label={t('sceneEditor.scenesGroup')}>
-                                          {allScenes
-                                            .filter((s) => s.id !== localScene.id)
-                                            .map((s) => (
-                                              <option key={s.id} value={s.id}>
-                                                {s.name}
-                                              </option>
-                                            ))}
-                                        </optgroup>
-                                      </select>
-                                    </div>
-                                  )}
+                              {localScene.vignetteType !== 'conclusion' && (
+                                <div>
+                                  <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                                    {t('sceneEditor.goToLabel')}
+                                  </label>
+                                  <select
+                                    value={localScene.vignetteNextSceneId || ''}
+                                    onChange={(e) =>
+                                      updateLocalScene('vignetteNextSceneId', e.target.value)
+                                    }
+                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
+                                  >
+                                    <option value="">{t('sceneEditor.justClose')}</option>
+                                    <option value="END_GAME">{t('sceneEditor.endGame')}</option>
+                                    <optgroup label={t('sceneEditor.scenesGroup')}>
+                                      {allScenes
+                                        .filter((s) => s.id !== localScene.id)
+                                        .map((s) => (
+                                          <option key={s.id} value={s.id}>
+                                            {s.name}
+                                          </option>
+                                        ))}
+                                    </optgroup>
+                                  </select>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
@@ -1137,9 +1135,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                 setSelectedChoiceId(null);
                               }
                             }}
-                            className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-[calc(100%+2px)] group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
-                              selectedChoiceId === choice.id ? 'bg-red-500 rounded-none' : 'bg-red-500 rounded-r-lg'
-                            }`}
+                            className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-[calc(100%+2px)] group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${selectedChoiceId === choice.id ? 'bg-red-500 rounded-none' : 'bg-red-500 rounded-r-lg'
+                              }`}
                             title={t('sceneEditor.removeBtn')}
                           >
                             <Trash2 className="w-5 h-5 pointer-events-none" />
@@ -1148,22 +1145,22 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                       ))
                     }
                     <div className="pr-2 mt-2">
-                        <button
-                          onClick={() => {
-                            const newId = `choice_${Date.now()} `;
-                            const newChoice: Choice = {
-                              id: newId,
-                              label: t('sceneEditor.newChoice'),
-                              targetSceneId: '',
-                            };
-                            updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
-                            setSelectedChoiceId(newId);
-                          }}
-                          className="w-full flex items-center justify-start px-3 h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          {t('sceneEditor.createChoiceBtn', 'Criar Decisão')}
-                        </button>
+                      <button
+                        onClick={() => {
+                          const newId = `choice_${Date.now()} `;
+                          const newChoice: Choice = {
+                            id: newId,
+                            label: t('sceneEditor.newChoice'),
+                            targetSceneId: '',
+                          };
+                          updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
+                          setSelectedChoiceId(newId);
+                        }}
+                        className="w-full flex items-center justify-start px-3 h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
+                      >
+                        <Plus className="w-4 h-4 mr-2" />
+                        {t('sceneEditor.createChoiceBtn', 'Criar Decisão')}
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1171,7 +1168,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                 {/* RIGHT DETAIL PANEL */}
                 <div className="flex-1 flex flex-col bg-background/50 min-w-0">
                   {selectedChoiceId &&
-                  localScene.choices?.find((c) => c.id === selectedChoiceId) ? (
+                    localScene.choices?.find((c) => c.id === selectedChoiceId) ? (
                     (() => {
                       const choiceIndex = localScene.choices!.findIndex(
                         (c) => c.id === selectedChoiceId

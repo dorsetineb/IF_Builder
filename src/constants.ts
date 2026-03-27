@@ -1,24 +1,33 @@
-export const FONTS = [
-    // Monospace - Retro/Tech
-    { name: 'Silkscreen', family: "'Silkscreen', sans-serif" },
-    { name: 'DotGothic16', family: "'DotGothic16', sans-serif" },
-    { name: 'Press Start 2P', family: "'Press Start 2P', cursive" },
-    { name: 'Cutive Mono', family: "'Cutive Mono', monospace" },
-    { name: 'Space Mono', family: "'Space Mono', monospace" },
-    { name: 'Inconsolata', family: "'Inconsolata', monospace" },
-    { name: 'IBM Plex Mono', family: "'IBM Plex Mono', monospace" },
-    { name: 'Roboto Mono', family: "'Roboto Mono', monospace" },
-    // Sans-serif - Modern
-    { name: 'Chakra Petch', family: "'Chakra Petch', sans-serif" },
-    { name: 'Orbitron', family: "'Orbitron', sans-serif" },
-    // Serif - Literary
-    { name: 'Crimson Text', family: "'Crimson Text', serif" },
-    { name: 'Lora', family: "'Lora', serif" },
-    { name: 'Merriweather', family: "'Merriweather', serif" },
-    { name: 'Playfair Display', family: "'Playfair Display', serif" },
-    { name: 'Cinzel', family: "'Cinzel', serif" },
-    // Special
-    { name: 'Special Elite', family: "'Special Elite', cursive" },
+export interface Font {
+    name: string;
+    family: string;
+    category: 'pixel' | 'mono' | 'sans-serif' | 'serifada' | 'manuscrita' | 'futurista' | 'display' | 'decorativa';
+    sizeAdjust: number;
+}
+
+export const FONTS: Font[] = [
+    // Pixel
+    { name: 'Silkscreen', family: "'Silkscreen', sans-serif", category: 'pixel', sizeAdjust: 1.0 },
+    { name: 'DotGothic16', family: "'DotGothic16', sans-serif", category: 'pixel', sizeAdjust: 1.25 },
+    { name: 'Pixelify Sans', family: "'Pixelify Sans', sans-serif", category: 'pixel', sizeAdjust: 1.3 },
+    // Mono
+    { name: 'Space Mono', family: "'Space Mono', monospace", category: 'mono', sizeAdjust: 1.2 },
+    // Sans-serif / Futurista
+    { name: 'Space Grotesk', family: "'Space Grotesk', sans-serif", category: 'sans-serif', sizeAdjust: 1.3 },
+    { name: 'Urbanist', family: "'Urbanist', sans-serif", category: 'sans-serif', sizeAdjust: 1.1 },
+    { name: 'Chakra Petch', family: "'Chakra Petch', sans-serif", category: 'sans-serif', sizeAdjust: 1.1 },
+    { name: 'Archivo', family: "'Archivo', sans-serif", category: 'sans-serif', sizeAdjust: 1.1 },
+    { name: 'Asimovian', family: "'Asimovian', sans-serif", category: 'futurista', sizeAdjust: 1.1 },
+    { name: 'Offside', family: "'Offside', sans-serif", category: 'futurista', sizeAdjust: 1.1 },
+    { name: 'Tomorrow', family: "'Tomorrow', sans-serif", category: 'futurista', sizeAdjust: 1.1 },
+    { name: 'Funnel Display', family: "'Funnel Display', sans-serif", category: 'display', sizeAdjust: 1.05 },
+    { name: 'Geo', family: "'Geo', sans-serif", category: 'futurista', sizeAdjust: 1.55 },
+    // Serifada / Slab
+    { name: 'Zilla Slab', family: "'Zilla Slab', serif", category: 'serifada', sizeAdjust: 1.3 },
+    { name: 'Arvo', family: "'Arvo', serif", category: 'serifada', sizeAdjust: 1.05 },
+    { name: 'Cardo', family: "'Cardo', serif", category: 'serifada', sizeAdjust: 1.3 },
+    { name: 'Texturina', family: "'Texturina', serif", category: 'serifada', sizeAdjust: 1.25 },
+    { name: 'IM Fell English', family: "'IM Fell English', serif", category: 'serifada', sizeAdjust: 1.3 },
 ];
 
 export const PREDEFINED_THEMES = [

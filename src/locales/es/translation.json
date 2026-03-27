@@ -573,7 +573,7 @@
       "choices": "Decisiones"
     },
     "objectWarning": "Los cambios hechos aquí afectan al mismo objeto si se usa en otras escenas.",
-    "narrativeTitle": "NARRATIVA",
+    "narrativeTitle": "DETALLES DE LA ESCENA",
     "vignetteNarrativeTitle": "DETALLES DE LA VIÑETA",
     "vignetteTitleLabel": "NOMBRE DE LA VIÑETA",
     "vignetteDescription": "TEXTO DE LA VIÑETA",
@@ -839,8 +839,8 @@
     },
     "aparencia": {
       "structure": "ESTRUCTURA",
-      "scenes": "ESCENAS",
-      "vinhetas": "VIÑETAS",
+      "scenes": "DISEÑO DE ESCENAS",
+      "vinhetas": "DISEÑO DE VIÑETAS",
       "frameColor": "Color",
       "styleTheme": "ESTILO Y TEMA",
       "light": "Claro",
@@ -871,9 +871,9 @@
       "sizeLarge": "Grande",
       "sceneName": "Nombre de la Escena",
       "sampleDesc1": "Esta es una descripción de ejemplo para la escena. El texto fluye según los ",
-      "sampleDescHighlight": "AJUSTES",
+      "sampleDescHighlight": "Ajustes",
       "sampleDesc2": " elegidos.",
-      "sampleCommand": "COMANDO DE EJEMPLO",
+      "sampleCommand": "Comando de ejemplo",
       "action": "ACCIÓN",
       "homeButton": "BOTÓN DE INICIO",
       "sampleVignetteDesc": "Esta es una descripción de ejemplo para la viñeta."
@@ -927,18 +927,6 @@
     "saveThemeChanges": "Guardar cambios en el tema",
     "noChangesToSave": "No hay cambios para guardar",
     "save": "Guardar",
-    "fonts": {
-      "PixelPadro": "Píxel (Estándar)",
-      "PixelArcade": "Píxel (Arcade)",
-      "PixelTerminal": "Píxel (Terminal)",
-      "PixelGtico": "Píxel (Gótico)",
-      "MquinadeEscrever": "Máquina de Escribir",
-      "MonoArredondada": "Mono (Redondeada)",
-      "MonoTcnica": "Mono (Técnica)",
-      "MonoConsole": "Mono (Consola)",
-      "MonoModerna": "Mono (Moderna)",
-      "MonoClssica": "Mono (Clásica)"
-    },
     "themes": {
       "MeiaNoite": "Medianoche",
       "Floresta": "Bosque",
@@ -1086,5 +1074,37 @@
     "oesteLabel": "Oeste",
     "acimaLabel": "Arriba",
     "abaixoLabel": "Abajo"
+  },
+  "fonts": {
+    "Silkscreen": "Silkscreen",
+    "DotGothic": "DotGothic",
+    "PixelifySans": "Pixelify Sans",
+    "SpaceMono": "Space Mono",
+    "SpaceGrotesk": "Space Grotesk",
+    "Urbanist": "Urbanist",
+    "ChakraPetch": "Chakra Petch",
+    "Archivo": "Archivo",
+    "Asimovian": "Asimovian",
+    "Offside": "Offside",
+    "Tomorrow": "Tomorrow",
+    "FunnelDisplay": "Funnel Display",
+    "Geo": "Geo",
+    "ZillaSlab": "Zilla Slab",
+    "Arvo": "Arvo",
+    "Cardo": "Cardo",
+    "Texturina": "Texturina",
+    "IMFellEnglish": "IM Fell English",
+    "RockSalt": "Rock Salt",
+    "Astloch": "Astloch",
+    "categories": {
+      "pixel": "Pixel",
+      "mono": "Mono",
+      "sans-serif": "Sans-serif",
+      "serifada": "Serifa",
+      "manuscrita": "Manuscrita",
+      "futurista": "Futurista",
+      "display": "Display",
+      "decorativa": "Decorativa"
+    }
   }
 }

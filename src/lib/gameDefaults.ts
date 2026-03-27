@@ -303,8 +303,8 @@ body.with-spacing .main-wrapper { height: 100%; }
 .scene-description.typewriting-active .highlight-word { cursor: default; }
 .scene-description.typewriting-active .highlight-word:hover { filter: none; text-decoration: none; }
 .verb-echo { color: var(--text-dim-color); font-style: italic; }
-.highlight-item { font-weight: bold; color: var(--highlight-color); }
-.highlight-word { font-weight: bold; color: var(--accent-color); cursor: pointer; transition: color 0.2s; }
+.highlight-item { color: var(--highlight-color); }
+.highlight-word { color: var(--accent-color); cursor: pointer; transition: color 0.2s; }
 .highlight-word:hover { filter: brightness(1.2); text-decoration: underline; }
 
 /* Desktop Action Bar with Popup Inside - Removido fundo cinza do popup */

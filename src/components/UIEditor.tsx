@@ -309,7 +309,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localFocusColor, setLocalFocusColor] = useState(focusColor);
     const [localChanceIconColor, setLocalChanceIconColor] = useState(chanceIconColor);
     const [localFontFamily, setLocalFontFamily] = useState(gameFontFamily);
-    const [localGameFontSize, setLocalGameFontSize] = useState(gameFontSize === '0.85em' ? '12' : gameFontSize);
+        const [localGameFontSize, setLocalGameFontSize] = useState(gameFontSize === '0.85em' ? '12' : (gameFontSize || '14'));
     const [localChanceIcon, setLocalChanceIcon] = useState(chanceIcon);
     const [localChanceLossMessage, setLocalChanceLossMessage] = useState(chanceLossMessage || '');
     const [localChanceRestoreMessage, setLocalChanceRestoreMessage] = useState(chanceRestoreMessage || '');
@@ -1736,7 +1736,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
                                         <div className="flex items-center w-full text-left">
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <LayoutTemplate className="w-4 h-4" /> {t('UIEditor.aparencia.scenes', 'Cenas')}
+                                                <LayoutTemplate className="w-4 h-4" /> {t('UIEditor.aparencia.scenes', 'Layout das Cenas')}
                                             </h3>
                                         </div>
 
@@ -1819,7 +1819,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
                                         <div className="flex items-center w-full text-left">
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <ArrowRight className="w-4 h-4" /> {t('UIEditor.aparencia.vinhetas', 'Vinhetas')}
+                                                <ArrowRight className="w-4 h-4" /> {t('UIEditor.aparencia.vinhetas', 'Layout das Vinhetas')}
                                             </h3>
                                         </div>
 
@@ -1967,7 +1967,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                 {/* Right Column: Preview (Expanded width) */}
                                 <div className="col-span-1 lg:col-span-7 relative">
-                                    <div className="space-y-6 flex flex-col pt-2">
+                                    <div className="space-y-6 flex flex-col">
                                         {/* SECTION: UI TEXT (Moved here) */}
                                         <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
                                             <div className="flex items-center w-full text-left">
@@ -1987,7 +1987,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                                 className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
                                                             >
                                                                 {FONTS.map(font => (
-                                                                    <option key={font.name} value={font.family}>{font.name}</option>
+                                                                    <option key={font.name} value={font.family}>
+                                                                        {t(`fonts.${font.name.replace(/[^a-zA-Z]/g, '')}`, { defaultValue: font.name })} · {t(`fonts.categories.${font.category}`, { defaultValue: font.category })}
+                                                                    </option>
                                                                 ))}
                                                             </select>
                                                             <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
@@ -2025,7 +2027,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     onClick={() => setPreviewType('vignette')}
                                                     className={`flex-1 py-1 rounded-md text-[10px] font-bold uppercase transition-all ${previewType === 'vignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                                 >
-                                                    {t('UIEditor.aparencia.vinhetas', 'Vinheta')}
+                                                    {t('UIEditor.aparencia.vinhetas', 'Layout das Vinhetas')}
                                                 </button>
                                             </div>
                                         </div>
@@ -2114,10 +2116,22 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     <div className="flex-1 flex flex-col overflow-hidden">
                                                         {/* Text content */}
                                                         <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
-                                                            <p className="leading-relaxed" style={{ color: localTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize }}>
-                                                                {t('UIEditor.aparencia.sampleDesc1')} <span style={{ color: localTitleColor, fontWeight: 'bold' }}>{t('UIEditor.aparencia.sampleDescHighlight')}</span> {t('UIEditor.aparencia.sampleDesc2')}
+                                                            <p className="leading-relaxed" style={{ color: localTextColor, fontSize: (() => {
+                                                                const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
+                                                                const fontInfo = FONTS.find(f => f.family === localFontFamily);
+                                                                const multiplier = fontInfo?.sizeAdjust || 1.0;
+                                                                return `${baseSize * multiplier}px`;
+                                                            })() }}>
+                                                                {t('UIEditor.aparencia.sampleDesc1')}
+                                                                <span style={{ color: localTitleColor }}>{t('UIEditor.aparencia.sampleDescHighlight')}</span>
+                                                                {t('UIEditor.aparencia.sampleDesc2')}
                                                             </p>
-                                                            <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize }}>
+                                                            <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: (() => {
+                                                                const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
+                                                                const fontInfo = FONTS.find(f => f.family === localFontFamily);
+                                                                const multiplier = fontInfo?.sizeAdjust || 1.0;
+                                                                return `${baseSize * multiplier}px`;
+                                                            })() }}>
                                                                 {'>'} {t('UIEditor.aparencia.sampleCommand')}
                                                             </p>
                                                         </div>
@@ -2185,10 +2199,20 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     </div>
                                                     <div className={`relative z-10 w-full flex flex-col gap-2 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
                                                         {!localOmitSplashTitle && (
-                                                            <div className="font-bold uppercase tracking-widest drop-shadow-md" style={{ color: localTitleColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sceneName', 'Título da vinheta')}</div>
+                                                            <div className="font-bold uppercase tracking-widest drop-shadow-md" style={{ color: localTitleColor, fontSize: (() => {
+                                                                const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
+                                                                const fontInfo = FONTS.find(f => f.family === localFontFamily);
+                                                                const multiplier = fontInfo?.sizeAdjust || 1.0;
+                                                                return `${baseSize * multiplier}px`;
+                                                            })(), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sceneName', 'Título da vinheta')}</div>
                                                         )}
                                                         {!localOmitSplashDescription && (
-                                                            <p className="leading-relaxed drop-shadow-sm" style={{ color: localTextColor, fontSize: /^\d+$/.test(localGameFontSize) ? `${localGameFontSize}px` : localGameFontSize, fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sampleVignetteDesc', 'Esta é uma descrição de exemplo para a vinheta.')}</p>
+                                                            <p className="leading-relaxed drop-shadow-sm" style={{ color: localTextColor, fontSize: (() => {
+                                                                const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
+                                                                const fontInfo = FONTS.find(f => f.family === localFontFamily);
+                                                                const multiplier = fontInfo?.sizeAdjust || 1.0;
+                                                                return `${baseSize * multiplier}px`;
+                                                            })(), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sampleVignetteDesc', 'Esta é uma descrição de exemplo para a vinheta.')}</p>
                                                         )}
                                                         <button
                                                             className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate text-[11px] mt-1"
