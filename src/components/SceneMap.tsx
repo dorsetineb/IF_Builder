@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, Vignette } from '../types';
-import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle } from 'lucide-react';
+import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 interface SceneMapProps {
@@ -15,6 +15,7 @@ interface SceneMapProps {
   gameInteractionType?: 'parser' | 'choice';
   onAddNode?: (type: 'scene' | 'vignette') => void;
   hasOpeningVignette?: boolean;
+  isSidebarOpen?: boolean;
   theme?: string;
 }
 
@@ -62,6 +63,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
   onUpdateScenePosition,
   onUpdateVignettePosition,
   onReorganizeScenes,
+  onAddNode,
+  hasOpeningVignette = false,
+  isSidebarOpen = false,
   gameInteractionType = 'parser',
 }) => {
   const { t } = useTranslation();
@@ -649,7 +653,37 @@ const SceneMap: React.FC<SceneMapProps> = ({
           }}
         />
 
-        {/* CONTROLS OVERLAY - Top Left (Removed) */}
+        {/* CONTROLS OVERLAY - Top Left Creation Buttons */}
+        {!isSidebarOpen && (
+          <div className="absolute top-4 left-3 z-20 flex gap-2 pointer-events-auto" style={{ width: '264px' }}>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onAddNode?.('vignette');
+              }}
+              className="flex-1 flex items-center justify-center px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-[11px] bg-white text-zinc-950 hover:bg-zinc-200 border border-transparent whitespace-nowrap flex-shrink-0"
+            >
+              <ArrowRight className="w-3.5 h-3.5 mr-1.5" />
+              {t('sceneList.nodeSelection.vignette.title', 'Criar Vinheta')}
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (hasOpeningVignette) onAddNode?.('scene');
+              }}
+              disabled={!hasOpeningVignette}
+              className={`flex-1 flex items-center justify-center px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-[11px] border border-transparent whitespace-nowrap flex-shrink-0 ${
+                !hasOpeningVignette 
+                  ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed grayscale' 
+                  : 'bg-white text-zinc-950 hover:bg-zinc-200'
+              }`}
+              title={!hasOpeningVignette ? t('sceneList.nodeSelection.scene.lockedDesc', 'Crie uma vinheta de abertura para habilitar cenas.') : ''}
+            >
+              <Split className="w-3.5 h-3.5 mr-1.5" />
+              {t('sceneList.nodeSelection.scene.title', 'Criar Cena')}
+            </button>
+          </div>
+        )}
 
         <div
           className="transition-transform duration-100"

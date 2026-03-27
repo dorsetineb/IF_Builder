@@ -1064,6 +1064,7 @@ const Editor: React.FC = () => {
 
   const handleAddNodeType = (type: 'scene' | 'vignette') => {
     setIsNodeTypeModalOpen(false);
+    setIsNarrativeMenuOpen(true);
     handleAddScene(type);
   };
 
@@ -1557,6 +1558,7 @@ const Editor: React.FC = () => {
                     gameInteractionType={gameData.gameInteractionType || 'parser'}
                     onAddNode={handleAddNodeType}
                     hasOpeningVignette={hasOpeningVignette}
+                    isSidebarOpen={isNarrativeMenuOpen}
                     theme={appTheme}
                   />
                 </Suspense>

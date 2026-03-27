@@ -1056,15 +1056,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } else if (scene.vignetteNextSceneId) {
                 // Go to next scene: Load it FIRST (behind the vignette), then fade out
-                gameContainer.classList.remove('hidden');
-                gameContainer.classList.add('ready'); // Ensure gameContainer visually appears
-                loadScene(scene.vignetteNextSceneId, false);
-                
-                vignetteScreen.classList.add('fade-out');
-                setTimeout(() => {
+                if (gameData.cenas[scene.vignetteNextSceneId]) {
+                    gameContainer.classList.remove('hidden');
+                    gameContainer.classList.add('ready'); // Ensure gameContainer visually appears
+                    loadScene(scene.vignetteNextSceneId, false);
+                    
+                    vignetteScreen.classList.add('fade-out');
+                    setTimeout(() => {
+                        vignetteScreen.classList.add('hidden');
+                        vignetteScreen.classList.remove('fade-out');
+                    }, 1000);
+                } else {
+                    // Safety fallback: If scene doesn't exist, just hide vignette to show game
+                    console.warn('Vignette target scene not found:', scene.vignetteNextSceneId);
                     vignetteScreen.classList.add('hidden');
-                    vignetteScreen.classList.remove('fade-out');
-                }, 1000);
+                    gameContainer.classList.remove('hidden');
+                    gameContainer.classList.add('ready');
+                }
             } else {
                 // No next scene defined, just hide vignette and show game
                 vignetteScreen.classList.add('hidden');

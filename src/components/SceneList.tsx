@@ -146,7 +146,7 @@ const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<Sce
               e.stopPropagation();
               onDeleteScene(scene.id);
             }}
-            className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
+            className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-[calc(100%+1px)] group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
               isLateralMenu 
                 ? selectedSceneId === scene.id && currentView === 'scenes'
                   ? 'bg-red-500 rounded-none' // flush with right edge
@@ -242,7 +242,7 @@ const SceneList: React.FC<SceneListProps> = ({
 
   const getAddButtonClass = () => {
     const baseClass =
-      'w-full flex items-center justify-start px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent mt-2 flex-shrink-0';
+      'flex items-center justify-center px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent flex-shrink-0 whitespace-nowrap';
 
     // Default / Dark
     return `${baseClass} bg-white text-zinc-950 hover:bg-zinc-200`;
@@ -271,21 +271,41 @@ const SceneList: React.FC<SceneListProps> = ({
   return (
     <div className={`flex flex-col gap-0 h-full`}>
       {/* View Map Button */}
-      {isLateralMenu && (
-        <div className={`relative flex-shrink-0 mb-4 mt-2 px-2`}>
-          <button
-            onClick={() => onViewMap?.()}
-            className={`flex items-center gap-3 w-full text-xs transition-colors ${
-              currentView === 'map'
-                ? `text-primary font-bold`
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
-          >
-            <Map className="w-4 h-4 flex-shrink-0" />
-            <span className="truncate flex-1 text-left">{t('sceneList.viewMap', 'Ver mapa de cenas')}</span>
-          </button>
-        </div>
-      )}
+      {/* Creation Buttons - Moved to Top */}
+      <div className={`flex gap-2 mb-4 px-1 flex-shrink-0 h-[42px] min-h-[42px] ${isLateralMenu ? 'mr-2' : ''}`}>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onAddNode?.('vignette');
+          }}
+          className={`${getAddButtonClass()} flex-1 text-[11px]`}
+        >
+          <ArrowRight className="w-3.5 h-3.5 mr-1.5 currentColor" />
+          {t('sceneList.nodeSelection.vignette.title', 'Criar Vinheta')}
+        </button>
+
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (hasOpeningVignette) onAddNode?.('scene');
+          }}
+          disabled={!hasOpeningVignette}
+          title={
+            !hasOpeningVignette
+              ? t(
+                  'sceneList.nodeSelection.scene.lockedDesc',
+                  'Crie uma vinheta de abertura para habilitar cenas.'
+                )
+              : ''
+          }
+          className={`${getAddButtonClass()} flex-1 text-[11px] ${
+            !hasOpeningVignette ? 'opacity-50 cursor-not-allowed grayscale' : ''
+          }`}
+        >
+          <Split className="w-3.5 h-3.5 mr-1.5 currentColor" />
+          {t('sceneList.nodeSelection.scene.title', 'Criar Cena')}
+        </button>
+      </div>
 
       {/* Search Input */}
       <div className={`relative flex-shrink-0 mb-3 ${isLateralMenu ? 'mr-2' : ''}`}>
@@ -337,40 +357,22 @@ const SceneList: React.FC<SceneListProps> = ({
                 </div>
                 
                 {/* Creation Buttons */}
-                <div className={`flex gap-2 mt-2 mb-6 px-1 flex-shrink-0 ${isLateralMenu ? 'mr-2' : ''}`}>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onAddNode?.('vignette');
-                    }}
-                    className={`${getAddButtonClass()} flex-1 h-[32px] px-2 text-[11px] min-h-0 w-auto justify-center`}
-                  >
-                    <ArrowRight className="w-3.5 h-3.5 mr-1.5 currentColor" />
-                    {t('sceneList.nodeSelection.vignette.title', 'Criar Vinheta')}
-                  </button>
-
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (hasOpeningVignette) onAddNode?.('scene');
-                    }}
-                    disabled={!hasOpeningVignette}
-                    title={
-                      !hasOpeningVignette
-                        ? t(
-                            'sceneList.nodeSelection.scene.lockedDesc',
-                            'Crie uma vinheta de abertura para habilitar cenas.'
-                          )
-                        : ''
-                    }
-                    className={`${getAddButtonClass()} flex-1 h-[32px] px-2 text-[11px] min-h-0 w-auto justify-center ${
-                      !hasOpeningVignette ? 'opacity-50 cursor-not-allowed grayscale' : ''
-                    }`}
-                  >
-                    <Split className="w-3.5 h-3.5 mr-1.5 currentColor" />
-                    {t('sceneList.nodeSelection.scene.title', 'Criar Cena')}
-                  </button>
-                </div>
+                {/* Moved Map Button Here */}
+                {isLateralMenu && (
+                  <div className={`relative flex-shrink-0 mt-2 px-2`}>
+                    <button
+                      onClick={() => onViewMap?.()}
+                      className={`flex items-center gap-3 w-full text-xs transition-colors ${
+                        currentView === 'map'
+                          ? `text-primary font-bold`
+                          : 'text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <Map className="w-4 h-4 flex-shrink-0" />
+                      <span className="truncate flex-1 text-left">{t('sceneList.viewMap', 'Ver mapa de cenas')}</span>
+                    </button>
+                  </div>
+                )}
               </div>
             );
           }}

@@ -77,7 +77,11 @@ export const useSceneManagement = ({
             if (existingSceneCount === 1) {
                 const firstSceneId = prev.sceneOrder[0];
                 const firstScene = prev.scenes[firstSceneId];
-                if (firstScene && firstScene.vignetteType === 'opening' && !firstScene.vignetteNextSceneId) {
+                // Auto-link if no link exists OR if the current link sequence points to a non-existent scene
+                const currentNextId = firstScene?.vignetteNextSceneId;
+                const isLinkMissingOrInvalid = !currentNextId || !prev.scenes[currentNextId];
+
+                if (firstScene && firstScene.vignetteType === 'opening' && isLinkMissingOrInvalid) {
                     newScenes[firstSceneId] = {
                         ...firstScene,
                         vignetteNextSceneId: newId
@@ -127,6 +131,10 @@ export const useSceneManagement = ({
                         Object.keys(exits).forEach(key => {
                             if (exits[key] === id) delete exits[key];
                         });
+                    }
+                    // Clean up dangling vignette links
+                    if (scene.vignetteNextSceneId === id) {
+                        scene.vignetteNextSceneId = '';
                     }
                 });
 
