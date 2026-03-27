@@ -984,7 +984,14 @@
     "saving_fiction": "SAVING FICTION",
     "uploadErrorTitle": "Upload Error",
     "imageLimitExceeded": "The image exceeds the {{limit}} MB limit.",
-    "audioLimitExceeded": "The audio exceeds the {{limit}} MB limit."
+    "audioLimitExceeded": "The audio exceeds the {{limit}} MB limit.",
+    "exportFormat": "Export Format",
+    "exportFormatZip": "ZIP Package",
+    "exportFormatZipDesc": "Lighter file,\nSlower load.",
+    "exportFormatHtml": "Single HTML",
+    "exportFormatHtmlDesc": "Heavier file,\nFaster load.",
+    "htmlImportError": "IF Builder data block not found in HTML.",
+    "htmlImportErrorDesc": "The HTML file does not contain IF Builder data or is corrupted."
   },
   "SceneEditor": {
     "imageLimitExceeded": "The image exceeds the {{size}}MB limit."

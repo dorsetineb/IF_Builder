@@ -192,7 +192,7 @@ DATE:        ${exportDate.toLocaleString()}
           const fontUrl = getFontUrl(fontFamily);
           fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
         }
-      } catch (e) {
+      } catch {
         const fontUrl = getFontUrl(fontFamily);
         fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
       }
@@ -418,6 +418,330 @@ DATE:        ${exportDate.toLocaleString()}
       customFilename || exportData.gameTitle?.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'game';
     if (!finalFilename.toLowerCase().endsWith('.zip')) {
       finalFilename += '.zip';
+    }
+    link.download = finalFilename;
+
+    document.body.appendChild(link);
+    link.click();
+
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(link.href);
+    }, 100);
+  };
+
+  const handleExportHTML = async (customFilename?: string) => {
+    // Deep clone gameData — keep Base64 data URIs inline (no extraction)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const exportData = JSON.parse(JSON.stringify(gameData)) as any;
+
+    // Add Metadata
+    const exportDate = new Date();
+    const userName = profile?.username?.replace(/[^a-zA-Z0-9 _-]/g, '') || 'IF Builder User';
+
+    exportData.metadata = {
+      exportedBy: userName,
+      exportDate: exportDate.toISOString(),
+      platform: 'IF Builder',
+      version: '1.0',
+      format: 'single-html',
+    };
+
+    const fontFamily = exportData.gameFontFamily || "'Silkscreen', sans-serif";
+    const fontName = fontFamily.split(',')[0].replace(/'/g, '').trim();
+    let fontStylesheet = '';
+    let finalCss = exportData.gameCSS;
+
+    // Sanitize legacy CSS (same fixes as ZIP export)
+    const frameCssFixes: [string, string][] = [
+      ['body.frame-rounded-top.game-container.image-panel', 'body.frame-rounded-top .game-container .image-panel'],
+      ['body.frame-rounded-top.game-container.image-container', 'body.frame-rounded-top .game-container .image-container'],
+      ['body.frame-book-cover.game-container.image-panel', 'body.frame-book-cover .game-container .image-panel'],
+      ['body.frame-book-cover.game-container.image-container', 'body.frame-book-cover .game-container .image-container'],
+      ['body.frame-trading-card.image-panel', 'body.frame-trading-card .image-panel'],
+      ['body.frame-trading-card.game-container:not(.layout-image-last).image-panel', 'body.frame-trading-card .game-container:not(.layout-image-last) .image-panel'],
+      ['body.frame-trading-card.game-container.layout-image-last.image-panel', 'body.frame-trading-card .game-container.layout-image-last .image-panel'],
+      ['body.frame-trading-card.image-container', 'body.frame-trading-card .image-container'],
+      ['body.frame-none.main-wrapper', 'body.frame-none .main-wrapper'],
+      ['body.frame-none.game-container {', 'body.frame-none .game-container {'],
+      ['body.frame-none.image-panel', 'body.frame-none .image-panel'],
+      ['body.frame-none.game-container.layout-horizontal.image-panel', 'body.frame-none .game-container.layout-horizontal .image-panel'],
+      ['body.frame-none.game-container.layout-image-last.image-panel', 'body.frame-none .game-container.layout-image-last .image-panel'],
+    ];
+    for (const [from, to] of frameCssFixes) {
+      finalCss = finalCss.replaceAll(from, to);
+    }
+
+    // Embed fonts as Base64 inline in CSS
+    if (fontName) {
+      const googleFontName = fontName.replace(/ /g, '+');
+      const fontCssUrl = `https://fonts.googleapis.com/css2?family=${googleFontName}:wght@400;700&display=swap`;
+      try {
+        const cssResponse = await fetch(fontCssUrl);
+        if (cssResponse.ok) {
+          let fontCssText = await cssResponse.text();
+          const fontUrlRegex = /url\((https:\/\/[^)]+\.woff2)\)/g;
+          const fontUrlsToDownload = new Set<string>();
+          let match;
+          while ((match = fontUrlRegex.exec(fontCssText)) !== null)
+            fontUrlsToDownload.add(match[1]);
+
+          for (const originalUrl of fontUrlsToDownload) {
+            try {
+              const fontRes = await fetch(originalUrl);
+              if (fontRes.ok) {
+                const fontBlob = await fontRes.blob();
+                const fontBase64 = await new Promise<string>((resolve) => {
+                  const reader = new FileReader();
+                  reader.onloadend = () => resolve(reader.result as string);
+                  reader.readAsDataURL(fontBlob);
+                });
+                fontCssText = fontCssText.replace(
+                  new RegExp(originalUrl.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'),
+                  fontBase64
+                );
+              }
+            } catch { /* skip font if fetch fails */ }
+          }
+          finalCss = fontCssText + '\n\n' + finalCss;
+        } else {
+          const fontUrl = getFontUrl(fontFamily);
+          fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
+        }
+      } catch {
+        const fontUrl = getFontUrl(fontFamily);
+        fontStylesheet = fontUrl ? `<link href="${fontUrl}" rel="stylesheet">` : '';
+      }
+    }
+
+    // Inject translated defaults for empty text fields
+    const textDefaults: Record<string, string> = {
+      gameSplashButtonText: t('UIEditor.textos.splashButtonPlaceholder'),
+      gameContinueButtonText: t('UIEditor.textos.continueButtonPlaceholder'),
+      gameRestartButtonText: t('UIEditor.textos.restartButtonPlaceholder'),
+      gameActionButtonText: t('UIEditor.textos.actionButtonPlaceholder'),
+      gameVerbInputPlaceholder: t('UIEditor.textos.commandInputValue'),
+      gameSuggestionsButtonText: t('UIEditor.textos.suggestionsPlaceholder'),
+      gameInventoryButtonText: t('UIEditor.textos.inventoryPlaceholder'),
+      gameDiaryButtonText: t('UIEditor.textos.diaryPlaceholder'),
+      gameTrackersButtonText: t('UIEditor.textos.trackersPlaceholder'),
+      gameSystemButtonText: t('UIEditor.textos.systemPlaceholder'),
+      gameMainMenuButtonText: t('UIEditor.textos.mainMenuPlaceholder'),
+      gameSaveMenuTitle: t('UIEditor.textos.saveMenuPlaceholder', 'Save Game'),
+      gameLoadMenuTitle: t('UIEditor.textos.loadMenuPlaceholder', 'Load Game'),
+      gameViewEndingButtonText: t('UIEditor.textos.viewEndingPlaceholder'),
+      gameDiaryPlayerName: t('UIEditor.textos.diaryPlayerNamePlaceholder'),
+      gameSuggestionsEmptyFeedback: t('UIEditor.textos.suggestionsEmptyFeedbackDefault'),
+      gameInventoryEmptyFeedback: t('UIEditor.textos.inventoryEmptyFeedbackDefault'),
+    };
+    Object.keys(textDefaults).forEach((key) => {
+      if (!exportData[key]) exportData[key] = textDefaults[key];
+    });
+
+    const engineData = prepareGameDataForEngine(exportData);
+    const safeJson = JSON.stringify(engineData).replace(/<\/script/g, '<\\/script>');
+    const finalGameScript = `window.embeddedGameData = ${safeJson};\n\n${gameJS}`;
+
+    const trackersButtonHTML =
+      exportData.enableTrackers && (exportData.gameShowTrackersUI ?? true)
+        ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>'
+        : '';
+    const systemButtonHTML =
+      (exportData.gameShowSystemButton ?? true)
+        ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>'
+        : '';
+
+    const suggestionsButtonHTML =
+      (exportData.enableSuggestions ?? true)
+        ? `<button id="suggestions-button">${exportData.gameSuggestionsButtonText || t('UIEditor.textos.suggestionsPlaceholder')}</button>`
+        : '';
+
+    const inventoryButtonHTML =
+      (exportData.enableInventory ?? true)
+        ? `<button id="inventory-button">${exportData.gameInventoryButtonText || t('UIEditor.textos.inventoryPlaceholder')}</button>`
+        : '';
+
+    const diaryButtonHTML =
+      (exportData.enableDiary ?? true)
+        ? `<button id="diary-button">${exportData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder')}</button>`
+        : '';
+
+    let htmlContent = gameData.gameHTML
+      .replace('__GAME_TITLE__', exportData.gameTitle || 'IF Builder Game')
+      .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme with-spacing`)
+      .replace(
+        '__LAYOUT_ORIENTATION_CLASS__',
+        exportData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : ''
+      )
+      .replace(
+        '__LAYOUT_ORDER_CLASS__',
+        exportData.gameLayoutOrder === 'image-last' ? 'layout-image-last' : ''
+      )
+      .replace('__FRAME_CLASS__', getFrameClass(exportData.gameImageFrame))
+      .replace('__MOBILE_BEHAVIOR_CLASS__', 'behavior-immersive')
+      .replace('__FONT_STYLESHEET__', fontStylesheet)
+      .replace(
+        '__CHANCES_CONTAINER__',
+        exportData.enableChances
+          ? '<div id="chances-container" class="chances-container"></div>'
+          : ''
+      )
+      .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
+      .replace('__SYSTEM_BUTTON__', systemButtonHTML)
+      .replace('__SUGGESTIONS_BUTTON__', suggestionsButtonHTML)
+      .replace('__INVENTORY_BUTTON__', inventoryButtonHTML)
+      .replace('__DIARY_BUTTON__', diaryButtonHTML)
+      .replace(
+        /__INVENTORY_BUTTON_TEXT__/g,
+        exportData.gameInventoryButtonText || t('UIEditor.textos.inventoryPlaceholder')
+      )
+      .replace(
+        /__SUGGESTIONS_BUTTON_TEXT__/g,
+        exportData.gameSuggestionsButtonText || t('UIEditor.textos.suggestionsPlaceholder')
+      )
+      .replace(
+        /__TRACKERS_BUTTON_TEXT__/g,
+        exportData.gameTrackersButtonText || t('UIEditor.textos.trackersPlaceholder')
+      )
+      .replace(
+        /__SYSTEM_BUTTON_TEXT__/g,
+        exportData.gameSystemButtonText || t('UIEditor.textos.systemPlaceholder')
+      )
+      .replace(
+        '__SAVE_MENU_TITLE__',
+        exportData.gameSaveMenuTitle || t('UIEditor.textos.saveMenuPlaceholder', 'Save Game')
+      )
+      .replace(
+        '__LOAD_MENU_TITLE__',
+        exportData.gameLoadMenuTitle || t('UIEditor.textos.loadMenuPlaceholder', 'Load Game')
+      )
+      .replace(
+        '__MAIN_MENU_BUTTON_TEXT__',
+        exportData.gameMainMenuButtonText || t('UIEditor.textos.mainMenuPlaceholder')
+      )
+      .replace(
+        /(<button(?:(?!\bid="vignette-continue-button")[^>])*class="[^"]*ending-restart-button[^"]*"[^>]*>)(.*?)(<\/button>)/g,
+        `$1${exportData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder')}$3`
+      )
+      .replace(
+        /<button id="continue-button"([^>]*)>.*?<\/button>/g,
+        `<button id="continue-button"$1>${exportData.gameContinueButtonText || t('UIEditor.textos.continueButtonPlaceholder')}</button>`
+      )
+      .replace(
+        /<button id="system-button"([^>]*)>.*?<\/button>/g,
+        `<button id="system-button"$1>${exportData.gameSystemButtonText || t('UIEditor.textos.systemPlaceholder')}</button>`
+      )
+      .replace(
+        '__CONTINUE_BUTTON_TEXT__',
+        exportData.gameContinueButtonText || t('UIEditor.textos.continueButtonPlaceholder')
+      )
+      .replace(
+        /__RESTART_BUTTON_TEXT__/g,
+        exportData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder')
+      )
+      .replace(
+        '__ACTION_BUTTON_TEXT__',
+        exportData.gameActionButtonText || t('UIEditor.textos.actionButtonPlaceholder')
+      )
+      .replace(
+        '__VERB_INPUT_PLACEHOLDER__',
+        exportData.gameVerbInputPlaceholder || t('UIEditor.textos.commandInputValue')
+      )
+      .replace(
+        '__VIEW_ENDING_BUTTON_TEXT__',
+        exportData.gameViewEndingButtonText || t('UIEditor.textos.viewEndingPlaceholder')
+      )
+      .replace(
+        '__POSITIVE_ENDING_BG_STYLE__',
+        exportData.positiveEndingImage
+          ? `style="background-image: url('${exportData.positiveEndingImage}')"`
+          : ''
+      )
+      .replace(
+        '__POSITIVE_ENDING_ALIGN_CLASS__',
+        exportData.positiveEndingContentAlignment === 'left' ? 'align-left' : ''
+      )
+      .replace('__POSITIVE_ENDING_DESCRIPTION__', exportData.positiveEndingDescription || '')
+      .replace(
+        '__NEGATIVE_ENDING_BG_STYLE__',
+        exportData.negativeEndingImage
+          ? `style="background-image: url('${exportData.negativeEndingImage}')"`
+          : ''
+      )
+      .replace(
+        '__NEGATIVE_ENDING_ALIGN_CLASS__',
+        exportData.negativeEndingContentAlignment === 'left' ? 'align-left' : ''
+      )
+      .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '');
+
+    // Build final CSS with replacements
+    const css =
+      finalCss
+        .replace(/__FONT_FAMILY__/g, fontFamily)
+        .replace(/__GAME_FONT_SIZE__/g, (() => {
+          const size = exportData.gameFontSize || '1em';
+          return /^\\d+$/.test(size) ? `${size}px` : size;
+        })())
+        .replace(/__GAME_TEXT_COLOR__/g, exportData.gameTextColor || '#c9d1d9')
+        .replace(/__GAME_TITLE_COLOR__/g, exportData.gameTitleColor || '#58a6ff')
+        .replace(/__GAME_FOCUS_COLOR__/g, exportData.gameFocusColor || '#58a6ff')
+        .replace(/__GAME_TEXT_COLOR_LIGHT__/g, exportData.textColorLight || '#24292f')
+        .replace(/__GAME_TITLE_COLOR_LIGHT__/g, exportData.titleColorLight || '#0969da')
+        .replace(/__GAME_FOCUS_COLOR_LIGHT__/g, exportData.focusColorLight || '#0969da')
+        .replace(/__SPLASH_BUTTON_COLOR__/g, exportData.gameSplashButtonColor || '#2ea043')
+        .replace(
+          /__SPLASH_BUTTON_HOVER_COLOR__/g,
+          exportData.gameSplashButtonHoverColor || '#238636'
+        )
+        .replace(/__SPLASH_BUTTON_TEXT_COLOR__/g, exportData.gameSplashButtonTextColor || '#ffffff')
+        .replace(/__ACTION_BUTTON_COLOR__/g, exportData.gameActionButtonColor || '#ffffff')
+        .replace(/__SPLASH_BUTTON_TEXT_COLOR__/g, exportData.gameSplashButtonTextColor || '#ffffff')
+        .replace(/__ACTION_BUTTON_TEXT_COLOR__/g, exportData.gameActionButtonTextColor || '#0d1117')
+        .replace(/__FRAME_BOOK_COLOR__/g, exportData.frameBookColor || exportData.gameFrameColor || '#FFFFFF')
+        .replace(/__FRAME_TRADING_CARD_COLOR__/g, exportData.frameTradingCardColor || exportData.gameFrameColor || '#FFFFFF')
+        .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, exportData.frameRoundedTopColor || exportData.gameFrameColor || '#FFFFFF')
+        .replace(/__SCENE_NAME_OVERLAY_BG__/g, exportData.gameSceneNameOverlayBg || '#0d1117')
+        .replace(
+          /__SCENE_NAME_OVERLAY_TEXT_COLOR__/g,
+          exportData.gameSceneNameOverlayTextColor || '#c9d1d9'
+        )
+        .replace(
+          /__SCENE_NAME_OVERLAY_TEXT_COLOR__/g,
+          exportData.gameSceneNameOverlayTextColor || '#c9d1d9'
+        )
+        .replace(
+          /__CONTINUE_INDICATOR_COLOR__/g,
+          exportData.gameContinueIndicatorColor || exportData.gameTitleColor || '#58a6ff'
+        ) + OVERLAY_CSS;
+
+    // Inline CSS into the HTML (replace <link rel="stylesheet" href="style.css"> if present)
+    htmlContent = htmlContent.replace(
+      /<link[^>]*href="style\.css"[^>]*>/,
+      `<style>${css}</style>`
+    );
+    // If no external stylesheet link exists, inject <style> before </head>
+    if (!htmlContent.includes('<style>')) {
+      htmlContent = htmlContent.replace('</head>', `<style>${css}</style>\n</head>`);
+    }
+
+    // Inline JS + editor source data before </body>
+    const safeEditorJson = JSON.stringify(exportData).replace(/<\/script/g, '<\\/script>');
+    htmlContent = htmlContent.replace(
+      '</body>',
+      `<script>${finalGameScript}<` + `/script>\n` +
+      `<script id="if-builder-source" type="application/json">${safeEditorJson}<` + `/script>\n` +
+      '</body>'
+    );
+
+    // Download as single HTML file
+    const finalBlob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(finalBlob);
+
+    let finalFilename =
+      customFilename || exportData.gameTitle?.replace(/[^a-z0-9]/gi, '_').toLowerCase() || 'game';
+    if (!finalFilename.toLowerCase().endsWith('.html')) {
+      finalFilename += '.html';
     }
     link.download = finalFilename;
 
@@ -704,6 +1028,37 @@ DATE:        ${exportDate.toLocaleString()}
         }
       };
       reader.readAsArrayBuffer(file);
+    } else if (file.name.endsWith('.html') || file.name.endsWith('.htm')) {
+      // Single HTML Bundle import — extract editor data from invisible JSON block
+      reader.onload = (ev) => {
+        try {
+          const htmlText = ev.target?.result as string;
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(htmlText, 'text/html');
+          const sourceTag = doc.getElementById('if-builder-source');
+          if (!sourceTag?.textContent) {
+            throw new Error(
+              t('editor.htmlImportError', 'Bloco de dados IF Builder não encontrado no HTML.')
+            );
+          }
+          const data = JSON.parse(sourceTag.textContent);
+          if (!data || typeof data !== 'object') throw new Error('Arquivo inválido');
+          handleImportGame(data);
+        } catch (error) {
+          console.error('Erro ao importar HTML:', error);
+          toast(
+            t('editor.importErrorTitle', 'Erro na Importação'),
+            t(
+              'editor.htmlImportErrorDesc',
+              'O arquivo HTML não contém dados do IF Builder ou está corrompido.'
+            ),
+            'error'
+          );
+        } finally {
+          setIsImporting(false);
+        }
+      };
+      reader.readAsText(file);
     } else {
       reader.onload = (ev) => {
         try {
@@ -747,6 +1102,7 @@ DATE:        ${exportDate.toLocaleString()}
 
   return {
     handleExport,
+    handleExportHTML,
     handleImportFile,
     handleImportGame,
     handleDownloadExample,

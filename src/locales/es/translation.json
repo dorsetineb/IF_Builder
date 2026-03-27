@@ -985,7 +985,14 @@
     "saving_fiction": "GUARDANDO FICCIÓN",
     "uploadErrorTitle": "Error en la Subida",
     "imageLimitExceeded": "La imagen excede el límite de {{limit}} MB.",
-    "audioLimitExceeded": "El audio excede el límite de {{limit}} MB."
+    "audioLimitExceeded": "El audio excede el límite de {{limit}} MB.",
+    "exportFormat": "Formato de Exportación",
+    "exportFormatZip": "Paquete ZIP",
+    "exportFormatZipDesc": "Archivo más ligero,\nCarga más lenta.",
+    "exportFormatHtml": "HTML Único",
+    "exportFormatHtmlDesc": "Archivo más pesado,\nCarga más rápida.",
+    "htmlImportError": "Bloque de datos IF Builder no encontrado en el HTML.",
+    "htmlImportErrorDesc": "El archivo HTML no contiene datos de IF Builder o está corrupto."
   },
   "SceneEditor": {
     "imageLimitExceeded": "La imagen excede el límite de {{size}}MB."

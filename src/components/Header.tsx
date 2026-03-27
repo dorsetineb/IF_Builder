@@ -1,5 +1,5 @@
 
-import React, { useRef } from 'react';
+import React from 'react';
 import { GameData, View } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Eye, Plus, CircleHelp, ChevronLeft, ChevronRight, PanelLeft, Upload, Download, Save } from 'lucide-react';
@@ -13,13 +13,12 @@ const Header: React.FC<{
   sidebarCollapsed?: boolean;
   onToggleCollapse?: () => void;
   onExport: () => void;
-  onImport: (file: File) => void;
+  onImport: () => void;
   onHome?: () => void;
   currentView: View;
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
 }> = ({ gameData, isPreviewing, onTogglePreview, onNewGame, sidebarCollapsed, onToggleCollapse, onExport, onImport, onHome, currentView }) => {
   const { t } = useTranslation();
-  const importInputRef = useRef<HTMLInputElement>(null);
 
   const totalConnectableNodes = Object.keys(gameData?.scenes || {}).length + (gameData?.vignettes?.length || 0);
   const isPreviewDisabled = totalConnectableNodes < 2;
@@ -83,27 +82,12 @@ const Header: React.FC<{
         <div className="flex items-center gap-3 ml-auto">
           {(!['about', 'guide', 'settings'].includes(currentView)) && (
             <>
-              {/* Hidden Import Input */}
-              <input
-                type="file"
-                ref={importInputRef}
-                className="hidden"
-                accept=".json,.zip"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) onImport(file);
-                  e.target.value = '';
-                }}
-              />
-
               {isPreviewing ? (
                 <button onMouseDown={onTogglePreview} className="flex items-center px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs uppercase tracking-wider">
                   <Eye className="w-3.5 h-3.5 mr-2" /> {t('header.closePreview', 'Fechar Preview')}
                 </button>
               ) : (
                 <>
-
-
                   <button
                     onClick={onExport}
                     className="flex items-center justify-center px-3 py-2 text-primary hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
@@ -113,7 +97,7 @@ const Header: React.FC<{
                   </button>
 
                   <button
-                    onClick={() => importInputRef.current?.click()}
+                    onClick={onImport}
                     className="flex items-center justify-center px-3 py-2 text-primary hover:text-white transition-colors text-xs font-semibold uppercase tracking-wider gap-2"
                     title={t('header.loadGame', 'Carregar')}
                   >
@@ -128,7 +112,6 @@ const Header: React.FC<{
                   >
                     <Eye className="w-3.5 h-3.5 mr-2" /> {t('header.previewGameBtn', 'Pré-visualizar')}
                   </button>
-
                 </>
               )}
             </>

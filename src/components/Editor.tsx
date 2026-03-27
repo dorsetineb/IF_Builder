@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { useToast } from './ToastContext';
@@ -59,7 +59,7 @@ import NodeTypeModal from './NodeTypeModal';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Info, Settings as SettingsIcon, CircleHelp, X, Save } from 'lucide-react';
+import { Info, Settings as SettingsIcon, CircleHelp, X, Save, FileArchive, FileCode } from 'lucide-react';
 import Settings from '../pages/Settings';
 import AboutProject from '../pages/AboutProject';
 
@@ -849,6 +849,13 @@ const Editor: React.FC = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [saveFilename, setSaveFilename] = useState('');
+  const [saveFormat, setSaveFormat] = useState<'zip' | 'html'>('zip');
+
+  // Load Modal States
+  const importFileRef = useRef<HTMLInputElement>(null);
+  const handleImportClick = () => {
+    importFileRef.current?.click();
+  };
 
   // BIOS Animation State
   const [biosStep, setBiosStep] = useState(0); // 0: Info, 1: Prompt Wait, 2: Typing
@@ -1060,7 +1067,7 @@ const Editor: React.FC = () => {
     handleAddScene(type);
   };
 
-  const { handleExport, handleImportFile, handleImportGame, handleDownloadExample, isImporting } =
+  const { handleExport, handleExportHTML, handleImportFile, handleImportGame, handleDownloadExample, isImporting } =
     useExportImport({
       gameData,
       setGameData,
@@ -1194,7 +1201,11 @@ const Editor: React.FC = () => {
     setIsSaving(true);
     setShowSaveModal(false);
     try {
-      await handleExport(saveFilename);
+      if (saveFormat === 'html') {
+        await handleExportHTML(saveFilename);
+      } else {
+        await handleExport(saveFilename);
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -1306,7 +1317,7 @@ const Editor: React.FC = () => {
               setSelectedSceneId(null);
             }})}
             onExport={() => setShowSaveModal(true)}
-            onImport={handleImportFile}
+            onImport={handleImportClick}
             currentView={currentView}
           />
           <Preview gameData={gameData} testSceneId={previewSceneId} />
@@ -1324,7 +1335,7 @@ const Editor: React.FC = () => {
             sidebarCollapsed={sidebarCollapsed}
             onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
             onExport={() => setShowSaveModal(true)}
-            onImport={handleImportFile}
+            onImport={handleImportClick}
             onHome={() => attemptNavigation({ type: 'action', action: () => {
               setCurrentView('welcome');
               setSelectedSceneId(null);
@@ -1597,7 +1608,7 @@ const Editor: React.FC = () => {
 
             {showSaveModal && (
               <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center">
-                <div className="bg-background border border-muted-foreground/50 rounded-lg shadow-xl w-[400px] max-w-[90vw] overflow-hidden">
+                <div className="bg-background border border-muted-foreground/50 rounded-lg shadow-xl w-[440px] max-w-[90vw] overflow-hidden">
                   <div className="flex justify-between items-center p-4 border-b border-muted-foreground/50 bg-muted/30">
                     <h3 className="font-semibold text-lg">
                       {t('editor.save_project', 'Salvar Projeto')}
@@ -1613,9 +1624,6 @@ const Editor: React.FC = () => {
                     <p className="text-sm text-muted-foreground">
                       {t('editor.save_project_desc', 'Dê um nome ao seu projeto para exportá-lo.')}
                     </p>
-                    <label className="text-sm font-medium">
-                      {t('editor.project_filename', 'Nome do Arquivo')}
-                    </label>
                     <div className="relative">
                       <input
                         type="text"
@@ -1630,6 +1638,43 @@ const Editor: React.FC = () => {
                           }
                         }}
                       />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3 mb-2">
+                      <button
+                        type="button"
+                        onClick={() => setSaveFormat('zip')}
+                        className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all text-left ${
+                          saveFormat === 'zip'
+                            ? 'border-primary bg-primary/10'
+                            : 'border-muted-foreground/30 hover:border-muted-foreground/50'
+                        }`}
+                      >
+                        <FileArchive className={`w-6 h-6 ${saveFormat === 'zip' ? 'text-primary' : 'text-muted-foreground'}`} />
+                        <span className={`text-xs font-bold ${saveFormat === 'zip' ? 'text-primary' : 'text-foreground'}`}>
+                          {t('editor.exportFormatZip', 'Pacote ZIP')}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground text-center leading-tight whitespace-pre-line">
+                          {t('editor.exportFormatZipDesc', 'Arquivo mais leve,\nLoad mais demorado.')}
+                        </span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setSaveFormat('html')}
+                        className={`flex flex-col items-center gap-2 p-3 rounded-lg border-2 transition-all text-left ${
+                          saveFormat === 'html'
+                            ? 'border-primary bg-primary/10'
+                            : 'border-muted-foreground/30 hover:border-muted-foreground/50'
+                        }`}
+                      >
+                        <FileCode className={`w-6 h-6 ${saveFormat === 'html' ? 'text-primary' : 'text-muted-foreground'}`} />
+                        <span className={`text-xs font-bold ${saveFormat === 'html' ? 'text-primary' : 'text-foreground'}`}>
+                          {t('editor.exportFormatHtml', 'HTML Único')}
+                        </span>
+                        <span className="text-[10px] text-muted-foreground text-center leading-tight whitespace-pre-line">
+                          {t('editor.exportFormatHtmlDesc', 'Arquivo mais pesado,\nLoad mais rápido.')}
+                        </span>
+                      </button>
                     </div>
                   </div>
                   <div className="flex justify-end gap-3 p-4 border-t border-muted-foreground/50 bg-muted/30">
@@ -1651,6 +1696,20 @@ const Editor: React.FC = () => {
                 </div>
               </div>
             )}
+
+            {/* Hidden Single Import Input */}
+            <input
+              type="file"
+              ref={importFileRef}
+              className="hidden"
+              accept=".json,.zip,.html,.htm"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleImportFile(file);
+                // Clear input so same file can be uploaded again if needed
+                if (e.target) e.target.value = '';
+              }}
+            />
 
             {isSaving && (
               <div className="fixed inset-0 z-[9998] bg-black/80 backdrop-blur-sm flex items-center justify-center">
