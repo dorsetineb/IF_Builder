@@ -1011,6 +1011,14 @@ const Editor: React.FC = () => {
   const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
   const [previewSceneId, setPreviewSceneId] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<View>('welcome');
+  const mainRef = useRef<HTMLElement>(null);
+
+  // Scroll to top when view or scene changes
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTo(0, 0);
+    }
+  }, [currentView, selectedSceneId]);
 
   // Update page title based on current view
   useEffect(() => {
@@ -1391,7 +1399,8 @@ const Editor: React.FC = () => {
               </div>
             )}
             <main
-              className={`flex-1 overflow-y-auto relative bg-background ${['welcome', 'map', 'global_objects', 'trackers', 'global_commands'].includes(currentView) || (currentView === 'scenes' && !selectedScene) ? 'p-0' : 'p-6'}`}
+              ref={mainRef}
+              className="flex-1 overflow-y-auto relative bg-background p-0"
             >
               {/* currentView === 'vignettes' block removed */}
               {currentView === 'interface' && (

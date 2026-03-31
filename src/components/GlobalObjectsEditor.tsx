@@ -198,7 +198,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
             {/* LEFT SIDEBAR (Standardized Layout) */}
             <div className="w-72 flex-shrink-0 bg-muted-foreground/20 flex flex-col pt-4 pl-2 pr-0 pb-2 transition-all z-10 shadow-lg border-r border-primary/20">
                 {/* Search Header */}
-                <div className="relative mb-3 mt-2 pr-2 flex-shrink-0">
+                <div className="relative mb-3 mt-0 pr-2 flex-shrink-0">
                     <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                         type="text"
@@ -272,42 +272,49 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
             </div>
 
             {/* RIGHT MAIN PANEL */}
-            <div className="flex-1 overflow-y-auto relative bg-background p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto relative bg-background px-4 pb-4">
                 {/* Header with Save/Undo actions */}
-                <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/50 shadow-sm">
-                    <p className="text-muted-foreground text-xs font-medium">
-                        {t('globalObjectsEditor.headerDesc', 'Gerenciador Global: Objetos criados aqui podem ser usados em qualquer cena.')}
-                    </p>
-                    <div className="flex items-center gap-3">
-                        {isDirty && (
-                            <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
-                                {t('globalObjectsEditor.unsavedChanges', 'Alterações não salvas')}
-                            </div>
-                        )}
-                        <button
-                            onClick={handleUndo}
-                            disabled={!isDirty}
-                            className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
-                        >
-                            {t('globalObjectsEditor.undoBtn', 'Desfazer')}
-                        </button>
-                        <button
-                            onClick={handleSave}
-                            disabled={!isDirty}
-                            className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
-                        >
-                            {t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
-                        </button>
+                <div className="sticky top-0 z-40 bg-background flex flex-col pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm border-b border-muted-foreground/50">
+                    {/* Solid background shield to perfectly hide scrolled content */}
+                    <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
+                    
+                    <div className="flex justify-between items-center p-4 bg-card rounded-xl border border-muted-foreground/50 shadow-sm relative z-10">
+                        <p className="text-muted-foreground text-xs font-medium">
+                            {t('globalObjectsEditor.headerDesc', 'Gerenciador Global: Objetos criados aqui podem ser usados em qualquer cena.')}
+                        </p>
+                        <div className="flex items-center gap-3">
+                            {isDirty && (
+                                <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
+                                    {t('globalObjectsEditor.unsavedChanges', 'Alterações não salvas')}
+                                </div>
+                            )}
+                            <button
+                                onClick={handleUndo}
+                                disabled={!isDirty}
+                                className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
+                            >
+                                {t('globalObjectsEditor.undoBtn', 'Desfazer')}
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                disabled={!isDirty}
+                                className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed shadow-sm"
+                            >
+                                {t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
+                            </button>
+                        </div>
                     </div>
-                </div>
+                <div className="absolute left-0 right-0 -bottom-2 h-2 bg-gradient-to-b from-background to-transparent pointer-events-none" />
+            </div>
 
-                <div className="pt-6 pb-8 w-full">
+            <div className="mt-4">
+                <div key={selectedObject?.id || 'empty'} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                     {selectedObject ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                             {/* Left Column: Details & Usages */}
                             <div className="space-y-6">
                                 {/* Object Details Card */}
-                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
+                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
                                     <div className="flex justify-between items-center mb-6">
                                         <h3 className="text-sm font-bold text-foreground flex items-center gap-2 uppercase tracking-wide">
                                             <Box className="w-4 h-4" />
@@ -390,7 +397,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                 </div>
 
                                 {/* Usages Card */}
-                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
+                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                                     <h3 className="text-sm font-bold text-foreground mb-6 flex items-center gap-2 uppercase tracking-wide">
                                         <Link className="w-4 h-4 opacity-70" />
                                         {t('globalObjectsEditor.usedInScenes', 'Usado nas cenas')}
@@ -417,7 +424,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                             {/* Right Column: Multimedia */}
                             <div className="space-y-6">
                                 {/* Multimedia Card */}
-                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
+                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-sm font-bold text-foreground flex items-center gap-2 uppercase tracking-wide">
                                             <Image className="w-4 h-4" />
@@ -478,6 +485,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                             <h4 className="text-sm font-bold text-muted-foreground mb-1">{t('objectEditor.noObjectSelected', 'Selecione um objeto para editar')}</h4>
                         </div>
                     )}
+                    </div>
                 </div>
             </div>
 

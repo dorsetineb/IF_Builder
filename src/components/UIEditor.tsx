@@ -949,36 +949,40 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     };
 
     return (
-        <div className="space-y-6 pb-8">
-            {/* Header with Save/Undo actions */}
-            <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/50">
-                <p className="text-muted-foreground text-xs font-medium">
-                    {t('UIEditor.header.description')}
-                </p>
-                <div className="flex items-center gap-3">
-                    {isDirty && (
-                        <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
-                            {t('UIEditor.header.unsavedChanges')}
-                        </div>
-                    )}
-                    <button
-                        onClick={handleUndo}
-                        disabled={!isDirty}
-                        className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
-                    >
-                        {t('UIEditor.header.undo')}
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={!isDirty}
-                        className="px-4 py-1.5 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
-                    >
-                        {t('UIEditor.header.save')}
-                    </button>
+        <div className="px-4 pb-8 h-full">
+            <div className="sticky top-0 z-40 bg-background flex flex-col pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm border-b border-muted-foreground/50">
+                {/* Solid background shield to perfectly hide scrolled content */}
+                <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
+                {/* Soft gradient transition */}
+                <div className="absolute left-0 right-0 -bottom-2 h-2 bg-gradient-to-b from-background to-transparent pointer-events-none" />
+                {/* Header with Save/Undo actions */}
+                <div className="flex justify-between items-center p-4 rounded-xl border border-muted-foreground/50 bg-card shadow-sm relative z-10">
+                    <p className="text-muted-foreground text-xs font-medium">
+                        {t('UIEditor.header.description')}
+                    </p>
+                    <div className="flex items-center gap-3">
+                        {isDirty && (
+                            <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
+                                {t('UIEditor.header.unsavedChanges')}
+                            </div>
+                        )}
+                        <button
+                            onClick={handleUndo}
+                            disabled={!isDirty}
+                            className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
+                        >
+                            {t('UIEditor.header.undo')}
+                        </button>
+                        <button
+                            onClick={handleSave}
+                            disabled={!isDirty}
+                            className="px-4 py-1.5 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
+                        >
+                            {t('UIEditor.header.save')}
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div>
-                <div className="border-b border-muted-foreground/50 flex items-center justify-between pr-4">
+                <div className="border-b border-muted-foreground/50 flex items-center justify-between relative">
                     <div className="flex space-x-1 overflow-x-auto">
                         {Object.entries(TABS).map(([key, name]) => {
                             return (
@@ -997,8 +1001,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         })}
                     </div>
                 </div>
+            </div>
 
-                <div className={`bg-muted/10 -mt-px py-8 grid grid-cols-1 gap-8 items-start`}>
+            <div className="mt-4">
+                <div className="bg-background">
 
 
                     {activeTab === 'sistemas' && (
@@ -1011,7 +1017,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         {/* --- LEFT COLUMN --- */}
                                         <div className="flex-1 w-full space-y-6">
                                             {/* --- GAME STYLE --- */}
-                                            <div className={`w-full p-6 bg-card border-2 ${localGameInteractionType ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
+                                            <div className={`w-full p-6 bg-card border-2 ${localGameInteractionType ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '0ms' }}>
                                                 <div className="flex justify-between items-start mb-6">
                                                     <div className="flex items-center gap-3">
                                                         <LayoutTemplate className="w-5 h-5" />
@@ -1055,7 +1061,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* IMAGES */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableImages ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableImages ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '100ms' }}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <ImageIcon className="w-5 h-5" />
@@ -1115,7 +1121,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* TEXT CONTROL */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableTextControl ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableTextControl ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '200ms' }}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Type className="w-5 h-5" />
@@ -1189,7 +1195,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="flex-1 w-full space-y-6">
                                             {/* CHANCES/VIDAS */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableChances ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableChances ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '300ms' }}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Heart className="w-5 h-5" />
@@ -1268,7 +1274,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* SUGGESTOES */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableSuggestions ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableSuggestions ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '400ms' }}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Lightbulb className="w-5 h-5" />
@@ -1298,7 +1304,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* INVENTORY */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableInventory ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableInventory ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '500ms' }}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Package className="w-5 h-5" />
@@ -1328,7 +1334,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* DIARY */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableDiary ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableDiary ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '600ms' }}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <Book className="w-5 h-5" />
@@ -1366,7 +1372,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                             {/* TRACKERS */}
                                             <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableTrackers ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4`}>
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableTrackers ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '700ms' }}>
                                                     <div className="flex justify-between items-center">
                                                         <div className="flex items-center gap-3">
                                                             <SlidersHorizontal className="w-5 h-5" />
@@ -1586,7 +1592,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         activeTab === 'textos' && (
                             <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6 content-start">
                                 {/* SECTION: AÇÕES & INTERAÇÃO */}
-                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
+                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
                                     <div className="flex items-center gap-3">
                                         <Hand className="w-5 h-5" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.actions')}</h4>
@@ -1612,7 +1618,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
 
                                 {/* SECTION: SUGESTÕES */}
-                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
+                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                                     <div className="flex items-center gap-3">
                                         <Lightbulb className="w-5 h-5" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.suggestions')}</h4>
@@ -1642,7 +1648,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
 
                                 {/* SECTION: INVENTÁRIO */}
-                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
+                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
                                     <div className="flex items-center gap-3">
                                         <Package className="w-5 h-5" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.inventory')}</h4>
@@ -1672,7 +1678,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
 
                                 {/* SECTION: DIÁRIO & NARRATIVA */}
-                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
+                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
                                     <div className="flex items-center gap-3">
                                         <Book className="w-5 h-5" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.diary')}</h4>
@@ -1690,7 +1696,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
 
                                 {/* SECTION: INTERFACE & SISTEMA */}
-                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6">
+                                <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '400ms' }}>
                                     <div className="flex items-center gap-3">
                                         <Wrench className="w-5 h-5" />
                                         <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.system')}</h4>
@@ -1733,7 +1739,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="col-span-1 lg:col-span-5 space-y-8 custom-scrollbar pb-20">
 
                                     {/* SECTION: ESTRUTURA */}
-                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
+                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
                                         <div className="flex items-center w-full text-left">
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
                                                 <LayoutTemplate className="w-4 h-4" /> {t('UIEditor.aparencia.scenes', 'Layout das Cenas')}
@@ -1816,7 +1822,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     </div>
 
                                     {/* SECTION: VINHETAS */}
-                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
+                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                                         <div className="flex items-center w-full text-left">
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
                                                 <ArrowRight className="w-4 h-4" /> {t('UIEditor.aparencia.vinhetas', 'Layout das Vinhetas')}
@@ -1863,15 +1869,61 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         </div>
                                     </div>
 
+                                    {/* SECTION: UI TEXT */}
+                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '150ms' }}>
+                                        <div className="flex items-center w-full text-left">
+                                            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                                                <Type className="w-4 h-4" /> {t('UIEditor.aparencia.fontsText')}
+                                            </h3>
+                                        </div>
+
+                                        <div className="mt-6 space-y-6">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.font')}</label>
+                                                    <div className="relative">
+                                                        <select
+                                                            value={localFontFamily}
+                                                            onChange={(e) => setLocalFontFamily(e.target.value)}
+                                                            className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
+                                                        >
+                                                            {FONTS.map(font => (
+                                                                <option key={font.name} value={font.family}>
+                                                                    {t(`fonts.${font.name.replace(/[^a-zA-Z]/g, '')}`, { defaultValue: font.name })} · {t(`fonts.categories.${font.category}`, { defaultValue: font.category })}
+                                                                </option>
+                                                            ))}
+                                                        </select>
+                                                        <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                                    </div>
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.size')}</label>
+                                                    <div className="relative">
+                                                        <select
+                                                            value={localGameFontSize}
+                                                            onChange={(e) => setLocalGameFontSize(e.target.value)}
+                                                            className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
+                                                        >
+                                                            <option value="12">{t('UIEditor.aparencia.sizeSmall')}</option>
+                                                            <option value="14">{t('UIEditor.aparencia.sizeMedium')}</option>
+                                                            <option value="16">{t('UIEditor.aparencia.sizeLarge')}</option>
+                                                        </select>
+                                                        <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
                                     {/* SECTION: ESTILO & TEMA */}
-                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
+                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
                                         <div className="flex items-center w-full text-left">
                                             <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
                                                 <Palette className="w-4 h-4" /> {t('UIEditor.aparencia.styleTheme')}
                                             </h3>
                                         </div>
 
-                                        <div className="space-y-6 pt-4">
+                                        <div className="mt-6 space-y-6">
                                             <div className="space-y-2">
                                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('ThemeEditor.uiTheme', 'Cor da Interface')}</label>
                                                 <div className="flex bg-background rounded-lg p-1 border border-muted-foreground/50">
@@ -1956,76 +2008,28 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             </div>
                                                         </div>
                                                     )}
-                                                </div>              </div>
+                                                </div>
+                                            </div>
 
                                         </div>
                                     </div>
-
-
-
                                 </div>
 
                                 {/* Right Column: Preview (Expanded width) */}
-                                <div className="col-span-1 lg:col-span-7 relative">
+                                <div className="col-span-1 lg:col-span-7 relative sticky top-[160px] self-start">
                                     <div className="space-y-6 flex flex-col">
-                                        {/* SECTION: UI TEXT (Moved here) */}
-                                        <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm">
-                                            <div className="flex items-center w-full text-left">
-                                                <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                    <Type className="w-4 h-4" /> {t('UIEditor.aparencia.fontsText')}
-                                                </h3>
-                                            </div>
-
-                                            <div className="space-y-6 pt-4">
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div className="space-y-2">
-                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.font')}</label>
-                                                        <div className="relative">
-                                                            <select
-                                                                value={localFontFamily}
-                                                                onChange={(e) => setLocalFontFamily(e.target.value)}
-                                                                className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
-                                                            >
-                                                                {FONTS.map(font => (
-                                                                    <option key={font.name} value={font.family}>
-                                                                        {t(`fonts.${font.name.replace(/[^a-zA-Z]/g, '')}`, { defaultValue: font.name })} · {t(`fonts.categories.${font.category}`, { defaultValue: font.category })}
-                                                                    </option>
-                                                                ))}
-                                                            </select>
-                                                            <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-                                                        </div>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.size')}</label>
-                                                        <div className="relative">
-                                                            <select
-                                                                value={localGameFontSize}
-                                                                onChange={(e) => setLocalGameFontSize(e.target.value)}
-                                                                className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
-                                                            >
-                                                                <option value="12">{t('UIEditor.aparencia.sizeSmall')}</option>
-                                                                <option value="14">{t('UIEditor.aparencia.sizeMedium')}</option>
-                                                                <option value="16">{t('UIEditor.aparencia.sizeLarge')}</option>
-                                                            </select>
-                                                            <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center justify-start gap-3 mb-2">
-                                            <span className="text-[10px] font-bold text-muted-foreground uppercase">{t('UIEditor.aparencia.previewLabel', 'Exemplo de')}</span>
-                                            <div className="flex bg-background rounded-lg p-1 border border-muted-foreground/50 w-48">
+                                        <div className="flex items-center justify-start gap-3 mb-2 w-full">
+                                            <span className="text-[10px] font-bold text-muted-foreground uppercase whitespace-nowrap">{t('UIEditor.aparencia.previewLabel', 'Exemplo de')}</span>
+                                            <div className="flex bg-background rounded-lg p-1 border border-muted-foreground/50 w-full max-w-[340px]">
                                                 <button
                                                     onClick={() => setPreviewType('scene')}
-                                                    className={`flex-1 py-1 rounded-md text-[10px] font-bold uppercase transition-all ${previewType === 'scene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                                                    className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'scene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                                 >
-                                                    {t('UIEditor.aparencia.scenes', 'Cena')}
+                                                    {t('UIEditor.aparencia.scenes', 'Layout das Cenas')}
                                                 </button>
                                                 <button
                                                     onClick={() => setPreviewType('vignette')}
-                                                    className={`flex-1 py-1 rounded-md text-[10px] font-bold uppercase transition-all ${previewType === 'vignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                                                    className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'vignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                                                 >
                                                     {t('UIEditor.aparencia.vinhetas', 'Layout das Vinhetas')}
                                                 </button>
@@ -2235,7 +2239,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         activeTab === 'config' && (
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 {/* Idioma Section */}
-                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm transition-all duration-300 flex flex-col h-full">
+                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm transition-all duration-300 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
                                     <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
                                         <Globe className="w-4 h-4" />
                                         {t('settings.language.label', 'Idioma')}
@@ -2260,7 +2264,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 </div>
 
                                 {/* Aparência Section */}
-                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm transition-all duration-300 flex flex-col h-full">
+                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm transition-all duration-300 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                                     <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
                                         <Palette className="w-4 h-4" />
                                         {t('settings.appearance', 'Aparência')}
@@ -2270,21 +2274,21 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="grid grid-cols-3 gap-3">
                                             <button
                                                 onClick={() => handleAppThemeChange('dark')}
-                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
+                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'dark' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'} animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '0ms' }}
                                             >
                                                 <Moon size={16} className="text-muted-foreground" />
                                                 <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'dark' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.dark', 'Noite')}</span>
                                             </button>
                                             <button
                                                 onClick={() => handleAppThemeChange('windows')}
-                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'windows' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
+                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'windows' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'} animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '100ms' }}
                                             >
                                                 <Monitor size={16} className="text-muted-foreground" />
                                                 <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'windows' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.windows', 'W95')}</span>
                                             </button>
                                             <button
                                                 onClick={() => handleAppThemeChange('terminal')}
-                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
+                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'} animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '200ms' }}
                                             >
                                                 <Terminal size={16} className="text-muted-foreground" />
                                                 <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
@@ -2298,8 +2302,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                 </div>
             </div>
-
-            {/* Footer buttons removed */}
         </div>
     );
 };

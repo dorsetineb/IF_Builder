@@ -132,7 +132,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
             {/* LEFT SIDEBAR (Standardized Layout) */}
             <div className="w-72 flex-shrink-0 bg-muted-foreground/20 flex flex-col pt-4 pl-2 pr-0 pb-2 transition-all z-10 shadow-lg border-r border-primary/20">
                 {/* Search Header */}
-                <div className="relative mb-3 mt-2 pr-2 flex-shrink-0">
+                <div className="relative mb-3 mt-0 pr-2 flex-shrink-0">
                     <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <input
                         type="text"
@@ -207,120 +207,132 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
             </div>
 
             {/* RIGHT MAIN PANEL */}
-            <div className="flex-1 overflow-y-auto relative bg-background p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto relative bg-background px-4 pb-4">
                 {/* Header with Save/Undo actions */}
-                <div className="sticky top-0 z-40 backdrop-blur-md bg-background/95 flex justify-between items-center p-4 rounded-xl border border-muted-foreground/50 shadow-sm">
-                    <div className="text-muted-foreground text-xs font-medium space-y-1">
-                        <p>{t('globalCommandsEditor.headerDesc1', 'Configure os verbos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).')}</p>
-                        <p>
-                            <Trans i18nKey="globalCommandsEditor.headerDesc2">
-                                Os verbos <strong>&quot;olhar&quot;, &quot;examinar&quot;, &quot;ver&quot;</strong> e <strong>&quot;ler&quot;</strong> sempre estarão disponíveis para o usuário acionar a descrição de um objeto.
-                            </Trans>
-                        </p>
+                <div className="sticky top-0 z-40 bg-background flex flex-col pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm border-b border-muted-foreground/50">
+                    {/* Solid background shield to perfectly hide scrolled content */}
+                    <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
+                    
+                    <div className="flex justify-between items-center p-4 bg-card rounded-xl border border-muted-foreground/50 shadow-sm relative z-10">
+                        <div className="text-muted-foreground text-xs font-medium space-y-1">
+                            <p>{t('globalCommandsEditor.headerDesc1', 'Configure os verbos que estarão sempre disponíveis para o jogador (ex: ajuda, tutorial).')}</p>
+                            <p>
+                                <Trans i18nKey="globalCommandsEditor.headerDesc2">
+                                    Os verbos <strong>&quot;olhar&quot;, &quot;examinar&quot;, &quot;ver&quot;</strong> e <strong>&quot;ler&quot;</strong> sempre estarão disponíveis para o usuário acionar a descrição de um objeto.
+                                </Trans>
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-3 shrink-0 pl-4">
+                            {isDirty && (
+                                <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
+                                    {t('globalObjectsEditor.unsavedChanges', 'Alterações não salvas')}
+                                </div>
+                            )}
+                            <button
+                                onClick={handleUndo}
+                                disabled={!isDirty}
+                                className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
+                            >
+                                {t('globalObjectsEditor.undoBtn', 'Desfazer')}
+                            </button>
+                            <button
+                                onClick={handleSave}
+                                disabled={!isDirty}
+                                className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed shadow-sm"
+                            >
+                                {t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
+                            </button>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-3 shrink-0 pl-4">
-                        {isDirty && (
-                            <div className="flex items-center gap-2 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-2">
-                                {t('globalObjectsEditor.unsavedChanges', 'Alterações não salvas')}
-                            </div>
-                        )}
-                        <button
-                            onClick={handleUndo}
-                            disabled={!isDirty}
-                            className="px-3 py-1.5 text-xs font-bold text-muted-foreground hover:text-foreground disabled:opacity-30 disabled:hover:text-muted-foreground transition-colors"
-                        >
-                            {t('globalObjectsEditor.undoBtn', 'Desfazer')}
-                        </button>
-                        <button
-                            onClick={handleSave}
-                            disabled={!isDirty}
-                            className="px-4 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed shadow-sm"
-                        >
-                            {t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}
-                        </button>
-                    </div>
+                    {/* Soft gradient transition */}
+                    <div className="absolute left-0 right-0 -bottom-2 h-2 bg-gradient-to-b from-background to-transparent pointer-events-none" />
                 </div>
 
-                <div className="pt-6 pb-8 w-full">
-                    {selectedVerb ? (
-                        <div className="space-y-6">
-                            <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
-                                <h3 className="text-sm font-bold text-foreground flex items-center gap-2 uppercase tracking-wide mb-6">
-                                    <MessageSquare className="w-4 h-4" />
-                                    {t('globalCommandsEditor.editCommandTitle', 'Propriedades do Verbo')}
-                                </h3>
+                <div className="mt-4">
+                    <div key={selectedVerb?.id || 'empty'} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        {selectedVerb ? (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                {/* Left Column: Logic */}
                                 <div className="space-y-6">
-                                <div className="space-y-2">
-                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                                        {t('globalCommandsEditor.verbsLabel', 'Verbos (separados por vírgula)')}
-                                    </label>
-                                    <div className="flex gap-2">
-                                        {/* Icon Picker */}
-                                        <div className="relative group shrink-0">
-                                            <button
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    setIsIconPickerOpen(!isIconPickerOpen);
-                                                }}
-                                                className="w-10 h-10 flex items-center justify-center bg-input border border-input rounded-lg text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
-                                                title={t('globalCommandsEditor.chooseIconTooltip', 'Escolher ícone')}
-                                            >
-                                                {(() => {
-                                                    const Icon = COMMAND_ICONS.find(i => i.name === selectedVerb.icon)?.component || MessageSquare;
-                                                    return <Icon className="w-5 h-5" />;
-                                                })()}
-                                            </button>
-                                            {isIconPickerOpen && (
-                                                <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-popover border border-muted-foreground/50 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
-                                                    {COMMAND_ICONS.map(icon => (
+                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
+                                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2 uppercase tracking-wide mb-6">
+                                            <MessageSquare className="w-4 h-4" />
+                                            {t('globalCommandsEditor.editCommandTitle', 'Propriedades do Verbo')}
+                                        </h3>
+                                        <div className="space-y-6">
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                                                    {t('globalCommandsEditor.verbsLabel', 'Verbos (separados por vírgula)')}
+                                                </label>
+                                                <div className="flex gap-2">
+                                                    {/* Icon Picker */}
+                                                    <div className="relative group shrink-0">
                                                         <button
-                                                            key={icon.name}
-                                                            onClick={() => { handleVerbChange(selectedVerb.id, 'icon', icon.name); setIsIconPickerOpen(false); }}
-                                                            className={`p-2 rounded hover:bg-accent flex items-center justify-center transition-colors ${selectedVerb.icon === icon.name ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}
-                                                            title={icon.name}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                setIsIconPickerOpen(!isIconPickerOpen);
+                                                            }}
+                                                            className="w-10 h-10 flex items-center justify-center bg-input border border-input rounded-lg text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
+                                                            title={t('globalCommandsEditor.chooseIconTooltip', 'Escolher ícone')}
                                                         >
-                                                            <icon.component className="w-4 h-4" />
+                                                            {(() => {
+                                                                const Icon = COMMAND_ICONS.find(i => i.name === selectedVerb.icon)?.component || MessageSquare;
+                                                                return <Icon className="w-5 h-5" />;
+                                                            })()}
                                                         </button>
-                                                    ))}
+                                                        {isIconPickerOpen && (
+                                                            <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-popover border border-muted-foreground/50 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                                                {COMMAND_ICONS.map(icon => (
+                                                                    <button
+                                                                        key={icon.name}
+                                                                        onClick={() => { handleVerbChange(selectedVerb.id, 'icon', icon.name); setIsIconPickerOpen(false); }}
+                                                                        className={`p-2 rounded hover:bg-accent flex items-center justify-center transition-colors ${selectedVerb.icon === icon.name ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}
+                                                                        title={icon.name}
+                                                                    >
+                                                                        <icon.component className="w-4 h-4" />
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <input
+                                                        type="text"
+                                                        value={selectedVerb.verbs.join(', ')}
+                                                        onChange={(e) => {
+                                                            const cleanedVerbs = e.target.value.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
+                                                            handleVerbChange(selectedVerb.id, 'verbs', cleanedVerbs);
+                                                        }}
+                                                        placeholder={t('globalCommandsEditor.verbsPlaceholder', 'ex: ajuda, help, ?')}
+                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all"
+                                                    />
                                                 </div>
-                                            )}
+                                                <p className="text-[10px] text-muted-foreground">
+                                                    {t('globalCommandsEditor.verbsDesc', 'Palavras que ativam este verbo. Ex: "ajuda" ou "help".')}
+                                                </p>
+                                            </div>
+                                            <div className="space-y-2 flex-1">
+                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                                                    {t('globalCommandsEditor.descriptionLabel', 'Descrição / Resposta')}
+                                                </label>
+                                                <textarea
+                                                    value={selectedVerb.description}
+                                                    onChange={(e) => handleVerbChange(selectedVerb.id, 'description', e.target.value)}
+                                                    placeholder={t('globalCommandsEditor.descriptionPlaceholder', 'Texto que será exibido para o jogador quando usar este verbo.')}
+                                                    rows={8}
+                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all resize-none"
+                                                />
+                                            </div>
                                         </div>
-                                        <input
-                                            type="text"
-                                            value={selectedVerb.verbs.join(', ')}
-                                            onChange={(e) => {
-                                                const cleanedVerbs = e.target.value.split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
-                                                handleVerbChange(selectedVerb.id, 'verbs', cleanedVerbs);
-                                            }}
-                                            placeholder={t('globalCommandsEditor.verbsPlaceholder', 'ex: ajuda, help, ?')}
-                                            className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all"
-                                        />
                                     </div>
-                                    <p className="text-[10px] text-muted-foreground">
-                                        {t('globalCommandsEditor.verbsDesc', 'Palavras que ativam este verbo. Ex: "ajuda" ou "help".')}
-                                    </p>
-                                </div>
-                                <div className="space-y-2 flex-1">
-                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                                        {t('globalCommandsEditor.descriptionLabel', 'Descrição / Resposta')}
-                                    </label>
-                                    <textarea
-                                        value={selectedVerb.description}
-                                        onChange={(e) => handleVerbChange(selectedVerb.id, 'description', e.target.value)}
-                                        placeholder={t('globalCommandsEditor.descriptionPlaceholder', 'Texto que será exibido para o jogador quando usar este verbo.')}
-                                        rows={8}
-                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all resize-none"
-                                    />
-                                </div>
                                 </div>
                             </div>
-                        </div>
-                    ) : (
-                        <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center mt-20">
-                            <MessageSquare className="w-12 h-12 mb-4 opacity-20" />
-                            <h4 className="text-sm font-bold text-muted-foreground mb-1">{t('globalCommandsEditor.noCommandSelected', 'Selecione um verbo para editar')}</h4>
-                        </div>
-                    )}
+                        ) : (
+                            <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center mt-20">
+                                <MessageSquare className="w-12 h-12 mb-4 opacity-20" />
+                                <h4 className="text-sm font-bold text-muted-foreground mb-1">{t('globalCommandsEditor.noCommandSelected', 'Selecione um verbo para editar')}</h4>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

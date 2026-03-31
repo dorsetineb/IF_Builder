@@ -54,7 +54,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 </div>
             )}
 
-            <div className="max-w-7xl mx-auto px-8 pt-6 pb-24 w-full animate-in fade-in duration-500">
+            <div className="max-w-7xl mx-auto px-8 pt-6 pb-24 w-full">
 
 
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start relative">
@@ -99,7 +99,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                         {/* TAB: SOBRE O PROJETO (NOVO) */}
                         {activeTab === 'about_project' && (
-                            <div className="space-y-8 animate-in slide-in-from-left-4 duration-300 pt-4">
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
                                 <div className="">
                                     <div className="flex items-center gap-3 mb-6">
                                         <h2 className="text-lg font-bold text-foreground">
@@ -117,7 +117,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                         {/* TAB: APOIAR (ANTIGO SOBRE O PROJETO) */}
                         {activeTab === 'support' && (
-                            <div className="space-y-8 animate-in slide-in-from-left-4 duration-300 pt-4">
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
                                 <div className="">
                                     <div className="flex items-center gap-3 mb-6">
                                         <h2 className="text-lg font-bold text-foreground">
@@ -140,7 +140,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                         {/* TAB: SOBRE O DESENVOLVEDOR (Renamed & Reordered) */}
                         {activeTab === 'dev' && (
-                            <div className="space-y-8 animate-in slide-in-from-left-4 duration-300 pt-4">
+                            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pt-4">
                                 <div className="">
                                     <div className="flex flex-col md:flex-row gap-8">
                                         {/* Avatar Refined */}

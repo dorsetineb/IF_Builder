@@ -410,8 +410,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
     const isVignetteMode = localScene.vignetteType && localScene.vignetteType !== 'none';
 
     return (
-      <div className="space-y-6">
-        <div className="sticky top-0 z-40 flex justify-between items-center bg-background/95 backdrop-blur-md p-4 rounded-xl border border-muted-foreground/50">
+      <div className="pb-8 px-4">
+        <div className="sticky top-0 z-40 bg-background flex flex-col pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm border-b border-muted-foreground/50">
+          {/* Solid background shield to perfectly hide scrolled content */}
+          <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
+          <div className="flex justify-between items-center bg-card p-4 rounded-xl border border-muted-foreground/50 shadow-sm relative z-10">
           <p className="text-muted-foreground text-xs font-medium">
             {t('sceneEditor.headerDesc')}
           </p>
@@ -459,11 +462,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
               <span>{t('sceneEditor.saveBtn')}</span>
             </button>
           </div>
-        </div>
-
-        <div>
+          </div>
           {!isVignetteMode && (
-            <div className="border-b border-muted-foreground/50 flex items-center justify-between pr-4">
+            <div className="border-b border-muted-foreground/50 flex items-center justify-between">
               <div className="flex space-x-1 overflow-x-auto">
                 {Object.entries(TABS).map(([key, name]) => {
                   const isVignette = localScene.vignetteType && localScene.vignetteType !== 'none';
@@ -495,14 +496,18 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
               )}
             </div>
           )}
+          {/* Soft gradient transition */}
+          <div className="absolute left-0 right-0 -bottom-2 h-2 bg-gradient-to-b from-background to-transparent pointer-events-none" />
+        </div>
 
-          <div className="bg-background pt-6">
+        <div className="mt-4">
+          <div className="bg-background">
             {activeTab === 'properties' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div key={localScene.id} className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Left Column: Details & Rules */}
                 <div className="space-y-6 flex flex-col h-full">
                   {/* Scene Details Card */}
-                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 flex flex-col flex-1">
+                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 flex flex-col flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                       <FileText className="w-4 h-4" />
                       {isVignetteMode
@@ -758,7 +763,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                 {/* Right Column: Rules & Preview */}
                 <div className="space-y-6">
                   {/* Multimedia Card */}
-                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
+                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                         <ImageIcon className="w-4 h-4" />
@@ -963,7 +968,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                     )}
                   </div>
                   {/* Branching Preview Card */}
-                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
+                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
                     <div className="flex justify-between items-center mb-4">
                       <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                         <GitBranch className="w-4 h-4" />
@@ -988,7 +993,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                   {/* Narrative Rules Card - Renamed to Chance Rules */}
                   {(enableChances || gameSystemEnabled === 'chances') && (
-                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6">
+                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
                       <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                         <Scroll className="w-4 h-4" />
                         {t('sceneEditor.chancesTitle')}
@@ -1055,34 +1060,38 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             )}
 
             {activeTab === 'objects' && (
-              <ObjectEditor
-                sceneId={localScene.id}
-                objects={currentSceneObjects}
-                allGlobalObjects={Object.values(mergedGlobalObjects)}
-                onCreateGlobalObject={handleCreateGlobalObjectWrapper}
-                onLinkObject={handleLinkObjectWrapper}
-                onUnlinkObject={handleUnlinkObjectWrapper}
-                onUpdateGlobalObject={handleUpdateGlobalObjectLocal}
-              />
+              <div key={localScene.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <ObjectEditor
+                  sceneId={localScene.id}
+                  objects={currentSceneObjects}
+                  allGlobalObjects={Object.values(mergedGlobalObjects)}
+                  onCreateGlobalObject={handleCreateGlobalObjectWrapper}
+                  onLinkObject={handleLinkObjectWrapper}
+                  onUnlinkObject={handleUnlinkObjectWrapper}
+                  onUpdateGlobalObject={handleUpdateGlobalObjectLocal}
+                />
+              </div>
             )}
 
             {activeTab === 'interactions' && (
-              <InteractionEditor
-                interactions={localScene.interactions}
-                onUpdateInteractions={(interactions) =>
-                  updateLocalScene('interactions', interactions)
-                }
-                allScenes={allScenes}
-                currentSceneId={localScene.id}
-                sceneObjects={currentSceneObjects}
-                allTakableObjects={allAvailableInventoryObjects}
-                consequenceTrackers={consequenceTrackers}
-                vignettes={vignettes}
-              />
+              <div key={localScene.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <InteractionEditor
+                  interactions={localScene.interactions}
+                  onUpdateInteractions={(interactions) =>
+                    updateLocalScene('interactions', interactions)
+                  }
+                  allScenes={allScenes}
+                  currentSceneId={localScene.id}
+                  sceneObjects={currentSceneObjects}
+                  allTakableObjects={allAvailableInventoryObjects}
+                  consequenceTrackers={consequenceTrackers}
+                  vignettes={vignettes}
+                />
+              </div>
             )}
 
             {activeTab === 'choices' && (
-              <div className="flex h-[calc(100vh-260px)] min-h-[450px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card">
+              <div key={localScene.id} className="flex h-[calc(100vh-260px)] min-h-[450px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* LEFT LIST PANEL */}
                 <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/10">
                   {/* Search and Header */}
