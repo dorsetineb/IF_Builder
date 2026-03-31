@@ -187,13 +187,13 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             <div className="flex bg-zinc-900/50 p-1 rounded-lg mb-6 border border-muted-foreground/50">
                                 <button
                                     onClick={() => setSupportMethod('pix')}
-                                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${supportMethod === 'pix' ? 'bg-primary text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${supportMethod === 'pix' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                                 >
                                     PIX
                                 </button>
                                 <button
                                     onClick={() => setSupportMethod('kofi')}
-                                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${supportMethod === 'kofi' ? 'bg-[#29abe0] text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                    className={`flex-1 py-1.5 text-xs font-bold rounded-md transition-all ${supportMethod === 'kofi' ? 'bg-[#29abe0] text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                                 >
                                     Ko-fi
                                 </button>
