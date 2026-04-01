@@ -505,9 +505,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             {activeTab === 'properties' && (
               <div key={localScene.id} className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {/* Left Column: Details & Rules */}
-                <div className="space-y-6 flex flex-col h-full">
+                <div className="space-y-6 flex flex-col">
                   {/* Scene Details Card */}
-                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 flex flex-col flex-1 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
+                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                       <FileText className="w-4 h-4" />
                       {isVignetteMode
@@ -515,7 +515,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                         : t('sceneEditor.narrativeTitle')}
                     </h3>
 
-                    <div className="space-y-4 flex-1 flex flex-col">
+                    <div className="space-y-4 flex flex-col">
                       {isVignetteMode && localScene.vignetteType !== 'opening' && (
                         <div className="mb-6">
                           <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
@@ -604,7 +604,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                         </div>
                       </div>
 
-                      <div className="pt-2 flex-1 flex flex-col">
+                      <div className="pt-2 flex flex-col">
                         <div className="flex justify-between items-center mb-1.5">
                           <label
                             htmlFor="sceneDescription"
@@ -620,12 +620,12 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                             </span>
                           )}
                         </div>
-                        <div className="relative flex-1 flex flex-col">
+                        <div className="relative flex flex-col">
                           <textarea
                             id="sceneDescription"
                             value={localScene.description}
                             onChange={handleDescriptionChange}
-                            className="w-full flex-1 min-h-[160px] bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
+                            className="w-full min-h-[192px] bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
                             placeholder={t('sceneEditor.descPlaceholder')}
                           />
 
@@ -757,6 +757,70 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                     </div>
                   </div>
 
+                  {/* Narrative Rules Card - Renamed to Chance Rules */}
+                  {(enableChances || gameSystemEnabled === 'chances') && (
+                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
+                      <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+                        <Scroll className="w-4 h-4" />
+                        {t('sceneEditor.chancesTitle')}
+                      </h3>
+                      <div className="space-y-3">
+                        {/* Chance Removal */}
+                        <label
+                          className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.removesChanceOnEntry ? 'bg-red-500/5 border-red-500/30' : 'bg-transparent border-muted-foreground/50 hover:bg-muted/10'} `}
+                        >
+                          <div className="relative flex items-center mt-0.5">
+                            <input
+                              type="checkbox"
+                              checked={!!localScene.removesChanceOnEntry}
+                              onChange={(e) =>
+                                handleToggle('removesChanceOnEntry', e.target.checked)
+                              }
+                              className="custom-checkbox"
+                              disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
+                            />
+                          </div>
+                          <div>
+                            <span
+                              className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-500' : 'text-muted-foreground group-hover:text-foreground'} `}
+                            >
+                              {t('sceneEditor.removesChance')}
+                            </span>
+                            <span className="block text-[10px] text-muted-foreground mt-0.5">
+                              {t('sceneEditor.removesChanceDesc')}
+                            </span>
+                          </div>
+                        </label>
+
+                        {/* Chance Restoration */}
+                        <label
+                          className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.restoresChanceOnEntry ? 'bg-green-500/5 border-green-500/30' : 'bg-transparent border-muted-foreground/50 hover:bg-muted/10'} `}
+                        >
+                          <div className="relative flex items-center mt-0.5">
+                            <input
+                              type="checkbox"
+                              checked={!!localScene.restoresChanceOnEntry}
+                              onChange={(e) =>
+                                handleToggle('restoresChanceOnEntry', e.target.checked)
+                              }
+                              className="custom-checkbox"
+                              disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
+                            />
+                          </div>
+                          <div>
+                            <span
+                              className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-500' : 'text-muted-foreground group-hover:text-foreground'} `}
+                            >
+                              {t('sceneEditor.restoresChance')}
+                            </span>
+                            <span className="block text-[10px] text-muted-foreground mt-0.5">
+                              {t('sceneEditor.restoresChanceDesc')}
+                            </span>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  )}
 
                 </div>
 
@@ -991,70 +1055,6 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                     </p>
                   </div>
 
-                  {/* Narrative Rules Card - Renamed to Chance Rules */}
-                  {(enableChances || gameSystemEnabled === 'chances') && (
-                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
-                      <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-                        <Scroll className="w-4 h-4" />
-                        {t('sceneEditor.chancesTitle')}
-                      </h3>
-                      <div className="space-y-3">
-                        {/* Chance Removal */}
-                        <label
-                          className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.removesChanceOnEntry ? 'bg-red-500/5 border-red-500/30' : 'bg-transparent border-muted-foreground/50 hover:bg-muted/10'} `}
-                        >
-                          <div className="relative flex items-center mt-0.5">
-                            <input
-                              type="checkbox"
-                              checked={!!localScene.removesChanceOnEntry}
-                              onChange={(e) =>
-                                handleToggle('removesChanceOnEntry', e.target.checked)
-                              }
-                              className="custom-checkbox"
-                              disabled={isAnyCheckboxChecked && !localScene.removesChanceOnEntry}
-                            />
-                          </div>
-                          <div>
-                            <span
-                              className={`block text-xs font-bold ${localScene.removesChanceOnEntry ? 'text-red-500' : 'text-muted-foreground group-hover:text-foreground'} `}
-                            >
-                              {t('sceneEditor.removesChance')}
-                            </span>
-                            <span className="block text-[10px] text-muted-foreground mt-0.5">
-                              {t('sceneEditor.removesChanceDesc')}
-                            </span>
-                          </div>
-                        </label>
-
-                        {/* Chance Restoration */}
-                        <label
-                          className={`flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group ${localScene.restoresChanceOnEntry ? 'bg-green-500/5 border-green-500/30' : 'bg-transparent border-muted-foreground/50 hover:bg-muted/10'} `}
-                        >
-                          <div className="relative flex items-center mt-0.5">
-                            <input
-                              type="checkbox"
-                              checked={!!localScene.restoresChanceOnEntry}
-                              onChange={(e) =>
-                                handleToggle('restoresChanceOnEntry', e.target.checked)
-                              }
-                              className="custom-checkbox"
-                              disabled={isAnyCheckboxChecked && !localScene.restoresChanceOnEntry}
-                            />
-                          </div>
-                          <div>
-                            <span
-                              className={`block text-xs font-bold ${localScene.restoresChanceOnEntry ? 'text-green-500' : 'text-muted-foreground group-hover:text-foreground'} `}
-                            >
-                              {t('sceneEditor.restoresChance')}
-                            </span>
-                            <span className="block text-[10px] text-muted-foreground mt-0.5">
-                              {t('sceneEditor.restoresChanceDesc')}
-                            </span>
-                          </div>
-                        </label>
-                      </div>
-                    </div>
-                  )}
                 </div>
               </div>
             )}

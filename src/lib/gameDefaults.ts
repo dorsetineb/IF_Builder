@@ -72,7 +72,7 @@ export const gameHTML = `
                         __SYSTEM_BUTTON__
                     </div>
                     <div class="input-area">
-                        <input type="text" id="verb-input" placeholder="__VERB_INPUT_PLACEHOLDER__">
+                        <div id="verb-input" contenteditable="true" role="textbox" aria-multiline="false"></div>
                         <button id="submit-verb">__ACTION_BUTTON_TEXT__</button>
                     </div>
                 </div>

@@ -115,11 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const ICONS_OUTLINE = {
-        heart: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
-        circle: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
-        cross: '<svg stroke="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 5 V19 M5 12 H19"/></svg>',
-        square: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>',
-        diamond: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2l10 10-10 10L2 12z"/></svg>'
+        heart: '<svg fill="none" stroke="%COLOR%" stroke-width="3.5" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
+        circle: '<svg fill="none" stroke="%COLOR%" stroke-width="3.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
+        cross: '<svg stroke="none" stroke="%COLOR%" stroke-width="3.5" viewBox="0 0 24 24"><path d="M12 5 V19 M5 12 H19"/></svg>',
+        square: '<svg fill="none" stroke="%COLOR%" stroke-width="3.5" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>',
+        diamond: '<svg fill="none" stroke="%COLOR%" stroke-width="3.5" viewBox="0 0 24 24"><path d="M12 2l10 10-10 10L2 12z"/></svg>'
     };
 
     const gameData = window.embeddedGameData;
@@ -128,6 +128,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let visitedScenes = []; 
     let actionLog = []; 
     let chances = gameData.gameMaxChances || 3;
+    let lastChanceChange = null; 
     let isGameEnded = false;
     let trackers = {};
     let removedObjectsFromScenes = {}; 
@@ -1252,8 +1253,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
         const scene = gameData.cenas[sceneId]; if (!scene) return;
         if (scene.backgroundMusic) playBgm(scene.backgroundMusic);
+        const oldChances = chances;
         if (scene.removesChanceOnEntry && gameData.enableChances) chances--; 
         if (scene.restoresChanceOnEntry && gameData.enableChances) chances = Math.min(chances + 1, gameData.gameMaxChances);
+        
+        if (chances !== oldChances) {
+            lastChanceChange = {
+                type: chances < oldChances ? 'lost' : 'restored',
+                index: chances < oldChances ? chances : (chances - 1)
+            };
+        }
         currentSceneId = sceneId;
         if (!visitedScenes.includes(sceneId)) visitedScenes.push(sceneId);
         actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
@@ -1526,9 +1535,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const iconSvg = ICONS[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
             const iconOutlineSvg = ICONS_OUTLINE[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
             for (let i = 0; i < (gameData.gameMaxChances || 3); i++) {
-                const icon = document.createElement('div'); icon.className = 'chance-icon ' + (i < chances ? '' : 'lost');
-                icon.innerHTML = i < chances ? iconSvg : iconOutlineSvg; chancesContainer.appendChild(icon);
+                const icon = document.createElement('div');
+                const isLost = i >= chances;
+                icon.className = 'chance-icon ' + (isLost ? 'lost' : '');
+                
+                // Aplicar animação se este ícone foi o afetado agora
+                if (lastChanceChange && lastChanceChange.index === i) {
+                    icon.classList.add('animate-chance-' + lastChanceChange.type);
+                }
+                
+                icon.innerHTML = isLost ? iconOutlineSvg : iconSvg;
+                chancesContainer.appendChild(icon);
             }
+            lastChanceChange = null;
         }
         
         // CHOICE MODE HANDLING
@@ -1604,7 +1623,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (oldChoices) oldChoices.remove();
         }
 
-        actionPopup.classList.add('hidden'); verbInput.value = ''; activePopupType = null;
+        actionPopup.classList.add('hidden'); verbInput.textContent = ''; activePopupType = null;
     };
 
     const activateEndingUI = (type) => {
@@ -1617,7 +1636,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const gameOver = () => { 
         activateEndingUI('lose'); 
     };
-    const handleInput = () => { if (isPrinting) return; const input = verbInput.value.trim(); if (input) { processCommand(input); verbInput.value = ''; } };
+    const handleInput = () => { if (isPrinting) return; const input = verbInput.textContent.trim(); if (input) { processCommand(input); verbInput.textContent = ''; } };
+    
+    // Prevent Enter from creating new lines in contenteditable and trigger handleInput instead
+    verbInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleInput();
+        }
+    });
     const hasWord = (word, text) => {
         if (!word || !text) return false;
         const normalizedWord = word.toLowerCase().trim();
@@ -1764,8 +1791,15 @@ document.addEventListener('DOMContentLoaded', () => {
             sceneSuggestions.forEach(v => { 
                 const btn = document.createElement('button'); btn.textContent = v; 
                 btn.addEventListener('click', () => { 
-                    verbInput.value = v.toLowerCase() + ' '; 
+                    verbInput.textContent = v.toLowerCase() + ' '; 
                     verbInput.focus(); 
+                    // Move cursor to end of contenteditable
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(verbInput);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
                     actionPopup.classList.add('hidden'); 
                     activePopupType = null; 
                 }); 

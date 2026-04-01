@@ -55,7 +55,11 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             ? `<button id="diary-button">${gameData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder', 'Logbook')}</button>`
             : '';
 
-        const finalHtml = gameData.gameHTML
+        const rawHtml = gameData.gameHTML || gameHTML;
+        // Force migration of legacy input to contenteditable div for all projects
+        const migratedHtml = rawHtml.replace(/<input type="text" id="verb-input"[^>]*>/, '<div id="verb-input" contenteditable="true" role="textbox" aria-multiline="false"></div>');
+
+        const finalHtml = migratedHtml
             .replace(/__GAME_TITLE__/g, gameData.gameTitle || 'IF Builder Game')
             .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme with-spacing`)
             .replace('__LAYOUT_ORIENTATION_CLASS__', gameData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : '')
@@ -84,7 +88,8 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             .replace('__CONTINUE_BUTTON_TEXT__', gameData.gameContinueButtonText || t('UIEditor.textos.continueButtonPlaceholder'))
             .replace(/__RESTART_BUTTON_TEXT__/g, gameData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder'))
             .replace('__ACTION_BUTTON_TEXT__', gameData.gameActionButtonText || t('UIEditor.textos.actionButtonPlaceholder'))
-            .replace('__VERB_INPUT_PLACEHOLDER__', gameData.gameVerbInputPlaceholder || t('UIEditor.textos.commandInputValue'))
+            .replace('__VERB_INPUT_PLACEHOLDER__', gameData.gameVerbInputPlaceholder || t('UIEditor.textos.commandInputValue')) // Legacy safety
+            .replace('id="verb-input"', `id="verb-input" data-placeholder="${gameData.gameVerbInputPlaceholder || t('UIEditor.textos.commandInputValue')}"`)
             .replace('__POSITIVE_ENDING_BG_STYLE__', gameData.positiveEndingImage ? `style="background-image: url('${gameData.positiveEndingImage}')"` : '')
             .replace('__POSITIVE_ENDING_ALIGN_CLASS__', gameData.positiveEndingContentAlignment === 'left' ? 'align-left' : '')
             .replace('__POSITIVE_ENDING_DESCRIPTION__', gameData.positiveEndingDescription || '')
@@ -132,8 +137,76 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                 }
             }
             /* Common Icon Style */
-            .chance-icon svg { width: 24px; height: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); display: block; }
-            .chance-icon.lost svg { opacity: 0.3; }
+            .chance-icon svg { width: 24px; height: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); display: block; transition: all 0.3s ease; }
+            .chance-icon.lost svg { opacity: 0.8; }
+
+            /* Chance Animations */
+            @keyframes chanceLost {
+                0% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
+                30% { transform: scale(0.6); filter: drop-shadow(0 0 15px #ff0000) brightness(1.5); }
+                100% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
+            }
+
+            @keyframes chanceRestored {
+                0% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
+                40% { transform: scale(1.6); filter: drop-shadow(0 0 20px #4dff4d) brightness(1.5); }
+                100% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
+            }
+
+            .animate-chance-lost { animation: chanceLost 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; z-index: 10; }
+            .animate-chance-restored { animation: chanceRestored 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; z-index: 10; }
+
+            /* Final structural fix for Silkscreen clipping using contenteditable div */
+            #verb-input {
+                flex: 1;
+                min-width: 0;
+                height: 46px !important;
+                background: rgba(0,0,0,0.3);
+                border: 2px solid rgba(255,255,255,0.2);
+                color: var(--text-color, white);
+                padding: 0 12px !important;
+                font-family: var(--font-family);
+                font-size: 1em;
+                box-sizing: border-box !important;
+                outline: none;
+                transition: all 0.2s;
+                display: block !important; /* Block mode with line-height is better for caret centering */
+                line-height: 42px !important; /* Calculated: 46px height - 4px (2px+2px borders) */
+                white-space: nowrap !important;
+                overflow: visible !important; 
+                cursor: text;
+                user-select: text;
+            }
+            #verb-input:focus {
+                border-color: var(--title-color, #ffcc00);
+                background: rgba(0,0,0,0.4);
+            }
+            #verb-input:empty::before {
+                content: attr(data-placeholder);
+                color: rgba(255,255,255,0.4);
+                pointer-events: none;
+                display: block;
+                line-height: 42px !important; /* Ensures placeholder is also centered with the same logic */
+            }
+            
+            #submit-verb {
+                height: 46px !important;
+                padding: 8px 16px !important;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border: none !important; 
+                border-radius: 0 !important;
+                margin: 0 !important; /* Prevent gaps or misalignment */
+            }
+            
+            body.behavior-immersive #verb-input,
+            body.behavior-immersive #submit-verb {
+                height: 46px !important;
+            }
+            body.behavior-immersive #verb-input {
+                 padding: 0 12px !important;
+            }
 
             /* Mobile Responsive Fix */
             @media (max-width: 768px) {
