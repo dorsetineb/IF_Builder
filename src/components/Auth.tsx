@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Activity, Minus, Square, X, Play } from 'lucide-react';
+import { Activity, Minus, Square, X, Play, Loader2 } from 'lucide-react';
 import { DitherShader } from '@/components/ui/dither-shader';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeProvider';
+import { GameData } from '../types';
+import Preview from './Preview';
 
 type LandingView = 'landing' | 'about' | 'play';
 
@@ -14,6 +16,8 @@ export function Auth() {
 
     // Landing page view state
     const [currentView, setCurrentView] = useState<LandingView>('landing');
+    const [demoData, setDemoData] = useState<GameData | null>(null);
+    const [isLoadingDemo, setIsLoadingDemo] = useState(false);
 
     const { theme } = useTheme();
 
@@ -38,8 +42,34 @@ export function Auth() {
         setTimeout(() => {
             setCurrentView('landing');
             setIsClosing(false);
+            // Optionally clear demo data or keep it for next time
         }, 300);
     };
+
+    React.useEffect(() => {
+        if (currentView === 'play' && !demoData) {
+            const fetchDemoData = async () => {
+                setIsLoadingDemo(true);
+                try {
+                    const demoFolderName = i18n.language.startsWith('pt')
+                        ? "fuja_da_masmorra"
+                        : i18n.language.startsWith('es')
+                        ? "escapa_la_mazmorra"
+                        : "escape_the_dungeon";
+
+                    const response = await fetch(`/${demoFolderName}/editor_data.json`);
+                    if (!response.ok) throw new Error('Failed to fetch demo data');
+                    const data = await response.json();
+                    setDemoData(data);
+                } catch (error) {
+                    console.error("Error loading demo data:", error);
+                } finally {
+                    setIsLoadingDemo(false);
+                }
+            };
+            fetchDemoData();
+        }
+    }, [currentView, demoData, i18n.language]);
 
     // Sidebar Component (Left)
     const renderSidebar = () => (
@@ -165,19 +195,28 @@ export function Auth() {
                     </div>
                 </div>
 
-                {/* Game iframe */}
-                <div className="flex-1 min-h-0">
-                    <iframe
-                        src={
-                            i18n.language.startsWith('pt')
-                                ? "/fuja_da_masmorra/index.html"
+                {/* Game Preview */}
+                <div className="flex-1 min-h-0 bg-black relative">
+                    {isLoadingDemo ? (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-primary bg-black/40">
+                            <Loader2 className="w-8 h-8 animate-spin" />
+                            <p className="animate-pulse font-mono text-xs uppercase tracking-widest">{t('UIEditor.textos.loading', 'Carregando...')}</p>
+                        </div>
+                    ) : demoData ? (
+                        <Preview
+                            gameData={demoData}
+                            basePath={i18n.language.startsWith('pt')
+                                ? "/fuja_da_masmorra"
                                 : i18n.language.startsWith('es')
-                                ? "/escapa_la_mazmorra/index.html"
-                                : "/escape_the_dungeon/index.html"
-                        }
-                        className="w-full h-full border-0"
-                        title="Demo"
-                    />
+                                ? "/escapa_la_mazmorra"
+                                : "/escape_the_dungeon"
+                            }
+                        />
+                    ) : (
+                        <div className="absolute inset-0 flex items-center justify-center text-red-500 font-mono text-xs uppercase tracking-widest">
+                            ERROR: FAILED_TO_LOAD_DATA
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

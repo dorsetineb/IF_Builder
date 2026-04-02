@@ -1,5 +1,5 @@
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { GameData } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { gameHTML, initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
@@ -23,9 +23,11 @@ const getFrameClass = (frame?: GameData['gameImageFrame']): string => {
     }
 }
 
-const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = ({ gameData, testSceneId }) => {
+const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, basePath?: string }> = ({ gameData, testSceneId, basePath }) => {
     const { t } = useTranslation();
-    const srcDoc = useMemo(() => {
+    const [blobUrl, setBlobUrl] = useState<string | null>(null);
+
+    const fullHtml = useMemo(() => {
         const enableChances = gameData.enableChances || gameData.gameSystemEnabled === 'chances';
         const enableTrackers = gameData.enableTrackers || gameData.gameSystemEnabled === 'trackers';
 
@@ -227,14 +229,68 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                 const victory = vignettes.find(v => v.isConclusion && v.id.includes('VICTORY')) || vignettes.find(v => v.isConclusion);
                 const defeat = vignettes.find(v => v.isConclusion && v.id.includes('DEFEAT'));
 
-                const getScaleCss = (scale: string | undefined, selector: string) => {
+                const getScaleCss = (scale: string | undefined, selector: string, textAlign: string | undefined) => {
                     const s = scale === 'sm' ? { h1: '1.25rem', p: '0.75rem' } :
                         scale === 'lg' ? { h1: '2rem', p: '1rem' } :
                             { h1: '1.5rem', p: '0.875rem' }; // Base/Default
 
+                    const alignment = textAlign === 'left' ? {
+                        justify: 'flex-start',
+                        align: 'flex-start',
+                        text: 'left'
+                    } : textAlign === 'center' ? {
+                        justify: 'center',
+                        align: 'center',
+                        text: 'center'
+                    } : {
+                        justify: 'flex-end',
+                        align: 'flex-end',
+                        text: 'right'
+                    };
+
                     return `
-                       ${selector} h1 { font-size: ${s.h1} !important; line-height: 1.2 !important; }
-                       ${selector} p, ${selector} .description { font-size: ${s.p} !important; }
+                       html body ${selector}.splash-screen { 
+                           display: block !important;
+                           position: fixed !important;
+                           top: 0 !important;
+                           left: 0 !important;
+                           width: 100% !important;
+                           height: 100% !important;
+                           padding: 0 !important;
+                           margin: 0 !important;
+                       }
+                       html body ${selector} .splash-content {
+                           position: absolute !important;
+                           ${alignment.justify === 'center' ? 'left: 50% !important; transform: translateX(-50%) !important;' : alignment.justify === 'flex-start' ? 'left: 5vw !important; transform: none !important;' : 'right: 5vw !important; transform: none !important;'}
+                           ${alignment.align === 'center' ? 'top: 50% !important; transform: ' + (alignment.justify === 'center' ? 'translate(-50%, -50%)' : 'translate(0, -50%)') + ' !important;' : alignment.align === 'flex-start' ? 'top: 5vh !important; transform: none !important;' : 'bottom: 5vh !important; transform: none !important;'}
+                           width: auto !important;
+                           min-width: 300px !important;
+                           max-width: 80% !important;
+                           height: auto !important;
+                           padding: 2rem !important;
+                           margin: 0 !important;
+                           display: flex !important;
+                           flex-direction: column !important;
+                           align-items: ${alignment.align} !important;
+                           text-align: ${alignment.text} !important;
+                           z-index: 100 !important;
+                       }
+                       html body ${selector} .splash-text {
+                           text-align: ${alignment.text} !important;
+                           display: flex !important;
+                           flex-direction: column !important;
+                           align-items: ${alignment.align} !important;
+                       }
+                       html body ${selector} .splash-buttons {
+                           width: auto !important;
+                           min-width: 250px !important;
+                           display: flex !important;
+                           flex-direction: column !important;
+                           align-items: ${alignment.align} !important;
+                           margin-top: 1.5rem !important;
+                       }
+                       html body ${selector} h1 { font-size: ${s.h1} !important; line-height: 1.1 !important; margin-bottom: 0.5rem !important; }
+                       html body ${selector} p, html body ${selector} .description { font-size: ${s.p} !important; margin-bottom: 1rem !important; }
                    `;
                 };
 
@@ -260,10 +316,12 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
                 };
 
                 return `
-                    ${opening ? getScaleCss(opening.textScale, '#splash-screen .splash-content') : ''}
-                    ${victory ? getScaleCss(victory.textScale, '#positive-ending-screen .content') : ''}
-                    ${defeat ? getScaleCss(defeat.textScale, '#negative-ending-screen .content') : ''}
+                    ${opening ? getScaleCss(opening.textScale, '#splash-screen', opening.textAlign) : ''}
+                    ${opening ? getScaleCss(opening.textScale, '#vignette-screen', opening.textAlign) : ''}
+                    ${victory ? getScaleCss(victory.textScale, '#positive-ending-screen', victory.textAlign) : ''}
+                    ${defeat ? getScaleCss(defeat.textScale, '#negative-ending-screen', defeat.textAlign) : ''}
                     ${opening ? getAnimationCss(opening, '#splash-screen .splash-content') : ''}
+                    ${opening ? getAnimationCss(opening, '#vignette-screen .splash-content') : ''}
                     ${victory ? getAnimationCss(victory, '#positive-ending-screen .content') : ''}
                     ${defeat ? getAnimationCss(defeat, '#negative-ending-screen .content') : ''}
                 `;
@@ -322,19 +380,35 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null }> = (
             window.isSceneTest = ${!!testSceneId};
         </script>`;
         const testSceneCss = testSceneId ? `<style>html,body{background-color:#000!important}#splash-screen{display:none!important;opacity:0!important;pointer-events:none!important}#game-container{opacity:0;transition:opacity 0.3s ease-in-out}#game-container.ready{opacity:1!important}</style>` : '';
+        const baseTag = basePath ? `<base href="${window.location.origin}${basePath}/">` : '';
         const styleTag = `<style>${finalCss}</style>`;
         const gameScriptTag = `<script>${gameJS}</script>`;
 
         return finalHtml
-            .replace('</head>', `${testSceneCss}${styleTag}</head>`)
+            .replace('</head>', `${baseTag}${testSceneCss}${styleTag}</head>`)
             .replace('</body>', `${dataScript}${gameScriptTag}</body>`);
 
-    }, [gameData, testSceneId, t]);
+    }, [gameData, testSceneId, t, basePath]);
+
+    useEffect(() => {
+        if (!fullHtml) {
+            setBlobUrl(null);
+            return;
+        }
+
+        const blob = new Blob([fullHtml], { type: 'text/html' });
+        const url = URL.createObjectURL(blob);
+        setBlobUrl(url);
+
+        return () => {
+            URL.revokeObjectURL(url);
+        };
+    }, [fullHtml]);
 
     return (
         <div className="w-full h-full bg-brand-bg relative">
             <iframe
-                srcDoc={srcDoc}
+                src={blobUrl || 'about:blank'}
                 title="Pré-visualização do Jogo"
                 className="w-full h-full border-none"
                 sandbox="allow-scripts allow-same-origin"

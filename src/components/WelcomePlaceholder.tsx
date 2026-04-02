@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DitherShader } from '@/components/ui/dither-shader';
-import { X, Monitor, Cloud, CircleHelp, Zap } from 'lucide-react';
+import { X, Monitor, Cloud, CircleHelp, Zap, Loader2 } from 'lucide-react';
 import { NewProjectModal } from './NewProjectModal';
 import { GameData } from '../types';
 import { useTranslation } from 'react-i18next';
+import Preview from './Preview';
 
 interface WelcomePlaceholderProps {
     onCreateScene: (data?: Partial<GameData>) => void;
@@ -19,6 +20,8 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
     const [showDownloadHelp, setShowDownloadHelp] = useState(false);
     const [isNewProjectModalOpen, setIsNewProjectModalOpen] = useState(false);
     const [isGamePopupOpen, setIsGamePopupOpen] = useState(false);
+    const [demoData, setDemoData] = useState<GameData | null>(null);
+    const [isLoadingDemo, setIsLoadingDemo] = useState(false);
 
     const handleDownloadClick = () => {
         setIsFlashing(true);
@@ -44,6 +47,36 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
         setIsNewProjectModalOpen(false);
         onCreateScene(data);
     };
+
+    useEffect(() => {
+        if (isGamePopupOpen && !demoData) {
+            const fetchDemoData = async () => {
+                setIsLoadingDemo(true);
+                try {
+                    const demoFolderName = i18n.language.startsWith('pt')
+                        ? "fuja_da_masmorra"
+                        : i18n.language.startsWith('es')
+                        ? "escapa_la_mazmorra"
+                        : "escape_the_dungeon";
+                    
+                    const response = await fetch(`/${demoFolderName}/editor_data.json`);
+                    if (!response.ok) throw new Error("Failed to load demo data");
+                    const data = await response.json();
+                    setDemoData(data);
+                } catch (error) {
+                    console.error("Error loading demo data:", error);
+                } finally {
+                    setIsLoadingDemo(false);
+                }
+            };
+            fetchDemoData();
+        }
+    }, [isGamePopupOpen, i18n.language, demoData]);
+
+    // Reset demo data when language changes to ensure correct one is loaded
+    useEffect(() => {
+        setDemoData(null);
+    }, [i18n.language]);
 
     return (
         <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden bg-zinc-950">
@@ -198,18 +231,25 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                                 <X className={`w-3.5 h-3.5 group-hover:text-white text-primary-foreground/70`} />
                             </button>
                         </div>
-                        <div className="flex-1 min-h-0">
-                            <iframe
-                                src={
-                                    i18n.language.startsWith('pt')
-                                        ? "/fuja_da_masmorra/index.html"
-                                        : i18n.language.startsWith('es')
-                                        ? "/escapa_la_mazmorra/index.html"
-                                        : "/escape_the_dungeon/index.html"
-                                }
-                                className="w-full h-full border-0"
-                                title="Demo"
-                            />
+                        <div className="flex-1 min-h-0 bg-black flex items-center justify-center">
+                            {isLoadingDemo ? (
+                                <div className="flex flex-col items-center gap-4 text-white">
+                                    <Loader2 className="w-12 h-12 animate-spin text-primary" />
+                                    <span className="font-mono text-sm uppercase tracking-widest animate-pulse">Loading data...</span>
+                                </div>
+                            ) : demoData ? (
+                                <Preview 
+                                    gameData={demoData} 
+                                    basePath={i18n.language.startsWith('pt') 
+                                        ? "/fuja_da_masmorra" 
+                                        : i18n.language.startsWith('es') 
+                                        ? "/escapa_la_mazmorra" 
+                                        : "/escape_the_dungeon"} 
+                                />
+                            ) : (
+                                <div className="text-white font-mono text-sm uppercase">Error loading demo.</div>
+                            )}
+
                         </div>
                     </div>
                 </div>
