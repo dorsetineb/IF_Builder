@@ -2,7 +2,7 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { GameData } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { gameHTML, initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
+import { gameHTML, gameCSS, initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 import { useTranslation } from 'react-i18next';
 
@@ -57,7 +57,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             ? `<button id="diary-button">${gameData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder', 'Logbook')}</button>`
             : '';
 
-        const rawHtml = gameData.gameHTML || gameHTML;
+        const rawHtml = gameHTML;
         // Force migration of legacy input to contenteditable div for all projects
         const migratedHtml = rawHtml.replace(/<input type="text" id="verb-input"[^>]*>/, '<div id="verb-input" contenteditable="true" role="textbox" aria-multiline="false"></div>');
 
@@ -238,10 +238,6 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
                         justify: 'flex-start',
                         align: 'flex-start',
                         text: 'left'
-                    } : textAlign === 'center' ? {
-                        justify: 'center',
-                        align: 'center',
-                        text: 'center'
                     } : {
                         justify: 'flex-end',
                         align: 'flex-end',
@@ -316,10 +312,10 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
                 };
 
                 return `
-                    ${opening ? getScaleCss(opening.textScale, '#splash-screen', opening.textAlign) : ''}
-                    ${opening ? getScaleCss(opening.textScale, '#vignette-screen', opening.textAlign) : ''}
-                    ${victory ? getScaleCss(victory.textScale, '#positive-ending-screen', victory.textAlign) : ''}
-                    ${defeat ? getScaleCss(defeat.textScale, '#negative-ending-screen', defeat.textAlign) : ''}
+                    ${opening ? getScaleCss(opening.textScale, '#splash-screen', opening.contentAlignment) : ''}
+                    ${opening ? getScaleCss(opening.textScale, '#vignette-screen', opening.contentAlignment) : ''}
+                    ${victory ? getScaleCss(victory.textScale, '#positive-ending-screen', victory.contentAlignment) : ''}
+                    ${defeat ? getScaleCss(defeat.textScale, '#negative-ending-screen', defeat.contentAlignment) : ''}
                     ${opening ? getAnimationCss(opening, '#splash-screen .splash-content') : ''}
                     ${opening ? getAnimationCss(opening, '#vignette-screen .splash-content') : ''}
                     ${victory ? getAnimationCss(victory, '#positive-ending-screen .content') : ''}
@@ -331,7 +327,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             ${OVERLAY_CSS}
         `;
 
-        const finalCss = (gameData.gameCSS + cssOverrides)
+        const finalCss = (gameCSS + cssOverrides)
             // Hotfix for legacy typo
             .replace('__FRAME_ROUND_TOP_COLOR__', '__FRAME_ROUNDED_TOP_COLOR__')
             .replace(/__FONT_FAMILY__/g, fontFamily)
