@@ -8,9 +8,9 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
-    <link rel="stylesheet" href="style.css?v=1774222462895">
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="dark-theme with-spacing frame-trading-card __FONT_ADJUST_CLASS__ behavior-immersive is-demo">
+<body class="dark-theme with-spacing frame-trading-card __FONT_ADJUST_CLASS__ behavior-immersive">
     <audio id="scene-sound-effect" preload="auto"></audio>
     <audio id="bgm-audio" preload="auto" loop></audio>
     <div class="main-wrapper" id="main-wrapper">
@@ -70,7 +70,7 @@
                         
                     </div>
                     <div class="input-area">
-                        <input type="text" id="verb-input" placeholder="O QUE VOCÊ FAZ?">
+                        <div id="verb-input" contenteditable="true" role="textbox" aria-multiline="false"></div>
                         <button id="submit-verb">AÇÃO</button>
                     </div>
                 </div>
@@ -239,5 +239,5 @@
       </filter>
     </defs>
   </svg>
-<script src="game.js?v=1774222462895"></script></body>
+<script src="game.js"></script></body>
 </html>
