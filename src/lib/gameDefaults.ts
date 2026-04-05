@@ -443,10 +443,13 @@ body.with-spacing .main-wrapper { height: 100%; }
         pointer-events: none;
     }
     body.behavior-immersive .scene-description {
-        background: linear-gradient(to top, rgba(0,0,0,0.98) 60%, transparent 100%) !important;
-        padding: 45px 15px 5px 15px !important; 
-        max-height: 45vh !important; 
-        min-height: 25vh !important; 
+        background: linear-gradient(to top, rgba(0,0,0,0.98) 75%, transparent 100%) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-end !important;
+        padding: 100px 15px 10px 15px !important; 
+        max-height: 60vh !important; 
+        min-height: 35vh !important; 
         width: 100vw !important;
         flex-grow: 0;
         border-radius: 0;
