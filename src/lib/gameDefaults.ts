@@ -266,7 +266,7 @@ select { background-color: var(--button-bg); color: var(--text-color); border: 1
 option { background-color: var(--bg-color); color: var(--text-color); }
 .main-wrapper { height: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative; max-width: 1280px; margin: 0 auto; }
 body.with-spacing .main-wrapper { height: 100%; }
-.splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); background-size: cover; background-position: center; z-index: 2000; padding: 0; display: flex; align-items: var(--splash-align-items); justify-content: var(--splash-justify-content); transition: opacity 1s ease-in-out; }
+.splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); background-size: cover; background-position: center; z-index: 2000; padding: 0; display: flex; align-items: var(--splash-align-items); justify-content: var(--splash-justify-content); transition: opacity 1s ease-in-out; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
 .splash-screen.fade-out { opacity: 0; pointer-events: none; }
 .splash-screen.align-left { --splash-justify-content: flex-start; --splash-align-items: flex-start; --splash-text-align: left; --splash-content-align-items: flex-start; }
 .splash-content { text-align: var(--splash-text-align); display: flex; flex-direction: column; align-items: var(--splash-content-align-items); gap: 20px; width: 100%; padding: 5vh max(40px, 6vw); position: relative; }
