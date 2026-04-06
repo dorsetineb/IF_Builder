@@ -280,6 +280,22 @@ body.with-spacing .main-wrapper { height: 100%; }
 #splash-start-button:hover, .ending-restart-button:hover, #continue-button:hover { transform: translateY(-3px); box-shadow: 0 3px 0px rgba(0, 0, 0, 0.4); }
 #splash-start-button:hover, .ending-restart-button:hover { background-color: var(--splash-button-hover-bg); }
 #continue-button:hover { background-color: #2563eb; }
+/* Vignette Credits */
+.vignette-credits { position: absolute; top: 0; bottom: 0; width: 48%; padding: 5vh max(40px, 4vw); display: flex; align-items: flex-end; overflow: hidden; z-index: 50; pointer-events: none; }
+.vignette-credits.credits-left { left: 0; }
+.vignette-credits.credits-right { right: 0; }
+.vignette-credits-text { font-size: 0.95em; color: var(--text-color); opacity: 1; white-space: pre-wrap; line-height: 1.6; width: 100%; }
+.vignette-credits.credits-scroll { align-items: flex-end; }
+.vignette-credits.credits-scroll .vignette-credits-text { animation: creditsScroll 30s linear forwards; }
+@keyframes creditsScroll { 0% { transform: translateY(100%); } 100% { transform: translateY(-100%); } }
+@media (max-width: 768px) {
+  .splash-screen { flex-direction: column; justify-content: flex-start !important; align-items: flex-start !important; }
+  .vignette-credits { position: relative; width: 100%; max-width: none; padding: 20px 20px 0 20px; top: auto; bottom: auto; left: auto; right: auto; align-items: flex-start; overflow: visible; flex-shrink: 0; }
+  .vignette-credits.credits-left, .vignette-credits.credits-right { left: auto; right: auto; }
+  .vignette-credits.credits-scroll .vignette-credits-text { animation: none; }
+  .vignette-credits-text { font-size: 0.95em; max-height: 30vh; overflow-y: auto; text-align: left; }
+  .splash-content { height: auto !important; flex-grow: 1; justify-content: flex-end; }
+}
 .chances-container { display: flex; align-items: center; gap: 8px; justify-content: flex-end; margin-bottom: 15px; }
 .chance-icon { width: 24px; height: 24px; transition: all 0.3s ease; }
 .chance-icon.lost { opacity: 0.5; }

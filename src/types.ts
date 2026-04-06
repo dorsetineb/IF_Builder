@@ -76,6 +76,8 @@ export interface Scene {
   negativeFeedback?: string;
   omitSplashTitle?: boolean;
   omitSplashDescription?: boolean;
+  creditsText?: string;
+  creditsScrollEnabled?: boolean;
 }
 
 export interface FixedVerb {

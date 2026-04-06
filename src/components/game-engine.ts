@@ -39,7 +39,9 @@ export const prepareGameDataForEngine = (data: GameData): object => {
                 omitSplashTitle: scene.omitSplashTitle,
                 omitSplashDescription: scene.omitSplashDescription,
                 suggestions: scene.suggestions || [],
-                negativeFeedback: scene.negativeFeedback
+                negativeFeedback: scene.negativeFeedback,
+                creditsText: scene.creditsText,
+                creditsScrollEnabled: scene.creditsScrollEnabled
             };
         }
     }
@@ -1083,6 +1085,33 @@ document.addEventListener('DOMContentLoaded', () => {
         };
         
         vignetteContinueButton.addEventListener('click', handleVignetteClick);
+
+        // Credits rendering for conclusion vignettes
+        const existingCredits = vignetteScreen.querySelector('.vignette-credits');
+        if (existingCredits) existingCredits.remove();
+
+        if (scene.creditsText && scene.creditsText.trim()) {
+            const creditsDiv = document.createElement('div');
+            creditsDiv.className = 'vignette-credits';
+            if (scene.creditsScrollEnabled) {
+                creditsDiv.classList.add('credits-scroll');
+            }
+
+            // Determine which side the content is on to put credits on the opposite
+            // Content defaults to right (flex-end), but align-left class moves it to left
+            const isContentLeft = vignetteScreen.classList.contains('align-left');
+            if (isContentLeft) {
+                creditsDiv.classList.add('credits-right');
+            } else {
+                creditsDiv.classList.add('credits-left');
+            }
+
+            const creditsInner = document.createElement('div');
+            creditsInner.className = 'vignette-credits-text';
+            creditsInner.textContent = scene.creditsText;
+            creditsDiv.appendChild(creditsInner);
+            vignetteScreen.appendChild(creditsDiv);
+        }
         
         // Show the vignette screen FIRST, then start rain effect after it's visible
         vignetteScreen.classList.remove('hidden');

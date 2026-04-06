@@ -33,6 +33,7 @@ import {
   RotateCcw,
   Save,
   Search,
+  List,
 } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useTranslation, Trans } from 'react-i18next';
@@ -757,8 +758,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                     </div>
                   </div>
 
-                  {/* Narrative Rules Card - Renamed to Chance Rules */}
-                  {(enableChances || gameSystemEnabled === 'chances') && (
+                  {/* Narrative Rules Card - Renamed to Chance Rules (hidden for conclusion vignettes) */}
+                  {(enableChances || gameSystemEnabled === 'chances') && localScene.vignetteType !== 'conclusion' && (
                     <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
                       <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                         <Scroll className="w-4 h-4" />
@@ -815,6 +816,47 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                             </span>
                             <span className="block text-[10px] text-muted-foreground mt-0.5">
                               {t('sceneEditor.restoresChanceDesc')}
+                            </span>
+                          </div>
+                        </label>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Credits Card - Only for Conclusion Vignettes */}
+                  {localScene.vignetteType === 'conclusion' && (
+                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
+                      <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+                        <List className="w-4 h-4" />
+                        {t('sceneEditor.creditsTitle', 'Créditos')}
+                      </h3>
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                            {t('sceneEditor.creditsTitle', 'Créditos')}
+                          </label>
+                          <textarea
+                            value={localScene.creditsText || ''}
+                            onChange={(e) => updateLocalScene('creditsText', e.target.value)}
+                            className="w-full min-h-[120px] bg-input border border-input rounded-lg px-4 py-3 text-xs text-foreground resize-y focus:ring-1 focus:ring-primary focus:border-primary transition-all leading-relaxed placeholder:text-muted-foreground"
+                            placeholder={t('sceneEditor.creditsPlaceholder', 'Texto dos créditos...')}
+                          />
+                        </div>
+                        <label className="flex items-start gap-3 p-3 rounded-lg border transition-all cursor-pointer group bg-transparent border-muted-foreground/50 hover:bg-muted/10">
+                          <div className="relative flex items-center mt-0.5">
+                            <input
+                              type="checkbox"
+                              checked={!!localScene.creditsScrollEnabled}
+                              onChange={(e) => updateLocalScene('creditsScrollEnabled', e.target.checked)}
+                              className="custom-checkbox"
+                            />
+                          </div>
+                          <div>
+                            <span className={`block text-xs font-bold ${localScene.creditsScrollEnabled ? 'text-primary' : 'text-muted-foreground group-hover:text-foreground'}`}>
+                              {t('sceneEditor.creditsScrollLabel', 'Animação de rolagem')}
+                            </span>
+                            <span className="block text-[10px] text-muted-foreground mt-0.5">
+                              {t('sceneEditor.creditsScrollDesc', 'Habilita a subida automática do texto.')}
                             </span>
                           </div>
                         </label>

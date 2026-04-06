@@ -681,7 +681,11 @@
     "selectPlaceholder": "Select...",
     "targetSceneChoiceDesc": "Where the player will go when clicking this button.",
     "noChoiceSelected": "No choice selected",
-    "noChoiceSelectedDesc": "Select a choice from the list to edit its details or create a new one."
+    "noChoiceSelectedDesc": "Select a choice from the list to edit its details or create a new one.",
+    "creditsTitle": "Credits",
+    "creditsPlaceholder": "Credits text...",
+    "creditsScrollLabel": "CREDITS SCROLL",
+    "creditsScrollDesc": "Enables cinematic scrolling (one-way)."
   },
   "UIEditor": {
     "errors": {

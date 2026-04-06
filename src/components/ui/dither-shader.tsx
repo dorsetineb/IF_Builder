@@ -113,6 +113,9 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
     const animationRef = useRef<number | null>(null);
     const timeRef = useRef<number>(0);
     const mouseRef = useRef<{ x: number; y: number } | null>(null);
+    const lastMousePosRef = useRef<{ x: number; y: number } | null>(null);
+    const hoverScaleRef = useRef<number>(0);
+    const targetScaleRef = useRef<number>(0);
     const imageRef = useRef<HTMLImageElement | null>(null);
     const sourceDataRef = useRef<ImageData | null>(null);
 
@@ -130,10 +133,12 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
         const updateMousePosition = (clientX: number, clientY: number) => {
             if (!containerRef.current) return;
             const rect = containerRef.current.getBoundingClientRect();
-            mouseRef.current = {
+            const pos = {
                 x: clientX - rect.left,
                 y: clientY - rect.top,
             };
+            mouseRef.current = pos;
+            lastMousePosRef.current = pos;
         };
 
         const handlePointer = (e: PointerEvent) => {
@@ -142,31 +147,38 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             const isTouch = e.pointerType === 'touch';
             
             if (isTouch) {
-                // For touch, only show if finger is down (buttons > 0 or down/move event)
                 const isDown = e.type === 'pointerdown' || e.type === 'pointermove';
                 const hasButtons = (e.buttons & 1) === 1;
                 
                 if (isDown && (e.type === 'pointerdown' || hasButtons)) {
                     updateMousePosition(e.clientX, e.clientY);
+                    targetScaleRef.current = 1.0;
                 } else if (e.type === 'pointerup' || e.type === 'pointercancel') {
-                    mouseRef.current = null;
+                    targetScaleRef.current = 0.0;
                 }
             } else {
-                // For mouse, standard hover behavior (reveal on move)
                 updateMousePosition(e.clientX, e.clientY);
+                targetScaleRef.current = 1.0;
             }
+        };
+
+        const handlePointerLeave = () => {
+            if (!enableHover) return;
+            targetScaleRef.current = 0.0;
         };
 
         window.addEventListener("pointermove", handlePointer);
         window.addEventListener("pointerdown", handlePointer);
         window.addEventListener("pointerup", handlePointer);
         window.addEventListener("pointercancel", handlePointer);
+        window.addEventListener("pointerleave", handlePointerLeave);
 
         return () => {
             window.removeEventListener("pointermove", handlePointer);
             window.removeEventListener("pointerdown", handlePointer);
             window.removeEventListener("pointerup", handlePointer);
             window.removeEventListener("pointercancel", handlePointer);
+            window.removeEventListener("pointerleave", handlePointerLeave);
         };
     }, [enableHover]);
 
@@ -192,16 +204,24 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             const sourceW = sourceDataRef.current.width;
             const sourceH = sourceDataRef.current.height;
 
-            const internalHoverRadius = hoverRadius / Math.max(1, gridSize);
+            // Smooth animation for hover scale
+            if (hoverScaleRef.current < targetScaleRef.current) {
+                hoverScaleRef.current = Math.min(targetScaleRef.current, hoverScaleRef.current + 0.08);
+            } else if (hoverScaleRef.current > targetScaleRef.current) {
+                hoverScaleRef.current = Math.max(targetScaleRef.current, hoverScaleRef.current - 0.05);
+            }
+
+            const currentScale = hoverScaleRef.current;
+            const internalHoverRadius = (hoverRadius * currentScale) / Math.max(1, gridSize);
             const hoverRadiusSq = internalHoverRadius * internalHoverRadius;
 
-            const mousePos = mouseRef.current;
             let internalMouseX = -9999;
             let internalMouseY = -9999;
 
-            if (mousePos) {
-                internalMouseX = mousePos.x / Math.max(1, gridSize);
-                internalMouseY = mousePos.y / Math.max(1, gridSize);
+            const activePos = targetScaleRef.current > 0 ? mouseRef.current : lastMousePosRef.current;
+            if (activePos && currentScale > 0) {
+                internalMouseX = activePos.x / Math.max(1, gridSize);
+                internalMouseY = activePos.y / Math.max(1, gridSize);
             }
 
             const matrixSize = gridSize <= 4 ? 4 : 8;

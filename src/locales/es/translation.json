@@ -682,7 +682,11 @@
     "selectPlaceholder": "Selecciona...",
     "targetSceneChoiceDesc": "A dónde irá el jugador al hacer clic en este botón.",
     "noChoiceSelected": "Ninguna opción seleccionada",
-    "noChoiceSelectedDesc": "Selecciona una opción de la lista para editar sus detalles o crea una nueva."
+    "noChoiceSelectedDesc": "Selecciona una opción de la lista para editar sus detalles o crea una nueva.",
+    "creditsTitle": "Créditos",
+    "creditsPlaceholder": "Texto de créditos...",
+    "creditsScrollLabel": "DESPLAZAMIENTO DE CRÉDITOS",
+    "creditsScrollDesc": "Habilita el desplazamiento automático (una sola vez)."
   },
   "UIEditor": {
     "errors": {
