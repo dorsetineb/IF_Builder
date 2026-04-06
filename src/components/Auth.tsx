@@ -18,6 +18,16 @@ export function Auth() {
     const [currentView, setCurrentView] = useState<LandingView>('landing');
     const [demoData, setDemoData] = useState<GameData | null>(null);
     const [isLoadingDemo, setIsLoadingDemo] = useState(false);
+    const [isMobile, setIsMobile] = useState(false);
+
+    React.useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const { theme } = useTheme();
 
@@ -73,44 +83,58 @@ export function Auth() {
 
     // Sidebar Component (Left)
     const renderSidebar = () => (
-        <div className="w-96 flex flex-col h-full relative z-20 transition-all duration-300">
-            <div className="flex-1 flex flex-col justify-center w-full pl-12 pr-6 space-y-12">
+        <div className={`${isMobile ? 'w-full pointer-events-none' : 'w-96'} flex flex-col h-full relative z-20 transition-all duration-300`}>
+            <div className={`flex-1 flex flex-col justify-center w-full pl-12 pr-6 space-y-12 ${isMobile ? '' : ''}`}>
                 {/* Tagline */}
-                <div className="text-sm text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md">
-                    <p>{t('auth.sidebar.line1', 'Em uma caverna escura.')}</p>
-                    <p>{t('auth.sidebar.line2', 'Monitores CRT iluminam o mofo.')}</p>
-                    <p className={`text-primary font-bold mt-2 drop-shadow-md`}>&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
+                <div className={`${isMobile ? 'absolute top-0 left-0 p-12' : 'text-sm text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md'}`}>
+                    {isMobile ? (
+                        <div className="text-sm text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md">
+                            <p>Por uma fresta, você enxerga uma caverna escura.</p>
+                            <p className="text-primary font-bold mt-2">
+                                &gt; ACESSO NEGADO DEVIDO A CORPO.
+                            </p>
+                            <p className="mt-2 opacity-50">Ache um computador com uma tela maior, e tente novamente.</p>
+                        </div>
+                    ) : (
+                        <>
+                            <p>{t('auth.sidebar.line1', 'Em uma caverna escura.')}</p>
+                            <p>{t('auth.sidebar.line2', 'Monitores CRT iluminam o mofo.')}</p>
+                            <p className={`text-primary font-bold mt-2 drop-shadow-md`}>&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
+                        </>
+                    )}
                 </div>
 
                 {/* Navigation Buttons */}
-                <div className="space-y-4 w-full">
-                    <button
-                        onMouseMove={(e) => {
-                            const rect = e.currentTarget.getBoundingClientRect();
-                            const x = e.clientX - rect.left;
-                            const y = e.clientY - rect.top;
-                            e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
-                            e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
-                        }}
-                        onClick={() => navigate('/editor')}
-                        className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden shadow-xl hover:scale-[1.02] bg-primary border-primary text-primary-foreground`}
-                    >
-                        <div
-                            className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
-                            style={{
-                                background: `radial-gradient(circle 60px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.2) 0%, transparent 100%)`
+                {!isMobile && (
+                    <div className="space-y-4 w-full">
+                        <button
+                            onMouseMove={(e) => {
+                                const rect = e.currentTarget.getBoundingClientRect();
+                                const x = e.clientX - rect.left;
+                                const y = e.clientY - rect.top;
+                                e.currentTarget.style.setProperty('--mouse-x', `${x}px`);
+                                e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
                             }}
-                        />
-                        <Play size={18} className="group-hover:translate-x-1 transition-transform relative z-10" />
-                        <span className="uppercase tracking-wider relative z-10">{t('auth.sidebar.startProgram', 'Iniciar Programa')}</span>
-                    </button>
+                            onClick={() => navigate('/editor')}
+                            className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden shadow-xl hover:scale-[1.02] bg-primary border-primary text-primary-foreground`}
+                        >
+                            <div
+                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
+                                style={{
+                                    background: `radial-gradient(circle 60px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.2) 0%, transparent 100%)`
+                                }}
+                            />
+                            <Play size={18} className="group-hover:translate-x-1 transition-transform relative z-10" />
+                            <span className="uppercase tracking-wider relative z-10">{t('auth.sidebar.startProgram', 'Iniciar Programa')}</span>
+                        </button>
 
-                    {/* Secret Hint Text */}
-                    <div className="text-sm text-white/80 leading-relaxed text-left space-y-1 pt-8 opacity-50 drop-shadow-md">
-                        <p>{t('auth.sidebar.hint1', 'Algo pode acontecer,')}</p>
-                        <p>{t('auth.sidebar.hint2', 'Se você clicar nos computadores.')}</p>
+                        {/* Secret Hint Text */}
+                        <div className="text-sm text-white/80 leading-relaxed text-left space-y-1 pt-8 opacity-50 drop-shadow-md">
+                            <p>{t('auth.sidebar.hint1', 'Algo pode acontecer,')}</p>
+                            <p>{t('auth.sidebar.hint2', 'Se você clicar nos computadores.')}</p>
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </div>
     );

@@ -127,18 +127,46 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
     const parsedCustomPalette = customPalette.map(parseColor);
 
     useEffect(() => {
-        const handleGlobalMouseMove = (e: MouseEvent) => {
-            if (!containerRef.current || !enableHover) return;
+        const updateMousePosition = (clientX: number, clientY: number) => {
+            if (!containerRef.current) return;
             const rect = containerRef.current.getBoundingClientRect();
             mouseRef.current = {
-                x: e.clientX - rect.left,
-                y: e.clientY - rect.top,
+                x: clientX - rect.left,
+                y: clientY - rect.top,
             };
         };
 
-        window.addEventListener("mousemove", handleGlobalMouseMove);
+        const handlePointer = (e: PointerEvent) => {
+            if (!enableHover) return;
+            
+            const isTouch = e.pointerType === 'touch';
+            
+            if (isTouch) {
+                // For touch, only show if finger is down (buttons > 0 or down/move event)
+                const isDown = e.type === 'pointerdown' || e.type === 'pointermove';
+                const hasButtons = (e.buttons & 1) === 1;
+                
+                if (isDown && (e.type === 'pointerdown' || hasButtons)) {
+                    updateMousePosition(e.clientX, e.clientY);
+                } else if (e.type === 'pointerup' || e.type === 'pointercancel') {
+                    mouseRef.current = null;
+                }
+            } else {
+                // For mouse, standard hover behavior (reveal on move)
+                updateMousePosition(e.clientX, e.clientY);
+            }
+        };
+
+        window.addEventListener("pointermove", handlePointer);
+        window.addEventListener("pointerdown", handlePointer);
+        window.addEventListener("pointerup", handlePointer);
+        window.addEventListener("pointercancel", handlePointer);
+
         return () => {
-            window.removeEventListener("mousemove", handleGlobalMouseMove);
+            window.removeEventListener("pointermove", handlePointer);
+            window.removeEventListener("pointerdown", handlePointer);
+            window.removeEventListener("pointerup", handlePointer);
+            window.removeEventListener("pointercancel", handlePointer);
         };
     }, [enableHover]);
 
