@@ -13,13 +13,13 @@ export const GuideView: React.FC = () => {
     };
 
     return (
-        <div className="max-w-4xl mx-auto p-8 animate-in fade-in duration-500 pb-20">
-            <div className="mb-8">
-                <h2 className="text-3xl font-bold text-foreground mb-4">{t('guide.title', 'Guia Rápido')}</h2>
+        <div className="max-w-4xl mx-auto px-8 pb-20 animate-in fade-in duration-500">
+            {/* Sticky Header: Intro + TOC */}
+            <div className="sticky top-0 z-40 bg-background pt-8 pb-4 -mx-8 px-8 shadow-sm">
                 <p className="text-muted-foreground max-w-3xl text-sm leading-relaxed mb-6" dangerouslySetInnerHTML={{ __html: t('guide.intro', 'O IF Builder permite criar ficções interativas, narrativas textuais onde o jogador interage com a história por meio de escolhas ou comandos (verbos). A ficção é composta por <strong>Cenas</strong>, onde o usuário lê descrições, observa imagens e toma decisões para interagir com <strong>objetos</strong> e <strong>navegar pelo mundo</strong>.') }}></p>
 
                 {/* Table of Contents Listbox */}
-                <div className="p-4 bg-muted/30 rounded-lg border border-muted-foreground/50">
+                <div className="p-4 bg-muted/30 rounded-lg border border-muted-foreground/50 mb-2">
                     <label className="text-xs font-medium text-muted-foreground mb-2 block uppercase tracking-wider">{t('guide.toc', 'Índice do Guia')}</label>
                     <div className="relative">
                         <select
@@ -45,11 +45,14 @@ export const GuideView: React.FC = () => {
                         <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                     </div>
                 </div>
+
+                {/* Gradient Overlay below the index */}
+                <div className="absolute left-0 right-0 -bottom-6 h-6 bg-gradient-to-b from-background to-transparent pointer-events-none" />
             </div>
 
-            <div className="space-y-10">
+            <div className="space-y-10 mt-12">
                 {/* 1. Editor de Cenas */}
-                <div id="section-scenes" className="space-y-3 scroll-mt-24">
+                <div id="section-scenes" className="space-y-3 scroll-mt-72">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-purple-500/10 rounded-lg text-purple-500">
                             <BookOpen className="w-5 h-5" />
@@ -69,7 +72,7 @@ export const GuideView: React.FC = () => {
                 </div>
 
                 {/* 2. Biblioteca de Objetos */}
-                <div id="section-objects" className="space-y-3 scroll-mt-24">
+                <div id="section-objects" className="space-y-3 scroll-mt-72">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-blue-500/10 rounded-lg text-blue-500">
                             <Box className="w-5 h-5" />
@@ -88,7 +91,7 @@ export const GuideView: React.FC = () => {
                 </div>
 
                 {/* 3. Interações */}
-                <div id="section-interactions" className="space-y-3 scroll-mt-24">
+                <div id="section-interactions" className="space-y-3 scroll-mt-72">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-green-500/10 rounded-lg text-green-500">
                             <Gamepad2 className="w-5 h-5" />
@@ -153,7 +156,7 @@ export const GuideView: React.FC = () => {
                 </div>
 
                 {/* 4. Comandos Globais */}
-                <div id="section-globals" className="space-y-3 scroll-mt-24">
+                <div id="section-globals" className="space-y-3 scroll-mt-72">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-cyan-500/10 rounded-lg text-cyan-500">
                             <Command className="w-5 h-5" />
@@ -170,7 +173,7 @@ export const GuideView: React.FC = () => {
                 </div>
 
                 {/* 5. Vinhetas */}
-                <div id="section-vignettes" className="space-y-3 scroll-mt-24">
+                <div id="section-vignettes" className="space-y-3 scroll-mt-72">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-amber-500/10 rounded-lg text-amber-500">
                             <Scroll className="w-5 h-5" />
@@ -189,7 +192,7 @@ export const GuideView: React.FC = () => {
                 </div>
 
                 {/* 6. Rastreadores */}
-                <div id="section-trackers" className="space-y-3 scroll-mt-24">
+                <div id="section-trackers" className="space-y-3 scroll-mt-72">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-orange-500/10 rounded-lg text-orange-500">
                             <Activity className="w-5 h-5" />
@@ -208,7 +211,7 @@ export const GuideView: React.FC = () => {
                 </div>
 
                 {/* 7. Mapa de Conexões */}
-                <div id="section-map" className="space-y-3 scroll-mt-24">
+                <div id="section-map" className="space-y-3 scroll-mt-72">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-indigo-500/10 rounded-lg text-indigo-500">
                             <Map className="w-5 h-5" />
@@ -226,7 +229,7 @@ export const GuideView: React.FC = () => {
                 </div>
 
                 {/* 8. Configurações do Jogo */}
-                <div id="section-settings" className="space-y-3 scroll-mt-24">
+                <div id="section-settings" className="space-y-3 scroll-mt-72">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-slate-500/10 rounded-lg text-slate-500">
                             <SlidersHorizontal className="w-5 h-5" />
@@ -273,7 +276,7 @@ export const GuideView: React.FC = () => {
                 </div>
 
                 {/* 9. Pré-visualização */}
-                <div id="section-preview" className="space-y-3 scroll-mt-24">
+                <div id="section-preview" className="space-y-3 scroll-mt-72">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-emerald-500/10 rounded-lg text-emerald-500">
                             <Play className="w-5 h-5" />
@@ -290,7 +293,7 @@ export const GuideView: React.FC = () => {
                 </div>
 
                 {/* 10. Exportação */}
-                <div id="section-export" className="space-y-3 pt-6 border-t border-muted-foreground/50 scroll-mt-24">
+                <div id="section-export" className="space-y-3 pt-6 border-t border-muted-foreground/50 scroll-mt-72">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-zinc-500/10 rounded-lg text-zinc-500">
                             <Download className="w-5 h-5" />
