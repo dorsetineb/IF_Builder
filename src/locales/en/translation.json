@@ -533,6 +533,7 @@
     "noItemRequired": "Does not require Item",
     "removesTarget": "Removes Target from Scene",
     "addsToInventory": "Adds to Inventory",
+    "showObjectImage": "Show object image",
     "consumesItem": "Consumes Used Item",
     "outcomeTitle": "Outcome",
     "goToSceneLabel": "Go to Scene",

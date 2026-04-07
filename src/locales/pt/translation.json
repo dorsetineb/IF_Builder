@@ -539,6 +539,7 @@
     "noItemRequired": "Não requer item",
     "removesTarget": "Remove Alvo",
     "addsToInventory": "Adiciona ao inventário",
+    "showObjectImage": "Exibir imagem do objeto",
     "consumesItem": "Consome item",
     "outcomeTitle": "Resultado",
     "goToSceneLabel": "Ir para Cena",

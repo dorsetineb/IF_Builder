@@ -534,6 +534,7 @@
     "noItemRequired": "No requiere objeto",
     "removesTarget": "Elimina Objetivo de la Escena",
     "addsToInventory": "Añade al Inventario",
+    "showObjectImage": "Mostrar imagen del objeto",
     "consumesItem": "Consume Objeto Usado",
     "outcomeTitle": "Resultado",
     "goToSceneLabel": "Ir a Escena",
