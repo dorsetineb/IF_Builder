@@ -31,6 +31,7 @@ export interface Interaction {
   trackerEffects?: TrackerEffect[];
   transitionType?: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom' | 'blur' | 'none';
   transitionSpeed?: number;
+  showObjectImage?: boolean;
   icon?: string; // Icon name from Lucide
 }
 
