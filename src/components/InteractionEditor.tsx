@@ -299,6 +299,19 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                     </div>
                                     <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.addsToInventory', 'Adiciona ao inventário')}</span>
                                 </label>
+
+                                <label className={`flex items-center gap-2 cursor-pointer group ${!selectedInteraction.addsToInventory && 'opacity-30 pointer-events-none'}`}>
+                                    <div className="relative flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            checked={!!selectedInteraction.showObjectImage}
+                                            onChange={e => handleInteractionChange('showObjectImage', e.target.checked)}
+                                            disabled={!selectedInteraction.addsToInventory}
+                                            className="custom-checkbox"
+                                        />
+                                    </div>
+                                    <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.showObjectImage', 'Exibir imagem do objeto')}</span>
+                                </label>
                             </div>
                         </div>
 

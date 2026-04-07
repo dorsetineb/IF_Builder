@@ -140,6 +140,22 @@ export const gameHTML = `
             </div>
         </div>
     </div>
+    
+    <!-- Acquisition Modal -->
+    <div id="acquisition-modal" class="modal-overlay hidden">
+        <div class="modal-content acquisition-modal-content">
+            <button class="modal-close-button">&times;</button>
+            <h2 id="acquisition-modal-title"></h2>
+            <div class="acquisition-modal-body">
+                <div id="acquisition-modal-image-container" class="acquisition-modal-image-container hidden">
+                    <img id="acquisition-modal-image" src="" alt="Item Image">
+                </div>
+                <div id="acquisition-modal-text-container" class="acquisition-modal-text-container text-center">
+                    <p id="acquisition-modal-description"></p>
+                </div>
+            </div>
+        </div>
+    </div>
   <svg style="display: none;">
     <defs>
       <filter id="tv-distortion-filter" x="-20%" y="-20%" width="140%" height="140%">
@@ -377,6 +393,13 @@ body.with-spacing .main-wrapper { height: 100%; }
 .item-modal-text-container { flex: 1; display: flex; flex-direction: column; gap: 12px; text-align: left; }
 .item-modal-name { margin: 0; font-size: 1.3em; color: var(--accent-color); border-bottom: 1px solid var(--border-color); padding-bottom: 8px; }
 #item-modal-description { color: var(--text-color); line-height: 1.6; font-size: 0.95em; }
+.acquisition-modal-content { max-width: 600px; text-align: center; }
+.acquisition-modal-body { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+.acquisition-modal-image-container { width: 500px; height: 500px; overflow: hidden; border: 2px solid var(--border-color); background-color: var(--input-bg); flex-shrink: 0; }
+.acquisition-modal-image-container img { width: 100%; height: 100%; object-fit: cover; }
+.acquisition-modal-text-container { width: 100%; padding-bottom: 10px; }
+#acquisition-modal-description { color: var(--text-color); line-height: 1.6; font-size: 0.95em; margin: 0; }
+.text-center { text-align: center; }
 
 .system-modal-content { max-width: 400px; text-align: center; }
 .system-menu { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }

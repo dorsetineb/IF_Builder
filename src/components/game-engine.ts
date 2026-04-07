@@ -194,6 +194,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemModalImage = document.getElementById('item-modal-image');
     const itemModalDescription = document.getElementById('item-modal-description');
     
+    const acquisitionModal = document.getElementById('acquisition-modal');
+    const acquisitionModalTitle = document.getElementById('acquisition-modal-title');
+    const acquisitionModalImageContainer = document.getElementById('acquisition-modal-image-container');
+    const acquisitionModalImage = document.getElementById('acquisition-modal-image');
+    const acquisitionModalDescription = document.getElementById('acquisition-modal-description');
+    
     const systemModal = document.getElementById('system-modal');
     const systemModalTitle = document.getElementById('system-modal-title');
     const systemMenuMain = document.getElementById('system-menu-main');
@@ -1735,7 +1741,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (interaction.trackerEffects) updateTrackers(interaction.trackerEffects);
         if (interaction.addsToInventory && interaction.target) {
             const objInScene = getObjectsForScene(currentSceneId).find(o => o.id === interaction.target);
-            if (objInScene) { addToInventory(objInScene); flagObjectAsRemoved(currentSceneId, objInScene.id); }
+            if (objInScene) { 
+                addToInventory(objInScene); 
+                flagObjectAsRemoved(currentSceneId, objInScene.id); 
+                // NEW: Trigger centered object image popup
+                if (interaction.showObjectImage) {
+                    openAcquisitionModal(objInScene, interaction.successMessage);
+                }
+            }
         } else if (interaction.removesTargetFromScene && interaction.target) flagObjectAsRemoved(currentSceneId, interaction.target);
         if (interaction.soundEffect) playSound(interaction.soundEffect);
         if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage);
@@ -1891,6 +1904,15 @@ document.addEventListener('DOMContentLoaded', () => {
         if (item.image) { itemModalImage.src = item.image; itemModalImageContainer.classList.remove('hidden'); }
         else itemModalImageContainer.classList.add('hidden');
         itemModal.classList.remove('hidden');
+    };
+    const openAcquisitionModal = (item, customDescription) => {
+        if (!acquisitionModal) return;
+        acquisitionModalTitle.textContent = item.name;
+        acquisitionModalDescription.innerHTML = formatText(customDescription || item.examineDescription);
+        setupHighlights(acquisitionModalDescription);
+        if (item.image) { acquisitionModalImage.src = item.image; acquisitionModalImageContainer.classList.remove('hidden'); }
+        else acquisitionModalImageContainer.classList.add('hidden');
+        acquisitionModal.classList.remove('hidden');
     };
     const showDiary = () => {
         diaryLog.innerHTML = ''; let currentInterContainer = null;
