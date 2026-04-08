@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, Vignette } from '../types';
-import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split } from 'lucide-react';
+import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split, BarChart3 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import EditorStatsModal from './EditorStatsModal';
 
 interface SceneMapProps {
   allScenesMap: GameData['scenes'];
@@ -17,6 +18,7 @@ interface SceneMapProps {
   hasOpeningVignette?: boolean;
   isSidebarOpen?: boolean;
   theme?: string;
+  gameTitle?: string;
 }
 
 const NODE_WIDTH = 250;
@@ -67,6 +69,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
   hasOpeningVignette = false,
   isSidebarOpen = false,
   gameInteractionType = 'parser',
+  gameTitle,
 }) => {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -83,13 +86,11 @@ const SceneMap: React.FC<SceneMapProps> = ({
     (node: MapNodeData) => {
       if (node.type === 'scene') {
         const scene = node.data as Scene;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const items: {
           id: string;
           targetId: string;
           label: string;
           type: MapNodeType;
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           original?: any;
         }[] = [];
 
@@ -545,6 +546,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
   const [nodes, setNodes] = useState(initialNodes);
   const [highlightOrphans, setHighlightOrphans] = useState(false);
+  const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
 
   useEffect(() => {
     if (!dragInfo) setNodes(initialNodes);
@@ -1057,6 +1059,13 @@ const SceneMap: React.FC<SceneMapProps> = ({
           <AlertTriangle className="w-4 h-4 mr-2" />
           {t('sceneMap.orphans', 'Órfãs')} {orphanIds.size > 0 && `(${orphanIds.size})`}
         </button>
+        <button
+          onClick={() => setIsStatsModalOpen(true)}
+          className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
+        >
+          <BarChart3 className="w-4 h-4 mr-2" />
+          {t('sceneMap.statistics', 'Estatísticas')}
+        </button>
       </div>
       <div className="absolute bottom-6 right-6 z-10 flex flex-col items-end gap-4 pointer-events-none">
         <div className={`backdrop-blur-md p-4 rounded-xl shadow-xl pointer-events-auto border bg-zinc-950/80 border-muted-foreground/50`}>
@@ -1099,6 +1108,20 @@ const SceneMap: React.FC<SceneMapProps> = ({
           </button>
         </div>
       </div>
+
+      <EditorStatsModal
+        isOpen={isStatsModalOpen}
+        onClose={() => setIsStatsModalOpen(false)}
+        onSceneClick={onSelectScene}
+        gameData={{
+          scenes: allScenesMap,
+          globalObjects: globalObjects,
+          vignettes: vignettes,
+          // Outros campos podem ser repassados se necessário, 
+          // mas o statsCalculator foca nestes.
+          gameTitle: gameTitle || '' 
+        } as GameData}
+      />
     </div>
   );
 };

@@ -1569,6 +1569,7 @@ const Editor: React.FC = () => {
                     hasOpeningVignette={hasOpeningVignette}
                     isSidebarOpen={isNarrativeMenuOpen}
                     theme={appTheme}
+                    gameTitle={gameData.gameTitle}
                   />
                 </Suspense>
               )}
