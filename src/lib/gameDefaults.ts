@@ -708,8 +708,8 @@ body.font-adjust-gothic { font-size: 1.1em; }
 .scene-description::-webkit-scrollbar-thumb:hover, .diary-log::-webkit-scrollbar-thumb:hover, #trackers-content::-webkit-scrollbar-thumb:hover { background-color: var(--text-color); }
 .tracker-item { margin-bottom: 15px; }
 .tracker-item-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
-.tracker-item-name { font-size: 0.85em; color: var(--text-dim-color); }
-.tracker-item-values { font-size: 0.85em; font-family: monospace; color: var(--text-color); }
+.tracker-item-name { font-size: 1em; color: var(--text-dim-color); }
+.tracker-item-values { font-size: 1em; font-family: monospace; color: var(--text-color); }
 .tracker-bar-container { width: 100%; height: 20px; background-color: var(--tracker-bar-bg-color); border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; }
 .tracker-bar { height: 100%; background-color: var(--tracker-bar-fill-color); transition: width 0.3s ease-in-out; }
 .empty-inventory-msg { font-size: 0.85em; color: var(--text-dim-color); font-style: italic; }

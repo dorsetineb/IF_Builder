@@ -1498,7 +1498,16 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSessionId++;
         const mySessionId = renderSessionId;
 
+        let skipParagraph = false;
+        const globalEnterSkip = (e) => {
+            if (e.key === 'Enter' && isPrinting) {
+                skipParagraph = true;
+            }
+        };
+        window.addEventListener('keydown', globalEnterSkip);
+
         const renderNextParagraph = () => {
+            skipParagraph = false;
             if (pIndex >= paragraphs.length) { 
                 isPrinting = false;
                 sceneDescription.classList.remove('typewriting-active');
@@ -1514,8 +1523,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
                 let nodeIdx = 0; let charIdx = 0;
                 const type = () => {
-                    if (mySessionId !== renderSessionId) return; // Stop if new render started
-                    if (nodeIdx >= textNodes.length) { p.classList.remove('typewriter-cursor'); setupHighlights(p); finishParagraph(); return; }
+                    if (mySessionId !== renderSessionId) {
+                        window.removeEventListener('keydown', globalEnterSkip);
+                        return;
+                    }
+                    if (skipParagraph || nodeIdx >= textNodes.length) {
+                        // Complete all remaining text nodes immediately
+                        for (let i = nodeIdx; i < textNodes.length; i++) {
+                            textNodes[i].nodeValue = fullTexts[i];
+                        }
+                        p.classList.remove('typewriter-cursor');
+                        setupHighlights(p);
+                        finishParagraph();
+                        return;
+                    }
                     const currentNode = textNodes[nodeIdx]; const fullText = fullTexts[nodeIdx];
                     if (charIdx < fullText.length) { currentNode.nodeValue += fullText[charIdx]; charIdx++; if (sceneDescription) sceneDescription.scrollTop = sceneDescription.scrollHeight; setTimeout(type, typeSpeedBase); }
                     else { nodeIdx++; charIdx = 0; type(); }
@@ -1555,6 +1576,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sceneDescription.appendChild(continueBtn); sceneDescription.scrollTop = sceneDescription.scrollHeight;
             } else { 
                 isPrinting = false;
+                window.removeEventListener('keydown', globalEnterSkip);
                 sceneDescription.classList.remove('typewriting-active');
                 sceneDescription.scrollTop = sceneDescription.scrollHeight; 
                 if (chances <= 0) gameOver(); else { verbInput.focus(); if (scene.isEndingScene) activateEndingUI('win'); }
@@ -1878,6 +1900,8 @@ document.addEventListener('DOMContentLoaded', () => {
         actionPopup.appendChild(container);
     };
 
+
+
     const showTrackers = () => {
         trackersContent.innerHTML = '';
         const definitions = gameData.consequenceTrackers || [];
@@ -1889,10 +1913,20 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             definitions.forEach(def => {
                 const currentVal = trackers[def.id] || 0;
-                const div = document.createElement('div');
-                div.className = 'tracker-row flex justify-between p-2 border-b border-zinc-700/50';
-                div.innerHTML = \`<span style="color: \${def.color || '#fff'}">\${def.name}</span><span>\${currentVal} / \${def.maxValue}</span>\`;
-                trackersContent.appendChild(div);
+                const percentage = Math.min(100, Math.max(0, (currentVal / def.maxValue) * 100));
+                const barColor = def.barColor || '#ffffff';
+                const item = document.createElement('div');
+                item.className = 'tracker-item';
+                
+                item.innerHTML = 
+                    '<div class="tracker-item-header">' +
+                        '<span class="tracker-item-name">' + def.name + '</span>' +
+                        (!def.hideValue ? '<span class="tracker-item-values">' + currentVal + ' / ' + def.maxValue + '</span>' : '') +
+                    '</div>' +
+                    '<div class="tracker-bar-container">' +
+                        '<div class="tracker-bar" style="width: ' + percentage + '%; background-color: ' + barColor + '; margin-left: ' + (def.invertBar ? 'auto' : '0') + '"></div>' +
+                    '</div>';
+                trackersContent.appendChild(item);
             });
         }
         trackersModal.classList.remove('hidden');

@@ -17,9 +17,6 @@ export const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ message }) => {
                     <div className="pixel-ripple"></div>
                     <div className="pixel-ripple"></div>
                 </div>
-                <p className="text-xs text-muted-foreground font-sans animate-pulse">
-                    {message || t('common.loading', 'Carregando...')}
-                </p>
             </div>
         </div>
     );
