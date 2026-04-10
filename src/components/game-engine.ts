@@ -1996,6 +1996,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const showDiary = (isConclusion = false) => {
         diaryLog.innerHTML = ''; let currentInterContainer = null;
         
+        const diaryTitle = document.getElementById('diary-modal-title');
+        if (diaryTitle) {
+            diaryTitle.style.display = isConclusion ? 'none' : 'block';
+        }
+
         // Show Stats if triggered from conclusion
         if (isConclusion) {
             const statsContainer = document.createElement('div');
