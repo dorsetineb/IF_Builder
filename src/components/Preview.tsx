@@ -362,6 +362,13 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             gameVerbInputPlaceholder: gameData.gameVerbInputPlaceholder || t('UIEditor.textos.commandInputValue'),
             gameSuggestionsEmptyFeedback: gameData.gameSuggestionsEmptyFeedback || t('UIEditor.textos.suggestionsEmptyFeedbackDefault'),
             gameInventoryEmptyFeedback: gameData.gameInventoryEmptyFeedback || t('UIEditor.textos.inventoryEmptyFeedbackDefault'),
+            gameTranslations: {
+                view_diary_btn: t('game.diary.view_diary_btn'),
+                stats_visited: t('game.diary.stats_visited'),
+                stats_time: t('game.diary.stats_time'),
+                total_words_read: t('game.diary.total_words_read'),
+                of_scenes: t('game.diary.of_scenes')
+            }
         });
         if (testSceneId) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

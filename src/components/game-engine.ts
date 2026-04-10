@@ -102,6 +102,12 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameInteractionType: data.gameInteractionType || 'parser',
         gameSuggestionsEmptyFeedback: data.gameSuggestionsEmptyFeedback,
         gameInventoryEmptyFeedback: data.gameInventoryEmptyFeedback,
+        gameTranslations: data.gameTranslations || {
+            view_diary_btn: "Ver Diário",
+            stats_visited: "Você visitou",
+            stats_time: "Tempo decorrido",
+            of_scenes: "cenas"
+        }
     };
 };
 
@@ -132,6 +138,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let chances = gameData.gameMaxChances || 3;
     let lastChanceChange = null; 
     let isGameEnded = false;
+    let gameStartTime = null;
+    let gameEndTime = null;
     let trackers = {};
     let removedObjectsFromScenes = {}; 
     let currentBgmSrc = "";
@@ -230,6 +238,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const vignetteTitle = document.getElementById('vignette-title');
     const vignetteDescription = document.getElementById('vignette-description');
     const vignetteContinueButton = document.getElementById('vignette-continue-button');
+
+    // View Diary button in vignettes
+    const vignetteDiaryButton = document.createElement('button');
+    vignetteDiaryButton.id = 'vignette-diary-button';
+    vignetteDiaryButton.className = 'ending-restart-button hidden';
+    vignetteDiaryButton.style.cssText = btnStyle + ' margin-top: 10px;';
+    vignetteDiaryButton.textContent = gameData.gameTranslations.view_diary_btn;
+    vignetteContinueButton.parentElement.appendChild(vignetteDiaryButton);
+    vignetteDiaryButton.addEventListener('click', () => showDiary(true));
+
+    // Also add to standard ending screens
+    [positiveEndingScreen, negativeEndingScreen].forEach(screen => {
+        if (!screen) return;
+        const btnContainer = screen.querySelector('.splash-buttons') || screen.querySelector('.splash-content');
+        if (btnContainer) {
+            const endDiaryBtn = document.createElement('button');
+            endDiaryBtn.className = 'ending-restart-button';
+            endDiaryBtn.style.cssText = btnStyle + ' margin-top: 10px;';
+            endDiaryBtn.textContent = gameData.gameTranslations.view_diary_btn;
+            btnContainer.appendChild(endDiaryBtn);
+            endDiaryBtn.addEventListener('click', () => showDiary(true));
+        }
+    });
 
     const playSound = (src) => { if (src && soundEffectAudio) { soundEffectAudio.src = src; soundEffectAudio.play().catch(() => {}); } };
 
@@ -809,7 +840,7 @@ document.addEventListener('DOMContentLoaded', () => {
         verbInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleInput(); });
         if (suggestionsButton) suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
         if (inventoryButton) inventoryButton.addEventListener('click', () => togglePopup('inventory'));
-        if (diaryButton) diaryButton.addEventListener('click', showDiary);
+        if (diaryButton) diaryButton.addEventListener('click', () => showDiary(false));
         if (trackersButton) trackersButton.addEventListener('click', showTrackers);
         if (systemButton) systemButton.addEventListener('click', toggleSystemMenu);
         closeButtons.forEach(btn => btn.addEventListener('click', (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); }));
@@ -861,6 +892,8 @@ document.addEventListener('DOMContentLoaded', () => {
         trackers = {}; 
         removedObjectsFromScenes = {};
         isGameEnded = false;
+        gameStartTime = Date.now();
+        gameEndTime = null;
         (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
         
         // Fix Audio Persistence: If the starting scene has no specific music.
@@ -1014,6 +1047,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const showVignetteScreen = (scene) => {
         // Hide game container and show vignette screen
         gameContainer.classList.add('hidden');
+
+        // NEW: If it's a conclusion, activate ending UI immediately to set end time and show diary button
+        if (scene.vignetteType === 'conclusion') {
+             activateEndingUI('win');
+        }
         
         // Set vignette content
         if (vignetteTitle) {
@@ -1685,8 +1723,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const activateEndingUI = (type) => {
         isGameEnded = type;
+        gameEndTime = Date.now();
         standardActionBar.classList.add('hidden');
         endingActionBar.classList.remove('hidden');
+
+        // Show View Diary button only for victory/defeat
+        if (type === 'win' || type === 'lose') {
+            if (vignetteDiaryButton) vignetteDiaryButton.classList.remove('hidden');
+        }
+
         if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
     };
 
@@ -1948,8 +1993,54 @@ document.addEventListener('DOMContentLoaded', () => {
         else acquisitionModalImageContainer.classList.add('hidden');
         acquisitionModal.classList.remove('hidden');
     };
-    const showDiary = () => {
+    const showDiary = (isConclusion = false) => {
         diaryLog.innerHTML = ''; let currentInterContainer = null;
+        
+        // Show Stats if triggered from conclusion
+        if (isConclusion) {
+            const statsContainer = document.createElement('div');
+            statsContainer.className = 'diary-stats-container';
+            
+            const totalScenesCount = Object.keys(gameData.cenas).length;
+            const visitedCount = visitedScenes.length;
+            
+            let timeStr = "0s";
+            if (gameStartTime && gameEndTime) {
+                const totalSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+                const hrs = Math.floor(totalSeconds / 3600);
+                const mins = Math.floor((totalSeconds % 3600) / 60);
+                const secs = totalSeconds % 60;
+                
+                if (hrs > 0) timeStr = hrs + "h " + mins + "m " + secs + "s";
+                else if (mins > 0) timeStr = mins + "m " + secs + "s";
+                else timeStr = secs + "s";
+            }
+
+            let totalWords = 0;
+            actionLog.forEach(entry => {
+                if (entry.type === 'scene' && entry.description) {
+                    totalWords += entry.description.split(/\\s+/).filter(Boolean).length;
+                } else if (entry.type === 'output' && entry.text) {
+                    totalWords += entry.text.split(/\\s+/).filter(Boolean).length;
+                }
+            });
+
+            statsContainer.innerHTML = 
+                '<div class="diary-stat-box">' +
+                    '<span class="diary-stat-label">' + gameData.gameTranslations.stats_visited + '</span>' +
+                    '<span class="diary-stat-value">' + visitedCount + ' / ' + totalScenesCount + ' ' + gameData.gameTranslations.of_scenes + '</span>' +
+                '</div>' +
+                '<div class="diary-stat-box">' +
+                    '<span class="diary-stat-label">' + gameData.gameTranslations.stats_time + '</span>' +
+                    '<span class="diary-stat-value">' + timeStr + '</span>' +
+                '</div>' +
+                '<div class="diary-stat-box">' +
+                    '<span class="diary-stat-label">' + gameData.gameTranslations.total_words_read + '</span>' +
+                    '<span class="diary-stat-value">' + totalWords + '</span>' +
+                '</div>';
+            diaryLog.appendChild(statsContainer);
+        }
+
         actionLog.forEach(entry => {
             if (entry.type === 'scene') {
                 const div = document.createElement('div'); div.className = 'diary-entry';
@@ -1967,7 +2058,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        diaryModal.classList.remove('hidden'); setTimeout(() => { diaryLog.scrollTop = diaryLog.scrollHeight; }, 10);
+        diaryModal.classList.remove('hidden'); 
+        setTimeout(() => { 
+            diaryLog.scrollTop = isConclusion ? 0 : diaryLog.scrollHeight; 
+        }, 10);
     };
     init();
 });

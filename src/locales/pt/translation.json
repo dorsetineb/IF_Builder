@@ -1137,5 +1137,14 @@
       "display": "Display",
       "decorativa": "Decorativa"
     }
+  },
+  "game": {
+    "diary": {
+      "view_diary_btn": "Ver Diário",
+      "stats_visited": "Você visitou",
+      "stats_time": "Tempo decorrido",
+      "total_words_read": "Palavras lidas",
+      "of_scenes": "cenas"
+    }
   }
 }

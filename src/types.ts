@@ -234,6 +234,13 @@ export interface GameData {
   gameViewEndingButtonText?: string;
   gameSuggestionsEmptyFeedback?: string;
   gameInventoryEmptyFeedback?: string;
+  gameTranslations?: {
+    view_diary_btn: string;
+    stats_visited: string;
+    stats_time: string;
+    total_words_read: string;
+    of_scenes: string;
+  };
 
 
   // Transitions

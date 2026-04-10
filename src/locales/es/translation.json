@@ -1111,5 +1111,14 @@
       "display": "Display",
       "decorativa": "Decorativa"
     }
+  },
+  "game": {
+    "diary": {
+      "view_diary_btn": "Ver Diario",
+      "stats_visited": "Has visitado",
+      "stats_time": "Tiempo trascurrido",
+      "total_words_read": "Palabras leídas",
+      "of_scenes": "escenas"
+    }
   }
 }

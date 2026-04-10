@@ -1154,5 +1154,14 @@
       "display": "Display",
       "decorativa": "Decorative"
     }
+  },
+  "game": {
+    "diary": {
+      "view_diary_btn": "View Diary",
+      "stats_visited": "You visited",
+      "stats_time": "Time elapsed",
+      "total_words_read": "Words read",
+      "of_scenes": "scenes"
+    }
   }
 }
