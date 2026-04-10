@@ -363,7 +363,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             gameSuggestionsEmptyFeedback: gameData.gameSuggestionsEmptyFeedback || t('UIEditor.textos.suggestionsEmptyFeedbackDefault'),
             gameInventoryEmptyFeedback: gameData.gameInventoryEmptyFeedback || t('UIEditor.textos.inventoryEmptyFeedbackDefault'),
             gameTranslations: {
-                view_diary_btn: t('game.diary.view_diary_btn'),
+                view_diary_btn: gameData.gameRetrospectiveButtonText || t('game.diary.view_diary_btn'),
                 stats_visited: t('game.diary.stats_visited'),
                 stats_time: t('game.diary.stats_time'),
                 total_words_read: t('game.diary.total_words_read'),

@@ -9,7 +9,7 @@ import { GameData, FixedVerb } from '../types';
 import { useTranslation } from 'react-i18next';
 import { DitherShader } from '@/components/ui/dither-shader';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Terminal, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand } from 'lucide-react';
+import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Terminal, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, History as HistoryIcon } from 'lucide-react';
 
 interface UIEditorProps {
     html: string;
@@ -68,6 +68,7 @@ interface UIEditorProps {
     gameMainMenuButtonText?: string;
     gameContinueIndicatorColor: string;
     gameViewEndingButtonText?: string;
+    gameRetrospectiveButtonText?: string;
 
     title: string;
     logo: string;
@@ -106,6 +107,7 @@ interface UIEditorProps {
     enableChances?: boolean;
     enableImages?: boolean;
     enableTextControl?: boolean;
+    enableRetrospective?: boolean;
     inventoryCapacity?: number;
     inventoryMaxWeight?: number;
     diaryAutoScroll?: boolean;
@@ -250,7 +252,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, gameFrameColor, onUpdate, isDirty, onSetDirty,
         gameShowTrackersUI, gameShowSystemButton, gameInteractionType, suggestionsButtonText, inventoryButtonText,
         diaryButtonText, trackersButtonText, gameSystemButtonText, gameSaveMenuTitle, gameLoadMenuTitle,
-        gameMainMenuButtonText, gameContinueIndicatorColor, gameViewEndingButtonText, title, logo, omitSplashTitle, omitSplashDescription,
+        gameMainMenuButtonText, gameContinueIndicatorColor, gameViewEndingButtonText, gameRetrospectiveButtonText, title, logo, omitSplashTitle, omitSplashDescription,
         splashImage, splashContentAlignment, splashDescription, backgroundMusic,
         positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription, positiveEndingMusic,
         negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription, negativeEndingMusic,
@@ -291,6 +293,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localLoadMenuTitle, setLocalLoadMenuTitle] = useState(gameLoadMenuTitle);
     const [localMainMenuButtonText, setLocalMainMenuButtonText] = useState(gameMainMenuButtonText);
     const [localViewEndingButtonText, setLocalViewEndingButtonText] = useState(gameViewEndingButtonText);
+    const [localRetrospectiveButtonText, setLocalRetrospectiveButtonText] = useState(gameRetrospectiveButtonText);
     const [activeTab, setActiveTab] = useState<'sistemas' | 'aparencia' | 'textos' | 'config'>('config');
     const [originalTheme, setOriginalTheme] = useState(theme);
     const [localLanguage, setLocalLanguage] = useState(i18n.language || 'pt');
@@ -399,6 +402,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localEnableChances, setLocalEnableChances] = useState(enableChances ?? (gameSystemEnabled === 'chances'));
     const [localEnableImages, setLocalEnableImages] = useState(enableImages ?? true);
     const [localEnableTextControl, setLocalEnableTextControl] = useState(enableTextControl ?? true);
+    const [localEnableRetrospective, setLocalEnableRetrospective] = useState(props.enableRetrospective ?? true);
 
     const [localInventoryCapacity, setLocalInventoryCapacity] = useState(inventoryCapacity ?? 10);
     const [localInventoryMaxWeight, setLocalInventoryMaxWeight] = useState(inventoryMaxWeight ?? 0);
@@ -487,6 +491,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalGameShowTrackersUI(gameShowTrackersUI ?? true); }, [gameShowTrackersUI]);
     useEffect(() => { setLocalGameShowSystemButton(gameShowSystemButton ?? true); }, [gameShowSystemButton]);
     useEffect(() => { setLocalDiaryPlayerName(diaryPlayerName); }, [diaryPlayerName]);
+    useEffect(() => { setLocalRetrospectiveButtonText(gameRetrospectiveButtonText); }, [gameRetrospectiveButtonText]);
     useEffect(() => { setLocalChanceIcon(chanceIcon); }, [chanceIcon]);
     useEffect(() => { setLocalChanceLossMessage(chanceLossMessage || ''); }, [chanceLossMessage]);
     useEffect(() => { setLocalChanceRestoreMessage(chanceRestoreMessage || ''); }, [chanceRestoreMessage]);
@@ -507,6 +512,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalEnableChances(enableChances ?? (gameSystemEnabled === 'chances')); }, [enableChances, gameSystemEnabled]);
     useEffect(() => { setLocalEnableImages(enableImages ?? true); }, [enableImages]);
     useEffect(() => { setLocalEnableTextControl(enableTextControl ?? true); }, [enableTextControl]);
+    useEffect(() => { setLocalEnableRetrospective(props.enableRetrospective ?? true); }, [props.enableRetrospective]);
 
     // 8. Specific System Settings
     useEffect(() => { setLocalInventoryCapacity(inventoryCapacity ?? 10); }, [inventoryCapacity]);
@@ -527,7 +533,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localDiaryPlayerName, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI,
         localGameShowSystemButton, localGameInteractionType, localSuggestionsButtonText,
         localInventoryButtonText, localDiaryButtonText, localTrackersButtonText, localSystemButtonText,
-        localSaveMenuTitle, localLoadMenuTitle, localMainMenuButtonText, localViewEndingButtonText,
+        localSaveMenuTitle, localLoadMenuTitle, localMainMenuButtonText, localViewEndingButtonText, localRetrospectiveButtonText,
         localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor,
         localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor,
         localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceLossMessage,
@@ -542,7 +548,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localImageTransitionType, localImageSpeed,
         // New Systems
         localEnableTrackers, localEnableInventory, localEnableSuggestions, localEnableDiary, localEnableFixedVerbs,
-        localEnableChances, localEnableImages, localEnableTextControl, localInventoryCapacity,
+        localEnableChances, localEnableImages, localEnableTextControl, localEnableRetrospective, localInventoryCapacity,
         localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
         localDiaryShowSceneImage, localDiaryShowPlayerAction,
         localSuggestionsEmptyFeedback, localInventoryEmptyFeedback
@@ -577,7 +583,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localDiaryPlayerName, localGameSystemEnabled, localMaxChances, localGameShowTrackersUI,
         localGameShowSystemButton, localGameInteractionType, localSuggestionsButtonText,
         localInventoryButtonText, localDiaryButtonText, localTrackersButtonText, localSystemButtonText,
-        localSaveMenuTitle, localLoadMenuTitle, localMainMenuButtonText, localViewEndingButtonText,
+        localSaveMenuTitle, localLoadMenuTitle, localMainMenuButtonText, localViewEndingButtonText, localRetrospectiveButtonText,
         localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor,
         localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor,
         localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceLossMessage,
@@ -591,7 +597,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localFixedVerbs, localTextAnimationType, localTextSpeed, localTextReadingFlow,
         localImageTransitionType, localImageSpeed,
         localEnableTrackers, localEnableInventory, localEnableSuggestions, localEnableDiary, localEnableFixedVerbs,
-        localEnableChances, localEnableImages, localEnableTextControl, localInventoryCapacity,
+        localEnableChances, localEnableImages, localEnableTextControl, localEnableRetrospective, localInventoryCapacity,
         localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
         localDiaryShowSceneImage, localDiaryShowPlayerAction,
         localSuggestionsEmptyFeedback, localInventoryEmptyFeedback
@@ -622,6 +628,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localLoadMenuTitle !== gameLoadMenuTitle) onUpdate('gameLoadMenuTitle', localLoadMenuTitle, true);
         if (localMainMenuButtonText !== gameMainMenuButtonText) onUpdate('gameMainMenuButtonText', localMainMenuButtonText, true);
         if (localViewEndingButtonText !== gameViewEndingButtonText) onUpdate('gameViewEndingButtonText', localViewEndingButtonText, true);
+        if (localRetrospectiveButtonText !== gameRetrospectiveButtonText) onUpdate('gameRetrospectiveButtonText', localRetrospectiveButtonText, true);
         if (localTextColor !== textColor) onUpdate('gameTextColor', localTextColor, true);
         if (localTitleColor !== titleColor) onUpdate('gameTitleColor', localTitleColor, true);
         if (localSplashButtonColor !== splashButtonColor) onUpdate('gameSplashButtonColor', localSplashButtonColor, true);
@@ -683,6 +690,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localEnableDiary !== (enableDiary ?? true)) onUpdate('enableDiary', localEnableDiary, true);
         if (localEnableFixedVerbs !== (enableFixedVerbs ?? (fixedVerbs && fixedVerbs.length > 0))) onUpdate('enableFixedVerbs', localEnableFixedVerbs, true);
         if (localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances'))) onUpdate('enableChances', localEnableChances, true);
+        if (localEnableRetrospective !== (props.enableRetrospective ?? true)) onUpdate('enableRetrospective', localEnableRetrospective, true);
 
         if (localSuggestionsEmptyFeedback !== (props.gameSuggestionsEmptyFeedback || '')) onUpdate('gameSuggestionsEmptyFeedback', localSuggestionsEmptyFeedback, true);
         if (localInventoryEmptyFeedback !== (props.gameInventoryEmptyFeedback || '')) onUpdate('gameInventoryEmptyFeedback', localInventoryEmptyFeedback, true);
@@ -1008,7 +1016,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
 
                     {activeTab === 'sistemas' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-32">
                             <div>
                                 {/* --- BENTO BOX LAYOUT: FULL WIDTH HEADER + 2 INDEPENDENT COLUMNS + FOOTER --- */}
                                 <div className="space-y-6">
@@ -1187,9 +1195,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                             </div>
                                                         </div>
                                                     )}
-                                                </div>
-                                            </div>
+
                                         </div>
+                                    </div>
+                                </div>
 
                                         {/* --- RIGHT COLUMN --- */}
                                         <div className="flex-1 w-full space-y-6">
@@ -1406,6 +1415,30 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                     )}
                                                 </div>
                                             </div>
+
+                                            {/* RETROSPECTIVA */}
+                                            <div className="w-full">
+                                                <div className={`w-full p-6 bg-card border-2 ${localEnableRetrospective ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '800ms' }}>
+                                                    <div className="flex justify-between items-center">
+                                                        <div className="flex items-center gap-3">
+                                                            <HistoryIcon className="w-5 h-5" />
+                                                            <div>
+                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableRetrospective ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.retrospective')}</h4>
+                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.retrospectiveDesc')}</p>
+                                                            </div>
+                                                        </div>
+                                                        <label className="relative inline-flex items-center cursor-pointer">
+                                                            <input type="checkbox" checked={localEnableRetrospective} onChange={(e) => setLocalEnableRetrospective(e.target.checked)} className="sr-only peer" />
+                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                                                <div 
+                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableRetrospective ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
+                                                                    style={{ transform: localEnableRetrospective ? 'translateX(16px)' : 'translateX(0)' }}
+                                                                ></div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -1613,6 +1646,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                         <div className="space-y-2">
                                             <label htmlFor="restartButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.restartButtonText')}</label>
                                             <input type="text" id="restartButtonText" value={localRestartButtonText || ''} onChange={(e) => setLocalRestartButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.restartButtonPlaceholder')} />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <label htmlFor="retrospectiveButtonText" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.retrospectiveButton')}</label>
+                                            <input type="text" id="retrospectiveButtonText" value={localRetrospectiveButtonText || ''} onChange={(e) => setLocalRetrospectiveButtonText(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.retrospectivePlaceholder')} />
                                         </div>
                                     </div>
                                 </div>

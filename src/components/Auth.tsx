@@ -305,7 +305,7 @@ export function Auth() {
                 </h1>
                 <div className="font-mono text-[10px] text-muted-foreground tracking-wider pr-2 mt-2 border-r-2 border-muted-foreground/50 text-right">
                     <p>SYS.STATUS: ONLINE</p>
-                    <p>NODE: ALPHA-7</p>
+                    <p>VER: 1.0.0</p>
                 </div>
             </div>
         </div>

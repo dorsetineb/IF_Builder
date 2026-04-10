@@ -162,6 +162,7 @@ export interface GameData {
   gameSplashButtonTextColor?: string;
   gameContinueButtonText?: string;
   gameRestartButtonText?: string;
+  gameRetrospectiveButtonText?: string;
   gameLayoutOrientation?: 'vertical' | 'horizontal';
   gameLayoutOrder?: 'image-first' | 'image-last';
   gameImageFrame?: 'none' | 'book-cover' | 'trading-card' | 'rounded-top';
@@ -179,6 +180,7 @@ export interface GameData {
   enableDiary?: boolean;
   enableFixedVerbs?: boolean;
   enableChances?: boolean; // Legacy/Basic system
+  enableRetrospective?: boolean;
 
   // Inventory Config
   inventoryCapacity?: number;

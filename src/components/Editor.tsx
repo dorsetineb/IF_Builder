@@ -1238,8 +1238,8 @@ const Editor: React.FC = () => {
                     }
                 `}</style>
         <div className="space-y-1 max-w-3xl">
-          <p>IF-BUILDER BIOS v1.0.24</p>
-          <p className="mb-4">Copyright (C) 2026 Deepmind Systems Inc.</p>
+          <p>IF-BUILDER BIOS V.1.0.0</p>
+          <p className="mb-4">Copyright (C) 2026 @DORSETINEB</p>
 
           <p>System Memory: 640KB OK</p>
           <p>Extended Memory: 32MB OK</p>

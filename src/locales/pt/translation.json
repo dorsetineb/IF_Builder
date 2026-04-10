@@ -800,6 +800,8 @@
       "transNone": "Nenhuma",
       "trackers": "Rastreadores",
       "trackersDesc": "Barras de progressão que impactam a história",
+      "retrospective": "Retrospectiva",
+      "retrospectiveDesc": "Exibir resumo da jornada no final do jogo",
       "trackersInfo": "Rastreadores são variáveis para pontos de vida alternativos, dinheiro, sanidade, etc.",
       "configureTrackers": "Configurar Rastreadores",
       "gameTitle": "Título do Jogo",
@@ -835,6 +837,9 @@
       "continueButtonPlaceholder": "Continuar Aventura",
       "restartButtonText": "Reiniciar",
       "restartButtonPlaceholder": "Reiniciar Aventura",
+      "retrospectiveButtonText": "Retrospectiva",
+      "retrospectiveButton": "Botão Retrospectiva",
+      "retrospectivePlaceholder": "Retrospectiva",
       "navigationButtons": "Ferramentas",
       "suggestionsButton": "Botão Sugestões",
       "suggestionsPlaceholder": "Sugestões",
@@ -1140,7 +1145,7 @@
   },
   "game": {
     "diary": {
-      "view_diary_btn": "Ver Diário",
+      "view_diary_btn": "Retrospectiva",
       "stats_visited": "Você visitou",
       "stats_time": "Tempo decorrido",
       "total_words_read": "Palavras lidas",

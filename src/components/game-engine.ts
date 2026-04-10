@@ -99,6 +99,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         enableFixedVerbs: data.enableFixedVerbs,
         enableImages: data.enableImages ?? true,
         enableTextControl: data.enableTextControl ?? true,
+        enableRetrospective: data.enableRetrospective ?? true,
         gameInteractionType: data.gameInteractionType || 'parser',
         gameSuggestionsEmptyFeedback: data.gameSuggestionsEmptyFeedback,
         gameInventoryEmptyFeedback: data.gameInventoryEmptyFeedback,
@@ -1727,9 +1728,12 @@ document.addEventListener('DOMContentLoaded', () => {
         standardActionBar.classList.add('hidden');
         endingActionBar.classList.remove('hidden');
 
-        // Show View Diary button only for victory/defeat
-        if (type === 'win' || type === 'lose') {
+        // Show View Diary button only for victory/defeat if enabled
+        const showRetrospective = gameData.enableRetrospective !== false;
+        if ((type === 'win' || type === 'lose') && showRetrospective) {
             if (vignetteDiaryButton) vignetteDiaryButton.classList.remove('hidden');
+        } else {
+            if (vignetteDiaryButton) vignetteDiaryButton.classList.add('hidden');
         }
 
         if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
