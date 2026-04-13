@@ -114,7 +114,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .action-buttons button:hover { background-color: var(--border-color); border-color: var(--text-dim-color); }
 .input-area { display: flex; gap: 8px; }
 #verb-input { flex-grow: 1; padding: 12px 10px; border: 2px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); font-family: var(--font-family); font-size: 1em; }
-#verb-input:focus { outline: none; border-color: var(--border-color); }
+#verb-input:focus { outline: none; border-color: var(--action-button-bg); }
 #verb-input:disabled { background-color: var(--button-bg); cursor: not-allowed; }
 #submit-verb { padding: 8px 16px; border: 2px solid var(--border-color); background-color: var(--action-button-bg); color: var(--action-button-text-color); font-family: var(--font-family); cursor: pointer; font-weight: bold; transition: background-color 0.2s; font-size: 1em; }
 #submit-verb:hover { filter: brightness(0.9); }

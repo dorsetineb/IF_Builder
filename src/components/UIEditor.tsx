@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect, memo } from 'react';
+import React, { useState, useEffect, memo, useMemo } from 'react';
 import { useTheme } from './ThemeProvider';
 import { useToast } from './ToastContext';
 import { FONTS, PREDEFINED_THEMES, MAX_IMAGE_SIZE, MAX_AUDIO_SIZE } from '../constants';
@@ -8,6 +7,8 @@ import { FONTS, PREDEFINED_THEMES, MAX_IMAGE_SIZE, MAX_AUDIO_SIZE } from '../con
 import { GameData, FixedVerb } from '../types';
 import { useTranslation } from 'react-i18next';
 import { DitherShader } from '@/components/ui/dither-shader';
+import { SystemsTab } from './UIEditor/SystemsTab';
+import { AppearanceTab } from './UIEditor/AppearanceTab';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Terminal, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, History as HistoryIcon } from 'lucide-react';
 
@@ -121,6 +122,7 @@ interface UIEditorProps {
 }
 
 // Define App Theme Primary Colors based on index.css
+// APP_THEME_COLORS moved to constant or kept here if specific to UIEditor
 const APP_THEME_COLORS = {
     dark: '#9D4EDD',      // Vibrant Purple
     light: '#18181b',     // Zinc-950 (Dark Grey/Black for Light theme as per :root --primary)
@@ -129,37 +131,6 @@ const APP_THEME_COLORS = {
     windows: '#008080',    // Teal (W95 theme accent)
     system: '#9D4EDD'     // Default fallback
 };
-
-const ColorInput: React.FC<{
-    label: string;
-    id: string;
-    value: string;
-    onChange: (value: string) => void;
-    placeholder: string;
-}> = memo(({ label, id, value, onChange, placeholder }) => (
-    <div>
-        <label htmlFor={id} className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{label}</label>
-        <div className="flex items-center gap-2 p-1 bg-background border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all">
-            <input
-                type="color"
-                id={`${id}-picker`}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="w-10 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
-                aria-label={`Seletor de cor para ${label}`}
-            />
-            <input
-                type="text"
-                id={id}
-                value={value}
-                onChange={(e) => onChange(e.target.value)}
-                className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase"
-                placeholder={placeholder}
-            />
-        </div>
-    </div>
-));
-ColorInput.displayName = 'ColorInput';
 
 const FixedVerbItem: React.FC<{
     verb: FixedVerb;
@@ -227,7 +198,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const { theme, setTheme } = useTheme(); // Get app theme
     const currentSliderColor = APP_THEME_COLORS[theme as keyof typeof APP_THEME_COLORS] || APP_THEME_COLORS.dark;
 
-    const getDitherColors = () => {
+    const ditherColors = useMemo(() => {
         switch (theme) {
             case 'terminal':
                 return { primary: '#0d1117', secondary: '#4af626' };
@@ -236,8 +207,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
             default: // dark
                 return { primary: '#000000', secondary: currentSliderColor };
         }
-    };
-    const ditherColors = getDitherColors();
+    }, [theme, currentSliderColor]);
 
     const {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -906,54 +876,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
             case 'diamond': return <Diamond fill={color} stroke="none" className={className} />;
             default: return <Heart fill={color} stroke="none" className={className} />;
         }
-    };
-
-    const getFramePreviewStyles = (frame: GameData['gameImageFrame']) => {
-        const panelStyles: React.CSSProperties = { boxSizing: 'border-box', overflow: 'hidden' };
-        const containerStyles: React.CSSProperties = {
-            backgroundColor: localGameTheme === 'dark' ? '#1a202c' : '#e2e8f0',
-            color: localGameTheme === 'dark' ? '#a0aec0' : '#4a5568',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            boxSizing: 'border-box',
-            overflow: 'hidden'
-        };
-        let panelClass = '';
-        let containerClass = '';
-
-        switch (frame) {
-            case 'rounded-top':
-                panelStyles.padding = '5px';
-                panelStyles.backgroundColor = localGameFrameColor || '#FFFFFF';
-                panelStyles.border = 'none';
-                panelStyles.borderRadius = '40px 40px 4px 4px';
-                containerStyles.borderRadius = '35px 35px 0 0';
-                panelClass = 'frame-preview-portal';
-                containerClass = 'frame-preview-portal-container';
-                break;
-            case 'book-cover':
-                panelStyles.padding = '5px';
-                panelStyles.backgroundColor = localGameFrameColor || '#FFFFFF';
-                panelStyles.border = 'none';
-                panelClass = 'frame-preview-book';
-                break;
-            case 'trading-card':
-                panelStyles.backgroundColor = localGameFrameColor || '#FFFFFF';
-                panelStyles.borderRadius = '12px';
-                panelStyles.padding = '4px';
-                containerStyles.border = 'none';
-                containerStyles.borderRadius = '8px';
-                panelClass = 'frame-preview-trading';
-                containerClass = 'frame-preview-trading-container';
-                break;
-            default:
-                panelStyles.border = 'none';
-                panelStyles.padding = '0';
-        }
-        return { panelStyles, containerStyles, panelClass, containerClass };
+       // getFramePreviewStyles moved to src/utils/frameStyles.ts
     };
 
     return (
@@ -1016,610 +939,115 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
 
                     {activeTab === 'sistemas' && (
-                        <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-32">
-                            <div>
-                                {/* --- BENTO BOX LAYOUT: FULL WIDTH HEADER + 2 INDEPENDENT COLUMNS + FOOTER --- */}
-                                <div className="space-y-6">
-
-                                    <div className="flex flex-col md:flex-row gap-6 items-start">
-                                        {/* --- LEFT COLUMN --- */}
-                                        <div className="flex-1 w-full space-y-6">
-                                            {/* --- GAME STYLE --- */}
-                                            <div className={`w-full p-6 bg-card border-2 ${localGameInteractionType ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '0ms' }}>
-                                                <div className="flex justify-between items-start mb-6">
-                                                    <div className="flex items-center gap-3">
-                                                        <LayoutTemplate className="w-5 h-5" />
-                                                        <div>
-                                                            <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.sistemas.gameStyle')}</h4>
-                                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.gameStyleDesc')}</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                <div className="grid grid-cols-1 gap-4">
-                                                        <button
-                                                            onClick={() => setLocalGameInteractionType('parser')}
-                                                            className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/10 shadow-sm opacity-100' : 'border-muted-foreground/50 bg-muted/30 hover:border-primary/30 opacity-50'}`}
-                                                        >
-                                                            <div className={`p-3 rounded-lg ${localGameInteractionType === 'parser' ? 'bg-primary/20 text-primary' : 'bg-background/40 text-muted-foreground'}`}>
-                                                                <Type className="w-6 h-6" />
-                                                            </div>
-                                                            <div>
-                                                                <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'parser' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.parser')}</span>
-                                                                <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.parserDesc')}</span>
-                                                            </div>
-                                                        </button>
-                                                    <button
-                                                        onClick={() => {
-                                                            setLocalGameInteractionType('choice');
-                                                            setLocalEnableInventory(false);
-                                                        }}
-                                                        className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-primary bg-primary/10 shadow-sm opacity-100' : 'border-muted-foreground/50 bg-muted/30 hover:border-primary/30 opacity-50'}`}
-                                                    >
-                                                        <div className={`p-3 rounded-lg ${localGameInteractionType === 'choice' ? 'bg-primary/20 text-primary' : 'bg-background/40 text-muted-foreground'}`}>
-                                                            <List className="w-6 h-6" />
-                                                        </div>
-                                                        <div>
-                                                            <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'choice' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.choice')}</span>
-                                                            <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.choiceDesc')}</span>
-                                                        </div>
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            {/* IMAGES */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableImages ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '100ms' }}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <ImageIcon className="w-5 h-5" />
-                                                            <div>
-                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.imagesInScenes')}</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.imagesInScenesDesc')}</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={localEnableImages} onChange={(e) => setLocalEnableImages(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div 
-                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableImages ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
-                                                                    style={{ transform: localEnableImages ? 'translateX(16px)' : 'translateX(0)' }}
-                                                                ></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                    {localEnableImages && (
-                                                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                            <div className="space-y-2">
-                                                                <label htmlFor="imageTransitionType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.imageTransition')}</label>
-                                                                <select
-                                                                    id="imageTransitionType"
-                                                                    value={localImageTransitionType}
-                                                                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                                    onChange={(e) => setLocalImageTransitionType(e.target.value as any)}
-                                                                    className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
-                                                                >
-                                                                    <option value="fade">{t('UIEditor.sistemas.transFade')}</option>
-                                                                    <option value="slide">{t('UIEditor.sistemas.transSlide')}</option>
-                                                                    <option value="none">{t('UIEditor.sistemas.transNone')}</option>
-                                                                </select>
-                                                            </div>
-                                                            <div className="space-y-2">
-                                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.speed')}</label>
-                                                                <div className="flex items-center gap-4">
-                                                                    <input
-                                                                        type="range"
-                                                                        min="0.1"
-                                                                        max="3"
-                                                                        step="0.1"
-                                                                        value={localImageSpeed}
-                                                                        onChange={(e) => setLocalImageSpeed(parseFloat(e.target.value))}
-                                                                        style={{
-                                                                            background: `linear-gradient(to right, ${currentSliderColor} ${((localImageSpeed - 0.1) / 2.9) * 100}%, ${currentSliderColor}33 ${((localImageSpeed - 0.1) / 2.9) * 100}%)`
-                                                                        }}
-                                                                        className="flex-grow h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
-                                                                    />
-                                                                    <span className="text-xl font-mono font-bold w-6 text-center">{localImageSpeed}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* TEXT CONTROL */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableTextControl ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '200ms' }}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <Type className="w-5 h-5" />
-                                                            <div>
-                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.textControl')}</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.textControlDesc')}</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={localEnableTextControl} onChange={(e) => setLocalEnableTextControl(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div 
-                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableTextControl ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
-                                                                    style={{ transform: localEnableTextControl ? 'translateX(16px)' : 'translateX(0)' }}
-                                                                ></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                    {localEnableTextControl && (
-                                                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                            <div className="grid grid-cols-2 gap-4">
-                                                                <div className="space-y-2">
-                                                                    <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.animationStyle')}</label>
-                                                                    <select
-                                                                        id="textAnimationType"
-                                                                        value={localTextAnimationType}
-                                                                        onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
-                                                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
-                                                                    >
-                                                                        <option value="fade">{t('UIEditor.sistemas.animFade')}</option>
-                                                                        <option value="typewriter">{t('UIEditor.sistemas.animTypewriter')}</option>
-                                                                    </select>
-                                                                </div>
-                                                                <div className="space-y-2">
-                                                                    <label htmlFor="textReadingFlow" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.readingFlow')}</label>
-                                                                    <select
-                                                                        id="textReadingFlow"
-                                                                        value={localTextReadingFlow}
-                                                                        onChange={(e) => setLocalTextReadingFlow(e.target.value as 'continuous' | 'paused')}
-                                                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
-                                                                    >
-                                                                        <option value="paused">{t('UIEditor.sistemas.flowPaused')}</option>
-                                                                        <option value="continuous">{t('UIEditor.sistemas.flowContinuous')}</option>
-                                                                    </select>
-                                                                </div>
-                                                            </div>
-                                                            <div className="space-y-2">
-                                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.speed')}</label>
-                                                                <div className="flex items-center gap-4">
-                                                                    <input
-                                                                        type="range"
-                                                                        min="1"
-                                                                        max="10"
-                                                                        value={localTextSpeed}
-                                                                        onChange={(e) => setLocalTextSpeed(parseFloat(e.target.value))}
-                                                                        style={{
-                                                                            background: `linear-gradient(to right, ${currentSliderColor} ${((localTextSpeed - 1) / 9) * 100}%, ${currentSliderColor}33 ${((localTextSpeed - 1) / 9) * 100}%)`
-                                                                        }}
-                                                                        className="flex-grow h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
-                                                                    />
-                                                                    <span className="text-xl font-mono font-bold w-6 text-center">{localTextSpeed}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                                        {/* --- RIGHT COLUMN --- */}
-                                        <div className="flex-1 w-full space-y-6">
-                                            {/* CHANCES/VIDAS */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableChances ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '300ms' }}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <Heart className="w-5 h-5" />
-                                                            <div>
-                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.lifeSystem')}</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.lifeSystemDesc')}</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={localEnableChances} onChange={(e) => setLocalEnableChances(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div 
-                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableChances ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
-                                                                    style={{ transform: localEnableChances ? 'translateX(16px)' : 'translateX(0)' }}
-                                                                ></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                    {localEnableChances && (
-                                                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                            <div className="flex items-end gap-3 w-full">
-                                                                <div className="space-y-1 flex-1 min-w-0">
-                                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.icon')}</label>
-                                                                    <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-muted-foreground/50 h-9 w-full">
-                                                                        {['heart', 'circle', 'diamond', 'cross'].map((icon) => (
-                                                                            <button
-                                                                                key={icon}
-                                                                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                                                onClick={() => setLocalChanceIcon(icon as any)}
-                                                                                className={`flex-1 h-full flex items-center justify-center rounded-md transition-all ${localChanceIcon === icon ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
-                                                                                title={icon}
-                                                                            >
-                                                                                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                                                                                <ChanceIcon type={icon as any} color={localChanceIcon === icon ? 'currentColor' : 'currentColor'} className="w-4 h-4" />
-                                                                            </button>
-                                                                        ))}
-                                                                    </div>
-                                                                </div>
-                                                                <div className="space-y-1 flex-1 min-w-0">
-                                                                    <label htmlFor="chanceColor" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.color')}</label>
-                                                                    <div className="flex items-center gap-2 p-1 bg-background border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all h-9 w-full">
-                                                                        <input
-                                                                            type="color"
-                                                                            id="chanceColor-picker"
-                                                                            value={localChanceIconColor}
-                                                                            onChange={(e) => setLocalChanceIconColor(e.target.value)}
-                                                                            className="w-8 h-full p-0 border-none rounded cursor-pointer bg-transparent shrink-0"
-                                                                            aria-label="Seletor de cor"
-                                                                        />
-                                                                        <input
-                                                                            type="text"
-                                                                            id="chanceColor"
-                                                                            value={localChanceIconColor}
-                                                                            onChange={(e) => setLocalChanceIconColor(e.target.value)}
-                                                                            className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase truncate"
-                                                                            placeholder="#FF0000"
-                                                                        />
-                                                                    </div>
-                                                                </div>
-                                                                <div className="space-y-1 w-20 shrink-0">
-                                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.lives')}</label>
-                                                                    <input
-                                                                        type="number"
-                                                                        value={localMaxChances}
-                                                                        onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
-                                                                        min="1"
-                                                                        max="10"
-                                                                        className="w-full h-9 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-2 text-xs font-bold text-center text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all"
-                                                                    />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* SUGGESTOES */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableSuggestions ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '400ms' }}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <Lightbulb className="w-5 h-5" />
-                                                            <div>
-                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableSuggestions ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.suggestions', 'Sugestões')}</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.suggestionsDesc', 'Ativa o botão de sugestões de ações.')}</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={localEnableSuggestions}
-                                                                onChange={(e) => setLocalEnableSuggestions(e.target.checked)}
-                                                                disabled={localGameInteractionType === 'choice'}
-                                                                className="sr-only peer"
-                                                            />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div 
-                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableSuggestions ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
-                                                                    style={{ transform: localEnableSuggestions ? 'translateX(16px)' : 'translateX(0)' }}
-                                                                ></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* INVENTORY */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableInventory ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '500ms' }}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <Package className="w-5 h-5" />
-                                                            <div>
-                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.inventoryDesc')}</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
-                                                            <input
-                                                                type="checkbox"
-                                                                checked={localEnableInventory}
-                                                                onChange={(e) => setLocalEnableInventory(e.target.checked)}
-                                                                disabled={localGameInteractionType === 'choice'}
-                                                                className="sr-only peer"
-                                                            />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div 
-                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableInventory ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
-                                                                    style={{ transform: localEnableInventory ? 'translateX(16px)' : 'translateX(0)' }}
-                                                                ></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* DIARY */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableDiary ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '600ms' }}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <Book className="w-5 h-5" />
-                                                            <div>
-                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.diary')}</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.diaryDesc')}</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={localEnableDiary} onChange={(e) => setLocalEnableDiary(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div 
-                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableDiary ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
-                                                                    style={{ transform: localEnableDiary ? 'translateX(16px)' : 'translateX(0)' }}
-                                                                ></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                    {localEnableDiary && (
-                                                        <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                                                            <div className="flex flex-row items-center gap-6">
-                                                                <div className="flex items-center gap-2 cursor-pointer" onClick={() => setLocalDiaryShowSceneImage(!localDiaryShowSceneImage)}>
-                                                                    <input type="checkbox" checked={localDiaryShowSceneImage} onChange={(e) => setLocalDiaryShowSceneImage(e.target.checked)} className="custom-checkbox" />
-                                                                    <span className="text-[11px] text-muted-foreground">{t('UIEditor.sistemas.showSceneImage')}</span>
-                                                                </div>
-                                                                <div className="flex items-center gap-2 cursor-pointer" onClick={() => setLocalDiaryShowPlayerAction(!localDiaryShowPlayerAction)}>
-                                                                    <input type="checkbox" checked={localDiaryShowPlayerAction} onChange={(e) => setLocalDiaryShowPlayerAction(e.target.checked)} className="custom-checkbox" />
-                                                                    <span className="text-[11px] text-muted-foreground">{t('UIEditor.sistemas.showPlayerAction')}</span>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* TRACKERS */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableTrackers ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '700ms' }}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <SlidersHorizontal className="w-5 h-5" />
-                                                            <div>
-                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.trackers')}</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.trackersDesc')}</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={localEnableTrackers} onChange={(e) => setLocalEnableTrackers(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div 
-                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableTrackers ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
-                                                                    style={{ transform: localEnableTrackers ? 'translateX(16px)' : 'translateX(0)' }}
-                                                                ></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                    {localEnableTrackers && (
-                                                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                                                            <p className="text-[11px] text-muted-foreground leading-relaxed">
-                                                                {t('UIEditor.sistemas.trackersInfo')}
-                                                            </p>
-                                                            <button
-                                                                onClick={() => props.onNavigateToTrackers?.()}
-                                                                className="w-full py-3 bg-primary/10 text-primary border border-primary/20 rounded-lg text-[10px] font-bold uppercase tracking-widest hover:bg-primary hover:text-primary-foreground transition-all active:scale-95 flex items-center justify-center gap-2"
-                                                            >
-                                                                <SlidersHorizontal className="w-4 h-4" /> {t('UIEditor.sistemas.configureTrackers')}
-                                                            </button>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* RETROSPECTIVA */}
-                                            <div className="w-full">
-                                                <div className={`w-full p-6 bg-card border-2 ${localEnableRetrospective ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '800ms' }}>
-                                                    <div className="flex justify-between items-center">
-                                                        <div className="flex items-center gap-3">
-                                                            <HistoryIcon className="w-5 h-5" />
-                                                            <div>
-                                                                <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableRetrospective ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.retrospective')}</h4>
-                                                                <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.retrospectiveDesc')}</p>
-                                                            </div>
-                                                        </div>
-                                                        <label className="relative inline-flex items-center cursor-pointer">
-                                                            <input type="checkbox" checked={localEnableRetrospective} onChange={(e) => setLocalEnableRetrospective(e.target.checked)} className="sr-only peer" />
-                                                            <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
-                                                                <div 
-                                                                    className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableRetrospective ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
-                                                                    style={{ transform: localEnableRetrospective ? 'translateX(16px)' : 'translateX(0)' }}
-                                                                ></div>
-                                                            </div>
-                                                        </label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <SystemsTab
+                            localGameInteractionType={localGameInteractionType}
+                            setLocalGameInteractionType={setLocalGameInteractionType}
+                            localEnableImages={localEnableImages}
+                            setLocalEnableImages={setLocalEnableImages}
+                            localImageTransitionType={localImageTransitionType}
+                            setLocalImageTransitionType={setLocalImageTransitionType}
+                            localImageSpeed={localImageSpeed}
+                            setLocalImageSpeed={setLocalImageSpeed}
+                            currentSliderColor={currentSliderColor}
+                            localEnableTextControl={localEnableTextControl}
+                            setLocalEnableTextControl={setLocalEnableTextControl}
+                            localTextAnimationType={localTextAnimationType}
+                            setLocalTextAnimationType={setLocalTextAnimationType}
+                            localTextReadingFlow={localTextReadingFlow}
+                            setLocalTextReadingFlow={setLocalTextReadingFlow}
+                            localTextSpeed={localTextSpeed}
+                            setLocalTextSpeed={setLocalTextSpeed}
+                            localEnableChances={localEnableChances}
+                            setLocalEnableChances={setLocalEnableChances}
+                            localChanceIcon={localChanceIcon}
+                            setLocalChanceIcon={setLocalChanceIcon}
+                            localChanceIconColor={localChanceIconColor}
+                            setLocalChanceIconColor={setLocalChanceIconColor}
+                            localMaxChances={localMaxChances}
+                            setLocalMaxChances={setLocalMaxChances}
+                            localEnableSuggestions={localEnableSuggestions}
+                            setLocalEnableSuggestions={setLocalEnableSuggestions}
+                            localEnableInventory={localEnableInventory}
+                            setLocalEnableInventory={setLocalEnableInventory}
+                            localEnableDiary={localEnableDiary}
+                            setLocalEnableDiary={setLocalEnableDiary}
+                            localDiaryShowSceneImage={localDiaryShowSceneImage}
+                            setLocalDiaryShowSceneImage={setLocalDiaryShowSceneImage}
+                            localDiaryShowPlayerAction={localDiaryShowPlayerAction}
+                            setLocalDiaryShowPlayerAction={setLocalDiaryShowPlayerAction}
+                            localEnableTrackers={localEnableTrackers}
+                            setLocalEnableTrackers={setLocalEnableTrackers}
+                            localEnableRetrospective={localEnableRetrospective}
+                            setLocalEnableRetrospective={setLocalEnableRetrospective}
+                            onNavigateToTrackers={props.onNavigateToTrackers}
+                        />
                     )}
 
-
-
-
                     {
-                        false /* abertura moved to Vignettes, activeTab === 'abertura' */ && (
-                            <div className="space-y-4"><div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                                {/* LEFT COLUMN: Texts & Audio */}
-                                <div className="flex flex-col h-full gap-4">
-                                    <div className="space-y-2">
-                                        <label htmlFor="gameTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.gameTitle')}</label>
-                                        <input
-                                            type="text"
-                                            id="gameTitle"
-                                            value={localTitle}
-                                            onChange={(e) => setLocalTitle(e.target.value)}
-                                            className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-primary/50 transition-all font-bold placeholder:text-muted-foreground"
-                                            placeholder={t('UIEditor.sistemas.gameTitlePlaceholder')}
-                                        />
-                                    </div>
-                                    <div className="flex flex-col gap-2 flex-1 h-full">
-                                        <label htmlFor="splashDescription" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.gameDescription')}</label>
-                                        <textarea
-                                            id="splashDescription"
-                                            value={localSplashDescription}
-                                            onChange={(e) => setLocalSplashDescription(e.target.value)}
-                                            className="w-full flex-1 bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 focus:border-primary/50 transition-all resize-none leading-relaxed placeholder:text-muted-foreground h-full"
-                                            placeholder={t('UIEditor.sistemas.gameDescriptionPlaceholder')}
-                                        />
-                                    </div>
-                                </div>
-
-
-
-
-                                {/* RIGHT COLUMN: Preview & Image Settings */}
-                                <div className="flex flex-col h-full gap-2">
-                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.layout.backgroundImage')}</label>
-                                    <div className="relative w-full aspect-video bg-muted/50 border border-muted-foreground/50 rounded-xl overflow-hidden shadow-2xl group flex-shrink-0">
-                                        {/* Background Image Layer */}
-                                        {localSplashImage ? (
-                                            <div className="absolute inset-0 w-full h-full">
-                                                <img src={localSplashImage} alt="Fundo" className="w-full h-full object-cover opacity-60 transition-opacity group-hover:opacity-40" />
-                                            </div>
-                                        ) : (
-                                            <div className="absolute inset-0 flex flex-col items-start justify-start p-4 bg-muted/10">
-                                                <ImageIcon className="w-8 h-8 text-muted-foreground/30 mb-2" />
-                                                <p className="text-[9px] uppercase tracking-widest text-muted-foreground/50 font-bold">{t('UIEditor.sistemas.noBackgroundImage')}</p>
-                                            </div>
-                                        )}
-
-                                        {/* Upload Overlay (Hover) */}
-                                        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-all gap-3 backdrop-blur-sm">
-                                            <label className="p-3 bg-secondary text-secondary-foreground rounded-lg cursor-pointer hover:bg-secondary/80 transition-all shadow-xl active:scale-95 transform hover:-translate-y-1">
-                                                <Upload className="w-5 h-5" />
-                                                <input type="file" accept="image/*" onChange={(e) => handleImageUpload(e, setLocalSplashImage)} className="hidden" />
-                                            </label>
-                                            {localSplashImage && (
-                                                <button onClick={() => setLocalSplashImage('')} className="p-3 bg-red-500/10 text-red-500 rounded-lg border border-red-500/20 hover:bg-red-500 hover:text-white transition-all shadow-xl active:scale-95 transform hover:-translate-y-1">
-                                                    <Trash2 className="w-5 h-5" />
-                                                </button>
-                                            )}
-                                        </div>
-
-                                        {/* Content Preview Overlay */}
-                                        {!localOmitSplashTitle && (
-                                            <div
-                                                className={`absolute inset-0 z-20 p-8 flex flex-col pointer-events-none transition-all duration-300
-                                                ${localSplashContentVerticalAlignment === 'top' ? 'justify-start' : 'justify-end'}
-                                                ${localSplashContentAlignment === 'right' ? 'items-end text-right' : 'items-start text-left'}
-                                            `}
-                                                style={{ fontFamily: localFontFamily }}
-                                            >
-                                                <div className={`max-w-[70%] space-y-3 flex flex-col ${localSplashContentAlignment === 'right' ? 'items-end' : 'items-start'}`}>
-                                                    <h1 className="text-lg font-black uppercase tracking-tight drop-shadow-lg" style={{ color: localTitleColor }}>
-                                                        {localTitle || "Título do Jogo"}
-                                                    </h1>
-                                                    <p className="text-[9px] text-white/90 leading-relaxed line-clamp-3 drop-shadow-md font-medium">
-                                                        {localSplashDescription || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."}
-                                                    </p>
-                                                    <div className="pt-2">
-                                                        <span className="px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] rounded shadow-lg block hover:scale-105 transition-transform" style={{ backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor }}>
-                                                            {localSplashButtonText || t('UIEditor.textos.splashButtonPlaceholder')}
-                                                        </span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="space-y-1 pt-2 w-full flex flex-col items-center text-center">
-                                        <p className="text-[10px] text-muted-foreground font-medium italic">{t('UIEditor.layout.recommendedRes')}</p>
-
-                                    </div>
-                                </div>
-                            </div>
-                                {/* LOWER SECTION: Soundtrack & Controls */}
-                                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pt-0">
-                                    {/* Left: Soundtrack */}
-                                    <div className="space-y-4">
-                                        <h4 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.startSoundtrack')}</h4>
-                                        <div className="flex items-center gap-3">
-                                            <label className="flex-grow flex items-center justify-center px-4 py-3 bg-muted border border-muted-foreground/50 text-foreground font-bold rounded-lg hover:bg-muted/80 hover:text-foreground transition-all cursor-pointer text-[10px] uppercase tracking-widest shadow-lg group">
-                                                <Upload className="w-4 h-4 mr-2 text-primary group-hover:scale-110 transition-transform" /> {localBackgroundMusic ? t('UIEditor.sistemas.changeMusic') : t('UIEditor.sistemas.loadMusic')}
-                                                <input type="file" accept="audio/mpeg,audio/wav,audio/ogg" onChange={(e) => handleAudioUpload(e, setLocalBackgroundMusic)} className="hidden" />
-                                            </label>
-                                            {localBackgroundMusic && (
-                                                <button
-                                                    onClick={() => setLocalBackgroundMusic('')}
-                                                    className="p-3 bg-red-500/5 text-muted-foreground rounded-lg border border-muted-foreground/50 hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-lg"
-                                                    title={t('UIEditor.sistemas.removeMusic')}
-                                                >
-                                                    <Trash2 className="w-5 h-5" />
-                                                </button>
-                                            )}
-                                        </div>
-                                        <p className="text-[10px] text-muted-foreground font-medium italic">{t('UIEditor.sistemas.musicInfo')}</p>
-                                    </div>
-
-                                    {/* Right: Controls */}
-                                    <div className="space-y-6">
-                                        <div className="space-y-2">
-                                            <label htmlFor="splashContentAlignment" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.layout.contentAlignment')}</label>
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <select
-                                                    id="splashContentAlignment"
-                                                    value={localSplashContentAlignment}
-                                                    onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                                    className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background shadow-lg"
-                                                >
-                                                    <option value="right">{t('UIEditor.layout.alignRight')}</option>
-                                                    <option value="left">{t('UIEditor.layout.alignLeft')}</option>
-                                                </select>
-                                                <select
-                                                    id="splashContentVerticalAlignment"
-                                                    value={localSplashContentVerticalAlignment}
-                                                    onChange={(e) => setLocalSplashContentVerticalAlignment(e.target.value as 'top' | 'bottom')}
-                                                    className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 focus:border-primary/50 transition-all [&>option]:bg-background shadow-lg"
-                                                >
-                                                    <option value="bottom">{t('UIEditor.sistemas.alignBottom')}</option>
-                                                    <option value="top">{t('UIEditor.sistemas.alignTop')}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-3">
-                                            <div className="flex items-center">
-                                                <label className="flex items-center gap-3 cursor-pointer group select-none">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={localOmitSplashTitle}
-                                                        onChange={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}
-                                                        className="custom-checkbox"
-                                                    />
-                                                    <span className="text-[11px] text-muted-foreground group-hover:text-foreground transition-colors">{t('UIEditor.layout.hideTitle')}</span>
-                                                </label>
-                                            </div>
-                                            <div className="flex items-center">
-                                                <label className="flex items-center gap-3 cursor-pointer group select-none">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={localOmitSplashDescription}
-                                                        onChange={() => setLocalOmitSplashDescription(!localOmitSplashDescription)}
-                                                        className="custom-checkbox"
-                                                    />
-                                                    <span className="text-[11px] text-muted-foreground group-hover:text-foreground transition-colors">{t('UIEditor.layout.hideDescription')}</span>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
+                        activeTab === 'aparencia' && (
+                            <AppearanceTab
+                                localLayoutOrientation={localLayoutOrientation}
+                                setLocalLayoutOrientation={setLocalLayoutOrientation}
+                                localLayoutOrder={localLayoutOrder}
+                                setLocalLayoutOrder={setLocalLayoutOrder}
+                                localImageFrame={localImageFrame}
+                                setLocalImageFrame={setLocalImageFrame}
+                                localGameTheme={localGameTheme}
+                                localGameFrameColor={localGameFrameColor}
+                                setLocalGameFrameColor={setLocalGameFrameColor}
+                                localTextColor={localTextColor}
+                                setLocalTextColor={setLocalTextColor}
+                                localTextColorLight={localTextColorLight}
+                                setLocalTextColorLight={setLocalTextColorLight}
+                                localTitleColor={localTitleColor}
+                                setLocalTitleColor={setLocalTitleColor}
+                                localTitleColorLight={localTitleColorLight}
+                                setLocalTitleColorLight={setLocalTitleColorLight}
+                                localFocusColor={localFocusColor}
+                                setLocalFocusColor={setLocalFocusColor}
+                                localFocusColorLight={localFocusColorLight}
+                                setLocalFocusColorLight={setLocalFocusColorLight}
+                                localGameContinueIndicatorColor={localGameContinueIndicatorColor}
+                                setLocalGameContinueIndicatorColor={setLocalGameContinueIndicatorColor}
+                                localSplashButtonColor={localSplashButtonColor}
+                                setLocalSplashButtonColor={setLocalSplashButtonColor}
+                                localSplashButtonTextColor={localSplashButtonTextColor}
+                                setLocalSplashButtonTextColor={setLocalSplashButtonTextColor}
+                                localSplashButtonHoverColor={localSplashButtonHoverColor}
+                                setLocalSplashButtonHoverColor={setLocalSplashButtonHoverColor}
+                                localActionButtonColor={localActionButtonColor}
+                                setLocalActionButtonColor={setLocalActionButtonColor}
+                                localActionButtonTextColor={localActionButtonTextColor}
+                                setLocalActionButtonTextColor={setLocalActionButtonTextColor}
+                                localGameSceneNameOverlayBg={localGameSceneNameOverlayBg}
+                                setLocalGameSceneNameOverlayBg={setLocalGameSceneNameOverlayBg}
+                                localGameSceneNameOverlayTextColor={localGameSceneNameOverlayTextColor}
+                                setLocalGameSceneNameOverlayTextColor={setLocalGameSceneNameOverlayTextColor}
+                                localFontFamily={localFontFamily}
+                                setLocalFontFamily={setLocalFontFamily}
+                                localGameFontSize={localGameFontSize}
+                                setLocalGameFontSize={setLocalGameFontSize}
+                                localSplashContentAlignment={localSplashContentAlignment}
+                                setLocalSplashContentAlignment={setLocalSplashContentAlignment}
+                                localOmitSplashTitle={localOmitSplashTitle}
+                                setLocalOmitSplashTitle={setLocalOmitSplashTitle}
+                                localOmitSplashDescription={localOmitSplashDescription}
+                                setLocalOmitSplashDescription={setLocalOmitSplashDescription}
+                                localSplashButtonText={localSplashButtonText}
+                                localEnableInventory={localEnableInventory}
+                                localEnableDiary={localEnableDiary}
+                                localEnableTrackers={localEnableTrackers}
+                                localGameShowSystemButton={localGameShowSystemButton}
+                                handleThemeChange={handleThemeChange}
+                                applyTheme={applyTheme}
+                                previewType={previewType}
+                                setPreviewType={setPreviewType}
+                                isColorsExpanded={isColorsExpanded}
+                                setIsColorsExpanded={setIsColorsExpanded}
+                                ditherColors={ditherColors}
+                            />
                         )
                     }
-
 
                     {
                         activeTab === 'textos' && (
@@ -1763,509 +1191,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             <label htmlFor="loadMenuTitle" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.textos.loadMenuTitle')}</label>
                                             <input type="text" id="loadMenuTitle" value={localLoadMenuTitle || ''} onChange={e => setLocalLoadMenuTitle(e.target.value)} className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all" placeholder={t('UIEditor.textos.loadMenuPlaceholder')} />
                                         </div>
-                                    </div>
-                                </div>
-                            </div>
-                        )
-                    }
-
-                    {
-                        activeTab === 'aparencia' && (
-                            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 h-full">
-                                {/* Left Column: Settings (Reduced width) */}
-                                <div className="col-span-1 lg:col-span-5 space-y-8 custom-scrollbar pb-20">
-
-                                    {/* SECTION: ESTRUTURA */}
-                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
-                                        <div className="flex items-center w-full text-left">
-                                            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <LayoutTemplate className="w-4 h-4" /> {t('UIEditor.aparencia.scenes', 'Layout das Cenas')}
-                                            </h3>
-                                        </div>
-
-                                        <div className="space-y-6 pt-4">
-                                            <div className="space-y-2">
-                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.orientation')}</label>
-                                                <div className="relative">
-                                                    <select
-                                                        value={localLayoutOrientation}
-                                                        onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
-                                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
-                                                    >
-                                                        <option value="vertical">{t('UIEditor.layout.vertical')}</option>
-                                                        <option value="horizontal">{t('UIEditor.layout.horizontal')}</option>
-                                                    </select>
-                                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.imagePosition')}</label>
-                                                <div className="relative">
-                                                    <select
-                                                        value={localLayoutOrder}
-                                                        onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
-                                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
-                                                    >
-                                                        {localLayoutOrientation === 'vertical' ? (
-                                                            <>
-                                                                <option value="image-first">{t('UIEditor.layout.posLeft')}</option>
-                                                                <option value="image-last">{t('UIEditor.layout.posRight')}</option>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <option value="image-first">{t('UIEditor.layout.posAbove')}</option>
-                                                                <option value="image-last">{t('UIEditor.layout.posBelow')}</option>
-                                                            </>
-                                                        )}
-                                                    </select>
-                                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-                                                </div>
-                                            </div>
-
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.frameType')}</label>
-                                                    <div className="relative">
-                                                        <select
-                                                            value={localImageFrame}
-                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                            onChange={(e) => setLocalImageFrame(e.target.value as any)}
-                                                            className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
-                                                        >
-                                                            <option value="none">{t('UIEditor.layout.frameNone')}</option>
-                                                            <option value="rounded-top">{t('UIEditor.layout.framePortal')}</option>
-                                                            <option value="book-cover">{t('UIEditor.layout.frameSquare')}</option>
-                                                            <option value="trading-card">{t('UIEditor.layout.frameRounded')}</option>
-                                                        </select>
-                                                        <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-                                                    </div>
-                                                </div>
-                                                {localImageFrame && localImageFrame !== 'none' && (
-                                                    <div className="space-y-2">
-                                                        {localImageFrame === 'rounded-top' && (
-                                                            <ColorInput label={t('UIEditor.aparencia.frameColor', 'Cor')} id="frameRoundedTopColor" value={localGameFrameColor} onChange={setLocalGameFrameColor} placeholder="#FFFFFF" />
-                                                        )}
-                                                        {localImageFrame === 'book-cover' && (
-                                                            <ColorInput label={t('UIEditor.aparencia.frameColor', 'Cor')} id="frameBookColor" value={localGameFrameColor} onChange={setLocalGameFrameColor} placeholder="#FFFFFF" />
-                                                        )}
-                                                        {localImageFrame === 'trading-card' && (
-                                                            <ColorInput label={t('UIEditor.aparencia.frameColor', 'Cor')} id="frameTradingCardColor" value={localGameFrameColor} onChange={setLocalGameFrameColor} placeholder="#FFFFFF" />
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* SECTION: VINHETAS */}
-                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
-                                        <div className="flex items-center w-full text-left">
-                                            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <ArrowRight className="w-4 h-4" /> {t('UIEditor.aparencia.vinhetas', 'Layout das Vinhetas')}
-                                            </h3>
-                                        </div>
-
-                                        <div className="space-y-6 pt-4">
-                                            <div className="space-y-2">
-                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.contentAlignment')}</label>
-                                                <div className="relative">
-                                                    <select
-                                                        value={localSplashContentAlignment}
-                                                        onChange={(e) => setLocalSplashContentAlignment(e.target.value as 'left' | 'right')}
-                                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
-                                                    >
-                                                        <option value="right">{t('UIEditor.layout.alignRight')}</option>
-                                                        <option value="left">{t('UIEditor.layout.alignLeft')}</option>
-                                                    </select>
-                                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-                                                </div>
-                                            </div>
-                                            <div className="flex flex-row gap-4">
-                                                <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}>
-                                                    <input
-                                                        type="checkbox"
-                                                        id="omitSplashTitle"
-                                                        checked={localOmitSplashTitle}
-                                                        onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
-                                                        className="custom-checkbox"
-                                                    />
-                                                    <label htmlFor="omitSplashTitle" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('UIEditor.layout.hideTitle')}</label>
-                                                </div>
-                                                <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashDescription(!localOmitSplashDescription)}>
-                                                    <input
-                                                        type="checkbox"
-                                                        id="omitSplashDescription"
-                                                        checked={localOmitSplashDescription}
-                                                        onChange={(e) => setLocalOmitSplashDescription(e.target.checked)}
-                                                        className="custom-checkbox"
-                                                    />
-                                                    <label htmlFor="omitSplashDescription" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('UIEditor.layout.hideDescription')}</label>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* SECTION: UI TEXT */}
-                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '150ms' }}>
-                                        <div className="flex items-center w-full text-left">
-                                            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <Type className="w-4 h-4" /> {t('UIEditor.aparencia.fontsText')}
-                                            </h3>
-                                        </div>
-
-                                        <div className="mt-6 space-y-6">
-                                            <div className="grid grid-cols-2 gap-4">
-                                                <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.font')}</label>
-                                                    <div className="relative">
-                                                        <select
-                                                            value={localFontFamily}
-                                                            onChange={(e) => setLocalFontFamily(e.target.value)}
-                                                            className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
-                                                        >
-                                                            {FONTS.map(font => (
-                                                                <option key={font.name} value={font.family}>
-                                                                    {t(`fonts.${font.name.replace(/[^a-zA-Z]/g, '')}`, { defaultValue: font.name })} · {t(`fonts.categories.${font.category}`, { defaultValue: font.category })}
-                                                                </option>
-                                                            ))}
-                                                        </select>
-                                                        <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-                                                    </div>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.size')}</label>
-                                                    <div className="relative">
-                                                        <select
-                                                            value={localGameFontSize}
-                                                            onChange={(e) => setLocalGameFontSize(e.target.value)}
-                                                            className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
-                                                        >
-                                                            <option value="12">{t('UIEditor.aparencia.sizeSmall')}</option>
-                                                            <option value="14">{t('UIEditor.aparencia.sizeMedium')}</option>
-                                                            <option value="16">{t('UIEditor.aparencia.sizeLarge')}</option>
-                                                        </select>
-                                                        <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* SECTION: ESTILO & TEMA */}
-                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
-                                        <div className="flex items-center w-full text-left">
-                                            <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                                <Palette className="w-4 h-4" /> {t('UIEditor.aparencia.styleTheme')}
-                                            </h3>
-                                        </div>
-
-                                        <div className="mt-6 space-y-6">
-                                            <div className="space-y-2">
-                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('ThemeEditor.uiTheme', 'Cor da Interface')}</label>
-                                                <div className="flex bg-background rounded-lg p-1 border border-muted-foreground/50">
-                                                    <button
-                                                        onClick={() => handleThemeChange('dark')}
-                                                        className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-                                                    >
-                                                        {t('ThemeEditor.dark', 'Noite')}
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleThemeChange('light')}
-                                                        className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'light' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-                                                    >
-                                                        {t('ThemeEditor.light', 'Dia')}
-                                                    </button>
-                                                </div>
-                                            </div>
-
-                                            <div className="space-y-2">
-                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.predefinedThemes')}</label>
-                                                <div className="grid grid-cols-3 gap-2">
-                                                    {PREDEFINED_THEMES.map((theme) => (
-                                                        <button
-                                                            key={theme.nameKey}
-                                                            onClick={() => applyTheme(theme)}
-                                                            className="flex flex-col items-center justify-center p-3 rounded-lg border border-muted-foreground/50 bg-background hover:border-primary/50 hover:bg-muted/80 transition-all gap-2 group"
-                                                        >
-                                                            <div className="flex -space-x-1">
-                                                                <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.textColorLight }}></div>
-                                                                <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.titleColor }}></div>
-                                                            </div>
-                                                            <span className="text-[9px] font-bold uppercase tracking-tight text-muted-foreground group-hover:text-foreground">{t(`ThemeEditor.themes.${theme.nameKey}`, { defaultValue: theme.name })}</span>
-                                                        </button>
-                                                    ))}
-                                                </div>
-                                                <div className="pt-2">
-                                                    <div
-                                                        className="flex items-center justify-between w-full text-left bg-muted/10 p-3 rounded-lg cursor-pointer hover:bg-muted/20 transition-colors"
-                                                        onClick={() => setIsColorsExpanded(!isColorsExpanded)}
-                                                    >
-                                                        <div className="flex items-center gap-2">
-                                                            <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${isColorsExpanded ? 'rotate-180' : ''}`} />
-                                                            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.aparencia.colorCustom')}</span>
-                                                        </div>
-                                                    </div>
-                                                    {isColorsExpanded && (
-                                                        <div className="mt-3 space-y-6 animate-in fade-in slide-in-from-top-1 px-1">
-                                                            <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.sceneDesc')}</h4>
-                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label={t('UIEditor.aparencia.defaultText')} id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label={t('UIEditor.aparencia.titleHighlight')} id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
-                                                                    <ColorInput label={t('UIEditor.aparencia.focusHighlight')} id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label={t('UIEditor.aparencia.indicatorArrow')} id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.uiButtons')}</h4>
-                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label={t('UIEditor.aparencia.splashButton')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label={t('UIEditor.aparencia.splashButtonTextColor')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label={t('UIEditor.aparencia.splashButtonHover')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label={t('UIEditor.aparencia.actionButton')} id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
-                                                                    <ColorInput label={t('UIEditor.aparencia.actionButtonTextColor')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.sceneNameBox')}</h4>
-                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label={t('UIEditor.aparencia.bgColor')} id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
-                                                                    <ColorInput label={t('UIEditor.aparencia.text')} id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="space-y-4">
-                                                                <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.others')}</h4>
-                                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                                    <ColorInput label={t('UIEditor.aparencia.mainBg')} id="gameFrameColor" value={localGameFrameColor} onChange={setLocalGameFrameColor} placeholder="#000000" />
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* Right Column: Preview (Expanded width) */}
-                                <div className="col-span-1 lg:col-span-7 relative sticky top-[160px] self-start">
-                                    <div className="space-y-6 flex flex-col">
-                                        <div className="flex items-center justify-start gap-3 mb-2 w-full">
-                                            <span className="text-[10px] font-bold text-muted-foreground uppercase whitespace-nowrap">{t('UIEditor.aparencia.previewLabel', 'Exemplo de')}</span>
-                                            <div className="flex bg-background rounded-lg p-1 border border-muted-foreground/50 w-full max-w-[340px]">
-                                                <button
-                                                    onClick={() => setPreviewType('scene')}
-                                                    className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'scene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-                                                >
-                                                    {t('UIEditor.aparencia.scenes', 'Layout das Cenas')}
-                                                </button>
-                                                <button
-                                                    onClick={() => setPreviewType('vignette')}
-                                                    className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'vignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-                                                >
-                                                    {t('UIEditor.aparencia.vinhetas', 'Layout das Vinhetas')}
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {previewType === 'scene' ? (
-                                            <div
-                                                className={`
-                                                    rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300 flex-1 w-full
-                                                    ${localGameTheme === 'dark' ? 'bg-background border-muted-foreground/50' : 'bg-zinc-100 border-muted-foreground/50'}
-                                                    ${localLayoutOrientation === 'horizontal' ? 'aspect-[9/16]' : 'aspect-video'}
-                                                `}
-                                                style={{ fontFamily: localFontFamily, maxHeight: '500px' }}
-                                            >
-                                                {/* Preview Content Area - Dynamic Flex Direction (INVERTED LOGIC) */}
-                                                <div className={`flex-1 p-6 flex gap-6 overflow-hidden relative ${localLayoutOrientation === 'vertical' ? 'flex-row' : 'flex-col'}`}>
-
-                                                    {/* Image Area - Dynamic Order & Frame */}
-                                                    <div
-                                                        className={`
-                                                            relative flex items-center justify-center flex-shrink-0 transition-all duration-300
-                                                            ${localLayoutOrientation === 'vertical' ? 'w-2/5 h-full' : 'w-full h-1/2 min-h-[50%]'}
-                                                            ${localLayoutOrder === 'image-first' ? 'order-first' : 'order-last'}
-                                                        `}
-                                                    >
-                                                        {(() => {
-                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                            const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(localImageFrame as any);
-
-                                                            const adaptedPanelStyles = {
-                                                                ...panelStyles,
-                                                                width: '100%',
-                                                                height: '100%',
-                                                                display: 'flex',
-                                                                alignItems: 'center',
-                                                                justifyContent: 'center'
-                                                            };
-
-                                                            return (
-                                                                <div
-                                                                    ref={el => {
-                                                                        if (el) {
-                                                                            if (panelStyles.borderRadius) el.style.setProperty('border-radius', panelStyles.borderRadius as string, 'important');
-                                                                            if (panelStyles.overflow) el.style.setProperty('overflow', panelStyles.overflow as string, 'important');
-                                                                        }
-                                                                    }}
-                                                                    style={adaptedPanelStyles}
-                                                                    className={panelClass}
-                                                                >
-                                                                    <div
-                                                                        ref={el => {
-                                                                            if (el) {
-                                                                                if (containerStyles.borderRadius) el.style.setProperty('border-radius', containerStyles.borderRadius as string, 'important');
-                                                                                if (containerStyles.overflow) el.style.setProperty('overflow', containerStyles.overflow as string, 'important');
-                                                                            }
-                                                                        }}
-                                                                        style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
-                                                                        className={containerClass}
-                                                                    >
-                                                                        <div className="absolute inset-0 opacity-60">
-                                                                            <DitherShader
-                                                                                src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
-                                                                                gridSize={2}
-                                                                                ditherMode="bayer"
-                                                                                colorMode="duotone"
-                                                                                primaryColor={ditherColors.primary}
-                                                                                secondaryColor={ditherColors.secondary}
-                                                                                className="w-full h-full"
-                                                                                objectFit="cover"
-                                                                            />
-                                                                        </div>
-                                                                        <div className="absolute bottom-4 left-0 right-0 flex justify-center z-20">
-                                                                            <div
-                                                                                className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest"
-                                                                                style={{ backgroundColor: localGameSceneNameOverlayBg, color: localGameSceneNameOverlayTextColor }}
-                                                                            >
-                                                                                {t('UIEditor.aparencia.sceneName')}
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        })()}
-                                                    </div>
-
-                                                    {/* Text Area + Nav + Input Column */}
-                                                    <div className="flex-1 flex flex-col overflow-hidden">
-                                                        {/* Text content */}
-                                                        <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
-                                                            <p className="leading-relaxed" style={{ color: localTextColor, fontSize: (() => {
-                                                                const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
-                                                                const fontInfo = FONTS.find(f => f.family === localFontFamily);
-                                                                const multiplier = fontInfo?.sizeAdjust || 1.0;
-                                                                return `${baseSize * multiplier}px`;
-                                                            })() }}>
-                                                                {t('UIEditor.aparencia.sampleDesc1')}
-                                                                <span style={{ color: localTitleColor }}>{t('UIEditor.aparencia.sampleDescHighlight')}</span>
-                                                                {t('UIEditor.aparencia.sampleDesc2')}
-                                                            </p>
-                                                            <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: (() => {
-                                                                const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
-                                                                const fontInfo = FONTS.find(f => f.family === localFontFamily);
-                                                                const multiplier = fontInfo?.sizeAdjust || 1.0;
-                                                                return `${baseSize * multiplier}px`;
-                                                            })() }}>
-                                                                {'>'} {t('UIEditor.aparencia.sampleCommand')}
-                                                            </p>
-                                                        </div>
-
-                                                        {/* Navigation Buttons */}
-                                                        <div className="flex items-center gap-1.5 flex-wrap pt-2 flex-shrink-0">
-                                                            {localEnableInventory && (
-                                                                <button className="px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider border" style={{ borderColor: localTextColor + '40', color: localTextColor, backgroundColor: 'transparent' }}>
-                                                                    {t('UIEditor.textos.inventoryPlaceholder')}
-                                                                </button>
-                                                            )}
-                                                            {localEnableDiary && (
-                                                                <button className="px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider border" style={{ borderColor: localTextColor + '40', color: localTextColor, backgroundColor: 'transparent' }}>
-                                                                    {t('UIEditor.textos.diaryPlaceholder')}
-                                                                </button>
-                                                            )}
-                                                            {localEnableTrackers && (
-                                                                <button className="px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider border" style={{ borderColor: localTextColor + '40', color: localTextColor, backgroundColor: 'transparent' }}>
-                                                                    {t('UIEditor.textos.trackersPlaceholder')}
-                                                                </button>
-                                                            )}
-                                                            {localGameShowSystemButton && (
-                                                                <button className="px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider border" style={{ borderColor: localTextColor + '40', color: localTextColor, backgroundColor: 'transparent' }}>
-                                                                    {t('UIEditor.textos.systemPlaceholder')}
-                                                                </button>
-                                                            )}
-                                                        </div>
-
-                                                        {/* Input + Action */}
-                                                        <div className="flex gap-1.5 pt-1.5 flex-shrink-0">
-                                                            <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${localGameTheme === 'dark' ? 'bg-muted/50 border-muted-foreground/50' : 'bg-white border-muted-foreground/50'}`}>
-                                                                <span className="font-mono truncate" style={{ fontSize: '11px', fontFamily: localFontFamily, color: localGameTheme === 'dark' ? '#52525b' : '#a1a1aa' }}>{t('UIEditor.textos.commandInputValue')}</span>
-                                                            </div>
-                                                            <button
-                                                                className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate text-[11px]"
-                                                                style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily }}
-                                                            >
-                                                                {t('UIEditor.aparencia.action')}
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        ) : (
-                                            <div className="flex items-center justify-center w-full flex-1">
-                                                <div
-                                                    className="relative w-full aspect-video bg-muted border border-muted-foreground/50 rounded-xl flex flex-col justify-end overflow-hidden p-6 box-border shadow-2xl"
-                                                    style={{
-                                                        alignItems: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
-                                                        textAlign: localSplashContentAlignment === 'left' ? 'left' : 'right',
-                                                        maxHeight: '500px'
-                                                    }}
-                                                >
-                                                    <div className="absolute inset-0 opacity-60">
-                                                        <DitherShader
-                                                            src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
-                                                            gridSize={2}
-                                                            ditherMode="bayer"
-                                                            colorMode="duotone"
-                                                            primaryColor={ditherColors.primary}
-                                                            secondaryColor={ditherColors.secondary}
-                                                            className="w-full h-full"
-                                                            objectFit="cover"
-                                                        />
-                                                    </div>
-                                                    <div className={`relative z-10 w-full flex flex-col gap-2 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
-                                                        {!localOmitSplashTitle && (
-                                                            <div className="font-bold uppercase tracking-widest drop-shadow-md" style={{ color: localTitleColor, fontSize: (() => {
-                                                                const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
-                                                                const fontInfo = FONTS.find(f => f.family === localFontFamily);
-                                                                const multiplier = fontInfo?.sizeAdjust || 1.0;
-                                                                return `${baseSize * multiplier}px`;
-                                                            })(), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sceneName', 'Título da vinheta')}</div>
-                                                        )}
-                                                        {!localOmitSplashDescription && (
-                                                            <p className="leading-relaxed drop-shadow-sm" style={{ color: localTextColor, fontSize: (() => {
-                                                                const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
-                                                                const fontInfo = FONTS.find(f => f.family === localFontFamily);
-                                                                const multiplier = fontInfo?.sizeAdjust || 1.0;
-                                                                return `${baseSize * multiplier}px`;
-                                                            })(), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sampleVignetteDesc', 'Esta é uma descrição de exemplo para a vinheta.')}</p>
-                                                        )}
-                                                        <button
-                                                            className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate text-[11px] mt-1"
-                                                            style={{ backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor, fontFamily: localFontFamily }}
-                                                        >
-                                                            {localSplashButtonText || t('UIEditor.aparencia.homeButton', 'Começar')}
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
                                     </div>
                                 </div>
                             </div>

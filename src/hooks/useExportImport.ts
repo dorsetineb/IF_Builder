@@ -13,6 +13,7 @@ import { FONTS } from '../constants';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import DOMPurify from 'dompurify';
 import { useTranslation } from 'react-i18next';
+import { processAsset } from '../services/exportService';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let JSZip: any;
@@ -58,58 +59,37 @@ export const useExportImport = ({
     const assetsFolder = zip.folder('assets');
     const assetMap = new Map<string, string>(); // base64 -> filename
 
-    const processAsset = (
-      base64String: string | undefined,
-      baseName: string
-    ): string | undefined => {
-      if (!base64String || !base64String.startsWith('data:')) return base64String;
-      if (assetMap.has(base64String)) return assetMap.get(base64String);
-
-      const commaIndex = base64String.indexOf(',');
-      if (commaIndex === -1) return base64String;
-
-      const header = base64String.substring(0, commaIndex);
-      const data = base64String.substring(commaIndex + 1);
-
-      const mimeMatch = header.match(/data:([^;]+)/);
-      if (!mimeMatch || !mimeMatch[1]) return base64String;
-
-      const mimeType = mimeMatch[1];
-      const extension = mimeType.split('/')[1]?.split('+')[0] || 'bin';
-
-      const filename = `assets/${baseName}.${extension}`;
-      assetsFolder.file(`${baseName}.${extension}`, data, { base64: true });
-      assetMap.set(base64String, filename);
-      return filename;
-    };
-
-    exportData.gameLogo = processAsset(exportData.gameLogo, 'logo');
-    exportData.gameSplashImage = processAsset(exportData.gameSplashImage, 'splash_image');
-    exportData.gameBackgroundMusic = processAsset(exportData.gameBackgroundMusic, 'project_bgm');
+    exportData.gameLogo = processAsset(exportData.gameLogo, 'logo', assetsFolder, assetMap);
+    exportData.gameSplashImage = processAsset(exportData.gameSplashImage, 'splash_image', assetsFolder, assetMap);
+    exportData.gameBackgroundMusic = processAsset(exportData.gameBackgroundMusic, 'project_bgm', assetsFolder, assetMap);
     exportData.positiveEndingImage = processAsset(
       exportData.positiveEndingImage,
-      'positive_ending'
+      'positive_ending',
+      assetsFolder,
+      assetMap
     );
     exportData.negativeEndingImage = processAsset(
       exportData.negativeEndingImage,
-      'negative_ending'
+      'negative_ending',
+      assetsFolder,
+      assetMap
     );
 
     for (const sceneId in exportData.scenes) {
       const scene = exportData.scenes[sceneId];
-      scene.image = processAsset(scene.image, `scene_image_${sceneId}`);
-      scene.backgroundMusic = processAsset(scene.backgroundMusic, `scene_bgm_${sceneId}`);
+      scene.image = processAsset(scene.image, `scene_image_${sceneId}`, assetsFolder, assetMap);
+      scene.backgroundMusic = processAsset(scene.backgroundMusic, `scene_bgm_${sceneId}`, assetsFolder, assetMap);
       if (scene.interactions) {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         scene.interactions.forEach((inter: any, index: number) => {
-          inter.soundEffect = processAsset(inter.soundEffect, `sfx_${sceneId}_${index}`);
+          inter.soundEffect = processAsset(inter.soundEffect, `sfx_${sceneId}_${index}`, assetsFolder, assetMap);
         });
       }
     }
 
     for (const objId in exportData.globalObjects) {
       const obj = exportData.globalObjects[objId];
-      obj.image = processAsset(obj.image, `obj_image_${objId}`);
+      obj.image = processAsset(obj.image, `obj_image_${objId}`, assetsFolder, assetMap);
     }
 
     // Add Metadata

@@ -8,6 +8,7 @@ import { initialGameData } from '../lib/gameDefaults';
 import { FONTS, PREDEFINED_THEMES } from '../constants';
 import Preview from './Preview';
 import { useTranslation } from 'react-i18next';
+import { getFramePreviewStyles } from '../utils/frameStyles';
 
 interface NewProjectModalProps {
     isOpen: boolean;
@@ -723,54 +724,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                         <div className="flex-1 relative overflow-hidden flex items-center justify-center p-4 bg-black/50">
                             {/* Custom Preview Logic from UIEditor */}
                             {(() => {
-                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                const getFramePreviewStyles = (frame: any) => {
-                                    const panelStyles: React.CSSProperties = { boxSizing: 'border-box', overflow: 'hidden' };
-                                    const containerStyles: React.CSSProperties = {
-                                        backgroundColor: theme === 'dark' ? '#1a202c' : '#e2e8f0',
-                                        color: theme === 'dark' ? '#a0aec0' : '#4a5568',
-                                        width: '100%',
-                                        height: '100%',
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                        boxSizing: 'border-box',
-                                        overflow: 'hidden'
-                                    };
-                                    let panelClass = '';
-                                    let containerClass = '';
-
-                                    switch (frame) {
-                                        case 'rounded-top':
-                                            panelStyles.padding = '5px';
-                                            panelStyles.backgroundColor = colors.frameRoundedTopColor || '#FFFFFF';
-                                            panelStyles.border = 'none';
-                                            panelStyles.borderRadius = '40px 40px 4px 4px';
-                                            containerStyles.borderRadius = '35px 35px 0 0';
-                                            panelClass = 'frame-preview-portal';
-                                            containerClass = 'frame-preview-portal-container';
-                                            break;
-                                        case 'book-cover':
-                                            panelStyles.padding = '5px';
-                                            panelStyles.backgroundColor = colors.frameBookColor || '#FFFFFF';
-                                            panelStyles.border = 'none';
-                                            panelClass = 'frame-preview-book';
-                                            break;
-                                        case 'trading-card':
-                                            panelStyles.backgroundColor = colors.frameTradingCardColor || '#FFFFFF';
-                                            panelStyles.borderRadius = '12px';
-                                            panelStyles.padding = '4px';
-                                            containerStyles.border = 'none';
-                                            containerStyles.borderRadius = '8px';
-                                            panelClass = 'frame-preview-trading';
-                                            containerClass = 'frame-preview-trading-container';
-                                            break;
-                                        default:
-                                            panelStyles.border = 'none';
-                                            panelStyles.padding = '0';
-                                    }
-                                    return { panelStyles, containerStyles, panelClass, containerClass };
-                                };
+                                const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame as any, theme, theme === 'dark' ? '#FFFFFF' : '#1a202c');
 
                                 if (tab === 'info') {
                                     return (

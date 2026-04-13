@@ -366,6 +366,28 @@
     border-radius: 0 !important;
   }
 
+  /* 
+     FRAME PREVIEW OVERRIDES 
+     These rules specifically target the frame previews to allow them to be rounded.
+     By placing them here in the same @layer as the universal reset but with higher specificity,
+     they override the square aesthetic ONLY for these elements.
+  */
+  .game-preview-safe-zone.frame-preview-portal {
+    border-radius: 40px 40px 4px 4px !important;
+  }
+  .game-preview-safe-zone .frame-preview-portal-container {
+    border-radius: 35px 35px 0 0 !important;
+  }
+  .game-preview-safe-zone.frame-preview-trading {
+    border-radius: 12px !important;
+  }
+  .game-preview-safe-zone .frame-preview-trading-container {
+    border-radius: 8px !important;
+  }
+  .game-preview-safe-zone.frame-preview-book {
+    border-radius: 0 !important;
+  }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -481,27 +503,6 @@
 ::-webkit-scrollbar-corner {
   background: var(--background);
   /* zinc-950 */
-}
-
-/* Forced Frame Styles to override global * { border-radius: 0 !important } */
-#root .frame-preview-portal {
-  border-radius: 40px 40px 4px 4px !important;
-}
-
-#root .frame-preview-portal-container {
-  border-radius: 35px 35px 0 0 !important;
-}
-
-#root .frame-preview-trading {
-  border-radius: 12px !important;
-}
-
-#root .frame-preview-trading-container {
-  border-radius: 8px !important;
-}
-
-#root .frame-preview-book {
-  border-radius: 0 !important;
 }
 
 /* 3D Cube Loader Animation */

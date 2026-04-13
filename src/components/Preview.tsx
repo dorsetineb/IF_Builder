@@ -180,7 +180,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
                 user-select: text;
             }
             #verb-input:focus {
-                border-color: var(--title-color, #ffcc00);
+                border-color: var(--action-button-bg, #4fd1c5);
                 background: rgba(0,0,0,0.4);
             }
             #verb-input:empty::before {
