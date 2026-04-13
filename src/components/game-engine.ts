@@ -1376,9 +1376,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.stopPropagation();
                 if (isPrinting) return; 
                 const word = span.dataset.word;
-                const currentVal = verbInput.value.trim();
-                verbInput.value = currentVal ? (currentVal + ' ' + word) : word;
+                const currentVal = verbInput.textContent.trim();
+                verbInput.textContent = currentVal ? (currentVal + ' ' + word) : word;
                 verbInput.focus();
+                
+                // Move cursor to end for contenteditable
+                if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
+                    const range = document.createRange();
+                    range.selectNodeContents(verbInput);
+                    range.collapse(false);
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
             });
         });
     };
