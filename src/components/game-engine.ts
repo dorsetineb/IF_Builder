@@ -1566,7 +1566,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const p = document.createElement('p'); const formattedHTML = formatText(paragraphs[pIndex]);
             if (textAnimType === 'typewriter') {
-                p.className = 'scene-paragraph typewriter-cursor'; p.style.opacity = '1'; p.innerHTML = formattedHTML; sceneDescription.appendChild(p);
+                p.className = 'scene-paragraph typewriter-cursor'; p.style.opacity = '1'; 
+                p.innerHTML = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }) : formattedHTML;
+                sceneDescription.appendChild(p);
                 const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
                 let node; const textNodes = []; while((node = walker.nextNode())) textNodes.push(node);
                 const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
@@ -1591,7 +1593,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     else { nodeIdx++; charIdx = 0; type(); }
                 };
                 type();
-            } else { p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); finishParagraph(); }
+            } else { 
+                p.innerHTML = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }) : formattedHTML;
+                p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); finishParagraph(); 
+            }
         };
 
         const finishParagraph = () => {

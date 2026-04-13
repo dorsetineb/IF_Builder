@@ -2,6 +2,7 @@
 import React from 'react';
 import { BookOpen, Map, Box, Gamepad2, Play, Command, Scroll, Activity, SlidersHorizontal, Download, Lightbulb, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import DOMPurify from 'dompurify';
 
 export const GuideView: React.FC = () => {
     const { t } = useTranslation();
@@ -16,7 +17,7 @@ export const GuideView: React.FC = () => {
         <div className="max-w-4xl mx-auto px-8 pb-20 animate-in fade-in duration-500">
             {/* Sticky Header: Intro + TOC */}
             <div className="sticky top-0 z-40 bg-background pt-8 pb-4 -mx-8 px-8 shadow-sm">
-                <p className="text-muted-foreground max-w-3xl text-sm leading-relaxed mb-6" dangerouslySetInnerHTML={{ __html: t('guide.intro', 'O IF Builder permite criar ficções interativas, narrativas textuais onde o jogador interage com a história por meio de escolhas ou comandos (verbos). A ficção é composta por <strong>Cenas</strong>, onde o usuário lê descrições, observa imagens e toma decisões para interagir com <strong>objetos</strong> e <strong>navegar pelo mundo</strong>.') }}></p>
+                <p className="text-muted-foreground max-w-3xl text-sm leading-relaxed mb-6" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guide.intro', 'O IF Builder permite criar ficções interativas, narrativas textuais onde o jogador interage com a história por meio de escolhas ou comandos (verbos). A ficção é composta por <strong>Cenas</strong>, onde o usuário lê descrições, observa imagens e toma decisões para interagir com <strong>objetos</strong> e <strong>navegar pelo mundo</strong>.')) }}></p>
 
                 {/* Table of Contents Listbox */}
                 <div className="p-4 bg-muted/30 rounded-lg border border-muted-foreground/50 mb-2">
@@ -60,10 +61,10 @@ export const GuideView: React.FC = () => {
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.scenes.title', '1. Editor de Cenas')}</h3>
                     </div>
                     <div className="text-sm text-muted-foreground space-y-3 pl-12">
-                        <p dangerouslySetInnerHTML={{ __html: t('guideView.section1.desc', 'O IF Builder usa um sistema de nós simples. Cada cena possui uma &quot;Ação Principal&quot; que conecta a outras cenas.') }}></p>
+                        <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guideView.section1.desc', 'O IF Builder usa um sistema de nós simples. Cada cena possui uma &quot;Ação Principal&quot; que conecta a outras cenas.')) }}></p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item1', '<strong>Nome e Descrição:</strong> Defina o título e o texto que o jogador verá ao entrar na cena.') }}></li>
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item2', '<strong>Texto Interativo:</strong> Utilize <code className="bg-muted px-1 rounded">&lt; &gt;</code> em uma palavra para torná-la clicável (ex: <code className="bg-muted px-1 rounded">&lt;porta&gt;</code>).') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guide.sections.scenes.item2', '<strong>Texto Interativo:</strong> Utilize <code className="bg-muted px-1 rounded">&lt; &gt;</code> em uma palavra para torná-la clicável (ex: <code className="bg-muted px-1 rounded">&lt;porta&gt;</code>).')) }}></li>
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item3', '<strong>Imagem e Música:</strong> Cada cena pode ter uma imagem de fundo e trilha sonora próprias.') }}></li>
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item4', '<strong>Cena Inicial:</strong> Defina qual cena será o ponto de partida no menu lateral.') }}></li>
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item5', '<strong>Cena de Encerramento:</strong> Marque uma cena como final para encerrar a narrativa.') }}></li>
@@ -103,7 +104,7 @@ export const GuideView: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-3">
                                 <ul className="space-y-1.5 text-xs">
-                                    <li dangerouslySetInnerHTML={{ __html: t('guide.sections.interactions.item1', '<strong>Verbos:</strong> Palavras que ativam a ação (ex: abrir, usar, pegar).') }}></li>
+                                    <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guide.sections.interactions.item1', '<strong>Verbos:</strong> Palavras que ativam a ação (ex: abrir, usar, pegar).')) }}></li>
                                     <li dangerouslySetInnerHTML={{ __html: t('guide.sections.interactions.item2', '<strong>Alvo:</strong> Objeto da cena afetado (ex: Porta).') }}></li>
                                     <li dangerouslySetInnerHTML={{ __html: t('guide.sections.interactions.item3', '<strong>Requisito:</strong> Item necessário no inventário (ex: Chave).') }}></li>
                                     <li dangerouslySetInnerHTML={{ __html: t('guide.sections.interactions.item4', '<strong>Resultado:</strong> Ir para cena, mudar texto, ou tocar vinheta.') }}></li>
@@ -310,7 +311,7 @@ export const GuideView: React.FC = () => {
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item5', '<strong>Para continuar editando:</strong> Use o botão <strong>Carregar</strong> repassando este mesmo arquivo .zip.') }}></li>
                         </ol>
                         <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-4 text-red-500 dark:text-red-400 mt-4">
-                            <p dangerouslySetInnerHTML={{ __html: t('guide.sections.export.warning', '<strong>IMPORTANTE:</strong> Lembre-se de <strong>SEMPRE salvar o seu projeto</strong>, pois o editor não grava nenhuma sessão. Se você sair sem salvar, assim como ocorria em programas no passado, você perderá <strong>TODO</strong> seu progresso!') }}></p>
+                            <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guide.sections.export.warning', '<strong>IMPORTANTE:</strong> Lembre-se de <strong>SEMPRE salvar o seu projeto</strong>, pois o editor não grava nenhuma sessão. Se você sair sem salvar, assim como ocorria em programas no passado, você perderá <strong>TODO</strong> seu progresso!')) }}></p>
                         </div>
                     </div>
                 </div>

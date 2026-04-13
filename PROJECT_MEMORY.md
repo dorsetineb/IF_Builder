@@ -6,18 +6,30 @@ Este arquivo serve como um log persistente de implementações, decisões de arq
 
 ## 🚩 Status Atual
 - **Última Atualização**: 2026-04-13
-- **Foco Atual**: Manutenção de bugs críticos e acessibilidade.
-- **Tarefa Pendente**: (Nenhuma no momento após a correção do engine).
+- **Foco Atual**: Segurança e Hardening do aplicativo.
+- **Tarefa Pendente**: Monitorar impacto da CSP em futuras integrações de terceiros.
 
 ---
 
 ## 📝 Log de Implementações
+
+### [2026-04-13] Implementação de Segurança (Fase 2)
+- **Ações**:
+  - Adicionada **Content Security Policy (CSP)** ao `index.html` restringindo scripts e frames (com suporte a `blob:` para o engine e CDNs confiáveis).
+  - Implementada sanitização de HTML com **DOMPurify** no editor (Guia e Manual) e no motor de jogo (`renderScene`).
+  - Configurado whitelist para manter o funcionamento do recurso de palavras destacadas (`<span>` com `class` e `data-word`).
+- **Resultado**: Proteção contra XSS injetado em descrições de cenas e hardening do ambiente global.
 
 ### [2026-04-13] Correção do Input de Palavras Destacadas
 - **Problema**: O clique em palavras destacadas na descrição da cena não inseria o texto no campo de comando.
 - **Causa**: O `verb-input` foi migrado para um `div contenteditable`, mas o código ainda usava `.value`.
 - **Solução**: Atualizada a função `setupHighlights` no `game-engine.ts` para usar `.textContent` e adicionada lógica de reposicionamento de cursor no final do texto.
 - **Impacto**: Correção aplicada tanto no preview interno quanto nos arquivos exportados (.zip e .html).
+
+---
+
+## 🏛️ Decisões de Arquitetura (ADR)
+... (mantendo as anteriores)
 
 ---
 
