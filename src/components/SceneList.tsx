@@ -88,7 +88,7 @@ const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<Sce
             isLateralMenu 
               ? selectedSceneId === scene.id && currentView === 'three_panels'
                   ? `bg-primary text-primary-foreground font-bold shadow-md rounded-l-lg rounded-r-none` // Selected: 100% opaque primary
-                  : `text-foreground hover:bg-primary/10 hover:shadow-sm rounded-lg mr-4` // Unselected: normal text, subtle primary hover
+                  : `text-foreground hover:bg-primary/10 hover:shadow-sm rounded-l-lg rounded-r-none` // Unselected: normal text, subtle primary hover
               : selectedSceneId === scene.id && currentView === 'three_panels'
                   ? isDirty
                       ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold rounded-lg'
@@ -274,59 +274,9 @@ const SceneList: React.FC<SceneListProps> = ({
 
   return (
     <div className={`flex flex-col gap-0 h-full`}>
-      {/* View Map Button - Creation Buttons Container */}
-      <div className={`flex flex-col gap-2 mb-4 px-0 flex-shrink-0 ${isLateralMenu ? 'mr-4' : ''}`}>
-        <div className="flex gap-2">
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onAddNode?.('vignette');
-          }}
-          className={`${getAddButtonClass()} flex-1`}
-        >
-          <ArrowRight className="w-3.5 h-3.5 mr-1.5 currentColor" />
-          {t('sceneList.nodeSelection.vignette.title', 'Criar Vinheta')}
-        </button>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            if (hasOpeningVignette) onAddNode?.('scene');
-          }}
-          disabled={!hasOpeningVignette}
-          title={
-            !hasOpeningVignette
-              ? t(
-                  'sceneList.nodeSelection.scene.lockedDesc',
-                  'Crie uma vinheta de abertura para habilitar cenas.'
-                )
-              : ''
-          }
-          className={`${getAddButtonClass()} flex-1 ${
-            !hasOpeningVignette ? 'opacity-50 cursor-not-allowed grayscale' : ''
-          }`}
-        >
-          <Split className="w-3.5 h-3.5 mr-1.5 currentColor" />
-          {t('sceneList.nodeSelection.scene.title', 'Criar Cena')}
-        </button>
-      </div>
-
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onToggleNarrative?.();
-          }}
-          className="flex items-center justify-start gap-2 px-1 text-zinc-400 hover:text-white transition-colors group"
-        >
-          <Columns3 className="w-4 h-4 transition-transform group-hover:scale-110" />
-          <span className="text-[10px] uppercase font-bold tracking-widest border-b border-transparent group-hover:border-white/30">
-            {isNarrativeMenuOpen ? t('sceneMap.hideNarrativeList', 'Esconder lista de narrativas') : t('sceneMap.showNarrativeList', 'Ver lista de narrativas')}
-          </span>
-        </button>
-      </div>
 
       {/* Search Input */}
-      <div className={`relative flex-shrink-0 mb-3 ${isLateralMenu ? 'mr-4' : ''}`}>
+      <div className={`relative flex-shrink-0 mb-3`}>
         <Search className={`absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
         <input
           type="text"

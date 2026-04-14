@@ -17,6 +17,7 @@ interface SceneMapProps {
   onAddNode?: (type: 'scene' | 'vignette') => void;
   hasOpeningVignette?: boolean;
   gameTitle?: string;
+  isSidebarOpen?: boolean;
   isNarrativeMenuOpen?: boolean;
   onToggleNarrative?: () => void;
   selectedSceneId?: string | null;
@@ -703,19 +704,6 @@ const SceneMap: React.FC<SceneMapProps> = ({
                 {t('sceneList.nodeSelection.scene.title', 'Criar Cena')}
               </button>
             </div>
-            
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleNarrative?.();
-              }}
-              className="flex items-center justify-start gap-2 px-1 text-zinc-400 hover:text-white transition-colors group"
-            >
-              <Columns3 className="w-4 h-4 transition-transform group-hover:scale-110" />
-              <span className="text-[10px] uppercase font-bold tracking-widest border-b border-transparent group-hover:border-white/30">
-                {isNarrativeMenuOpen ? t('sceneMap.hideNarrativeList', 'Esconder lista de narrativas') : t('sceneMap.showNarrativeList', 'Ver lista de narrativas')}
-              </span>
-            </button>
           </div>
         )}
 
@@ -1068,7 +1056,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
           })}
         </div>
       </div>
-      <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2 transition-all duration-300">
+      <div className="absolute bottom-4 left-4 z-10 flex flex-col items-start gap-2 transition-all duration-300">
         {/* Zoom Controls Row */}
         <div className={`flex w-[140px] h-[40px] rounded-lg overflow-hidden shadow-xl pointer-events-auto border bg-zinc-950 border-muted-foreground/50`}>
           <button
@@ -1122,8 +1110,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
         </div>
       </div>
 
-      {/* Top Right: Legend */}
-      <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-4 pointer-events-none transition-all duration-300">
+      {/* Legend */}
+      <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-4 pointer-events-none transition-all duration-300">
         <div className={`backdrop-blur-md p-4 rounded-xl shadow-xl pointer-events-auto border bg-zinc-950/80 border-muted-foreground/50`}>
           <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 text-zinc-500`}>
             {t('sceneMap.legend', 'Legenda')}

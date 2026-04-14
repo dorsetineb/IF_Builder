@@ -59,7 +59,7 @@ import NodeTypeModal from './NodeTypeModal';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Info, Settings as SettingsIcon, CircleHelp, X, Save, FileArchive, FileCode } from 'lucide-react';
+import { Info, Settings as SettingsIcon, CircleHelp, X, Save, FileArchive, FileCode, Columns3, List } from 'lucide-react';
 import Settings from '../pages/Settings';
 import AboutProject from '../pages/AboutProject';
 
@@ -944,6 +944,7 @@ const Editor: React.FC = () => {
     if (navData.type === 'scene') {
       setCurrentView('three_panels');
       setSelectedSceneId(navData.id);
+      setIsNarrativeMenuOpen(false);
     } else if (navData.type === 'view') {
       const targetView = (navData.view as string) === 'scenes' || (navData.view as string) === 'map' 
         ? 'three_panels' 
@@ -1384,28 +1385,6 @@ const Editor: React.FC = () => {
               isDirty={isDirty}
               theme={appTheme}
             />
-            {isNarrativeMenuOpen && currentView === 'three_panels' && (
-              <div className="w-72 flex-shrink-0 bg-muted-foreground/20 flex flex-col pt-4 pl-4 pr-0 pb-2 transition-all z-10 shadow-lg border-r border-primary/20">
-                <SceneList
-                  scenes={scenesList}
-                  startSceneId={gameData.startScene}
-                  selectedSceneId={selectedSceneId}
-                  onSelectScene={handleSelectScene}
-                  onAddScene={() => setIsNodeTypeModalOpen(true)}
-                  onDeleteScene={handleDeleteScene}
-                  onReorderScenes={handleReorderScenes}
-                  isDirty={hasUnsavedTabChanges}
-                  theme={appTheme}
-                  currentView={currentView}
-                  isLateralMenu={true}
-                  onAddNode={handleAddNodeType}
-                  hasOpeningVignette={hasOpeningVignette}
-                  onViewMap={() => attemptNavigation({ type: 'view', view: 'map' })}
-                  isNarrativeMenuOpen={isNarrativeMenuOpen}
-                  onToggleNarrative={() => setIsNarrativeMenuOpen(!isNarrativeMenuOpen)}
-                />
-              </div>
-            )}
             <main
               ref={mainRef}
               className="flex-1 overflow-y-auto relative bg-background p-0"
@@ -1544,7 +1523,7 @@ const Editor: React.FC = () => {
 
               {currentView === 'three_panels' && (
                 <div className="flex h-full w-full overflow-hidden relative">
-                  {/* Left Panel: Narrative Map (Visible workspace) */}
+                  {/* Painel Esquerdo: Mapa Narrativo (Área de trabalho visível) */}
                   <div className="flex-1 h-full min-w-0 overflow-hidden relative transition-all duration-300">
                     <Suspense fallback={<LoadingOverlay message="Carregando Mapa..." />}>
                       <SceneMap
@@ -1561,7 +1540,6 @@ const Editor: React.FC = () => {
                         onAddNode={handleAddNodeType}
                         hasOpeningVignette={hasOpeningVignette}
                         isSidebarOpen={isNarrativeMenuOpen}
-                        theme={appTheme}
                         gameTitle={gameData.gameTitle}
                         isNarrativeMenuOpen={isNarrativeMenuOpen}
                         onToggleNarrative={() => setIsNarrativeMenuOpen(!isNarrativeMenuOpen)}
@@ -1570,15 +1548,81 @@ const Editor: React.FC = () => {
                     </Suspense>
                   </div>
 
-                  {/* Right Panel: Side Editor */}
+                  {/* Painel Direito: Navegador de Narrativas / Editor de Cena Contextual */}
                   <div 
-                    className={`h-full bg-background border-l border-muted-foreground/30 shadow-[-10px_0_30px_rgba(0,0,0,0.3)] z-50 transition-all duration-300 overflow-hidden ${
-                      selectedScene 
-                        ? isSidePanelExpanded ? 'w-[55.55%]' : 'w-1/3'
-                        : 'w-0 border-l-0'
+                    className={`h-full bg-background border-l border-muted-foreground/30 shadow-[-10px_0_30px_rgba(0,0,0,0.3)] z-50 transition-all duration-300 overflow-hidden flex flex-col ${
+                      isNarrativeMenuOpen 
+                        ? 'w-1/4'
+                        : selectedScene
+                          ? isSidePanelExpanded ? 'w-[55.55%]' : 'w-1/3'
+                          : 'w-0 border-l-0'
                     }`}
                   >
-                    {selectedScene && (
+                    {(isNarrativeMenuOpen || selectedScene) && (
+                       <div className="sticky top-0 z-[60] bg-background border-b border-muted-foreground/30 shadow-md px-4 py-4 flex justify-between items-center">
+                           <div className="flex items-center gap-2">
+                             <button
+                               type="button"
+                               onClick={(e) => {
+                                 e.preventDefault();
+                                 e.stopPropagation();
+                                 if (isNarrativeMenuOpen) {
+                                   setIsNarrativeMenuOpen(false);
+                                 } else {
+                                   setIsNarrativeMenuOpen(true);
+                                 }
+                               }}
+                               className={`flex items-center gap-2 px-1 py-1 transition-colors group relative z-50 ${isNarrativeMenuOpen ? 'text-primary' : 'text-zinc-400 hover:text-white'}`}
+                               title={isNarrativeMenuOpen ? t('sidebar.hideNarrative', 'Ocultar lista de narrativas') : t('sidebar.showNarrative', 'Ver lista de narrativas')}
+                             >
+                               <List className={`w-4 h-4 transition-transform group-hover:scale-110 ${isNarrativeMenuOpen ? 'text-primary' : ''}`} />
+                               <span className={`text-[10px] uppercase font-bold tracking-widest border-b border-transparent group-hover:border-current/30`}>
+                                 {isNarrativeMenuOpen ? t('sidebar.hideNarrative', 'Ocultar lista de narrativas') : t('sidebar.showNarrative', 'Ver lista de narrativas')}
+                               </span>
+                             </button>
+                           </div>
+                           
+                           <div className="flex items-center gap-2">
+                               <button 
+                                 onClick={() => {
+                                   setIsNarrativeMenuOpen(false);
+                                   setSelectedSceneId(null);
+                                 }}
+                                 className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground group"
+                               >
+                                 <X className="w-4 h-4 transition-transform group-hover:scale-110" />
+                                 <span className="text-[10px] font-bold uppercase tracking-widest">{t('common.close', 'Fechar')}</span>
+                               </button>
+                           </div>
+                       </div>
+                     )}
+
+                    <div className="flex-1 overflow-y-auto">
+                      {isNarrativeMenuOpen ? (
+                        <div className="h-full flex flex-col px-4 pt-4 pb-2 transition-all">
+                          <SceneList
+                          scenes={scenesList}
+                          startSceneId={gameData.startScene}
+                          selectedSceneId={selectedSceneId}
+                          onSelectScene={(id) => {
+                            handleSelectScene(id);
+                            setIsNarrativeMenuOpen(false);
+                          }}
+                          onAddScene={() => setIsNodeTypeModalOpen(true)}
+                          onDeleteScene={handleDeleteScene}
+                          onReorderScenes={handleReorderScenes}
+                          isDirty={hasUnsavedTabChanges}
+                          theme={appTheme}
+                          currentView={currentView}
+                          isLateralMenu={true}
+                          onAddNode={handleAddNodeType}
+                          hasOpeningVignette={hasOpeningVignette}
+                          onViewMap={() => attemptNavigation({ type: 'view', view: 'map' })}
+                          isNarrativeMenuOpen={isNarrativeMenuOpen}
+                          onToggleNarrative={() => setIsNarrativeMenuOpen(!isNarrativeMenuOpen)}
+                        />
+                      </div>
+                    ) : selectedScene ? (
                       <Suspense fallback={<LoadingOverlay message="Carregando Editor..." />}>
                         <SceneEditor
                           key={`side-editor-${selectedScene.id}`}
@@ -1616,41 +1660,49 @@ const Editor: React.FC = () => {
                           isSidePanel={true}
                           onClose={() => setSelectedSceneId(null)}
                           onTabChange={setSidePanelTab}
+                          isNarrativeMenuOpen={isNarrativeMenuOpen}
+                          onToggleNarrative={() => {
+                            setIsNarrativeMenuOpen(true);
+                          }}
                         />
                       </Suspense>
-                    )}
+                    ) : null}
                   </div>
                 </div>
-              )}
+              </div>
+            )}
 
-              {currentView === 'trackers' && (
-                <Suspense fallback={<LoadingOverlay message="Carregando Rastreadores..." />}>
-                  <TrackersEditor
-                    trackers={consequenceTrackers}
-                    onUpdateTrackers={handleUpdateTrackers}
-                    allScenes={scenesList}
-                    allTrackerIds={(gameData.consequenceTrackers || []).map((t) => t.id)}
-                    isDirty={hasUnsavedTabChanges}
-                    onSetDirty={setHasUnsavedTabChanges}
-                    onSelectScene={handleSelectScene}
-                  />
-                </Suspense>
-              )}
+            {currentView === 'trackers' && (
+              <Suspense fallback={<LoadingOverlay message="Carregando Rastreadores..." />}>
+                <TrackersEditor
+                  trackers={consequenceTrackers}
+                  onUpdateTrackers={handleUpdateTrackers}
+                  allScenes={scenesList}
+                  allTrackerIds={(gameData.consequenceTrackers || []).map((t) => t.id)}
+                  isDirty={hasUnsavedTabChanges}
+                  onSetDirty={setHasUnsavedTabChanges}
+                  onSelectScene={handleSelectScene}
+                />
+              </Suspense>
+            )}
 
-              {currentView === 'global_commands' && (
-                <Suspense fallback={<LoadingOverlay message="Carregando Verbos..." />}>
-                  <GlobalCommandsEditor
-                    fixedVerbs={gameData.fixedVerbs || []}
-                    onUpdate={handleUpdateGameData}
-                    isDirty={hasUnsavedTabChanges}
-                    onSetDirty={setHasUnsavedTabChanges}
-                  />
-                </Suspense>
-              )}
+            {currentView === 'global_commands' && (
+              <Suspense fallback={<LoadingOverlay message="Carregando Verbos..." />}>
+                <GlobalCommandsEditor
+                  fixedVerbs={gameData.fixedVerbs || []}
+                  onUpdate={handleUpdateGameData}
+                  isDirty={hasUnsavedTabChanges}
+                  onSetDirty={setHasUnsavedTabChanges}
+                />
+              </Suspense>
+            )}
 
-              {currentView === 'settings' && <Settings hideHeader />}
-              {currentView === 'about' && <AboutProject hideHeader />}
-            </main>
+            {currentView === 'settings' && <Settings hideHeader />}
+            {currentView === 'about' && <AboutProject hideHeader />}
+          </main>
+        </div>
+      </div>
+    )}
 
             {showSaveModal && (
               <div className="fixed inset-0 z-[100] bg-black/50 backdrop-blur-sm flex items-center justify-center">
@@ -1800,9 +1852,6 @@ const Editor: React.FC = () => {
                 </div>
               </div>
             )}
-          </div>
-        </div>
-      )}
       <ConfirmationModal
         isOpen={confirmationModal.isOpen}
         title={confirmationModal.title}

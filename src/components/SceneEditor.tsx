@@ -36,6 +36,7 @@ import {
   List,
   X,
   Hammer,
+  Columns3,
 } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useTranslation, Trans } from 'react-i18next';
@@ -76,6 +77,8 @@ interface SceneEditorProps {
   isSidePanel?: boolean;
   onClose?: () => void;
   onTabChange?: (tab: 'properties' | 'objects' | 'interactions' | 'choices') => void;
+  isNarrativeMenuOpen?: boolean;
+  onToggleNarrative?: () => void;
 }
 
 const getCleanSceneState = (s: Scene): Scene => {
@@ -130,6 +133,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
     isSidePanel,
     onClose,
     onTabChange,
+    isNarrativeMenuOpen,
+    onToggleNarrative,
   }) => {
     const { toast } = useToast();
     const { t } = useTranslation();
@@ -425,48 +430,23 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
     return (
       <div className={`flex flex-col ${isSidePanel ? 'h-full overflow-hidden' : 'pb-8 px-4'}`}>
-        <div className={`sticky top-0 z-40 bg-background flex flex-col pt-4 pb-4 gap-3 ${isSidePanel ? 'px-4 border-b border-muted-foreground/30 shadow-md' : '-mx-4 px-4 shadow-sm border-b border-muted-foreground/50'}`}>
+        <div className={`sticky top-0 z-40 bg-background flex flex-col ${isSidePanel ? 'pt-2 pb-0 px-4 border-b border-muted-foreground/30 shadow-md' : 'pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm border-b border-muted-foreground/50'}`}>
           {/* Solid background shield to perfectly hide scrolled content */}
           <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
           
-          <div className={`flex justify-between items-center bg-card p-3 rounded-xl border border-muted-foreground/50 shadow-sm relative z-10`}>
-            {isSidePanel ? (
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={handlePreview}
-                  className="flex items-center gap-2 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg"
-                  title={t('sceneEditor.testTooltip')}
-                >
-                  <Hammer className="w-4 h-4" />
-                  <span className="text-[10px] uppercase font-bold tracking-tight">
-                    {isVignetteMode ? t('sceneEditor.testVignetteBtn', 'Testar vinheta') : t('sceneEditor.testSceneBtn', 'Testar cena')}
-                  </span>
-                </button>
-              </div>
-            ) : (
+          {!isSidePanel && (
+            <div className={`flex justify-between items-center bg-card p-3 rounded-xl border border-muted-foreground/50 shadow-sm relative z-10`}>
               <p className="text-muted-foreground text-xs font-medium">
                 {t('sceneEditor.headerDesc')}
               </p>
-            )}
-            
-            <div className="flex items-center gap-2">
-              {isDirty && (
-                <div className="flex items-center gap-1 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-1">
-                  <span className={`${isSidePanel ? 'hidden' : 'hidden sm:inline'}`}>{t('sceneEditor.unsavedChanges')}</span>
-                </div>
-              )}
+              
+              <div className="flex items-center gap-2">
+                {isDirty && (
+                  <div className="flex items-center gap-1 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-1">
+                    <span className="hidden sm:inline">{t('sceneEditor.unsavedChanges')}</span>
+                  </div>
+                )}
 
-              {isSidePanel && onClose && (
-                <button 
-                  onClick={onClose}
-                  className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground group"
-                >
-                  <X className="w-5 h-5 transition-transform group-hover:scale-110" />
-                  <span className="text-[10px] font-bold uppercase tracking-widest">{t('common.close', 'Fechar')}</span>
-                </button>
-              )}
-
-              {!isSidePanel && (
                 <button
                   onClick={handlePreview}
                   className="flex items-center gap-2 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg"
@@ -475,9 +455,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   <Hammer className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">{t('sceneEditor.testBtn')}</span>
                 </button>
-              )}
 
-              {!isSidePanel && (
                 <button
                   onClick={() => onCopyScene(localScene)}
                   className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors hover:bg-zinc-800 rounded-lg"
@@ -486,9 +464,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   <Copy className="w-3.5 h-3.5" />
                   <span className="hidden sm:inline">{t('sceneEditor.copyBtn')}</span>
                 </button>
-              )}
 
-              {!isSidePanel && (
                 <>
                   <button
                     onClick={handleUndo}
@@ -509,11 +485,12 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                     <span>{t('sceneEditor.saveBtn')}</span>
                   </button>
                 </>
-              )}
+              </div>
             </div>
-          </div>
+          )}
+
           {!isVignetteMode && (
-            <div className="border-b border-muted-foreground/50 flex items-center justify-between">
+            <div className={`${isSidePanel ? '' : 'border-b border-muted-foreground/50'} flex items-center justify-between`}>
               <div className="flex space-x-1 overflow-x-auto">
                 {Object.entries(TABS).map(([key, name]) => {
                   const isVignette = localScene.vignetteType && localScene.vignetteType !== 'none';
@@ -539,10 +516,13 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             </div>
           )}
           {/* Soft gradient transition */}
-          <div className="absolute left-0 right-0 -bottom-2 h-2 bg-gradient-to-b from-background to-transparent pointer-events-none" />
+          <div className="absolute left-0 right-0 -bottom-4 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none" />
         </div>
 
-        <div className={`mt-4 ${isSidePanel ? 'flex-1 overflow-y-auto px-4 pb-24' : ''}`}>
+        <div className={`mt-4 relative ${isSidePanel ? 'flex-1 overflow-y-auto px-4 pb-24' : ''}`}>
+          {isSidePanel && (
+            <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-background to-transparent z-40 pointer-events-none" />
+          )}
           <div className="bg-background">
             {activeTab === 'properties' && (
               <div key={localScene.id} className={`grid grid-cols-1 ${isSidePanel ? 'gap-6' : 'md:grid-cols-2 gap-8'}`}>
@@ -1484,7 +1464,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
         {isSidePanel && (
           <div className="sticky bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md px-4 pb-4 pt-4 flex flex-col gap-3 z-50">
             {/* Gradient transition below footer */}
-            <div className="absolute bottom-full left-0 right-0 h-10 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+            <div className="absolute bottom-full left-0 right-0 h-4 bg-gradient-to-t from-background to-transparent pointer-events-none" />
 
             {activeTab === 'objects' && (
               <div className="text-[10px] text-yellow-500/90 italic text-right leading-tight px-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
@@ -1492,27 +1472,40 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
               </div>
             )}
 
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-between items-center gap-3">
               <button
-                onClick={handleUndo}
-                disabled={!isDirty}
-                className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap"
+                onClick={handlePreview}
+                className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap"
+                title={t('sceneEditor.testTooltip')}
               >
-                <RotateCcw className="w-4 h-4" />
-                <span>{t('sceneEditor.undoBtn')}</span>
+                <Hammer className="w-4 h-4" />
+                <span className="text-[10px] uppercase font-bold tracking-tight">
+                  {isVignetteMode ? t('sceneEditor.testVignetteBtn', 'Testar vinheta') : t('sceneEditor.testSceneBtn', 'Testar cena')}
+                </span>
               </button>
 
-              <button
-                onClick={handleSave}
-                disabled={!isDirty}
-                className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap"
-              >
-                <Save className="w-4 h-4" />
-                <span>{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleUndo}
+                  disabled={!isDirty}
+                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  <span>{t('sceneEditor.undoBtn')}</span>
+                </button>
+
+                <button
+                  onClick={handleSave}
+                  disabled={!isDirty}
+                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
+                </button>
+              </div>
             </div>
-        </div>
-      )}
+          </div>
+        )}
       </div>
     );
   }
