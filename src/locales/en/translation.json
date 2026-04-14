@@ -5,6 +5,10 @@
     "guideTitle": "IF Builder / Quick Guide",
     "aboutTitle": "IF Builder / About Project"
   },
+  "common": {
+    "back": "Back",
+    "close": "Close"
+  },
   "auth": {
     "errors": {
       "alreadyRegistered": "This user is already registered.",
@@ -605,6 +609,8 @@
     "unsavedChanges": "Unsaved changes",
     "testTooltip": "Test only this scene",
     "testBtn": "Test",
+    "testSceneBtn": "Test scene",
+    "testVignetteBtn": "Test vignette",
     "copyTooltip": "Copy Scene",
     "copyBtn": "Copy",
     "undoTooltip": "Undo changes",

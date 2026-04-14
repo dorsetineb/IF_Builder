@@ -5,6 +5,10 @@
     "guideTitle": "IF Builder / Guia Rápido",
     "aboutTitle": "IF Builder / Sobre o Projeto"
   },
+  "common": {
+    "back": "Voltar",
+    "close": "Fechar"
+  },
   "auth": {
     "errors": {
       "alreadyRegistered": "Este usuário já está cadastrado.",
@@ -613,6 +617,8 @@
     "unsavedChanges": "Alterações não salvas",
     "testTooltip": "Testar apenas esta cena",
     "testBtn": "Testar",
+    "testSceneBtn": "Testar cena",
+    "testVignetteBtn": "Testar vinheta",
     "copyTooltip": "Copiar Cena",
     "copyBtn": "Copiar",
     "undoTooltip": "Desfazer alterações",

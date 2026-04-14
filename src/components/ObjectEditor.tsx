@@ -32,6 +32,7 @@ interface ObjectEditorProps {
     onLinkObject: (sceneId: string, objectId: string) => void;
     onUnlinkObject: (sceneId: string, objectId: string) => void;
     onUpdateGlobalObject: (objectId: string, updatedData: Partial<GameObject>) => void;
+    isSidePanel?: boolean;
 }
 
 const generateUniqueId = (prefix: 'obj', existingIds: string[]): string => {
@@ -49,7 +50,8 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
     onCreateGlobalObject,
     onLinkObject,
     onUnlinkObject,
-    onUpdateGlobalObject
+    onUpdateGlobalObject,
+    isSidePanel
 }) => {
     const [selectedObjectId, setSelectedObjectId] = useState<string | null>(objects.length > 0 ? objects[0].id : null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -166,13 +168,15 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                             onClick={() => setSelectedObjectId(obj.id)}
                                             className={`relative overflow-hidden flex items-center gap-3 h-[42px] px-2 rounded-lg border-transparent transition-all text-left group flex-shrink-0 ${selectedObjectId === obj.id ? 'bg-primary text-primary-foreground font-bold shadow-md rounded-r-none mr-0' : 'text-foreground hover:bg-primary/10 hover:shadow-sm mr-2'}`}
                                         >
-                                            <div className={`w-7 h-7 rounded border flex items-center justify-center overflow-hidden shrink-0 ${selectedObjectId === obj.id ? 'bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground' : 'bg-muted border-muted-foreground/50 text-muted-foreground'}`}>
-                                                {obj.image ? (
-                                                    <img src={obj.image} alt="" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <IconComponent className="w-4 h-4" />
-                                                )}
-                                            </div>
+                                            {!isSidePanel && (
+                                                <div className={`w-7 h-7 rounded border flex items-center justify-center overflow-hidden shrink-0 ${selectedObjectId === obj.id ? 'bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground' : 'bg-muted border-muted-foreground/50 text-muted-foreground'}`}>
+                                                    {obj.image ? (
+                                                        <img src={obj.image} alt="" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <IconComponent className="w-4 h-4" />
+                                                    )}
+                                                </div>
+                                            )}
                                             <div className="min-w-0 flex-1">
                                                 <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-primary-foreground' : 'text-foreground'}`}>{obj.name}</div>
                                                 <div className={`text-[10px] font-mono truncate ${selectedObjectId === obj.id ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>#{obj.id}</div>
@@ -215,13 +219,15 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                             className="flex items-center justify-between gap-2 h-[42px] px-2 mr-2 rounded-lg border border-dashed border-muted-foreground/50 hover:bg-accent transition-all text-left group flex-shrink-0"
                                         >
                                             <div className="flex items-center gap-3 min-w-0 cursor-pointer" onClick={() => setSelectedObjectId(obj.id)}>
-                                                <div className="w-7 h-7 rounded bg-muted border border-muted-foreground/50 flex items-center justify-center overflow-hidden shrink-0 opacity-50">
-                                                    {obj.image ? (
-                                                        <img src={obj.image} alt="" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <IconComponent className="w-4 h-4 text-muted-foreground" />
-                                                    )}
-                                                </div>
+                                                {!isSidePanel && (
+                                                    <div className="w-7 h-7 rounded bg-muted border border-muted-foreground/50 flex items-center justify-center overflow-hidden shrink-0 opacity-50">
+                                                        {obj.image ? (
+                                                            <img src={obj.image} alt="" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <IconComponent className="w-4 h-4 text-muted-foreground" />
+                                                        )}
+                                                    </div>
+                                                )}
                                                 <div className="min-w-0">
                                                     <div className="text-xs font-medium text-muted-foreground truncate">{obj.name}</div>
                                                 </div>

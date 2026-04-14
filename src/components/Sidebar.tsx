@@ -8,6 +8,7 @@ import {
   CircleHelp,
   MessageSquare,
   Zap,
+  Columns3,
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
@@ -48,8 +49,8 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
   // Sync accordion state with current view
   // Sync accordion state with current view
   useEffect(() => {
-    // Only force collapse if we leave scenes/map view.
-    if (currentView !== 'scenes' && currentView !== 'map') {
+    // Only force collapse if we leave scenes/map view or the new three_panels view.
+    if (currentView !== 'scenes' && currentView !== 'map' && currentView !== 'three_panels') {
       if (isNarrativeMenuOpen && onToggleNarrative) {
           onToggleNarrative();
       }
@@ -110,6 +111,31 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
                 </span>
                 {/* Arrow removed as requested */}
               </>
+            )}
+          </button>
+        </div>
+
+        {/* 3 Panéis View Mode */}
+        <div className="flex flex-col mt-1">
+          <button
+            className={`flex items-center gap-3 pl-4 pr-3 h-[42px] transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${
+              currentView === 'three_panels'
+                ? `bg-primary text-primary-foreground font-bold shadow-sm rounded-l-lg`
+                : 'text-muted-foreground hover:bg-primary/10 hover:text-white rounded-lg mr-3'
+            } ${isCollapsed ? 'justify-center px-0 pl-0 pr-0 mr-0 rounded-lg' : ''}`}
+            onClick={() => onSetView('three_panels')}
+            title={isCollapsed ? t('sidebar.threePanels', '3 Panéis') : undefined}
+          >
+            {/* Hover Glow Effect */}
+            <div
+              className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'three_panels' ? 'translate-x-0' : ''}`}
+            />
+
+            <Columns3 className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+            {!isCollapsed && (
+              <span className="truncate relative z-10 flex-1 text-left">
+                {t('sidebar.threePanels', '3 Panéis')}
+              </span>
             )}
           </button>
         </div>

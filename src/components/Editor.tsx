@@ -942,7 +942,9 @@ const Editor: React.FC = () => {
     setHasUnsavedTabChanges(false); // Clear draft state
     setPendingNavigation(null);
     if (navData.type === 'scene') {
-      setCurrentView('scenes');
+      if (currentView !== 'three_panels') {
+        setCurrentView('scenes');
+      }
       setSelectedSceneId(navData.id);
     } else if (navData.type === 'view') {
       setCurrentView(navData.view);
@@ -1011,7 +1013,10 @@ const Editor: React.FC = () => {
   const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null);
   const [previewSceneId, setPreviewSceneId] = useState<string | null>(null);
   const [currentView, setCurrentView] = useState<View>('welcome');
+  const [sidePanelTab, setSidePanelTab] = useState<string>('properties');
   const mainRef = useRef<HTMLElement>(null);
+
+  const isSidePanelExpanded = sidePanelTab === 'objects' || sidePanelTab === 'interactions';
 
   // Scroll to top when view or scene changes
   useEffect(() => {
@@ -1587,6 +1592,90 @@ const Editor: React.FC = () => {
                     onSetDirty={setHasUnsavedTabChanges}
                   />
                 </Suspense>
+              )}
+
+              {currentView === 'three_panels' && (
+                <div className="flex h-full w-full overflow-hidden relative">
+                  {/* Middle Panel: Narrative Map */}
+                  <div className={`flex-1 h-full transition-all duration-300 ${
+                    selectedScene 
+                      ? isSidePanelExpanded 
+                        ? 'pr-[55.55%]' 
+                        : 'pr-[33.33%]' 
+                      : ''
+                  }`}>
+                    <Suspense fallback={<LoadingOverlay message="Carregando Mapa..." />}>
+                      <SceneMap
+                        key="three-panels-map"
+                        allScenesMap={gameData.scenes}
+                        globalObjects={gameData.globalObjects}
+                        startSceneId={gameData.startScene}
+                        vignettes={gameData.vignettes || []}
+                        onSelectScene={handleSelectScene}
+                        onUpdateScenePosition={handleUpdateScenePosition}
+                        onUpdateVignettePosition={handleUpdateVignettePosition}
+                        onReorganizeScenes={handleReorganizeScenes}
+                        gameInteractionType={gameData.gameInteractionType || 'parser'}
+                        onAddNode={handleAddNodeType}
+                        hasOpeningVignette={hasOpeningVignette}
+                        isSidebarOpen={isNarrativeMenuOpen}
+                        theme={appTheme}
+                        gameTitle={gameData.gameTitle}
+                      />
+                    </Suspense>
+                  </div>
+
+                  {/* Right Panel: Side Editor */}
+                  <div 
+                    className={`absolute right-0 top-0 bottom-0 bg-background border-l border-muted-foreground/30 shadow-[-10px_0_30px_rgba(0,0,0,0.3)] z-50 transition-all duration-300 transform ${
+                      isSidePanelExpanded ? 'w-[55.55%]' : 'w-1/3'
+                    } ${
+                      selectedScene ? 'translate-x-0' : 'translate-x-full'
+                    }`}
+                  >
+                    {selectedScene && (
+                      <Suspense fallback={<LoadingOverlay message="Carregando Editor..." />}>
+                        <SceneEditor
+                          key={`side-editor-${selectedScene.id}`}
+                          scene={selectedScene}
+                          allScenes={scenesList}
+                          globalObjects={gameData.globalObjects}
+                          onUpdateScene={handleUpdateScene}
+                          onCopyScene={handleCopyScene}
+                          onCreateGlobalObject={handleCreateGlobalObject}
+                          onLinkObjectToScene={handleLinkObjectToScene}
+                          onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
+                          onUpdateGlobalObject={handleUpdateGlobalObject}
+                          enableChances={
+                            (gameData.enableChances ?? detectedActiveSystems.chances) ||
+                            gameData.gameSystemEnabled === 'chances'
+                          }
+                          gameSystemEnabled={gameData.gameSystemEnabled}
+                          onPreviewScene={(scene) => {
+                            setPreviewSceneId(scene.id);
+                            setIsPreviewing(true);
+                          }}
+                          onSelectScene={handleSelectScene}
+                          isDirty={hasUnsavedTabChanges}
+                          onSetDirty={setHasUnsavedTabChanges}
+                          layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
+                          consequenceTrackers={consequenceTrackers}
+                          isStartScene={selectedScene.id === gameData.startScene}
+                          gameInteractionType={gameData.gameInteractionType || 'parser'}
+                          vignettes={gameData.vignettes || []}
+                          onViewMap={() => attemptNavigation({ type: 'view', view: 'map' })}
+                          globalSplashButtonText={gameData.gameSplashButtonText || ''}
+                          onUpdateGlobalSplashButtonText={(text) =>
+                            handleUpdateGameData('gameSplashButtonText', text)
+                          }
+                          isSidePanel={true}
+                          onClose={() => setSelectedSceneId(null)}
+                          onTabChange={setSidePanelTab}
+                        />
+                      </Suspense>
+                    )}
+                  </div>
+                </div>
               )}
 
               {currentView === 'trackers' && (

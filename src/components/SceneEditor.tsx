@@ -71,6 +71,9 @@ interface SceneEditorProps {
   gameSystemEnabled?: 'none' | 'chances' | 'trackers';
   globalSplashButtonText?: string;
   onUpdateGlobalSplashButtonText?: (text: string) => void;
+  isSidePanel?: boolean;
+  onClose?: () => void;
+  onTabChange?: (tab: 'properties' | 'objects' | 'interactions' | 'choices') => void;
 }
 
 const getCleanSceneState = (s: Scene): Scene => {
@@ -122,6 +125,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
     globalSplashButtonText,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     onUpdateGlobalSplashButtonText,
+    isSidePanel,
+    onClose,
+    onTabChange,
   }) => {
     const { toast } = useToast();
     const { t } = useTranslation();
@@ -149,6 +155,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
       setActiveTab('properties');
       setSuggestionsInput(cleanScene.suggestions ? cleanScene.suggestions.join(', ') : '');
     }, [scene.id]);
+
+    // Sync active tab with parent
+    useEffect(() => {
+      onTabChange?.(activeTab);
+    }, [activeTab, onTabChange]);
 
     // Check for dirty state
     useEffect(() => {
@@ -411,58 +422,86 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
     const isVignetteMode = localScene.vignetteType && localScene.vignetteType !== 'none';
 
     return (
-      <div className="pb-8 px-4">
-        <div className="sticky top-0 z-40 bg-background flex flex-col pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm border-b border-muted-foreground/50">
+      <div className={`flex flex-col ${isSidePanel ? 'h-full overflow-hidden' : 'pb-8 px-4'}`}>
+        <div className={`sticky top-0 z-40 bg-background flex flex-col pt-4 pb-4 gap-3 ${isSidePanel ? 'px-4 border-b border-muted-foreground/30 shadow-md' : '-mx-4 px-4 shadow-sm border-b border-muted-foreground/50'}`}>
           {/* Solid background shield to perfectly hide scrolled content */}
           <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
-          <div className="flex justify-between items-center bg-card p-4 rounded-xl border border-muted-foreground/50 shadow-sm relative z-10">
-          <p className="text-muted-foreground text-xs font-medium">
-            {t('sceneEditor.headerDesc')}
-          </p>
-          <div className="flex items-center gap-2">
-            {isDirty && (
-              <div className="flex items-center gap-1 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-1">
-                <span className="hidden sm:inline">{t('sceneEditor.unsavedChanges')}</span>
+          
+          <div className={`flex justify-between items-center bg-card ${isSidePanel ? 'p-3' : 'p-4'} rounded-xl border border-muted-foreground/50 shadow-sm relative z-10`}>
+            {isSidePanel ? (
+              <div className="flex items-center gap-2">
+                {onClose && (
+                  <button 
+                    onClick={onClose}
+                    className="flex items-center gap-2 px-2 py-1.5 hover:bg-muted rounded-lg transition-colors text-muted-foreground hover:text-foreground group"
+                  >
+                    <ArrowRight className="w-5 h-5 rotate-180 transition-transform group-hover:-translate-x-1" />
+                    <span className="text-[10px] font-bold uppercase tracking-widest">{t('common.back', 'Voltar')}</span>
+                  </button>
+                )}
               </div>
+            ) : (
+              <p className="text-muted-foreground text-xs font-medium">
+                {t('sceneEditor.headerDesc')}
+              </p>
             )}
+            
+            <div className="flex items-center gap-2">
+              {isDirty && (
+                <div className="flex items-center gap-1 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-1">
+                  <span className={`${isSidePanel ? 'hidden' : 'hidden sm:inline'}`}>{t('sceneEditor.unsavedChanges')}</span>
+                </div>
+              )}
 
-            <button
-              onClick={handlePreview}
-              className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg"
-              title={t('sceneEditor.testTooltip')}
-            >
-              <Eye className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{t('sceneEditor.testBtn')}</span>
-            </button>
+              <button
+                onClick={handlePreview}
+                className="flex items-center gap-2 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg"
+                title={t('sceneEditor.testTooltip')}
+              >
+                <Eye className="w-3.5 h-3.5" />
+                {isSidePanel ? (
+                  <span className="text-[10px] uppercase font-bold tracking-tight">
+                    {isVignetteMode ? t('sceneEditor.testVignetteBtn', 'Testar vinheta') : t('sceneEditor.testSceneBtn', 'Testar cena')}
+                  </span>
+                ) : (
+                  <span className="hidden sm:inline">{t('sceneEditor.testBtn')}</span>
+                )}
+              </button>
 
-            <button
-              onClick={() => onCopyScene(localScene)}
-              className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors hover:bg-zinc-800 rounded-lg"
-              title={t('sceneEditor.copyTooltip')}
-            >
-              <Copy className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{t('sceneEditor.copyBtn')}</span>
-            </button>
+              {!isSidePanel && (
+                <button
+                  onClick={() => onCopyScene(localScene)}
+                  className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors hover:bg-zinc-800 rounded-lg"
+                  title={t('sceneEditor.copyTooltip')}
+                >
+                  <Copy className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{t('sceneEditor.copyBtn')}</span>
+                </button>
+              )}
 
-            <button
-              onClick={handleUndo}
-              disabled={!isDirty}
-              className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors hover:bg-zinc-800 rounded-lg"
-              title={t('sceneEditor.undoTooltip')}
-            >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">{t('sceneEditor.undoBtn')}</span>
-            </button>
+              {!isSidePanel && (
+                <>
+                  <button
+                    onClick={handleUndo}
+                    disabled={!isDirty}
+                    className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors hover:bg-zinc-800 rounded-lg"
+                    title={t('sceneEditor.undoTooltip')}
+                  >
+                    <RotateCcw className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">{t('sceneEditor.undoBtn')}</span>
+                  </button>
 
-            <button
-              onClick={handleSave}
-              disabled={!isDirty}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
-            >
-              <Save className="w-3.5 h-3.5" />
-              <span>{t('sceneEditor.saveBtn')}</span>
-            </button>
-          </div>
+                  <button
+                    onClick={handleSave}
+                    disabled={!isDirty}
+                    className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
+                  >
+                    <Save className="w-3.5 h-3.5" />
+                    <span>{t('sceneEditor.saveBtn')}</span>
+                  </button>
+                </>
+              )}
+            </div>
           </div>
           {!isVignetteMode && (
             <div className="border-b border-muted-foreground/50 flex items-center justify-between">
@@ -488,23 +527,16 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   );
                 })}
               </div>
-              {activeTab === 'objects' && (
-                <div className="flex-1 min-w-[150px] ml-4 mb-2 text-right">
-                  <span className="text-[10px] text-yellow-400 italic break-words leading-tight">
-                    {t('sceneEditor.objectWarning')}
-                  </span>
-                </div>
-              )}
             </div>
           )}
           {/* Soft gradient transition */}
           <div className="absolute left-0 right-0 -bottom-2 h-2 bg-gradient-to-b from-background to-transparent pointer-events-none" />
         </div>
 
-        <div className="mt-4">
+        <div className={`mt-4 ${isSidePanel ? 'flex-1 overflow-y-auto px-4 pb-24' : ''}`}>
           <div className="bg-background">
             {activeTab === 'properties' && (
-              <div key={localScene.id} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div key={localScene.id} className={`grid grid-cols-1 ${isSidePanel ? 'gap-6' : 'md:grid-cols-2 gap-8'}`}>
                 {/* Left Column: Details & Rules */}
                 <div className="space-y-6 flex flex-col">
                   {/* Scene Details Card */}
@@ -758,7 +790,137 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                     </div>
                   </div>
 
-                  {/* Narrative Rules Card - Renamed to Chance Rules (hidden for conclusion vignettes) */}
+                  {/* Multimedia Card (Only when side panel - moved here to be below details) */}
+                  {isSidePanel && (
+                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                          <ImageIcon className="w-4 h-4" />
+                          {t('sceneEditor.multimediaTitle')}
+                        </h3>
+                        <span className="text-[10px] text-muted-foreground">
+                          {layoutOrientation === 'vertical'
+                            ? t('sceneEditor.suggestedResVertical')
+                            : t('sceneEditor.suggestedResHorizontal')}
+                        </span>
+                      </div>
+
+                      <div className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group mb-6">
+                        <style>{OVERLAY_CSS}</style>
+
+                        {localScene.image ? (
+                          <>
+                            <img
+                              src={localScene.image}
+                              alt={localScene.name}
+                              className="w-full h-full object-cover"
+                            />
+
+                            <div
+                              className={`scene-overlay ${localScene.overlayEffect ? 'overlay-' + localScene.overlayEffect : ''}`}
+                              style={{ zIndex: 10 }}
+                            ></div>
+                            {localScene.overlayEffect === 'rain' && <RainOverlay />}
+                            {localScene.overlayEffect === 'blur' && <BlurOverlay />}
+                            {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
+                            {localScene.overlayEffect === 'tv' && <TVOverlay />}
+                            {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
+                            {localScene.overlayEffect === 'glitch' && <GlitchOverlay />}
+                            {localScene.overlayEffect === 'nosferatu' && <NosferatuOverlay />}
+                            {localScene.overlayEffect === 'wiggate' && <WiggleOverlay />}
+                            {localScene.overlayEffect === 'fog' && (
+                              <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 20, pointerEvents: 'none' }}>
+                                <FogOverlay />
+                              </div>
+                            )}
+
+                            <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm" style={{ zIndex: 20 }}>
+                              <label htmlFor="image-upload-input-side" className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-primary transition-colors">
+                                <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
+                                  <Upload className="w-5 h-5" />
+                                </div>
+                                <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.changeBtn')}</span>
+                                <input id="image-upload-input-side" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                              </label>
+                              <button onClick={() => updateLocalScene('image', '')} className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors">
+                                <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
+                                  <Trash2 className="w-5 h-5" />
+                                </div>
+                                <span className="text-[10px] font-bold uppercase tracking-wider">{t('sceneEditor.removeBtn')}</span>
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <label htmlFor="image-upload-input-side" className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/5 transition-colors group">
+                            <div className="w-12 h-12 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
+                              <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+                            </div>
+                            <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">{t('sceneEditor.loadImage')}</span>
+                            <input id="image-upload-input-side" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                          </label>
+                        )}
+                      </div>
+
+                      <div className="space-y-2 mb-4">
+                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">{t('sceneEditor.overlayLabel')}</label>
+                        <select
+                          value={localScene.overlayEffect || ''}
+                          onChange={(e) => updateLocalScene('overlayEffect', e.target.value)}
+                          className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
+                        >
+                          <option value="">{t('sceneEditor.effects.none')}</option>
+                          <option value="grain">{t('sceneEditor.effects.grain')}</option>
+                          <option value="rain">{t('sceneEditor.effects.rain')}</option>
+                          <option value="blur">{t('sceneEditor.effects.blur')}</option>
+                          <option value="chromatic">{t('sceneEditor.effects.chromatic')}</option>
+                          <option value="tv">{t('sceneEditor.effects.tv')}</option>
+                          <option value="confetti">{t('sceneEditor.effects.confetti')}</option>
+                          <option value="glitch">{t('sceneEditor.effects.glitch')}</option>
+                          <option value="nosferatu">{t('sceneEditor.effects.nosferatu')}</option>
+                          <option value="wiggle">{t('sceneEditor.effects.wiggle')}</option>
+                          <option value="fog">{t('sceneEditor.effects.fog')}</option>
+                        </select>
+                      </div>
+
+                      {localScene.vignetteType !== 'opening' && (
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('sceneEditor.audioLabel')}</label>
+                          <div className="flex items-center gap-3 p-3 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors">
+                            <div className="w-8 h-8 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center flex-shrink-0">
+                              <Music className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-primary' : 'text-muted-foreground'}`} />
+                            </div>
+                            <div className="flex-grow min-w-0">
+                              {localScene.backgroundMusic ? (
+                                <div className="flex flex-col">
+                                  <span className="text-xs text-foreground truncate">{t('sceneEditor.customAudioSet')}</span>
+                                  <span className="text-[10px] text-green-500 truncate">{localScene.backgroundMusicName || t('sceneEditor.audioLoaded')}</span>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col">
+                                  <span className="text-xs text-muted-foreground italic">{t('sceneEditor.noAudio')}</span>
+                                  <span className="text-[9px] text-muted-foreground/60">{t('sceneEditor.leaveEmptyAudio')}</span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-shrink-0">
+                              {localScene.backgroundMusic ? (
+                                <button onClick={() => setLocalScene(prev => ({ ...prev, backgroundMusic: undefined, backgroundMusicName: undefined }))} className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              ) : (
+                                <label htmlFor="music-upload-side" className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-primary">
+                                  {t('sceneEditor.loadBtn')}
+                                  <input id="music-upload-side" type="file" accept="audio/*" onChange={handleMusicUpload} className="hidden" />
+                                </label>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Narrative Rules Card */}
                   {(enableChances || gameSystemEnabled === 'chances') && localScene.vignetteType !== 'conclusion' && (
                     <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
                       <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
@@ -864,240 +1026,241 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                     </div>
                   )}
 
-                </div>
-
-                {/* Right Column: Rules & Preview */}
+                             {/* Right Column: Multimedia & Connections */}
                 <div className="space-y-6">
-                  {/* Multimedia Card */}
-                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                        <ImageIcon className="w-4 h-4" />
-                        {t('sceneEditor.multimediaTitle')}
-                      </h3>
-                      <span className="text-[10px] text-muted-foreground">
-                        {layoutOrientation === 'vertical'
-                          ? t('sceneEditor.suggestedResVertical')
-                          : t('sceneEditor.suggestedResHorizontal')}
-                      </span>
-                    </div>
+                  {/* Multimedia Card (Only when NOT side panel) */}
+                  {!isSidePanel && (
+                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                          <ImageIcon className="w-4 h-4" />
+                          {t('sceneEditor.multimediaTitle')}
+                        </h3>
+                        <span className="text-[10px] text-muted-foreground">
+                          {layoutOrientation === 'vertical'
+                            ? t('sceneEditor.suggestedResVertical')
+                            : t('sceneEditor.suggestedResHorizontal')}
+                        </span>
+                      </div>
 
-                    {/* Image Preview Area */}
-                    <div className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group mb-6">
-                      <style>{OVERLAY_CSS}</style>
+                      {/* Image Preview Area */}
+                      <div className="relative w-full aspect-video bg-muted/30 rounded-lg overflow-hidden border border-muted-foreground/50 group mb-6">
+                        <style>{OVERLAY_CSS}</style>
 
-                      {localScene.image ? (
-                        <>
-                          <img
-                            src={localScene.image}
-                            alt={localScene.name}
-                            className="w-full h-full object-cover"
-                          />
-
-                          {/* Overlay Layer - Rendered AFTER image for correct layering */}
-                          <div
-                            className={`scene-overlay ${localScene.overlayEffect ? 'overlay-' + localScene.overlayEffect : ''}`}
-                            style={{ zIndex: 10 }}
-                          ></div>
-                          {localScene.overlayEffect === 'rain' && <RainOverlay />}
-                          {localScene.overlayEffect === 'blur' && <BlurOverlay />}
-                          {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
-                          {localScene.overlayEffect === 'tv' && <TVOverlay />}
-                          {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
-                          {localScene.overlayEffect === 'glitch' && <GlitchOverlay />}
-                          {localScene.overlayEffect === 'nosferatu' && <NosferatuOverlay />}
-                          {localScene.overlayEffect === 'wiggle' && <WiggleOverlay />}
-                          {localScene.overlayEffect === 'fog' && (
-                            <div
-                              style={{
-                                position: 'absolute',
-                                top: 0,
-                                left: 0,
-                                width: '100%',
-                                height: '100%',
-                                zIndex: 20,
-                                pointerEvents: 'none',
-                              }}
-                            >
-                              <FogOverlay />
-                            </div>
-                          )}
-
-                          {/* Hover buttons - highest z-index */}
-                          <div
-                            className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm"
-                            style={{ zIndex: 20 }}
-                          >
-                            <label
-                              htmlFor="image-upload-input"
-                              className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-primary transition-colors"
-                            >
-                              <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
-                                <Upload className="w-5 h-5" />
-                              </div>
-                              <span className="text-[10px] font-bold uppercase tracking-wider">
-                                {t('sceneEditor.changeBtn')}
-                              </span>
-                              <input
-                                id="image-upload-input"
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                                className="hidden"
-                              />
-                            </label>
-                            <button
-                              onClick={() => updateLocalScene('image', '')}
-                              className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors"
-                            >
-                              <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
-                                <Trash2 className="w-5 h-5" />
-                              </div>
-                              <span className="text-[10px] font-bold uppercase tracking-wider">
-                                {t('sceneEditor.removeBtn')}
-                              </span>
-                            </button>
-                          </div>
-                        </>
-                      ) : (
-                        <label
-                          htmlFor="image-upload-input"
-                          className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/5 transition-colors group"
-                        >
-                          <div className="w-12 h-12 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
-                            <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
-                          </div>
-                          <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
-                            {t('sceneEditor.loadImage')}
-                          </span>
-                          <input
-                            id="image-upload-input"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageUpload}
-                            className="hidden"
-                          />
-                        </label>
-                      )}
-                    </div>
-
-                    {/* Overlay Effect Section */}
-                    <div className="space-y-2 mb-4">
-                      <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                        {t('sceneEditor.overlayLabel')}
-                      </label>
-                      <select
-                        value={localScene.overlayEffect || ''}
-                        onChange={(e) => updateLocalScene('overlayEffect', e.target.value)}
-                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
-                      >
-                        <option value="">{t('sceneEditor.effects.none')}</option>
-                        <option value="grain">{t('sceneEditor.effects.grain')}</option>
-                        <option value="rain">{t('sceneEditor.effects.rain')}</option>
-                        <option value="blur">{t('sceneEditor.effects.blur')}</option>
-                        <option value="chromatic">{t('sceneEditor.effects.chromatic')}</option>
-                        <option value="tv">{t('sceneEditor.effects.tv')}</option>
-                        <option value="confetti">{t('sceneEditor.effects.confetti')}</option>
-                        <option value="glitch">{t('sceneEditor.effects.glitch')}</option>
-                        <option value="nosferatu">{t('sceneEditor.effects.nosferatu')}</option>
-                        <option value="wiggle">{t('sceneEditor.effects.wiggle')}</option>
-                        <option value="fog">{t('sceneEditor.effects.fog')}</option>
-                      </select>
-                    </div>
-
-                    {/* Audio Section - Hidden for opening vignettes as browsers block autoplay without interaction */}
-                    {localScene.vignetteType !== 'opening' && (
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                          {t('sceneEditor.audioLabel')}
-                        </label>
-                        <div className="flex items-center gap-3 p-3 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors">
-                          <div className="w-8 h-8 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center flex-shrink-0">
-                            <Music
-                              className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-primary' : 'text-muted-foreground'} `}
+                        {localScene.image ? (
+                          <>
+                            <img
+                              src={localScene.image}
+                              alt={localScene.name}
+                              className="w-full h-full object-cover"
                             />
-                          </div>
-                          <div className="flex-grow min-w-0">
-                            {localScene.backgroundMusic ? (
-                              <div className="flex flex-col">
-                                <span className="text-xs text-foreground truncate">
-                                  {t('sceneEditor.customAudioSet')}
-                                </span>
-                                <span className="text-[10px] text-green-500 truncate">
-                                  {localScene.backgroundMusicName || t('sceneEditor.audioLoaded')}
-                                </span>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col">
-                                <span className="text-xs text-muted-foreground italic">
-                                  {t('sceneEditor.noAudio')}
-                                </span>
-                                <span className="text-[9px] text-muted-foreground/60">
-                                  {t('sceneEditor.leaveEmptyAudio')}
-                                </span>
+
+                            {/* Overlay Layer - Rendered AFTER image for correct layering */}
+                            <div
+                              className={`scene-overlay ${localScene.overlayEffect ? 'overlay-' + localScene.overlayEffect : ''}`}
+                              style={{ zIndex: 10 }}
+                            ></div>
+                            {localScene.overlayEffect === 'rain' && <RainOverlay />}
+                            {localScene.overlayEffect === 'blur' && <BlurOverlay />}
+                            {localScene.overlayEffect === 'chromatic' && <ChromaticOverlay />}
+                            {localScene.overlayEffect === 'tv' && <TVOverlay />}
+                            {localScene.overlayEffect === 'confetti' && <ConfettiOverlay />}
+                            {localScene.overlayEffect === 'glitch' && <GlitchOverlay />}
+                            {localScene.overlayEffect === 'nosferatu' && <NosferatuOverlay />}
+                            {localScene.overlayEffect === 'wiggle' && <WiggleOverlay />}
+                            {localScene.overlayEffect === 'fog' && (
+                              <div
+                                style={{
+                                  position: 'absolute',
+                                  top: 0,
+                                  left: 0,
+                                  width: '100%',
+                                  height: '100%',
+                                  zIndex: 20,
+                                  pointerEvents: 'none',
+                                }}
+                              >
+                                <FogOverlay />
                               </div>
                             )}
-                          </div>
-                          <div className="flex-shrink-0">
-                            {localScene.backgroundMusic ? (
-                              <button
-                                onClick={() =>
-                                  setLocalScene((prev) => ({
-                                    ...prev,
-                                    backgroundMusic: undefined,
-                                    backgroundMusicName: undefined,
-                                  }))
-                                }
-                                className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all"
-                                title={t('sceneEditor.removeBtn')}
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
-                            ) : (
+
+                            {/* Hover buttons - highest z-index */}
+                            <div
+                              className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 gap-4 backdrop-blur-sm"
+                              style={{ zIndex: 20 }}
+                            >
                               <label
-                                htmlFor="music-upload"
-                                className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-primary"
+                                htmlFor="image-upload-input"
+                                className="flex flex-col items-center gap-2 cursor-pointer text-white hover:text-primary transition-colors"
                               >
-                                {t('sceneEditor.loadBtn')}
+                                <div className="p-2 bg-white/10 rounded-full hover:bg-white/20 transition-all">
+                                  <Upload className="w-5 h-5" />
+                                </div>
+                                <span className="text-[10px] font-bold uppercase tracking-wider">
+                                  {t('sceneEditor.changeBtn')}
+                                </span>
                                 <input
-                                  id="music-upload"
+                                  id="image-upload-input"
                                   type="file"
-                                  accept="audio/*"
-                                  onChange={handleMusicUpload}
+                                  accept="image/*"
+                                  onChange={handleImageUpload}
                                   className="hidden"
                                 />
                               </label>
-                            )}
+                              <button
+                                onClick={() => updateLocalScene('image', '')}
+                                className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors"
+                              >
+                                <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
+                                  <Trash2 className="w-5 h-5" />
+                                </div>
+                                <span className="text-[10px] font-bold uppercase tracking-wider">
+                                  {t('sceneEditor.removeBtn')}
+                                </span>
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <label
+                            htmlFor="image-upload-input"
+                            className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/5 transition-colors group"
+                          >
+                            <div className="w-12 h-12 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
+                              <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+                            </div>
+                            <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
+                              {t('sceneEditor.loadImage')}
+                            </span>
+                            <input
+                              id="image-upload-input"
+                              type="file"
+                              accept="image/*"
+                              onChange={handleImageUpload}
+                              className="hidden"
+                            />
+                          </label>
+                        )}
+                      </div>
+
+                      {/* Overlay Effect Section */}
+                      <div className="space-y-2 mb-4">
+                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
+                          {t('sceneEditor.overlayLabel')}
+                        </label>
+                        <select
+                          value={localScene.overlayEffect || ''}
+                          onChange={(e) => updateLocalScene('overlayEffect', e.target.value)}
+                          className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all [&>option]:bg-card"
+                        >
+                          <option value="">{t('sceneEditor.effects.none')}</option>
+                          <option value="grain">{t('sceneEditor.effects.grain')}</option>
+                          <option value="rain">{t('sceneEditor.effects.rain')}</option>
+                          <option value="blur">{t('sceneEditor.effects.blur')}</option>
+                          <option value="chromatic">{t('sceneEditor.effects.chromatic')}</option>
+                          <option value="tv">{t('sceneEditor.effects.tv')}</option>
+                          <option value="confetti">{t('sceneEditor.effects.confetti')}</option>
+                          <option value="glitch">{t('sceneEditor.effects.glitch')}</option>
+                          <option value="nosferatu">{t('sceneEditor.effects.nosferatu')}</option>
+                          <option value="wiggle">{t('sceneEditor.effects.wiggle')}</option>
+                          <option value="fog">{t('sceneEditor.effects.fog')}</option>
+                        </select>
+                      </div>
+
+                      {/* Audio Section */}
+                      {localScene.vignetteType !== 'opening' && (
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                            {t('sceneEditor.audioLabel')}
+                          </label>
+                          <div className="flex items-center gap-3 p-3 bg-muted/30 border border-dashed border-input rounded-lg hover:border-primary/50 transition-colors">
+                            <div className="w-8 h-8 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center flex-shrink-0">
+                              <Music
+                                className={`w-4 h-4 ${localScene.backgroundMusic ? 'text-primary' : 'text-muted-foreground'} `}
+                              />
+                            </div>
+                            <div className="flex-grow min-w-0">
+                              {localScene.backgroundMusic ? (
+                                <div className="flex flex-col">
+                                  <span className="text-xs text-foreground truncate">
+                                    {t('sceneEditor.customAudioSet')}
+                                  </span>
+                                  <span className="text-[10px] text-green-500 truncate">
+                                    {localScene.backgroundMusicName || t('sceneEditor.audioLoaded')}
+                                  </span>
+                                </div>
+                              ) : (
+                                <div className="flex flex-col">
+                                  <span className="text-xs text-muted-foreground italic">
+                                    {t('sceneEditor.noAudio')}
+                                  </span>
+                                  <span className="text-[9px] text-muted-foreground/60">
+                                    {t('sceneEditor.leaveEmptyAudio')}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex-shrink-0">
+                              {localScene.backgroundMusic ? (
+                                <button
+                                  onClick={() =>
+                                    setLocalScene((prev) => ({
+                                      ...prev,
+                                      backgroundMusic: undefined,
+                                      backgroundMusicName: undefined,
+                                    }))
+                                  }
+                                  className="p-2 hover:bg-red-500/10 text-zinc-400 hover:text-red-500 rounded transition-all"
+                                  title={t('sceneEditor.removeBtn')}
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              ) : (
+                                <label
+                                  htmlFor="music-upload"
+                                  className="px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 text-[10px] font-bold uppercase tracking-wider rounded cursor-pointer transition-colors border border-primary"
+                                >
+                                  {t('sceneEditor.loadBtn')}
+                                  <input
+                                    id="music-upload"
+                                    type="file"
+                                    accept="audio/*"
+                                    onChange={handleMusicUpload}
+                                    className="hidden"
+                                  />
+                                </label>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-                  {/* Branching Preview Card */}
-                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
-                    <div className="flex justify-between items-center mb-4">
-                      <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
-                        <GitBranch className="w-4 h-4" />
-                        {t('sceneEditor.connectionsTitle')}
-                      </h3>
-                      {/* Optional: Link to full map if needed, but simplistic for now */}
-                      <button
-                        onClick={() => onViewMap?.()}
-                        className="text-[10px] text-primary hover:text-primary/80 font-bold uppercase tracking-widest transition-colors flex items-center gap-1"
-                        title={t('sceneEditor.viewFullMapTooltip')}
-                      >
-                        {t('sceneEditor.viewFullMap')}
-                      </button>
+                      )}
                     </div>
+                  )}
 
-                    <BranchingPreview currentScene={localScene} allScenes={allScenes} />
+                  {/* Branching Preview Card (Only when NOT side panel) */}
+                  {!isSidePanel && (
+                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                          <GitBranch className="w-4 h-4" />
+                          {t('sceneEditor.connectionsTitle')}
+                        </h3>
+                        <button
+                          onClick={() => onViewMap?.()}
+                          className="text-[10px] text-primary hover:text-primary/80 font-bold uppercase tracking-widest transition-colors flex items-center gap-1"
+                          title={t('sceneEditor.viewFullMapTooltip')}
+                        >
+                          {t('sceneEditor.viewFullMap')}
+                        </button>
+                      </div>
 
-                    <p className="text-[10px] text-zinc-500 text-center mt-3">
-                      {t('sceneEditor.connectionsDesc')}
-                    </p>
-                  </div>
+                      <BranchingPreview currentScene={localScene} allScenes={allScenes} />
 
-                </div>
+                      <p className="text-[10px] text-zinc-500 text-center mt-3">
+                        {t('sceneEditor.connectionsDesc')}
+                      </p>
+                    </div>
+                  )}
+                </div>       </div>
               </div>
             )}
 
@@ -1111,6 +1274,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   onLinkObject={handleLinkObjectWrapper}
                   onUnlinkObject={handleUnlinkObjectWrapper}
                   onUpdateGlobalObject={handleUpdateGlobalObjectLocal}
+                  isSidePanel={isSidePanel}
                 />
               </div>
             )}
@@ -1128,6 +1292,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   allTakableObjects={allAvailableInventoryObjects}
                   consequenceTrackers={consequenceTrackers}
                   vignettes={vignettes}
+                  isSidePanel={isSidePanel}
                 />
               </div>
             )}
@@ -1306,6 +1471,38 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             )}
           </div>
         </div>
+
+        {isSidePanel && (
+          <div className="sticky bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md p-4 flex flex-col gap-3 z-50">
+            {/* Gradient transition below footer */}
+            <div className="absolute bottom-full left-0 right-0 h-10 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+
+            {activeTab === 'objects' && (
+              <div className="text-[10px] text-yellow-500/90 italic text-center leading-tight px-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+                * {t('sceneEditor.objectWarning')}
+              </div>
+            )}
+
+            <div className="flex justify-between gap-3">
+              <button
+                onClick={handleUndo}
+                disabled={!isDirty}
+                className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg"
+              >
+                <RotateCcw className="w-4 h-4" />
+                <span>{t('sceneEditor.undoBtn')}</span>
+              </button>
+
+            <button
+              onClick={handleSave}
+              disabled={!isDirty}
+              className="flex-[2] flex items-center justify-center gap-1.5 px-4 py-2.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
+            >
+              <Save className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
       </div>
     );
   }

@@ -39,6 +39,7 @@ interface InteractionEditorProps {
     allTakableObjects: GameObject[];
     consequenceTrackers: ConsequenceTracker[];
     vignettes: Vignette[];
+    isSidePanel?: boolean;
 }
 
 const generateUniqueId = (prefix: 'inter', existingIds: string[]): string => {
@@ -56,7 +57,8 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
     allTakableObjects,
     consequenceTrackers,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    vignettes
+    vignettes,
+    isSidePanel
 }) => {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(interactions.length > 0 ? 0 : null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -421,12 +423,14 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 onClick={() => setSelectedIndex(index)}
                                 className={`relative overflow-hidden flex items-center gap-3 h-[42px] px-2 rounded-lg border-transparent transition-all text-left group flex-shrink-0 ${selectedIndex === index ? 'bg-primary text-primary-foreground font-bold shadow-md rounded-r-none mr-0' : 'text-foreground hover:bg-primary/10 hover:shadow-sm mr-2'}`}
                             >
-                                <div className={`flex items-center justify-center shrink-0 ${selectedIndex === index ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
-                                    {(() => {
-                                        const Icon = INTERACTION_ICONS.find(i => i.name === inter.icon)?.component || MousePointer2;
-                                        return <Icon className="w-4 h-4" />;
-                                    })()}
-                                </div>
+                                {!isSidePanel && (
+                                    <div className={`flex items-center justify-center shrink-0 ${selectedIndex === index ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                                        {(() => {
+                                            const Icon = INTERACTION_ICONS.find(i => i.name === inter.icon)?.component || MousePointer2;
+                                            return <Icon className="w-4 h-4" />;
+                                        })()}
+                                    </div>
+                                )}
                                 <div className="min-w-0 flex-1">
                                     <div className={`text-xs font-bold truncate ${selectedIndex === index ? 'text-primary-foreground' : 'text-foreground'}`}>
                                         {inter.verbs.join(', ')}
