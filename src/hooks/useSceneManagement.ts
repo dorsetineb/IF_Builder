@@ -96,7 +96,7 @@ export const useSceneManagement = ({
                 startScene: !hasOpeningVignette ? newId : prev.startScene
             };
         });
-        setCurrentView('scenes');
+        setCurrentView('three_panels');
         setSelectedSceneId(newId);
         setIsDirty(true);
     }, [gameData.scenes, gameData.sceneOrder, setGameData, setCurrentView, setSelectedSceneId, setIsDirty]);
@@ -194,7 +194,7 @@ export const useSceneManagement = ({
                 sceneOrder: orderWithNew
             };
         });
-        setCurrentView('scenes');
+        setCurrentView('three_panels');
         setSelectedSceneId(newId);
         setIsDirty(true);
     }, [gameData.scenes, gameData.sceneOrder, setGameData, setCurrentView, setSelectedSceneId, setIsDirty]);

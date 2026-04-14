@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useRef, CSSProperties, useState, useMemo, useCallback } from 'react';
 import { Scene, View } from '../types';
-import { Trash2, Menu, ArrowRight, Search, Split, Map } from 'lucide-react';
+import { Trash2, Menu, ArrowRight, Search, Split, Map, Columns3 } from 'lucide-react';
 import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useTranslation } from 'react-i18next';
@@ -21,6 +21,8 @@ interface SceneListProps {
   currentView?: View;
   isLateralMenu?: boolean;
   theme?: string;
+  isNarrativeMenuOpen?: boolean;
+  onToggleNarrative?: () => void;
 }
 
 interface SceneRowData {
@@ -84,10 +86,10 @@ const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<Sce
         onClick={() => onSelectScene(scene.id)}
         className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center transition-all overflow-hidden cursor-pointer h-[42px] ${
             isLateralMenu 
-              ? selectedSceneId === scene.id && currentView === 'scenes'
+              ? selectedSceneId === scene.id && currentView === 'three_panels'
                   ? `bg-primary text-primary-foreground font-bold shadow-md rounded-l-lg rounded-r-none` // Selected: 100% opaque primary
-                  : `text-foreground hover:bg-primary/10 hover:shadow-sm rounded-lg mr-2` // Unselected: normal text, subtle primary hover
-              : selectedSceneId === scene.id && currentView === 'scenes'
+                  : `text-foreground hover:bg-primary/10 hover:shadow-sm rounded-lg mr-4` // Unselected: normal text, subtle primary hover
+              : selectedSceneId === scene.id && currentView === 'three_panels'
                   ? isDirty
                       ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold rounded-lg'
                       : 'bg-primary/20 text-primary border border-primary/30 rounded-lg'
@@ -123,10 +125,10 @@ const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<Sce
                 <span
                   className={`text-[10px] font-bold px-1.5 py-0.5 rounded-md border ${
                      isLateralMenu 
-                       ? selectedSceneId === scene.id && currentView === 'scenes'
+                       ? selectedSceneId === scene.id && currentView === 'three_panels'
                           ? 'bg-primary-foreground text-primary border-primary-foreground/50' 
                           : 'bg-primary text-primary-foreground border-primary/50'                
-                       : selectedSceneId === scene.id && currentView === 'scenes'
+                       : selectedSceneId === scene.id && currentView === 'three_panels'
                           ? isDirty
                             ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30'
                             : 'bg-primary text-primary-foreground border-primary/50' // Active Selected Start
@@ -148,7 +150,7 @@ const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<Sce
             }}
             className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-[calc(100%+1px)] group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
               isLateralMenu 
-                ? selectedSceneId === scene.id && currentView === 'scenes'
+                ? selectedSceneId === scene.id && currentView === 'three_panels'
                   ? 'bg-red-500 rounded-none' // flush with right edge
                   : 'bg-red-500 rounded-r-lg' // match the rounded-lg of container
                 : 'bg-red-500 rounded-r-lg' 
@@ -177,6 +179,8 @@ const SceneList: React.FC<SceneListProps> = ({
   isDirty,
   currentView,
   isLateralMenu,
+  isNarrativeMenuOpen,
+  onToggleNarrative,
 }) => {
   const { t } = useTranslation();
   const [searchTerm, setSearchTerm] = useState('');
@@ -242,7 +246,7 @@ const SceneList: React.FC<SceneListProps> = ({
 
   const getAddButtonClass = () => {
     const baseClass =
-      'flex items-center justify-center px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent flex-shrink-0 whitespace-nowrap';
+      'flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent flex-shrink-0 whitespace-nowrap';
 
     // Default / Dark
     return `${baseClass} bg-white text-zinc-950 hover:bg-zinc-200`;
@@ -270,15 +274,15 @@ const SceneList: React.FC<SceneListProps> = ({
 
   return (
     <div className={`flex flex-col gap-0 h-full`}>
-      {/* View Map Button */}
-      {/* Creation Buttons - Moved to Top */}
-      <div className={`flex gap-2 mb-4 px-1 flex-shrink-0 h-[42px] min-h-[42px] ${isLateralMenu ? 'mr-2' : ''}`}>
+      {/* View Map Button - Creation Buttons Container */}
+      <div className={`flex flex-col gap-2 mb-4 px-0 flex-shrink-0 ${isLateralMenu ? 'mr-4' : ''}`}>
+        <div className="flex gap-2">
         <button
           onClick={(e) => {
             e.stopPropagation();
             onAddNode?.('vignette');
           }}
-          className={`${getAddButtonClass()} flex-1 text-[11px]`}
+          className={`${getAddButtonClass()} flex-1`}
         >
           <ArrowRight className="w-3.5 h-3.5 mr-1.5 currentColor" />
           {t('sceneList.nodeSelection.vignette.title', 'Criar Vinheta')}
@@ -298,7 +302,7 @@ const SceneList: React.FC<SceneListProps> = ({
                 )
               : ''
           }
-          className={`${getAddButtonClass()} flex-1 text-[11px] ${
+          className={`${getAddButtonClass()} flex-1 ${
             !hasOpeningVignette ? 'opacity-50 cursor-not-allowed grayscale' : ''
           }`}
         >
@@ -307,8 +311,22 @@ const SceneList: React.FC<SceneListProps> = ({
         </button>
       </div>
 
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleNarrative?.();
+          }}
+          className="flex items-center justify-start gap-2 px-1 text-zinc-400 hover:text-white transition-colors group"
+        >
+          <Columns3 className="w-4 h-4 transition-transform group-hover:scale-110" />
+          <span className="text-[10px] uppercase font-bold tracking-widest border-b border-transparent group-hover:border-white/30">
+            {isNarrativeMenuOpen ? t('sceneMap.hideNarrativeList', 'Esconder lista de narrativas') : t('sceneMap.showNarrativeList', 'Ver lista de narrativas')}
+          </span>
+        </button>
+      </div>
+
       {/* Search Input */}
-      <div className={`relative flex-shrink-0 mb-3 ${isLateralMenu ? 'mr-2' : ''}`}>
+      <div className={`relative flex-shrink-0 mb-3 ${isLateralMenu ? 'mr-4' : ''}`}>
         <Search className={`absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
         <input
           type="text"
@@ -358,21 +376,6 @@ const SceneList: React.FC<SceneListProps> = ({
                 
                 {/* Creation Buttons */}
                 {/* Moved Map Button Here */}
-                {isLateralMenu && (
-                  <div className={`relative flex-shrink-0 mt-2 px-2`}>
-                    <button
-                      onClick={() => onViewMap?.()}
-                      className={`flex items-center gap-3 w-full text-xs transition-colors ${
-                        currentView === 'map'
-                          ? `text-primary font-bold`
-                          : 'text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      <Map className="w-4 h-4 flex-shrink-0" />
-                      <span className="truncate flex-1 text-left">{t('sceneList.viewMap', 'Ver mapa de cenas')}</span>
-                    </button>
-                  </div>
-                )}
               </div>
             );
           }}

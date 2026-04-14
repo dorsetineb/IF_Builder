@@ -59,17 +59,16 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
 
   // Platform Sidebar Style Button Class
   const getButtonClass = (view: View) =>
-    `flex items-center gap-3 pl-4 pr-3 h-[42px] transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${
+    `flex items-center gap-3 pl-4 pr-3 h-[56px] transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${
       currentView === view
         ? `bg-primary text-primary-foreground font-bold shadow-sm rounded-l-lg`
         : 'text-muted-foreground hover:bg-primary/10 hover:text-white rounded-lg mr-3'
     } ${isCollapsed ? 'justify-center px-0 pl-0 pr-0 mr-0 rounded-lg' : ''}`;
 
   const handleToggleScenes = () => {
-    if (currentView !== 'scenes' && currentView !== 'map') {
-      onSetView('map');
+    if (currentView !== 'three_panels') {
+      onSetView('three_panels');
     }
-    if (onToggleNarrative) onToggleNarrative();
   };
 
   const handleSetView = (view: View) => {
@@ -90,8 +89,8 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           className={`flex flex-col`}
         >
           <button
-            className={`flex items-center gap-3 pl-4 pr-3 h-[42px] transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${
-              isNarrativeMenuOpen && (currentView === 'scenes' || currentView === 'map')
+            className={`flex items-center gap-3 pl-4 pr-3 h-[56px] transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${
+              currentView === 'three_panels'
                 ? `bg-primary text-primary-foreground font-bold shadow-sm rounded-l-lg`
                 : 'text-muted-foreground hover:bg-primary/10 hover:text-white rounded-lg mr-3'
             } ${isCollapsed ? 'justify-center px-0 pl-0 pr-0 mr-0 rounded-lg' : ''}`}
@@ -100,7 +99,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           >
             {/* Hover Glow Effect */}
             <div
-              className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${isNarrativeMenuOpen && (currentView === 'scenes' || currentView === 'map') ? 'translate-x-0' : ''}`}
+              className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'three_panels' ? 'translate-x-0' : ''}`}
             />
 
             <BookOpen className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
@@ -115,30 +114,6 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
           </button>
         </div>
 
-        {/* 3 Panéis View Mode */}
-        <div className="flex flex-col mt-1">
-          <button
-            className={`flex items-center gap-3 pl-4 pr-3 h-[42px] transition-all text-xs font-medium group relative overflow-hidden flex-shrink-0 ${
-              currentView === 'three_panels'
-                ? `bg-primary text-primary-foreground font-bold shadow-sm rounded-l-lg`
-                : 'text-muted-foreground hover:bg-primary/10 hover:text-white rounded-lg mr-3'
-            } ${isCollapsed ? 'justify-center px-0 pl-0 pr-0 mr-0 rounded-lg' : ''}`}
-            onClick={() => onSetView('three_panels')}
-            title={isCollapsed ? t('sidebar.threePanels', '3 Panéis') : undefined}
-          >
-            {/* Hover Glow Effect */}
-            <div
-              className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'three_panels' ? 'translate-x-0' : ''}`}
-            />
-
-            <Columns3 className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-            {!isCollapsed && (
-              <span className="truncate relative z-10 flex-1 text-left">
-                {t('sidebar.threePanels', '3 Panéis')}
-              </span>
-            )}
-          </button>
-        </div>
 
         {/* Vinhetas */}
         {/* Vignettes button removed */}

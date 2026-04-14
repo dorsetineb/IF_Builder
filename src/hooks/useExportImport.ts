@@ -903,7 +903,7 @@ DATE:        ${exportDate.toLocaleString()}
         t('editor.projectImportedDesc', 'Projeto carregado e migrado com sucesso.'),
         'success'
       );
-      setCurrentView('map');
+      setCurrentView('three_panels');
     },
     [
       gameData.scenes,

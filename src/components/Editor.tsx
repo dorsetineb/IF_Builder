@@ -942,13 +942,14 @@ const Editor: React.FC = () => {
     setHasUnsavedTabChanges(false); // Clear draft state
     setPendingNavigation(null);
     if (navData.type === 'scene') {
-      if (currentView !== 'three_panels') {
-        setCurrentView('scenes');
-      }
+      setCurrentView('three_panels');
       setSelectedSceneId(navData.id);
     } else if (navData.type === 'view') {
-      setCurrentView(navData.view);
-      if (navData.view === 'scenes' && !selectedSceneId && scenesList.length > 0) {
+      const targetView = (navData.view as string) === 'scenes' || (navData.view as string) === 'map' 
+        ? 'three_panels' 
+        : navData.view;
+      setCurrentView(targetView);
+      if (targetView === 'three_panels' && !selectedSceneId && scenesList.length > 0) {
         setSelectedSceneId(scenesList[0].id);
       }
     } else if (navData.type === 'navigate') {
@@ -1148,7 +1149,7 @@ const Editor: React.FC = () => {
     });
     setIsDirty(false);
     setImportKey((prev) => prev + 1);
-    setCurrentView('map'); 
+    setCurrentView('three_panels');
     toast(
       t('editor.newProjectSuccessTitle', 'Nova Ficção Criada'),
       t('editor.newProjectSuccessDesc', 'Projeto iniciado com sucesso!'),
@@ -1174,7 +1175,7 @@ const Editor: React.FC = () => {
       });
       setIsDirty(false);
       setImportKey((prev) => prev + 1);
-      setCurrentView('map');
+      setCurrentView('three_panels');
     };
 
     if (hasScenes) {
@@ -1327,7 +1328,7 @@ const Editor: React.FC = () => {
             onTogglePreview={() => setIsPreviewing(false)}
             onNewGame={handleNewGame}
             onHome={() => attemptNavigation({ type: 'action', action: () => {
-              setCurrentView('scenes');
+              setCurrentView('three_panels');
               setSelectedSceneId(null);
             }})}
             onExport={() => setShowSaveModal(true)}
@@ -1383,8 +1384,8 @@ const Editor: React.FC = () => {
               isDirty={isDirty}
               theme={appTheme}
             />
-            {isNarrativeMenuOpen && (currentView === 'scenes' || currentView === 'map') && (
-              <div className="w-72 flex-shrink-0 bg-muted-foreground/20 flex flex-col pt-4 pl-2 pr-0 pb-2 transition-all z-10 shadow-lg border-r border-primary/20">
+            {isNarrativeMenuOpen && currentView === 'three_panels' && (
+              <div className="w-72 flex-shrink-0 bg-muted-foreground/20 flex flex-col pt-4 pl-4 pr-0 pb-2 transition-all z-10 shadow-lg border-r border-primary/20">
                 <SceneList
                   scenes={scenesList}
                   startSceneId={gameData.startScene}
@@ -1400,6 +1401,8 @@ const Editor: React.FC = () => {
                   onAddNode={handleAddNodeType}
                   hasOpeningVignette={hasOpeningVignette}
                   onViewMap={() => attemptNavigation({ type: 'view', view: 'map' })}
+                  isNarrativeMenuOpen={isNarrativeMenuOpen}
+                  onToggleNarrative={() => setIsNarrativeMenuOpen(!isNarrativeMenuOpen)}
                 />
               </div>
             )}
@@ -1510,41 +1513,7 @@ const Editor: React.FC = () => {
                   />
                 </Suspense>
               )}
-              {currentView === 'scenes' && selectedScene ? (
-                <SceneEditor
-                  scene={selectedScene}
-                  allScenes={scenesList}
-                  globalObjects={gameData.globalObjects}
-                  onUpdateScene={handleUpdateScene}
-                  onCopyScene={handleCopyScene}
-                  onCreateGlobalObject={handleCreateGlobalObject}
-                  onLinkObjectToScene={handleLinkObjectToScene}
-                  onUnlinkObjectFromScene={handleUnlinkObjectFromScene}
-                  onUpdateGlobalObject={handleUpdateGlobalObject}
-                  enableChances={
-                    (gameData.enableChances ?? detectedActiveSystems.chances) ||
-                    gameData.gameSystemEnabled === 'chances'
-                  }
-                  gameSystemEnabled={gameData.gameSystemEnabled}
-                  onPreviewScene={(scene) => {
-                    setPreviewSceneId(scene.id);
-                    setIsPreviewing(true);
-                  }}
-                  onSelectScene={handleSelectScene}
-                  isDirty={hasUnsavedTabChanges}
-                  onSetDirty={setHasUnsavedTabChanges}
-                  layoutOrientation={gameData.gameLayoutOrientation || 'vertical'}
-                  consequenceTrackers={consequenceTrackers}
-                  isStartScene={selectedScene.id === gameData.startScene}
-                  gameInteractionType={gameData.gameInteractionType || 'parser'}
-                  vignettes={gameData.vignettes || []}
-                  onViewMap={() => attemptNavigation({ type: 'view', view: 'map' })}
-                  globalSplashButtonText={gameData.gameSplashButtonText || ''}
-                  onUpdateGlobalSplashButtonText={(text) =>
-                    handleUpdateGameData('gameSplashButtonText', text)
-                  }
-                />
-              ) : currentView === 'welcome' || (currentView === 'scenes' && !selectedScene) ? (
+              {currentView === 'welcome' ? (
                   <WelcomePlaceholder
                     onCreateScene={handleCreateNewProject}
                     onDownloadExample={handleDownloadExample}
@@ -1557,27 +1526,6 @@ const Editor: React.FC = () => {
                   <GuideView />
                 </Suspense>
               ) : null}
-
-              {currentView === 'map' && (
-                <Suspense fallback={<LoadingOverlay message="Carregando Mapa..." />}>
-                  <SceneMap
-                    allScenesMap={gameData.scenes}
-                    globalObjects={gameData.globalObjects}
-                    startSceneId={gameData.startScene}
-                    vignettes={gameData.vignettes || []}
-                    onSelectScene={handleSelectScene}
-                    onUpdateScenePosition={handleUpdateScenePosition}
-                    onUpdateVignettePosition={handleUpdateVignettePosition}
-                    onReorganizeScenes={handleReorganizeScenes}
-                    gameInteractionType={gameData.gameInteractionType || 'parser'}
-                    onAddNode={handleAddNodeType}
-                    hasOpeningVignette={hasOpeningVignette}
-                    isSidebarOpen={isNarrativeMenuOpen}
-                    theme={appTheme}
-                    gameTitle={gameData.gameTitle}
-                  />
-                </Suspense>
-              )}
 
               {currentView === 'global_objects' && (
                 <Suspense fallback={<LoadingOverlay message="Carregando Objetos..." />}>
@@ -1596,20 +1544,14 @@ const Editor: React.FC = () => {
 
               {currentView === 'three_panels' && (
                 <div className="flex h-full w-full overflow-hidden relative">
-                  {/* Middle Panel: Narrative Map */}
-                  <div className={`flex-1 h-full transition-all duration-300 ${
-                    selectedScene 
-                      ? isSidePanelExpanded 
-                        ? 'pr-[55.55%]' 
-                        : 'pr-[33.33%]' 
-                      : ''
-                  }`}>
+                  {/* Left Panel: Narrative Map (Visible workspace) */}
+                  <div className="flex-1 h-full min-w-0 overflow-hidden relative transition-all duration-300">
                     <Suspense fallback={<LoadingOverlay message="Carregando Mapa..." />}>
                       <SceneMap
                         key="three-panels-map"
-                        allScenesMap={gameData.scenes}
-                        globalObjects={gameData.globalObjects}
-                        startSceneId={gameData.startScene}
+                        allScenesMap={gameData.scenes || {}}
+                        globalObjects={gameData.globalObjects || {}}
+                        startSceneId={gameData.startScene || ''}
                         vignettes={gameData.vignettes || []}
                         onSelectScene={handleSelectScene}
                         onUpdateScenePosition={handleUpdateScenePosition}
@@ -1621,16 +1563,19 @@ const Editor: React.FC = () => {
                         isSidebarOpen={isNarrativeMenuOpen}
                         theme={appTheme}
                         gameTitle={gameData.gameTitle}
+                        isNarrativeMenuOpen={isNarrativeMenuOpen}
+                        onToggleNarrative={() => setIsNarrativeMenuOpen(!isNarrativeMenuOpen)}
+                        selectedSceneId={selectedSceneId}
                       />
                     </Suspense>
                   </div>
 
                   {/* Right Panel: Side Editor */}
                   <div 
-                    className={`absolute right-0 top-0 bottom-0 bg-background border-l border-muted-foreground/30 shadow-[-10px_0_30px_rgba(0,0,0,0.3)] z-50 transition-all duration-300 transform ${
-                      isSidePanelExpanded ? 'w-[55.55%]' : 'w-1/3'
-                    } ${
-                      selectedScene ? 'translate-x-0' : 'translate-x-full'
+                    className={`h-full bg-background border-l border-muted-foreground/30 shadow-[-10px_0_30px_rgba(0,0,0,0.3)] z-50 transition-all duration-300 overflow-hidden ${
+                      selectedScene 
+                        ? isSidePanelExpanded ? 'w-[55.55%]' : 'w-1/3'
+                        : 'w-0 border-l-0'
                     }`}
                   >
                     {selectedScene && (
@@ -1663,7 +1608,7 @@ const Editor: React.FC = () => {
                           isStartScene={selectedScene.id === gameData.startScene}
                           gameInteractionType={gameData.gameInteractionType || 'parser'}
                           vignettes={gameData.vignettes || []}
-                          onViewMap={() => attemptNavigation({ type: 'view', view: 'map' })}
+                          onViewMap={() => {}} // Redundant in three_panels
                           globalSplashButtonText={gameData.gameSplashButtonText || ''}
                           onUpdateGlobalSplashButtonText={(text) =>
                             handleUpdateGameData('gameSplashButtonText', text)

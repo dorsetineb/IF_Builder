@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, Vignette } from '../types';
-import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split, BarChart3 } from 'lucide-react';
+import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split, BarChart3, List, Columns3 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import EditorStatsModal from './EditorStatsModal';
 
@@ -16,9 +16,10 @@ interface SceneMapProps {
   gameInteractionType?: 'parser' | 'choice';
   onAddNode?: (type: 'scene' | 'vignette') => void;
   hasOpeningVignette?: boolean;
-  isSidebarOpen?: boolean;
-  theme?: string;
   gameTitle?: string;
+  isNarrativeMenuOpen?: boolean;
+  onToggleNarrative?: () => void;
+  selectedSceneId?: string | null;
 }
 
 const NODE_WIDTH = 250;
@@ -70,6 +71,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
   isSidebarOpen = false,
   gameInteractionType = 'parser',
   gameTitle,
+  isNarrativeMenuOpen,
+  onToggleNarrative,
+  selectedSceneId,
 }) => {
   const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -425,7 +429,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
           height: h,
         });
 
-        if (savedY === undefined) currentY += h + Y_GAP;
+        // Always increment currentY used for auto-stacking, 
+        // even if node has a saved position, to maintain layout stability.
+        currentY += h + Y_GAP;
 
         minX = Math.min(minX, x);
         maxX = Math.max(maxX, x + NODE_WIDTH);
@@ -616,20 +622,31 @@ const SceneMap: React.FC<SceneMapProps> = ({
     [isPanning, panStart, dragInfo, view.x, view.y, view.scale]
   );
 
-  const handleMouseUp = useCallback(() => {
-    if (dragInfo) {
-      const finalNode = nodes.find((n) => n.id === dragInfo.id);
-      if (finalNode) {
-        if (finalNode.type === 'scene') {
-          onUpdateScenePosition(finalNode.id, finalNode.x, finalNode.y);
-        } else {
-          onUpdateVignettePosition(finalNode.id, finalNode.x, finalNode.y);
+  const handleMouseUp = useCallback(
+    (e: React.MouseEvent) => {
+      if (dragInfo) {
+        // Calculate total distance moved to differentiate between click and drag
+        const dx = e.clientX - dragStartPos.current.x;
+        const dy = e.clientY - dragStartPos.current.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        // Only save position if moved more than 5 pixels (standard drag threshold)
+        if (distance > 5) {
+          const finalNode = nodes.find((n) => n.id === dragInfo.id);
+          if (finalNode) {
+            if (finalNode.type === 'scene') {
+              onUpdateScenePosition(finalNode.id, finalNode.x, finalNode.y);
+            } else {
+              onUpdateVignettePosition(finalNode.id, finalNode.x, finalNode.y);
+            }
+          }
         }
+        setDragInfo(null);
       }
-      setDragInfo(null);
-    }
-    setIsPanning(false);
-  }, [dragInfo, nodes, onUpdateScenePosition, onUpdateVignettePosition]);
+      setIsPanning(false);
+    },
+    [dragInfo, nodes, onUpdateScenePosition, onUpdateVignettePosition]
+  );
 
   const handleToggleOrphans = useCallback(() => {
     setHighlightOrphans((prev) => !prev);
@@ -643,8 +660,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
         onWheel={handleWheel}
         onMouseDown={handleCanvasMouseDown}
         onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
+        onMouseUp={(e) => handleMouseUp(e)}
+        onMouseLeave={(e) => handleMouseUp(e)}
       >
         <div
           className="absolute inset-0 pointer-events-none opacity-10"
@@ -657,32 +674,47 @@ const SceneMap: React.FC<SceneMapProps> = ({
 
         {/* CONTROLS OVERLAY - Top Left Creation Buttons */}
         {!isSidebarOpen && (
-          <div className="absolute top-4 left-3 z-20 flex gap-2 pointer-events-auto" style={{ width: '264px' }}>
+          <div className="absolute top-4 left-4 z-20 flex flex-col gap-2 w-[256px]">
+            <div className="flex gap-2 pointer-events-auto">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddNode?.('vignette');
+                }}
+                className="flex-1 flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-zinc-200 border border-transparent whitespace-nowrap flex-shrink-0"
+              >
+                <ArrowRight className="w-3.5 h-3.5 mr-1.5" />
+                {t('sceneList.nodeSelection.vignette.title', 'Criar Vinheta')}
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (hasOpeningVignette) onAddNode?.('scene');
+                }}
+                disabled={!hasOpeningVignette}
+                className={`flex-1 flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent whitespace-nowrap flex-shrink-0 ${
+                  !hasOpeningVignette 
+                    ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed grayscale' 
+                    : 'bg-white text-zinc-950 hover:bg-zinc-200'
+                }`}
+                title={!hasOpeningVignette ? t('sceneList.nodeSelection.scene.lockedDesc', 'Crie uma vinheta de abertura para habilitar cenas.') : ''}
+              >
+                <Split className="w-3.5 h-3.5 mr-1.5" />
+                {t('sceneList.nodeSelection.scene.title', 'Criar Cena')}
+              </button>
+            </div>
+            
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                onAddNode?.('vignette');
+                onToggleNarrative?.();
               }}
-              className="flex-1 flex items-center justify-center px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-[11px] bg-white text-zinc-950 hover:bg-zinc-200 border border-transparent whitespace-nowrap flex-shrink-0"
+              className="flex items-center justify-start gap-2 px-1 text-zinc-400 hover:text-white transition-colors group"
             >
-              <ArrowRight className="w-3.5 h-3.5 mr-1.5" />
-              {t('sceneList.nodeSelection.vignette.title', 'Criar Vinheta')}
-            </button>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                if (hasOpeningVignette) onAddNode?.('scene');
-              }}
-              disabled={!hasOpeningVignette}
-              className={`flex-1 flex items-center justify-center px-2 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-[11px] border border-transparent whitespace-nowrap flex-shrink-0 ${
-                !hasOpeningVignette 
-                  ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed grayscale' 
-                  : 'bg-white text-zinc-950 hover:bg-zinc-200'
-              }`}
-              title={!hasOpeningVignette ? t('sceneList.nodeSelection.scene.lockedDesc', 'Crie uma vinheta de abertura para habilitar cenas.') : ''}
-            >
-              <Split className="w-3.5 h-3.5 mr-1.5" />
-              {t('sceneList.nodeSelection.scene.title', 'Criar Cena')}
+              <Columns3 className="w-4 h-4 transition-transform group-hover:scale-110" />
+              <span className="text-[10px] uppercase font-bold tracking-widest border-b border-transparent group-hover:border-white/30">
+                {isNarrativeMenuOpen ? t('sceneMap.hideNarrativeList', 'Esconder lista de narrativas') : t('sceneMap.showNarrativeList', 'Ver lista de narrativas')}
+              </span>
             </button>
           </div>
         )}
@@ -904,12 +936,15 @@ const SceneMap: React.FC<SceneMapProps> = ({
                 : isVignetteConclusion
                   ? 'border-green-500 border-4'
                   : isEnding
-                    ? 'border-green-500'
-                    : `border-${colorBase}-500`;
+                    ? 'border-green-500 border-4'
+                    : `border-${colorBase}-500 border-4`;
 
+            const isSelected = selectedSceneId === node.id;
+            
             return (
               <div
                 key={node.id}
+                data-node-id={node.id}
                 onMouseDown={(e) => {
                   e.stopPropagation();
                   const nodeRef = nodes.find((n) => n.id === node.id);
@@ -930,7 +965,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   )
                     onSelectScene(node.id);
                 }}
-                className={`absolute bg-zinc-900 rounded-xl shadow-[0_10px_30px_rgba(0,0,0,0.3)] flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} border-2 ${borderColorClass} cursor-pointer hover:border-${colorBase}-400 hover:shadow-${colorBase}-500/10 overflow-hidden group`}
+                className={`absolute bg-zinc-900 rounded-xl flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} border-2 ${borderColorClass} cursor-pointer hover:border-${colorBase}-400 overflow-hidden group ${isSelected ? 'shadow-[0_0_50px_rgba(255,255,255,0.7)] z-50' : 'shadow-[0_10px_30px_rgba(0,0,0,0.3)]'}`}
                 style={{
                   width: NODE_WIDTH,
                   transform: `translate(${node.x}px, ${node.y}px)`,
@@ -1033,41 +1068,62 @@ const SceneMap: React.FC<SceneMapProps> = ({
           })}
         </div>
       </div>
-      <div className="absolute bottom-6 left-6 z-10 flex items-center gap-3">
-        <button
-          onClick={onReorganizeScenes}
-          className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
-        >
-          <LayoutGrid className="w-4 h-4 mr-2" />
-          {t('sceneMap.reorganize', 'Reorganizar')}
-        </button>
-        <button
-          onClick={handleViewAll}
-          className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
-        >
-          <Maximize2 className="w-4 h-4 mr-2" />
-          {t('sceneMap.viewAll', 'Ver Tudo')}
-        </button>
-        <button
-          onClick={handleToggleOrphans}
-          className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
-            highlightOrphans
-              ? 'bg-red-600 text-white border-red-500 hover:bg-red-700'
-              : 'bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700'
-          }`}
-        >
-          <AlertTriangle className="w-4 h-4 mr-2" />
-          {t('sceneMap.orphans', 'Órfãs')} {orphanIds.size > 0 && `(${orphanIds.size})`}
-        </button>
-        <button
-          onClick={() => setIsStatsModalOpen(true)}
-          className={`flex items-center px-4 py-2 font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
-        >
-          <BarChart3 className="w-4 h-4 mr-2" />
-          {t('sceneMap.statistics', 'Estatísticas')}
-        </button>
+      <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2 transition-all duration-300">
+        {/* Zoom Controls Row */}
+        <div className={`flex w-[140px] h-[40px] rounded-lg overflow-hidden shadow-xl pointer-events-auto border bg-zinc-950 border-muted-foreground/50`}>
+          <button
+            onClick={() => handleZoom('in')}
+            className={`flex-1 flex items-center justify-center transition-all border-r text-zinc-400 hover:text-white hover:bg-zinc-900 border-muted-foreground/50`}
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => handleZoom('out')}
+            className={`flex-1 flex items-center justify-center transition-all text-zinc-400 hover:text-white hover:bg-zinc-900`}
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Map Actions Row */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onReorganizeScenes}
+            className={`flex items-center px-4 h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
+          >
+            <LayoutGrid className="w-4 h-4 mr-2" />
+            {t('sceneMap.reorganize', 'Reorganizar')}
+          </button>
+          <button
+            onClick={handleViewAll}
+            className={`flex items-center px-4 h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
+          >
+            <Maximize2 className="w-4 h-4 mr-2" />
+            {t('sceneMap.viewAll', 'Ver Tudo')}
+          </button>
+          <button
+            onClick={handleToggleOrphans}
+            className={`flex items-center px-4 h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
+              highlightOrphans
+                ? 'bg-red-600 text-white border-red-500 hover:bg-red-700'
+                : 'bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700'
+            }`}
+          >
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            {t('sceneMap.orphans', 'Órfãs')} {orphanIds.size > 0 && `(${orphanIds.size})`}
+          </button>
+          <button
+            onClick={() => setIsStatsModalOpen(true)}
+            className={`w-[140px] flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
+          >
+            <BarChart3 className="w-4 h-4 mr-2" />
+            {t('sceneMap.statistics', 'Estatísticas')}
+          </button>
+        </div>
       </div>
-      <div className="absolute bottom-6 right-6 z-10 flex flex-col items-end gap-4 pointer-events-none">
+
+      {/* Top Right: Legend */}
+      <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-4 pointer-events-none transition-all duration-300">
         <div className={`backdrop-blur-md p-4 rounded-xl shadow-xl pointer-events-auto border bg-zinc-950/80 border-muted-foreground/50`}>
           <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 text-zinc-500`}>
             {t('sceneMap.legend', 'Legenda')}
@@ -1092,20 +1148,6 @@ const SceneMap: React.FC<SceneMapProps> = ({
               </span>
             </li>
           </ul>
-        </div>
-        <div className={`flex rounded-lg overflow-hidden shadow-xl pointer-events-auto border bg-zinc-950 border-muted-foreground/50`}>
-          <button
-            onClick={() => handleZoom('in')}
-            className={`w-10 h-10 flex items-center justify-center transition-all border-r text-zinc-400 hover:text-white hover:bg-zinc-900 border-muted-foreground/50`}
-          >
-            <Plus className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleZoom('out')}
-            className={`w-10 h-10 flex items-center justify-center transition-all text-zinc-400 hover:text-white hover:bg-zinc-900`}
-          >
-            <Minus className="w-4 h-4" />
-          </button>
         </div>
       </div>
 
