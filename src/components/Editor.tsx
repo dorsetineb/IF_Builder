@@ -929,7 +929,7 @@ const Editor: React.FC = () => {
   };
 
   type PendingNavigation = 
-    | { type: 'scene'; id: string } 
+    | { type: 'scene'; id: string | null } 
     | { type: 'view'; view: View } 
     | { type: 'navigate'; path: string } 
     | { type: 'exit' }
@@ -1112,7 +1112,7 @@ const Editor: React.FC = () => {
 
   // Scene handlers and Reorder handlers moved to useSceneManagement
 
-  const handleSelectScene = (id: string) => {
+  const handleSelectScene = (id: string | null) => {
     attemptNavigation({ type: 'scene', id });
   };
 

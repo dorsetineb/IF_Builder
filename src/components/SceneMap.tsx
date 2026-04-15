@@ -9,7 +9,7 @@ interface SceneMapProps {
   globalObjects: GameData['globalObjects'];
   startSceneId: string;
   vignettes: Vignette[];
-  onSelectScene: (sceneId: string) => void;
+  onSelectScene: (sceneId: string | null) => void;
   onUpdateScenePosition: (sceneId: string, x: number, y: number) => void;
   onUpdateVignettePosition: (vignetteId: string, x: number, y: number) => void;
   onReorganizeScenes: () => void;
@@ -674,9 +674,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
         />
 
         {/* CONTROLS OVERLAY - Top Left Creation Buttons */}
-        {!isSidebarOpen && (
-          <div className="absolute top-4 left-4 z-20 flex flex-col gap-2 w-[256px]">
-            <div className="flex gap-2 pointer-events-auto">
+        <div className="absolute top-4 left-4 z-20 flex flex-col gap-2 w-[256px]">
+          <div className="flex gap-2 pointer-events-auto">
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -705,7 +704,6 @@ const SceneMap: React.FC<SceneMapProps> = ({
               </button>
             </div>
           </div>
-        )}
 
         <div
           className="transition-transform duration-100"
@@ -951,7 +949,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                         Math.pow(e.clientY - dragStartPos.current.y, 2)
                     ) < 5
                   )
-                    onSelectScene(node.id);
+                    onSelectScene(selectedSceneId === node.id ? null : node.id);
                 }}
                 className={`absolute bg-zinc-900 rounded-xl flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} border-2 ${borderColorClass} cursor-pointer hover:border-${colorBase}-400 overflow-hidden group ${isSelected ? 'shadow-[0_0_50px_rgba(255,255,255,0.7)] z-50' : 'shadow-[0_10px_30px_rgba(0,0,0,0.3)]'}`}
                 style={{

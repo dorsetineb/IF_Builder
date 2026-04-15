@@ -122,11 +122,11 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
     };
 
     return (
-        <div className="flex h-[calc(100vh-260px)] min-h-[450px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card shadow-sm" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
+        <div className="flex flex-1 h-full overflow-hidden" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* LEFT SIDEBAR */}
             <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/30">
                 {/* Sidebar Header */}
-                <div className="px-2 pt-4 pb-3 space-y-4">
+                <div className="px-3 pt-4 pb-4 space-y-4 border-b border-muted-foreground/50">
                     <div className="flex bg-muted rounded-lg p-1 border border-muted-foreground/50">
                         <button
                             onClick={() => setIsLinkMode(false)}
@@ -149,13 +149,24 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                             placeholder={t('objectEditor.searchPlaceholder', 'Buscar objetos...')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-primary/50 focus:border-primary focus:bg-background"
+                            className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-muted-foreground/30 focus:border-primary focus:bg-background"
                         />
                     </div>
+
+                    {/* Create Object Button (Fixed at top) */}
+                    {!isLinkMode && (
+                        <button
+                            onClick={handleCreateNewObject}
+                            className="w-full flex items-center justify-start px-3 h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
+                        >
+                            <Plus className="w-4 h-4 mr-2" />
+                            {t('objectEditor.createNewBtn', 'Criar Objeto')}
+                        </button>
+                    )}
                 </div>
 
                 {/* Object List */}
-                <div className="flex-1 overflow-y-auto pl-2 pb-4 pr-0 flex flex-col items-stretch">
+                <div className="flex-1 overflow-y-auto min-h-0 pb-8 pr-0 flex flex-col items-stretch">
                     {!isLinkMode ? (
                         /* CURRENT SCENE OBJECTS */
                         <>
@@ -166,17 +177,15 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                         <button
                                             key={obj.id}
                                             onClick={() => setSelectedObjectId(obj.id)}
-                                            className={`relative overflow-hidden flex items-center gap-3 h-[42px] px-2 rounded-lg border-transparent transition-all text-left group flex-shrink-0 ${selectedObjectId === obj.id ? 'bg-primary text-primary-foreground font-bold shadow-md rounded-r-none mr-0' : 'text-foreground hover:bg-primary/10 hover:shadow-sm mr-2'}`}
+                                            className={`relative overflow-hidden flex items-center gap-3 h-[42px] px-3 border-transparent transition-all text-left group flex-shrink-0 ${selectedObjectId === obj.id ? 'bg-primary text-primary-foreground font-bold shadow-md' : 'text-foreground hover:bg-primary/10 hover:shadow-sm'}`}
                                         >
-                                            {!isSidePanel && (
-                                                <div className={`w-7 h-7 rounded border flex items-center justify-center overflow-hidden shrink-0 ${selectedObjectId === obj.id ? 'bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground' : 'bg-muted border-muted-foreground/50 text-muted-foreground'}`}>
-                                                    {obj.image ? (
-                                                        <img src={obj.image} alt="" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <IconComponent className="w-4 h-4" />
-                                                    )}
-                                                </div>
-                                            )}
+                                            <div className={`w-7 h-7 rounded border flex items-center justify-center overflow-hidden shrink-0 ${selectedObjectId === obj.id ? 'bg-primary-foreground/20 border-primary-foreground/30 text-primary-foreground' : 'bg-muted border-muted-foreground/50 text-muted-foreground'}`}>
+                                                {obj.image ? (
+                                                    <img src={obj.image} alt="" className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <IconComponent className="w-4 h-4" />
+                                                )}
+                                            </div>
                                             <div className="min-w-0 flex-1">
                                                 <div className={`text-xs font-bold truncate ${selectedObjectId === obj.id ? 'text-primary-foreground' : 'text-foreground'}`}>{obj.name}</div>
                                                 <div className={`text-[10px] font-mono truncate ${selectedObjectId === obj.id ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>#{obj.id}</div>
@@ -186,9 +195,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                                     e.stopPropagation();
                                                     setUnlinkModal({ isOpen: true, objectId: obj.id });
                                                 }}
-                                                className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-[calc(100%+2px)] group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
-                                                    selectedObjectId === obj.id ? 'bg-red-500 rounded-none' : 'bg-red-500 rounded-r-lg'
-                                                }`}
+                                                className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-[calc(100%+2px)] group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer bg-red-500`}
                                                 title={t('objectEditor.unlinkBtn', 'Desvincular')}
                                             >
                                                 <Unlink className="w-5 h-5 pointer-events-none" />
@@ -197,15 +204,6 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                     );
                                 })
                             )}
-                            <div className="pr-2 mt-2">
-                                <button
-                                    onClick={handleCreateNewObject}
-                                    className="w-full flex items-center justify-start px-3 h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
-                                >
-                                    <Plus className="w-4 h-4 mr-2" />
-                                    {t('objectEditor.createNewBtn', 'Criar Objeto')}
-                                </button>
-                            </div>
                         </>
                     ) : (
                         /* AVAILABLE TO LINK OBJECTS */
@@ -216,18 +214,16 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                     return (
                                         <div
                                             key={obj.id}
-                                            className="flex items-center justify-between gap-2 h-[42px] px-2 mr-2 rounded-lg border border-dashed border-muted-foreground/50 hover:bg-accent transition-all text-left group flex-shrink-0"
+                                            className="flex items-center justify-between gap-2 h-[42px] px-3 border-b border-dashed border-muted-foreground/30 hover:bg-accent transition-all text-left group flex-shrink-0"
                                         >
                                             <div className="flex items-center gap-3 min-w-0 cursor-pointer" onClick={() => setSelectedObjectId(obj.id)}>
-                                                {!isSidePanel && (
-                                                    <div className="w-7 h-7 rounded bg-muted border border-muted-foreground/50 flex items-center justify-center overflow-hidden shrink-0 opacity-50">
-                                                        {obj.image ? (
-                                                            <img src={obj.image} alt="" className="w-full h-full object-cover" />
-                                                        ) : (
-                                                            <IconComponent className="w-4 h-4 text-muted-foreground" />
-                                                        )}
-                                                    </div>
-                                                )}
+                                                <div className="w-7 h-7 rounded bg-muted border border-muted-foreground/50 flex items-center justify-center overflow-hidden shrink-0 opacity-50">
+                                                    {obj.image ? (
+                                                        <img src={obj.image} alt="" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <IconComponent className="w-4 h-4 text-muted-foreground" />
+                                                    )}
+                                                </div>
                                                 <div className="min-w-0">
                                                     <div className="text-xs font-medium text-muted-foreground truncate">{obj.name}</div>
                                                 </div>
@@ -249,12 +245,12 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
             </div>
 
             {/* RIGHT MAIN PANEL */}
-            <div className="flex-1 flex flex-col bg-background/50 min-w-0">
+            <div className="flex-1 flex flex-col min-w-0">
                 {selectedObject ? (
                     <div className="flex flex-col h-full">
                         {/* Link Action at Top (Optional) */}
                         {!isSelectedObjectLinked && (
-                            <div className="px-6 pt-6 pb-0 flex justify-end shrink-0">
+                            <div className="px-6 pt-0 pb-0 flex justify-end shrink-0">
                                 <button
                                     onClick={() => handleLinkExistingObject(selectedObject.id)}
                                     className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-[10px] font-bold uppercase transition-all shadow-sm"
@@ -266,8 +262,8 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                         )}
 
                         {/* Edit Form */}
-                        <div className="flex-1 overflow-y-auto p-6">
-                            <div className="max-w-xl mx-auto flex flex-col gap-6">
+                        <div className="flex-1 overflow-y-auto pt-0 pb-6 px-6">
+                            <div className="max-w-xl mx-auto flex flex-col gap-6 pt-4">
                                 
                                 {/* Basic Info Row */}
                                 <div className="grid grid-cols-3 gap-x-6 gap-y-4">
@@ -410,7 +406,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                         </label>
                                       )}
                                     </div>
-                                    <p className="text-[10px] text-muted-foreground text-center mt-4 pt-2 italic">
+                                    <p className="text-[10px] text-muted-foreground text-center mt-2 italic">
                                         {t('objectEditor.objectsHint', 'Esta imagem será exibida quando o usuário clicar no objeto a partir do Inventário.')}
                                     </p>
                                 </div>

@@ -519,17 +519,17 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
           <div className="absolute left-0 right-0 -bottom-4 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none" />
         </div>
 
-        <div className={`mt-4 relative ${isSidePanel ? 'flex-1 overflow-y-auto px-4 pb-24' : ''}`}>
+        <div className={`mt-4 relative flex-1 flex flex-col h-full min-h-0 ${isSidePanel && !['objects', 'interactions', 'choices'].includes(activeTab) ? 'overflow-y-auto px-4 pb-24' : ''}`}>
           {isSidePanel && (
             <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-background to-transparent z-40 pointer-events-none" />
           )}
-          <div className="bg-background">
+          <div className="bg-background flex flex-col flex-1 h-full min-h-0">
             {activeTab === 'properties' && (
               <div key={localScene.id} className={`grid grid-cols-1 ${isSidePanel ? 'gap-6' : 'md:grid-cols-2 gap-8'}`}>
                 {/* Left Column: Details & Rules */}
                 <div className="space-y-6 flex flex-col">
                   {/* Scene Details Card */}
-                  <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
+                  <div className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
                     <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                       <FileText className="w-4 h-4" />
                       {isVignetteMode
@@ -781,7 +781,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                   {/* Multimedia Card (Only when side panel - moved here to be below details) */}
                   {isSidePanel && (
-                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
+                    <div className="pt-8 border-t border-muted/30 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                       <div className="flex justify-between items-center mb-4">
                         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                           <ImageIcon className="w-4 h-4" />
@@ -911,7 +911,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                   {/* Narrative Rules Card */}
                   {(enableChances || gameSystemEnabled === 'chances') && localScene.vignetteType !== 'conclusion' && (
-                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
+                    <div className="pt-8 border-t border-muted/30 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
                       <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                         <Scroll className="w-4 h-4" />
                         {t('sceneEditor.chancesTitle')}
@@ -976,7 +976,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                   {/* Credits Card - Only for Conclusion Vignettes */}
                   {localScene.vignetteType === 'conclusion' && (
-                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
+                    <div className="pt-8 border-t border-muted/30 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
                       <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                         <List className="w-4 h-4" />
                         {t('sceneEditor.creditsTitle', 'Créditos')}
@@ -1014,12 +1014,13 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                       </div>
                     </div>
                   )}
+                </div>
 
-                             {/* Right Column: Multimedia & Connections */}
+                {/* Right Column: Multimedia & Connections */}
                 <div className="space-y-6">
                   {/* Multimedia Card (Only when NOT side panel) */}
                   {!isSidePanel && (
-                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
+                    <div className="pt-8 border-t border-muted/30 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                       <div className="flex justify-between items-center mb-4">
                         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                           <ImageIcon className="w-4 h-4" />
@@ -1227,7 +1228,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                   {/* Branching Preview Card (Only when NOT side panel) */}
                   {!isSidePanel && (
-                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
+                    <div className="pt-8 border-t border-muted/30 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
                       <div className="flex justify-between items-center mb-4">
                         <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
                           <GitBranch className="w-4 h-4" />
@@ -1249,12 +1250,12 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                       </p>
                     </div>
                   )}
-                </div>       </div>
+                </div>
               </div>
             )}
 
             {activeTab === 'objects' && (
-              <div key={localScene.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div key={localScene.id} className="flex flex-col flex-1 h-full min-h-0 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <ObjectEditor
                   sceneId={localScene.id}
                   objects={currentSceneObjects}
@@ -1269,7 +1270,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             )}
 
             {activeTab === 'interactions' && (
-              <div key={localScene.id} className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div key={localScene.id} className="flex flex-col flex-1 h-full min-h-0 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <InteractionEditor
                   interactions={localScene.interactions}
                   onUpdateInteractions={(interactions) =>
@@ -1287,174 +1288,93 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             )}
 
             {activeTab === 'choices' && (
-              <div key={localScene.id} className="flex h-[calc(100vh-260px)] min-h-[450px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card animate-in fade-in slide-in-from-bottom-4 duration-500">
-                {/* LEFT LIST PANEL */}
-                <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/10">
-                  {/* Search and Header */}
-                  <div className="p-4 border-b border-muted-foreground/50 space-y-4">
-                    <div className="relative">
-                      <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                      <input
-                        type="text"
-                        value={choicesSearchQuery || ''}
-                        onChange={(e) => setChoicesSearchQuery?.(e.target.value)}
-                        placeholder={t('sceneEditor.searchChoicesPlaceholder', 'Buscar decisão...')}
-                        className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-primary/50 focus:border-primary focus:bg-background"
-                      />
-                    </div>
-                  </div>
+              <div key={localScene.id} className="flex-1 overflow-y-auto pt-16 px-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="max-w-4xl mx-auto space-y-6">
+                  <button
+                    onClick={() => {
+                      const newId = `choice_${Date.now()}`;
+                      const newChoice: Choice = {
+                        id: newId,
+                        label: t('sceneEditor.newChoice'),
+                        targetSceneId: '',
+                      };
+                      updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
+                    }}
+                    className="w-full flex items-center justify-start px-3 h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold transition-all active:scale-[0.98] shadow-sm flex-shrink-0 mb-6"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    {t('sceneEditor.createChoiceBtn', 'Criar Decisão')}
+                  </button>
 
-                  {/* List */}
-                  <div className="flex-1 overflow-y-auto pl-2 py-4 pr-0 space-y-0 flex flex-col items-stretch">
-                    {(localScene.choices || [])
-                      .filter((c) => !choicesSearchQuery || c.label.toLowerCase().includes(choicesSearchQuery.toLowerCase()))
-                      .map((choice) => (
+                  <div className="grid grid-cols-1 gap-4">
+                    {(localScene.choices || []).map((choice, index) => (
+                      <div key={choice.id} className="relative bg-card border border-muted-foreground/30 rounded-xl p-4 hover:border-primary/50 transition-all shadow-sm group">
                         <button
-                          key={choice.id}
-                          onClick={() => setSelectedChoiceId(choice.id)}
-                          className={`relative overflow-hidden flex items-center gap-3 h-[42px] px-2 rounded-lg border-transparent transition-all text-left group flex-shrink-0 ${selectedChoiceId === choice.id ? 'bg-primary text-primary-foreground font-bold shadow-md rounded-r-none mr-0' : 'text-foreground hover:bg-primary/10 hover:shadow-sm mr-2'} `}
+                          onClick={() => {
+                            if (window.confirm(t('sceneEditor.removeChoiceConfirm'))) {
+                              const newChoices = localScene.choices!.filter(c => c.id !== choice.id);
+                              updateLocalScene('choices', newChoices);
+                            }
+                          }}
+                          className="absolute top-0 right-0 w-10 h-10 flex items-center justify-center bg-red-500 text-white rounded-tr-xl rounded-bl-xl hover:bg-red-600 transition-all z-10"
+                          title={t('sceneEditor.removeBtn')}
                         >
-                          <div className={`flex items-center justify-center shrink-0 ${selectedChoiceId === choice.id ? 'text-primary-foreground/70' : 'text-muted-foreground'} `}>
-                            <ArrowRight className="w-4 h-4" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div
-                              className={`text-xs font-bold truncate ${selectedChoiceId === choice.id ? 'text-primary-foreground' : 'text-foreground'} `}
-                            >
-                              {choice.label || t('sceneEditor.newChoice')}
-                            </div>
-                            <div className={`text-[10px] truncate flex items-center gap-1 ${selectedChoiceId === choice.id ? 'text-primary-foreground/70' : 'text-muted-foreground'} `}>
-                              {choice.targetSceneId
-                                ? `${t('sceneEditor.targetPrefix', 'Destino: ')}${allScenes.find((s) => s.id === choice.targetSceneId)?.name || choice.targetSceneId} `
-                                : t('sceneEditor.noDestination')}
-                            </div>
-                          </div>
-                          <div
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              if (window.confirm(t('sceneEditor.removeChoiceConfirm'))) {
-                                const newChoices = localScene.choices!.filter(
-                                  (c) => c.id !== choice.id
-                                );
-                                updateLocalScene('choices', newChoices);
-                                setSelectedChoiceId(null);
-                              }
-                            }}
-                            className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-[calc(100%+2px)] group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${selectedChoiceId === choice.id ? 'bg-red-500 rounded-none' : 'bg-red-500 rounded-r-lg'
-                              }`}
-                            title={t('sceneEditor.removeBtn')}
-                          >
-                            <Trash2 className="w-5 h-5 pointer-events-none" />
-                          </div>
+                          <Trash2 className="w-5 h-5" />
                         </button>
-                      ))
-                    }
-                    <div className="pr-2 mt-2">
-                      <button
-                        onClick={() => {
-                          const newId = `choice_${Date.now()} `;
-                          const newChoice: Choice = {
-                            id: newId,
-                            label: t('sceneEditor.newChoice'),
-                            targetSceneId: '',
-                          };
-                          updateLocalScene('choices', [...(localScene.choices || []), newChoice]);
-                          setSelectedChoiceId(newId);
-                        }}
-                        className="w-full flex items-center justify-start px-3 h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
-                      >
-                        <Plus className="w-4 h-4 mr-2" />
-                        {t('sceneEditor.createChoiceBtn', 'Criar Decisão')}
-                      </button>
-                    </div>
-                  </div>
-                </div>
 
-                {/* RIGHT DETAIL PANEL */}
-                <div className="flex-1 flex flex-col bg-background/50 min-w-0">
-                  {selectedChoiceId &&
-                    localScene.choices?.find((c) => c.id === selectedChoiceId) ? (
-                    (() => {
-                      const choiceIndex = localScene.choices!.findIndex(
-                        (c) => c.id === selectedChoiceId
-                      );
-                      const choice = localScene.choices![choiceIndex];
-                      return (
-                        <div className="flex flex-col h-full">
-                          <div className="px-6 py-4 border-b border-muted-foreground/50 flex justify-between items-center bg-muted/50">
-                            <div className="flex items-center gap-2">
-                              <ArrowRight className="w-4 h-4 text-purple-500" />
-                              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
-                                {t('sceneEditor.choiceDetails')}
-                              </span>
-                            </div>
+                        <div className="space-y-4 pr-12">
+                          <div className="space-y-1.5">
+                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                              {t('sceneEditor.buttonTextChoiceLabel', 'Texto do Botão')}
+                            </label>
+                            <input
+                              type="text"
+                              value={choice.label}
+                              onChange={(e) => {
+                                const newChoices = [...localScene.choices!];
+                                newChoices[index] = { ...choice, label: e.target.value };
+                                updateLocalScene('choices', newChoices);
+                              }}
+                              className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary"
+                              placeholder={t('sceneEditor.buttonTextChoicePlaceholder')}
+                            />
                           </div>
 
-                          <div className="flex-1 overflow-y-auto p-6">
-                            <div className="max-w-2xl mx-auto space-y-6">
-                              <div className="space-y-1.5">
-                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                                  {t('sceneEditor.buttonTextChoiceLabel')}
-                                </label>
-                                <input
-                                  type="text"
-                                  value={choice.label}
-                                  onChange={(e) => {
-                                    const newChoices = [...localScene.choices!];
-                                    newChoices[choiceIndex] = { ...choice, label: e.target.value };
-                                    updateLocalScene('choices', newChoices);
-                                  }}
-                                  className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary"
-                                  placeholder={t('sceneEditor.buttonTextChoicePlaceholder')}
-                                />
-                              </div>
-
-                              <div className="space-y-1.5">
-                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                                  {t('sceneEditor.targetSceneChoiceLabel')}
-                                </label>
-                                <div className="relative">
-                                  <select
-                                    value={choice.targetSceneId}
-                                    onChange={(e) => {
-                                      const newChoices = [...localScene.choices!];
-                                      newChoices[choiceIndex] = {
-                                        ...choice,
-                                        targetSceneId: e.target.value,
-                                      };
-                                      updateLocalScene('choices', newChoices);
-                                    }}
-                                    className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground pr-8 appearance-none focus:ring-1 focus:ring-primary [&>option]:bg-card"
-                                  >
-                                    <option value="">{t('sceneEditor.selectPlaceholder')}</option>
-                                    {allScenes.map((s) => (
-                                      <option key={s.id} value={s.id}>
-                                        {s.name}
-                                      </option>
-                                    ))}
-                                  </select>
-                                  <ArrowRight className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-                                </div>
-                                <p className="text-[10px] text-muted-foreground mt-1">
-                                  {t('sceneEditor.targetSceneChoiceDesc')}
-                                </p>
-                              </div>
+                          <div className="space-y-1.5">
+                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                              {t('sceneEditor.targetSceneChoiceLabel', 'Cena de Destino')}
+                            </label>
+                            <div className="relative">
+                              <select
+                                value={choice.targetSceneId}
+                                onChange={(e) => {
+                                  const newChoices = [...localScene.choices!];
+                                  newChoices[index] = { ...choice, targetSceneId: e.target.value };
+                                  updateLocalScene('choices', newChoices);
+                                }}
+                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground pr-8 appearance-none focus:ring-1 focus:ring-primary [&>option]:bg-card"
+                              >
+                                <option value="">{t('sceneEditor.selectPlaceholder')}</option>
+                                {allScenes.map((s) => (
+                                  <option key={s.id} value={s.id}>
+                                    {s.name}
+                                  </option>
+                                ))}
+                              </select>
+                              <ArrowRight className="absolute right-2 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                             </div>
                           </div>
                         </div>
-                      );
-                    })()
-                  ) : (
-                    <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
-                      <ArrowRight className="w-12 h-12 mb-4 opacity-20" />
-                      <h4 className="text-sm font-bold text-muted-foreground mb-1">
-                        {t('sceneEditor.noChoiceSelected')}
-                      </h4>
-                      <p className="text-xs max-w-xs opacity-60">
-                        {t('sceneEditor.noChoiceSelectedDesc')}
-                      </p>
-                    </div>
-                  )}
+                      </div>
+                    ))}
+
+                    {(localScene.choices || []).length === 0 && (
+                      <div className="col-span-full py-12 flex flex-col items-center justify-center bg-muted/20 border-2 border-dashed border-muted-foreground/20 rounded-2xl text-muted-foreground">
+                        <ArrowRight className="w-12 h-12 mb-4 opacity-10" />
+                        <p className="text-sm">{t('sceneEditor.noChoicesAdded', 'Nenhuma decisão adicionada a esta cena.')}</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             )}

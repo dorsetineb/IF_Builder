@@ -174,8 +174,8 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
         return (
             <div className="flex flex-col h-full" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
                 {/* Scrollable Content */}
-                <div className="flex-1 overflow-y-auto p-6">
-                    <div className="max-w-xl mx-auto flex flex-col gap-6">
+                <div className="flex-1 overflow-y-auto pt-0 pb-6 px-6">
+                    <div className="max-w-xl mx-auto flex flex-col gap-6 pt-4">
                         {/* Row 1: Icon & Verbs */}
                         <div className="flex gap-4 items-start">
                             {/* Icon Picker */}
@@ -397,11 +397,11 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
     };
 
     return (
-        <div className="flex h-[calc(100vh-260px)] min-h-[450px] border border-muted-foreground/50 rounded-xl overflow-hidden bg-card shadow-sm">
+        <div className="flex flex-1 h-full overflow-hidden">
             {/* LEFT SIDEBAR - List */}
             <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/30">
                 {/* Header/Search */}
-                <div className="px-2 pt-4 pb-3">
+                <div className="px-3 pt-4 pb-4 border-b border-muted-foreground/50 space-y-4">
                     <div className="relative">
                         <Search className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <input
@@ -409,28 +409,35 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                             placeholder={t('interactionEditor.searchPlaceholder', 'Buscar verbos...')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-primary/50 focus:border-primary focus:bg-background"
+                            className="w-full pl-8 pr-2 py-2 text-xs rounded-md focus:outline-none focus:ring-1 focus:ring-primary h-[42px] bg-background/50 text-foreground placeholder-muted-foreground border border-muted-foreground/30 focus:border-primary focus:bg-background"
                         />
                     </div>
+
+                    {/* Create Interaction Button (Fixed) */}
+                    <button
+                        onClick={handleAdd}
+                        className="w-full flex items-center justify-start px-3 h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
+                    >
+                        <Plus className="w-4 h-4 mr-2" />
+                        {t('interactionEditor.newInteractionBtn', 'Criar Interação')}
+                    </button>
                 </div>
 
                 {/* List */}
-                <div className="flex-1 overflow-y-auto pl-2 pb-4 pr-0 flex flex-col items-stretch">
+                <div className="flex-1 overflow-y-auto min-h-0 pb-8 pr-0 flex flex-col items-stretch">
                     {filteredInteractions.length > 0 && (
                         filteredInteractions.map(({ inter, index }) => (
                             <button
                                 key={inter.id}
                                 onClick={() => setSelectedIndex(index)}
-                                className={`relative overflow-hidden flex items-center gap-3 h-[42px] px-2 rounded-lg border-transparent transition-all text-left group flex-shrink-0 ${selectedIndex === index ? 'bg-primary text-primary-foreground font-bold shadow-md rounded-r-none mr-0' : 'text-foreground hover:bg-primary/10 hover:shadow-sm mr-2'}`}
+                                className={`relative overflow-hidden flex items-center gap-3 h-[42px] px-3 border-transparent transition-all text-left group flex-shrink-0 ${selectedIndex === index ? 'bg-primary text-primary-foreground font-bold shadow-md' : 'text-foreground hover:bg-primary/10 hover:shadow-sm'}`}
                             >
-                                {!isSidePanel && (
-                                    <div className={`flex items-center justify-center shrink-0 ${selectedIndex === index ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
-                                        {(() => {
-                                            const Icon = INTERACTION_ICONS.find(i => i.name === inter.icon)?.component || MousePointer2;
-                                            return <Icon className="w-4 h-4" />;
-                                        })()}
-                                    </div>
-                                )}
+                                <div className={`flex items-center justify-center shrink-0 ${selectedIndex === index ? 'text-primary-foreground/70' : 'text-muted-foreground'}`}>
+                                    {(() => {
+                                        const Icon = INTERACTION_ICONS.find(i => i.name === inter.icon)?.component || MousePointer2;
+                                        return <Icon className="w-4 h-4" />;
+                                    })()}
+                                </div>
                                 <div className="min-w-0 flex-1">
                                     <div className={`text-xs font-bold truncate ${selectedIndex === index ? 'text-primary-foreground' : 'text-foreground'}`}>
                                         {inter.verbs.join(', ')}
@@ -444,36 +451,25 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                         e.stopPropagation();
                                         handleRemove(index);
                                     }}
-                                    className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-[calc(100%+2px)] group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
-                                        selectedIndex === index ? 'bg-red-500 rounded-none' : 'bg-red-500 rounded-r-lg'
-                                    }`}
+                                    className="absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-[calc(100%+2px)] group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer bg-red-500"
                                     title={t('interactionEditor.removeInteraction', 'Remover Interação')}
                                 >
-                                    <Trash2 className="w-5 h-5 pointer-events-none" />
+                                    <Trash2 className="w-5 h-5" />
                                 </div>
                             </button>
                         ))
                     )}
-                    <div className="pr-2 mt-2">
-                        <button
-                            onClick={handleAdd}
-                            className="w-full flex items-center justify-start px-3 h-[42px] bg-white text-zinc-950 hover:bg-zinc-200 rounded-lg text-xs font-bold transition-all active:scale-[0.98] shadow-sm flex-shrink-0"
-                        >
-                            <Plus className="w-4 h-4 mr-2" />
-                            {t('interactionEditor.newInteractionBtn', 'Criar Interação')}
-                        </button>
-                    </div>
                 </div>
             </div>
 
             {/* RIGHT MAIN PANEL - Editor */}
-            <div className="flex-1 flex flex-col bg-background/50 min-w-0">
+            <div className="flex-1 flex flex-col min-w-0">
                 {selectedIndex !== null ? (
                     renderEditor()
                 ) : (
                     <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
                         <MousePointer2 className="w-12 h-12 mb-4 opacity-20" />
-                        <h4 className="text-sm font-bold text-zinc-400 mb-1">{t('interactionEditor.noInteractionSelected', 'Nenhuma interação selecionada')}</h4>
+                        <h4 className="text-sm font-bold text-muted-foreground mb-1">{t('interactionEditor.noInteractionSelected', 'Nenhuma interação selecionada')}</h4>
                         <p className="text-xs max-w-xs opacity-60">{t('interactionEditor.noInteractionDesc', 'Selecione uma interação da lista para editar ou crie uma nova.')}</p>
                     </div>
                 )}
