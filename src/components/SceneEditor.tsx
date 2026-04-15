@@ -519,7 +519,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
           <div className="absolute left-0 right-0 -bottom-4 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none" />
         </div>
 
-        <div className={`mt-4 relative flex-1 flex flex-col h-full min-h-0 ${isSidePanel && !['objects', 'interactions', 'choices'].includes(activeTab) ? 'overflow-y-auto px-4 pb-24' : ''}`}>
+        <div className={`mt-4 relative flex-1 flex flex-col h-full min-h-0 ${isSidePanel && !['objects', 'interactions', 'choices'].includes(activeTab) ? 'overflow-y-auto pt-10 px-4 pb-24' : ''}`}>
           {isSidePanel && (
             <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-background to-transparent z-40 pointer-events-none" />
           )}
@@ -1288,7 +1288,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             )}
 
             {activeTab === 'choices' && (
-              <div key={localScene.id} className="flex-1 overflow-y-auto pt-16 px-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div key={localScene.id} className="flex-1 overflow-y-auto pt-10 px-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="max-w-4xl mx-auto space-y-6">
                   <button
                     onClick={() => {

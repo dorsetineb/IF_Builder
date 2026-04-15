@@ -424,7 +424,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                 </div>
 
                 {/* List */}
-                <div className="flex-1 overflow-y-auto min-h-0 pb-8 pr-0 flex flex-col items-stretch">
+                <div className="flex-1 overflow-y-auto min-h-0 pt-10 pb-8 pr-0 flex flex-col items-stretch">
                     {filteredInteractions.length > 0 && (
                         filteredInteractions.map(({ inter, index }) => (
                             <button

@@ -166,7 +166,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                 </div>
 
                 {/* Object List */}
-                <div className="flex-1 overflow-y-auto min-h-0 pb-8 pr-0 flex flex-col items-stretch">
+                <div className="flex-1 overflow-y-auto min-h-0 pt-10 pb-8 pr-0 flex flex-col items-stretch">
                     {!isLinkMode ? (
                         /* CURRENT SCENE OBJECTS */
                         <>
