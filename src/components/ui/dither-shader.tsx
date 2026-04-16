@@ -42,6 +42,8 @@ interface DitherShaderProps {
     hoverRadius?: number;
     /** Additional CSS classes for the container */
     className?: string;
+    /** Enable automatic horizontal scan mode (replaces circular mask) */
+    isScanMode?: boolean;
 }
 
 // 4x4 Bayer matrix
@@ -107,6 +109,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
     enableHover = false,
     hoverRadius = 100,
     className,
+    isScanMode = false,
 }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -256,21 +259,35 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
 
                     let luminance = getLuminance(r, g, b) / 255;
 
-                    // --- SPOTLIGHT REVEAL LOGIC ---
-                    if (enableHover) {
+                    // --- SPOTLIGHT / SCAN REVEAL LOGIC ---
+                    if (isScanMode || enableHover) {
                         let mask = 0.0;
-                        if (internalMouseX !== -9999) {
+                        
+                        if (isScanMode) {
+                            // Automatic scan logic - Faster, thicker and slanted
+                            const scanCycle = height * 1.8; // More space for slanted start/end
+                            const currentScanY = (time * 450) % scanCycle; // Faster speed
+                            const scanY = currentScanY - (height * 0.4); 
+                            
+                            // Inclination using x-offset: dist is vertical distance to slanted line
+                            const slantFactor = 0.2; // Angle of slant
+                            const dist = Math.abs(y + (x * slantFactor) - scanY);
+                            const thickness = height * 0.45; // Much thicker reveal area
+                            
+                            mask = 1.0 - (dist / thickness);
+                            if (mask < 0) mask = 0;
+                        } else if (enableHover && internalMouseX !== -9999) {
+                            // Circular flashlight logic
                             const dx = x - internalMouseX;
                             const dy = y - internalMouseY;
                             const distSq = dx * dx + dy * dy;
                             if (distSq < hoverRadiusSq) {
                                 const dist = Math.sqrt(distSq);
-                                // Linear falloff: 1.0 at center, 0.0 at radius
                                 mask = 1.0 - (dist / internalHoverRadius);
                                 if (mask < 0) mask = 0;
                             }
                         }
-                        // Apply mask: Area outside spotlight is black (luminance 0)
+                        
                         luminance = luminance * mask;
                     }
                     // -----------------------------
@@ -332,7 +349,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             gridSize, ditherMode, colorMode, invert,
             parsedPrimaryColor, parsedSecondaryColor,
             brightness, contrast, threshold,
-            enableHover, hoverRadius
+            enableHover, hoverRadius, isScanMode
         ]
     );
 
@@ -396,7 +413,7 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
                 if (cancel) return;
                 timeRef.current += animationSpeed;
                 renderLoop(ctx, internalWidth, internalHeight, timeRef.current);
-                if (animated || enableHover) {
+                if (animated || enableHover || isScanMode) {
                     animationRef.current = requestAnimationFrame(loop);
                 }
             };

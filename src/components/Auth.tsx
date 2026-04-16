@@ -263,7 +263,8 @@ export function Auth() {
                     animationSpeed={0.005}
                     className="w-full h-full"
                     objectFit="cover"
-                    enableHover={true}
+                    enableHover={!isMobile}
+                    isScanMode={isMobile}
                     hoverRadius={433}
                 />
             </div>
