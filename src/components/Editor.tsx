@@ -1550,16 +1550,16 @@ const Editor: React.FC = () => {
 
                   {/* Painel Direito: Navegador de Narrativas / Editor de Cena Contextual */}
                   <div 
-                    className={`h-full bg-background border-l border-muted-foreground/30 shadow-[-10px_0_30px_rgba(0,0,0,0.3)] z-50 transition-all duration-300 overflow-hidden flex flex-col ${
+                    className={`h-full bg-background border-l border-muted-foreground/50 shadow-[-10px_0_30px_rgba(0,0,0,0.3)] z-50 transition-all duration-300 overflow-hidden flex flex-col ${
                       isNarrativeMenuOpen 
-                        ? 'w-1/4'
+                        ? 'w-1/3'
                         : selectedScene
                           ? isSidePanelExpanded ? 'w-[55.55%]' : 'w-1/3'
                           : 'w-0 border-l-0'
                     }`}
                   >
                     {(isNarrativeMenuOpen || selectedScene) && (
-                       <div className="sticky top-0 z-[60] bg-background border-b border-muted-foreground/30 shadow-md px-4 py-4 flex justify-between items-center">
+                       <div className="sticky top-0 z-[60] bg-background border-b border-muted-foreground/50 shadow-md px-4 py-4 flex justify-between items-center">
                            <div className="flex items-center gap-2">
                              <button
                                type="button"
@@ -1599,7 +1599,7 @@ const Editor: React.FC = () => {
 
                     <div className="flex-1 overflow-y-auto">
                       {isNarrativeMenuOpen ? (
-                        <div className="h-full flex flex-col px-4 pt-4 pb-2 transition-all">
+                        <div className="h-full flex flex-col pt-4 pb-2 transition-all">
                           <SceneList
                           scenes={scenesList}
                           startSceneId={gameData.startScene}

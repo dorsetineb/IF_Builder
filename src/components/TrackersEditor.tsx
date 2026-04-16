@@ -291,7 +291,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                 <div className="space-y-6">
                                     <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
                                         <div className="flex justify-between items-center mb-6">
-                                            <h3 className="text-sm font-bold text-foreground flex items-center gap-2 uppercase tracking-wide">
+                                            <h3 className="text-[10px] font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
                                                 <SlidersHorizontal className="w-4 h-4" />
                                                 {t('trackersEditor.propertiesTitle', 'Propriedades do Rastreador')}
                                             </h3>
@@ -458,7 +458,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                 {/* Right Column: Visual */}
                                 <div className="space-y-6">
                                     <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
-                                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2 uppercase tracking-wide mb-6">
+                                        <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 mb-6 uppercase tracking-widest">
                                             {t('trackersEditor.visualTitle', 'Visual')}
                                         </h3>
 

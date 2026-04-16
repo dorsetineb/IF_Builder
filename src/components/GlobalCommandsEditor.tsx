@@ -251,19 +251,24 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                 <div className="mt-4">
                     <div key={selectedVerb?.id || 'empty'} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                         {selectedVerb ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="flex flex-col gap-8">
                                 {/* Left Column: Logic */}
                                 <div className="space-y-6">
                                     <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
-                                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2 uppercase tracking-wide mb-6">
+                                        <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
                                             <MessageSquare className="w-4 h-4" />
-                                            {t('globalCommandsEditor.editCommandTitle', 'Propriedades do Verbo')}
+                                            {t('globalCommandsEditor.editCommandTitle', 'Descrição dos verbos')}
                                         </h3>
                                         <div className="space-y-6">
                                             <div className="space-y-2">
-                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                                                    {t('globalCommandsEditor.verbsLabel', 'Verbos (separados por vírgula)')}
-                                                </label>
+                                                <div className="flex justify-between items-center">
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
+                                                        {t('globalCommandsEditor.verbsLabel', 'Verbos (separados por vírgula)')}
+                                                    </label>
+                                                    <p className="text-[10px] text-muted-foreground text-right italic opacity-80">
+                                                        {t('globalCommandsEditor.verbsDesc', 'Palavras que ativam este verbo. Ex: "ajuda" ou "help".')}
+                                                    </p>
+                                                </div>
                                                 <div className="flex gap-2">
                                                     {/* Icon Picker */}
                                                     <div className="relative group shrink-0">
@@ -306,19 +311,16 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                                         className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all"
                                                     />
                                                 </div>
-                                                <p className="text-[10px] text-muted-foreground">
-                                                    {t('globalCommandsEditor.verbsDesc', 'Palavras que ativam este verbo. Ex: "ajuda" ou "help".')}
-                                                </p>
                                             </div>
                                             <div className="space-y-2 flex-1">
                                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">
-                                                    {t('globalCommandsEditor.descriptionLabel', 'Descrição / Resposta')}
+                                                    {t('globalCommandsEditor.descriptionLabel', 'Descrição do verbo')}
                                                 </label>
                                                 <textarea
                                                     value={selectedVerb.description}
                                                     onChange={(e) => handleVerbChange(selectedVerb.id, 'description', e.target.value)}
                                                     placeholder={t('globalCommandsEditor.descriptionPlaceholder', 'Texto que será exibido para o jogador quando usar este verbo.')}
-                                                    rows={8}
+                                                    rows={16}
                                                     className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all resize-none"
                                                 />
                                             </div>

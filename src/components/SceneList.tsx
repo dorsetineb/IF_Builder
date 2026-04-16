@@ -87,8 +87,8 @@ const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<Sce
         className={`${scene.id !== startSceneId ? 'group' : ''} relative flex items-center transition-all overflow-hidden cursor-pointer h-[42px] ${
             isLateralMenu 
               ? selectedSceneId === scene.id && currentView === 'three_panels'
-                  ? `bg-primary text-primary-foreground font-bold shadow-md rounded-l-lg rounded-r-none` // Selected: 100% opaque primary
-                  : `text-foreground hover:bg-primary/10 hover:shadow-sm rounded-l-lg rounded-r-none` // Unselected: normal text, subtle primary hover
+                  ? `bg-primary text-primary-foreground font-bold shadow-md rounded-none` // Selected: 100% opaque primary
+                  : `text-foreground hover:bg-primary/10 hover:shadow-sm rounded-none` // Unselected: normal text, subtle primary hover
               : selectedSceneId === scene.id && currentView === 'three_panels'
                   ? isDirty
                       ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 font-bold rounded-lg'
@@ -101,21 +101,8 @@ const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<Sce
         onDragOver={(e) => e.preventDefault()}
         draggable={!searchTerm && scene.id !== startSceneId}
       >
-        <div className={`flex items-center flex-grow p-2`}>
-          {/* Always reserve space for the icon to ensure alignment */}
-          {scene.id !== startSceneId && (
-            <Menu
-              className={`w-4 h-4 mr-2 flex-shrink-0 ${isDraggable ? 'cursor-move' : 'cursor-default opacity-50'} ${
-                 isLateralMenu 
-                   ? selectedSceneId === scene.id && currentView === 'scenes' 
-                      ? 'text-primary-foreground/70' 
-                      : 'text-muted-foreground'
-                   : selectedSceneId === scene.id && currentView === 'scenes' 
-                      ? (isDirty ? 'text-yellow-500' : 'text-primary') 
-                      : 'text-muted-foreground'
-              }`}
-            />
-          )}
+        <div className={`flex items-center flex-grow p-2 px-4`}>
+
 
           <div className="flex items-center justify-between w-full min-w-0">
             <span className="truncate font-medium text-xs">{scene.name}</span>
@@ -137,6 +124,19 @@ const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<Sce
                 >
                   {t('sceneList.start', 'Início')}
                 </span>
+              )}
+              {scene.id !== startSceneId && scene.vignetteType !== 'transition' && scene.vignetteType !== 'conclusion' && (
+                <Menu
+                  className={`w-4 h-4 ml-1 flex-shrink-0 ${isDraggable ? 'cursor-move' : 'cursor-default opacity-50'} ${
+                    isLateralMenu 
+                      ? selectedSceneId === scene.id && currentView === 'scenes' 
+                        ? 'text-primary-foreground/70' 
+                        : 'text-muted-foreground'
+                      : selectedSceneId === scene.id && currentView === 'scenes' 
+                        ? (isDirty ? 'text-yellow-500' : 'text-primary') 
+                        : 'text-muted-foreground'
+                  }`}
+                />
               )}
             </div>
           </div>
@@ -276,8 +276,8 @@ const SceneList: React.FC<SceneListProps> = ({
     <div className={`flex flex-col gap-0 h-full`}>
 
       {/* Search Input */}
-      <div className={`relative flex-shrink-0 mb-3`}>
-        <Search className={`absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
+      <div className={`relative flex-shrink-0 mb-3 px-4`}>
+        <Search className={`absolute left-7 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground`} />
         <input
           type="text"
           placeholder={t('sceneList.search', 'Buscar...')}

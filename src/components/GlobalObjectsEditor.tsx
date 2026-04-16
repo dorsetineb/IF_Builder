@@ -316,7 +316,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                 {/* Object Details Card */}
                                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
                                     <div className="flex justify-between items-center mb-6">
-                                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2 uppercase tracking-wide">
+                                        <h3 className="text-[10px] font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
                                             <Box className="w-4 h-4" />
                                             {t('objectEditor.propertiesTitle', 'Propriedades do Objeto')}
                                         </h3>
@@ -398,7 +398,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
 
                                 {/* Usages Card */}
                                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
-                                    <h3 className="text-sm font-bold text-foreground mb-6 flex items-center gap-2 uppercase tracking-wide">
+                                    <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
                                         <Link className="w-4 h-4 opacity-70" />
                                         {t('globalObjectsEditor.usedInScenes', 'Usado nas cenas')}
                                     </h3>
@@ -426,7 +426,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                 {/* Multimedia Card */}
                                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
                                     <div className="flex justify-between items-center mb-4">
-                                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2 uppercase tracking-wide">
+                                        <h3 className="text-[10px] font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
                                             <Image className="w-4 h-4" />
                                             {t('sceneEditor.multimediaTitle')}
                                         </h3>

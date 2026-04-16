@@ -37,6 +37,7 @@ import {
   X,
   Hammer,
   Columns3,
+  Heart,
 } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useTranslation, Trans } from 'react-i18next';
@@ -515,14 +516,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
               </div>
             </div>
           )}
-          {/* Soft gradient transition */}
-          <div className="absolute left-0 right-0 -bottom-4 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none" />
+          {/* Soft gradient transition - Overlapping the padding of the container below */}
+          <div className="absolute left-0 right-0 -bottom-4 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none z-[60]" />
         </div>
 
-        <div className={`mt-4 relative flex-1 flex flex-col h-full min-h-0 ${isSidePanel && !['objects', 'interactions', 'choices'].includes(activeTab) ? 'overflow-y-auto pt-10 px-4 pb-24' : ''}`}>
-          {isSidePanel && (
-            <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-background to-transparent z-40 pointer-events-none" />
-          )}
+        <div className={`pt-4 relative flex-1 flex flex-col h-full min-h-0 ${isSidePanel && !['objects', 'interactions', 'choices'].includes(activeTab) ? 'overflow-y-auto pt-6 px-4 pb-24' : ''}`}>
           <div className="bg-background flex flex-col flex-1 h-full min-h-0">
             {activeTab === 'properties' && (
               <div key={localScene.id} className={`grid grid-cols-1 ${isSidePanel ? 'gap-6' : 'md:grid-cols-2 gap-8'}`}>
@@ -530,7 +528,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                 <div className="space-y-6 flex flex-col">
                   {/* Scene Details Card */}
                   <div className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
-                    <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+                    <h3 className="text-[10px] font-bold text-foreground mb-4 flex items-center gap-2 uppercase tracking-widest">
                       <FileText className="w-4 h-4" />
                       {isVignetteMode
                         ? t('sceneEditor.vignetteNarrativeTitle', 'Detalhes da Vinheta')
@@ -781,9 +779,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                   {/* Multimedia Card (Only when side panel - moved here to be below details) */}
                   {isSidePanel && (
-                    <div className="pt-8 border-t border-muted/30 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
+                    <div className="pt-4 border-t border-muted-foreground/50 mt-4 -mx-4 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                       <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                        <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
                           <ImageIcon className="w-4 h-4" />
                           {t('sceneEditor.multimediaTitle')}
                         </h3>
@@ -911,9 +909,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                   {/* Narrative Rules Card */}
                   {(enableChances || gameSystemEnabled === 'chances') && localScene.vignetteType !== 'conclusion' && (
-                    <div className="pt-8 border-t border-muted/30 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
-                      <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
-                        <Scroll className="w-4 h-4" />
+                    <div className="pt-4 border-t border-muted-foreground/50 mt-4 -mx-4 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
+                      <h3 className="text-[10px] font-bold text-foreground mb-4 flex items-center gap-2 uppercase tracking-widest">
+                        <Heart className="w-4 h-4" />
                         {t('sceneEditor.chancesTitle')}
                       </h3>
                       <div className="space-y-3">
@@ -976,8 +974,8 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                   {/* Credits Card - Only for Conclusion Vignettes */}
                   {localScene.vignetteType === 'conclusion' && (
-                    <div className="pt-8 border-t border-muted/30 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
-                      <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+                    <div className="pt-4 border-t border-muted-foreground/50 mt-4 -mx-4 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
+                      <h3 className="text-[10px] font-bold text-foreground mb-4 flex items-center gap-2 uppercase tracking-widest">
                         <List className="w-4 h-4" />
                         {t('sceneEditor.creditsTitle', 'Créditos')}
                       </h3>
@@ -1020,9 +1018,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                 <div className="space-y-6">
                   {/* Multimedia Card (Only when NOT side panel) */}
                   {!isSidePanel && (
-                    <div className="pt-8 border-t border-muted/30 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
+                    <div className="pt-4 border-t border-muted-foreground/50 mt-4 -mx-4 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                       <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                        <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
                           <ImageIcon className="w-4 h-4" />
                           {t('sceneEditor.multimediaTitle')}
                         </h3>
@@ -1228,9 +1226,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                   {/* Branching Preview Card (Only when NOT side panel) */}
                   {!isSidePanel && (
-                    <div className="pt-8 border-t border-muted/30 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
+                    <div className="pt-4 border-t border-muted-foreground/50 mt-4 -mx-4 px-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
                       <div className="flex justify-between items-center mb-4">
-                        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                        <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 uppercase tracking-widest">
                           <GitBranch className="w-4 h-4" />
                           {t('sceneEditor.connectionsTitle')}
                         </h3>
@@ -1288,7 +1286,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             )}
 
             {activeTab === 'choices' && (
-              <div key={localScene.id} className="flex-1 overflow-y-auto pt-10 px-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div key={localScene.id} className="flex-1 overflow-y-auto pt-4 px-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                 <div className="max-w-4xl mx-auto space-y-6">
                   <button
                     onClick={() => {

@@ -551,6 +551,26 @@ const SceneMap: React.FC<SceneMapProps> = ({
     setView({ x: newX, y: newY, scale: newScale });
   }, [initialNodes, bounds]);
 
+  const centerNode = (targetNode: Node) => {
+    if (!containerRef.current) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    
+    // Calculate new X and Y to center the node fully in the container
+    setView(v => {
+      const centerX = rect.width / 2;
+      const centerY = rect.height / 2;
+      
+      const nodeCenterScaledX = (targetNode.x + NODE_WIDTH / 2) * v.scale;
+      const nodeCenterScaledY = (targetNode.y + targetNode.height / 2) * v.scale;
+      
+      return { 
+        ...v, 
+        x: centerX - nodeCenterScaledX,
+        y: centerY - nodeCenterScaledY 
+      };
+    });
+  };
+
   const [nodes, setNodes] = useState(initialNodes);
   const [highlightOrphans, setHighlightOrphans] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
@@ -657,21 +677,15 @@ const SceneMap: React.FC<SceneMapProps> = ({
     <div className="h-full flex flex-col relative w-full">
       <div
         ref={containerRef}
-        className={`w-full h-full bg-background overflow-hidden ${isPanning || dragInfo ? 'cursor-grabbing' : 'cursor-grab'} shadow-inner relative`}
+        className={`w-full h-full bg-background overflow-hidden ${isPanning || dragInfo ? 'cursor-grabbing' : 'cursor-grab'} shadow-inner relative select-none`}
         onWheel={handleWheel}
+        onDragStart={(e) => e.preventDefault()}
         onMouseDown={handleCanvasMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={(e) => handleMouseUp(e)}
         onMouseLeave={(e) => handleMouseUp(e)}
       >
-        <div
-          className="absolute inset-0 pointer-events-none opacity-10"
-          style={{
-            backgroundImage: 'radial-gradient(circle, currentColor 1.5px, transparent 1px)',
-            backgroundSize: `${24 * view.scale}px ${24 * view.scale}px`,
-            backgroundPosition: `${view.x}px ${view.y}px`,
-          }}
-        />
+
 
         {/* CONTROLS OVERLAY - Top Left Creation Buttons */}
         <div className="absolute top-4 left-4 z-20 flex flex-col gap-2 w-[256px]">
@@ -706,9 +720,25 @@ const SceneMap: React.FC<SceneMapProps> = ({
           </div>
 
         <div
-          className="transition-transform duration-100"
-          style={{ transform: `translate(${view.x}px, ${view.y}px) scale(${view.scale})`, transformOrigin: '0 0' }}
+          className={`${(dragInfo || isPanning) ? '' : 'transition-transform duration-500'} will-change-transform`}
+          style={{
+            transform: `translate3d(${view.x}px, ${view.y}px, 0) scale(${view.scale})`,
+            transformOrigin: '0 0',
+          }}
         >
+          {/* Narrative Map Background Dots - Now inside the transform for perfect sync */}
+          <div
+            className="absolute pointer-events-none text-primary opacity-50"
+            style={{
+              backgroundImage: 'radial-gradient(circle, currentColor 1.5px, transparent 1px)',
+              backgroundSize: '25px 25px',
+              top: -10000,
+              left: -10000,
+              width: 20000,
+              height: 20000,
+              zIndex: -1
+            }}
+          />
           <svg
             className="absolute"
             width={Math.max(1000, bounds.maxX + 1000)}
@@ -816,6 +846,17 @@ const SceneMap: React.FC<SceneMapProps> = ({
                       offsetX: (e.clientX - view.x) / view.scale - nodeRef.x,
                       offsetY: (e.clientY - view.y) / view.scale - nodeRef.y,
                     });
+                  }}
+                  onClick={(e) => {
+                    const dx = e.clientX - dragStartPos.current.x;
+                    const dy = e.clientY - dragStartPos.current.y;
+                    if (Math.sqrt(dx * dx + dy * dy) < 5) {
+                      const isAlreadySelected = selectedSceneId === node.id;
+                      onSelectScene(isAlreadySelected ? null : node.id);
+                      if (!isAlreadySelected) {
+                        setTimeout(() => centerNode(node), 100);
+                      }
+                    }
                   }}
                   className={`absolute bg-zinc-900 rounded-xl flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} ${borderClass} cursor-pointer shadow-[0_10px_30px_rgba(0,0,0,0.3)] ${shadowClass} overflow-hidden group`}
                   style={{
@@ -943,13 +984,15 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   });
                 }}
                 onClick={(e) => {
-                  if (
-                    Math.sqrt(
-                      Math.pow(e.clientX - dragStartPos.current.x, 2) +
-                        Math.pow(e.clientY - dragStartPos.current.y, 2)
-                    ) < 5
-                  )
-                    onSelectScene(selectedSceneId === node.id ? null : node.id);
+                  const dx = e.clientX - dragStartPos.current.x;
+                  const dy = e.clientY - dragStartPos.current.y;
+                  if (Math.sqrt(dx * dx + dy * dy) < 5) {
+                    const isAlreadySelected = selectedSceneId === node.id;
+                    onSelectScene(isAlreadySelected ? null : node.id);
+                    if (!isAlreadySelected) {
+                      setTimeout(() => centerNode(node), 100);
+                    }
+                  }
                 }}
                 className={`absolute bg-zinc-900 rounded-xl flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} border-2 ${borderColorClass} cursor-pointer hover:border-${colorBase}-400 overflow-hidden group ${isSelected ? 'shadow-[0_0_50px_rgba(255,255,255,0.7)] z-50' : 'shadow-[0_10px_30px_rgba(0,0,0,0.3)]'}`}
                 style={{
