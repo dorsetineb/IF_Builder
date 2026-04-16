@@ -116,7 +116,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                 <div className="flex items-center gap-3">
                                     <LayoutTemplate className="w-5 h-5" />
                                     <div>
-                                        <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.sistemas.gameStyle')}</h4>
+                                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-foreground">{t('UIEditor.sistemas.gameStyle')}</h4>
                                         <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.gameStyleDesc')}</p>
                                     </div>
                                 </div>
@@ -160,7 +160,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                     <div className="flex items-center gap-3">
                                         <ImageIcon className="w-5 h-5" />
                                         <div>
-                                            <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.imagesInScenes')}</h4>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.imagesInScenes')}</h4>
                                             <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.imagesInScenesDesc')}</p>
                                         </div>
                                     </div>
@@ -219,7 +219,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                     <div className="flex items-center gap-3">
                                         <Type className="w-5 h-5" />
                                         <div>
-                                            <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.textControl')}</h4>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.textControl')}</h4>
                                             <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.textControlDesc')}</p>
                                         </div>
                                     </div>
@@ -293,7 +293,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                     <div className="flex items-center gap-3">
                                         <Heart className="w-5 h-5" />
                                         <div>
-                                            <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.lifeSystem')}</h4>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.lifeSystem')}</h4>
                                             <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.lifeSystemDesc')}</p>
                                         </div>
                                     </div>
@@ -370,7 +370,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                     <div className="flex items-center gap-3">
                                         <Lightbulb className="w-5 h-5" />
                                         <div>
-                                            <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableSuggestions ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.suggestions', 'Sugestões')}</h4>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableSuggestions ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.suggestions', 'Sugestões')}</h4>
                                             <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.suggestionsDesc', 'Ativa o botão de sugestões de ações.')}</p>
                                         </div>
                                     </div>
@@ -400,7 +400,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                     <div className="flex items-center gap-3">
                                         <Package className="w-5 h-5" />
                                         <div>
-                                            <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
                                             <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.inventoryDesc')}</p>
                                         </div>
                                     </div>
@@ -430,7 +430,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                     <div className="flex items-center gap-3">
                                         <Book className="w-5 h-5" />
                                         <div>
-                                            <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.diary')}</h4>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.diary')}</h4>
                                             <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.diaryDesc')}</p>
                                         </div>
                                     </div>
@@ -468,7 +468,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                     <div className="flex items-center gap-3">
                                         <SlidersHorizontal className="w-5 h-5" />
                                         <div>
-                                            <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.trackers')}</h4>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.trackers')}</h4>
                                             <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.trackersDesc')}</p>
                                         </div>
                                     </div>
@@ -505,7 +505,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                     <div className="flex items-center gap-3">
                                         <HistoryIcon className="w-5 h-5" />
                                         <div>
-                                            <h4 className={`text-xs font-bold uppercase tracking-widest transition-colors ${localEnableRetrospective ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.retrospective')}</h4>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableRetrospective ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.retrospective')}</h4>
                                             <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.retrospectiveDesc')}</p>
                                         </div>
                                     </div>

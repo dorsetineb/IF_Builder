@@ -517,7 +517,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             </div>
           )}
           {/* Soft gradient transition - Overlapping the padding of the container below */}
-          <div className="absolute left-0 right-0 -bottom-4 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none z-[60]" />
+          <div className="absolute left-0 right-0 -bottom-4 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none z-[100]" />
         </div>
 
         <div className={`pt-4 relative flex-1 flex flex-col h-full min-h-0 ${isSidePanel && !['objects', 'interactions', 'choices'].includes(activeTab) ? 'overflow-y-auto pt-6 px-4 pb-24' : ''}`}>

@@ -1056,7 +1056,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
                                     <div className="flex items-center gap-3">
                                         <Hand className="w-5 h-5" />
-                                        <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.actions')}</h4>
+                                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.actions')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
@@ -1086,7 +1086,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                                     <div className="flex items-center gap-3">
                                         <Lightbulb className="w-5 h-5" />
-                                        <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.suggestions')}</h4>
+                                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.suggestions')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
@@ -1116,7 +1116,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
                                     <div className="flex items-center gap-3">
                                         <Package className="w-5 h-5" />
-                                        <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.inventory')}</h4>
+                                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.inventory')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
@@ -1146,7 +1146,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '300ms' }}>
                                     <div className="flex items-center gap-3">
                                         <Book className="w-5 h-5" />
-                                        <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.diary')}</h4>
+                                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.diary')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
@@ -1164,7 +1164,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 <div className="break-inside-avoid p-6 bg-card border border-muted-foreground/50 rounded-2xl transition-all hover:shadow-lg shadow-sm flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '400ms' }}>
                                     <div className="flex items-center gap-3">
                                         <Wrench className="w-5 h-5" />
-                                        <h4 className="text-xs font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.system')}</h4>
+                                        <h4 className="text-[10px] font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.system')}</h4>
                                     </div>
                                     <div className="flex flex-col gap-4">
                                         <div className="space-y-2">
@@ -1202,7 +1202,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                 {/* Idioma Section */}
                                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm transition-all duration-300 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
-                                    <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
+                                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground mb-6 flex items-center gap-2">
                                         <Globe className="w-4 h-4" />
                                         {t('settings.language.label', 'Idioma')}
                                     </h3>
@@ -1227,7 +1227,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
                                 {/* Aparência Section */}
                                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm transition-all duration-300 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
-                                    <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
+                                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground mb-6 flex items-center gap-2">
                                         <Palette className="w-4 h-4" />
                                         {t('settings.appearance', 'Aparência')}
                                     </h3>

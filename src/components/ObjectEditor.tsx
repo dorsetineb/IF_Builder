@@ -124,7 +124,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
     return (
         <div className="flex flex-1 h-full overflow-hidden" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* LEFT SIDEBAR */}
-            <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-muted/30">
+            <div className="w-1/3 min-w-[250px] border-r border-muted-foreground/50 flex flex-col bg-background">
                 {/* Sidebar Header */}
                 <div className="px-3 pt-4 pb-4 space-y-4 border-b border-muted-foreground/50">
                     <div className="flex bg-muted rounded-lg p-1 border border-muted-foreground/50">
@@ -165,13 +165,13 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                     )}
                 </div>
 
-                {/* Gradient transition for sidebar list */}
-                <div className="sticky top-0 z-20 h-0 w-full relative">
-                    <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-muted to-transparent pointer-events-none" />
-                </div>
+
 
                 {/* Object List */}
-                <div className="flex-1 overflow-y-auto min-h-0 pt-4 pb-8 pr-0 flex flex-col items-stretch">
+                <div className="flex-1 overflow-y-auto min-h-0 pt-4 pb-8 pr-0 flex flex-col items-stretch relative">
+                    {/* Soft top gradient */}
+                    <div className="sticky top-0 left-0 right-0 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none z-10 -mt-4 mb-0" />
+
                     {!isLinkMode ? (
                         /* CURRENT SCENE OBJECTS */
                         <>
@@ -267,7 +267,9 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                         )}
 
                         {/* Edit Form */}
-                        <div className="flex-1 overflow-y-auto pt-0 pb-6 px-6">
+                        <div className="flex-1 overflow-y-auto pt-0 pb-6 px-6 relative">
+                            {/* Soft top gradient */}
+                            <div className="sticky top-0 left-0 right-0 h-6 bg-gradient-to-b from-background to-transparent pointer-events-none z-10 -ml-6 -mr-6" />
                             <div className="max-w-xl mx-auto flex flex-col gap-6 pt-4">
                                 
                                 {/* Basic Info Row */}

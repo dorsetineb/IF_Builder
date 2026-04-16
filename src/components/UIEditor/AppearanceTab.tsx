@@ -162,7 +162,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 {/* SECTION: ESTRUTURA */}
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '50ms' }}>
                     <div className="flex items-center w-full text-left">
-                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
                             <LayoutTemplate className="w-4 h-4" /> {t('UIEditor.aparencia.estrutura', 'Estrutura')}
                         </h3>
                     </div>
@@ -242,7 +242,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 {/* SECTION: VINHETAS */}
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                     <div className="flex items-center w-full text-left">
-                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
                             <ArrowRight className="w-4 h-4" /> {t('UIEditor.aparencia.vinhetas', 'Layout das Vinhetas')}
                         </h3>
                     </div>
@@ -290,7 +290,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 {/* SECTION: UI TEXT */}
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '150ms' }}>
                     <div className="flex items-center w-full text-left">
-                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
                             <Type className="w-4 h-4" /> {t('UIEditor.aparencia.fontsText')}
                         </h3>
                     </div>
@@ -336,7 +336,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 {/* SECTION: ESTILO & TEMA */}
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
                     <div className="flex items-center w-full text-left">
-                        <h3 className="text-xs font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
                             <Palette className="w-4 h-4" /> {t('UIEditor.aparencia.styleTheme')}
                         </h3>
                     </div>
