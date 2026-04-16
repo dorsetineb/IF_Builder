@@ -7,7 +7,20 @@
   },
   "common": {
     "back": "Volver",
-    "close": "Cerrar"
+    "close": "Cerrar",
+    "continue": "Continuar",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "confirm": "Confirmar",
+    "delete": "Eliminar",
+    "error": "Error",
+    "success": "Éxito",
+    "languages": {
+      "pt": "Português",
+      "en": "English",
+      "es": "Español"
+    },
+    "loading": "Cargando"
   },
   "auth": {
     "errors": {
@@ -486,6 +499,7 @@
     "initialValueLabel": "Valor Inicial",
     "maxValueLabel": "Valor Máximo",
     "barColorLabel": "Color de la Barra",
+    "previewLabel": "Previsualización",
     "invertFillLabel": "Invertir Relleno",
     "invertFillDesc": "La barra disminuye de derecha a izquierda.",
     "hideValuesLabel": "Ocultar Valores",
@@ -854,7 +868,7 @@
       }
     },
     "aparencia": {
-      "structure": "ESTRUCTURA",
+      "estrutura": "ESTRUCTURA",
       "scenes": "DISEÑO DE ESCENAS",
       "vinhetas": "DISEÑO DE VIÑETAS",
       "frameColor": "Color",
@@ -1000,21 +1014,6 @@
   },
   "SceneEditor": {
     "imageLimitExceeded": "La imagen excede el límite de {{size}}MB."
-  },
-  "common": {
-    "continue": "Continuar",
-    "cancel": "Cancelar",
-    "save": "Guardar",
-    "confirm": "Confirmar",
-    "delete": "Eliminar",
-    "error": "Error",
-    "success": "Éxito",
-    "languages": {
-      "pt": "Português",
-      "en": "English",
-      "es": "Español"
-    },
-    "loading": "Cargando"
   },
   "branchingPreview": {
     "endGame": "Fin del Juego",
@@ -1178,4 +1177,4 @@
       "fix": "Corregir"
     }
   }
-}
+}

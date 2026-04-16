@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { ConsequenceTracker, Scene, Interaction, TrackerEffect } from '../types';
+import { ConsequenceTracker, Scene, Interaction, TrackerEffect, GameObject } from '../types';
 import { Plus, Trash2, Search, Activity, ArrowLeft, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, ExternalLink, SlidersHorizontal, Box } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ColorInput } from './UIEditor/ColorInput';
 
 const TRACKER_ICONS = [
     { name: 'activity', component: Activity },
@@ -31,6 +32,7 @@ interface TrackersEditorProps {
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
     onSelectScene: (sceneId: string, tab?: string) => void;
+    allObjects: Record<string, GameObject>;
 }
 
 const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
@@ -44,7 +46,7 @@ const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
 
 
 
-const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrackers, allScenes, allTrackerIds, isDirty, onSetDirty, onSelectScene }) => {
+const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrackers, allScenes, allTrackerIds, isDirty, onSetDirty, onSelectScene, allObjects }) => {
     const sortedTrackers = useMemo(() => {
         return [...trackers].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     }, [trackers]);
@@ -438,23 +440,14 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                             <div className="w-full space-y-6">
                                                 <div className="grid grid-cols-3 gap-6">
                                                     {/* Bar Color (1/3) */}
-                                                    <div className="col-span-1 space-y-1.5">
-                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('trackersEditor.barColorLabel', 'Cor da Barra')}</label>
-                                                        <div className="flex items-center bg-input border border-input rounded-lg px-2 py-1.5 h-[38px]">
-                                                            <input
-                                                                type="color"
-                                                                value={selectedTracker.barColor || '#a855f7'}
-                                                                onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
-                                                                className="w-5 h-5 bg-transparent border-none p-0 cursor-pointer mr-2"
-                                                            />
-                                                            <input
-                                                                type="text"
-                                                                value={selectedTracker.barColor || '#a855f7'}
-                                                                onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
-                                                                className="flex-1 min-w-0 bg-transparent border-none text-[10px] text-foreground focus:ring-0 font-mono p-0 uppercase"
-                                                                placeholder="#a855f7"
-                                                            />
-                                                        </div>
+                                                    <div className="col-span-1">
+                                                        <ColorInput
+                                                            label={t('trackersEditor.barColorLabel', 'Cor da Barra')}
+                                                            id="tracker-bar-color"
+                                                            value={selectedTracker.barColor || '#a855f7'}
+                                                            onChange={val => handleTrackerChange(selectedTracker.id, 'barColor', val)}
+                                                            placeholder="#a855f7"
+                                                        />
                                                     </div>
 
                                                     {/* LIVE PREVIEW SECTION (2/3) */}
@@ -541,22 +534,21 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                             <div className="grid grid-cols-1 gap-2">
                                                                 {group.items.map((item, idx) => {
                                                                     const { interaction, effect } = item;
-                                                                    const interactionDesc = `${interaction.verbs[0] || t('trackersEditor.actionAction', 'Ação')}${interaction.target ? t('trackersEditor.actionOn', ' em ') + interaction.target : ''}`;
+                                                                    const targetName = interaction.target ? (allObjects[interaction.target]?.name || interaction.target) : '';
+                                                                    const interactionDesc = `${interaction.verbs[0] || t('trackersEditor.actionAction', 'Ação')}${targetName ? ' ' + targetName : ''}`;
+
                                                                     return (
                                                                         <button
                                                                             key={`${interaction.id}-${idx}`}
                                                                             onClick={() => onSelectScene(group.scene.id, 'interactions')}
-                                                                            className="flex items-center justify-between p-3 bg-muted/20 border border-border/50 rounded-lg hover:border-primary/30 hover:bg-muted/40 transition-all text-left group/item"
+                                                                            className="flex items-center justify-between p-2.5 bg-muted/10 border border-muted-foreground/40 rounded-lg hover:border-primary/50 hover:bg-muted/20 transition-all text-left group/item"
                                                                         >
                                                                             <div className="flex flex-col min-w-0 pr-4">
-                                                                                <span className="text-xs font-medium text-foreground group-hover/item:text-primary transition-colors truncate">
+                                                                                <span className="text-xs font-semibold text-foreground group-hover/item:text-primary transition-colors truncate">
                                                                                     {interactionDesc}
                                                                                 </span>
-                                                                                <span className="text-[9px] text-muted-foreground font-mono mt-0.5 opacity-60">
-                                                                                    {interaction.id}
-                                                                                </span>
                                                                             </div>
-                                                                            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md font-mono text-xs font-bold shrink-0 ${effect.valueChange >= 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                                                                            <div className={`flex items-center gap-1.5 px-2 py-0.5 rounded-md font-mono text-[10px] font-bold shrink-0 ${effect.valueChange >= 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
                                                                                 {effect.valueChange >= 0 ? '+' : ''}{effect.valueChange}
                                                                             </div>
                                                                         </button>

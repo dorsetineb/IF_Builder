@@ -168,9 +168,9 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
 
 
                 {/* Object List */}
-                <div className="flex-1 overflow-y-auto min-h-0 pt-4 pb-8 pr-0 flex flex-col items-stretch relative">
+                <div className="flex-1 overflow-y-auto min-h-0 pt-0 pb-8 pr-0 flex flex-col items-stretch relative">
                     {/* Soft top gradient */}
-                    <div className="sticky top-0 left-0 right-0 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none z-10 -mt-4 mb-0" />
+                    <div className="sticky top-0 left-0 right-0 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none z-10" />
 
                     {!isLinkMode ? (
                         /* CURRENT SCENE OBJECTS */
@@ -269,8 +269,8 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                         {/* Edit Form */}
                         <div className="flex-1 overflow-y-auto pt-0 pb-6 px-6 relative">
                             {/* Soft top gradient */}
-                            <div className="sticky top-0 left-0 right-0 h-6 bg-gradient-to-b from-background to-transparent pointer-events-none z-10 -ml-6 -mr-6" />
-                            <div className="max-w-xl mx-auto flex flex-col gap-6 pt-4">
+                            <div className="sticky top-0 left-0 right-0 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none z-10 -ml-6 -mr-6" />
+                            <div className="max-w-xl mx-auto flex flex-col gap-6">
                                 
                                 {/* Basic Info Row */}
                                 <div className="grid grid-cols-3 gap-x-6 gap-y-4">

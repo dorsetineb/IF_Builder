@@ -1685,6 +1685,7 @@ const Editor: React.FC = () => {
                   isDirty={hasUnsavedTabChanges}
                   onSetDirty={setHasUnsavedTabChanges}
                   onSelectScene={handleSelectScene}
+                  allObjects={gameData.globalObjects || {}}
                 />
               </Suspense>
             )}
