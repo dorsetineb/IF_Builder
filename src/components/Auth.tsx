@@ -91,7 +91,7 @@ export function Auth() {
                         <div className="text-sm text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md">
                             <p>Por uma fresta, você enxerga uma caverna escura.</p>
                             <p className="text-primary font-bold mt-2">
-                                &gt; ACESSO NEGADO DEVIDO A CORPO.
+                                &gt; ACESSO NEGADO DEVIDO A SMARTPHONE.
                             </p>
                             <p className="mt-2 opacity-50">Ache um computador com uma tela maior, e tente novamente.</p>
                         </div>
