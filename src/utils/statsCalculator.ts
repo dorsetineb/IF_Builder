@@ -3,13 +3,16 @@ import { GameData } from "../types";
 export interface ProjectStats {
     totalScenes: number;
     scenesByType: {
+        opening: number;
         scenes: number;
-        transitionVignettes: number;
-        victoryVignettes: number;
-        defeatVignettes: number;
+        transition: number;
+        victory: number;
+        defeat: number;
     };
     totalVignettes: number;
     totalGlobalObjects: number;
+    usedObjectsCount: number;
+    usedTakableObjectsCount: number;
     totalTakableObjects: number;
     totalInteractions: number;
     
@@ -77,10 +80,11 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
 
     // Scene Type Counters
     const scenesByType = {
-        scenes: scenes.length,
-        transitionVignettes: 0,
-        victoryVignettes: 0,
-        defeatVignettes: 0
+        opening: 0,
+        scenes: 0,
+        transition: 0,
+        victory: 0,
+        defeat: 0
     };
 
     // QA variables
@@ -157,59 +161,60 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
         if (!scene.image || scene.image.trim() === '') missingSceneImages++;
         if (!scene.description || scene.description.trim() === '') missingSceneDescriptions++;
 
+        // Scene Categorization
+        const isVignette = !!scene.vignetteId || !!scene.vignetteType;
+        const isOpening = scene.id === 'VNT_OPENING' || scene.id === gameData.startScene || scene.vignetteType === 'opening';
+        const isDefeat = scene.isDefeatOutcome || scene.vignetteType === 'defeat';
+        const isVictory = scene.isEndingScene || scene.vignetteType === 'conclusion';
+
+        if (isOpening) {
+            scenesByType.opening++;
+        } else if (isDefeat) {
+            scenesByType.defeat++;
+        } else if (isVictory) {
+            scenesByType.victory++;
+        } else if (isVignette) {
+            scenesByType.transition++;
+        } else {
+            scenesByType.scenes++;
+        }
+
         // Contagem de deadEnds
         const hasExits = (scene.exits && Object.values(scene.exits).some(e => e)) || 
                          (scene.choices && scene.choices.length > 0) ||
                          (scene.interactions && scene.interactions.some(i => i.goToScene || i.vignetteId));
-        if (!hasExits && !scene.isEndingScene && !scene.isDefeatOutcome && !(scene as any).vignetteType) {
+        if (!hasExits && !isVictory && !isDefeat && !isOpening) {
             deadEnds++;
         }
     });
 
-    // Calcula Orphans
-    const reachable = new Set<string>();
-    const queue: string[] = [];
-    
-    // Inicializa Queue com as raízes disponíveis
-    const openingVig = vignettes.find(v => v.id === 'VNT_OPENING');
-    if (openingVig) queue.push(openingVig.id);
-    else if (gameData.startScene) queue.push(gameData.startScene);
-
-    // BFS
-    const defeatSceneInfo = scenes.find((s) => s.isDefeatOutcome || (s as any).vignetteType === 'defeat');
-    const defeatVigInfo = vignettes.find((v) => v.id === 'VNT_DEFEAT' || v.isSystemDefeat || (v as any).vignetteType === 'defeat');
-    
-    while(queue.length > 0) {
-        const id = queue.shift()!;
-        if (reachable.has(id)) continue;
-        reachable.add(id);
-
-        const scene = gameData.scenes[id];
-        if (scene) {
-            scene.choices?.forEach(c => { if(c.targetSceneId) queue.push(c.targetSceneId) });
-            scene.interactions?.forEach(i => {
-                if (i.vignetteId) queue.push(i.vignetteId);
-                else if (i.goToScene) queue.push(i.goToScene);
-            });
-            if (scene.exits) {
-               Object.values(scene.exits).forEach(e => { if(e) queue.push(e as string) });
-            }
-            // IF Builder defalts to globally available defeat
-            if (defeatSceneInfo) queue.push(defeatSceneInfo.id);
-            else if (defeatVigInfo) queue.push(defeatVigInfo.id);
-            
-        } else {
-            const vig = vignettes.find(v => v.id === id);
-            if (vig) {
-                if (vig.id === 'VNT_OPENING' && gameData.startScene) queue.push(gameData.startScene);
-                if (vig.nextSceneId && !vig.isConclusion && !(vig as any).vignetteType?.includes('conclusion')) {
-                    queue.push(vig.nextSceneId);
-                }
-            }
+    // New Orphan Logic: Nodes with zero incoming AND outgoing connections
+    // This matches SceneMap's definition of "Órfãs"
+    const orphanCount = scenes.filter(s => {
+        // Skip special/system scenes or start scene
+        if (s.id === 'VNT_OPENING' || s.id === 'VNT_VICTORY' || s.id === 'VNT_DEFEAT' || 
+            s.id === gameData.startScene || s.isDefeatOutcome || s.isEndingScene || (s as any).vignetteType === 'opening') {
+            return false;
         }
-    }
 
-    const orphanCount = scenes.filter(s => !reachable.has(s.id)).length;
+        // 1. Check Outgoing
+        const hasOutgoing = (s.exits && Object.values(s.exits).some(e => e)) || 
+                           (s.choices && s.choices.some(c => c.targetSceneId)) ||
+                           (s.interactions && s.interactions.some(i => i.goToScene || i.vignetteId));
+        
+        if (hasOutgoing) return false;
+
+        // 2. Check Incoming from other scenes
+        const hasIncoming = scenes.some(other => {
+            if (other.id === s.id) return false;
+            const oExits = other.exits && Object.values(other.exits).some(e => e === s.id);
+            const oChoices = other.choices && other.choices.some(c => c.targetSceneId === s.id);
+            const oInteractions = other.interactions && other.interactions.some(i => i.goToScene === s.id || i.vignetteId === s.id);
+            return oExits || oChoices || oInteractions;
+        }) || (vignettes || []).some(v => v.nextSceneId === s.id);
+
+        return !hasIncoming;
+    }).length;
 
     // Global Objects
     let objectsMissingImages = 0;
@@ -224,43 +229,30 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
 
     const uselessObjects = objects.filter(obj => !usedObjectIds.has(obj.id)).map(obj => obj.name);
 
-    // Vignettes
+    // Vignettes - Only for calculating words and assets, categorization is handled in the map (scenes)
     vignettes.forEach(vig => {
         totalWords += countWords(vig.title);
         totalWords += countWords(vig.description);
         processAssetSize(getBase64Size(vig.image));
         processAssetSize(getBase64Size(vig.backgroundMusic));
         
-        const isDefeat = vig.isSystemDefeat || vig.id?.includes('DEFEAT') || (vig as any).vignetteType === 'defeat';
-        const isVictory = vig.isConclusion || vig.id?.includes('VICTORY') || (vig as any).vignetteType === 'conclusion';
-
-        if (isDefeat) {
-            scenesByType.defeatVignettes++;
-        } else if (isVictory) {
-            scenesByType.victoryVignettes++;
-        } else if (vig.id !== 'VNT_OPENING') {
-            scenesByType.transitionVignettes++;
-        }
+        // Note: scenesByType is now handled primarily in the scenes loop above 
+        // to match what is actually on the narrative map.
     });
 
-    scenes.forEach(scene => {
-        const isDefeat = scene.isDefeatOutcome || (scene as any).vignetteType === 'defeat';
-        const isVictory = scene.isEndingScene || (scene as any).vignetteType === 'conclusion';
-        
-        if (isDefeat) {
-            scenesByType.defeatVignettes++;
-            scenesByType.scenes--; // Remove from regular scenes
-        } else if (isVictory) {
-            scenesByType.victoryVignettes++;
-            scenesByType.scenes--; // Remove from regular scenes
-        }
-    });
-
+    const totalAssetSizeMB = totalAssetBytes / (1024 * 1024);
+    const ENGINE_OVERHEAD_MB = 1.75; // Estimate for base HTML/JS/CSS envelope
+    
     return {
         totalScenes: scenes.length,
         scenesByType,
         totalVignettes: vignettes.length,
         totalGlobalObjects: objects.length,
+        usedObjectsCount: usedObjectIds.size,
+        usedTakableObjectsCount: Array.from(usedObjectIds).filter(id => {
+            const obj = gameData.globalObjects[id];
+            return obj && (obj as any).isTakable;
+        }).length,
         totalTakableObjects: takableCount,
         totalInteractions,
         totalWords,
@@ -279,7 +271,7 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
         uselessObjectsNames: uselessObjects,
         interactionsWithoutEffectCount: interactionsWithoutEffect,
         
-        estimatedAssetSizeMB: Number((totalAssetBytes / (1024 * 1024)).toFixed(2)),
+        estimatedAssetSizeMB: Number((totalAssetSizeMB + ENGINE_OVERHEAD_MB).toFixed(2)),
         maxAssetSizeMB: Number((maxAssetBytes / (1024 * 1024)).toFixed(2)),
         avgAssetSizeMBPerScene: scenes.length > 0 ? Number(((totalAssetBytes / scenes.length) / (1024 * 1024)).toFixed(2)) : 0,
         

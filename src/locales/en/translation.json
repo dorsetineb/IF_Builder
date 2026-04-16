@@ -1174,5 +1174,51 @@
       "total_words_read": "Words read",
       "of_scenes": "scenes"
     }
+  },
+  "editorStats": {
+    "modalTitle": "Statistics",
+    "scenesCount": "Scenes",
+    "narrativeMetrics": "Narrative Metrics",
+    "opening": "Opening",
+    "regularScenes": "Scenes",
+    "transitionVignettes": "Transition Vignettes",
+    "conclusions": "Conclusions",
+    "negativeConclusions": "Negative Conclusions",
+    "totalObjects": "Objects",
+    "takable": "takable",
+    "avgObjects": "avg. per scene",
+    "totalInteractions": "Interactions",
+    "avgInteractions": "avg. per scene",
+    "created": "Created",
+    "used": "Used",
+    "qaAudit": "QA Audit",
+    "assetWeight": "Project Size",
+    "total": "Total size",
+    "max": "Heaviest asset",
+    "avg": "Average size",
+    "verbs": "Top Verbs",
+    "noVerbs": "No verbs",
+    "content": "Literary Density",
+    "avgWords": "Avg. words per scene",
+    "totalWords": "Total words",
+    "avgReadingTime": "Reading time",
+    "minutes": "min.",
+    "totalReadingTime": "Total reading",
+    "mostWords": "Longest text",
+    "leastWords": "Shortest text",
+    "words": "words",
+    "mostInteractions": "Most interactive",
+    "interactions": "interactions",
+    "integrity": "Project Integrity",
+    "deadEnds": "Dead Ends",
+    "orphanScenes": "Orphan Scenes",
+    "scenesMissingImage": "Missing image",
+    "scenesMissingDesc": "Missing text",
+    "objectsMissingImage": "Obj s/ images",
+    "uselessObjects": "Useless objects",
+    "hollowInteractions": "Hollow actions",
+    "actions": {
+      "fix": "Fix"
+    }
   }
-}
+}

@@ -1157,5 +1157,51 @@
       "total_words_read": "Palavras lidas",
       "of_scenes": "cenas"
     }
+  },
+  "editorStats": {
+    "modalTitle": "Estatísticas",
+    "scenesCount": "Cenas",
+    "narrativeMetrics": "Métrica narrativa",
+    "opening": "Abertura",
+    "regularScenes": "Cenas",
+    "transitionVignettes": "Vinhetas de Transição",
+    "conclusions": "Conclusões",
+    "negativeConclusions": "Conclusões Negativas",
+    "totalObjects": "Objetos",
+    "takable": "coletáveis",
+    "avgObjects": "média por cena",
+    "totalInteractions": "Interações",
+    "avgInteractions": "média por cena",
+    "created": "Criados",
+    "used": "Utilizados",
+    "qaAudit": "Auditoria QA",
+    "assetWeight": "Tamanho do Projeto",
+    "total": "Total",
+    "max": "Asset mais pesado",
+    "avg": "Média",
+    "verbs": "Verbos mais usados",
+    "noVerbs": "Nenhum verbo",
+    "content": "Densidade Literária",
+    "avgWords": "Palavras / Cena",
+    "totalWords": "Total Geral",
+    "avgReadingTime": "Tempo de leitura",
+    "minutes": "min.",
+    "totalReadingTime": "Leitura total",
+    "mostWords": "Texto mais longo",
+    "leastWords": "Texto mais curto",
+    "words": "palavras",
+    "mostInteractions": "Cena mais interativa",
+    "interactions": "interações",
+    "integrity": "Integridade do projeto",
+    "deadEnds": "Fins s/ Saída",
+    "orphanScenes": "Cenas Órfãs",
+    "scenesMissingImage": "Cenas s/ imagem",
+    "scenesMissingDesc": "Cenas s/ texto",
+    "objectsMissingImage": "Objetos s/ img",
+    "uselessObjects": "Objetos inúteis",
+    "hollowInteractions": "Ações vazias",
+    "actions": {
+      "fix": "Corrigir"
+    }
   }
-}
+}

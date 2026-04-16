@@ -1131,5 +1131,51 @@
       "total_words_read": "Palabras leídas",
       "of_scenes": "escenas"
     }
+  },
+  "editorStats": {
+    "modalTitle": "Estadísticas",
+    "scenesCount": "Escenas",
+    "narrativeMetrics": "Métricas narrativas",
+    "opening": "Apertura",
+    "regularScenes": "Escenas",
+    "transitionVignettes": "Viñetas de Transición",
+    "conclusions": "Conclusiones",
+    "negativeConclusions": "Conclusiones Negativas",
+    "totalObjects": "Objetos",
+    "takable": "coleccionables",
+    "avgObjects": "promedio por escena",
+    "totalInteractions": "Interacciones",
+    "avgInteractions": "promedio por escena",
+    "created": "Creados",
+    "used": "Utilizados",
+    "qaAudit": "Auditoría de Calidad (QA)",
+    "assetWeight": "Peso de los Archivos",
+    "total": "Peso Total",
+    "max": "Archivo más pesado",
+    "avg": "Peso promedio",
+    "verbs": "Verbos más frecuentes",
+    "noVerbs": "Sin verbos definidos",
+    "content": "Densidad Literaria",
+    "avgWords": "Palabras promedio por escena",
+    "totalWords": "Total de palabras",
+    "avgReadingTime": "Tiempo de lectura",
+    "minutes": "min.",
+    "totalReadingTime": "Lectura total",
+    "mostWords": "Texto más largo",
+    "leastWords": "Texto más corto",
+    "words": "palabras",
+    "mostInteractions": "Escena más interactiva",
+    "interactions": "interacciones",
+    "integrity": "Integridad del proyecto",
+    "deadEnds": "Finales sin Salida",
+    "orphanScenes": "Escenas Huérfanas",
+    "scenesMissingImage": "Sin imagen",
+    "scenesMissingDesc": "Sin texto",
+    "objectsMissingImage": "Obj sin img",
+    "uselessObjects": "Objetos inútiles",
+    "hollowInteractions": "Acciones vacías",
+    "actions": {
+      "fix": "Corregir"
+    }
   }
-}
+}
