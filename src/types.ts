@@ -69,7 +69,7 @@ export interface Scene {
   restoresChanceOnEntry?: boolean;
   mapX?: number;
   mapY?: number;
-  vignetteType?: 'opening' | 'transition' | 'conclusion' | 'none';
+  vignetteType?: 'opening' | 'transition' | 'conclusion' | 'defeat' | 'none';
   vignetteButtonText?: string;
   vignetteNextSceneId?: string;
   overlayEffect?: string;

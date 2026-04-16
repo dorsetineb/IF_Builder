@@ -85,6 +85,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
     null
   );
   const dragStartPos = useRef({ x: 0, y: 0 });
+  const lastFocusedId = useRef<string | null>(null);
 
   // Helper to extract linking items from a Node (Scene or Vignette)
   const getLinkingItems = useCallback(
@@ -551,25 +552,27 @@ const SceneMap: React.FC<SceneMapProps> = ({
     setView({ x: newX, y: newY, scale: newScale });
   }, [initialNodes, bounds]);
 
-  const centerNode = (targetNode: Node) => {
+  const centerNode = useCallback((targetNode: Node, targetScale?: number) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     
-    // Calculate new X and Y to center the node fully in the container
     setView(v => {
       const centerX = rect.width / 2;
       const centerY = rect.height / 2;
       
-      const nodeCenterScaledX = (targetNode.x + NODE_WIDTH / 2) * v.scale;
-      const nodeCenterScaledY = (targetNode.y + targetNode.height / 2) * v.scale;
+      const newScale = targetScale || v.scale;
+      
+      const nodeCenterScaledX = (targetNode.x + NODE_WIDTH / 2) * newScale;
+      const nodeCenterScaledY = (targetNode.y + targetNode.height / 2) * newScale;
       
       return { 
         ...v, 
+        scale: newScale,
         x: centerX - nodeCenterScaledX,
         y: centerY - nodeCenterScaledY 
       };
     });
-  };
+  }, []);
 
   const [nodes, setNodes] = useState(initialNodes);
   const [highlightOrphans, setHighlightOrphans] = useState(false);
@@ -578,6 +581,23 @@ const SceneMap: React.FC<SceneMapProps> = ({
   useEffect(() => {
     if (!dragInfo) setNodes(initialNodes);
   }, [initialNodes, dragInfo]);
+
+  // Center and Zoom on selection change
+  useEffect(() => {
+    if (selectedSceneId && selectedSceneId !== lastFocusedId.current) {
+      const node = nodes.find(n => n.id === selectedSceneId);
+      if (node) {
+        // Small delay to ensure the map is ready if coming from a different view
+        const timer = setTimeout(() => {
+          centerNode(node, 1.0);
+          lastFocusedId.current = selectedSceneId;
+        }, 50);
+        return () => clearTimeout(timer);
+      }
+    } else if (!selectedSceneId) {
+      lastFocusedId.current = null;
+    }
+  }, [selectedSceneId, nodes, centerNode]);
 
   const hasInitialFitted = useRef(false);
 
@@ -670,8 +690,14 @@ const SceneMap: React.FC<SceneMapProps> = ({
   );
 
   const handleToggleOrphans = useCallback(() => {
-    setHighlightOrphans((prev) => !prev);
-  }, []);
+    setHighlightOrphans((prev) => {
+      const next = !prev;
+      if (next) {
+        handleViewAll();
+      }
+      return next;
+    });
+  }, [handleViewAll]);
 
   return (
     <div className="h-full flex flex-col relative w-full">
@@ -853,9 +879,6 @@ const SceneMap: React.FC<SceneMapProps> = ({
                     if (Math.sqrt(dx * dx + dy * dy) < 5) {
                       const isAlreadySelected = selectedSceneId === node.id;
                       onSelectScene(isAlreadySelected ? null : node.id);
-                      if (!isAlreadySelected) {
-                        setTimeout(() => centerNode(node), 100);
-                      }
                     }
                   }}
                   className={`absolute bg-zinc-900 rounded-xl flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} ${borderClass} cursor-pointer shadow-[0_10px_30px_rgba(0,0,0,0.3)] ${shadowClass} overflow-hidden group`}
@@ -989,9 +1012,6 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   if (Math.sqrt(dx * dx + dy * dy) < 5) {
                     const isAlreadySelected = selectedSceneId === node.id;
                     onSelectScene(isAlreadySelected ? null : node.id);
-                    if (!isAlreadySelected) {
-                      setTimeout(() => centerNode(node), 100);
-                    }
                   }
                 }}
                 className={`absolute bg-zinc-900 rounded-xl flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} border-2 ${borderColorClass} cursor-pointer hover:border-${colorBase}-400 overflow-hidden group ${isSelected ? 'shadow-[0_0_50px_rgba(255,255,255,0.7)] z-50' : 'shadow-[0_10px_30px_rgba(0,0,0,0.3)]'}`}

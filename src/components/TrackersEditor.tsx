@@ -30,7 +30,7 @@ interface TrackersEditorProps {
     allTrackerIds: string[];
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
-    onSelectScene: (sceneId: string) => void;
+    onSelectScene: (sceneId: string, tab?: string) => void;
 }
 
 const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
@@ -154,6 +154,20 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
     }, [allScenes, localTrackers]);
 
     const usages = selectedTracker ? (allTrackerUsages.get(selectedTracker.id) || []) : [];
+
+    const usageGroups = useMemo(() => {
+        const groups: { scene: Scene; items: { interaction: Interaction; effect: TrackerEffect }[] }[] = [];
+        usages.forEach(usage => {
+            let group = groups.find(g => g.scene.id === usage.scene.id);
+            if (!group) {
+                group = { scene: usage.scene, items: [] };
+                groups.push(group);
+            }
+            group.items.push({ interaction: usage.interaction, effect: usage.effect });
+        });
+        // Sort groups by scene name
+        return groups.sort((a, b) => (a.scene.name || '').localeCompare(b.scene.name || ''));
+    }, [usages]);
 
     // Determine consequence scene name for display
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -420,136 +434,149 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                 </p>
                                             </div>
 
-                                            {/* Usages List */}
-                                            <div className="pt-4 border-t border-border/50 space-y-4">
-                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('trackersEditor.interactionsLabel', 'Interações que alteram este rastreador')}</label>
-                                                {usages.length > 0 ? (
-                                                    <div className="grid grid-cols-2 gap-3">
-                                                        {usages.map(({ scene, interaction, effect }, index) => {
-                                                            const interactionDesc = `${interaction.verbs[0] || t('trackersEditor.actionAction', 'Ação')}${interaction.target ? t('trackersEditor.actionOn', ' em ') + interaction.target : ''}`;
-                                                            return (
-                                                                <button
-                                                                    key={`${interaction.id}-${index}`}
-                                                                    onClick={() => onSelectScene(scene.id)}
-                                                                    className="flex flex-col items-start p-3 bg-card border border-muted-foreground/50 rounded-lg hover:border-primary/50 hover:bg-accent/50 transition-all text-left group"
-                                                                >
-                                                                    <div className="w-full flex justify-between items-start mb-1">
-                                                                        <span className="text-xs font-bold text-foreground group-hover:text-primary truncate">{scene.name}</span>
-                                                                        <span className={`font-mono text-[10px] px-1.5 py-0.5 rounded ${effect.valueChange >= 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
-                                                                            {effect.valueChange >= 0 ? '+' : ''}{effect.valueChange}
-                                                                        </span>
-                                                                    </div>
-                                                                    <span className="text-[10px] text-muted-foreground truncate w-full">{interactionDesc}</span>
-                                                                </button>
-                                                            );
-                                                        })}
+                                            {/* VISUAL & COLORS (Refined Layout) */}
+                                            <div className="w-full space-y-6">
+                                                <div className="grid grid-cols-3 gap-6">
+                                                    {/* Bar Color (1/3) */}
+                                                    <div className="col-span-1 space-y-1.5">
+                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('trackersEditor.barColorLabel', 'Cor da Barra')}</label>
+                                                        <div className="flex items-center bg-input border border-input rounded-lg px-2 py-1.5 h-[38px]">
+                                                            <input
+                                                                type="color"
+                                                                value={selectedTracker.barColor || '#a855f7'}
+                                                                onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
+                                                                className="w-5 h-5 bg-transparent border-none p-0 cursor-pointer mr-2"
+                                                            />
+                                                            <input
+                                                                type="text"
+                                                                value={selectedTracker.barColor || '#a855f7'}
+                                                                onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
+                                                                className="flex-1 min-w-0 bg-transparent border-none text-[10px] text-foreground focus:ring-0 font-mono p-0 uppercase"
+                                                                placeholder="#a855f7"
+                                                            />
+                                                        </div>
                                                     </div>
-                                                ) : (
-                                                    <div className="flex flex-col items-center justify-center p-6 bg-muted/20 border border-dashed border-muted-foreground/50 rounded-lg text-center">
-                                                        <p className="text-muted-foreground text-xs italic">{t('trackersEditor.noInteractions', 'Nenhuma interação altera este rastreador ainda.')}</p>
+
+                                                    {/* LIVE PREVIEW SECTION (2/3) */}
+                                                    <div className="col-span-2 space-y-1.5">
+                                                        <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                                            {t('trackersEditor.previewLabel', 'Pré-visualização')}
+                                                        </label>
+                                                        <div className="flex items-center h-[38px]">
+                                                            <div className="w-full h-4 rounded-full overflow-hidden border shadow-sm bg-muted border-muted-foreground/30">
+                                                                <div
+                                                                    className="h-full rounded-full transition-all duration-500 ease-out"
+                                                                    style={{
+                                                                        width: `33.33%`,
+                                                                        backgroundColor: selectedTracker.barColor || '#a855f7',
+                                                                        float: selectedTracker.invertBar ? 'right' : 'none',
+                                                                        boxShadow: `inset 0 0 10px rgba(0,0,0,0.1), 0 0 8px ${(selectedTracker.barColor || '#a855f7')}40`
+                                                                    }}
+                                                                />
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                )}
-                                            </div>
+                                                </div>
 
-                                        </div>
-                                    </div>
-                                </div>
+                                                {/* Invert/Hide Flags (Side-by-Side) */}
+                                                <div className="grid grid-cols-2 gap-4 pt-2">
+                                                    <label className="flex items-start p-3 rounded-lg border border-border/50 bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer group">
+                                                        <div className="flex items-center h-5">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={!!selectedTracker.invertBar}
+                                                                onChange={e => handleTrackerChange(selectedTracker.id, 'invertBar', e.target.checked)}
+                                                                className="custom-checkbox"
+                                                            />
+                                                        </div>
+                                                        <div className="ml-3">
+                                                            <span className="block text-xs font-bold text-foreground group-hover:text-primary transition-colors leading-tight">{t('trackersEditor.invertFillLabel', 'Inverter Preenchimento')}</span>
+                                                            <span className="block text-[9px] text-muted-foreground mt-0.5 leading-tight">{t('trackersEditor.invertFillDesc', 'Barra da direita p/ esquerda.')}</span>
+                                                        </div>
+                                                    </label>
 
-                                {/* Right Column: Visual */}
-                                <div className="space-y-6">
-                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
-                                        <h3 className="text-[10px] font-bold text-foreground flex items-center gap-2 mb-6 uppercase tracking-widest">
-                                            {t('trackersEditor.visualTitle', 'Visual')}
-                                        </h3>
-
-                                        {/* LIVE PREVIEW SECTION */}
-                                        <div className="mb-6 p-4 bg-background border border-muted-foreground/50 rounded-lg">
-                                            <div className="flex justify-between items-center mb-3">
-                                                <span className="text-xs font-bold text-foreground flex items-center gap-2">
-                                                    {(() => {
-                                                        const Icon = TRACKER_ICONS.find(i => i.name === selectedTracker.icon)?.component || Activity;
-                                                        return <Icon className="w-4 h-4" style={{ color: selectedTracker.barColor || '#a855f7' }} />;
-                                                    })()}
-                                                    {selectedTracker.name || t('trackersEditor.noName', 'Sem nome')}
-                                                </span>
-                                                {!selectedTracker.hideValue && (
-                                                    <span className="text-xs font-mono opacity-80 text-muted-foreground">
-                                                        {selectedTracker.initialValue}/{selectedTracker.maxValue || 100}
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <div className="w-full h-2 rounded-full overflow-hidden border shadow-inner bg-muted border-muted-foreground/50">
-                                                <div
-                                                    className="h-full rounded-full transition-all duration-500 ease-out"
-                                                    style={{
-                                                        width: `${selectedTracker.invertBar ? 100 - Math.min(100, Math.max(0, (selectedTracker.initialValue / (selectedTracker.maxValue || 100)) * 100)) : Math.min(100, Math.max(0, (selectedTracker.initialValue / (selectedTracker.maxValue || 100)) * 100))}%`,
-                                                        backgroundColor: selectedTracker.barColor || '#a855f7',
-                                                        float: selectedTracker.invertBar ? 'right' : 'none',
-                                                        boxShadow: `0 0 8px ${(selectedTracker.barColor || '#a855f7')}60`
-                                                    }}
-                                                />
-                                            </div>
-                                        </div>
-
-                                        <div className="space-y-6">
-                                            {/* Bar Color */}
-                                            <div className="w-full space-y-1.5">
-                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('trackersEditor.barColorLabel', 'Cor da Barra')}</label>
-                                                <div className="flex items-center gap-2">
-                                                    <div className="flex-1 flex items-center bg-input border border-input rounded-lg px-2 py-1.5 h-[38px]">
-                                                        <input
-                                                            type="color"
-                                                            value={selectedTracker.barColor || '#a855f7'}
-                                                            onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
-                                                            className="w-5 h-5 bg-transparent border-none p-0 cursor-pointer mr-2"
-                                                        />
-                                                        <input
-                                                            type="text"
-                                                            value={selectedTracker.barColor || '#a855f7'}
-                                                            onChange={e => handleTrackerChange(selectedTracker.id, 'barColor', e.target.value)}
-                                                            className="flex-1 bg-transparent border-none text-xs text-foreground focus:ring-0 font-mono p-0 uppercase"
-                                                            placeholder="#a855f7"
-                                                        />
-                                                    </div>
+                                                    <label className="flex items-start p-3 rounded-lg border border-border/50 bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer group">
+                                                        <div className="flex items-center h-5">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={!!selectedTracker.hideValue}
+                                                                onChange={e => handleTrackerChange(selectedTracker.id, 'hideValue', e.target.checked)}
+                                                                className="custom-checkbox"
+                                                            />
+                                                        </div>
+                                                        <div className="ml-3">
+                                                            <span className="block text-xs font-bold text-foreground group-hover:text-primary transition-colors leading-tight">{t('trackersEditor.hideValuesLabel', 'Ocultar Valores')}</span>
+                                                            <span className="block text-[9px] text-muted-foreground mt-0.5 leading-tight">{t('trackersEditor.hideValuesDesc', 'Remove números (X/Y).')}</span>
+                                                        </div>
+                                                    </label>
                                                 </div>
                                             </div>
 
-                                            {/* Flags */}
-                                            <div className="grid grid-cols-1 gap-4 pt-2">
-                                                <label className="flex items-start p-3 rounded-lg border border-border/50 bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer group">
-                                                    <div className="flex items-center h-5">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={!!selectedTracker.invertBar}
-                                                            onChange={e => handleTrackerChange(selectedTracker.id, 'invertBar', e.target.checked)}
-                                                            className="custom-checkbox"
-                                                        />
-                                                    </div>
-                                                    <div className="ml-3">
-                                                        <span className="block text-xs font-bold text-foreground group-hover:text-primary transition-colors">{t('trackersEditor.invertFillLabel', 'Inverter Preenchimento')}</span>
-                                                        <span className="block text-[10px] text-muted-foreground mt-0.5">{t('trackersEditor.invertFillDesc', 'A barra diminui da direita para a esquerda.')}</span>
-                                                    </div>
-                                                    <ArrowLeft className={`ml-auto w-4 h-4 text-muted-foreground ${selectedTracker.invertBar ? 'text-primary' : ''}`} />
-                                                </label>
 
-                                                <label className="flex items-start p-3 rounded-lg border border-border/50 bg-muted/20 hover:bg-muted/40 transition-colors cursor-pointer group">
-                                                    <div className="flex items-center h-5">
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={!!selectedTracker.hideValue}
-                                                            onChange={e => handleTrackerChange(selectedTracker.id, 'hideValue', e.target.checked)}
-                                                            className="custom-checkbox"
-                                                        />
-                                                    </div>
-                                                    <div className="ml-3">
-                                                        <span className="block text-xs font-bold text-foreground group-hover:text-primary transition-colors">{t('trackersEditor.hideValuesLabel', 'Ocultar Valores')}</span>
-                                                        <span className="block text-[10px] text-muted-foreground mt-0.5">{t('trackersEditor.hideValuesDesc', 'Não mostra os números (X/Y) na interface.')}</span>
-                                                    </div>
-                                                </label>
-                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                {/* Right Column: Linked Interactions */}
+                                <div className="space-y-6">
+                                    <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '150ms' }}>
+                                        <div className="flex justify-between items-center mb-6">
+                                            <h3 className="text-[10px] font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
+                                                <Box className="w-4 h-4" />
+                                                {t('trackersEditor.interactionsLabel', 'Interações Vinculadas')}
+                                            </h3>
+                                        </div>
+
+                                        <div className="space-y-4">
+                                            {usageGroups.length > 0 ? (
+                                                <div className="flex flex-col">
+                                                    {usageGroups.map((group, groupIdx) => (
+                                                        <div key={group.scene.id} className={`${groupIdx > 0 ? 'mt-8 pt-8 border-t border-muted-foreground/50 -mx-6 px-6' : ''} space-y-3`}>
+                                                            <div className="flex items-center px-1">
+                                                                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest whitespace-nowrap">
+                                                                    {group.scene.name}
+                                                                </span>
+                                                            </div>
+                                                            <div className="grid grid-cols-1 gap-2">
+                                                                {group.items.map((item, idx) => {
+                                                                    const { interaction, effect } = item;
+                                                                    const interactionDesc = `${interaction.verbs[0] || t('trackersEditor.actionAction', 'Ação')}${interaction.target ? t('trackersEditor.actionOn', ' em ') + interaction.target : ''}`;
+                                                                    return (
+                                                                        <button
+                                                                            key={`${interaction.id}-${idx}`}
+                                                                            onClick={() => onSelectScene(group.scene.id, 'interactions')}
+                                                                            className="flex items-center justify-between p-3 bg-muted/20 border border-border/50 rounded-lg hover:border-primary/30 hover:bg-muted/40 transition-all text-left group/item"
+                                                                        >
+                                                                            <div className="flex flex-col min-w-0 pr-4">
+                                                                                <span className="text-xs font-medium text-foreground group-hover/item:text-primary transition-colors truncate">
+                                                                                    {interactionDesc}
+                                                                                </span>
+                                                                                <span className="text-[9px] text-muted-foreground font-mono mt-0.5 opacity-60">
+                                                                                    {interaction.id}
+                                                                                </span>
+                                                                            </div>
+                                                                            <div className={`flex items-center gap-1.5 px-2 py-1 rounded-md font-mono text-xs font-bold shrink-0 ${effect.valueChange >= 0 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-rose-500/10 text-rose-500'}`}>
+                                                                                {effect.valueChange >= 0 ? '+' : ''}{effect.valueChange}
+                                                                            </div>
+                                                                        </button>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            ) : (
+                                                <div className="flex flex-col items-center justify-center p-8 bg-muted/10 border border-dashed border-muted-foreground/30 rounded-lg text-center">
+                                                    <p className="text-muted-foreground text-xs italic">
+                                                        {t('trackersEditor.noInteractions', 'Nenhuma interação altera este rastreador ainda.')}
+                                                    </p>
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
+
                             </div>
                         ) : (
                             <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center mt-20">

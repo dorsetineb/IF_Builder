@@ -929,7 +929,7 @@ const Editor: React.FC = () => {
   };
 
   type PendingNavigation = 
-    | { type: 'scene'; id: string | null } 
+    | { type: 'scene'; id: string | null; tab?: string } 
     | { type: 'view'; view: View } 
     | { type: 'navigate'; path: string } 
     | { type: 'exit' }
@@ -945,6 +945,9 @@ const Editor: React.FC = () => {
       setCurrentView('three_panels');
       setSelectedSceneId(navData.id);
       setIsNarrativeMenuOpen(false);
+      if (navData.tab) {
+        setSidePanelTab(navData.tab);
+      }
     } else if (navData.type === 'view') {
       const targetView = (navData.view as string) === 'scenes' || (navData.view as string) === 'map' 
         ? 'three_panels' 
@@ -1112,8 +1115,8 @@ const Editor: React.FC = () => {
 
   // Scene handlers and Reorder handlers moved to useSceneManagement
 
-  const handleSelectScene = (id: string | null) => {
-    attemptNavigation({ type: 'scene', id });
+  const handleSelectScene = (id: string | null, tab?: string) => {
+    attemptNavigation({ type: 'scene', id, tab });
   };
 
   const handleSetView = (view: View) => {

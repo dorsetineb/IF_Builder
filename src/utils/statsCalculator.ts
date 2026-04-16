@@ -162,10 +162,10 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
         if (!scene.description || scene.description.trim() === '') missingSceneDescriptions++;
 
         // Scene Categorization
-        const isVignette = !!scene.vignetteId || !!scene.vignetteType;
+        const isVignette = scene.vignetteType && scene.vignetteType !== 'none';
         const isOpening = scene.id === 'VNT_OPENING' || scene.id === gameData.startScene || scene.vignetteType === 'opening';
-        const isDefeat = scene.isDefeatOutcome || scene.vignetteType === 'defeat';
-        const isVictory = scene.isEndingScene || scene.vignetteType === 'conclusion';
+        const isDefeat = !!scene.isDefeatOutcome || scene.vignetteType === 'defeat';
+        const isVictory = (scene.isEndingScene || scene.vignetteType === 'conclusion') && !scene.isDefeatOutcome;
 
         if (isOpening) {
             scenesByType.opening++;
@@ -193,7 +193,7 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
     const orphanCount = scenes.filter(s => {
         // Skip special/system scenes or start scene
         if (s.id === 'VNT_OPENING' || s.id === 'VNT_VICTORY' || s.id === 'VNT_DEFEAT' || 
-            s.id === gameData.startScene || s.isDefeatOutcome || s.isEndingScene || (s as any).vignetteType === 'opening') {
+            s.id === gameData.startScene || s.isDefeatOutcome || s.isEndingScene || s.vignetteType === 'opening') {
             return false;
         }
 
