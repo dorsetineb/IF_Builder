@@ -777,10 +777,10 @@
     },
     "tabs": {
       "layout": "Layout",
-      "config": "Workspace",
-      "sistemas": "Systems",
-      "textos": "Texts",
-      "aparencia": "Style"
+      "config": "Editor Interface",
+      "sistemas": "Mechanics",
+      "textos": "Standard Texts",
+      "aparencia": "Visual Style"
     },
     "header": {
       "description": "Customize the game interface, configure menus and texts.",

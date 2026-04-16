@@ -156,9 +156,9 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     const { t } = useTranslation();
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pb-32">
             {/* Left Column: Controls */}
-            <div className="col-span-1 lg:col-span-5 space-y-8 h-[calc(100vh-280px)] overflow-y-auto pr-4 custom-scrollbar">
+            <div className="col-span-1 lg:col-span-5 space-y-8">
                 {/* SECTION: ESTRUTURA */}
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '50ms' }}>
                     <div className="flex items-center w-full text-left">
@@ -451,7 +451,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
             </div>
 
             {/* Right Column: Preview */}
-            <div className="col-span-1 lg:col-span-7 relative sticky top-0 self-start">
+            <div className="col-span-1 lg:col-span-7 relative sticky top-[110px] self-start z-10">
                 <div className="space-y-6 flex flex-col">
                     <div className="flex items-center justify-start gap-3 mb-2 w-full">
                         <span className="text-[10px] font-bold text-muted-foreground uppercase whitespace-nowrap text-zinc-400">{t('UIEditor.aparencia.previewLabel', 'Exemplo de')}</span>

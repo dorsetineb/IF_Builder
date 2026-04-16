@@ -716,10 +716,10 @@
     },
     "tabs": {
       "layout": "Diseño",
-      "config": "Área de trabajo",
-      "sistemas": "Sistemas",
-      "textos": "Textos",
-      "aparencia": "Estilo"
+      "config": "Interfaz del Editor",
+      "sistemas": "Mecánicas",
+      "textos": "Textos Estándar",
+      "aparencia": "Estilo Visual"
     },
     "header": {
       "description": "Personaliza la interfaz del juego, configura menús y textos.",

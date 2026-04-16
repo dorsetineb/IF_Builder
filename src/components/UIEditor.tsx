@@ -264,7 +264,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localMainMenuButtonText, setLocalMainMenuButtonText] = useState(gameMainMenuButtonText);
     const [localViewEndingButtonText, setLocalViewEndingButtonText] = useState(gameViewEndingButtonText);
     const [localRetrospectiveButtonText, setLocalRetrospectiveButtonText] = useState(gameRetrospectiveButtonText);
-    const [activeTab, setActiveTab] = useState<'sistemas' | 'aparencia' | 'textos' | 'config'>('config');
+    const [activeTab, setActiveTab] = useState<'sistemas' | 'aparencia' | 'textos' | 'config'>('aparencia');
     const [originalTheme, setOriginalTheme] = useState(theme);
     const [localLanguage, setLocalLanguage] = useState(i18n.language || 'pt');
     const handleAppThemeChange = (newTheme: string) => {
@@ -332,10 +332,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed);
 
     const TABS = {
-        config: t('UIEditor.tabs.config', 'Área de trabalho'),
         aparencia: t('UIEditor.tabs.aparencia'),
         sistemas: t('UIEditor.tabs.sistemas'),
         textos: t('UIEditor.tabs.textos'),
+        config: t('UIEditor.tabs.config', 'Área de trabalho'),
     };
 
 
