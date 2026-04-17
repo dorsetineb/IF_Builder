@@ -539,38 +539,40 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
                                         {activeSections.estrutura && (
                                             <div className="space-y-4 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                                                <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.orientation', 'Orientação')}</label>
-                                                    <select
-                                                        value={layoutOrientation}
-                                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                        onChange={(e) => setLayoutOrientation(e.target.value as any)}
-                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
-                                                    >
-                                                        <option value="vertical">{t('newProject.appearance.vertical', 'Vertical')}</option>
-                                                        <option value="horizontal">{t('newProject.appearance.horizontal', 'Horizontal')}</option>
-                                                    </select>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.imagePosition', 'Posição da Imagem')}</label>
-                                                    <select
-                                                        value={layoutOrder}
-                                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                        onChange={(e) => setLayoutOrder(e.target.value as any)}
-                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
-                                                    >
-                                                        {layoutOrientation === 'vertical' ? (
-                                                            <>
-                                                                <option value="image-first">{t('newProject.appearance.left', 'Esquerda')}</option>
-                                                                <option value="image-last">{t('newProject.appearance.right', 'Direita')}</option>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <option value="image-first">{t('newProject.appearance.above', 'Acima')}</option>
-                                                                <option value="image-last">{t('newProject.appearance.below', 'Abaixo')}</option>
-                                                            </>
-                                                        )}
-                                                    </select>
+                                                <div className="grid grid-cols-2 gap-4">
+                                                    <div className="space-y-2">
+                                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.orientation', 'Orientação')}</label>
+                                                        <select
+                                                            value={layoutOrientation}
+                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                            onChange={(e) => setLayoutOrientation(e.target.value as any)}
+                                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                        >
+                                                            <option value="vertical">{t('newProject.appearance.vertical', 'Vertical')}</option>
+                                                            <option value="horizontal">{t('newProject.appearance.horizontal', 'Horizontal')}</option>
+                                                        </select>
+                                                    </div>
+                                                    <div className="space-y-2">
+                                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.imagePosition', 'Posição da Imagem')}</label>
+                                                        <select
+                                                            value={layoutOrder}
+                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                                                            onChange={(e) => setLayoutOrder(e.target.value as any)}
+                                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                        >
+                                                            {layoutOrientation === 'vertical' ? (
+                                                                <>
+                                                                    <option value="image-first">{t('newProject.appearance.left', 'Esquerda')}</option>
+                                                                    <option value="image-last">{t('newProject.appearance.right', 'Direita')}</option>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <option value="image-first">{t('newProject.appearance.above', 'Acima')}</option>
+                                                                    <option value="image-last">{t('newProject.appearance.below', 'Abaixo')}</option>
+                                                                </>
+                                                            )}
+                                                        </select>
+                                                    </div>
                                                 </div>
                                                 <div className="space-y-2">
                                                     <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.frameTitle', 'Moldura')}</label>

@@ -168,42 +168,44 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                     </div>
 
                     <div className="space-y-6 pt-4">
-                        <div className="space-y-2">
-                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.orientation')}</label>
-                            <div className="relative">
-                                <select
-                                    value={localLayoutOrientation}
-                                    onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
-                                    className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
-                                >
-                                    <option value="vertical">{t('UIEditor.layout.vertical')}</option>
-                                    <option value="horizontal">{t('UIEditor.layout.horizontal')}</option>
-                                </select>
-                                <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.orientation')}</label>
+                                <div className="relative">
+                                    <select
+                                        value={localLayoutOrientation}
+                                        onChange={(e) => setLocalLayoutOrientation(e.target.value as 'vertical' | 'horizontal')}
+                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer"
+                                    >
+                                        <option value="vertical">{t('UIEditor.layout.vertical')}</option>
+                                        <option value="horizontal">{t('UIEditor.layout.horizontal')}</option>
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                </div>
                             </div>
-                        </div>
 
-                        <div className="space-y-2">
-                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.imagePosition')}</label>
-                            <div className="relative">
-                                <select
-                                    value={localLayoutOrder}
-                                    onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
-                                    className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
-                                >
-                                    {localLayoutOrientation === 'vertical' ? (
-                                        <>
-                                            <option value="image-first">{t('UIEditor.layout.posLeft')}</option>
-                                            <option value="image-last">{t('UIEditor.layout.posRight')}</option>
-                                        </>
-                                    ) : (
-                                        <>
-                                            <option value="image-first">{t('UIEditor.layout.posAbove')}</option>
-                                            <option value="image-last">{t('UIEditor.layout.posBelow')}</option>
-                                        </>
-                                    )}
-                                </select>
-                                <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                            <div className="space-y-2">
+                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.imagePosition')}</label>
+                                <div className="relative">
+                                    <select
+                                        value={localLayoutOrder}
+                                        onChange={(e) => setLocalLayoutOrder(e.target.value as 'image-first' | 'image-last')}
+                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-purple-500/30 transition-all appearance-none cursor-pointer"
+                                    >
+                                        {localLayoutOrientation === 'vertical' ? (
+                                            <>
+                                                <option value="image-first">{t('UIEditor.layout.posLeft')}</option>
+                                                <option value="image-last">{t('UIEditor.layout.posRight')}</option>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <option value="image-first">{t('UIEditor.layout.posAbove')}</option>
+                                                <option value="image-last">{t('UIEditor.layout.posBelow')}</option>
+                                            </>
+                                        )}
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                </div>
                             </div>
                         </div>
 
@@ -247,9 +249,12 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                         </h3>
                     </div>
 
-                    <div className="space-y-6 pt-4">
-                        <div className="space-y-2">
-                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.layout.contentAlignment')}</label>
+                    <div className="space-y-4 pt-4">
+                        <div className="grid grid-cols-2 gap-4">
+                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('UIEditor.layout.contentAlignment')}</label>
+                            <div /> {/* Empty label area for the second column */}
+                        </div>
+                        <div className="grid grid-cols-2 gap-4 items-center">
                             <div className="relative">
                                 <select
                                     value={localSplashContentAlignment}
@@ -261,27 +266,27 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                 </select>
                                 <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                             </div>
-                        </div>
-                        <div className="flex flex-row gap-4">
-                            <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}>
-                                <input
-                                    type="checkbox"
-                                    id="omitSplashTitle"
-                                    checked={localOmitSplashTitle}
-                                    onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
-                                    className="custom-checkbox"
-                                />
-                                <label htmlFor="omitSplashTitle" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('UIEditor.layout.hideTitle')}</label>
-                            </div>
-                            <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashDescription(!localOmitSplashDescription)}>
-                                <input
-                                    type="checkbox"
-                                    id="omitSplashDescription"
-                                    checked={localOmitSplashDescription}
-                                    onChange={(e) => setLocalOmitSplashDescription(e.target.checked)}
-                                    className="custom-checkbox"
-                                />
-                                <label htmlFor="omitSplashDescription" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('UIEditor.layout.hideDescription')}</label>
+                            <div className="flex flex-row gap-4 py-1">
+                                <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashTitle(!localOmitSplashTitle)}>
+                                    <input
+                                        type="checkbox"
+                                        id="omitSplashTitle"
+                                        checked={localOmitSplashTitle}
+                                        onChange={(e) => setLocalOmitSplashTitle(e.target.checked)}
+                                        className="custom-checkbox"
+                                    />
+                                    <label htmlFor="omitSplashTitle" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('UIEditor.layout.hideTitle')}</label>
+                                </div>
+                                <div className="flex items-center group cursor-pointer" onClick={() => setLocalOmitSplashDescription(!localOmitSplashDescription)}>
+                                    <input
+                                        type="checkbox"
+                                        id="omitSplashDescription"
+                                        checked={localOmitSplashDescription}
+                                        onChange={(e) => setLocalOmitSplashDescription(e.target.checked)}
+                                        className="custom-checkbox"
+                                    />
+                                    <label htmlFor="omitSplashDescription" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('UIEditor.layout.hideDescription')}</label>
+                                </div>
                             </div>
                         </div>
                     </div>
