@@ -1390,7 +1390,7 @@ const Editor: React.FC = () => {
             />
             <main
               ref={mainRef}
-              className="flex-1 overflow-y-auto relative bg-background p-0"
+              className={`flex-1 relative bg-background p-0 ${currentView === 'interface' ? 'overflow-hidden' : 'overflow-y-auto'}`}
             >
               {/* currentView === 'vignettes' block removed */}
               {currentView === 'interface' && (

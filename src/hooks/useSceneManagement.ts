@@ -183,6 +183,18 @@ export const useSceneManagement = ({
             ...JSON.parse(JSON.stringify(sceneToCopy)),
             id: newId,
             name: `${sceneToCopy.name} (Cópia)`,
+            // Clear narrative connections
+            vignetteNextSceneId: undefined,
+            exits: undefined,
+            choices: [],
+            interactions: (sceneToCopy.interactions || []).map(inter => ({
+                ...inter,
+                goToScene: undefined,
+                vignetteId: undefined
+            })),
+            // Map offset to avoid overlap
+            mapX: (sceneToCopy.mapX || 0) + 40,
+            mapY: (sceneToCopy.mapY || 0) + 40,
         };
 
         setGameData(prev => {

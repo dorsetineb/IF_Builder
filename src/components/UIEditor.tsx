@@ -880,8 +880,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     };
 
     return (
-        <div className="px-4 pb-8 h-full">
-            <div className="sticky top-0 z-40 bg-background flex flex-col pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm border-b border-muted-foreground/50">
+        <div className="h-full flex flex-col overflow-hidden">
+            <div className="z-40 bg-background flex flex-col pt-4 pb-0 gap-3 px-4">
                 {/* Solid background shield to perfectly hide scrolled content */}
                 <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
                 {/* Soft gradient transition */}
@@ -907,9 +907,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         <button
                             onClick={handleSave}
                             disabled={!isDirty}
-                            className="px-4 py-1.5 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
+                            className="flex items-center gap-2 px-4 py-1.5 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed group"
                         >
-                            {t('UIEditor.header.save')}
+                            <Save className="w-3.5 h-3.5 transition-transform group-hover:scale-110" />
+                            <span>{t('UIEditor.header.save')}</span>
                         </button>
                     </div>
                 </div>
@@ -934,7 +935,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 </div>
             </div>
 
-            <div className="mt-4">
+            <div className="flex-1 overflow-y-auto px-4 pb-12 pt-4 custom-scrollbar">
                 <div className="bg-background">
 
 

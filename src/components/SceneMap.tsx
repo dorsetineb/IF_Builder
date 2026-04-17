@@ -721,7 +721,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                   e.stopPropagation();
                   onAddNode?.('vignette');
                 }}
-                className="flex-1 flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-zinc-200 border border-transparent whitespace-nowrap flex-shrink-0"
+                className="flex-1 flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-primary hover:text-white border border-transparent whitespace-nowrap flex-shrink-0"
               >
                 <ArrowRight className="w-3.5 h-3.5 mr-1.5" />
                 {t('sceneList.nodeSelection.vignette.title', 'Criar Vinheta')}
@@ -735,7 +735,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
                 className={`flex-1 flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent whitespace-nowrap flex-shrink-0 ${
                   !hasOpeningVignette 
                     ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed grayscale' 
-                    : 'bg-white text-zinc-950 hover:bg-zinc-200'
+                    : 'bg-white text-zinc-950 hover:bg-primary hover:text-white'
                 }`}
                 title={!hasOpeningVignette ? t('sceneList.nodeSelection.scene.lockedDesc', 'Crie uma vinheta de abertura para habilitar cenas.') : ''}
               >
@@ -1138,14 +1138,14 @@ const SceneMap: React.FC<SceneMapProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={onReorganizeScenes}
-            className={`flex items-center px-4 h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
+            className={`flex items-center px-4 h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary hover:text-white hover:border-primary`}
           >
             <LayoutGrid className="w-4 h-4 mr-2" />
             {t('sceneMap.reorganize', 'Reorganizar')}
           </button>
           <button
             onClick={handleViewAll}
-            className={`flex items-center px-4 h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
+            className={`flex items-center px-4 h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary hover:text-white hover:border-primary`}
           >
             <Maximize2 className="w-4 h-4 mr-2" />
             {t('sceneMap.viewAll', 'Ver Tudo')}
@@ -1155,7 +1155,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
             className={`flex items-center px-4 h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
               highlightOrphans
                 ? 'bg-red-600 text-white border-red-500 hover:bg-red-700'
-                : 'bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700'
+                : 'bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary hover:text-white hover:border-primary'
             }`}
           >
             <AlertTriangle className="w-4 h-4 mr-2" />
@@ -1163,7 +1163,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
           </button>
           <button
             onClick={() => setIsStatsModalOpen(true)}
-            className={`w-[140px] flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-zinc-700`}
+            className={`flex items-center px-4 h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary hover:text-white hover:border-primary`}
           >
             <BarChart3 className="w-4 h-4 mr-2" />
             {t('sceneMap.statistics', 'Estatísticas')}

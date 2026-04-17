@@ -428,6 +428,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
       !!localScene.restoresChanceOnEntry;
 
     const isVignetteMode = localScene.vignetteType && localScene.vignetteType !== 'none';
+    const copyLabel = t('sceneEditor.copyBtn', 'Copiar');
 
     return (
       <div className={`flex flex-col ${isSidePanel ? 'h-full overflow-hidden' : 'pb-8 px-4'}`}>
@@ -436,58 +437,60 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
           <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
           
           {!isSidePanel && (
-            <div className={`flex justify-between items-center bg-card p-3 rounded-xl border border-muted-foreground/50 shadow-sm relative z-10`}>
-              <p className="text-muted-foreground text-xs font-medium">
-                {t('sceneEditor.headerDesc')}
-              </p>
+            <div className="flex justify-between items-center bg-card p-3 rounded-xl border border-muted-foreground/50 shadow-sm relative z-10">
+              <div className="flex items-center gap-4 flex-1 overflow-hidden">
+                <p className="text-muted-foreground text-xs font-medium truncate max-w-[150px] lg:max-w-none">
+                  {t('sceneEditor.headerDesc')}
+                </p>
+                
+                <div className="flex items-center gap-2 flex-1 max-w-[320px] animate-in fade-in slide-in-from-left-2 duration-300">
+                  <button
+                    onClick={handlePreview}
+                    className="flex-1 max-w-[160px] min-w-[40px] flex items-center justify-center gap-2 px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap"
+                    title={t('sceneEditor.testTooltip')}
+                  >
+                    <Hammer className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline-block">{t('sceneEditor.testBtn')}</span>
+                  </button>
+
+                  <button
+                    onClick={() => onCopyScene(localScene)}
+                    className="flex-1 max-w-[160px] min-w-[40px] flex items-center justify-center gap-1.5 px-3 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap"
+                    title={t('sceneEditor.copyTooltip')}
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline-block">{copyLabel}</span>
+                  </button>
+                </div>
+              </div>
               
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-1 max-w-[300px] justify-end ml-4">
                 {isDirty && (
-                  <div className="flex items-center gap-1 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-1">
-                    <span className="hidden sm:inline">{t('sceneEditor.unsavedChanges')}</span>
+                  <div className="flex items-center gap-1 text-yellow-500 text-[10px] font-bold uppercase tracking-widest animate-pulse mr-1 whitespace-nowrap overflow-hidden">
+                    <span className="hidden lg:inline">{t('sceneEditor.unsavedChanges')}</span>
                   </div>
                 )}
 
                 <button
-                  onClick={handlePreview}
-                  className="flex items-center gap-2 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg"
-                  title={t('sceneEditor.testTooltip')}
+                  onClick={handleUndo}
+                  disabled={!isDirty}
+                  className="flex-1 max-w-[140px] min-w-[40px] flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap"
                 >
-                  <Hammer className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{t('sceneEditor.testBtn')}</span>
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline-block truncate">{t('sceneEditor.undoBtn')}</span>
                 </button>
 
                 <button
-                  onClick={() => onCopyScene(localScene)}
-                  className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors hover:bg-zinc-800 rounded-lg"
-                  title={t('sceneEditor.copyTooltip')}
+                  onClick={handleSave}
+                  disabled={!isDirty}
+                  className="flex-1 max-w-[140px] min-w-[40px] flex items-center justify-center gap-1.5 px-2 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap"
                 >
-                  <Copy className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">{t('sceneEditor.copyBtn')}</span>
+                  <Save className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline-block truncate">{t('globalObjectsEditor.saveBtn', 'Salvar')}</span>
                 </button>
-
-                <>
-                  <button
-                    onClick={handleUndo}
-                    disabled={!isDirty}
-                    className="flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors hover:bg-zinc-800 rounded-lg"
-                    title={t('sceneEditor.undoTooltip')}
-                  >
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span className="hidden sm:inline">{t('sceneEditor.undoBtn')}</span>
-                  </button>
-
-                  <button
-                    onClick={handleSave}
-                    disabled={!isDirty}
-                    className="flex items-center gap-1.5 px-3 py-1.5 bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed"
-                  >
-                    <Save className="w-3.5 h-3.5" />
-                    <span>{t('sceneEditor.saveBtn')}</span>
-                  </button>
-                </>
               </div>
             </div>
+
           )}
 
           {!isVignetteMode && (
@@ -1390,37 +1393,74 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
               </div>
             )}
 
-            <div className="flex justify-between items-center gap-3">
-              <button
-                onClick={handlePreview}
-                className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap"
-                title={t('sceneEditor.testTooltip')}
-              >
-                <Hammer className="w-4 h-4" />
-                <span className="text-[10px] uppercase font-bold tracking-tight">
-                  {isVignetteMode ? t('sceneEditor.testVignetteBtn', 'Testar vinheta') : t('sceneEditor.testSceneBtn', 'Testar cena')}
-                </span>
-              </button>
+            <div className={`flex w-full items-center ${activeTab === 'properties' || activeTab === 'choices' ? 'justify-between' : 'justify-between'}`}>
+              <div className={`flex items-center ${activeTab === 'properties' || activeTab === 'choices' ? 'gap-2 w-full justify-between' : 'gap-2'}`}>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handlePreview}
+                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap flex-none"
+                    title={t('sceneEditor.testTooltip')}
+                  >
+                    <Hammer className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                    <span className="hidden min-[450px]:inline-block">
+                      {t('sceneEditor.testBtn', 'Testar')}
+                    </span>
+                  </button>
 
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={handleUndo}
-                  disabled={!isDirty}
-                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap"
-                >
-                  <RotateCcw className="w-4 h-4" />
-                  <span>{t('sceneEditor.undoBtn')}</span>
-                </button>
+                  <button
+                    onClick={() => onCopyScene(localScene)}
+                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white transition-colors bg-zinc-800/50 hover:bg-primary border border-muted-foreground/50 hover:border-primary rounded-lg whitespace-nowrap flex-none"
+                    title={t('sceneEditor.copyTooltip')}
+                  >
+                    <Copy className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                    <span className="hidden min-[450px]:inline-block">
+                      {copyLabel}
+                    </span>
+                  </button>
+                </div>
 
-                <button
-                  onClick={handleSave}
-                  disabled={!isDirty}
-                  className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap"
-                >
-                  <Save className="w-4 h-4" />
-                  <span>{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
-                </button>
+                <div className={`${activeTab === 'properties' || activeTab === 'choices' ? 'flex items-center gap-2' : 'hidden'}`}>
+                  <button
+                    onClick={handleUndo}
+                    disabled={!isDirty}
+                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap flex-none"
+                  >
+                    <RotateCcw className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                    <span className="hidden min-[450px]:inline-block">{t('sceneEditor.undoBtn')}</span>
+                  </button>
+
+                  <button
+                    onClick={handleSave}
+                    disabled={!isDirty}
+                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap flex-none shadow-lg"
+                  >
+                    <Save className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                    <span className="hidden min-[450px]:inline-block">{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
+                  </button>
+                </div>
               </div>
+
+              {activeTab !== 'properties' && activeTab !== 'choices' && (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleUndo}
+                    disabled={!isDirty}
+                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] text-xs font-bold text-zinc-400 hover:text-white disabled:opacity-30 disabled:hover:text-zinc-400 transition-colors bg-zinc-800/50 hover:bg-zinc-800 border border-muted-foreground/50 rounded-lg whitespace-nowrap flex-none"
+                  >
+                    <RotateCcw className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                    <span className="hidden min-[450px]:inline-block">{t('sceneEditor.undoBtn')}</span>
+                  </button>
+
+                  <button
+                    onClick={handleSave}
+                    disabled={!isDirty}
+                    className="flex items-center justify-center gap-1.5 px-4 h-[56px] bg-yellow-500 text-zinc-950 font-bold rounded-lg hover:bg-yellow-600 transition-all text-xs disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed whitespace-nowrap flex-none shadow-lg"
+                  >
+                    <Save className="w-4 h-4 shrink-0" strokeWidth={2.5} />
+                    <span className="hidden min-[450px]:inline-block">{t('globalObjectsEditor.saveBtn', 'Salvar Alterações')}</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}

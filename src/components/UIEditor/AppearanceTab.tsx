@@ -456,7 +456,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
             </div>
 
             {/* Right Column: Preview */}
-            <div className="col-span-1 lg:col-span-7 relative sticky top-[110px] self-start z-10">
+            <div className="col-span-1 lg:col-span-7 relative sticky top-0 self-start z-10">
                 <div className="space-y-6 flex flex-col">
                     <div className="flex items-center justify-start gap-3 mb-2 w-full">
                         <span className="text-[10px] font-bold text-muted-foreground uppercase whitespace-nowrap text-zinc-400">{t('UIEditor.aparencia.previewLabel', 'Exemplo de')}</span>
