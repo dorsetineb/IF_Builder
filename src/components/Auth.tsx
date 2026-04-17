@@ -116,7 +116,7 @@ export function Auth() {
                                 e.currentTarget.style.setProperty('--mouse-y', `${y}px`);
                             }}
                             onClick={() => navigate('/editor')}
-                            className={`w-full flex items-center justify-start gap-3 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden shadow-xl hover:scale-[1.02] bg-primary border-primary text-primary-foreground`}
+                            className={`w-full flex items-center justify-start gap-4 px-6 py-4 rounded-xl font-bold text-sm transition-all group border relative overflow-hidden shadow-xl bg-primary border-primary text-primary-foreground hover:bg-white hover:text-zinc-950 hover:border-white`}
                         >
                             <div
                                 className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"
@@ -124,7 +124,7 @@ export function Auth() {
                                     background: `radial-gradient(circle 60px at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.2) 0%, transparent 100%)`
                                 }}
                             />
-                            <Play size={18} className="group-hover:translate-x-1 transition-transform relative z-10" />
+                            <Play size={20} className="relative z-10 group-hover:translate-x-1 transition-transform shrink-0" />
                             <span className="uppercase tracking-wider relative z-10">{t('auth.sidebar.startProgram', 'Iniciar Programa')}</span>
                         </button>
 

@@ -350,9 +350,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     <div className="grid grid-cols-1 gap-4">
                                         <button
                                             onClick={() => setInteractionType('parser')}
-                                            className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'parser' ? 'bg-primary/10 border-primary ring-1 ring-primary/50' : 'bg-black/30 border-muted-foreground/50 hover:border-muted-foreground/50 hover:bg-zinc-900'}`}
+                                            className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'parser' ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:border-muted-foreground/50 hover:bg-zinc-900'}`}
                                         >
-                                            <div className={`p-4 rounded-xl ${interactionType === 'parser' ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-300'}`}>
+                                            <div className={`p-4 rounded-xl transition-colors ${interactionType === 'parser' ? 'bg-primary text-white' : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-300'}`}>
                                                 <Terminal className="w-8 h-8" />
                                             </div>
                                             <div>
@@ -365,9 +365,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
                                         <button
                                             onClick={() => setInteractionType('choice')}
-                                            className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'choice' ? 'bg-primary/10 border-primary ring-1 ring-primary/50' : 'bg-black/30 border-muted-foreground/50 hover:border-muted-foreground/50 hover:bg-zinc-900'}`}
+                                            className={`flex items-start gap-4 p-6 rounded-xl border transition-all text-left group ${interactionType === 'choice' ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:border-muted-foreground/50 hover:bg-zinc-900'}`}
                                         >
-                                            <div className={`p-4 rounded-xl ${interactionType === 'choice' ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-300'}`}>
+                                            <div className={`p-4 rounded-xl transition-colors ${interactionType === 'choice' ? 'bg-primary text-white' : 'bg-zinc-800 text-zinc-500 group-hover:text-zinc-300'}`}>
                                                 <MousePointerClick className="w-8 h-8" />
                                             </div>
                                             <div>
@@ -382,7 +382,14 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     <div className="w-full h-px bg-zinc-800 my-2"></div>
 
                                     <div className="grid grid-cols-1 gap-4">
-                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                        <div className="flex items-center gap-4 p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                            <button
+                                                onClick={() => interactionType !== 'choice' && setEnableInventory(!enableInventory)}
+                                                disabled={interactionType === 'choice'}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableInventory ? 'bg-primary' : 'bg-zinc-700'} ${interactionType === 'choice' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            >
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableInventory ? 'translateX(24px)' : 'translateX(0)' }} />
+                                            </button>
                                             <div className="flex items-center gap-4">
                                                 <div className={`p-3 rounded-lg ${enableInventory ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
                                                     <Package className="w-6 h-6" />
@@ -392,16 +399,15 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <p className="text-xs text-zinc-500">{t('newProject.features.inventoryDesc', 'Gestão de itens pegos pelo jogador')}</p>
                                                 </div>
                                             </div>
-                                            <button
-                                                onClick={() => interactionType !== 'choice' && setEnableInventory(!enableInventory)}
-                                                disabled={interactionType === 'choice'}
-                                                className={`w-12 h-6 rounded-full relative transition-all ${enableInventory ? 'bg-primary' : 'bg-zinc-700'} ${interactionType === 'choice' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                            >
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableInventory ? 'translateX(24px)' : 'translateX(0)' }} />
-                                            </button>
                                         </div>
 
-                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                        <div className="flex items-center gap-4 p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                            <button
+                                                onClick={() => setEnableDiary(!enableDiary)}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableDiary ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableDiary ? 'translateX(24px)' : 'translateX(0)' }} />
+                                            </button>
                                             <div className="flex items-center gap-4">
                                                 <div className={`p-3 rounded-lg ${enableDiary ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
                                                     <BookText className="w-6 h-6" />
@@ -411,15 +417,15 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <p className="text-xs text-zinc-500">{t('newProject.features.diaryDesc', 'Registro automático de eventos')}</p>
                                                 </div>
                                             </div>
-                                            <button
-                                                onClick={() => setEnableDiary(!enableDiary)}
-                                                className={`w-12 h-6 rounded-full relative transition-all ${enableDiary ? 'bg-primary' : 'bg-zinc-700'}`}
-                                            >
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableDiary ? 'translateX(24px)' : 'translateX(0)' }} />
-                                            </button>
                                         </div>
 
-                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                        <div className="flex items-center gap-4 p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                            <button
+                                                onClick={() => setEnableChances(!enableChances)}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableChances ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableChances ? 'translateX(24px)' : 'translateX(0)' }} />
+                                            </button>
                                             <div className="flex items-center gap-4">
                                                 <div className={`p-3 rounded-lg ${enableChances ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
                                                     <Heart className="w-6 h-6" />
@@ -429,15 +435,15 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <p className="text-xs text-zinc-500">{t('newProject.features.chancesDesc', 'Limitar tentativas e chances')}</p>
                                                 </div>
                                             </div>
-                                            <button
-                                                onClick={() => setEnableChances(!enableChances)}
-                                                className={`w-12 h-6 rounded-full relative transition-all ${enableChances ? 'bg-primary' : 'bg-zinc-700'}`}
-                                            >
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableChances ? 'translateX(24px)' : 'translateX(0)' }} />
-                                            </button>
                                         </div>
 
-                                        <div className="flex items-center justify-between p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                        <div className="flex items-center gap-4 p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                            <button
+                                                onClick={() => setEnableTrackers(!enableTrackers)}
+                                                className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableTrackers ? 'bg-primary' : 'bg-zinc-700'}`}
+                                            >
+                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableTrackers ? 'translateX(24px)' : 'translateX(0)' }} />
+                                            </button>
                                             <div className="flex items-center gap-4">
                                                 <div className={`p-3 rounded-lg ${enableTrackers ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
                                                     <SlidersHorizontal className="w-6 h-6" />
@@ -447,12 +453,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <p className="text-xs text-zinc-500">{t('newProject.features.trackersDesc', 'Variáveis numéricas (saúde, dinheiro, sanidade)')}</p>
                                                 </div>
                                             </div>
-                                            <button
-                                                onClick={() => setEnableTrackers(!enableTrackers)}
-                                                className={`w-12 h-6 rounded-full relative transition-all ${enableTrackers ? 'bg-primary' : 'bg-zinc-700'}`}
-                                            >
-                                                <div className={`absolute top-1 left-1 bg-white w-4 h-4 rounded-full transition-all shadow-sm`} style={{ transform: enableTrackers ? 'translateX(24px)' : 'translateX(0)' }} />
-                                            </button>
                                         </div>
                                     </div>
                                 </div>

@@ -2,7 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
     LayoutTemplate, Type, List, Image as ImageIcon, Heart, 
-    Lightbulb, Package, Book, SlidersHorizontal, History as HistoryIcon 
+    Lightbulb, Package, Book, SlidersHorizontal, History as HistoryIcon,
+    Star, Square, Circle, X
 } from 'lucide-react';
 import { GameData } from '../../types';
 
@@ -10,8 +11,9 @@ import { GameData } from '../../types';
 export const ChanceIcon: React.FC<{ type: any, color: string, className?: string }> = ({ type, color, className }) => {
     switch (type) {
         case 'heart': return <Heart className={className} style={{ fill: color, color }} />;
-        case 'circle': return <div className={`rounded-full ${className}`} style={{ backgroundColor: color }} />;
-        case 'diamond': return <div className={`rotate-45 ${className}`} style={{ backgroundColor: color }} />;
+        case 'circle': return <Circle className={className} style={{ fill: color, color }} />;
+        case 'square': return <Square className={className} style={{ fill: color, color }} />;
+        case 'star': return <Star className={className} style={{ fill: color, color }} />;
         case 'cross': return <div className={`relative ${className} flex items-center justify-center`}><div className="absolute w-full h-[20%] bg-current" style={{ backgroundColor: color }} /><div className="absolute h-full w-[20%] bg-current" style={{ backgroundColor: color }} /></div>;
         default: return <Heart className={className} style={{ fill: color, color }} />;
     }
@@ -125,9 +127,9 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                             <div className="grid grid-cols-1 gap-4">
                                 <button
                                     onClick={() => setLocalGameInteractionType('parser')}
-                                    className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/10 shadow-sm opacity-100' : 'border-muted-foreground/50 bg-muted/30 hover:border-primary/30 opacity-50'}`}
+                                    className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/20 shadow-md opacity-100' : 'border-muted-foreground/50 bg-muted/30 hover:border-primary/30 opacity-50'}`}
                                 >
-                                    <div className={`p-3 rounded-lg ${localGameInteractionType === 'parser' ? 'bg-primary/20 text-primary' : 'bg-background/40 text-muted-foreground'}`}>
+                                    <div className={`p-3 rounded-lg transition-colors ${localGameInteractionType === 'parser' ? 'bg-primary text-white' : 'bg-background/40 text-muted-foreground'}`}>
                                         <Type className="w-6 h-6" />
                                     </div>
                                     <div>
@@ -140,9 +142,9 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                         setLocalGameInteractionType('choice');
                                         setLocalEnableInventory(false);
                                     }}
-                                    className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-primary bg-primary/10 shadow-sm opacity-100' : 'border-muted-foreground/50 bg-muted/30 hover:border-primary/30 opacity-50'}`}
+                                    className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-primary bg-primary/20 shadow-md opacity-100' : 'border-muted-foreground/50 bg-muted/30 hover:border-primary/30 opacity-50'}`}
                                 >
-                                    <div className={`p-3 rounded-lg ${localGameInteractionType === 'choice' ? 'bg-primary/20 text-primary' : 'bg-background/40 text-muted-foreground'}`}>
+                                    <div className={`p-3 rounded-lg transition-colors ${localGameInteractionType === 'choice' ? 'bg-primary text-white' : 'bg-background/40 text-muted-foreground'}`}>
                                         <List className="w-6 h-6" />
                                     </div>
                                     <div>
@@ -156,15 +158,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                         {/* IMAGES */}
                         <div className="w-full">
                             <div className={`w-full p-6 bg-card border-2 ${localEnableImages ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '100ms' }}>
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <ImageIcon className="w-5 h-5" />
-                                        <div>
-                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.imagesInScenes')}</h4>
-                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.imagesInScenesDesc')}</p>
-                                        </div>
-                                    </div>
-                                    <label className="relative inline-flex items-center cursor-pointer">
+                                <div className="flex items-center gap-4">
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
                                         <input type="checkbox" checked={localEnableImages} onChange={(e) => setLocalEnableImages(e.target.checked)} className="sr-only peer" />
                                         <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                             <div 
@@ -173,6 +168,13 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                             ></div>
                                         </div>
                                     </label>
+                                    <div className="flex items-center gap-3">
+                                        <ImageIcon className="w-5 h-5" />
+                                        <div>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableImages ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.imagesInScenes')}</h4>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.imagesInScenesDesc')}</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 {localEnableImages && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -215,15 +217,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                         {/* TEXT CONTROL */}
                         <div className="w-full">
                             <div className={`w-full p-6 bg-card border-2 ${localEnableTextControl ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '200ms' }}>
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <Type className="w-5 h-5" />
-                                        <div>
-                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.textControl')}</h4>
-                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.textControlDesc')}</p>
-                                        </div>
-                                    </div>
-                                    <label className="relative inline-flex items-center cursor-pointer">
+                                <div className="flex items-center gap-4">
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
                                         <input type="checkbox" checked={localEnableTextControl} onChange={(e) => setLocalEnableTextControl(e.target.checked)} className="sr-only peer" />
                                         <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                             <div 
@@ -232,6 +227,13 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                             ></div>
                                         </div>
                                     </label>
+                                    <div className="flex items-center gap-3">
+                                        <Type className="w-5 h-5" />
+                                        <div>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableTextControl ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.textControl')}</h4>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.textControlDesc')}</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 {localEnableTextControl && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -289,15 +291,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                         {/* CHANCES/VIDAS */}
                         <div className="w-full">
                             <div className={`w-full p-6 bg-card border-2 ${localEnableChances ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '300ms' }}>
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <Heart className="w-5 h-5" />
-                                        <div>
-                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.lifeSystem')}</h4>
-                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.lifeSystemDesc')}</p>
-                                        </div>
-                                    </div>
-                                    <label className="relative inline-flex items-center cursor-pointer">
+                                <div className="flex items-center gap-4">
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
                                         <input type="checkbox" checked={localEnableChances} onChange={(e) => setLocalEnableChances(e.target.checked)} className="sr-only peer" />
                                         <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                             <div 
@@ -306,26 +301,46 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                             ></div>
                                         </div>
                                     </label>
+                                    <div className="flex items-center gap-3">
+                                        <Heart className="w-5 h-5" />
+                                        <div>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableChances ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.lifeSystem')}</h4>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.lifeSystemDesc')}</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 {localEnableChances && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                                         <div className="flex items-end gap-3 w-full">
+                                            <div className="space-y-1 w-20 shrink-0">
+                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.lives')}</label>
+                                                <input
+                                                    type="number"
+                                                    value={localMaxChances}
+                                                    onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
+                                                    min="1"
+                                                    max="10"
+                                                    className="w-full h-9 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-2 text-xs font-bold text-center text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all"
+                                                />
+                                            </div>
+
                                             <div className="space-y-1 flex-1 min-w-0">
                                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.icon')}</label>
                                                 <div className="flex items-center gap-1 bg-muted/30 p-1 rounded-lg border border-muted-foreground/50 h-9 w-full">
-                                                    {['heart', 'circle', 'diamond', 'cross'].map((icon) => (
+                                                    {['heart', 'circle', 'square', 'star', 'cross'].map((icon) => (
                                                         <button
                                                             key={icon}
                                                             onClick={() => setLocalChanceIcon(icon as any)}
-                                                            className={`flex-1 h-full flex items-center justify-center rounded-md transition-all ${localChanceIcon === icon ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:bg-muted hover:text-foreground'}`}
+                                                            className={`flex-1 h-full flex items-center justify-center rounded-md transition-all ${localChanceIcon === icon ? 'bg-primary/10 shadow-sm opacity-100 ring-1 ring-primary/20' : 'opacity-30 grayscale-[50%] hover:opacity-100 hover:grayscale-0 hover:bg-muted/50'}`}
                                                             title={icon}
                                                         >
-                                                            <ChanceIcon type={icon as any} color={localChanceIcon === icon ? 'currentColor' : 'currentColor'} className="w-4 h-4" />
+                                                            <ChanceIcon type={icon as any} color={localChanceIconColor} className="w-4 h-4" />
                                                         </button>
                                                     ))}
                                                 </div>
                                             </div>
-                                            <div className="space-y-1 flex-1 min-w-0">
+
+                                            <div className="space-y-1 w-32 shrink-0">
                                                 <label htmlFor="chanceColor" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.color')}</label>
                                                 <div className="flex items-center gap-2 p-1 bg-background border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all h-9 w-full">
                                                     <input
@@ -341,21 +356,10 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                                         id="chanceColor"
                                                         value={localChanceIconColor}
                                                         onChange={(e) => setLocalChanceIconColor(e.target.value)}
-                                                        className="w-full bg-transparent font-mono text-xs text-foreground focus:outline-none focus:ring-0 uppercase truncate"
+                                                        className="w-full bg-transparent font-mono text-[10px] text-foreground focus:outline-none focus:ring-0 uppercase truncate"
                                                         placeholder="#FF0000"
                                                     />
                                                 </div>
-                                            </div>
-                                            <div className="space-y-1 w-20 shrink-0">
-                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.sistemas.lives')}</label>
-                                                <input
-                                                    type="number"
-                                                    value={localMaxChances}
-                                                    onChange={(e) => setLocalMaxChances(Math.max(1, Math.min(10, parseInt(e.target.value, 10) || 1)))}
-                                                    min="1"
-                                                    max="10"
-                                                    className="w-full h-9 bg-zinc-950 border border-muted-foreground/50 rounded-lg px-2 text-xs font-bold text-center text-zinc-300 focus:ring-1 focus:ring-primary/50 transition-all"
-                                                />
                                             </div>
                                         </div>
                                     </div>
@@ -366,15 +370,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                         {/* SUGGESTIONS */}
                         <div className="w-full">
                             <div className={`w-full p-6 bg-card border-2 ${localEnableSuggestions ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '400ms' }}>
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <Lightbulb className="w-5 h-5" />
-                                        <div>
-                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableSuggestions ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.suggestions', 'Sugestões')}</h4>
-                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.suggestionsDesc', 'Ativa o botão de sugestões de ações.')}</p>
-                                        </div>
-                                    </div>
-                                    <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
+                                <div className="flex items-center gap-4">
+                                    <label className={`relative inline-flex items-center shrink-0 ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
                                         <input
                                             type="checkbox"
                                             checked={localEnableSuggestions}
@@ -389,6 +386,13 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                             ></div>
                                         </div>
                                     </label>
+                                    <div className="flex items-center gap-3">
+                                        <Lightbulb className="w-5 h-5" />
+                                        <div>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableSuggestions ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.suggestions', 'Sugestões')}</h4>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.suggestionsDesc', 'Ativa o botão de sugestões de ações.')}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -396,15 +400,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                         {/* INVENTORY */}
                         <div className="w-full">
                             <div className={`w-full p-6 bg-card border-2 ${localEnableInventory ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '500ms' }}>
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <Package className="w-5 h-5" />
-                                        <div>
-                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
-                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.inventoryDesc')}</p>
-                                        </div>
-                                    </div>
-                                    <label className={`relative inline-flex items-center ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
+                                <div className="flex items-center gap-4">
+                                    <label className={`relative inline-flex items-center shrink-0 ${localGameInteractionType === 'choice' ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}>
                                         <input
                                             type="checkbox"
                                             checked={localEnableInventory}
@@ -419,6 +416,13 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                             ></div>
                                         </div>
                                     </label>
+                                    <div className="flex items-center gap-3">
+                                        <Package className="w-5 h-5" />
+                                        <div>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableInventory ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.inventory')}</h4>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.inventoryDesc')}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -426,15 +430,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                         {/* DIARY */}
                         <div className="w-full">
                             <div className={`w-full p-6 bg-card border-2 ${localEnableDiary ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '600ms' }}>
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <Book className="w-5 h-5" />
-                                        <div>
-                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.diary')}</h4>
-                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.diaryDesc')}</p>
-                                        </div>
-                                    </div>
-                                    <label className="relative inline-flex items-center cursor-pointer">
+                                <div className="flex items-center gap-4">
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
                                         <input type="checkbox" checked={localEnableDiary} onChange={(e) => setLocalEnableDiary(e.target.checked)} className="sr-only peer" />
                                         <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                             <div 
@@ -443,6 +440,13 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                             ></div>
                                         </div>
                                     </label>
+                                    <div className="flex items-center gap-3">
+                                        <Book className="w-5 h-5" />
+                                        <div>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableDiary ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.diary')}</h4>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.diaryDesc')}</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 {localEnableDiary && (
                                     <div className="animate-in fade-in slide-in-from-top-2 duration-300">
@@ -464,15 +468,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                         {/* TRACKERS */}
                         <div className="w-full">
                             <div className={`w-full p-6 bg-card border-2 ${localEnableTrackers ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '700ms' }}>
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <SlidersHorizontal className="w-5 h-5" />
-                                        <div>
-                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.trackers')}</h4>
-                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.trackersDesc')}</p>
-                                        </div>
-                                    </div>
-                                    <label className="relative inline-flex items-center cursor-pointer">
+                                <div className="flex items-center gap-4">
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
                                         <input type="checkbox" checked={localEnableTrackers} onChange={(e) => setLocalEnableTrackers(e.target.checked)} className="sr-only peer" />
                                         <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                             <div 
@@ -481,6 +478,13 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                             ></div>
                                         </div>
                                     </label>
+                                    <div className="flex items-center gap-3">
+                                        <SlidersHorizontal className="w-5 h-5" />
+                                        <div>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableTrackers ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.trackers')}</h4>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.trackersDesc')}</p>
+                                        </div>
+                                    </div>
                                 </div>
                                 {localEnableTrackers && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
@@ -501,15 +505,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                         {/* RETROSPECTIVE */}
                         <div className="w-full">
                             <div className={`w-full p-6 bg-card border-2 ${localEnableRetrospective ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '800ms' }}>
-                                <div className="flex justify-between items-center">
-                                    <div className="flex items-center gap-3">
-                                        <HistoryIcon className="w-5 h-5" />
-                                        <div>
-                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableRetrospective ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.retrospective')}</h4>
-                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.retrospectiveDesc')}</p>
-                                        </div>
-                                    </div>
-                                    <label className="relative inline-flex items-center cursor-pointer">
+                                <div className="flex items-center gap-4">
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
                                         <input type="checkbox" checked={localEnableRetrospective} onChange={(e) => setLocalEnableRetrospective(e.target.checked)} className="sr-only peer" />
                                         <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
                                             <div 
@@ -518,6 +515,13 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                             ></div>
                                         </div>
                                     </label>
+                                    <div className="flex items-center gap-3">
+                                        <HistoryIcon className="w-5 h-5" />
+                                        <div>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableRetrospective ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.retrospective')}</h4>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.retrospectiveDesc')}</p>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
