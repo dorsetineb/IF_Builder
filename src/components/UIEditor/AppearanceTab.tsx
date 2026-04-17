@@ -384,12 +384,12 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                             </div>
                             <div className="pt-2">
                                 <div
-                                    className="flex items-center justify-between w-full text-left bg-muted/10 p-3 rounded-lg cursor-pointer hover:bg-muted/20 transition-colors"
+                                    className="flex items-center justify-start w-full text-left py-2 px-0 cursor-pointer hover:opacity-70 transition-opacity group"
                                     onClick={() => setIsColorsExpanded(!isColorsExpanded)}
                                 >
                                     <div className="flex items-center gap-2">
+                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest transition-colors group-hover:text-foreground">{t('UIEditor.aparencia.colorCustom')}</span>
                                         <ChevronDown className={`w-3 h-3 text-muted-foreground transition-transform duration-200 ${isColorsExpanded ? 'rotate-180' : ''}`} />
-                                        <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{t('UIEditor.aparencia.colorCustom')}</span>
                                     </div>
                                 </div>
                                 {isColorsExpanded && (
