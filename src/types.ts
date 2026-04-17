@@ -222,6 +222,7 @@ export interface GameData {
   fixedVerbs?: FixedVerb[];
   consequenceTrackers?: ConsequenceTracker[];
   vignettes?: Vignette[]; // All vignettes, including opening (first one)
+  vignetteScaling?: 'sm' | 'md' | 'lg';
   gameShowTrackersUI?: boolean;
   gameShowSystemButton?: boolean;
   gameSuggestionsButtonText?: string;
