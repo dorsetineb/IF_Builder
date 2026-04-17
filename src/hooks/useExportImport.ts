@@ -358,7 +358,11 @@ DATE:        ${exportDate.toLocaleString()}
         '__NEGATIVE_ENDING_ALIGN_CLASS__',
         exportData.negativeEndingContentAlignment === 'left' ? 'align-left' : ''
       )
-      .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '');
+      .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '')
+      .replace('<div id="splash-screen" class="splash-screen', `<div id="splash-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
+      .replace('<div id="positive-ending-screen" class="splash-screen', `<div id="positive-ending-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
+      .replace('<div id="negative-ending-screen" class="splash-screen', `<div id="negative-ending-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
+      .replace('<div id="vignette-screen" class="splash-screen', `<div id="vignette-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`);
 
     htmlContent = htmlContent.replace('</body>', '<script src="game.js"></script></body>');
 
@@ -367,11 +371,11 @@ DATE:        ${exportDate.toLocaleString()}
         .replace(/__FONT_FAMILY__/g, fontFamily)
         .replace(/__GAME_FONT_SIZE__/g, (() => {
           const size = exportData.gameFontSize || '14';
-          const isNumeric = /^\\d+$/.test(size);
-          if (!isNumeric) return size;
+          return /^\d+$/.test(size) ? `${size}px` : size;
+        })())
+        .replace(/__FONT_SIZE_ADJUST__/g, (() => {
           const fontInfo = FONTS.find(f => f.family === fontFamily);
-          const multiplier = fontInfo?.sizeAdjust || 1.0;
-          return `${Math.round(parseInt(size) * multiplier)}px`;
+          return (fontInfo?.sizeAdjust || 1.0).toString();
         })())
         .replace(/__GAME_TEXT_COLOR__/g, exportData.gameTextColor || '#c9d1d9')
         .replace(/__GAME_TITLE_COLOR__/g, exportData.gameTitleColor || '#58a6ff')
@@ -677,7 +681,11 @@ DATE:        ${exportDate.toLocaleString()}
         '__NEGATIVE_ENDING_ALIGN_CLASS__',
         exportData.negativeEndingContentAlignment === 'left' ? 'align-left' : ''
       )
-      .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '');
+      .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '')
+      .replace('<div id="splash-screen" class="splash-screen', `<div id="splash-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
+      .replace('<div id="positive-ending-screen" class="splash-screen', `<div id="positive-ending-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
+      .replace('<div id="negative-ending-screen" class="splash-screen', `<div id="negative-ending-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
+      .replace('<div id="vignette-screen" class="splash-screen', `<div id="vignette-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`);
 
     // Build final CSS with replacements
     const css =
@@ -685,11 +693,11 @@ DATE:        ${exportDate.toLocaleString()}
         .replace(/__FONT_FAMILY__/g, fontFamily)
         .replace(/__GAME_FONT_SIZE__/g, (() => {
           const size = exportData.gameFontSize || '14';
-          const isNumeric = /^\\d+$/.test(size);
-          if (!isNumeric) return size;
+          return /^\d+$/.test(size) ? `${size}px` : size;
+        })())
+        .replace(/__FONT_SIZE_ADJUST__/g, (() => {
           const fontInfo = FONTS.find(f => f.family === fontFamily);
-          const multiplier = fontInfo?.sizeAdjust || 1.0;
-          return `${Math.round(parseInt(size) * multiplier)}px`;
+          return (fontInfo?.sizeAdjust || 1.0).toString();
         })())
         .replace(/__GAME_TEXT_COLOR__/g, exportData.gameTextColor || '#c9d1d9')
         .replace(/__GAME_TITLE_COLOR__/g, exportData.gameTitleColor || '#58a6ff')

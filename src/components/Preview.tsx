@@ -5,6 +5,7 @@ import { GameData } from '../types';
 import { gameHTML, gameCSS, initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
 import { useTranslation } from 'react-i18next';
+import { FONTS } from '../constants';
 
 // Helper to generate the correct Google Fonts URL from a font-family string.
 const getFontUrl = (fontFamily: string) => {
@@ -225,70 +226,10 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             /* 3. Text Scale Dynamic Injection */
             ${(() => {
                 const vignettes = gameData.vignettes || [];
+                const vignetteScaleClass = `vignette-scale-${gameData.vignetteScaling || 'md'}`;
                 const opening = vignettes.find(v => v.id === 'VNT_OPENING') || vignettes[0];
                 const victory = vignettes.find(v => v.isConclusion && v.id.includes('VICTORY')) || vignettes.find(v => v.isConclusion);
                 const defeat = vignettes.find(v => v.isConclusion && v.id.includes('DEFEAT'));
-
-                const getScaleCss = (scale: string | undefined, selector: string, textAlign: string | undefined) => {
-                    const s = scale === 'sm' ? { h1: '1.25rem', p: '0.75rem' } :
-                        scale === 'lg' ? { h1: '2rem', p: '1rem' } :
-                            { h1: '1.5rem', p: '0.875rem' }; // Base/Default
-
-                    const alignment = textAlign === 'left' ? {
-                        justify: 'flex-start',
-                        align: 'flex-start',
-                        text: 'left'
-                    } : {
-                        justify: 'flex-end',
-                        align: 'flex-end',
-                        text: 'right'
-                    };
-
-                    return `
-                       html body ${selector}.splash-screen { 
-                           display: block !important;
-                           position: fixed !important;
-                           top: 0 !important;
-                           left: 0 !important;
-                           width: 100% !important;
-                           height: 100% !important;
-                           padding: 0 !important;
-                           margin: 0 !important;
-                       }
-                       html body ${selector} .splash-content {
-                           position: absolute !important;
-                           ${alignment.justify === 'center' ? 'left: 50% !important; transform: translateX(-50%) !important;' : alignment.justify === 'flex-start' ? 'left: 5vw !important; transform: none !important;' : 'right: 5vw !important; transform: none !important;'}
-                           ${alignment.align === 'center' ? 'top: 50% !important; transform: ' + (alignment.justify === 'center' ? 'translate(-50%, -50%)' : 'translate(0, -50%)') + ' !important;' : alignment.align === 'flex-start' ? 'top: 5vh !important; transform: none !important;' : 'bottom: 5vh !important; transform: none !important;'}
-                           width: auto !important;
-                           min-width: 300px !important;
-                           max-width: 80% !important;
-                           height: auto !important;
-                           padding: 2rem !important;
-                           margin: 0 !important;
-                           display: flex !important;
-                           flex-direction: column !important;
-                           align-items: ${alignment.align} !important;
-                           text-align: ${alignment.text} !important;
-                           z-index: 100 !important;
-                       }
-                       html body ${selector} .splash-text {
-                           text-align: ${alignment.text} !important;
-                           display: flex !important;
-                           flex-direction: column !important;
-                           align-items: ${alignment.align} !important;
-                       }
-                       html body ${selector} .splash-buttons {
-                           width: auto !important;
-                           min-width: 250px !important;
-                           display: flex !important;
-                           flex-direction: column !important;
-                           align-items: ${alignment.align} !important;
-                           margin-top: 1.5rem !important;
-                       }
-                       html body ${selector} h1 { font-size: ${s.h1} !important; line-height: 1.1 !important; margin-bottom: 0.5rem !important; }
-                       html body ${selector} p, html body ${selector} .description { font-size: ${s.p} !important; margin-bottom: 1rem !important; }
-                   `;
-                };
 
                 const getAnimationCss = (vignette: typeof opening, selector: string) => {
                     if (!vignette) return '';
@@ -312,10 +253,6 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
                 };
 
                 return `
-                    ${opening ? getScaleCss(opening.textScale, '#splash-screen', opening.contentAlignment) : ''}
-                    ${opening ? getScaleCss(opening.textScale, '#vignette-screen', opening.contentAlignment) : ''}
-                    ${victory ? getScaleCss(victory.textScale, '#positive-ending-screen', victory.contentAlignment) : ''}
-                    ${defeat ? getScaleCss(defeat.textScale, '#negative-ending-screen', defeat.contentAlignment) : ''}
                     ${opening ? getAnimationCss(opening, '#splash-screen .splash-content') : ''}
                     ${opening ? getAnimationCss(opening, '#vignette-screen .splash-content') : ''}
                     ${victory ? getAnimationCss(victory, '#positive-ending-screen .content') : ''}
@@ -334,6 +271,10 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             .replace(/__GAME_FONT_SIZE__/g, (() => {
                 const size = gameData.gameFontSize || '12';
                 return /^\d+$/.test(size) ? `${size}px` : size;
+            })())
+            .replace(/__FONT_SIZE_ADJUST__/g, (() => {
+                const fontInfo = FONTS.find(f => f.family === fontFamily);
+                return (fontInfo?.sizeAdjust || 1.0).toString();
             })())
             .replace(/__GAME_TEXT_COLOR__/g, gameData.gameTextColor || '#c9d1d9')
             .replace(/__GAME_TITLE_COLOR__/g, gameData.gameTitleColor || '#58a6ff')
@@ -386,8 +327,13 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
         const baseTag = basePath ? `<base href="${window.location.origin}${basePath}/">` : '';
         const styleTag = `<style>${finalCss}</style>`;
         const gameScriptTag = `<script>${gameJS}</script>`;
+        const vignetteScaleClass = `vignette-scale-${gameData.vignetteScaling || 'md'}`;
 
         return finalHtml
+            .replace('<div id="splash-screen" class="splash-screen"', `<div id="splash-screen" class="splash-screen ${vignetteScaleClass}"`)
+            .replace('<div id="positive-ending-screen" class="splash-screen"', `<div id="positive-ending-screen" class="splash-screen ${vignetteScaleClass}"`)
+            .replace('<div id="negative-ending-screen" class="splash-screen"', `<div id="negative-ending-screen" class="splash-screen ${vignetteScaleClass}"`)
+            .replace('<div id="vignette-screen" class="splash-screen"', `<div id="vignette-screen" class="splash-screen ${vignetteScaleClass}"`)
             .replace('</head>', `${baseTag}${testSceneCss}${styleTag}</head>`)
             .replace('</body>', `${dataScript}${gameScriptTag}</body>`);
 

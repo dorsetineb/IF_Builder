@@ -267,7 +267,7 @@ body { padding: 0; }
 body.with-spacing { padding: 30px; }
 body.dark-theme { --bg-color: #0d1117; --panel-bg: #161b22; --border-color: #30363d; --text-color: __GAME_TEXT_COLOR__; --text-dim-color: #8b949e; --accent-color: __GAME_TITLE_COLOR__; --danger-color: #f85149; --danger-hover-bg: #da3633; --highlight-color: __GAME_FOCUS_COLOR__; --input-bg: #010409; --button-bg: #21262d; --button-hover-bg: #30363d; }
 body.light-theme { --bg-color: #ffffff; --panel-bg: #f6f8fa; --border-color: #d0d7de; --text-color: __GAME_TEXT_COLOR_LIGHT__; --text-dim-color: #57606a; --accent-color: __GAME_TITLE_COLOR_LIGHT__; --danger-color: #cf222e; --danger-hover-bg: #a40e26; --highlight-color: __GAME_FOCUS_COLOR_LIGHT__; --input-bg: #ffffff; --button-bg: #f6f8fa; --button-hover-bg: #e5e7eb; }
-:root { --font-family: __FONT_FAMILY__; --font-size-base: __GAME_FONT_SIZE__; --scale-factor: 1; --font-size: calc(var(--font-size-base) * var(--scale-factor)); --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: __CONTINUE_INDICATOR_COLOR__; --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
+:root { --font-family: __FONT_FAMILY__; --font-size-base: __GAME_FONT_SIZE__; --font-size-adjust: __FONT_SIZE_ADJUST__; --scale-factor: 1; --font-size: calc(var(--font-size-base) * var(--font-size-adjust) * var(--scale-factor)); --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: __CONTINUE_INDICATOR_COLOR__; --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
 body.is-demo { --scale-factor: 0.7; }
 body.is-demo .splash-content { gap: calc(20px * var(--scale-factor)); }
 body.is-demo .splash-logo { max-height: calc(150px * var(--scale-factor)); }
@@ -288,8 +288,16 @@ body.with-spacing .main-wrapper { height: 100%; }
 .splash-screen.align-left { --splash-justify-content: flex-start; --splash-align-items: flex-start; --splash-text-align: left; --splash-content-align-items: flex-start; }
 .splash-content { text-align: var(--splash-text-align); display: flex; flex-direction: column; align-items: var(--splash-content-align-items); gap: 20px; width: 100%; padding: 5vh max(40px, 6vw); position: relative; }
 .splash-logo { max-height: 150px; width: auto; margin-bottom: 20px; }
-.splash-text h1 { font-size: 2em; color: var(--accent-color); margin: 0; text-shadow: none; }
-.splash-text p { font-size: 0.95em; margin-top: 10px; color: var(--text-color); max-width: 60ch; white-space: pre-wrap; }
+.splash-text h1 { font-size: 2.2em; color: var(--accent-color); margin: 0; text-shadow: none; line-height: 1.1; }
+.splash-text p, .splash-text .description { font-size: 1em; margin-top: 10px; color: var(--text-color); max-width: 60ch; white-space: pre-wrap; line-height: 1.6; }
+
+/* Vignette Scaling Classes (Relative to Base Font Size) */
+.vignette-scale-sm h1 { font-size: 1.6em !important; }
+.vignette-scale-sm p, .vignette-scale-sm .description { font-size: 0.85em !important; }
+.vignette-scale-md h1 { font-size: 2.2em !important; }
+.vignette-scale-md p, .vignette-scale-md .description { font-size: 1em !important; }
+.vignette-scale-lg h1 { font-size: 3.2em !important; }
+.vignette-scale-lg p, .vignette-scale-lg .description { font-size: 1.25em !important; }
 .splash-buttons { display: flex; flex-direction: column; gap: 15px; width: 100%; align-items: var(--splash-content-align-items); }
 #splash-start-button, .ending-restart-button, #continue-button, #vignette-continue-button { font-family: var(--font-family); padding: 12px 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; }
 #splash-start-button, .ending-restart-button, #vignette-continue-button { background-color: var(--splash-button-bg); }
@@ -301,7 +309,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .vignette-credits { position: absolute; top: 0; bottom: 0; width: 48%; padding: 5vh max(40px, 4vw); display: flex; align-items: flex-end; overflow: hidden; z-index: 50; pointer-events: none; }
 .vignette-credits.credits-left { left: 0; }
 .vignette-credits.credits-right { right: 0; }
-.vignette-credits-text { font-size: 0.95em; color: var(--text-color); opacity: 1; white-space: pre-wrap; line-height: 1.6; width: 100%; }
+.vignette-credits-text { font-size: 1em; color: var(--text-color); opacity: 1; white-space: pre-wrap; line-height: 1.6; width: 100%; }
 .vignette-credits.credits-scroll { align-items: flex-end; }
 .vignette-credits.credits-scroll .vignette-credits-text { animation: creditsScroll 30s linear forwards; }
 @keyframes creditsScroll { 0% { transform: translateY(100%); } 100% { transform: translateY(-100%); } }
