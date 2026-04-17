@@ -1,0 +1,260 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.11/purify.min.js"></script>
+    <title>Fuja da Masmorra</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="dark-theme with-spacing frame-trading-card __FONT_ADJUST_CLASS__ behavior-immersive">
+    <audio id="scene-sound-effect" preload="auto"></audio>
+    <audio id="bgm-audio" preload="auto" loop></audio>
+    <div class="main-wrapper" id="main-wrapper">
+
+
+        <div id="positive-ending-screen" class="splash-screen hidden " style="background-image: url('assets/splash_image.png')">
+            <div class="splash-content">
+                <div class="splash-text">
+                    <p>Você conseguiu fugir da masmorra!</p>
+                </div>
+                <button class="ending-restart-button">RECOMEÇAR</button>
+            </div>
+        </div>
+        <div id="negative-ending-screen" class="splash-screen hidden " style="background-image: url('assets/splash_image.png')">
+            <div class="splash-content">
+                <div class="splash-text">
+                    <p>Você morreu...</p>
+                </div>
+                <button class="ending-restart-button">RECOMEÇAR</button>
+            </div>
+        </div>
+
+        <div id="vignette-screen" class="splash-screen hidden">
+            <div id="vignette-overlay" class="scene-overlay" style="z-index: 1;"></div>
+            <div class="splash-content" style="z-index: 10;">
+                <div class="splash-text">
+                    <h1 id="vignette-title"></h1>
+                    <p id="vignette-description"></p>
+                </div>
+                <div class="splash-buttons">
+                    <button id="vignette-continue-button" class="ending-restart-button">Continuar</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-container   hidden" id="game-container">
+            <div class="image-panel">
+                <div id="image-container" class="image-container">
+                  <!-- Back image: The Next Scene (loads behind) -->
+                  <img id="scene-image-back" src="" alt="Cena seguinte" class="scene-image hidden">
+                  <!-- Front image: The Current Scene (animates out) -->
+                  <img id="scene-image" src="" alt="Cena atual" class="scene-image">
+                  <div id="scene-overlay" class="scene-overlay"></div>
+                  <div id="scene-name-overlay" class="scene-name-overlay"></div>
+                </div>
+            </div>
+            <div class="text-panel">
+                <div id="scene-description" class="scene-description"></div>
+                <div id="chances-container" class="chances-container"></div>
+                <div class="action-bar" id="standard-action-bar">
+                    <div id="action-popup" class="action-popup hidden"></div>
+                    <div class="action-buttons">
+                        <button id="suggestions-button">Sugestões</button>
+                        <button id="inventory-button">Inventário</button>
+                        <button id="diary-button">Diário</button>
+                        
+                        
+                    </div>
+                    <div class="input-area">
+                        <div id="verb-input" contenteditable="true" role="textbox" aria-multiline="false"></div>
+                        <button id="submit-verb">AÇÃO</button>
+                    </div>
+                </div>
+                <div class="action-bar hidden" id="ending-action-bar">
+                    <button id="view-ending-button" class="view-ending-button">Ver Final</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Trackers Modal -->
+    <div id="trackers-modal" class="modal-overlay hidden">
+        <div class="modal-content trackers-modal-content">
+            <button class="modal-close-button">&times;</button>
+            <h2>Rastreadores</h2>
+            <div id="trackers-content"></div>
+        </div>
+    </div>
+
+    <!-- Diary Modal -->
+    <div id="diary-modal" class="modal-overlay hidden">
+        <div class="modal-content diary-modal-content">
+            <button class="modal-close-button">&times;</button>
+            <h2 id="diary-modal-title">__DIARY_BUTTON_TEXT__</h2>
+            <div id="diary-log" class="diary-log"></div>
+        </div>
+    </div>
+    
+    <!-- System Modal -->
+    <div id="system-modal" class="modal-overlay hidden">
+        <div class="modal-content system-modal-content">
+            <button class="modal-close-button">&times;</button>
+            <h2 id="system-modal-title">Salvar / Carregar</h2>
+            
+            <!-- Main System Menu -->
+            <div id="system-menu-main" class="system-menu">
+                <button id="btn-save-menu">Salvar</button>
+                <button id="btn-load-menu">Carregar</button>
+                <button id="btn-main-menu" class="danger-button">Menu Principal</button>
+            </div>
+
+            <!-- Slots Container -->
+            <div id="system-slots-container" class="system-slots hidden">
+                <div id="slots-list">
+                    <!-- Slots will be injected here -->
+                </div>
+                <button id="btn-back-system" class="mt-4">Voltar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Item Modal -->
+    <div id="item-modal" class="modal-overlay hidden">
+        <div class="modal-content item-modal-content">
+            <button class="modal-close-button">&times;</button>
+            <h2 id="item-modal-title">Inventário</h2>
+            <div class="item-modal-body">
+                <div id="item-modal-image-container" class="item-modal-image-container hidden">
+                    <img id="item-modal-image" src="" alt="Item Image">
+                </div>
+                <div id="item-modal-text-container" class="item-modal-text-container">
+                    <h3 id="item-modal-name" class="item-modal-name"></h3>
+                    <p id="item-modal-description"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Acquisition Modal -->
+    <div id="acquisition-modal" class="modal-overlay hidden">
+        <div class="modal-content acquisition-modal-content">
+            <button class="modal-close-button">&times;</button>
+            <h2 id="acquisition-modal-title"></h2>
+            <div class="acquisition-modal-body">
+                <div id="acquisition-modal-image-container" class="acquisition-modal-image-container hidden">
+                    <img id="acquisition-modal-image" src="" alt="Item Image">
+                </div>
+                <div id="acquisition-modal-text-container" class="acquisition-modal-text-container text-center">
+                    <p id="acquisition-modal-description"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+  <svg style="display: none;">
+    <defs>
+      <filter id="tv-distortion-filter" x="-20%" y="-20%" width="140%" height="140%">
+        <!-- 1. Chromatic Aberration (RGB Shift) -->
+        <feOffset in="SourceGraphic" dx="-4" dy="0" result="r_offset">
+          <animate attributeName="dx" values="-4;-3;-5;-4" dur="0.2s" repeatCount="indefinite"/>
+        </feOffset>
+        <feOffset in="SourceGraphic" dx="4" dy="0" result="b_offset">
+          <animate attributeName="dx" values="4;3;5;4" dur="0.3s" repeatCount="indefinite"/>
+        </feOffset>
+        <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+        
+        <!-- Split channels & merge with Screen blend mode (Fixes Blue Tint) -->
+        <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
+        <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
+        <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
+        
+        <feBlend in="red" in2="green" mode="screen" result="rg"/>
+        <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>
+        
+        <!-- 2. Horizontal Glitch/Jitter Distortion -->
+        <feTurbulence type="fractalNoise" baseFrequency="0.001 0.75" numOctaves="1" result="noise" seed="0">
+          <animate attributeName="baseFrequency" values="0.001 0.75; 0.001 0.76; 0.001 0.75" dur="0.15s" repeatCount="indefinite" />
+        </feTurbulence>
+        <feDisplacementMap in="rgb" in2="noise" scale="0.3" xChannelSelector="R" yChannelSelector="R" result="distorted"/>
+      </filter>
+      
+      <filter id="tv-distortion-filter-lg" x="-20%" y="-20%" width="140%" height="140%">
+        <!-- 1. Chromatic Aberration (RGB Shift) -->
+        <feOffset in="SourceGraphic" dx="-4" dy="0" result="r_offset">
+          <animate attributeName="dx" values="-4;-3;-5;-4" dur="0.2s" repeatCount="indefinite"/>
+        </feOffset>
+        <feOffset in="SourceGraphic" dx="4" dy="0" result="b_offset">
+          <animate attributeName="dx" values="4;3;5;4" dur="0.3s" repeatCount="indefinite"/>
+        </feOffset>
+        <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+        
+        <!-- Split channels & merge with Screen blend mode (Fixes Blue Tint) -->
+        <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
+        <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
+        <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
+        
+        <feBlend in="red" in2="green" mode="screen" result="rg"/>
+        <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>
+        
+        <!-- 2. Horizontal Glitch/Jitter Distortion (Stronger for Large Screens) -->
+        <feTurbulence type="fractalNoise" baseFrequency="0.001 0.75" numOctaves="1" result="noise" seed="0">
+          <animate attributeName="baseFrequency" values="0.001 0.75; 0.001 0.76; 0.001 0.75" dur="0.15s" repeatCount="indefinite" />
+        </feTurbulence>
+        <feDisplacementMap in="rgb" in2="noise" scale="2" xChannelSelector="R" yChannelSelector="R" result="distorted"/>
+      </filter>
+      
+      <!-- Glitch Distortion Filter -->
+      <filter id="glitch-distortion-filter" x="-10%" y="-10%" width="120%" height="120%">
+        <!-- Sporadic Chromatic Aberration (RGB Shift) - Normal when static -->
+        <feOffset in="SourceGraphic" dx="0" dy="0" result="r_offset">
+          <animate attributeName="dx" values="0;0;0;0;-4;0;0;0;0;-3;0;0" dur="3s" repeatCount="indefinite"/>
+        </feOffset>
+        <feOffset in="SourceGraphic" dx="0" dy="0" result="b_offset">
+          <animate attributeName="dx" values="0;0;0;0;4;0;0;0;0;3;0;0" dur="3s" repeatCount="indefinite"/>
+        </feOffset>
+        <feOffset in="SourceGraphic" dx="0" dy="0" result="g_offset" />
+        
+        <!-- Split channels & merge with Screen blend mode -->
+        <feColorMatrix in="r_offset" type="matrix" values="1 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 1 0" result="red"/>
+        <feColorMatrix in="g_offset" type="matrix" values="0 0 0 0 0  0 1 0 0 0  0 0 0 0 0  0 0 0 1 0" result="green"/>
+        <feColorMatrix in="b_offset" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 1 0 0  0 0 0 1 0" result="blue"/>
+        
+        <feBlend in="red" in2="green" mode="screen" result="rg"/>
+        <feBlend in="rg" in2="blue" mode="screen" result="rgb"/>
+        
+        <!-- Sporadic Horizontal Slice Displacement -->
+        <feTurbulence type="fractalNoise" baseFrequency="0.001 0.5" numOctaves="1" result="noise" seed="5">
+          <animate attributeName="seed" values="5;5;5;5;8;5;5;5;5;3;5;5" dur="4s" repeatCount="indefinite"/>
+        </feTurbulence>
+        <feDisplacementMap in="rgb" in2="noise" scale="4" xChannelSelector="R" yChannelSelector="G" result="distorted"/>
+      </filter>
+
+      <!-- Wiggle (Squiggly) Filters for Squigglevision -->
+      <filter id="squiggly-0">
+        <feTurbulence baseFrequency="0.02" numOctaves="3" result="noise" seed="0"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+      </filter>
+      <filter id="squiggly-1">
+        <feTurbulence baseFrequency="0.02" numOctaves="3" result="noise" seed="1"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+      </filter>
+      <filter id="squiggly-2">
+        <feTurbulence baseFrequency="0.02" numOctaves="3" result="noise" seed="2"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+      </filter>
+      <filter id="squiggly-3">
+        <feTurbulence baseFrequency="0.02" numOctaves="3" result="noise" seed="3"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+      </filter>
+      <filter id="squiggly-4">
+        <feTurbulence baseFrequency="0.02" numOctaves="3" result="noise" seed="4"/>
+        <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+      </filter>
+    </defs>
+  </svg>
+<script src="game.js"></script></body>
+</html>

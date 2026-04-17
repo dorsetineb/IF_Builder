@@ -726,7 +726,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                         <div className="flex-1 relative overflow-hidden flex items-center justify-center p-4 bg-black/50">
                             {/* Custom Preview Logic from UIEditor */}
                             {(() => {
-                                const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame as any, theme, theme === 'dark' ? '#FFFFFF' : '#1a202c');
+                                const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame, theme, theme === 'dark' ? '#FFFFFF' : '#1a202c');
 
                                 if (tab === 'info') {
                                     return (
@@ -757,7 +757,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             `}
                                             >
                                                 {(() => {
-                                                    const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame);
+                                                    const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame, theme, theme === 'dark' ? '#FFFFFF' : '#1a202c');
 
                                                     const adaptedPanelStyles = {
                                                         ...panelStyles,

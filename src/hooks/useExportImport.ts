@@ -68,9 +68,21 @@ export const useExportImport = ({
       assetsFolder,
       assetMap
     );
+    exportData.positiveEndingMusic = processAsset(
+      exportData.positiveEndingMusic,
+      'positive_ending_bgm',
+      assetsFolder,
+      assetMap
+    );
     exportData.negativeEndingImage = processAsset(
       exportData.negativeEndingImage,
       'negative_ending',
+      assetsFolder,
+      assetMap
+    );
+    exportData.negativeEndingMusic = processAsset(
+      exportData.negativeEndingMusic,
+      'negative_ending_bgm',
       assetsFolder,
       assetMap
     );
@@ -90,6 +102,14 @@ export const useExportImport = ({
     for (const objId in exportData.globalObjects) {
       const obj = exportData.globalObjects[objId];
       obj.image = processAsset(obj.image, `obj_image_${objId}`, assetsFolder, assetMap);
+    }
+
+    // Process Vignette assets
+    if (exportData.vignettes && Array.isArray(exportData.vignettes)) {
+      exportData.vignettes.forEach((vig: any, index: number) => {
+        vig.image = processAsset(vig.image, `vignette_image_${index}`, assetsFolder, assetMap);
+        vig.backgroundMusic = processAsset(vig.backgroundMusic, `vignette_bgm_${index}`, assetsFolder, assetMap);
+      });
     }
 
     // Add Metadata
@@ -893,7 +913,7 @@ DATE:        ${exportDate.toLocaleString()}
         gameViewEndingButtonText: sanitizedData.gameViewEndingButtonText || '',
         positiveEndingMusic: sanitizedData.positiveEndingMusic || '',
         negativeEndingMusic: sanitizedData.negativeEndingMusic || '',
-        vignettes: [],
+        vignettes: sanitizedData.vignettes || [],
       }));
 
       setIsDirty(false);
@@ -964,7 +984,9 @@ DATE:        ${exportDate.toLocaleString()}
               }
             }),
             restoreAsset(data.positiveEndingImage).then((res) => (data.positiveEndingImage = res)),
+            restoreAsset(data.positiveEndingMusic).then((res) => (data.positiveEndingMusic = res)),
             restoreAsset(data.negativeEndingImage).then((res) => (data.negativeEndingImage = res)),
+            restoreAsset(data.negativeEndingMusic).then((res) => (data.negativeEndingMusic = res)),
           ];
 
           await Promise.all(globalAssetsPromises);
