@@ -910,7 +910,7 @@
       }
     },
     "aparencia": {
-      "estrutura": "ESTRUTURA",
+      "estrutura": "ESTRUTURA DAS CENAS",
       "scenes": "LAYOUT DAS CENAS",
       "vinhetas": "LAYOUT DAS VINHETAS",
       "frameColor": "Cor",

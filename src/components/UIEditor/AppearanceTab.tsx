@@ -163,7 +163,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '50ms' }}>
                     <div className="flex items-center w-full text-left">
                         <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
-                            <LayoutTemplate className="w-4 h-4" /> {t('UIEditor.aparencia.estrutura', 'Estrutura')}
+                            <LayoutTemplate className="w-4 h-4" /> {t('UIEditor.aparencia.estrutura', 'Estrutura das cenas')}
                         </h3>
                     </div>
 
