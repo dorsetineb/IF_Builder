@@ -1,4 +1,3 @@
-
 import { GameData } from '../types';
 
 export const prepareGameDataForEngine = (data: GameData): object => {
@@ -57,10 +56,9 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameChanceIcon: data.gameChanceIcon,
         gameChanceIconColor: data.gameChanceIconColor,
         gameChanceReturnButtonText: data.gameChanceReturnButtonText,
-        gameTheme: data.gameTheme,
-        gameTextColorLight: data.textColorLight,
-        gameTitleColorLight: data.titleColorLight,
-        gameFocusColorLight: data.focusColorLight,
+        gameTextColor: data.gameTextColor,
+        gameTitleColor: data.gameTitleColor,
+        gameFocusColor: data.gameFocusColor,
         gameTextReadingFlow: data.gameTextReadingFlow,
         gameBackgroundMusic: data.gameBackgroundMusic,
         positiveEndingImage: data.positiveEndingImage,

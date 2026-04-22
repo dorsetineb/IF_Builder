@@ -25,23 +25,18 @@ interface AppearanceTabProps {
     setLocalImageFrame: (val: GameData['gameImageFrame']) => void;
     
     // Colors
-    localGameTheme: 'dark' | 'light';
+    localGameBackgroundColor: string;
+    setLocalGameBackgroundColor: (val: string) => void;
     localGameFrameColor: string;
     setLocalGameFrameColor: (val: string) => void;
     localTextColor: string;
     setLocalTextColor: (val: string) => void;
-    localTextColorLight: string;
-    setLocalTextColorLight: (val: string) => void;
     
     localTitleColor: string;
     setLocalTitleColor: (val: string) => void;
-    localTitleColorLight: string;
-    setLocalTitleColorLight: (val: string) => void;
     
     localFocusColor: string;
     setLocalFocusColor: (val: string) => void;
-    localFocusColorLight: string;
-    setLocalFocusColorLight: (val: string) => void;
     localGameContinueIndicatorColor: string;
     setLocalGameContinueIndicatorColor: (val: string) => void;
     localSplashButtonColor: string;
@@ -81,7 +76,6 @@ interface AppearanceTabProps {
     localGameShowSystemButton: boolean;
     
     // Theme Handlers
-    handleThemeChange: (theme: 'dark' | 'light') => void;
     applyTheme: (theme: any) => void;
     
     // Preview Management
@@ -99,21 +93,16 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     setLocalLayoutOrder,
     localImageFrame,
     setLocalImageFrame,
-    localGameTheme,
+    localGameBackgroundColor,
+    setLocalGameBackgroundColor,
     localGameFrameColor,
     setLocalGameFrameColor,
     localTextColor,
     setLocalTextColor,
-    localTextColorLight,
-    setLocalTextColorLight,
     localTitleColor,
     setLocalTitleColor,
-    localTitleColorLight,
-    setLocalTitleColorLight,
     localFocusColor,
     setLocalFocusColor,
-    localFocusColorLight,
-    setLocalFocusColorLight,
     localGameContinueIndicatorColor,
     setLocalGameContinueIndicatorColor,
     localSplashButtonColor,
@@ -145,7 +134,6 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     localEnableDiary,
     localEnableTrackers,
     localGameShowSystemButton,
-    handleThemeChange,
     applyTheme,
     previewType,
     setPreviewType,
@@ -348,24 +336,6 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
 
                     <div className="mt-6 space-y-6">
                         <div className="space-y-2">
-                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('ThemeEditor.uiTheme', 'Cor da Interface')}</label>
-                            <div className="flex bg-background rounded-lg p-1 border border-muted-foreground/50">
-                                <button
-                                    onClick={() => handleThemeChange('dark')}
-                                    className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-                                >
-                                    {t('ThemeEditor.dark', 'Noite')}
-                                </button>
-                                <button
-                                    onClick={() => handleThemeChange('light')}
-                                    className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${localGameTheme === 'light' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-                                >
-                                    {t('ThemeEditor.light', 'Dia')}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.predefinedThemes')}</label>
                             <div className="grid grid-cols-3 gap-2">
                                 {PREDEFINED_THEMES.map((theme) => (
@@ -375,7 +345,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                         className="flex flex-col items-center justify-center p-3 rounded-lg border border-muted-foreground/50 bg-background hover:border-primary/50 hover:bg-muted/80 transition-all gap-2 group"
                                     >
                                         <div className="flex -space-x-1">
-                                            <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.textColorLight }}></div>
+                                            <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.textColor }}></div>
                                             <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.titleColor }}></div>
                                         </div>
                                         <span className="text-[9px] font-bold uppercase tracking-tight text-muted-foreground group-hover:text-foreground">{t(`ThemeEditor.themes.${theme.nameKey}`, { defaultValue: theme.name })}</span>
@@ -398,24 +368,31 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                             <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.sceneDesc')}</h4>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                 <ColorInput 
+                                                    label={t('UIEditor.aparencia.gameBgColor', 'Cor de fundo')} 
+                                                    id="gameBackgroundColor" 
+                                                    value={localGameBackgroundColor} 
+                                                    onChange={setLocalGameBackgroundColor} 
+                                                    placeholder="#000000" 
+                                                />
+                                                <ColorInput 
                                                     label={t('UIEditor.aparencia.defaultText')} 
                                                     id="textColor" 
-                                                    value={localGameTheme === 'dark' ? localTextColor : localTextColorLight} 
-                                                    onChange={localGameTheme === 'dark' ? setLocalTextColor : setLocalTextColorLight} 
+                                                    value={localTextColor} 
+                                                    onChange={setLocalTextColor} 
                                                     placeholder="#FFFFFF" 
                                                 />
                                                 <ColorInput 
                                                     label={t('UIEditor.aparencia.titleHighlight')} 
                                                     id="titleColor" 
-                                                    value={localGameTheme === 'dark' ? localTitleColor : localTitleColorLight} 
-                                                    onChange={localGameTheme === 'dark' ? setLocalTitleColor : setLocalTitleColorLight} 
+                                                    value={localTitleColor} 
+                                                    onChange={setLocalTitleColor} 
                                                     placeholder="#58A6FF" 
                                                 />
                                                 <ColorInput 
                                                     label={t('UIEditor.aparencia.focusHighlight')} 
                                                     id="focusColor" 
-                                                    value={localGameTheme === 'dark' ? localFocusColor : localFocusColorLight} 
-                                                    onChange={localGameTheme === 'dark' ? setLocalFocusColor : setLocalFocusColorLight} 
+                                                    value={localFocusColor} 
+                                                    onChange={setLocalFocusColor} 
                                                     placeholder="#FFFFFF" 
                                                 />
                                                 <ColorInput label={t('UIEditor.aparencia.indicatorArrow')} id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
@@ -477,15 +454,15 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                     </div>
 
                     {previewType === 'scene' ? (
-                        <div
-                            className={`
-                                rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300 flex-1 w-full
-                                ${localGameTheme === 'dark' ? 'bg-background border-muted-foreground/50' : 'bg-zinc-100 border-muted-foreground/50'}
-                                ${localLayoutOrientation === 'horizontal' ? 'aspect-[9/16]' : 'aspect-video'}
-                            `}
-                            style={{ fontFamily: localFontFamily, maxHeight: '500px' }}
-                        >
-                            <div className={`flex-1 p-6 flex gap-6 overflow-hidden relative ${localLayoutOrientation === 'vertical' ? 'flex-row' : 'flex-col'}`}>
+                            <div
+                                className={`
+                                    rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300 flex-1 w-full
+                                    border-muted-foreground/50
+                                    ${localLayoutOrientation === 'horizontal' ? 'aspect-[9/16]' : 'aspect-video'}
+                                `}
+                                style={{ fontFamily: localFontFamily, maxHeight: '500px', backgroundColor: localGameBackgroundColor }}
+                            >
+                            <div className={`flex-1 p-[30px] flex gap-[30px] overflow-hidden relative ${localLayoutOrientation === 'vertical' ? 'flex-row' : 'flex-col'}`}>
                                 {/* Image Area */}
                                 <div
                                     className={`
@@ -495,7 +472,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                     `}
                                 >
                                     {(() => {
-                                        const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(localImageFrame as any, localGameTheme, localGameFrameColor);
+                                        const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(localImageFrame as any, localGameBackgroundColor, localGameFrameColor);
 
                                         return (
                                             <div
@@ -525,10 +502,21 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                                             objectFit="cover"
                                                         />
                                                     </div>
-                                                    <div className="absolute bottom-4 left-0 right-0 flex justify-center z-20">
+                                                    <div className="absolute top-4 left-4 z-20">
                                                         <div
-                                                            className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest"
-                                                            style={{ backgroundColor: localGameSceneNameOverlayBg, color: localGameSceneNameOverlayTextColor }}
+                                                            className="px-2 py-0.5 border uppercase leading-none"
+                                                            style={{ 
+                                                                backgroundColor: localGameSceneNameOverlayBg, 
+                                                                color: localGameSceneNameOverlayTextColor,
+                                                                borderColor: `color-mix(in srgb, ${localGameBackgroundColor} 80%, ${localTextColor} 20%)`,
+                                                                borderWidth: '2px',
+                                                                fontSize: (() => {
+                                                                    const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
+                                                                    const fontInfo = FONTS.find(f => f.family === localFontFamily);
+                                                                    const multiplier = fontInfo?.sizeAdjust || 1.0;
+                                                                    return `${baseSize * multiplier}px`;
+                                                                })()
+                                                            }}
                                                         >
                                                             {t('UIEditor.aparencia.sceneName')}
                                                         </div>
@@ -588,8 +576,8 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                         </div>
 
                                         <div className="flex gap-1.5 pt-1.5">
-                                            <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${localGameTheme === 'dark' ? 'bg-muted/50 border-muted-foreground/50' : 'bg-white border-muted-foreground/50'}`}>
-                                                <span className="font-mono truncate" style={{ fontSize: '11px', fontFamily: localFontFamily, color: localGameTheme === 'dark' ? '#52525b' : '#a1a1aa' }}>{t('UIEditor.textos.commandInputValue')}</span>
+                                            <div className="flex-1 rounded-md h-8 flex items-center px-2 border border-muted-foreground/50" style={{ backgroundColor: `color-mix(in srgb, ${localGameBackgroundColor} 98%, #000 2%)` }}>
+                                                <span className="font-mono truncate" style={{ fontSize: '11px', fontFamily: localFontFamily, color: `color-mix(in srgb, ${localTextColor} 70%, ${localGameBackgroundColor} 30%)` }}>{t('UIEditor.textos.commandInputValue')}</span>
                                             </div>
                                             <button
                                                 className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate text-[11px]"

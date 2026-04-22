@@ -201,10 +201,7 @@ export interface GameData {
   gameChanceReturnButtonText?: string;
   gameChanceLossMessage?: string;
   gameChanceRestoreMessage?: string;
-  gameTheme?: 'dark' | 'light';
-  textColorLight?: string;
-  titleColorLight?: string;
-  focusColorLight?: string;
+  gameBackgroundColor?: string;
   positiveEndingImage?: string;
   positiveEndingContentAlignment?: 'left' | 'right';
   positiveEndingDescription?: string;

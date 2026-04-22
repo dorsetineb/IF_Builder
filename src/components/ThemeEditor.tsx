@@ -19,10 +19,7 @@ interface ThemeEditorProps {
     chanceLossMessage: string;
     chanceRestoreMessage: string;
     chanceReturnButtonText: string;
-    gameTheme: 'dark' | 'light';
-    textColorLight: string;
-    titleColorLight: string;
-    focusColorLight: string;
+    gameBackgroundColor: string;
     gameFrameColor: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onUpdate: (field: keyof GameData, value: any) => void;
@@ -75,7 +72,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         focusColor, chanceIconColor, gameFontFamily,
         enableChances, chanceIcon, onUpdate, isDirty, onSetDirty,
         chanceLossMessage, chanceRestoreMessage, chanceReturnButtonText,
-        gameTheme, textColorLight, titleColorLight, focusColorLight, gameFrameColor
+        gameBackgroundColor, gameFrameColor
     } = props;
 
     const [localTextColor, setLocalTextColor] = useState(textColor);
@@ -92,10 +89,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
     const [localChanceLossMessage, setLocalChanceLossMessage] = useState(chanceLossMessage);
     const [localChanceRestoreMessage, setLocalChanceRestoreMessage] = useState(chanceRestoreMessage);
     const [localChanceReturnButtonText, setLocalChanceReturnButtonText] = useState(chanceReturnButtonText);
-    const [localGameTheme, setLocalGameTheme] = useState(gameTheme);
-    const [localTextColorLight, setLocalTextColorLight] = useState(textColorLight);
-    const [localTitleColorLight, setLocalTitleColorLight] = useState(titleColorLight);
-    const [localFocusColorLight, setLocalFocusColorLight] = useState(focusColorLight);
+    const [localGameBackgroundColor, setLocalGameBackgroundColor] = useState(gameBackgroundColor);
     const [localGameFrameColor, setLocalGameFrameColor] = useState(gameFrameColor);
     const [focusPreview, setFocusPreview] = useState(false);
     const [isCustomizing, setIsCustomizing] = useState(false);
@@ -115,13 +109,10 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
             localChanceLossMessage !== chanceLossMessage ||
             localChanceRestoreMessage !== chanceRestoreMessage ||
             localChanceReturnButtonText !== chanceReturnButtonText ||
-            localGameTheme !== gameTheme ||
-            localTextColorLight !== textColorLight ||
-            localTitleColorLight !== titleColorLight ||
-            localFocusColorLight !== focusColorLight ||
+            localGameBackgroundColor !== gameBackgroundColor ||
             localGameFrameColor !== gameFrameColor;
         onSetDirty(dirty);
-    }, [localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight, localTitleColorLight, localFocusColorLight, localGameFrameColor, props, onSetDirty]);
+    }, [localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor, localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor, localChanceIconColor, localFontFamily, localChanceIcon, localChanceLossMessage, localChanceRestoreMessage, localChanceReturnButtonText, localGameBackgroundColor, localGameFrameColor, props, onSetDirty]);
 
     // FIX: Using correct property names from types.ts (removed 'game' prefix for light theme colors)
     const handleSave = () => {
@@ -139,10 +130,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         if (localChanceLossMessage !== chanceLossMessage) onUpdate('gameChanceLossMessage', localChanceLossMessage);
         if (localChanceRestoreMessage !== chanceRestoreMessage) onUpdate('gameChanceRestoreMessage', localChanceRestoreMessage);
         if (localChanceReturnButtonText !== chanceReturnButtonText) onUpdate('gameChanceReturnButtonText', localChanceReturnButtonText);
-        if (localGameTheme !== gameTheme) onUpdate('gameTheme', localGameTheme);
-        if (localTextColorLight !== textColorLight) onUpdate('textColorLight', localTextColorLight);
-        if (localTitleColorLight !== titleColorLight) onUpdate('titleColorLight', localTitleColorLight);
-        if (localFocusColorLight !== focusColorLight) onUpdate('focusColorLight', localFocusColorLight);
+        if (localGameBackgroundColor !== gameBackgroundColor) onUpdate('gameBackgroundColor', localGameBackgroundColor);
         if (localGameFrameColor !== gameFrameColor) onUpdate('gameFrameColor', localGameFrameColor);
     };
 
@@ -161,10 +149,7 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         setLocalChanceLossMessage(chanceLossMessage);
         setLocalChanceRestoreMessage(chanceRestoreMessage);
         setLocalChanceReturnButtonText(chanceReturnButtonText);
-        setLocalGameTheme(gameTheme);
-        setLocalTextColorLight(textColorLight);
-        setLocalTitleColorLight(titleColorLight);
-        setLocalFocusColorLight(focusColorLight);
+        setLocalGameBackgroundColor(gameBackgroundColor);
         setLocalGameFrameColor(gameFrameColor);
     };
 
@@ -172,16 +157,13 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
         setLocalTextColor(theme.textColor);
         setLocalTitleColor(theme.titleColor);
         setLocalFocusColor(theme.focusColor);
-        setLocalTextColorLight(theme.textColorLight);
-        setLocalTitleColorLight(theme.titleColorLight);
-        setLocalFocusColorLight(theme.focusColorLight);
         setLocalSplashButtonColor(theme.splashButtonColor);
         setLocalSplashButtonHoverColor(theme.splashButtonHoverColor);
         setLocalSplashButtonTextColor(theme.splashButtonTextColor);
         setLocalActionButtonColor(theme.actionButtonColor);
         setLocalActionButtonTextColor(theme.actionButtonTextColor);
         setLocalChanceIconColor(theme.chanceIconColor);
-        if (theme.mode) setLocalGameTheme(theme.mode as 'dark' | 'light');
+        if (theme.gameBackgroundColor) setLocalGameBackgroundColor(theme.gameBackgroundColor);
         // Default frame color to white for all themes
         setLocalGameFrameColor('#FFFFFF');
     };
@@ -246,26 +228,6 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
             </div>
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="bg-zinc-900/40 border border-muted-foreground/50 rounded-xl p-6 space-y-8">
-                    <div className="space-y-4">
-                        <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">{t('ThemeEditor.uiTheme')}</h3>
-                        <div className="flex gap-2 rounded-lg bg-zinc-950 p-1 border border-muted-foreground/50">
-                            <button
-                                onClick={() => setLocalGameTheme('dark')}
-                                className={`w-full py-2 px-4 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all ${localGameTheme === 'dark' ? 'bg-white text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-zinc-300'
-                                    }`}
-                            >
-                                {t('ThemeEditor.dark')}
-                            </button>
-                            <button
-                                onClick={() => setLocalGameTheme('light')}
-                                className={`w-full py-2 px-4 rounded-md text-[10px] font-bold uppercase tracking-widest transition-all ${localGameTheme === 'light' ? 'bg-white text-zinc-950 shadow-lg' : 'text-zinc-500 hover:text-zinc-300'
-                                    }`}
-                            >
-                                {t('ThemeEditor.light')}
-                            </button>
-                        </div>
-                    </div>
-                    <div className="pt-6 border-t border-muted-foreground/50">
                         <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">{t('ThemeEditor.gameFont')}</h3>
                         <div>
                             <select
@@ -282,7 +244,6 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                 ))}
                             </select>
                         </div>
-                    </div>
 
                     <div className="pt-6 border-t border-muted-foreground/50">
                         <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-4">{t('ThemeEditor.predefinedThemes')}</h3>
@@ -320,27 +281,15 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
 
                     {isCustomizing && (
                         <>
-                            {localGameTheme === 'dark' && (
-                                <div className="pt-6 border-t border-muted-foreground/50">
-                                    <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">{t('ThemeEditor.colorsDark')}</h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        <ColorInput label={t('ThemeEditor.defaultText')} id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#c9d1d9" />
-                                        <ColorInput label={t('ThemeEditor.titleHighlight')} id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58a6ff" />
-                                        <ColorInput label={t('ThemeEditor.focusHighlight')} id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#58a6ff" />
-                                    </div>
+                            <div className="pt-6 border-t border-muted-foreground/50">
+                                <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">{t('ThemeEditor.colorsGeneral', 'Cores Principais')}</h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                    <ColorInput label={t('ThemeEditor.backgroundColor', 'Cor de Fundo')} id="gameBackgroundColor" value={localGameBackgroundColor} onChange={setLocalGameBackgroundColor} placeholder="#0d1117" />
+                                    <ColorInput label={t('ThemeEditor.defaultText')} id="textColor" value={localTextColor} onChange={setLocalTextColor} placeholder="#c9d1d9" />
+                                    <ColorInput label={t('ThemeEditor.titleHighlight')} id="titleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58a6ff" />
+                                    <ColorInput label={t('ThemeEditor.focusHighlight')} id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#58a6ff" />
                                 </div>
-                            )}
-
-                            {localGameTheme === 'light' && (
-                                <div className="pt-6 border-t border-muted-foreground/50">
-                                    <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-6">{t('ThemeEditor.colorsLight')}</h3>
-                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        <ColorInput label={t('ThemeEditor.defaultText')} id="textColorLight" value={localTextColorLight} onChange={setLocalTextColorLight} placeholder="#24292f" />
-                                        <ColorInput label={t('ThemeEditor.titleHighlight')} id="titleColorLight" value={localTitleColorLight} onChange={setLocalTitleColorLight} placeholder="#0969da" />
-                                        <ColorInput label={t('ThemeEditor.focusHighlight')} id="focusColorLight" value={localFocusColorLight} onChange={setLocalFocusColorLight} placeholder="#0969da" />
-                                    </div>
-                                </div>
-                            )}
+                            </div>
 
 
                             <div className="pt-6 border-t border-muted-foreground/50">
@@ -420,11 +369,11 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                 <div className="flex flex-col">
                     <p className="text-[10px] text-zinc-600 mb-4 text-center font-bold uppercase tracking-widest">{t('ThemeEditor.livePreview')}</p>
                     <div
-                        className={`flex-1 border p-6 flex flex-col justify-between transition-colors shadow-2xl rounded-xl ${localGameTheme === 'dark' ? 'bg-[#0d1117] border-muted-foreground/50' : 'bg-white border-muted-foreground/50'}`}
-                        style={{ fontFamily: localFontFamily }}
+                        className="flex-1 border p-6 flex flex-col justify-between transition-colors shadow-2xl rounded-xl border-muted-foreground/50"
+                        style={{ fontFamily: localFontFamily, backgroundColor: localGameBackgroundColor }}
                     >
                         <div className="flex justify-between items-start">
-                            <h1 className="text-xl" style={{ color: localGameTheme === 'dark' ? localTitleColor : localTitleColorLight }}>{t('ThemeEditor.previewTitle')}</h1>
+                            <h1 className="text-xl" style={{ color: localTitleColor }}>{t('ThemeEditor.previewTitle')}</h1>
                             {enableChances && (
                                 <div className="flex gap-1">
                                     <ChanceIcon type={localChanceIcon} color={localChanceIconColor} />
@@ -434,8 +383,8 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                             )}
                         </div>
                         <div className="my-4">
-                            <p className="text-sm" style={{ color: localGameTheme === 'dark' ? localTextColor : localTextColorLight }}>{t('ThemeEditor.previewDesc')}</p>
-                            <p className="mt-2 text-sm italic" style={{ color: localGameTheme === 'dark' ? '#8b949e' : '#57606a' }}>&gt; {t('ThemeEditor.previewCommand')}</p>
+                            <p className="text-sm" style={{ color: localTextColor }}>{t('ThemeEditor.previewDesc')}</p>
+                            <p className="mt-2 text-sm italic" style={{ color: `color-mix(in srgb, ${localTextColor} 70%, ${localGameBackgroundColor} 30%)` }}>&gt; {t('ThemeEditor.previewCommand')}</p>
                         </div>
                         <div className="space-y-4">
                             <div className="flex items-center gap-4">
@@ -444,11 +393,11 @@ const ThemeEditor: React.FC<ThemeEditorProps> = (props) => {
                                     placeholder={t('ThemeEditor.commandField')}
                                     className="flex-1 border-2 rounded p-2 text-xs transition-colors focus:ring-0"
                                     style={{
-                                        backgroundColor: localGameTheme === 'dark' ? '#010409' : '#f6f8fa',
-                                        color: localGameTheme === 'dark' ? localTextColor : localTextColorLight,
+                                        backgroundColor: `color-mix(in srgb, ${localGameBackgroundColor} 98%, #000 2%)`,
+                                        color: localTextColor,
                                         borderColor: focusPreview
-                                            ? (localGameTheme === 'dark' ? localFocusColor : localFocusColorLight)
-                                            : (localGameTheme === 'dark' ? '#30363d' : '#d0d7de'),
+                                            ? localFocusColor
+                                            : `color-mix(in srgb, ${localGameBackgroundColor} 85%, ${localTextColor} 15%)`,
                                         fontFamily: localFontFamily,
                                     }}
                                     onFocus={() => setFocusPreview(true)}

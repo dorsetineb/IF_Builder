@@ -1455,10 +1455,7 @@ const Editor: React.FC = () => {
                     gameFontSize={gameData.gameFontSize || '0.75em'}
                     chanceIcon={gameData.gameChanceIcon || 'heart'}
                     chanceReturnButtonText={gameData.gameChanceReturnButtonText || ''}
-                    gameTheme={gameData.gameTheme || 'dark'}
-                    textColorLight={gameData.textColorLight || '#24292f'}
-                    titleColorLight={gameData.titleColorLight || '#0969da'}
-                    focusColorLight={gameData.focusColorLight || '#0969da'}
+                    gameBackgroundColor={gameData.gameBackgroundColor || '#0d1117'}
                     frameBookColor={gameData.frameBookColor || '#FFFFFF'}
                     frameTradingCardColor={gameData.frameTradingCardColor || '#1c1917'}
                     frameRoundedTopColor={gameData.frameRoundedTopColor || '#facc15'}

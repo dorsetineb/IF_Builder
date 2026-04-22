@@ -254,7 +254,6 @@ DATE:        ${exportDate.toLocaleString()}
 
     let htmlContent = gameData.gameHTML
       .replace('__GAME_TITLE__', exportData.gameTitle || 'IF Builder Game')
-      .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme with-spacing`)
       .replace(
         '__LAYOUT_ORIENTATION_CLASS__',
         exportData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : ''
@@ -377,12 +376,10 @@ DATE:        ${exportDate.toLocaleString()}
           const fontInfo = FONTS.find(f => f.family === fontFamily);
           return (fontInfo?.sizeAdjust || 1.0).toString();
         })())
+        .replace(/__GAME_BACKGROUND_COLOR__/g, exportData.gameBackgroundColor || '#000000')
         .replace(/__GAME_TEXT_COLOR__/g, exportData.gameTextColor || '#c9d1d9')
         .replace(/__GAME_TITLE_COLOR__/g, exportData.gameTitleColor || '#58a6ff')
         .replace(/__GAME_FOCUS_COLOR__/g, exportData.gameFocusColor || '#58a6ff')
-        .replace(/__GAME_TEXT_COLOR_LIGHT__/g, exportData.textColorLight || '#24292f')
-        .replace(/__GAME_TITLE_COLOR_LIGHT__/g, exportData.titleColorLight || '#0969da')
-        .replace(/__GAME_FOCUS_COLOR_LIGHT__/g, exportData.focusColorLight || '#0969da')
         .replace(/__SPLASH_BUTTON_COLOR__/g, exportData.gameSplashButtonColor || '#2ea043')
         .replace(
           /__SPLASH_BUTTON_HOVER_COLOR__/g,
@@ -577,7 +574,6 @@ DATE:        ${exportDate.toLocaleString()}
 
     let htmlContent = gameData.gameHTML
       .replace('__GAME_TITLE__', exportData.gameTitle || 'IF Builder Game')
-      .replace('__THEME_CLASS__', `${exportData.gameTheme || 'dark'}-theme with-spacing`)
       .replace(
         '__LAYOUT_ORIENTATION_CLASS__',
         exportData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : ''
@@ -699,12 +695,10 @@ DATE:        ${exportDate.toLocaleString()}
           const fontInfo = FONTS.find(f => f.family === fontFamily);
           return (fontInfo?.sizeAdjust || 1.0).toString();
         })())
+        .replace(/__GAME_BACKGROUND_COLOR__/g, exportData.gameBackgroundColor || '#000000')
         .replace(/__GAME_TEXT_COLOR__/g, exportData.gameTextColor || '#c9d1d9')
         .replace(/__GAME_TITLE_COLOR__/g, exportData.gameTitleColor || '#58a6ff')
         .replace(/__GAME_FOCUS_COLOR__/g, exportData.gameFocusColor || '#58a6ff')
-        .replace(/__GAME_TEXT_COLOR_LIGHT__/g, exportData.textColorLight || '#24292f')
-        .replace(/__GAME_TITLE_COLOR_LIGHT__/g, exportData.titleColorLight || '#0969da')
-        .replace(/__GAME_FOCUS_COLOR_LIGHT__/g, exportData.focusColorLight || '#0969da')
         .replace(/__SPLASH_BUTTON_COLOR__/g, exportData.gameSplashButtonColor || '#2ea043')
         .replace(
           /__SPLASH_BUTTON_HOVER_COLOR__/g,

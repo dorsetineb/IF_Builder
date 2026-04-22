@@ -64,11 +64,10 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
 
         const finalHtml = migratedHtml
             .replace(/__GAME_TITLE__/g, gameData.gameTitle || 'IF Builder Game')
-            .replace('__THEME_CLASS__', `${gameData.gameTheme || 'dark'}-theme with-spacing`)
             .replace('__LAYOUT_ORIENTATION_CLASS__', gameData.gameLayoutOrientation === 'horizontal' ? 'layout-horizontal' : '')
             .replace('__LAYOUT_ORDER_CLASS__', gameData.gameLayoutOrder === 'image-last' ? 'layout-image-last' : '')
             .replace('__FRAME_CLASS__', getFrameClass(gameData.gameImageFrame))
-            .replace('__MOBILE_BEHAVIOR_CLASS__', 'behavior-immersive') // FIXO: COMPORTAMENTO IMERSIVO
+            .replace('__MOBILE_BEHAVIOR_CLASS__', 'behavior-immersive with-spacing') // FIXO: COMPORTAMENTO IMERSIVO
             .replace('__FONT_STYLESHEET__', fontStylesheet)
             .replace('__CHANCES_CONTAINER__', chancesContainerHTML)
             .replace('__TRACKERS_BUTTON__', trackersButtonHTML)
@@ -276,12 +275,10 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
                 const fontInfo = FONTS.find(f => f.family === fontFamily);
                 return (fontInfo?.sizeAdjust || 1.0).toString();
             })())
+            .replace(/__GAME_BACKGROUND_COLOR__/g, gameData.gameBackgroundColor || '#000000')
             .replace(/__GAME_TEXT_COLOR__/g, gameData.gameTextColor || '#c9d1d9')
             .replace(/__GAME_TITLE_COLOR__/g, gameData.gameTitleColor || '#58a6ff')
             .replace(/__GAME_FOCUS_COLOR__/g, gameData.gameFocusColor || '#58a6ff')
-            .replace(/__GAME_TEXT_COLOR_LIGHT__/g, gameData.textColorLight || '#24292f')
-            .replace(/__GAME_TITLE_COLOR_LIGHT__/g, gameData.titleColorLight || '#0969da')
-            .replace(/__GAME_FOCUS_COLOR_LIGHT__/g, gameData.focusColorLight || '#0969da')
             .replace(/__SPLASH_BUTTON_COLOR__/g, gameData.gameSplashButtonColor || '#2ea043')
             .replace(/__SPLASH_BUTTON_HOVER_COLOR__/g, gameData.gameSplashButtonHoverColor || '#238636')
             .replace(/__SPLASH_BUTTON_TEXT_COLOR__/g, gameData.gameSplashButtonTextColor || '#ffffff')

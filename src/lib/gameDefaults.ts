@@ -13,7 +13,7 @@ export const gameHTML = `
     __FONT_STYLESHEET__
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="__THEME_CLASS__ __FRAME_CLASS__ __FONT_ADJUST_CLASS__ __MOBILE_BEHAVIOR_CLASS__">
+<body class="__FRAME_CLASS__ __FONT_ADJUST_CLASS__ __MOBILE_BEHAVIOR_CLASS__ with-spacing">
     <audio id="scene-sound-effect" preload="auto"></audio>
     <audio id="bgm-audio" preload="auto" loop></audio>
     <div class="main-wrapper" id="main-wrapper">
@@ -265,9 +265,7 @@ export const gameHTML = `
 export const gameCSS = `
 body { padding: 0; }
 body.with-spacing { padding: 30px; }
-body.dark-theme { --bg-color: #0d1117; --panel-bg: #161b22; --border-color: #30363d; --text-color: __GAME_TEXT_COLOR__; --text-dim-color: #8b949e; --accent-color: __GAME_TITLE_COLOR__; --danger-color: #f85149; --danger-hover-bg: #da3633; --highlight-color: __GAME_FOCUS_COLOR__; --input-bg: #010409; --button-bg: #21262d; --button-hover-bg: #30363d; }
-body.light-theme { --bg-color: #ffffff; --panel-bg: #f6f8fa; --border-color: #d0d7de; --text-color: __GAME_TEXT_COLOR_LIGHT__; --text-dim-color: #57606a; --accent-color: __GAME_TITLE_COLOR_LIGHT__; --danger-color: #cf222e; --danger-hover-bg: #a40e26; --highlight-color: __GAME_FOCUS_COLOR_LIGHT__; --input-bg: #ffffff; --button-bg: #f6f8fa; --button-hover-bg: #e5e7eb; }
-:root { --font-family: __FONT_FAMILY__; --font-size-base: __GAME_FONT_SIZE__; --font-size-adjust: __FONT_SIZE_ADJUST__; --scale-factor: 1; --font-size: calc(var(--font-size-base) * var(--font-size-adjust) * var(--scale-factor)); --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: __CONTINUE_INDICATOR_COLOR__; --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
+:root { --bg-color: __GAME_BACKGROUND_COLOR__; --text-color: __GAME_TEXT_COLOR__; --panel-bg: color-mix(in srgb, var(--bg-color) 90%, var(--text-color) 10%); --input-bg: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --button-bg: color-mix(in srgb, var(--bg-color) 85%, var(--text-color) 15%); --button-hover-bg: color-mix(in srgb, var(--bg-color) 70%, var(--text-color) 30%); --border-color: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --text-dim-color: color-mix(in srgb, var(--text-color) 70%, transparent); --accent-color: __GAME_TITLE_COLOR__; --highlight-color: __GAME_FOCUS_COLOR__; --danger-color: #f85149; --danger-hover-bg: #da3633; --font-family: __FONT_FAMILY__; --font-size-base: __GAME_FONT_SIZE__; --font-size-adjust: __FONT_SIZE_ADJUST__; --scale-factor: 1; --font-size: calc(var(--font-size-base) * var(--font-size-adjust) * var(--scale-factor)); --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: __CONTINUE_INDICATOR_COLOR__; --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
 body.is-demo { --scale-factor: 0.7; }
 body.is-demo .splash-content { gap: calc(20px * var(--scale-factor)); }
 body.is-demo .splash-logo { max-height: calc(150px * var(--scale-factor)); }
@@ -324,7 +322,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .chances-container { display: flex; align-items: center; gap: 8px; justify-content: flex-end; margin-bottom: 15px; }
 .chance-icon { width: 24px; height: 24px; transition: all 0.3s ease; }
 .chance-icon.lost { opacity: 0.5; }
-.game-container { display: flex; flex-grow: 1; overflow: hidden; transition: opacity 1s ease-in-out; position: relative; z-index: 10; }
+.game-container { display: flex; flex-grow: 1; overflow: hidden; transition: opacity 1s ease-in-out; position: relative; z-index: 10; padding: 30px; }
 .game-container.fade-out { opacity: 0; }
 .image-panel { flex: 0 0 45%; max-width: 650px; border-right: 2px solid var(--border-color); display: flex; align-items: center; justify-content: center; background-color: var(--input-bg); position: relative; transition: padding 0.3s ease-in-out, background-color 0.3s ease-in-out; padding: 0; }
 .image-container { width: 100%; height: 100%; position: relative; overflow: hidden; background-size: cover; background-position: center; transition: border 0.3s ease-in-out, outline 0.3s ease-in-out, box-shadow 0.3s ease-in-out; }
@@ -332,14 +330,16 @@ body.with-spacing .main-wrapper { height: 100%; }
 #scene-image-back { z-index: 1; }
 #scene-image { z-index: 2; }
 .scene-name-overlay { position: absolute; top: 20px; left: 20px; background-color: var(--scene-name-overlay-bg); color: var(--scene-name-overlay-text-color); border: 2px solid var(--border-color); border-radius: 0; font-size: 1em; font-weight: bold; z-index: 10; opacity: 1; transition: opacity 0.5s ease-in-out; pointer-events: none; text-align: left; padding: 6px 12px; box-sizing: border-box; }
-.text-panel { flex: 1; display: flex; flex-direction: column; padding: 30px; position: relative; }
+.text-panel { flex: 1; display: flex; flex-direction: column; padding: 0 0 0 30px; position: relative; }
 .game-container.layout-horizontal { flex-direction: column; }
 .game-container.layout-horizontal .image-panel { flex-basis: 45%; max-width: none; width: 100%; border-right: none; border-bottom: 2px solid var(--border-color); }
-.game-container.layout-horizontal .text-panel { min-height: 0; }
+.game-container.layout-horizontal .text-panel { padding: 30px 0 0 0; min-height: 0; }
 .game-container.layout-image-last { flex-direction: row-reverse; }
 .game-container.layout-image-last .image-panel { border-right: none; border-left: 2px solid var(--border-color); }
+.game-container.layout-image-last .text-panel { padding: 0 30px 0 0; }
 .game-container.layout-horizontal.layout-image-last { flex-direction: column-reverse; }
 .game-container.layout-horizontal.layout-image-last .image-panel { border-left: none; border-bottom: none; border-top: 2px solid var(--border-color); }
+.game-container.layout-horizontal.layout-image-last .text-panel { padding: 0 0 30px 0; }
 .scene-description { flex-grow: 1; overflow-y: auto; white-space: pre-wrap; line-height: 1.6; padding-bottom: 20px; }
 .scene-description.typewriting-active .highlight-word { cursor: default; }
 .scene-description.typewriting-active .highlight-word:hover { filter: none; text-decoration: none; }
@@ -748,6 +748,7 @@ body.font-adjust-gothic { font-size: 1.1em; }
     }
     body.frame-none .game-container {
         height: 100vh !important;
+        padding: 0 !important;
     }
     body.frame-none .image-panel {
         height: 100vh !important;
@@ -763,6 +764,10 @@ body.font-adjust-gothic { font-size: 1.1em; }
     /* Ajuste para Image-Last (Imagem na direita) */
     body.frame-none .game-container.layout-image-last .image-panel {
         border-left: none !important;
+    }
+    /* No padding horizontal separator for full-bleed */
+    body.frame-none .text-panel {
+        padding: 30px !important;
     }
 }
 
@@ -1521,6 +1526,11 @@ export const initialGameData: GameData = {
     enableChances: false,
     gameTextReadingFlow: 'paused',
     gameInteractionType: 'parser',
+    gameBackgroundColor: '#0d1117',
+    gameTextColor: '#c9d1d9',
+    gameTitleColor: '#58a6ff',
+    gameFocusColor: '#58a6ff',
+    gameFrameColor: '#ffffff',
 
     // Inventory Defaults
     inventoryCapacity: 10,

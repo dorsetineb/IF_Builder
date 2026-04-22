@@ -9,6 +9,7 @@ import { FONTS, PREDEFINED_THEMES } from '../constants';
 import Preview from './Preview';
 import { useTranslation } from 'react-i18next';
 import { getFramePreviewStyles } from '../utils/frameStyles';
+import { useTheme } from './ThemeProvider';
 
 interface NewProjectModalProps {
     isOpen: boolean;
@@ -44,6 +45,7 @@ const ColorInput: React.FC<{ label: string, id: string, value: string, onChange:
 
 export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClose, onCreate }) => {
     const { t } = useTranslation();
+    const { theme } = useTheme();
     const [tab, setTab] = useState<Tab>('info');
 
     // Info State
@@ -74,10 +76,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     const [imageFrame, setImageFrame] = useState<'none' | 'rounded-top' | 'trading-card' | 'book-cover'>('none');
 
     // Appearance State - Theme & Colors
-    const [theme, setTheme] = useState<'dark' | 'light'>('dark');
+    const [gameBackgroundColor, setGameBackgroundColor] = useState('#000000');
     const [colors, setColors] = useState({
         textColor: '#e4e4e7', titleColor: '#58a6ff', focusColor: '#58a6ff',
-        textColorLight: '#18181b', titleColorLight: '#0969da', focusColorLight: '#0969da',
         splashButtonColor: '#2ea043', splashButtonHoverColor: '#238636', splashButtonTextColor: '#ffffff',
         actionButtonColor: '#ffffff', actionButtonTextColor: '#0d1117',
         chanceIconColor: '#ff4d4d',
@@ -123,15 +124,12 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     };
 
     const handleApplyTheme = (preset: typeof PREDEFINED_THEMES[0]) => {
-        setTheme(preset.mode as 'dark' | 'light');
+        setGameBackgroundColor(preset.gameBackgroundColor || '#000000');
         setColors(prev => ({
             ...prev,
             textColor: preset.textColor,
             titleColor: preset.titleColor,
             focusColor: preset.focusColor,
-            textColorLight: preset.textColorLight,
-            titleColorLight: preset.titleColorLight,
-            focusColorLight: preset.focusColorLight,
             splashButtonColor: preset.splashButtonColor,
             splashButtonHoverColor: preset.splashButtonHoverColor,
             splashButtonTextColor: preset.splashButtonTextColor,
@@ -141,7 +139,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             gameContinueIndicatorColor: preset.focusColor
         }));
 
-        const newFrameColor = (preset.mode as 'dark' | 'light') === 'dark' ? '#FFFFFF' : '#1a202c';
+        const newFrameColor = '#FFFFFF';
         setColors(prev => ({
             ...prev,
             frameBookColor: newFrameColor,
@@ -200,7 +198,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         gameLayoutOrientation: layoutOrientation,
         gameLayoutOrder: layoutOrder,
         gameImageFrame: imageFrame,
-        gameTheme: theme,
+        gameBackgroundColor: gameBackgroundColor,
         gameFontFamily: fontFamily,
         gameFontSize: fontSize,
         gameActionButtonText: actionButtonText,
@@ -211,9 +209,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         gameTextColor: colors.textColor,
         gameTitleColor: colors.titleColor,
         gameFocusColor: colors.focusColor,
-        textColorLight: colors.textColorLight,
-        titleColorLight: colors.titleColorLight,
-        focusColorLight: colors.focusColorLight,
         gameSplashButtonColor: colors.splashButtonColor,
         gameSplashButtonHoverColor: colors.splashButtonHoverColor,
         gameSplashButtonTextColor: colors.splashButtonTextColor,
@@ -247,7 +242,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             textAnimationType: 'fade',
             textSpeed: 3
         }]
-    }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, theme, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewStandardScene, previewVignetteScene, tab, enableInventory, enableDiary, enableChances, enableTrackers]);
+    }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, gameBackgroundColor, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewStandardScene, previewVignetteScene, tab, enableInventory, enableDiary, enableChances, enableTrackers]);
 
     const handleCreate = () => {
         const startSceneId = 'SCN_OPENING';
@@ -607,24 +602,6 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                         {activeSections.estilo && (
                                             <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
                                                 <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('ThemeEditor.uiTheme', 'Cor da Interface')}</label>
-                                                    <div className="flex bg-zinc-950 rounded-lg p-1 border border-muted-foreground/50">
-                                                        <button
-                                                            onClick={() => setTheme('dark')}
-                                                            className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${theme === 'dark' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
-                                                        >
-                                                            {t('ThemeEditor.dark', 'Noite')}
-                                                        </button>
-                                                        <button
-                                                            onClick={() => setTheme('light')}
-                                                            className={`flex-1 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all ${theme === 'light' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
-                                                        >
-                                                            {t('ThemeEditor.light', 'Dia')}
-                                                        </button>
-                                                    </div>
-                                                </div>
-
-                                                <div className="space-y-2">
                                                     <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.predefinedThemes', 'Temas Predefinidos')}</label>
                                                     <div className="grid grid-cols-3 gap-2">
                                                         {PREDEFINED_THEMES.map((theme) => (
@@ -661,6 +638,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                                 <ColorInput label={t('newProject.appearance.colorTitle', 'Título')} id="titleColor" value={colors.titleColor} onChange={(v) => setColors({ ...colors, titleColor: v })} />
                                                                 <ColorInput label={t('newProject.appearance.colorFocus', 'Foco')} id="focusColor" value={colors.focusColor} onChange={(v) => setColors({ ...colors, focusColor: v })} />
                                                                 <ColorInput label={t('newProject.appearance.colorActionBtn', 'Botões Ação')} id="actionBtnColor" value={colors.actionButtonColor} onChange={(v) => setColors({ ...colors, actionButtonColor: v })} />
+                                                                <ColorInput label={t('aparencia.bgColor', 'Cor de fundo')} id="gameBackgroundColor" value={gameBackgroundColor} onChange={setGameBackgroundColor} />
                                                             </div>
                                                         </div>
                                                     )}
@@ -726,7 +704,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                         <div className="flex-1 relative overflow-hidden flex items-center justify-center p-4 bg-black/50">
                             {/* Custom Preview Logic from UIEditor */}
                             {(() => {
-                                const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame, theme, theme === 'dark' ? '#FFFFFF' : '#1a202c');
+                                const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame, gameBackgroundColor, '#FFFFFF');
 
                                 if (tab === 'info') {
                                     return (
@@ -740,10 +718,10 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     <div
                                         className={`
                                         rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300
-                                        ${theme === 'dark' ? 'bg-zinc-950 border-muted-foreground/50' : 'bg-white border-muted-foreground/50'}
+                                        border-muted-foreground/50
                                         w-full h-full
                                     `}
-                                        style={{ fontFamily: fontFamily }}
+                                        style={{ fontFamily: fontFamily, backgroundColor: gameBackgroundColor }}
                                     >
                                         {/* Preview Content Area */}
                                         <div className={`flex-1 p-6 flex gap-6 overflow-hidden relative ${layoutOrientation === 'vertical' ? 'flex-row' : 'flex-col'}`}>
@@ -757,7 +735,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             `}
                                             >
                                                 {(() => {
-                                                    const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame, theme, theme === 'dark' ? '#FFFFFF' : '#1a202c');
+                                                    const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame, gameBackgroundColor, '#FFFFFF');
 
                                                     const adaptedPanelStyles = {
                                                         ...panelStyles,

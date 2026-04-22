@@ -41,10 +41,7 @@ interface UIEditorProps {
     chanceReturnButtonText: string;
     gameChanceLossMessage?: string;
     gameChanceRestoreMessage?: string;
-    gameTheme: 'dark' | 'light';
-    textColorLight: string;
-    titleColorLight: string;
-    focusColorLight: string;
+    gameBackgroundColor?: string;
     frameBookColor: string;
     frameTradingCardColor: string;
     frameRoundedTopColor: string;
@@ -218,7 +215,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         gameFontSize, chanceIcon, chanceReturnButtonText,
         gameChanceLossMessage: chanceLossMessage,
         gameChanceRestoreMessage: chanceRestoreMessage,
-        gameTheme, textColorLight, titleColorLight, focusColorLight,
+        gameBackgroundColor,
         gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, gameFrameColor, onUpdate, isDirty, onSetDirty,
         gameShowTrackersUI, gameShowSystemButton, gameInteractionType, suggestionsButtonText, inventoryButtonText,
         diaryButtonText, trackersButtonText, gameSystemButtonText, gameSaveMenuTitle, gameLoadMenuTitle,
@@ -287,10 +284,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localChanceLossMessage, setLocalChanceLossMessage] = useState(chanceLossMessage || '');
     const [localChanceRestoreMessage, setLocalChanceRestoreMessage] = useState(chanceRestoreMessage || '');
     const [localChanceReturnButtonText, setLocalChanceReturnButtonText] = useState(chanceReturnButtonText);
-    const [localGameTheme, setLocalGameTheme] = useState(gameTheme);
-    const [localTextColorLight, setLocalTextColorLight] = useState(textColorLight);
-    const [localTitleColorLight, setLocalTitleColorLight] = useState(titleColorLight);
-    const [localFocusColorLight, setLocalFocusColorLight] = useState(focusColorLight);
+    const [localGameBackgroundColor, setLocalGameBackgroundColor] = useState(gameBackgroundColor || '#000000');
 
     const [localGameSceneNameOverlayBg, setLocalGameSceneNameOverlayBg] = useState(gameSceneNameOverlayBg);
     const [localGameSceneNameOverlayTextColor, setLocalGameSceneNameOverlayTextColor] = useState(gameSceneNameOverlayTextColor);
@@ -390,7 +384,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalLayoutOrientation(layoutOrientation); }, [layoutOrientation]);
     useEffect(() => { setLocalLayoutOrder(layoutOrder); }, [layoutOrder]);
     useEffect(() => { setLocalImageFrame(imageFrame); }, [imageFrame]);
-    useEffect(() => { setLocalGameTheme(gameTheme); }, [gameTheme]);
 
     // 2. Buttons & Text
     useEffect(() => { setLocalSplashButtonText(splashButtonText); }, [splashButtonText]);
@@ -421,9 +414,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalActionButtonTextColor(actionButtonTextColor); }, [actionButtonTextColor]);
     useEffect(() => { setLocalFocusColor(focusColor); }, [focusColor]);
     useEffect(() => { setLocalChanceIconColor(chanceIconColor); }, [chanceIconColor]);
-    useEffect(() => { setLocalTextColorLight(textColorLight); }, [textColorLight]);
-    useEffect(() => { setLocalTitleColorLight(titleColorLight); }, [titleColorLight]);
-    useEffect(() => { setLocalFocusColorLight(focusColorLight); }, [focusColorLight]);
 
     useEffect(() => { setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg); }, [gameSceneNameOverlayBg]);
     useEffect(() => { setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor); }, [gameSceneNameOverlayTextColor]);
@@ -507,8 +497,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor,
         localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor,
         localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceLossMessage,
-        localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight,
-        localTitleColorLight, localFocusColorLight, localGameFrameColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
+        localChanceRestoreMessage, localChanceReturnButtonText, localGameBackgroundColor, localGameFrameColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
         localGameContinueIndicatorColor, localTitle, localLogo, localOmitSplashTitle, localSplashImage,
         localSplashContentAlignment, localSplashContentVerticalAlignment, localSplashDescription,
         localBackgroundMusic, localPositiveEndingImage, localPositiveEndingContentAlignment,
@@ -557,8 +546,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor,
         localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor,
         localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceLossMessage,
-        localChanceRestoreMessage, localChanceReturnButtonText, localGameTheme, localTextColorLight,
-        localTitleColorLight, localFocusColorLight, localGameFrameColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
+        localChanceRestoreMessage, localChanceReturnButtonText, localGameBackgroundColor, localGameFrameColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
         localGameContinueIndicatorColor, localTitle, localLogo, localOmitSplashTitle, localSplashImage,
         localSplashContentAlignment, localSplashContentVerticalAlignment, localSplashDescription,
         localBackgroundMusic, localPositiveEndingImage, localPositiveEndingContentAlignment,
@@ -614,10 +602,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localChanceLossMessage !== chanceLossMessage) onUpdate('gameChanceLossMessage', localChanceLossMessage, true);
         if (localChanceRestoreMessage !== chanceRestoreMessage) onUpdate('gameChanceRestoreMessage', localChanceRestoreMessage, true);
         if (localChanceReturnButtonText !== chanceReturnButtonText) onUpdate('gameChanceReturnButtonText', localChanceReturnButtonText, true);
-        if (localGameTheme !== gameTheme) onUpdate('gameTheme', localGameTheme, true);
-        if (localTextColorLight !== textColorLight) onUpdate('textColorLight', localTextColorLight, true);
-        if (localTitleColorLight !== titleColorLight) onUpdate('titleColorLight', localTitleColorLight, true);
-        if (localFocusColorLight !== focusColorLight) onUpdate('focusColorLight', localFocusColorLight, true);
+        if (localGameBackgroundColor !== gameBackgroundColor) onUpdate('gameBackgroundColor', localGameBackgroundColor, true);
 
         if (localGameSceneNameOverlayBg !== gameSceneNameOverlayBg) onUpdate('gameSceneNameOverlayBg', localGameSceneNameOverlayBg, true);
         if (localGameSceneNameOverlayTextColor !== gameSceneNameOverlayTextColor) onUpdate('gameSceneNameOverlayTextColor', localGameSceneNameOverlayTextColor, true);
@@ -724,10 +709,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalChanceLossMessage(chanceLossMessage || '');
         setLocalChanceRestoreMessage(chanceRestoreMessage || '');
         setLocalChanceReturnButtonText(chanceReturnButtonText);
-        setLocalGameTheme(gameTheme);
-        setLocalTextColorLight(textColorLight);
-        setLocalTitleColorLight(titleColorLight);
-        setLocalFocusColorLight(focusColorLight);
+        setLocalGameBackgroundColor(gameBackgroundColor || '#000000');
 
         setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg);
         setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor);
@@ -784,20 +766,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalLanguage(i18n.language || 'pt');
     };
 
-    const handleThemeChange = (theme: 'dark' | 'light') => {
-        setLocalGameTheme(theme);
-        const newFrameColor = '#FFFFFF';
-
-        setLocalGameFrameColor(newFrameColor);
-    };
-
-    const applyTheme = (theme: typeof PREDEFINED_THEMES[0]) => {
+    const applyTheme = (theme: any) => {
+        setLocalGameBackgroundColor(theme.gameBackgroundColor);
         setLocalTextColor(theme.textColor);
         setLocalTitleColor(theme.titleColor);
         setLocalFocusColor(theme.focusColor);
-        setLocalTextColorLight(theme.textColorLight);
-        setLocalTitleColorLight(theme.titleColorLight);
-        setLocalFocusColorLight(theme.focusColorLight);
         setLocalSplashButtonColor(theme.splashButtonColor);
         setLocalSplashButtonHoverColor(theme.splashButtonHoverColor);
         setLocalSplashButtonTextColor(theme.splashButtonTextColor);
@@ -809,12 +782,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalGameSceneNameOverlayBg('#000000');
         setLocalGameSceneNameOverlayTextColor('#FFFFFF');
 
-
-
         const newFrameColor = '#FFFFFF';
-
-
-
         setLocalGameFrameColor(newFrameColor);
     };
 
@@ -993,21 +961,16 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 setLocalLayoutOrder={setLocalLayoutOrder}
                                 localImageFrame={localImageFrame}
                                 setLocalImageFrame={setLocalImageFrame}
-                                localGameTheme={localGameTheme}
+                                localGameBackgroundColor={localGameBackgroundColor}
+                                setLocalGameBackgroundColor={setLocalGameBackgroundColor}
                                 localGameFrameColor={localGameFrameColor}
                                 setLocalGameFrameColor={setLocalGameFrameColor}
                                 localTextColor={localTextColor}
                                 setLocalTextColor={setLocalTextColor}
-                                localTextColorLight={localTextColorLight}
-                                setLocalTextColorLight={setLocalTextColorLight}
                                 localTitleColor={localTitleColor}
                                 setLocalTitleColor={setLocalTitleColor}
-                                localTitleColorLight={localTitleColorLight}
-                                setLocalTitleColorLight={setLocalTitleColorLight}
                                 localFocusColor={localFocusColor}
                                 setLocalFocusColor={setLocalFocusColor}
-                                localFocusColorLight={localFocusColorLight}
-                                setLocalFocusColorLight={setLocalFocusColorLight}
                                 localGameContinueIndicatorColor={localGameContinueIndicatorColor}
                                 setLocalGameContinueIndicatorColor={setLocalGameContinueIndicatorColor}
                                 localSplashButtonColor={localSplashButtonColor}
@@ -1039,7 +1002,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 localEnableDiary={localEnableDiary}
                                 localEnableTrackers={localEnableTrackers}
                                 localGameShowSystemButton={localGameShowSystemButton}
-                                handleThemeChange={handleThemeChange}
                                 applyTheme={applyTheme}
                                 previewType={previewType}
                                 setPreviewType={setPreviewType}

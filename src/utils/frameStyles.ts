@@ -3,13 +3,13 @@ import { GameData } from '../types';
 
 export const getFramePreviewStyles = (
     frame: GameData['gameImageFrame'],
-    localGameTheme: 'dark' | 'light',
+    gameBackgroundColor: string,
     localGameFrameColor?: string
 ) => {
     const panelStyles: React.CSSProperties = { boxSizing: 'border-box', overflow: 'hidden' };
     const containerStyles: React.CSSProperties = {
-        backgroundColor: localGameTheme === 'dark' ? '#111827' : '#f8fafc',
-        color: localGameTheme === 'dark' ? '#94a3b8' : '#475569',
+        backgroundColor: `color-mix(in srgb, ${gameBackgroundColor} 90%, white)`,
+        color: `color-mix(in srgb, ${gameBackgroundColor} 10%, white)`,
         width: '100%',
         height: '100%',
         display: 'flex',
