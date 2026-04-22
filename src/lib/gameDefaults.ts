@@ -265,7 +265,7 @@ export const gameHTML = `
 export const gameCSS = `
 body { padding: 0; }
 body.with-spacing { padding: 30px; }
-:root { --bg-color: __GAME_BACKGROUND_COLOR__; --text-color: __GAME_TEXT_COLOR__; --panel-bg: color-mix(in srgb, var(--bg-color) 90%, var(--text-color) 10%); --input-bg: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --button-bg: color-mix(in srgb, var(--bg-color) 85%, var(--text-color) 15%); --button-hover-bg: color-mix(in srgb, var(--bg-color) 70%, var(--text-color) 30%); --border-color: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --text-dim-color: color-mix(in srgb, var(--text-color) 70%, transparent); --accent-color: __GAME_TITLE_COLOR__; --highlight-color: __GAME_FOCUS_COLOR__; --danger-color: #f85149; --danger-hover-bg: #da3633; --font-family: __FONT_FAMILY__; --font-size-base: __GAME_FONT_SIZE__; --font-size-adjust: __FONT_SIZE_ADJUST__; --scale-factor: 1; --font-size: calc(var(--font-size-base) * var(--font-size-adjust) * var(--scale-factor)); --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: __CONTINUE_INDICATOR_COLOR__; --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
+:root { --bg-color: __GAME_BACKGROUND_COLOR__; --text-color: __GAME_TEXT_COLOR__; --panel-bg: color-mix(in srgb, var(--bg-color) 90%, var(--text-color) 10%); --input-bg: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --button-bg: color-mix(in srgb, var(--bg-color) 85%, var(--text-color) 15%); --button-hover-bg: color-mix(in srgb, var(--bg-color) 70%, var(--text-color) 30%); --border-color: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --text-dim-color: color-mix(in srgb, var(--text-color) 70%, transparent); --accent-color: __GAME_TITLE_COLOR__; --highlight-color: __GAME_FOCUS_COLOR__; --danger-color: #f85149; --danger-hover-bg: #da3633; --font-family: __FONT_FAMILY__; --font-size-base: __GAME_FONT_SIZE__; --font-size-adjust: __FONT_SIZE_ADJUST__; --scale-factor: 1; --font-size: calc(var(--font-size-base) * var(--font-size-adjust) * var(--scale-factor)); --splash-button-bg: __SPLASH_BUTTON_COLOR__; --splash-button-hover-bg: __SPLASH_BUTTON_HOVER_COLOR__; --splash-button-text-color: __SPLASH_BUTTON_TEXT_COLOR__; --action-button-bg: __ACTION_BUTTON_COLOR__; --action-button-text-color: __ACTION_BUTTON_TEXT_COLOR__; --action-button-hover-bg: __ACTION_BUTTON_HOVER_COLOR__; --system-button-bg: __SYSTEM_BUTTON_COLOR__; --system-button-text: __SYSTEM_BUTTON_TEXT_COLOR__; --system-button-border: __SYSTEM_BUTTON_BORDER_COLOR__; --system-button-hover-bg: __SYSTEM_BUTTON_HOVER_COLOR__; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: __SCENE_NAME_OVERLAY_BG__; --scene-name-overlay-text-color: __SCENE_NAME_OVERLAY_TEXT_COLOR__; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: __CONTINUE_INDICATOR_COLOR__; --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
 body.is-demo { --scale-factor: 0.7; }
 body.is-demo .splash-content { gap: calc(20px * var(--scale-factor)); }
 body.is-demo .splash-logo { max-height: calc(150px * var(--scale-factor)); }
@@ -360,14 +360,14 @@ body.with-spacing .main-wrapper { height: 100%; }
 .action-popup-list p { cursor: default; color: var(--text-dim-color); }
 
 .action-buttons { display: flex; gap: 8px; margin-bottom: 12px; }
-.action-buttons button { font-family: var(--font-family); padding: 8px 12px; border: 2px solid var(--border-color); background-color: var(--panel-bg); color: var(--text-color); cursor: pointer; transition: background-color 0.2s, border-color 0.2s; font-size: 1em; }
-.action-buttons button:hover { background-color: var(--border-color); border-color: var(--text-dim-color); }
+.action-buttons button { font-family: var(--font-family); padding: 8px 12px; border: 2px solid var(--system-button-border); background-color: var(--system-button-bg); color: var(--system-button-text); cursor: pointer; transition: all 0.2s; font-size: 1em; }
+.action-buttons button:hover { background-color: var(--system-button-hover-bg); transform: translateY(-2px); }
 .input-area { display: flex; gap: 8px; }
 #verb-input { flex-grow: 1; padding: 12px 10px; border: 2px solid var(--border-color); background-color: var(--input-bg); color: var(--text-color); font-family: var(--font-family); font-size: 1em; }
 #verb-input:focus { outline: none; border-color: var(--action-button-bg); }
 #verb-input:disabled { background-color: var(--button-bg); cursor: not-allowed; }
 #submit-verb { padding: 8px 16px; border: 2px solid var(--border-color); background-color: var(--action-button-bg); color: var(--action-button-text-color); font-family: var(--font-family); cursor: pointer; font-weight: bold; transition: background-color 0.2s; font-size: 1em; }
-#submit-verb:hover { filter: brightness(0.9); }
+#submit-verb:hover { background-color: var(--action-button-hover-bg); filter: none; }
 #submit-verb:disabled { background-color: var(--button-hover-bg); color: var(--text-dim-color); cursor: not-allowed; }
 #submit-verb:disabled:hover { background-color: var(--button-hover-bg); }
 .view-ending-button { width: 100%; padding: 12px; font-size: 1.1em; font-weight: bold; border: 2px solid var(--border-color); background-color: var(--action-button-bg); color: var(--action-button-text-color); font-family: var(--font-family); cursor: pointer; transition: all 0.2s; }
@@ -419,10 +419,10 @@ body.with-spacing .main-wrapper { height: 100%; }
 
 .system-modal-content { max-width: 400px; text-align: center; }
 .system-menu { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; }
-.system-menu button { width: 100%; padding: 15px; font-size: 1.1em; background-color: var(--button-bg); border: 2px solid var(--border-color); color: var(--text-color); cursor: pointer; transition: all 0.2s; font-family: var(--font-family); }
-.system-menu button:hover { background-color: var(--button-hover-bg); border-color: var(--accent-color); }
-.system-menu button.danger-button { color: var(--danger-color); border-color: var(--danger-color); }
-.system-menu button.danger-button:hover { background-color: var(--danger-hover-bg); color: #fff; }
+.system-menu button { width: 100%; padding: 15px; font-size: 1.1em; background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); cursor: pointer; transition: all 0.2s; font-family: var(--font-family); }
+.system-menu button:hover { background-color: var(--system-button-hover-bg); border-color: var(--accent-color); transform: translateY(-2px); }
+.system-menu button.danger-button { color: var(--danger-color); border-color: var(--danger-color); background-color: transparent; }
+.system-menu button.danger-button:hover { background-color: var(--danger-hover-bg); color: #fff; border-color: var(--danger-hover-bg); }
 .system-slots { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; text-align: left; }
 .slot-item { background-color: var(--input-bg); border: 2px solid var(--border-color); padding: 15px; cursor: pointer; transition: border-color 0.2s; display: flex; justify-content: space-between; align-items: center; }
 .slot-item:hover { border-color: var(--accent-color); }
@@ -433,7 +433,8 @@ body.with-spacing .main-wrapper { height: 100%; }
 .slot-actions { display: flex; gap: 10px; align-items: center; }
 .slot-delete-btn { background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1.5em; padding: 0 10px; line-height: 1; }
 .slot-delete-btn:hover { color: #fff; background-color: var(--danger-color); border-radius: 4px; }
-#btn-back-system { width: auto; padding: 10px 20px; align-self: center; margin-top: 10px; background-color: var(--button-bg); border: 1px solid var(--border-color); color: var(--text-color); cursor: pointer; font-family: var(--font-family); font-size: 0.9em; }
+#btn-back-system { width: auto; padding: 10px 20px; align-self: center; margin-top: 10px; background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); cursor: pointer; font-family: var(--font-family); font-size: 0.9em; transition: all 0.2s; }
+#btn-back-system:hover { background-color: var(--system-button-hover-bg); transform: translateY(-2px); }
 
 /* Mobile Immersive Layout Definitivo - CORREÇÃO DE FUNDOS E TRANSPARÊNCIAS */
 @media (max-width: 768px) {

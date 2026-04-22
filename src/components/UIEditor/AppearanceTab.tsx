@@ -7,7 +7,11 @@ import {
     ArrowRight, 
     ChevronDown, 
     Heart, 
-    Minus
+    Minus,
+    Sun,
+    Image as ImageIcon,
+    Command,
+    Package
 } from 'lucide-react';
 import { FONTS, PREDEFINED_THEMES } from '../../constants';
 import { GameData } from '../../types';
@@ -49,6 +53,18 @@ interface AppearanceTabProps {
     setLocalActionButtonColor: (val: string) => void;
     localActionButtonTextColor: string;
     setLocalActionButtonTextColor: (val: string) => void;
+    localActionButtonHoverColor: string;
+    setLocalActionButtonHoverColor: (val: string) => void;
+    
+    localSystemButtonColor: string;
+    setLocalSystemButtonColor: (val: string) => void;
+    localSystemButtonTextColor: string;
+    setLocalSystemButtonTextColor: (val: string) => void;
+    localSystemButtonBorderColor: string;
+    setLocalSystemButtonBorderColor: (val: string) => void;
+    localSystemButtonHoverColor: string;
+    setLocalSystemButtonHoverColor: (val: string) => void;
+    
     localGameSceneNameOverlayBg: string;
     setLocalGameSceneNameOverlayBg: (val: string) => void;
     localGameSceneNameOverlayTextColor: string;
@@ -115,6 +131,16 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     setLocalActionButtonColor,
     localActionButtonTextColor,
     setLocalActionButtonTextColor,
+    localActionButtonHoverColor,
+    setLocalActionButtonHoverColor,
+    localSystemButtonColor,
+    setLocalSystemButtonColor,
+    localSystemButtonTextColor,
+    setLocalSystemButtonTextColor,
+    localSystemButtonBorderColor,
+    setLocalSystemButtonBorderColor,
+    localSystemButtonHoverColor,
+    setLocalSystemButtonHoverColor,
     localGameSceneNameOverlayBg,
     setLocalGameSceneNameOverlayBg,
     localGameSceneNameOverlayTextColor,
@@ -142,6 +168,14 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     ditherColors
 }) => {
     const { t } = useTranslation();
+    const [isInputFocused, setIsInputFocused] = React.useState(false);
+
+    const getScaledFontSize = (factor = 1.0) => {
+        const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
+        const fontInfo = FONTS.find(f => f.family === localFontFamily);
+        const multiplier = fontInfo?.sizeAdjust || 1.0;
+        return `${baseSize * multiplier * factor}px`;
+    };
 
     return (
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pb-32">
@@ -363,9 +397,13 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                     </div>
                                 </div>
                                 {isColorsExpanded && (
-                                    <div className="mt-3 space-y-6 animate-in fade-in slide-in-from-top-1 px-1">
+                                    <div className="mt-3 space-y-8 animate-in fade-in slide-in-from-top-1 px-1">
+                                        {/* GRUPO 1: ATMOSFERA DO JOGO */}
                                         <div className="space-y-4">
-                                            <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.sceneDesc')}</h4>
+                                            <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
+                                                <Sun className="w-3 h-3 text-primary" />
+                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.atmosphere', 'Atmosfera do Jogo')}</h4>
+                                            </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                 <ColorInput 
                                                     label={t('UIEditor.aparencia.gameBgColor', 'Cor de fundo')} 
@@ -375,53 +413,92 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                                     placeholder="#000000" 
                                                 />
                                                 <ColorInput 
-                                                    label={t('UIEditor.aparencia.defaultText')} 
+                                                    label={t('UIEditor.aparencia.defaultText', 'Texto da narração')} 
                                                     id="textColor" 
                                                     value={localTextColor} 
                                                     onChange={setLocalTextColor} 
                                                     placeholder="#FFFFFF" 
                                                 />
                                                 <ColorInput 
-                                                    label={t('UIEditor.aparencia.titleHighlight')} 
+                                                    label={t('UIEditor.aparencia.titleHighlight', 'Acento (Títulos)')} 
                                                     id="titleColor" 
                                                     value={localTitleColor} 
                                                     onChange={setLocalTitleColor} 
                                                     placeholder="#58A6FF" 
                                                 />
                                                 <ColorInput 
-                                                    label={t('UIEditor.aparencia.focusHighlight')} 
+                                                    label={t('UIEditor.aparencia.focusHighlight', 'Destaque de Interação')} 
                                                     id="focusColor" 
                                                     value={localFocusColor} 
                                                     onChange={setLocalFocusColor} 
                                                     placeholder="#FFFFFF" 
                                                 />
-                                                <ColorInput label={t('UIEditor.aparencia.indicatorArrow')} id="gameContinueIndicatorColor" value={localGameContinueIndicatorColor} onChange={setLocalGameContinueIndicatorColor} placeholder="#FFFFFF" />
+                                                <ColorInput 
+                                                    label={t('UIEditor.aparencia.indicatorArrow', 'Indicador de Continuação')} 
+                                                    id="gameContinueIndicatorColor" 
+                                                    value={localGameContinueIndicatorColor} 
+                                                    onChange={setLocalGameContinueIndicatorColor} 
+                                                    placeholder="#FFFFFF" 
+                                                />
                                             </div>
                                         </div>
 
+                                        {/* GRUPO 2: IDENTIDADE DE CENA */}
                                         <div className="space-y-4">
-                                            <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.uiButtons')}</h4>
+                                            <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
+                                                <ImageIcon className="w-3 h-3 text-primary" />
+                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.sceneIdentity', 'Identidade de Cena')}</h4>
+                                            </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                <ColorInput label={t('UIEditor.aparencia.splashButton')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.splashButtonTextColor')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.splashButtonHover')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.actionButton')} id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.actionButtonTextColor')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.sceneNameBg', 'Fundo (Nome da Cena)')} id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
+                                                <ColorInput label={t('UIEditor.aparencia.sceneNameText', 'Texto (Nome da Cena)')} id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput 
+                                                    label={t('UIEditor.aparencia.frameColor', 'Moldura da Imagem')} 
+                                                    id="gameFrameColor" 
+                                                    value={localGameFrameColor} 
+                                                    onChange={setLocalGameFrameColor} 
+                                                    placeholder="#000000" 
+                                                />
                                             </div>
                                         </div>
 
+                                        {/* GRUPO 3: CONTROLES DE VINHETA */}
                                         <div className="space-y-4">
-                                            <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.sceneNameBox')}</h4>
+                                            <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
+                                                <ArrowRight className="w-3 h-3 text-primary" />
+                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.vignetteControls', 'Controles de Vinheta')}</h4>
+                                            </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                <ColorInput label={t('UIEditor.aparencia.bgColor')} id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
-                                                <ColorInput label={t('UIEditor.aparencia.text')} id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.splashButton', 'Fundo do Botão')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.splashButtonTextColor', 'Texto do Botão')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.splashButtonHover', 'Fundo no Hover')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
                                             </div>
                                         </div>
 
+                                        {/* GRUPO 4: CONTROLES DE AÇÃO */}
                                         <div className="space-y-4">
-                                            <h4 className="text-[10px] font-bold text-foreground border-b border-muted-foreground/50 pb-1">{t('UIEditor.aparencia.others')}</h4>
+                                            <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
+                                                <Command className="w-3 h-3 text-primary" />
+                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.actionControls', 'Controles de Ação (Gameplay)')}</h4>
+                                            </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                <ColorInput label={t('UIEditor.aparencia.mainBg')} id="gameFrameColor" value={localGameFrameColor} onChange={setLocalGameFrameColor} placeholder="#000000" />
+                                                <ColorInput label={t('UIEditor.aparencia.actionButton', 'Fundo do Botão')} id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.actionButtonTextColor', 'Texto do Botão')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.actionButtonHover', 'Fundo no Hover')} id="actionButtonHoverColor" value={localActionButtonHoverColor} onChange={setLocalActionButtonHoverColor} placeholder="#FFFFFF" />
+                                            </div>
+                                        </div>
+
+                                        {/* GRUPO 5: INTERFACE DO SISTEMA */}
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
+                                                <Package className="w-3 h-3 text-primary" />
+                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.systemInterface', 'Interface do Sistema (Menus)')}</h4>
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                                <ColorInput label={t('UIEditor.aparencia.systemButton', 'Fundo dos Botões')} id="systemButtonColor" value={localSystemButtonColor} onChange={setLocalSystemButtonColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.systemButtonTextColor', 'Texto dos Botões')} id="systemButtonTextColor" value={localSystemButtonTextColor} onChange={setLocalSystemButtonTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.systemButtonBorder', 'Cor da Borda')} id="systemButtonBorderColor" value={localSystemButtonBorderColor} onChange={setLocalSystemButtonBorderColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.systemButtonHover', 'Fundo no Hover')} id="systemButtonHoverColor" value={localSystemButtonHoverColor} onChange={setLocalSystemButtonHoverColor} placeholder="#FFFFFF" />
                                             </div>
                                         </div>
                                     </div>
@@ -452,6 +529,36 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                             </button>
                         </div>
                     </div>
+                    
+                    {/* Estilos dinâmicos para o Hover do Preview */}
+                    <style>
+                        {`
+                            .preview-btn-action { transition: all 0.2s ease; }
+                            .preview-btn-action:hover { 
+                                background-color: ${localActionButtonHoverColor} !important;
+                                transform: translateY(-1px);
+                                shadow: 0 4px 12px rgba(0,0,0,0.3);
+                            }
+                            
+                            .preview-btn-system { transition: all 0.2s ease; }
+                            .preview-btn-system:hover { 
+                                background-color: ${localSystemButtonHoverColor} !important;
+                                transform: translateY(-1px);
+                            }
+                            
+                            .preview-btn-splash { transition: all 0.2s ease; }
+                            .preview-btn-splash:hover { 
+                                background-color: ${localSplashButtonHoverColor} !important;
+                                transform: translateY(-1px);
+                            }
+
+                            .preview-interactive-text { transition: color 0.2s ease; }
+                            .preview-interactive-text:hover {
+                                color: ${localFocusColor} !important;
+                                cursor: pointer;
+                            }
+                        `}
+                    </style>
 
                     {previewType === 'scene' ? (
                             <div
@@ -510,12 +617,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                                                 color: localGameSceneNameOverlayTextColor,
                                                                 borderColor: `color-mix(in srgb, ${localGameBackgroundColor} 80%, ${localTextColor} 20%)`,
                                                                 borderWidth: '2px',
-                                                                fontSize: (() => {
-                                                                    const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
-                                                                    const fontInfo = FONTS.find(f => f.family === localFontFamily);
-                                                                    const multiplier = fontInfo?.sizeAdjust || 1.0;
-                                                                    return `${baseSize * multiplier}px`;
-                                                                })()
+                                                                fontSize: getScaledFontSize(1.0)
                                                             }}
                                                         >
                                                             {t('UIEditor.aparencia.sceneName')}
@@ -530,22 +632,12 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                 {/* Text Area */}
                                 <div className="flex-1 flex flex-col overflow-hidden">
                                     <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
-                                        <p className="leading-relaxed" style={{ color: localTextColor, fontSize: (() => {
-                                            const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
-                                            const fontInfo = FONTS.find(f => f.family === localFontFamily);
-                                            const multiplier = fontInfo?.sizeAdjust || 1.0;
-                                            return `${baseSize * multiplier}px`;
-                                        })() }}>
+                                        <p className="leading-relaxed" style={{ color: localTextColor, fontSize: getScaledFontSize(1.0) }}>
                                             {t('UIEditor.aparencia.sampleDesc1')}
-                                            <span style={{ color: localTitleColor }}>{t('UIEditor.aparencia.sampleDescHighlight')}</span>
+                                            <span className="preview-interactive-text" style={{ color: localTitleColor }}>{t('UIEditor.aparencia.sampleDescHighlight')}</span>
                                             {t('UIEditor.aparencia.sampleDesc2')}
                                         </p>
-                                        <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: (() => {
-                                            const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
-                                            const fontInfo = FONTS.find(f => f.family === localFontFamily);
-                                            const multiplier = fontInfo?.sizeAdjust || 1.0;
-                                            return `${baseSize * multiplier}px`;
-                                        })() }}>
+                                        <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: getScaledFontSize(1.0) }}>
                                             {'>'} {t('UIEditor.aparencia.sampleCommand')}
                                         </p>
                                     </div>
@@ -554,34 +646,42 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                     <div className="flex-shrink-0 space-y-2 pt-2">
                                         <div className="flex items-center gap-1.5 flex-wrap">
                                             {localEnableInventory && (
-                                                <button className="px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider border" style={{ borderColor: localTextColor + '40', color: localTextColor, backgroundColor: 'transparent' }}>
+                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
                                                     {t('UIEditor.textos.inventoryPlaceholder')}
                                                 </button>
                                             )}
                                             {localEnableDiary && (
-                                                <button className="px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider border" style={{ borderColor: localTextColor + '40', color: localTextColor, backgroundColor: 'transparent' }}>
+                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
                                                     {t('UIEditor.textos.diaryPlaceholder')}
                                                 </button>
                                             )}
                                             {localEnableTrackers && (
-                                                <button className="px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider border" style={{ borderColor: localTextColor + '40', color: localTextColor, backgroundColor: 'transparent' }}>
+                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
                                                     {t('UIEditor.textos.trackersPlaceholder')}
                                                 </button>
                                             )}
                                             {localGameShowSystemButton && (
-                                                <button className="px-2.5 py-1 rounded text-[11px] font-bold uppercase tracking-wider border" style={{ borderColor: localTextColor + '40', color: localTextColor, backgroundColor: 'transparent' }}>
+                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
                                                     {t('UIEditor.textos.systemPlaceholder')}
                                                 </button>
                                             )}
                                         </div>
 
                                         <div className="flex gap-1.5 pt-1.5">
-                                            <div className="flex-1 rounded-md h-8 flex items-center px-2 border border-muted-foreground/50" style={{ backgroundColor: `color-mix(in srgb, ${localGameBackgroundColor} 98%, #000 2%)` }}>
-                                                <span className="font-mono truncate" style={{ fontSize: '11px', fontFamily: localFontFamily, color: `color-mix(in srgb, ${localTextColor} 70%, ${localGameBackgroundColor} 30%)` }}>{t('UIEditor.textos.commandInputValue')}</span>
+                                            <div 
+                                                className="flex-1 rounded-md h-8 flex items-center px-2 border-2 transition-all duration-200 outline-none cursor-text" 
+                                                style={{ 
+                                                    backgroundColor: `color-mix(in srgb, ${localGameBackgroundColor} 98%, #000 2%)`,
+                                                    borderColor: isInputFocused ? localFocusColor : localSystemButtonBorderColor,
+                                                    boxShadow: isInputFocused ? `0 0 0 1px ${localFocusColor}40` : 'none'
+                                                }}
+                                                onClick={() => setIsInputFocused(!isInputFocused)}
+                                            >
+                                                <span className="font-mono truncate" style={{ fontSize: getScaledFontSize(1.0), fontFamily: localFontFamily, color: `color-mix(in srgb, ${localTextColor} 70%, ${localGameBackgroundColor} 30%)` }}>{t('UIEditor.textos.commandInputValue')}</span>
                                             </div>
                                             <button
-                                                className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate text-[11px]"
-                                                style={{ backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily }}
+                                                className="preview-btn-action px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
+                                                style={{ fontSize: getScaledFontSize(1.0), backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily }}
                                             >
                                                 {t('UIEditor.aparencia.action')}
                                             </button>
@@ -614,24 +714,14 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                 </div>
                                 <div className={`relative z-10 w-full flex flex-col gap-2 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
                                     {!localOmitSplashTitle && (
-                                        <div className="font-bold uppercase tracking-widest drop-shadow-md" style={{ color: localTitleColor, fontSize: (() => {
-                                            const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
-                                            const fontInfo = FONTS.find(f => f.family === localFontFamily);
-                                            const multiplier = fontInfo?.sizeAdjust || 1.0;
-                                            return `${baseSize * multiplier}px`;
-                                        })(), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sceneName', 'Título da vinheta')}</div>
+                                        <div className="font-bold uppercase tracking-widest drop-shadow-md" style={{ color: localTitleColor, fontSize: getScaledFontSize(1.2), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sceneName', 'Título da vinheta')}</div>
                                     )}
                                     {!localOmitSplashDescription && (
-                                        <p className="leading-relaxed drop-shadow-sm" style={{ color: localTextColor, fontSize: (() => {
-                                            const baseSize = /^\d+$/.test(localGameFontSize) ? parseInt(localGameFontSize) : 14;
-                                            const fontInfo = FONTS.find(f => f.family === localFontFamily);
-                                            const multiplier = fontInfo?.sizeAdjust || 1.0;
-                                            return `${baseSize * multiplier}px`;
-                                        })(), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sampleVignetteDesc', 'Esta é uma descrição de exemplo para a vinheta.')}</p>
+                                        <p className="leading-relaxed drop-shadow-sm" style={{ color: localTextColor, fontSize: getScaledFontSize(1.0), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sampleVignetteDesc', 'Esta é uma descrição de exemplo para a vinheta.')}</p>
                                     )}
                                     <button
-                                        className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate text-[11px] mt-1"
-                                        style={{ backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor, fontFamily: localFontFamily }}
+                                        className="preview-btn-splash px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate mt-1"
+                                        style={{ fontSize: getScaledFontSize(1.0), backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor, fontFamily: localFontFamily }}
                                     >
                                         {localSplashButtonText || t('UIEditor.aparencia.homeButton', 'Começar')}
                                     </button>

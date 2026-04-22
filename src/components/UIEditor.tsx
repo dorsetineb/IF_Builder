@@ -33,6 +33,7 @@ interface UIEditorProps {
     splashButtonTextColor: string;
     actionButtonColor: string;
     actionButtonTextColor: string;
+    actionButtonHoverColor: string;
     focusColor: string;
     chanceIconColor: string;
     gameFontFamily: string;
@@ -45,6 +46,11 @@ interface UIEditorProps {
     frameBookColor: string;
     frameTradingCardColor: string;
     frameRoundedTopColor: string;
+
+    systemButtonColor: string;
+    systemButtonTextColor: string;
+    systemButtonBorderColor: string;
+    systemButtonHoverColor: string;
 
     gameSceneNameOverlayBg: string;
     gameSceneNameOverlayTextColor: string;
@@ -211,11 +217,12 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         html, css, layoutOrientation, layoutOrder, imageFrame, actionButtonText, verbInputPlaceholder, diaryPlayerName,
         splashButtonText, continueButtonText, restartButtonText, gameSystemEnabled, maxChances,
         textColor, titleColor, splashButtonColor, splashButtonHoverColor, splashButtonTextColor,
-        actionButtonColor, actionButtonTextColor, focusColor, chanceIconColor, gameFontFamily,
+        actionButtonColor, actionButtonTextColor, actionButtonHoverColor, focusColor, chanceIconColor, gameFontFamily,
         gameFontSize, chanceIcon, chanceReturnButtonText,
         gameChanceLossMessage: chanceLossMessage,
         gameChanceRestoreMessage: chanceRestoreMessage,
         gameBackgroundColor,
+        systemButtonColor, systemButtonTextColor, systemButtonBorderColor, systemButtonHoverColor,
         gameSceneNameOverlayBg, gameSceneNameOverlayTextColor, gameFrameColor, onUpdate, isDirty, onSetDirty,
         gameShowTrackersUI, gameShowSystemButton, gameInteractionType, suggestionsButtonText, inventoryButtonText,
         diaryButtonText, trackersButtonText, gameSystemButtonText, gameSaveMenuTitle, gameLoadMenuTitle,
@@ -276,8 +283,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localSplashButtonTextColor, setLocalSplashButtonTextColor] = useState(splashButtonTextColor);
     const [localActionButtonColor, setLocalActionButtonColor] = useState(actionButtonColor);
     const [localActionButtonTextColor, setLocalActionButtonTextColor] = useState(actionButtonTextColor);
+    const [localActionButtonHoverColor, setLocalActionButtonHoverColor] = useState(actionButtonHoverColor);
     const [localFocusColor, setLocalFocusColor] = useState(focusColor);
     const [localChanceIconColor, setLocalChanceIconColor] = useState(chanceIconColor);
+    const [localSystemButtonColor, setLocalSystemButtonColor] = useState(systemButtonColor);
+    const [localSystemButtonTextColor, setLocalSystemButtonTextColor] = useState(systemButtonTextColor);
+    const [localSystemButtonBorderColor, setLocalSystemButtonBorderColor] = useState(systemButtonBorderColor);
+    const [localSystemButtonHoverColor, setLocalSystemButtonHoverColor] = useState(systemButtonHoverColor);
     const [localFontFamily, setLocalFontFamily] = useState(gameFontFamily);
         const [localGameFontSize, setLocalGameFontSize] = useState(gameFontSize === '0.85em' ? '12' : (gameFontSize || '14'));
     const [localChanceIcon, setLocalChanceIcon] = useState(chanceIcon);
@@ -412,8 +424,13 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalSplashButtonTextColor(splashButtonTextColor); }, [splashButtonTextColor]);
     useEffect(() => { setLocalActionButtonColor(actionButtonColor); }, [actionButtonColor]);
     useEffect(() => { setLocalActionButtonTextColor(actionButtonTextColor); }, [actionButtonTextColor]);
+    useEffect(() => { setLocalActionButtonHoverColor(actionButtonHoverColor); }, [actionButtonHoverColor]);
     useEffect(() => { setLocalFocusColor(focusColor); }, [focusColor]);
     useEffect(() => { setLocalChanceIconColor(chanceIconColor); }, [chanceIconColor]);
+    useEffect(() => { setLocalSystemButtonColor(systemButtonColor); }, [systemButtonColor]);
+    useEffect(() => { setLocalSystemButtonTextColor(systemButtonTextColor); }, [systemButtonTextColor]);
+    useEffect(() => { setLocalSystemButtonBorderColor(systemButtonBorderColor); }, [systemButtonBorderColor]);
+    useEffect(() => { setLocalSystemButtonHoverColor(systemButtonHoverColor); }, [systemButtonHoverColor]);
 
     useEffect(() => { setLocalGameSceneNameOverlayBg(gameSceneNameOverlayBg); }, [gameSceneNameOverlayBg]);
     useEffect(() => { setLocalGameSceneNameOverlayTextColor(gameSceneNameOverlayTextColor); }, [gameSceneNameOverlayTextColor]);
@@ -495,8 +512,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localInventoryButtonText, localDiaryButtonText, localTrackersButtonText, localSystemButtonText,
         localSaveMenuTitle, localLoadMenuTitle, localMainMenuButtonText, localViewEndingButtonText, localRetrospectiveButtonText,
         localTextColor, localTitleColor, localSplashButtonColor, localSplashButtonHoverColor,
-        localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localFocusColor,
-        localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceLossMessage,
+        localSplashButtonTextColor, localActionButtonColor, localActionButtonTextColor, localActionButtonHoverColor,
+        localSystemButtonColor, localSystemButtonTextColor, localSystemButtonBorderColor, localSystemButtonHoverColor,
+        localFocusColor, localChanceIconColor, localFontFamily, localGameFontSize, localChanceIcon, localChanceLossMessage,
         localChanceRestoreMessage, localChanceReturnButtonText, localGameBackgroundColor, localGameFrameColor, localGameSceneNameOverlayBg, localGameSceneNameOverlayTextColor,
         localGameContinueIndicatorColor, localTitle, localLogo, localOmitSplashTitle, localSplashImage,
         localSplashContentAlignment, localSplashContentVerticalAlignment, localSplashDescription,
@@ -594,6 +612,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localSplashButtonTextColor !== splashButtonTextColor) onUpdate('gameSplashButtonTextColor', localSplashButtonTextColor, true);
         if (localActionButtonColor !== actionButtonColor) onUpdate('gameActionButtonColor', localActionButtonColor, true);
         if (localActionButtonTextColor !== actionButtonTextColor) onUpdate('gameActionButtonTextColor', localActionButtonTextColor, true);
+        if (localActionButtonHoverColor !== actionButtonHoverColor) onUpdate('gameActionButtonHoverColor', localActionButtonHoverColor, true);
+        if (localSystemButtonColor !== systemButtonColor) onUpdate('gameSystemButtonColor', localSystemButtonColor, true);
+        if (localSystemButtonTextColor !== systemButtonTextColor) onUpdate('gameSystemButtonTextColor', localSystemButtonTextColor, true);
+        if (localSystemButtonBorderColor !== systemButtonBorderColor) onUpdate('gameSystemButtonBorderColor', localSystemButtonBorderColor, true);
+        if (localSystemButtonHoverColor !== systemButtonHoverColor) onUpdate('gameSystemButtonHoverColor', localSystemButtonHoverColor, true);
         if (localFocusColor !== focusColor) onUpdate('gameFocusColor', localFocusColor, true);
         if (localChanceIconColor !== chanceIconColor) onUpdate('gameChanceIconColor', localChanceIconColor, true);
         if (localFontFamily !== gameFontFamily) onUpdate('gameFontFamily', localFontFamily, true);
@@ -701,6 +724,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalSplashButtonTextColor(splashButtonTextColor);
         setLocalActionButtonColor(actionButtonColor);
         setLocalActionButtonTextColor(actionButtonTextColor);
+        setLocalActionButtonHoverColor(actionButtonHoverColor);
+        setLocalSystemButtonColor(systemButtonColor);
+        setLocalSystemButtonTextColor(systemButtonTextColor);
+        setLocalSystemButtonBorderColor(systemButtonBorderColor);
+        setLocalSystemButtonHoverColor(systemButtonHoverColor);
         setLocalFocusColor(focusColor);
         setLocalChanceIconColor(chanceIconColor);
         setLocalFontFamily(gameFontFamily);
@@ -776,6 +804,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalSplashButtonTextColor(theme.splashButtonTextColor);
         setLocalActionButtonColor(theme.actionButtonColor);
         setLocalActionButtonTextColor(theme.actionButtonTextColor);
+        setLocalActionButtonHoverColor(theme.actionButtonHoverColor || theme.actionButtonColor);
+        setLocalSystemButtonColor(theme.systemButtonColor || 'transparent');
+        setLocalSystemButtonTextColor(theme.systemButtonTextColor || theme.textColor);
+        setLocalSystemButtonBorderColor(theme.systemButtonBorderColor || (theme.textColor + '40'));
+        setLocalSystemButtonHoverColor(theme.systemButtonHoverColor || theme.focusColor);
         setLocalChanceIconColor(theme.chanceIconColor);
         setLocalGameContinueIndicatorColor(theme.focusColor);
         // Default overlay colors for themes
@@ -983,6 +1016,16 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 setLocalActionButtonColor={setLocalActionButtonColor}
                                 localActionButtonTextColor={localActionButtonTextColor}
                                 setLocalActionButtonTextColor={setLocalActionButtonTextColor}
+                                localActionButtonHoverColor={localActionButtonHoverColor}
+                                setLocalActionButtonHoverColor={setLocalActionButtonHoverColor}
+                                localSystemButtonColor={localSystemButtonColor}
+                                setLocalSystemButtonColor={setLocalSystemButtonColor}
+                                localSystemButtonTextColor={localSystemButtonTextColor}
+                                setLocalSystemButtonTextColor={setLocalSystemButtonTextColor}
+                                localSystemButtonBorderColor={localSystemButtonBorderColor}
+                                setLocalSystemButtonBorderColor={setLocalSystemButtonBorderColor}
+                                localSystemButtonHoverColor={localSystemButtonHoverColor}
+                                setLocalSystemButtonHoverColor={setLocalSystemButtonHoverColor}
                                 localGameSceneNameOverlayBg={localGameSceneNameOverlayBg}
                                 setLocalGameSceneNameOverlayBg={setLocalGameSceneNameOverlayBg}
                                 localGameSceneNameOverlayTextColor={localGameSceneNameOverlayTextColor}

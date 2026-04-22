@@ -169,10 +169,15 @@ export interface GameData {
   gameMobileLayoutBehavior?: 'standard' | 'immersive';
   gameActionButtonColor?: string;
   gameActionButtonTextColor?: string;
+  gameActionButtonHoverColor?: string;
   gameActionButtonText?: string;
   gameVerbInputPlaceholder?: string;
   gameDiaryPlayerName?: string;
   gameFocusColor?: string;
+  gameSystemButtonColor?: string;
+  gameSystemButtonTextColor?: string;
+  gameSystemButtonBorderColor?: string;
+  gameSystemButtonHoverColor?: string;
   gameSystemEnabled?: 'none' | 'chances' | 'trackers'; // Legacy, keep for migration
   enableTrackers?: boolean;
   enableInventory?: boolean;
