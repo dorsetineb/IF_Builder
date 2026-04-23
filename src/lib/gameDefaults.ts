@@ -802,7 +802,7 @@ body.font-adjust-gothic { font-size: 1.1em; }
 }
 
 /* Common Icon Style */
-.chance-icon svg { width: 24px; height: 24px; filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6)); display: block; }
+.chance-icon svg { width: 24px; height: 24px; display: block; }
 .chance-icon.lost svg { opacity: 0.3; }
 `;
 

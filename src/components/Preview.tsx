@@ -139,20 +139,20 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
                 }
             }
             /* Common Icon Style */
-            .chance-icon svg { width: 24px; height: 24px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); display: block; transition: all 0.3s ease; }
+            .chance-icon svg { width: 24px; height: 24px; display: block; transition: all 0.3s ease; }
             .chance-icon.lost svg { opacity: 0.8; }
 
             /* Chance Animations */
             @keyframes chanceLost {
-                0% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
-                30% { transform: scale(0.6); filter: drop-shadow(0 0 15px #ff0000) brightness(1.5); }
-                100% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
+                0% { transform: scale(1); }
+                30% { transform: scale(0.6); filter: brightness(1.5); }
+                100% { transform: scale(1); }
             }
 
             @keyframes chanceRestored {
-                0% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
-                40% { transform: scale(1.6); filter: drop-shadow(0 0 20px #4dff4d) brightness(1.5); }
-                100% { transform: scale(1); filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6)); }
+                0% { transform: scale(1); }
+                40% { transform: scale(1.6); filter: brightness(1.5); }
+                100% { transform: scale(1); }
             }
 
             .animate-chance-lost { animation: chanceLost 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; z-index: 10; }
