@@ -25,7 +25,7 @@ export const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-            <div className="bg-zinc-900 border border-muted-foreground/50 rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200">
+            <div className={`bg-zinc-900 border-2 ${isDanger ? 'border-red-600/50 ring-1 ring-red-600/20' : 'border-muted-foreground/20'} rounded-xl p-6 max-w-md w-full shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-200`}>
                 <h3 className="text-lg font-bold text-white">{title}</h3>
                 <p className="text-sm text-zinc-400 leading-relaxed whitespace-pre-wrap">{message}</p>
                 <div className="flex justify-end gap-3 pt-2">

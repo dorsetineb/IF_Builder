@@ -77,6 +77,9 @@ export interface Scene {
   negativeFeedback?: string;
   omitSplashTitle?: boolean;
   omitSplashDescription?: boolean;
+  vignetteAlignment?: 'left' | 'right';
+  vignetteShowTitle?: boolean;
+  vignetteShowDescription?: boolean;
   creditsText?: string;
   creditsScrollEnabled?: boolean;
 }

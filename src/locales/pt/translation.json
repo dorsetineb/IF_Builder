@@ -324,23 +324,26 @@
     "title": "Nova Ficção",
     "warningMessage": "O novo projeto irá substituir o atual.\n\nDeseja prosseguir?",
     "subtitle": "Configure os detalhes iniciais da sua aventura",
+    "previewLabel": "Exemplo de",
     "tabs": {
-      "info": "Informações",
-      "system": "Sistema",
-      "appearance": "Aparência"
+      "info": "Abertura",
+      "system": "Mecânicas",
+      "appearance": "Estilo Visual"
     },
     "info": {
-      "gameTitleLabel": "Título do Jogo",
+      "gameTitleLabel": "Título",
       "gameTitlePlaceholder": "Ex: A Caverna dos Dragões",
       "defaultTitle": "Minha Nova Aventura",
-      "descriptionLabel": "Sinopse / Descrição",
+      "descriptionLabel": "Descrição",
       "descriptionPlaceholder": "Uma breve descrição da sua história...",
       "defaultDescription": "Uma breve descrição da sua história...",
-      "startButtonLabel": "Texto do Botão de Início",
+      "startButtonLabel": "Texto do Botão",
       "startButtonPlaceholder": "Ex: Iniciar Aventura",
-      "coverImageLabel": "Capa / Imagem de Fundo",
+      "coverImageLabel": "Imagem de Fundo",
       "coverImageDesc": "Esta imagem será usada como fundo da tela inicial e da cena de abertura caso não seja definida outra.",
-      "recommendedDimensions": "Recomendado: 1920x1080"
+      "recommendedDimensions": "Recomendado: 1920x1080",
+      "vignetteLayout": "Layout das Vinhetas",
+      "vignetteLayoutTitle": "Layout das Vinhetas"
     },
     "system": {
       "parserTitle": "Parser (Descreva verbos)",
@@ -359,6 +362,7 @@
       "trackersDesc": "Variáveis numéricas (saúde, dinheiro, sanidade)"
     },
     "appearance": {
+      "layoutScenes": "Layout das Cenas",
       "structureTitle": "ESTRUTURA",
       "orientation": "Orientação",
       "vertical": "Vertical",
@@ -914,7 +918,7 @@
     "aparencia": {
       "estrutura": "ESTRUTURA DAS CENAS",
       "scenes": "LAYOUT DAS CENAS",
-      "vinhetas": "LAYOUT DAS VINHETAS",
+      "vinhetas": "Layout",
       "frameColor": "Cor",
       "styleTheme": "CORES E TEMAS",
       "predefinedThemes": "Temas Predefinidos",

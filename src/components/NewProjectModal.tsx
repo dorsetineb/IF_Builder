@@ -1,15 +1,13 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useState, useMemo, useRef } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { X, Layout, Type, Palette, Play, Upload, Image as ImageIcon, Trash2, ChevronDown, ChevronUp, LayoutTemplate, BookOpen, ArrowRight, Terminal, MousePointerClick, Package, BookText, Heart, SlidersHorizontal } from 'lucide-react';
+import { X, Layout, Type, Palette, Play, Upload, Image as ImageIcon, Trash2, ChevronDown, ChevronUp, LayoutTemplate, BookOpen, ArrowRight, Terminal, MousePointerClick, Package, BookText, Heart, SlidersHorizontal, Monitor, MousePointer2, PenTool, AlignLeft } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { GameData, Vignette, Scene } from '../types';
 import { initialGameData } from '../lib/gameDefaults';
 import { FONTS, PREDEFINED_THEMES } from '../constants';
-import Preview from './Preview';
 import { useTranslation } from 'react-i18next';
 import { getFramePreviewStyles } from '../utils/frameStyles';
-import { useTheme } from './ThemeProvider';
 
 interface NewProjectModalProps {
     isOpen: boolean;
@@ -17,12 +15,12 @@ interface NewProjectModalProps {
     onCreate: (data: Partial<GameData>) => void;
 }
 
-type Tab = 'info' | 'system' | 'appearance';
+type Tab = 'info' | 'appearance' | 'system';
 
 // Local helper component for Color Input
 const ColorInput: React.FC<{ label: string, id: string, value: string, onChange: (val: string) => void, placeholder?: string }> = ({ label, id, value, onChange, placeholder }) => (
     <div className="space-y-1">
-        <label htmlFor={id} className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{label}</label>
+        <label htmlFor={id} className="block text-[9px] font-bold text-zinc-500 uppercase tracking-widest">{label}</label>
         <div className="flex items-center gap-2 p-1 bg-zinc-950 border border-muted-foreground/50 rounded-lg focus-within:border-primary/50 transition-all h-9 w-full">
             <input
                 type="color"
@@ -45,8 +43,10 @@ const ColorInput: React.FC<{ label: string, id: string, value: string, onChange:
 
 export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClose, onCreate }) => {
     const { t } = useTranslation();
-    const { theme } = useTheme();
     const [tab, setTab] = useState<Tab>('info');
+    const [isInputFocused, setIsInputFocused] = useState(false);
+    const [isColorsExpanded, setIsColorsExpanded] = useState(false);
+    const [previewType, setPreviewType] = useState<'scene' | 'vignette'>('vignette');
 
     // Info State
     const [title, setTitle] = useState('');
@@ -60,6 +60,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     const [enableDiary, setEnableDiary] = useState(true);
     const [enableChances, setEnableChances] = useState(false);
     const [enableTrackers, setEnableTrackers] = useState(true);
+    
+    // Vignette Layout State
+    const [splashContentAlignment, setSplashContentAlignment] = useState<'left' | 'right'>('right');
+    const [omitSplashTitle, setOmitSplashTitle] = useState(false);
+    const [omitSplashDescription, setOmitSplashDescription] = useState(false);
 
     // Effect to disable inventory if Interaction Type is Choice (IF)
     React.useEffect(() => {
@@ -69,6 +74,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             setEnableInventory(true); // Build default expectation, parser usually has inventory
         }
     }, [interactionType]);
+    
+    // Auto-switch preview type based on tab
+    React.useEffect(() => {
+        if (tab === 'info') setPreviewType('vignette');
+        else setPreviewType('scene');
+    }, [tab]);
+
 
     // Appearance State - Structure
     const [layoutOrientation, setLayoutOrientation] = useState<'vertical' | 'horizontal'>('vertical');
@@ -81,6 +93,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         textColor: '#e4e4e7', titleColor: '#58a6ff', focusColor: '#58a6ff',
         splashButtonColor: '#2ea043', splashButtonHoverColor: '#238636', splashButtonTextColor: '#ffffff',
         actionButtonColor: '#ffffff', actionButtonTextColor: '#0d1117',
+        actionButtonHoverColor: '#f4f4f5',
+        systemButtonColor: 'transparent',
+        systemButtonTextColor: '#e4e4e7',
+        systemButtonBorderColor: 'rgba(228, 228, 231, 0.25)', // textColor + '40' approx
+        systemButtonHoverColor: '#58a6ff',
         chanceIconColor: '#ff4d4d',
         frameBookColor: '#FFFFFF',
         frameTradingCardColor: '#FFFFFF',
@@ -98,17 +115,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [verbInputPlaceholder, setVerbInputPlaceholder] = useState('');
 
-    // Collapsible sections state
-    const [activeSections, setActiveSections] = useState({
-        estrutura: true,
-        estilo: true,
-        texto: false,
-        cores: false
-    });
-
-    const toggleSection = (section: keyof typeof activeSections) => {
-        setActiveSections(prev => ({ ...prev, [section]: !prev[section] }));
+    const getScaledFontSize = (factor = 1.0) => {
+        const baseSize = /^\d+$/.test(fontSize) ? parseInt(fontSize) : 14;
+        const fontInfo = FONTS.find(f => f.family === fontFamily);
+        const multiplier = fontInfo?.sizeAdjust || 1.0;
+        return `${baseSize * multiplier * factor}px`;
     };
+
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
@@ -123,7 +136,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         if (e.target) e.target.value = '';
     };
 
-    const handleApplyTheme = (preset: typeof PREDEFINED_THEMES[0]) => {
+    const handleApplyTheme = (preset: any) => {
         setGameBackgroundColor(preset.gameBackgroundColor || '#000000');
         setColors(prev => ({
             ...prev,
@@ -135,6 +148,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             splashButtonTextColor: preset.splashButtonTextColor,
             actionButtonColor: preset.actionButtonColor,
             actionButtonTextColor: preset.actionButtonTextColor,
+            actionButtonHoverColor: preset.actionButtonHoverColor || preset.actionButtonColor,
+            systemButtonColor: preset.systemButtonColor || 'transparent',
+            systemButtonTextColor: preset.systemButtonTextColor || preset.textColor,
+            systemButtonBorderColor: preset.systemButtonBorderColor || (preset.textColor + '40'),
+            systemButtonHoverColor: preset.systemButtonHoverColor || preset.focusColor,
             chanceIconColor: preset.chanceIconColor,
             gameContinueIndicatorColor: preset.focusColor
         }));
@@ -174,8 +192,12 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         // Explicitly set vignetteType for the engine to render it as a vignette
         vignetteType: 'opening',
         vignetteButtonText: startButtonText || t('editor.defaultStartButton', 'COMEÇAR'),
-        vignetteNextSceneId: 'preview_scene'
-    }), [splashImage, description, startButtonText, title, t]);
+        vignetteNextSceneId: 'preview_scene',
+        // Layout settings
+        vignetteAlignment: splashContentAlignment,
+        vignetteShowTitle: !omitSplashTitle,
+        vignetteShowDescription: !omitSplashDescription
+    }), [splashImage, description, startButtonText, title, t, splashContentAlignment, omitSplashTitle, omitSplashDescription]);
 
     const previewGameData: GameData = useMemo(() => ({
         ...initialGameData,
@@ -204,6 +226,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         gameActionButtonText: actionButtonText,
         gameVerbInputPlaceholder: verbInputPlaceholder,
         gameTextSpeed: 3,
+
+        // Vignette Layout
+        gameSplashContentAlignment: splashContentAlignment,
+        gameOmitSplashTitle: omitSplashTitle,
+        gameOmitSplashDescription: omitSplashDescription,
 
         // Map Colors properly
         gameTextColor: colors.textColor,
@@ -237,12 +264,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             title: title || t('editor.newOpeningVignetteName', 'Abertura'),
             description: description || t('editor.newVignetteDescription', 'Descrição da nova vinheta.'),
             buttonText: startButtonText,
-            showTitle: true,
-            showDescription: true,
+            showTitle: !omitSplashTitle,
+            showDescription: !omitSplashDescription,
+            alignment: splashContentAlignment,
             textAnimationType: 'fade',
             textSpeed: 3
         }]
-    }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, gameBackgroundColor, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewStandardScene, previewVignetteScene, tab, enableInventory, enableDiary, enableChances, enableTrackers]);
+    }), [title, description, startButtonText, splashImage, interactionType, layoutOrientation, layoutOrder, imageFrame, gameBackgroundColor, fontFamily, fontSize, actionButtonText, verbInputPlaceholder, colors, previewStandardScene, previewVignetteScene, tab, enableInventory, enableDiary, enableChances, enableTrackers, splashContentAlignment, omitSplashTitle, omitSplashDescription]);
 
     const handleCreate = () => {
         const startSceneId = 'SCN_OPENING';
@@ -262,6 +290,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             objectIds: [],
             vignetteType: 'opening',
             vignetteButtonText: startButtonText || t('editor.defaultStartButton', 'COMEÇAR'),
+            vignetteAlignment: splashContentAlignment,
+            vignetteShowTitle: !omitSplashTitle,
+            vignetteShowDescription: !omitSplashDescription,
             mapX: 0,
             mapY: 0
         };
@@ -284,15 +315,15 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     };
 
     const handleNext = () => {
-        if (tab === 'info') setTab('system'); // Info -> System
-        else if (tab === 'system') setTab('appearance'); // System -> Appearance
+        if (tab === 'info') setTab('appearance'); // Info -> Appearance
+        else if (tab === 'appearance') setTab('system'); // Appearance -> System
     };
 
     if (!isOpen) return null;
 
     return (
         <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div onClick={(e) => e.stopPropagation()} className="bg-zinc-950 border border-muted-foreground/50 w-full max-w-6xl h-[90vh] rounded-2xl flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+            <div onClick={(e) => e.stopPropagation()} className="bg-zinc-950 border border-muted-foreground/50 w-full max-w-[1400px] h-[92vh] rounded-2xl flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
 
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-muted-foreground/50 bg-zinc-950/50">
@@ -309,36 +340,34 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                         <X className="w-6 h-6" />
                     </button>
                 </div>
+                
+                {/* Tabs Navigation - Full Width */}
+                <div className="flex border-b border-muted-foreground/50 bg-zinc-950/50">
+                    <button
+                        onClick={() => setTab('info')}
+                        className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'info' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
+                    >
+                        {t('newProject.tabs.info', 'Abertura')}
+                    </button>
+                    <button
+                        onClick={() => setTab('appearance')}
+                        className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'appearance' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
+                    >
+                        {t('newProject.tabs.appearance', 'Estilo Visual')}
+                    </button>
+                    <button
+                        onClick={() => setTab('system')}
+                        className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'system' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
+                    >
+                        {t('newProject.tabs.system', 'Mecânicas')}
+                    </button>
+                </div>
 
                 {/* Main Content */}
-                <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
-
-                    {/* Left Column: FormTabs */}
-                    <div className="w-full lg:w-1/2 flex flex-col border-r border-muted-foreground/50 bg-zinc-900/30">
-                        {/* Tabs Navigation */}
-                        <div className="flex border-b border-muted-foreground/50">
-                            <button
-                                onClick={() => setTab('info')}
-                                className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'info' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
-                            >
-                                {t('newProject.tabs.info', 'Informações')}
-                            </button>
-                            <button
-                                onClick={() => setTab('system')}
-                                className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'system' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
-                            >
-                                {t('newProject.tabs.system', 'Sistema')}
-                            </button>
-                            <button
-                                onClick={() => setTab('appearance')}
-                                className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'appearance' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
-                            >
-                                {t('newProject.tabs.appearance', 'Aparência')}
-                            </button>
-                        </div>
-
+                <div className="flex-1 overflow-hidden grid grid-cols-12">
+                    <div className="col-span-12 lg:col-span-5 xl:col-span-5 flex flex-col border-r border-muted-foreground/50 bg-zinc-900/30 overflow-hidden">
                         {/* Tab Content */}
-                        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar pb-12">
 
                             {tab === 'system' && (
                                 <div className="space-y-6 animate-in slide-in-from-left-4 duration-300">
@@ -351,7 +380,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 <Terminal className="w-8 h-8" />
                                             </div>
                                             <div>
-                                                <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'parser' ? 'text-white' : 'text-zinc-300'}`}>{t('newProject.system.parserTitle', 'Parser (Descreva comandos)')}</h3>
+                                                <h3 className={`text-xs font-bold uppercase tracking-widest mb-1 ${interactionType === 'parser' ? 'text-white' : 'text-zinc-300'}`}>{t('newProject.system.parserTitle', 'Parser (Descreva comandos)')}</h3>
                                                 <p className="text-xs text-zinc-400 leading-relaxed">
                                                     {t('newProject.system.parserDesc', 'O jogador digita ações como "pegar chave" ou "olhar mesa".')}
                                                 </p>
@@ -366,7 +395,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 <MousePointerClick className="w-8 h-8" />
                                             </div>
                                             <div>
-                                                <h3 className={`text-sm font-bold uppercase tracking-wide mb-1 ${interactionType === 'choice' ? 'text-white' : 'text-zinc-300'}`}>{t('newProject.system.choiceTitle', 'IF (Escolha uma opção)')}</h3>
+                                                <h3 className={`text-xs font-bold uppercase tracking-widest mb-1 ${interactionType === 'choice' ? 'text-white' : 'text-zinc-300'}`}>
+                                                    {t('newProject.system.choiceTitle', 'IF (Escolha uma opção)')}
+                                                </h3>
                                                 <p className="text-xs text-zinc-400 leading-relaxed">
                                                     {t('newProject.system.choiceDesc', 'O jogador escolhe entre opções pré-definidas para avançar na história.')}
                                                 </p>
@@ -374,10 +405,8 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                         </button>
                                     </div>
 
-                                    <div className="w-full h-px bg-zinc-800 my-2"></div>
-
                                     <div className="grid grid-cols-1 gap-4">
-                                        <div className="flex items-center gap-4 p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                        <div className={`flex items-center gap-4 p-4 border rounded-xl transition-all ${enableInventory ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/50'}`}>
                                             <button
                                                 onClick={() => interactionType !== 'choice' && setEnableInventory(!enableInventory)}
                                                 disabled={interactionType === 'choice'}
@@ -390,13 +419,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <Package className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableInventory ? 'text-white' : 'text-zinc-400'}`}>{t('newProject.features.inventory', 'Inventário')}</h4>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableInventory ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('newProject.features.inventory', 'Inventário')}</h4>
                                                     <p className="text-xs text-zinc-500">{t('newProject.features.inventoryDesc', 'Gestão de itens pegos pelo jogador')}</p>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-4 p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                        <div className={`flex items-center gap-4 p-4 border rounded-xl transition-all ${enableDiary ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/50'}`}>
                                             <button
                                                 onClick={() => setEnableDiary(!enableDiary)}
                                                 className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableDiary ? 'bg-primary' : 'bg-zinc-700'}`}
@@ -408,13 +437,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <BookText className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableDiary ? 'text-white' : 'text-zinc-400'}`}>{t('newProject.features.diary', 'Diário de Bordo')}</h4>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableDiary ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('newProject.features.diary', 'Diário de Bordo')}</h4>
                                                     <p className="text-xs text-zinc-500">{t('newProject.features.diaryDesc', 'Registro automático de eventos')}</p>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-4 p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                        <div className={`flex items-center gap-4 p-4 border rounded-xl transition-all ${enableChances ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/50'}`}>
                                             <button
                                                 onClick={() => setEnableChances(!enableChances)}
                                                 className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableChances ? 'bg-primary' : 'bg-zinc-700'}`}
@@ -426,13 +455,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <Heart className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableChances ? 'text-white' : 'text-zinc-400'}`}>{t('newProject.features.chances', 'Sistema de Vidas')}</h4>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableChances ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('newProject.features.chances', 'Sistema de Vidas')}</h4>
                                                     <p className="text-xs text-zinc-500">{t('newProject.features.chancesDesc', 'Limitar tentativas e chances')}</p>
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div className="flex items-center gap-4 p-4 bg-black/30 border border-muted-foreground/50 rounded-xl hover:bg-zinc-900/50 transition-colors">
+                                        <div className={`flex items-center gap-4 p-4 border rounded-xl transition-all ${enableTrackers ? 'bg-primary/20 border-primary ring-1 ring-primary/50 shadow-md' : 'bg-black/30 border-muted-foreground/50 hover:bg-zinc-900/50'}`}>
                                             <button
                                                 onClick={() => setEnableTrackers(!enableTrackers)}
                                                 className={`w-12 h-6 rounded-full relative transition-all shrink-0 ${enableTrackers ? 'bg-primary' : 'bg-zinc-700'}`}
@@ -444,7 +473,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     <SlidersHorizontal className="w-6 h-6" />
                                                 </div>
                                                 <div>
-                                                    <h4 className={`text-sm font-bold uppercase tracking-wide mb-1 ${enableTrackers ? 'text-white' : 'text-zinc-400'}`}>{t('newProject.features.trackers', 'Rastreadores')}</h4>
+                                                    <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableTrackers ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('newProject.features.trackers', 'Rastreadores')}</h4>
                                                     <p className="text-xs text-zinc-500">{t('newProject.features.trackersDesc', 'Variáveis numéricas (saúde, dinheiro, sanidade)')}</p>
                                                 </div>
                                             </div>
@@ -455,8 +484,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
                             {tab === 'info' && (
                                 <div className="space-y-6 animate-in slide-in-from-left-4 duration-300">
-                                    <div className="space-y-2">
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('newProject.info.gameTitleLabel', 'Título do Jogo')}</label>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-zinc-300">
+                                            <PenTool className="w-4 h-4" />
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.info.gameTitleLabel', 'Título')}</h3>
+                                        </div>
                                         <input
                                             type="text"
                                             value={title}
@@ -466,8 +498,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                         />
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('newProject.info.descriptionLabel', 'Sinopse / Descrição')}</label>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-zinc-300">
+                                            <AlignLeft className="w-4 h-4" />
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.info.descriptionLabel', 'Descrição')}</h3>
+                                        </div>
                                         <textarea
                                             value={description}
                                             onChange={(e) => setDescription(e.target.value)}
@@ -476,8 +511,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                         />
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('newProject.info.startButtonLabel', 'Texto do Botão de Início')}</label>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-zinc-300">
+                                            <MousePointer2 className="w-4 h-4" />
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.info.startButtonLabel', 'Texto do Botão')}</h3>
+                                        </div>
                                         <input
                                             type="text"
                                             value={startButtonText}
@@ -487,406 +525,529 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                         />
                                     </div>
 
-                                    <div className="flex gap-4 items-start bg-zinc-900/50 p-4 rounded-xl border border-muted-foreground/50">
-                                        <div className="relative w-24 h-24 bg-black/50 border border-muted-foreground/50 rounded-lg overflow-hidden shrink-0 group hover:border-muted-foreground/50 transition-colors">
-                                            {splashImage ? (
-                                                <>
-                                                    <img src={splashImage} alt="Capa" className="w-full h-full object-cover" />
-                                                    <button
-                                                        onClick={() => setSplashImage('')}
-                                                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
-                                                    >
-                                                        <Trash2 className="w-5 h-5 text-red-500" />
-                                                    </button>
-                                                </>
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <ImageIcon className="w-8 h-8 text-zinc-700" />
-                                                </div>
-                                            )}
-                                            <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-zinc-300">
+                                            <ImageIcon className="w-4 h-4" />
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.info.coverImageLabel', 'Imagem de Fundo')}</h3>
                                         </div>
-                                        <div className="flex-1 space-y-2">
-                                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-widest">{t('newProject.info.coverImageLabel', 'Capa / Imagem de Fundo')}</label>
-                                            <p className="text-[11px] text-zinc-400 leading-relaxed">
-                                                {t('newProject.info.coverImageDesc', 'Esta imagem será usada como fundo da tela inicial e da cena de abertura caso não seja definida outra.')}
-                                            </p>
-                                            <p className="text-[9px] text-zinc-600 uppercase tracking-wider">{t('newProject.info.recommendedDimensions', 'Recomendado: 1920x1080')}</p>
+                                        <div className="flex gap-6 items-start">
+                                            <div className="relative w-24 h-24 bg-black/50 border border-muted-foreground/50 rounded-lg overflow-hidden shrink-0 group hover:border-muted-foreground/50 transition-colors shadow-inner">
+                                                {splashImage ? (
+                                                    <>
+                                                        <img src={splashImage} alt="Capa" className="w-full h-full object-cover" />
+                                                        <button
+                                                            onClick={() => setSplashImage('')}
+                                                            className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                                                        >
+                                                            <Trash2 className="w-5 h-5 text-red-500" />
+                                                        </button>
+                                                    </>
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center">
+                                                        <ImageIcon className="w-8 h-8 text-zinc-700" />
+                                                    </div>
+                                                )}
+                                                <input type="file" accept="image/*" onChange={handleImageUpload} className="absolute inset-0 opacity-0 cursor-pointer" />
+                                            </div>
+                                            <div className="flex-1 space-y-2 pt-1">
+                                                <p className="text-[11px] text-zinc-400 leading-relaxed">
+                                                    {t('newProject.info.coverImageDesc', 'Esta imagem será usada como fundo da tela inicial e da cena de abertura caso não seja definida outra.')}
+                                                </p>
+                                                <p className="text-[9px] text-zinc-600 uppercase tracking-wider font-bold">{t('newProject.info.recommendedDimensions', 'Recomendado: 1920x1080')}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3 animate-in fade-in duration-500">
+                                        <div className="flex items-center gap-2 text-zinc-300">
+                                            <ArrowRight className="w-4 h-4" />
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.info.vignetteLayoutTitle', 'Layout das Vinhetas')}</h3>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-2 gap-4 items-end">
+                                            <div className="space-y-2">
+                                                <select
+                                                    value={splashContentAlignment}
+                                                    onChange={(e) => setSplashContentAlignment(e.target.value as 'left' | 'right')}
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                >
+                                                    <option value="right">{t('UIEditor.layout.alignRight', 'Direita')}</option>
+                                                    <option value="left">{t('UIEditor.layout.alignLeft', 'Esquerda')}</option>
+                                                </select>
+                                            </div>
+
+                                            <div className="flex gap-4 pb-2">
+                                                <label className="flex items-center gap-2 cursor-pointer group">
+                                                    <div className="relative w-4 h-4 border border-muted-foreground/50 rounded flex items-center justify-center bg-black/50 group-hover:border-primary/50 transition-colors">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                                            checked={omitSplashTitle}
+                                                            onChange={(e) => setOmitSplashTitle(e.target.checked)}
+                                                        />
+                                                        {omitSplashTitle && <div className="w-2 h-2 bg-primary rounded-sm" />}
+                                                    </div>
+                                                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wide group-hover:text-zinc-300 transition-colors">{t('UIEditor.layout.hideTitle', 'Ocultar título')}</span>
+                                                </label>
+
+                                                <label className="flex items-center gap-2 cursor-pointer group">
+                                                    <div className="relative w-4 h-4 border border-muted-foreground/50 rounded flex items-center justify-center bg-black/50 group-hover:border-primary/50 transition-colors">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                                                            checked={omitSplashDescription}
+                                                            onChange={(e) => setOmitSplashDescription(e.target.checked)}
+                                                        />
+                                                        {omitSplashDescription && <div className="w-2 h-2 bg-primary rounded-sm" />}
+                                                    </div>
+                                                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wide group-hover:text-zinc-300 transition-colors">{t('UIEditor.layout.hideDescription', 'Ocultar descrição')}</span>
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             )}
 
                             {tab === 'appearance' && (
-                                <div className="space-y-4 animate-in slide-in-from-left-4 duration-300">
+                                <div className="space-y-8 animate-in slide-in-from-left-4 duration-300">
 
-                                    {/* SECTION: ESTRUTURA */}
-                                    <div className="bg-black/30 border border-muted-foreground/50 rounded-xl p-4">
-                                        <button
-                                            onClick={() => toggleSection('estrutura')}
-                                            className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
-                                        >
-                                            <h3 className="text-xs font-bold text-zinc-300 uppercase tracking-widest flex items-center gap-2">
-                                                <LayoutTemplate className="w-4 h-4 text-zinc-500" /> {t('newProject.appearance.structureTitle', 'ESTRUTURA')}
-                                            </h3>
-                                            {activeSections.estrutura ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
-                                        </button>
-
-                                        {activeSections.estrutura && (
-                                            <div className="space-y-4 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                                                <div className="grid grid-cols-2 gap-4">
-                                                    <div className="space-y-2">
-                                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.orientation', 'Orientação')}</label>
-                                                        <select
-                                                            value={layoutOrientation}
-                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                            onChange={(e) => setLayoutOrientation(e.target.value as any)}
-                                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
-                                                        >
-                                                            <option value="vertical">{t('newProject.appearance.vertical', 'Vertical')}</option>
-                                                            <option value="horizontal">{t('newProject.appearance.horizontal', 'Horizontal')}</option>
-                                                        </select>
-                                                    </div>
-                                                    <div className="space-y-2">
-                                                        <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.imagePosition', 'Posição da Imagem')}</label>
-                                                        <select
-                                                            value={layoutOrder}
-                                                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                            onChange={(e) => setLayoutOrder(e.target.value as any)}
-                                                            className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
-                                                        >
-                                                            {layoutOrientation === 'vertical' ? (
-                                                                <>
-                                                                    <option value="image-first">{t('newProject.appearance.left', 'Esquerda')}</option>
-                                                                    <option value="image-last">{t('newProject.appearance.right', 'Direita')}</option>
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <option value="image-first">{t('newProject.appearance.above', 'Acima')}</option>
-                                                                    <option value="image-last">{t('newProject.appearance.below', 'Abaixo')}</option>
-                                                                </>
-                                                            )}
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.frameTitle', 'Moldura')}</label>
-                                                    <select
-                                                        value={imageFrame}
-                                                        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                                                        onChange={(e) => setImageFrame(e.target.value as any)}
-                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
-                                                    >
-                                                        <option value="none">{t('newProject.appearance.frameNone', 'Sem moldura')}</option>
-                                                        <option value="rounded-top">{t('newProject.appearance.framePortal', 'Portal')}</option>
-                                                        <option value="book-cover">{t('newProject.appearance.frameSquare', 'Quadrada')}</option>
-                                                        <option value="trading-card">{t('newProject.appearance.frameRounded', 'Arredondada')}</option>
-                                                    </select>
-                                                </div>
+                                    {/* SECTION: FONTES & TEXTO */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-zinc-300">
+                                            <Type className="w-4 h-4" />
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('UIEditor.aparencia.typography', 'Fontes e Texto')}</h3>
+                                        </div>
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('UIEditor.aparencia.fontFamily', 'Família da Fonte')}</label>
+                                                <select
+                                                    value={fontFamily}
+                                                    onChange={(e) => setFontFamily(e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                >
+                                                    {FONTS.map(f => (
+                                                        <option key={f.family} value={f.family}>{f.name}</option>
+                                                    ))}
+                                                </select>
                                             </div>
-                                        )}
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('UIEditor.aparencia.fontSize', 'Tamanho da Fonte')}</label>
+                                                <select
+                                                    value={fontSize}
+                                                    onChange={(e) => setFontSize(e.target.value)}
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                >
+                                                    <option value="12">Pequeno (12px)</option>
+                                                    <option value="14">Médio (14px)</option>
+                                                    <option value="16">Grande (16px)</option>
+                                                    <option value="18">Extra Grande (18px)</option>
+                                                </select>
+                                            </div>
+                                        </div>
                                     </div>
 
                                     {/* SECTION: ESTILO & TEMA */}
-                                    <div className="bg-black/30 border border-muted-foreground/50 rounded-xl p-4">
-                                        <button
-                                            onClick={() => toggleSection('estilo')}
-                                            className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
-                                        >
-                                            <h3 className="text-xs font-bold text-zinc-300 uppercase tracking-widest flex items-center gap-2">
-                                                <Palette className="w-4 h-4 text-zinc-500" /> {t('newProject.appearance.styleTheme', 'ESTILO & TEMA')}
-                                            </h3>
-                                            {activeSections.estilo ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
-                                        </button>
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-zinc-300">
+                                            <Palette className="w-4 h-4" />
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('UIEditor.aparencia.styleTheme', 'Estilo & Tema')}</h3>
+                                        </div>
 
-                                        {activeSections.estilo && (
-                                            <div className="space-y-6 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                                                <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.predefinedThemes', 'Temas Predefinidos')}</label>
-                                                    <div className="grid grid-cols-3 gap-2">
-                                                        {PREDEFINED_THEMES.map((theme) => (
-                                                            <button
-                                                                key={theme.nameKey}
-                                                                onClick={() => handleApplyTheme(theme)}
-                                                                className="flex flex-col items-center gap-1 p-2 rounded border border-muted-foreground/50 hover:bg-zinc-800 hover:border-muted-foreground/50 transition-all text-center group"
-                                                            >
-                                                                <div className="flex gap-1 justify-center">
-                                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.focusColor }}></div>
-                                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.titleColor }}></div>
-                                                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: theme.chanceIconColor }}></div>
-                                                                </div>
-                                                                <span className="text-[10px] font-bold text-zinc-500 group-hover:text-zinc-300">{t(`ThemeEditor.themes.${theme.nameKey}`, { defaultValue: theme.name })}</span>
-                                                            </button>
-                                                        ))}
+                                        <div className="space-y-3">
+                                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('UIEditor.aparencia.predefinedThemes', 'Temas Predefinidos')}</label>
+                                            <div className="grid grid-cols-4 gap-2">
+                                                {PREDEFINED_THEMES.map((theme) => (
+                                                    <button
+                                                        key={theme.nameKey}
+                                                        onClick={() => handleApplyTheme(theme)}
+                                                        className="flex flex-col items-center justify-center p-2 rounded-lg border border-muted-foreground/30 bg-zinc-950/50 hover:border-primary/50 hover:bg-zinc-900 transition-all gap-2 group"
+                                                    >
+                                                        <div className="flex -space-x-1">
+                                                            <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.textColor }}></div>
+                                                            <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.titleColor }}></div>
+                                                        </div>
+                                                        <span className="text-[8px] font-bold uppercase tracking-tight text-zinc-500 group-hover:text-zinc-100">{theme.name}</span>
+                                                    </button>
+                                                ))}
+                                            </div>
+
+                                            <div className="pt-2">
+                                                <div
+                                                    className="flex items-center justify-start w-full text-left py-2 px-0 cursor-pointer hover:opacity-70 transition-opacity group"
+                                                    onClick={() => setIsColorsExpanded(!isColorsExpanded)}
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest transition-colors group-hover:text-zinc-100">{t('UIEditor.aparencia.colorCustom', 'Personalização de Cores')}</span>
+                                                    <ChevronDown className={`w-3 h-3 text-zinc-500 transition-transform duration-200 ${isColorsExpanded ? 'rotate-180' : ''}`} />
                                                     </div>
                                                 </div>
 
-                                                {/* Expandable Color Controls (Optional) */}
-                                                <div className="pt-2 border-t border-muted-foreground/50">
-                                                    <button
-                                                        onClick={() => toggleSection('cores')}
-                                                        className="flex items-center justify-between w-full text-left py-2 hover:bg-zinc-800/50 px-2 rounded transition-colors"
-                                                    >
-                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase">{t('newProject.appearance.customColors', 'Cores Personalizadas')}</span>
-                                                        {activeSections.cores ? <ChevronUp className="w-3 h-3 text-zinc-500" /> : <ChevronDown className="w-3 h-3 text-zinc-500" />}
-                                                    </button>
-
-                                                    {activeSections.cores && (
-                                                        <div className="space-y-4 pt-4 px-2">
-                                                            <div className="grid grid-cols-2 gap-3">
-                                                                <ColorInput label={t('newProject.appearance.colorText', 'Texto')} id="textColor" value={colors.textColor} onChange={(v) => setColors({ ...colors, textColor: v })} />
-                                                                <ColorInput label={t('newProject.appearance.colorTitle', 'Título')} id="titleColor" value={colors.titleColor} onChange={(v) => setColors({ ...colors, titleColor: v })} />
-                                                                <ColorInput label={t('newProject.appearance.colorFocus', 'Foco')} id="focusColor" value={colors.focusColor} onChange={(v) => setColors({ ...colors, focusColor: v })} />
-                                                                <ColorInput label={t('newProject.appearance.colorActionBtn', 'Botões Ação')} id="actionBtnColor" value={colors.actionButtonColor} onChange={(v) => setColors({ ...colors, actionButtonColor: v })} />
-                                                                <ColorInput label={t('aparencia.bgColor', 'Cor de fundo')} id="gameBackgroundColor" value={gameBackgroundColor} onChange={setGameBackgroundColor} />
+                                                {isColorsExpanded && (
+                                                    <div className="mt-4 space-y-4 animate-in fade-in slide-in-from-top-1">
+                                                        {/* Cores de Texto e Fundo */}
+                                                        <div className="space-y-3">
+                                                            <div className="flex items-center gap-2 text-zinc-300 pb-2">
+                                                                <Palette className="w-4 h-4" />
+                                                                <h3 className="text-xs font-bold uppercase tracking-widest">{t('UIEditor.aparencia.textAndBg', 'Cores de Texto e Fundo')}</h3>
+                                                            </div>
+                                                            <div className="grid grid-cols-1 gap-4">
+                                                                <ColorInput label={t('UIEditor.aparencia.background', 'Fundo do Jogo')} id="bgColor" value={gameBackgroundColor} onChange={(val) => setGameBackgroundColor(val)} />
+                                                                <ColorInput label={t('UIEditor.aparencia.text', 'Texto Principal')} id="textColor" value={colors.textColor} onChange={(val) => setColors({ ...colors, textColor: val })} />
+                                                                <ColorInput label={t('UIEditor.aparencia.title', 'Títulos e Destaque')} id="titleColor" value={colors.titleColor} onChange={(val) => setColors({ ...colors, titleColor: val })} />
                                                             </div>
                                                         </div>
+
+                                                        {/* Cenas e Interfaces */}
+                                                        <div className="space-y-3 pt-4">
+                                                            <div className="flex items-center gap-2 text-zinc-300 pb-2">
+                                                                <Monitor className="w-4 h-4" />
+                                                                <h3 className="text-xs font-bold uppercase tracking-widest">{t('UIEditor.aparencia.scenesAndInterfaces', 'Cenas e Interfaces')}</h3>
+                                                            </div>
+                                                            <div className="grid grid-cols-1 gap-4">
+                                                                <ColorInput label={t('UIEditor.aparencia.focus', 'Cor de Foco/Interação')} id="focusColor" value={colors.focusColor} onChange={(val) => setColors({ ...colors, focusColor: val })} />
+                                                                <ColorInput label={t('UIEditor.aparencia.sceneOverlayBg', 'Nome da Cena (Fundo)')} id="overlayBg" value={colors.gameSceneNameOverlayBg} onChange={(val) => setColors({ ...colors, gameSceneNameOverlayBg: val })} />
+                                                                <ColorInput label={t('UIEditor.aparencia.sceneOverlayText', 'Nome da Cena (Texto)')} id="overlayText" value={colors.gameSceneNameOverlayTextColor} onChange={(val) => setColors({ ...colors, gameSceneNameOverlayTextColor: val })} />
+                                                                <ColorInput label={t('UIEditor.aparencia.hearts', 'Cor dos Corações')} id="heartsColor" value={colors.chanceIconColor} onChange={(val) => setColors({ ...colors, chanceIconColor: val })} />
+                                                            </div>
+                                                        </div>
+
+                                                        {/* Botões da Interface */}
+                                                        <div className="space-y-3 pt-4">
+                                                            <div className="flex items-center gap-2 text-zinc-300 pb-2">
+                                                                <MousePointer2 className="w-4 h-4" />
+                                                                <h3 className="text-xs font-bold uppercase tracking-widest">{t('UIEditor.aparencia.interfaceButtons', 'Botões da Interface')}</h3>
+                                                            </div>
+
+                                                            <div className="space-y-3">
+                                                                <div className="space-y-3">
+                                                                    <h4 className="text-xs font-bold uppercase text-zinc-400 tracking-widest">{t('UIEditor.aparencia.actionButton', 'Botão de Ação')}</h4>
+                                                                    <ColorInput label={t('UIEditor.aparencia.buttonBg', 'Fundo')} id="actionBtnBg" value={colors.actionButtonColor} onChange={(val) => setColors({ ...colors, actionButtonColor: val })} />
+                                                                    <ColorInput label={t('UIEditor.aparencia.buttonText', 'Texto')} id="actionBtnText" value={colors.actionButtonTextColor} onChange={(val) => setColors({ ...colors, actionButtonTextColor: val })} />
+                                                                    <ColorInput label={t('UIEditor.aparencia.buttonHover', 'Hover')} id="actionBtnHover" value={colors.actionButtonHoverColor} onChange={(val) => setColors({ ...colors, actionButtonHoverColor: val })} />
+                                                                </div>
+
+                                                                <div className="space-y-3">
+                                                                    <h4 className="text-xs font-bold uppercase text-zinc-400 tracking-widest">{t('UIEditor.aparencia.splashButton', 'Botão de Início')}</h4>
+                                                                    <ColorInput label={t('UIEditor.aparencia.buttonBg', 'Fundo')} id="splashBtnBg" value={colors.splashButtonColor} onChange={(val) => setColors({ ...colors, splashButtonColor: val })} />
+                                                                    <ColorInput label={t('UIEditor.aparencia.buttonText', 'Texto')} id="splashBtnText" value={colors.splashButtonTextColor} onChange={(val) => setColors({ ...colors, splashButtonTextColor: val })} />
+                                                                    <ColorInput label={t('UIEditor.aparencia.buttonHover', 'Hover')} id="splashBtnHover" value={colors.splashButtonHoverColor} onChange={(val) => setColors({ ...colors, splashButtonHoverColor: val })} />
+                                                                </div>
+
+                                                                <div className="space-y-3">
+                                                                    <h4 className="text-xs font-bold uppercase text-zinc-400 tracking-widest">{t('UIEditor.aparencia.systemButtons', 'Botões de Ferramenta')}</h4>
+                                                                    <ColorInput label={t('UIEditor.aparencia.buttonBorder', 'Borda')} id="sysBtnBorder" value={colors.systemButtonBorderColor} onChange={(val) => setColors({ ...colors, systemButtonBorderColor: val })} />
+                                                                    <ColorInput label={t('UIEditor.aparencia.buttonHover', 'Hover')} id="sysBtnHover" value={colors.systemButtonHoverColor} onChange={(val) => setColors({ ...colors, systemButtonHoverColor: val })} />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* SECTION: LAYOUT DAS CENAS */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-zinc-300">
+                                            <LayoutTemplate className="w-4 h-4" />
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.appearance.layoutScenes', 'Layout das Cenas')}</h3>
+                                        </div>
+                                        
+                                        <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.orientation', 'Orientação')}</label>
+                                                <select
+                                                    value={layoutOrientation}
+                                                    onChange={(e) => setLayoutOrientation(e.target.value as any)}
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                >
+                                                    <option value="vertical">{t('newProject.appearance.vertical', 'Vertical')}</option>
+                                                    <option value="horizontal">{t('newProject.appearance.horizontal', 'Horizontal')}</option>
+                                                </select>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.imagePosition', 'Posição da Imagem')}</label>
+                                                <select
+                                                    value={layoutOrder}
+                                                    onChange={(e) => setLayoutOrder(e.target.value as any)}
+                                                    className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                                >
+                                                    {layoutOrientation === 'vertical' ? (
+                                                        <>
+                                                            <option value="image-first">{t('newProject.appearance.left', 'Esquerda')}</option>
+                                                            <option value="image-last">{t('newProject.appearance.right', 'Direita')}</option>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <option value="image-first">{t('newProject.appearance.above', 'Acima')}</option>
+                                                            <option value="image-last">{t('newProject.appearance.below', 'Abaixo')}</option>
+                                                        </>
                                                     )}
-                                                </div>
+                                                </select>
                                             </div>
-                                        )}
+                                        </div>
+
+                                        <div className="space-y-2">
+                                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.frameTitle', 'Moldura')}</label>
+                                            <select
+                                                value={imageFrame}
+                                                onChange={(e) => setImageFrame(e.target.value as any)}
+                                                className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
+                                            >
+                                                <option value="none">{t('newProject.appearance.frameNone', 'Sem moldura')}</option>
+                                                <option value="rounded-top">{t('newProject.appearance.framePortal', 'Portal')}</option>
+                                                <option value="book-cover">{t('newProject.appearance.frameSquare', 'Quadrada')}</option>
+                                                <option value="trading-card">{t('newProject.appearance.frameRounded', 'Arredondada')}</option>
+                                            </select>
+                                        </div>
                                     </div>
-
-                                    {/* SECTION: FONTES & TEXTO */}
-                                    <div className="bg-black/30 border border-muted-foreground/50 rounded-xl p-4">
-                                        <button
-                                            onClick={() => toggleSection('texto')}
-                                            className="flex items-center justify-between w-full text-left group hover:opacity-80 transition-opacity"
-                                        >
-                                            <h3 className="text-xs font-bold text-zinc-300 uppercase tracking-widest flex items-center gap-2">
-                                                <Type className="w-4 h-4 text-zinc-500" /> {t('newProject.appearance.fontsTextTitle', 'FONTES & TEXTO')}
-                                            </h3>
-                                            {activeSections.texto ? <ChevronUp className="w-4 h-4 text-zinc-500" /> : <ChevronDown className="w-4 h-4 text-zinc-500" />}
-                                        </button>
-
-                                        {activeSections.texto && (
-                                            <div className="space-y-4 pt-4 animate-in fade-in slide-in-from-top-2 duration-200">
-                                                <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.fontFamily', 'Família da Fonte')}</label>
-                                                    <select
-                                                        value={fontFamily}
-                                                        onChange={(e) => setFontFamily(e.target.value)}
-                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
-                                                    >
-                                                        {FONTS.map(font => (
-                                                            <option key={font.name} value={font.family}>{font.name}</option>
-                                                        ))}
-                                                    </select>
-                                                </div>
-                                                <div className="space-y-2">
-                                                    <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.fontSize', 'Tamanho')}</label>
-                                                    <select
-                                                        value={fontSize}
-                                                        onChange={(e) => setFontSize(e.target.value)}
-                                                        className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
-                                                    >
-                                                        <option value="12">{t('newProject.appearance.sizeSmall', 'Pequeno')}</option>
-                                                        <option value="14">{t('newProject.appearance.sizeMedium', 'Médico')}</option>
-                                                        <option value="16">{t('newProject.appearance.sizeLarge', 'Grande')}</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-
                                 </div>
                             )}
                         </div>
                     </div>
 
                     {/* Right Column: Live Preview */}
-                    <div className="w-full lg:w-1/2 bg-black border-l border-muted-foreground/50 flex flex-col">
-                        <div className="flex border-b border-muted-foreground/50 bg-zinc-950/50">
-                            <div className="flex-1 py-4 px-6 text-xs font-bold uppercase tracking-widest border-b-2 border-transparent text-zinc-500 flex items-center justify-between">
-                                <h3>{t('newProject.preview', 'Pré-visualização')}</h3>
-                            </div>
-                        </div>
-                        <div className="flex-1 relative overflow-hidden flex items-center justify-center p-4 bg-black/50">
-                            {/* Custom Preview Logic from UIEditor */}
-                            {(() => {
-                                const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame, gameBackgroundColor, '#FFFFFF');
-
-                                if (tab === 'info') {
-                                    return (
-                                        <div className="absolute inset-0 transform scale-[0.85] origin-center pointer-events-none select-none">
-                                            <Preview gameData={previewGameData} testSceneId={null} />
-                                        </div>
-                                    )
+                    <div className="col-span-12 lg:col-span-7 xl:col-span-7 bg-black flex flex-col overflow-hidden relative">
+                        <style>
+                            {`
+                                .preview-btn-action { transition: all 0.2s ease; }
+                                .preview-btn-action:hover { 
+                                    background-color: ${colors.actionButtonHoverColor} !important;
+                                    transform: translateY(-1px);
+                                }
+                                
+                                .preview-btn-system { transition: all 0.2s ease; }
+                                .preview-btn-system:hover { 
+                                    background-color: ${colors.systemButtonHoverColor} !important;
+                                    transform: translateY(-1px);
+                                }
+                                
+                                .preview-btn-splash { transition: all 0.2s ease; }
+                                .preview-btn-splash:hover { 
+                                    background-color: ${colors.splashButtonHoverColor} !important;
+                                    transform: translateY(-1px);
                                 }
 
-                                return (
-                                    <div
-                                        className={`
-                                        rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300
-                                        border-muted-foreground/50
-                                        w-full h-full
-                                    `}
-                                        style={{ fontFamily: fontFamily, backgroundColor: gameBackgroundColor }}
-                                    >
-                                        {/* Preview Content Area */}
-                                        <div className={`flex-1 p-6 flex gap-6 overflow-hidden relative ${layoutOrientation === 'vertical' ? 'flex-row' : 'flex-col'}`}>
+                                .preview-interactive-text { transition: color 0.2s ease; }
+                                .preview-interactive-text:hover {
+                                    color: ${colors.focusColor} !important;
+                                    cursor: pointer;
+                                }
+                            `}
+                        </style>
+                        <div className="flex-1 relative flex items-center justify-center overflow-hidden p-8 bg-black/50">
+                                {/* Preview Toggle Overlay - Same as AppearanceTab */}
+                                <div className="absolute top-6 left-6 z-50">
+                                    <div className="flex bg-zinc-950/80 backdrop-blur-md p-1 rounded-lg border border-white/10 shadow-xl">
+                                        <button
+                                            onClick={() => setPreviewType('vignette')}
+                                            className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'vignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                        >
+                                            {t('newProject.info.vignetteLayout', 'Layout das Vinhetas')}
+                                        </button>
+                                        <button
+                                            onClick={() => setPreviewType('scene')}
+                                            className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'scene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                        >
+                                            {t('newProject.appearance.layoutScenes', 'Layout das Cenas')}
+                                        </button>
+                                    </div>
+                                </div>
 
-                                            {/* Image Area */}
+                                {/* Custom Preview Logic from UIEditor */}
+                                {(() => {
+                                    if (previewType === 'vignette') {
+                                        return (
                                             <div
                                                 className={`
-                                                relative flex items-center justify-center flex-shrink-0 transition-all duration-300
-                                                ${layoutOrientation === 'vertical' ? 'w-1/2 h-full' : 'w-full h-1/2 min-h-[50%]'}
-                                                ${layoutOrder === 'image-first' ? 'order-first' : 'order-last'}
-                                            `}
+                                                    relative w-full h-full border border-muted-foreground/50 rounded-xl flex flex-col justify-end overflow-hidden p-8 box-border shadow-2xl transition-all duration-300 max-h-[500px]
+                                                    ${layoutOrientation === 'horizontal' ? 'aspect-[9/16]' : 'aspect-video'}
+                                                `}
+                                                style={{
+                                                    backgroundColor: gameBackgroundColor,
+                                                    alignItems: splashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
+                                                    textAlign: splashContentAlignment === 'left' ? 'left' : 'right',
+                                                }}
                                             >
-                                                {(() => {
-                                                    const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame, gameBackgroundColor, '#FFFFFF');
+                                                <div className="absolute inset-0 opacity-40">
+                                                    {splashImage ? (
+                                                        <img src={splashImage} alt="" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
+                                                            <ImageIcon className="w-16 h-16 text-zinc-800" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className={`relative z-10 w-full flex flex-col gap-3 max-w-[80%] ${splashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
+                                                    {!omitSplashTitle && (
+                                                        <div className="font-bold uppercase tracking-widest drop-shadow-md leading-tight" style={{ color: colors.titleColor, fontSize: getScaledFontSize(1.4), fontFamily: fontFamily }}>
+                                                            {title || t('newProject.info.gameTitlePlaceholder', 'Título do Jogo')}
+                                                        </div>
+                                                    )}
+                                                    {!omitSplashDescription && (
+                                                        <p className="leading-relaxed drop-shadow-sm line-clamp-3" style={{ color: colors.textColor, fontSize: getScaledFontSize(1.0), fontFamily: fontFamily }}>
+                                                            {description || t('newProject.info.descriptionPlaceholder', 'Uma breve descrição da sua história...')}
+                                                        </p>
+                                                    )}
+                                                    <button
+                                                        className="preview-btn-splash px-5 h-10 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate mt-2"
+                                                        style={{ fontSize: getScaledFontSize(1.0), backgroundColor: colors.splashButtonColor, color: colors.splashButtonTextColor, fontFamily: fontFamily }}
+                                                    >
+                                                        {startButtonText || t('newProject.info.startButtonPlaceholder', 'Começar')}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )
+                                    } else {
+                                    return (
+                                        <div
+                                            className={`
+                                                rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300 w-full h-full max-h-[500px]
+                                                border-muted-foreground/50
+                                                ${layoutOrientation === 'horizontal' ? 'aspect-[9/16]' : 'aspect-video'}
+                                            `}
+                                            style={{ fontFamily: fontFamily, backgroundColor: gameBackgroundColor }}
+                                        >
+                                            <div className={`flex-1 p-[30px] flex gap-[30px] overflow-hidden relative ${layoutOrientation === 'vertical' ? 'flex-row' : 'flex-col'}`}>
+                                                {/* Image Area */}
+                                                <div
+                                                    className={`
+                                                        relative flex items-center justify-center flex-shrink-0 transition-all duration-300
+                                                        ${layoutOrientation === 'vertical' ? 'w-2/5 h-full' : 'w-full h-1/2 min-h-[50%]'}
+                                                        ${layoutOrder === 'image-first' ? 'order-first' : 'order-last'}
+                                                    `}
+                                                >
+                                                    {(() => {
+                                                        const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame as any, gameBackgroundColor, '#FFFFFF');
 
-                                                    const adaptedPanelStyles = {
-                                                        ...panelStyles,
-                                                        width: '100%',
-                                                        height: '100%',
-                                                        display: 'flex',
-                                                        alignItems: 'center',
-                                                        justifyContent: 'center'
-                                                    };
-
-                                                    return (
-                                                        <div
-                                                            ref={el => {
-                                                                if (el) {
-                                                                    if (panelStyles.borderRadius) el.style.setProperty('border-radius', panelStyles.borderRadius as string, 'important');
-                                                                    if (panelStyles.overflow) el.style.setProperty('overflow', panelStyles.overflow as string, 'important');
-                                                                }
-                                                            }}
-                                                            style={adaptedPanelStyles}
-                                                            className={panelClass}
-                                                        >
+                                                        return (
                                                             <div
-                                                                ref={el => {
-                                                                    if (el) {
-                                                                        if (containerStyles.borderRadius) el.style.setProperty('border-radius', containerStyles.borderRadius as string, 'important');
-                                                                        if (containerStyles.overflow) el.style.setProperty('overflow', containerStyles.overflow as string, 'important');
-                                                                    }
+                                                                className={panelClass}
+                                                                style={{
+                                                                    ...panelStyles,
+                                                                    width: '100%',
+                                                                    height: '100%',
+                                                                    display: 'flex',
+                                                                    alignItems: 'center',
+                                                                    justifyContent: 'center'
                                                                 }}
-                                                                style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
-                                                                className={containerClass}
                                                             >
-                                                                <ImageIcon className="w-12 h-12 text-zinc-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50" />
-                                                                <div className="absolute bottom-4 left-0 right-0 flex justify-center z-20">
-                                                                    <div
-                                                                        className="px-2 py-0.5 rounded text-[8px] font-bold uppercase tracking-widest"
-                                                                        style={{ backgroundColor: colors.gameSceneNameOverlayBg, color: colors.gameSceneNameOverlayTextColor }}
-                                                                    >
-                                                                        {t('newProject.previewOverlay.sceneName', 'Nome da Cena')}
+                                                                <div
+                                                                    style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
+                                                                    className={containerClass}
+                                                                >
+                                                                    <ImageIcon className="w-12 h-12 text-zinc-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50" />
+                                                                    <div className="absolute top-4 left-4 z-20">
+                                                                        <div
+                                                                            className="px-2 py-0.5 border uppercase leading-none"
+                                                                            style={{ 
+                                                                                backgroundColor: colors.gameSceneNameOverlayBg, 
+                                                                                color: colors.gameSceneNameOverlayTextColor,
+                                                                                borderColor: `color-mix(in srgb, ${gameBackgroundColor} 80%, ${colors.textColor} 20%)`,
+                                                                                borderWidth: '2px',
+                                                                                fontSize: getScaledFontSize(1.0)
+                                                                            }}
+                                                                        >
+                                                                            {t('UIEditor.aparencia.sceneName', 'Nome da Cena')}
+                                                                        </div>
                                                                     </div>
                                                                 </div>
-
                                                             </div>
-                                                        </div>
-                                                    );
-                                                })()}
-                                            </div>
-
-                                            {/* Right Column: Text & Chances */}
-                                            <div className="flex-1 flex flex-col overflow-hidden relative">
-                                                <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar pr-2">
-                                                    <p className="leading-relaxed" style={{ color: colors.textColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize }}>
-                                                        {t('newProject.previewOverlay.exampleDesc', 'Esta é uma descrição de exemplo para a cena. O texto flui conforme as')} <span style={{ color: colors.titleColor, fontWeight: 'bold' }}>{t('newProject.previewOverlay.exampleDescBold', 'CONFIGURAÇÕES')}</span> {t('newProject.previewOverlay.exampleDesc2', 'escolhidas.')}
-                                                    </p>
-                                                    <p className="mt-4 opacity-70" style={{ color: colors.textColor, fontFamily: fontFamily, fontSize: '0.85em' }}>
-                                                        {'>'} {t('newProject.previewOverlay.exampleCommand', 'VERBO DE EXEMPLO')}
-                                                    </p>
+                                                        );
+                                                    })()}
                                                 </div>
 
-                                                {/* Chances Footer (Anchored Bottom Right) */}
-                                                {enableChances && (
-                                                    <div className="flex-shrink-0 flex justify-end pt-2 z-10">
-                                                        <div className="flex gap-1">
-                                                            {[1, 2, 3].map(i => (
-                                                                <Heart key={i} className="w-4 h-4 fill-current" style={{ color: colors.chanceIconColor || '#ff4d4d' }} />
-                                                            ))}
+                                                {/* Text Area */}
+                                                <div className="flex-1 flex flex-col overflow-hidden">
+                                                    <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
+                                                        <p className="leading-relaxed" style={{ color: colors.textColor, fontSize: getScaledFontSize(1.0) }}>
+                                                            {t('UIEditor.aparencia.sampleDesc1', 'Esta é uma descrição de exemplo para a cena. O texto flui conforme as')}
+                                                            <span className="preview-interactive-text" style={{ color: colors.titleColor, fontWeight: 'bold', marginLeft: '4px', marginRight: '4px' }}>{t('UIEditor.aparencia.sampleDescHighlight', 'CONFIGURAÇÕES')}</span>
+                                                            {t('UIEditor.aparencia.sampleDesc2', 'escolhidas.')}
+                                                        </p>
+                                                        <p className="mt-4 opacity-70" style={{ color: colors.textColor, fontFamily: fontFamily, fontSize: getScaledFontSize(1.0) }}>
+                                                            {'>'} {t('UIEditor.aparencia.sampleCommand', 'VERBO DE EXEMPLO')}
+                                                        </p>
+                                                    </div>
+
+                                                    {/* Nav + Input Column */}
+                                                    <div className="flex-shrink-0 space-y-2 pt-2">
+                                                        <div className="flex items-center gap-1.5 flex-wrap">
+                                                            {enableInventory && (
+                                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: colors.systemButtonBorderColor, color: colors.systemButtonTextColor, backgroundColor: colors.systemButtonColor }}>
+                                                                    {t('newProject.features.inventory', 'Inventário')}
+                                                                </button>
+                                                            )}
+                                                            {enableDiary && (
+                                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: colors.systemButtonBorderColor, color: colors.systemButtonTextColor, backgroundColor: colors.systemButtonColor }}>
+                                                                    {t('newProject.features.diary', 'Diário')}
+                                                                </button>
+                                                            )}
+                                                            {enableTrackers && (
+                                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: colors.systemButtonBorderColor, color: colors.systemButtonTextColor, backgroundColor: colors.systemButtonColor }}>
+                                                                    {t('newProject.features.trackers', 'Status')}
+                                                                </button>
+                                                            )}
                                                         </div>
+
+                                                        {interactionType === 'parser' ? (
+                                                            <div className="flex gap-1.5 pt-1.5">
+                                                                <div 
+                                                                    className="flex-1 rounded-md h-8 flex items-center px-2 border-2 transition-all duration-200 outline-none cursor-text" 
+                                                                    style={{ 
+                                                                        backgroundColor: `color-mix(in srgb, ${gameBackgroundColor} 98%, #000 2%)`,
+                                                                        borderColor: isInputFocused ? colors.focusColor : colors.systemButtonBorderColor,
+                                                                        boxShadow: isInputFocused ? `0 0 0 1px ${colors.focusColor}40` : 'none'
+                                                                    }}
+                                                                    onClick={() => setIsInputFocused(!isInputFocused)}
+                                                                >
+                                                                    <span className="font-mono truncate" style={{ fontSize: getScaledFontSize(1.0), fontFamily: fontFamily, color: `color-mix(in srgb, ${colors.textColor} 70%, ${gameBackgroundColor} 30%)` }}>{t('UIEditor.textos.commandInputValue', 'o que você faz?')}</span>
+                                                                </div>
+                                                                <button
+                                                                    className="preview-btn-action px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
+                                                                    style={{ fontSize: getScaledFontSize(1.0), backgroundColor: colors.actionButtonColor, color: colors.actionButtonTextColor, fontFamily: fontFamily }}
+                                                                >
+                                                                    {t('UIEditor.aparencia.action', 'AÇÃO')}
+                                                                </button>
+                                                            </div>
+                                                        ) : (
+                                                            <div className="grid grid-cols-2 gap-2 pt-1.5 animate-in fade-in slide-in-from-bottom-1">
+                                                                {previewStandardScene.choices.map((choice) => (
+                                                                    <button
+                                                                        key={choice.id}
+                                                                        className="preview-btn-action px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-md flex items-center justify-center truncate"
+                                                                        style={{ 
+                                                                            backgroundColor: colors.actionButtonColor, 
+                                                                            color: colors.actionButtonTextColor, 
+                                                                            fontFamily: fontFamily,
+                                                                            fontSize: getScaledFontSize(1.0),
+                                                                            border: `1px solid ${colors.systemButtonBorderColor}40`
+                                                                        }}
+                                                                    >
+                                                                        {choice.label}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Preview Footer (Input OR Choices) */}
-                                        <div className={`p-3 border-t backdrop-blur-sm flex-shrink-0 space-y-2 ${theme === 'dark' ? 'border-muted-foreground/50 bg-zinc-950/80' : 'border-muted-foreground/50 bg-white/80'}`}>
-
-                                            {/* System Buttons Row */}
-                                            <div className="flex gap-2 pb-1">
-                                                {/* Suggestions Button - Only show in Parser mode */}
-                                                {interactionType === 'parser' && (
-                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-muted-foreground/50 text-zinc-400' : 'border-muted-foreground/50 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
-                                                        {t('newProject.previewOverlay.suggestions', 'Sugestões')}
-                                                    </button>
-                                                )}
-
-                                                {enableInventory && (
-                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-muted-foreground/50 text-zinc-400' : 'border-muted-foreground/50 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
-                                                        {t('newProject.features.inventory', 'Inventário')}
-                                                    </button>
-                                                )}
-                                                {enableDiary && (
-                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-muted-foreground/50 text-zinc-400' : 'border-muted-foreground/50 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
-                                                        {t('newProject.features.diary', 'Diário de Bordo')}
-                                                    </button>
-                                                )}
-                                                {enableTrackers && (
-                                                    <button className={`h-6 px-3 border rounded text-[10px] font-bold uppercase tracking-wider flex items-center justify-center bg-transparent ${theme === 'dark' ? 'border-muted-foreground/50 text-zinc-400' : 'border-muted-foreground/50 text-zinc-500'}`} style={{ fontFamily: fontFamily }}>
-                                                        {t('newProject.features.trackers', 'Rastreadores')}
-                                                    </button>
-                                                )}
-                                            </div>
-
-                                            {/* Input Area */}
-                                            {interactionType === 'parser' ? (
-                                                <div className="flex gap-2">
-                                                    <div className={`flex-1 rounded-md h-8 flex items-center px-2 border ${theme === 'dark' ? 'bg-zinc-900/50 border-muted-foreground/50' : 'bg-zinc-100 border-muted-foreground/50'}`}>
-                                                        <span className="font-mono truncate" style={{ fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily, color: theme === 'dark' ? '#52525b' : '#a1a1aa' }}>{verbInputPlaceholder}</span>
-                                                    </div>
-                                                    <button
-                                                        className="px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
-                                                        style={{ backgroundColor: colors.actionButtonColor, color: colors.actionButtonTextColor, fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize, fontFamily: fontFamily }}
-                                                    >
-                                                        {actionButtonText || t('newProject.previewOverlay.actionPlaceholder', 'AÇÃO')}
-                                                    </button>
                                                 </div>
-                                            ) : (
-                                                <div className="space-y-2">
-                                                    <button
-                                                        className="w-full h-8 border-2 font-bold uppercase tracking-widest transition-all truncate"
-                                                        style={{
-                                                            borderColor: colors.actionButtonColor || 'rgba(255,255,255,0.2)',
-                                                            backgroundColor: colors.actionButtonColor || '#ffffff',
-                                                            color: colors.actionButtonTextColor || '#000000',
-                                                            fontFamily: fontFamily,
-                                                            fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize,
-                                                            borderRadius: '0px' // Square
-                                                        }}
-                                                    >
-                                                        {t('newProject.previewOverlay.option1', 'Opção de Exemplo 1')}
-                                                    </button>
-                                                    <button
-                                                        className="w-full h-8 border-2 font-bold uppercase tracking-widest transition-all truncate"
-                                                        style={{
-                                                            borderColor: colors.actionButtonColor || 'rgba(255,255,255,0.2)',
-                                                            backgroundColor: colors.actionButtonColor || '#ffffff',
-                                                            color: colors.actionButtonTextColor || '#000000',
-                                                            fontFamily: fontFamily,
-                                                            fontSize: /^\d+$/.test(fontSize) ? `${fontSize}px` : fontSize,
-                                                            borderRadius: '0px' // Square
-                                                        }}
-                                                    >
-                                                        {t('newProject.previewOverlay.option2', 'Opção de Exemplo 2')}
-                                                    </button>
+                                            </div>
+
+                                            {enableChances && (
+                                                <div className="absolute top-6 right-6 flex gap-1 z-20">
+                                                    {[1, 2, 3].map(i => (
+                                                        <Heart key={i} className="w-4 h-4 fill-current" style={{ color: colors.chanceIconColor }} />
+                                                    ))}
                                                 </div>
                                             )}
                                         </div>
-                                    </div>
-                                );
-                            })()}
-                        </div>
+                                    );
+                                }
+                                })()}
+                            </div>
 
-                        {/* Footer Actions */}
-                        <div className="p-6 border-t border-muted-foreground/50 bg-zinc-950/50 flex justify-between items-center z-10">
+                    {/* Footer buttons moved to right column */}
+                        <div className="flex justify-end gap-3 p-6 pt-4 bg-zinc-950/20 backdrop-blur-sm z-50">
                             <button
                                 onClick={onClose}
                                 className="px-6 py-2.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors"
@@ -894,7 +1055,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                 {t('common.cancel', 'Cancelar')}
                             </button>
 
-                            {tab === 'appearance' ? (
+                            {tab === 'system' ? (
                                 <button
                                     onClick={handleCreate}
                                     disabled={!title}
