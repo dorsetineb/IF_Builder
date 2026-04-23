@@ -101,8 +101,8 @@ export const useSceneManagement = ({
         setIsDirty(true);
     }, [gameData.scenes, gameData.sceneOrder, setGameData, setCurrentView, setSelectedSceneId, setIsDirty]);
 
-    const handleDeleteScene = useCallback((id: string) => {
-        if (id === gameData.startScene && Object.keys(gameData.scenes).length > 1) {
+    const handleDeleteScene = useCallback((sceneId: string) => {
+        if (sceneId === gameData.startScene && Object.keys(gameData.scenes).length > 1) {
             toast(
                 t('editor.actionNotAllowed', 'Ação não permitida'),
                 t('editor.deleteStartSceneError', 'Você não pode deletar a cena inicial. Defina outra cena como inicial antes de excluir esta.'),
@@ -111,29 +111,29 @@ export const useSceneManagement = ({
             return;
         }
 
-        const proceedWithDelete = () => {
+        const executeDelete = () => {
             setGameData(prev => {
                 const newScenes = { ...prev.scenes };
-                delete newScenes[id];
-                const updatedOrder = prev.sceneOrder.filter(sid => sid !== id);
+                delete newScenes[sceneId];
+                const updatedOrder = prev.sceneOrder.filter(sid => sid !== sceneId);
                 let newStart = prev.startScene;
-                if (newStart === id) {
+                if (newStart === sceneId) {
                     newStart = updatedOrder.length > 0 ? updatedOrder[0] : '';
                 }
 
                 Object.values(newScenes).forEach((scene: Scene) => {
                     if (scene.interactions) {
-                        scene.interactions = scene.interactions.filter(i => i.goToScene !== id);
+                        scene.interactions = scene.interactions.filter(i => i.goToScene !== sceneId);
                     }
                     if (scene.exits) {
                         // eslint-disable-next-line @typescript-eslint/no-explicit-any
                         const exits = scene.exits as any;
                         Object.keys(exits).forEach(key => {
-                            if (exits[key] === id) delete exits[key];
+                            if (exits[key] === sceneId) delete exits[key];
                         });
                     }
                     // Clean up dangling vignette links
-                    if (scene.vignetteNextSceneId === id) {
+                    if (scene.vignetteNextSceneId === sceneId) {
                         scene.vignetteNextSceneId = '';
                     }
                 });
@@ -146,26 +146,34 @@ export const useSceneManagement = ({
                 };
             });
 
-            if (id === selectedSceneId) {
-                const newSceneId = gameData.sceneOrder.find(sid => sid !== id) || '';
+            if (sceneId === selectedSceneId) {
+                const newSceneId = gameData.sceneOrder.find(sid => sid !== sceneId) || '';
                 setSelectedSceneId(newSceneId);
             }
             setIsDirty(true);
+            const scene = gameData.scenes[sceneId];
+            const type = (scene as any).vignetteType && (scene as any).vignetteType !== 'none' ? 'vignette' : 'scene';
             toast(
-                t('editor.sceneDeletedTitle', 'Cena deletada'),
-                t('editor.sceneDeletedDesc', 'A cena foi removida com sucesso.'),
+                t(`editor.${type}DeletedTitle`),
+                t(`editor.${type}DeletedDesc`),
                 "success"
             );
             closeConfirmationModal();
         };
 
+        const scene = gameData.scenes[sceneId];
+        if (!scene) return;
+        const type = scene.vignetteType && scene.vignetteType !== 'none' ? 'vignette' : 'scene';
+
         setConfirmationModal({
             isOpen: true,
-            title: "Deletar Cena",
-            message: "Tem certeza que deseja deletar esta cena?\\n\\nEsta ação não pode ser desfeita e removerá todas as referências a ela.",
+            title: type === 'vignette' ? t('sceneEditor.deleteTitleVignette') : t('sceneEditor.deleteTitle'),
+            message: type === 'vignette' ? t('sceneEditor.deleteConfirmVignette') : t('sceneEditor.deleteConfirm'),
+            confirmText: t('common.delete', 'Excluir'),
+            cancelText: t('common.cancel', 'Cancelar'),
             isDanger: true,
-            onConfirm: proceedWithDelete,
-            onCancel: closeConfirmationModal
+            onConfirm: () => executeDelete(),
+            onCancel: closeConfirmationModal,
         });
     }, [gameData.startScene, gameData.scenes, gameData.sceneOrder, selectedSceneId, toast, closeConfirmationModal, setConfirmationModal, setGameData, setIsDirty, setSelectedSceneId, t]);
 

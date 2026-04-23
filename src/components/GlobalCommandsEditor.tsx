@@ -31,6 +31,8 @@ interface GlobalCommandsEditorProps {
     onUpdate: (field: keyof GameData | Partial<GameData>, value?: any, skipDirty?: boolean) => void;
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
+    setConfirmationModal: (modal: any) => void;
+    closeConfirmationModal: () => void;
 }
 
 const generateUniqueId = (prefix: string, existingIds: string[]): string => {
@@ -46,6 +48,8 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
     onUpdate,
     isDirty,
     onSetDirty,
+    setConfirmationModal,
+    closeConfirmationModal
 }) => {
     const [localVerbs, setLocalVerbs] = useState<FixedVerb[]>(fixedVerbs);
     const [selectedVerbId, setSelectedVerbId] = useState<string | null>(fixedVerbs.length > 0 ? fixedVerbs[0].id : null);
@@ -108,11 +112,23 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
     };
 
     const handleDelete = (verbId: string) => {
-        setLocalVerbs(prev => prev.filter(v => v.id !== verbId));
-        if (selectedVerbId === verbId) {
-            const remaining = localVerbs.filter(v => v.id !== verbId);
-            setSelectedVerbId(remaining.length > 0 ? remaining[0].id : null);
-        }
+        setConfirmationModal({
+            isOpen: true,
+            title: t('globalCommandsEditor.deleteTitle', 'Excluir Verbo'),
+            message: `${t('common.deleteConfirm', 'Tem certeza?')}\n\n${t('globalCommandsEditor.deleteDesc', 'Isso excluirá este comando global e todas as suas configurações.')}`,
+            confirmText: t('common.delete', 'Excluir'),
+            cancelText: t('common.cancel', 'Cancelar'),
+            onConfirm: () => {
+                setLocalVerbs(prev => prev.filter(v => v.id !== verbId));
+                if (selectedVerbId === verbId) {
+                    const remaining = localVerbs.filter(v => v.id !== verbId);
+                    setSelectedVerbId(remaining.length > 0 ? remaining[0].id : null);
+                }
+                closeConfirmationModal();
+            },
+            isDanger: true,
+            onCancel: closeConfirmationModal
+        });
     };
 
     const handleSave = () => {
@@ -323,6 +339,17 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                                     rows={16}
                                                     className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all resize-none"
                                                 />
+                                            </div>
+
+                                            {/* Action buttons (Delete) */}
+                                            <div className="pt-6 border-t border-muted-foreground/30 flex justify-end">
+                                                <button
+                                                    onClick={() => handleDelete(selectedVerb.id)}
+                                                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-all text-[10px] font-bold uppercase tracking-widest border border-red-500/20"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                    {t('globalCommandsEditor.deleteCommandTooltip', 'Excluir Verbo')}
+                                                </button>
                                             </div>
                                         </div>
                                     </div>

@@ -512,20 +512,20 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
             {/* Right Column: Preview */}
             <div className="col-span-1 lg:col-span-7 relative sticky top-0 self-start z-10">
                 <div className="space-y-6 flex flex-col">
-                    <div className="flex items-center justify-start gap-3 mb-2 w-full">
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase whitespace-nowrap text-zinc-400">{t('UIEditor.aparencia.previewLabel', 'Exemplo de')}</span>
+                    <div className="flex items-center justify-start gap-3 mb-4 w-full">
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase whitespace-nowrap text-zinc-400">{t('UIEditor.aparencia.previewLabel', 'Example of')}</span>
                         <div className="flex bg-background rounded-lg p-1 border border-muted-foreground/50 w-full max-w-[340px]">
                             <button
                                 onClick={() => setPreviewType('scene')}
                                 className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'scene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                             >
-                                {t('UIEditor.aparencia.scenes', 'Layout das Cenas')}
+                                {t('newProject.appearance.layoutScenes', 'Layout das Cenas')}
                             </button>
                             <button
                                 onClick={() => setPreviewType('vignette')}
                                 className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'vignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                             >
-                                {t('UIEditor.aparencia.vinhetas', 'Layout das Vinhetas')}
+                                {t('newProject.info.vignetteLayout', 'Layout das Vinhetas')}
                             </button>
                         </div>
                     </div>
@@ -714,10 +714,10 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                 </div>
                                 <div className={`relative z-10 w-full flex flex-col gap-2 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
                                     {!localOmitSplashTitle && (
-                                        <div className="font-bold uppercase tracking-widest drop-shadow-md" style={{ color: localTitleColor, fontSize: getScaledFontSize(1.2), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sceneName', 'Título da vinheta')}</div>
+                                        <div className="font-bold uppercase tracking-widest leading-tight" style={{ color: localTitleColor, fontSize: getScaledFontSize(1.2), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sceneName', 'Título da vinheta')}</div>
                                     )}
                                     {!localOmitSplashDescription && (
-                                        <p className="leading-relaxed drop-shadow-sm" style={{ color: localTextColor, fontSize: getScaledFontSize(1.0), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sampleVignetteDesc', 'Esta é uma descrição de exemplo para a vinheta.')}</p>
+                                        <p className="leading-relaxed" style={{ color: localTextColor, fontSize: getScaledFontSize(1.0), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sampleVignetteDesc', 'Esta é uma descrição de exemplo para a vinheta.')}</p>
                                     )}
                                     <button
                                         className="preview-btn-splash px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate mt-1"

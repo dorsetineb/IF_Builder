@@ -432,8 +432,8 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
             <ConfirmationModal
                 isOpen={unlinkModal.isOpen}
                 title={t('objectEditor.unlinkTitle', 'Desvincular Objeto')}
-                message={t('objectEditor.unlinkConfirm', 'Tem certeza?\\n\\nIsso removerá o objeto desta cena, mas ele ainda existirá no projeto.')}
-                confirmText={t('common.confirm', 'Confirmar')}
+                message={`${t('common.deleteConfirm', 'Tem certeza?')}\n\n${t('objectEditor.unlinkDesc', 'Isso removerá o objeto desta cena, mas ele ainda existirá no projeto.')}`}
+                confirmText={t('objectEditor.unlinkBtn', 'Desvincular')}
                 cancelText={t('common.cancel', 'Cancelar')}
                 isDanger={true}
                 onConfirm={() => {

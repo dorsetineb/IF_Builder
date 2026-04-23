@@ -485,8 +485,8 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
             <ConfirmationModal
                 isOpen={deleteModal.isOpen}
                 title={t('interactionEditor.removeInteraction', 'Remover Interação')}
-                message={t('interactionEditor.deleteConfirm', 'Tem certeza que deseja remover esta interação?')}
-                confirmText={t('common.confirm', 'Confirmar')}
+                message={`${t('common.deleteConfirm', 'Tem certeza?')}\n\n${t('interactionEditor.deleteDesc', 'Isso excluirá permanentemente esta interação.')}`}
+                confirmText={t('common.delete', 'Excluir')}
                 cancelText={t('common.cancel', 'Cancelar')}
                 isDanger={true}
                 onConfirm={confirmRemove}

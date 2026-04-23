@@ -82,7 +82,7 @@ const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) =>
               </div>
 
               <div className="mt-8 pt-8 border-t border-muted-foreground/50">
-                <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-4">{t('manualModal.exampleCommandTitle', 'Exemplo de verbo do jogador:')}</p>
+                <p className="text-[10px] font-bold text-primary uppercase tracking-widest mb-4">{t('manualModal.exampleCommandTitle', 'Player verb example:')}</p>
                 <div className="text-lg bg-zinc-950 p-6 rounded-xl border border-muted-foreground/50 shadow-inner italic text-white flex items-center gap-3">
                   <span className="text-zinc-600 font-mono">&gt;</span> {t('manualModal.exampleCommand', '"Destrancar porta com a chave"')}
                 </div>

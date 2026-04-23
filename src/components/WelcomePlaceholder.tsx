@@ -105,7 +105,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     {/* Botão 1: Começar a Criar */}
                     <button
                         onClick={() => setIsNewProjectModalOpen(true)}
-                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-muted-foreground/50 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20"
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-primary hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20"
                     >
                         <div className="w-10 h-10 bg-primary group-hover:bg-white transition-colors" style={{ maskImage: 'url(/icons/criar.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/criar.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.createNew', 'Crie uma ficção')}</span>
@@ -114,7 +114,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     {/* Botão 2: Jogar a Demo */}
                     <button
                         onClick={() => setIsGamePopupOpen(true)}
-                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-muted-foreground/50 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-primary hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
                     >
                         <div className="w-10 h-10 bg-primary group-hover:bg-white transition-colors" style={{ maskImage: 'url(/icons/demo.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/demo.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.playDemo', 'Acesse a demo')}</span>
@@ -125,7 +125,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         onClick={handleDownloadClick}
                         className={`group flex flex-col items-center justify-center gap-4 p-8 rounded-xl border hover:scale-[1.02] transition-all duration-300 ${isFlashing
                             ? 'bg-white border-white scale-[1.02]'
-                            : 'bg-black/40 backdrop-blur-sm border-muted-foreground/50 hover:border-white hover:bg-black/50'
+                            : 'bg-black/40 backdrop-blur-sm border-primary/50 hover:border-primary hover:bg-black/50'
                             }`}
                     >
                         <div className={`w-10 h-10 transition-colors ${isFlashing ? 'bg-white' : 'bg-primary group-hover:bg-white'}`} style={{ maskImage: 'url(/icons/exemplo.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/exemplo.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
@@ -139,7 +139,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     {/* Botão: Guia Rápido */}
                     <button
                         onClick={onGuidePage}
-                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-muted-foreground/50 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full md:w-[calc(33.333%-16px)]"
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-primary hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full md:w-[calc(33.333%-16px)]"
                     >
                         <CircleHelp className="w-10 h-10 text-primary group-hover:text-white transition-colors" />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
@@ -148,7 +148,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     {/* Botão: Sobre o Projeto */}
                     <button
                         onClick={onMeetProject}
-                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-muted-foreground/50 hover:border-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full md:w-[calc(33.333%-16px)]"
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-primary hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full md:w-[calc(33.333%-16px)]"
                     >
                         <Zap className="w-10 h-10 text-primary group-hover:text-white transition-colors" />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
@@ -169,14 +169,14 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
 
                         <h3 className="text-2xl font-bold text-white mb-8 text-center">{t('welcome.helpTItle', 'Como usar o exemplo baixado')}</h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <div className="group relative flex flex-col items-center text-center p-8 bg-zinc-950/50 rounded-2xl border border-muted-foreground/50 overflow-hidden shadow-lg transition-all duration-300 hover:bg-zinc-950">
+                            <div className="group relative flex flex-col items-center text-center p-8 bg-zinc-950/50 rounded-2xl border border-primary/50 overflow-hidden shadow-lg transition-all duration-300 hover:bg-zinc-950">
                                 <div className="absolute inset-0 bg-gradient-to-b from-[#008080]/0 to-[#008080]/20 group-hover:to-[#008080]/40 transition-colors" />
                                 <Monitor className="w-12 h-12 text-[#008080] mb-4 relative z-10 group-hover:scale-110 transition-transform duration-300" />
                                 <h4 className="text-xl font-bold text-white mb-4 relative z-10">{t('welcome.helpPlayTitle', 'Offline')}</h4>
                                 <p className="text-left text-zinc-400 text-sm relative z-10" dangerouslySetInnerHTML={{ __html: t('welcome.helpPlayDesc', 'Extraia o conteúdo do <strong>arquivo.zip</strong> e abra o arquivo <strong>index.html</strong> para acessar a ficção interativa de modo offline.') }} />
                             </div>
 
-                            <div className="group relative flex flex-col items-center text-center p-8 bg-zinc-950/50 rounded-2xl border border-muted-foreground/50 overflow-hidden shadow-lg transition-all duration-300 hover:bg-zinc-950">
+                            <div className="group relative flex flex-col items-center text-center p-8 bg-zinc-950/50 rounded-2xl border border-primary/50 overflow-hidden shadow-lg transition-all duration-300 hover:bg-zinc-950">
                                 <div className="absolute inset-0 bg-gradient-to-b from-blue-500/0 to-blue-500/20 group-hover:to-blue-500/40 transition-colors" />
                                 <Cloud className="w-12 h-12 text-blue-500 mb-4 relative z-10 group-hover:scale-110 transition-transform duration-300" />
                                 <h4 className="text-xl font-bold text-white mb-4 relative z-10">{t('welcome.helpEditTitle', 'Online')}</h4>

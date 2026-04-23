@@ -1130,7 +1130,7 @@ const Editor: React.FC = () => {
       setConfirmationModal({
         isOpen: true,
         title: t('newProject.title', 'Nova Ficção'),
-        message: t('newProject.warningMessage', 'O novo projeto irá substituir o atual.\\n\\nDeseja prosseguir?'),
+        message: `${t('common.warning', 'Aviso')}\n\n${t('newProject.warningMessage', 'O novo projeto irá substituir o atual. Deseja prosseguir?')}`,
         isDanger: true,
         onConfirm: () => {
           closeConfirmationModal();
@@ -1186,7 +1186,7 @@ const Editor: React.FC = () => {
       setConfirmationModal({
         isOpen: true,
         title: t('newProject.title', 'Nova Ficção'),
-        message: t('newProject.warningMessage', 'O novo projeto irá substituir o atual.\\n\\nDeseja prosseguir?'),
+        message: `${t('common.warning', 'Aviso')}\n\n${t('newProject.warningMessage', 'O novo projeto irá substituir o atual. Deseja prosseguir?')}`,
         isDanger: true,
         onConfirm: () => {
           closeConfirmationModal();
@@ -1412,6 +1412,8 @@ const Editor: React.FC = () => {
                     onUpdate={handleUpdateGameData}
                     isDirty={hasUnsavedTabChanges}
                     onSetDirty={setHasUnsavedTabChanges}
+                    setConfirmationModal={setConfirmationModal}
+                    closeConfirmationModal={closeConfirmationModal}
                     title={gameData.gameTitle || ''}
                     logo={gameData.gameLogo || ''}
                     omitSplashTitle={!!gameData.gameOmitSplashTitle}
@@ -1683,6 +1685,8 @@ const Editor: React.FC = () => {
                   onSetDirty={setHasUnsavedTabChanges}
                   onSelectScene={handleSelectScene}
                   allObjects={gameData.globalObjects || {}}
+                  setConfirmationModal={setConfirmationModal}
+                  closeConfirmationModal={closeConfirmationModal}
                 />
               </Suspense>
             )}
@@ -1694,6 +1698,8 @@ const Editor: React.FC = () => {
                   onUpdate={handleUpdateGameData}
                   isDirty={hasUnsavedTabChanges}
                   onSetDirty={setHasUnsavedTabChanges}
+                  setConfirmationModal={setConfirmationModal}
+                  closeConfirmationModal={closeConfirmationModal}
                 />
               </Suspense>
             )}

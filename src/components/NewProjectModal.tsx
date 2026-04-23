@@ -323,7 +323,10 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
     return (
         <div onClick={onClose} className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-in fade-in duration-200">
-            <div onClick={(e) => e.stopPropagation()} className="bg-zinc-950 border border-muted-foreground/50 w-full max-w-[1400px] h-[92vh] rounded-2xl flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300">
+            <div 
+                onClick={(e) => e.stopPropagation()} 
+                className="bg-zinc-950 w-full max-w-[1400px] h-[92vh] rounded-2xl flex flex-col shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-300 border-2 border-primary"
+            >
 
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-muted-foreground/50 bg-zinc-950/50">
@@ -494,7 +497,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             value={title}
                                             onChange={(e) => setTitle(e.target.value)}
                                             className="w-full bg-black/50 border border-muted-foreground/50 rounded-lg px-4 py-3 text-sm text-white focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-700 font-bold"
-                                            placeholder={t('newProject.info.gameTitlePlaceholder', 'Ex: A Caverna dos Dragões')}
+                                            placeholder={t('newProject.info.gameTitlePlaceholder', 'A Caverna dos Dragões')}
                                         />
                                     </div>
 
@@ -521,7 +524,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             value={startButtonText}
                                             onChange={(e) => setStartButtonText(e.target.value)}
                                             className="w-full bg-black/50 border border-muted-foreground/50 rounded-lg px-4 py-3 text-sm text-white focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-700 font-bold"
-                                            placeholder={t('newProject.info.startButtonPlaceholder', 'Ex: Iniciar Aventura')}
+                                            placeholder={t('newProject.info.startButtonPlaceholder', 'Iniciar Aventura')}
                                         />
                                     </div>
 
@@ -600,7 +603,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                         />
                                                         {omitSplashDescription && <div className="w-2 h-2 bg-primary rounded-sm" />}
                                                     </div>
-                                                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wide group-hover:text-zinc-300 transition-colors">{t('UIEditor.layout.hideDescription', 'Ocultar descrição')}</span>
+                                                    <span className="text-[10px] text-zinc-500 font-bold uppercase tracking-wide group-hover:text-zinc-300 transition-colors">{t('newProject.info.hideDescription', 'Ocultar descrição')}</span>
                                                 </label>
                                             </div>
                                         </div>
@@ -615,11 +618,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-zinc-300">
                                             <Type className="w-4 h-4" />
-                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('UIEditor.aparencia.typography', 'Fontes e Texto')}</h3>
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.appearance.fontsTextTitle', 'Fontes e Texto')}</h3>
                                         </div>
                                         <div className="grid grid-cols-2 gap-4">
                                             <div className="space-y-2">
-                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('UIEditor.aparencia.fontFamily', 'Família da Fonte')}</label>
+                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.fontFamily', 'Família da Fonte')}</label>
                                                 <select
                                                     value={fontFamily}
                                                     onChange={(e) => setFontFamily(e.target.value)}
@@ -631,16 +634,16 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                 </select>
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('UIEditor.aparencia.fontSize', 'Tamanho da Fonte')}</label>
+                                                <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.fontSize', 'Tamanho da Fonte')}</label>
                                                 <select
                                                     value={fontSize}
                                                     onChange={(e) => setFontSize(e.target.value)}
                                                     className="w-full bg-zinc-950 border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-zinc-300 focus:ring-1 focus:ring-primary/30"
                                                 >
-                                                    <option value="12">Pequeno (12px)</option>
-                                                    <option value="14">Médio (14px)</option>
-                                                    <option value="16">Grande (16px)</option>
-                                                    <option value="18">Extra Grande (18px)</option>
+                                                    <option value="12">{t('newProject.appearance.sizeSmall', 'Pequeno')} (12px)</option>
+                                                    <option value="14">{t('newProject.appearance.sizeMedium', 'Médio')} (14px)</option>
+                                                    <option value="16">{t('newProject.appearance.sizeLarge', 'Grande')} (16px)</option>
+                                                    <option value="18">{t('newProject.appearance.sizeExtraLarge', 'Extra Grande')} (18px)</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -650,11 +653,11 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-zinc-300">
                                             <Palette className="w-4 h-4" />
-                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('UIEditor.aparencia.styleTheme', 'Estilo & Tema')}</h3>
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.appearance.styleTheme', 'Estilo & Tema')}</h3>
                                         </div>
 
                                         <div className="space-y-3">
-                                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('UIEditor.aparencia.predefinedThemes', 'Temas Predefinidos')}</label>
+                                            <label className="block text-[10px] font-bold text-zinc-500 uppercase tracking-wider mb-2">{t('newProject.appearance.predefinedThemesTitle', 'Temas Predefinidos')}</label>
                                             <div className="grid grid-cols-4 gap-2">
                                                 {PREDEFINED_THEMES.map((theme) => (
                                                     <button
@@ -666,7 +669,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                             <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.textColor }}></div>
                                                             <div className="w-3 h-3 rounded-full border border-muted-foreground/50" style={{ backgroundColor: theme.titleColor }}></div>
                                                         </div>
-                                                        <span className="text-[8px] font-bold uppercase tracking-tight text-zinc-500 group-hover:text-zinc-100">{theme.name}</span>
+                                                        <span className="text-[8px] font-bold uppercase tracking-tight text-zinc-500 group-hover:text-zinc-100">
+                                                {t(`newProject.appearance.predefinedThemes.${theme.nameKey}`, theme.name)}
+                                            </span>
                                                     </button>
                                                 ))}
                                             </div>
@@ -677,7 +682,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                     onClick={() => setIsColorsExpanded(!isColorsExpanded)}
                                                 >
                                                     <div className="flex items-center gap-2">
-                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest transition-colors group-hover:text-zinc-100">{t('UIEditor.aparencia.colorCustom', 'Personalização de Cores')}</span>
+                                                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest transition-colors group-hover:text-zinc-100">{t('newProject.appearance.customColors', 'Personalização de Cores')}</span>
                                                     <ChevronDown className={`w-3 h-3 text-zinc-500 transition-transform duration-200 ${isColorsExpanded ? 'rotate-180' : ''}`} />
                                                     </div>
                                                 </div>
@@ -691,9 +696,9 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                                 <h3 className="text-xs font-bold uppercase tracking-widest">{t('UIEditor.aparencia.textAndBg', 'Cores de Texto e Fundo')}</h3>
                                                             </div>
                                                             <div className="grid grid-cols-1 gap-4">
-                                                                <ColorInput label={t('UIEditor.aparencia.background', 'Fundo do Jogo')} id="bgColor" value={gameBackgroundColor} onChange={(val) => setGameBackgroundColor(val)} />
-                                                                <ColorInput label={t('UIEditor.aparencia.text', 'Texto Principal')} id="textColor" value={colors.textColor} onChange={(val) => setColors({ ...colors, textColor: val })} />
-                                                                <ColorInput label={t('UIEditor.aparencia.title', 'Títulos e Destaque')} id="titleColor" value={colors.titleColor} onChange={(val) => setColors({ ...colors, titleColor: val })} />
+                                                                <ColorInput label={t('newProject.appearance.background', 'Fundo do Jogo')} id="bgColor" value={gameBackgroundColor} onChange={(val) => setGameBackgroundColor(val)} />
+                                                                <ColorInput label={t('newProject.appearance.text', 'Texto Principal')} id="textColor" value={colors.textColor} onChange={(val) => setColors({ ...colors, textColor: val })} />
+                                                                <ColorInput label={t('newProject.appearance.title', 'Títulos e Destaque')} id="titleColor" value={colors.titleColor} onChange={(val) => setColors({ ...colors, titleColor: val })} />
                                                             </div>
                                                         </div>
 
@@ -701,13 +706,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                         <div className="space-y-3 pt-4">
                                                             <div className="flex items-center gap-2 text-zinc-300 pb-2">
                                                                 <Monitor className="w-4 h-4" />
-                                                                <h3 className="text-xs font-bold uppercase tracking-widest">{t('UIEditor.aparencia.scenesAndInterfaces', 'Cenas e Interfaces')}</h3>
+                                                                <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.appearance.scenesAndInterfaces', 'Cenas e Interfaces')}</h3>
                                                             </div>
                                                             <div className="grid grid-cols-1 gap-4">
-                                                                <ColorInput label={t('UIEditor.aparencia.focus', 'Cor de Foco/Interação')} id="focusColor" value={colors.focusColor} onChange={(val) => setColors({ ...colors, focusColor: val })} />
-                                                                <ColorInput label={t('UIEditor.aparencia.sceneOverlayBg', 'Nome da Cena (Fundo)')} id="overlayBg" value={colors.gameSceneNameOverlayBg} onChange={(val) => setColors({ ...colors, gameSceneNameOverlayBg: val })} />
-                                                                <ColorInput label={t('UIEditor.aparencia.sceneOverlayText', 'Nome da Cena (Texto)')} id="overlayText" value={colors.gameSceneNameOverlayTextColor} onChange={(val) => setColors({ ...colors, gameSceneNameOverlayTextColor: val })} />
-                                                                <ColorInput label={t('UIEditor.aparencia.hearts', 'Cor dos Corações')} id="heartsColor" value={colors.chanceIconColor} onChange={(val) => setColors({ ...colors, chanceIconColor: val })} />
+                                                                <ColorInput label={t('newProject.appearance.focus', 'Cor de Foco/Interação')} id="focusColor" value={colors.focusColor} onChange={(val) => setColors({ ...colors, focusColor: val })} />
+                                                                <ColorInput label={t('newProject.appearance.sceneOverlayBg', 'Nome da Cena (Fundo)')} id="overlayBg" value={colors.gameSceneNameOverlayBg} onChange={(val) => setColors({ ...colors, gameSceneNameOverlayBg: val })} />
+                                                                <ColorInput label={t('newProject.appearance.sceneOverlayText', 'Nome da Cena (Texto)')} id="overlayText" value={colors.gameSceneNameOverlayTextColor} onChange={(val) => setColors({ ...colors, gameSceneNameOverlayTextColor: val })} />
+                                                                <ColorInput label={t('newProject.appearance.hearts', 'Cor dos Corações')} id="heartsColor" value={colors.chanceIconColor} onChange={(val) => setColors({ ...colors, chanceIconColor: val })} />
                                                             </div>
                                                         </div>
 
@@ -715,28 +720,28 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                         <div className="space-y-3 pt-4">
                                                             <div className="flex items-center gap-2 text-zinc-300 pb-2">
                                                                 <MousePointer2 className="w-4 h-4" />
-                                                                <h3 className="text-xs font-bold uppercase tracking-widest">{t('UIEditor.aparencia.interfaceButtons', 'Botões da Interface')}</h3>
+                                                                <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.appearance.interfaceButtons', 'Botões da Interface')}</h3>
                                                             </div>
 
                                                             <div className="space-y-3">
                                                                 <div className="space-y-3">
-                                                                    <h4 className="text-xs font-bold uppercase text-zinc-400 tracking-widest">{t('UIEditor.aparencia.actionButton', 'Botão de Ação')}</h4>
-                                                                    <ColorInput label={t('UIEditor.aparencia.buttonBg', 'Fundo')} id="actionBtnBg" value={colors.actionButtonColor} onChange={(val) => setColors({ ...colors, actionButtonColor: val })} />
-                                                                    <ColorInput label={t('UIEditor.aparencia.buttonText', 'Texto')} id="actionBtnText" value={colors.actionButtonTextColor} onChange={(val) => setColors({ ...colors, actionButtonTextColor: val })} />
-                                                                    <ColorInput label={t('UIEditor.aparencia.buttonHover', 'Hover')} id="actionBtnHover" value={colors.actionButtonHoverColor} onChange={(val) => setColors({ ...colors, actionButtonHoverColor: val })} />
+                                                                    <h4 className="text-xs font-bold uppercase text-zinc-400 tracking-widest">{t('newProject.appearance.actionButton', 'Botão de Ação')}</h4>
+                                                                    <ColorInput label={t('newProject.appearance.buttonBg', 'Fundo')} id="actionBtnBg" value={colors.actionButtonColor} onChange={(val) => setColors({ ...colors, actionButtonColor: val })} />
+                                                                    <ColorInput label={t('newProject.appearance.buttonText', 'Texto')} id="actionBtnText" value={colors.actionButtonTextColor} onChange={(val) => setColors({ ...colors, actionButtonTextColor: val })} />
+                                                                    <ColorInput label={t('newProject.appearance.buttonHover', 'Hover')} id="actionBtnHover" value={colors.actionButtonHoverColor} onChange={(val) => setColors({ ...colors, actionButtonHoverColor: val })} />
                                                                 </div>
 
                                                                 <div className="space-y-3">
-                                                                    <h4 className="text-xs font-bold uppercase text-zinc-400 tracking-widest">{t('UIEditor.aparencia.splashButton', 'Botão de Início')}</h4>
-                                                                    <ColorInput label={t('UIEditor.aparencia.buttonBg', 'Fundo')} id="splashBtnBg" value={colors.splashButtonColor} onChange={(val) => setColors({ ...colors, splashButtonColor: val })} />
-                                                                    <ColorInput label={t('UIEditor.aparencia.buttonText', 'Texto')} id="splashBtnText" value={colors.splashButtonTextColor} onChange={(val) => setColors({ ...colors, splashButtonTextColor: val })} />
-                                                                    <ColorInput label={t('UIEditor.aparencia.buttonHover', 'Hover')} id="splashBtnHover" value={colors.splashButtonHoverColor} onChange={(val) => setColors({ ...colors, splashButtonHoverColor: val })} />
+                                                                    <h4 className="text-xs font-bold uppercase text-zinc-400 tracking-widest">{t('newProject.appearance.splashButton', 'Botão de Início')}</h4>
+                                                                    <ColorInput label={t('newProject.appearance.buttonBg', 'Fundo')} id="splashBtnBg" value={colors.splashButtonColor} onChange={(val) => setColors({ ...colors, splashButtonColor: val })} />
+                                                                    <ColorInput label={t('newProject.appearance.buttonText', 'Texto')} id="splashBtnText" value={colors.splashButtonTextColor} onChange={(val) => setColors({ ...colors, splashButtonTextColor: val })} />
+                                                                    <ColorInput label={t('newProject.appearance.buttonHover', 'Hover')} id="splashBtnHover" value={colors.splashButtonHoverColor} onChange={(val) => setColors({ ...colors, splashButtonHoverColor: val })} />
                                                                 </div>
 
                                                                 <div className="space-y-3">
-                                                                    <h4 className="text-xs font-bold uppercase text-zinc-400 tracking-widest">{t('UIEditor.aparencia.systemButtons', 'Botões de Ferramenta')}</h4>
-                                                                    <ColorInput label={t('UIEditor.aparencia.buttonBorder', 'Borda')} id="sysBtnBorder" value={colors.systemButtonBorderColor} onChange={(val) => setColors({ ...colors, systemButtonBorderColor: val })} />
-                                                                    <ColorInput label={t('UIEditor.aparencia.buttonHover', 'Hover')} id="sysBtnHover" value={colors.systemButtonHoverColor} onChange={(val) => setColors({ ...colors, systemButtonHoverColor: val })} />
+                                                                    <h4 className="text-xs font-bold uppercase text-zinc-400 tracking-widest">{t('newProject.appearance.systemButtons', 'Botões de Ferramenta')}</h4>
+                                                                    <ColorInput label={t('newProject.appearance.buttonBorder', 'Borda')} id="sysBtnBorder" value={colors.systemButtonBorderColor} onChange={(val) => setColors({ ...colors, systemButtonBorderColor: val })} />
+                                                                    <ColorInput label={t('newProject.appearance.buttonHover', 'Hover')} id="sysBtnHover" value={colors.systemButtonHoverColor} onChange={(val) => setColors({ ...colors, systemButtonHoverColor: val })} />
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -828,251 +833,258 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     transform: translateY(-1px);
                                 }
 
-                                .preview-interactive-text { transition: color 0.2s ease; }
+.preview-interactive-text { transition: color 0.2s ease; }
                                 .preview-interactive-text:hover {
                                     color: ${colors.focusColor} !important;
                                     cursor: pointer;
                                 }
                             `}
                         </style>
-                        <div className="flex-1 relative flex items-center justify-center overflow-hidden p-8 bg-black/50">
-                                {/* Preview Toggle Overlay - Same as AppearanceTab */}
-                                <div className="absolute top-6 left-6 z-50">
-                                    <div className="flex bg-zinc-950/80 backdrop-blur-md p-1 rounded-lg border border-white/10 shadow-xl">
-                                        <button
-                                            onClick={() => setPreviewType('vignette')}
-                                            className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'vignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
-                                        >
-                                            {t('newProject.info.vignetteLayout', 'Layout das Vinhetas')}
-                                        </button>
-                                        <button
-                                            onClick={() => setPreviewType('scene')}
-                                            className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'scene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
-                                        >
-                                            {t('newProject.appearance.layoutScenes', 'Layout das Cenas')}
-                                        </button>
-                                    </div>
+                        <div className="flex-1 flex flex-col overflow-hidden p-8 bg-black/50">
+                            {/* Standardized Preview Toggle - Same as AppearanceTab */}
+                            <div className="flex items-center justify-center gap-3 mb-1 w-full shrink-0 animate-in fade-in slide-in-from-top-2 duration-500">
+                                <span className="text-[10px] font-bold text-zinc-400 uppercase whitespace-nowrap">{t('UIEditor.aparencia.previewLabel', 'Example of')}</span>
+                                <div className="flex bg-zinc-950 p-1 rounded-lg border border-muted-foreground/50 w-full max-w-[340px] shadow-lg">
+                                    <button
+                                        onClick={() => setPreviewType('vignette')}
+                                        className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'vignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                    >
+                                        {t('newProject.info.vignetteLayout', 'Layout das Vinhetas')}
+                                    </button>
+                                    <button
+                                        onClick={() => setPreviewType('scene')}
+                                        className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'scene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                                    >
+                                        {t('newProject.appearance.layoutScenes', 'Layout das Cenas')}
+                                    </button>
                                 </div>
+                            </div>
 
-                                {/* Custom Preview Logic from UIEditor */}
-                                {(() => {
-                                    if (previewType === 'vignette') {
-                                        return (
-                                            <div
-                                                className={`
-                                                    relative w-full h-full border border-muted-foreground/50 rounded-xl flex flex-col justify-end overflow-hidden p-8 box-border shadow-2xl transition-all duration-300 max-h-[500px]
-                                                    ${layoutOrientation === 'horizontal' ? 'aspect-[9/16]' : 'aspect-video'}
-                                                `}
-                                                style={{
-                                                    backgroundColor: gameBackgroundColor,
-                                                    alignItems: splashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
-                                                    textAlign: splashContentAlignment === 'left' ? 'left' : 'right',
-                                                }}
-                                            >
-                                                <div className="absolute inset-0 opacity-40">
-                                                    {splashImage ? (
-                                                        <img src={splashImage} alt="" className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
-                                                            <ImageIcon className="w-16 h-16 text-zinc-800" />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div className={`relative z-10 w-full flex flex-col gap-3 max-w-[80%] ${splashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
-                                                    {!omitSplashTitle && (
-                                                        <div className="font-bold uppercase tracking-widest drop-shadow-md leading-tight" style={{ color: colors.titleColor, fontSize: getScaledFontSize(1.4), fontFamily: fontFamily }}>
-                                                            {title || t('newProject.info.gameTitlePlaceholder', 'Título do Jogo')}
-                                                        </div>
-                                                    )}
-                                                    {!omitSplashDescription && (
-                                                        <p className="leading-relaxed drop-shadow-sm line-clamp-3" style={{ color: colors.textColor, fontSize: getScaledFontSize(1.0), fontFamily: fontFamily }}>
-                                                            {description || t('newProject.info.descriptionPlaceholder', 'Uma breve descrição da sua história...')}
-                                                        </p>
-                                                    )}
-                                                    <button
-                                                        className="preview-btn-splash px-5 h-10 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate mt-2"
-                                                        style={{ fontSize: getScaledFontSize(1.0), backgroundColor: colors.splashButtonColor, color: colors.splashButtonTextColor, fontFamily: fontFamily }}
+                            <div className="flex-1 flex flex-col items-center justify-center overflow-hidden">
+                                <div className={`flex flex-col w-full h-full max-h-[500px] ${layoutOrientation === 'horizontal' ? 'max-w-[282px]' : 'max-w-[889px]'}`}>
+                                    <div className="flex-1 flex flex-col items-center justify-start overflow-hidden">
+                                        {/* Custom Preview Logic from UIEditor */}
+                                        {(() => {
+                                            if (previewType === 'vignette') {
+                                                return (
+                                                    <div
+                                                        className={`
+                                                            relative w-full h-full border border-muted-foreground/50 rounded-xl flex flex-col justify-end overflow-hidden p-8 box-border shadow-2xl transition-all duration-300 max-h-[500px]
+                                                            ${layoutOrientation === 'horizontal' ? 'aspect-[9/16]' : 'aspect-video'}
+                                                        `}
+                                                        style={{
+                                                            backgroundColor: gameBackgroundColor,
+                                                            alignItems: splashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
+                                                            textAlign: splashContentAlignment === 'left' ? 'left' : 'right',
+                                                        }}
                                                     >
-                                                        {startButtonText || t('newProject.info.startButtonPlaceholder', 'Começar')}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        )
-                                    } else {
-                                    return (
-                                        <div
-                                            className={`
-                                                rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300 w-full h-full max-h-[500px]
-                                                border-muted-foreground/50
-                                                ${layoutOrientation === 'horizontal' ? 'aspect-[9/16]' : 'aspect-video'}
-                                            `}
-                                            style={{ fontFamily: fontFamily, backgroundColor: gameBackgroundColor }}
-                                        >
-                                            <div className={`flex-1 p-[30px] flex gap-[30px] overflow-hidden relative ${layoutOrientation === 'vertical' ? 'flex-row' : 'flex-col'}`}>
-                                                {/* Image Area */}
-                                                <div
-                                                    className={`
-                                                        relative flex items-center justify-center flex-shrink-0 transition-all duration-300
-                                                        ${layoutOrientation === 'vertical' ? 'w-2/5 h-full' : 'w-full h-1/2 min-h-[50%]'}
-                                                        ${layoutOrder === 'image-first' ? 'order-first' : 'order-last'}
-                                                    `}
-                                                >
-                                                    {(() => {
-                                                        const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame as any, gameBackgroundColor, '#FFFFFF');
-
-                                                        return (
-                                                            <div
-                                                                className={panelClass}
-                                                                style={{
-                                                                    ...panelStyles,
-                                                                    width: '100%',
-                                                                    height: '100%',
-                                                                    display: 'flex',
-                                                                    alignItems: 'center',
-                                                                    justifyContent: 'center'
-                                                                }}
+                                                        <div className="absolute inset-0 opacity-40">
+                                                            {splashImage ? (
+                                                                <img src={splashImage} alt="" className="w-full h-full object-cover" />
+                                                            ) : (
+                                                                <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
+                                                                    <ImageIcon className="w-16 h-16 text-zinc-800" />
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className={`relative z-10 w-full flex flex-col gap-3 max-w-[80%] ${splashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
+                                                            {!omitSplashTitle && (
+                                                                <div className="font-bold uppercase tracking-widest leading-tight" style={{ color: colors.titleColor, fontSize: getScaledFontSize(1.4), fontFamily: fontFamily }}>
+                                                                    {title || t('newProject.info.gameTitlePlaceholder', 'Título do Jogo')}
+                                                                </div>
+                                                            )}
+                                                            {!omitSplashDescription && (
+                                                                <p className="leading-relaxed line-clamp-3" style={{ color: colors.textColor, fontSize: getScaledFontSize(1.0), fontFamily: fontFamily }}>
+                                                                    {description || t('newProject.info.descriptionPlaceholder', 'Uma breve descrição da sua história...')}
+                                                                </p>
+                                                            )}
+                                                            <button
+                                                                className="preview-btn-splash px-5 h-10 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate mt-2"
+                                                                style={{ fontSize: getScaledFontSize(1.0), backgroundColor: colors.splashButtonColor, color: colors.splashButtonTextColor, fontFamily: fontFamily }}
                                                             >
-                                                                <div
-                                                                    style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
-                                                                    className={containerClass}
-                                                                >
-                                                                    <ImageIcon className="w-12 h-12 text-zinc-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50" />
-                                                                    <div className="absolute top-4 left-4 z-20">
+                                                                {startButtonText || t('newProject.info.startButtonPlaceholder', 'Começar')}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                );
+                                            } else {
+                                                return (
+                                                    <div
+                                                        className={`
+                                                            rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300 w-full h-full max-h-[500px]
+                                                            border-muted-foreground/50
+                                                            ${layoutOrientation === 'horizontal' ? 'aspect-[9/16]' : 'aspect-video'}
+                                                        `}
+                                                        style={{ fontFamily: fontFamily, backgroundColor: gameBackgroundColor }}
+                                                    >
+                                                        <div className={`flex-1 p-[30px] flex gap-[30px] overflow-hidden relative ${layoutOrientation === 'vertical' ? 'flex-row' : 'flex-col'}`}>
+                                                            {/* Image Area */}
+                                                            <div
+                                                                className={`
+                                                                    relative flex items-center justify-center flex-shrink-0 transition-all duration-300
+                                                                    ${layoutOrientation === 'vertical' ? 'w-2/5 h-full' : 'w-full h-1/2 min-h-[50%]'}
+                                                                    ${layoutOrder === 'image-first' ? 'order-first' : 'order-last'}
+                                                                `}
+                                                            >
+                                                                {(() => {
+                                                                    const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(imageFrame as any, gameBackgroundColor, '#FFFFFF');
+
+                                                                    return (
                                                                         <div
-                                                                            className="px-2 py-0.5 border uppercase leading-none"
-                                                                            style={{ 
-                                                                                backgroundColor: colors.gameSceneNameOverlayBg, 
-                                                                                color: colors.gameSceneNameOverlayTextColor,
-                                                                                borderColor: `color-mix(in srgb, ${gameBackgroundColor} 80%, ${colors.textColor} 20%)`,
-                                                                                borderWidth: '2px',
-                                                                                fontSize: getScaledFontSize(1.0)
+                                                                            className={panelClass}
+                                                                            style={{
+                                                                                ...panelStyles,
+                                                                                width: '100%',
+                                                                                height: '100%',
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                justifyContent: 'center'
                                                                             }}
                                                                         >
-                                                                            {t('UIEditor.aparencia.sceneName', 'Nome da Cena')}
+                                                                            <div
+                                                                                style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
+                                                                                className={containerClass}
+                                                                            >
+                                                                                <ImageIcon className="w-12 h-12 text-zinc-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50" />
+                                                                                <div className="absolute top-4 left-4 z-20">
+                                                                                    <div
+                                                                                        className="px-2 py-0.5 border uppercase leading-none"
+                                                                                        style={{ 
+                                                                                            backgroundColor: colors.gameSceneNameOverlayBg, 
+                                                                                            color: colors.gameSceneNameOverlayTextColor,
+                                                                                            borderColor: `color-mix(in srgb, ${gameBackgroundColor} 80%, ${colors.textColor} 20%)`,
+                                                                                            borderWidth: '2px',
+                                                                                            fontSize: getScaledFontSize(1.0)
+                                                                                        }}
+                                                                                    >
+                                                                                        {t('UIEditor.aparencia.sceneName', 'Nome da Cena')}
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
                                                                         </div>
+                                                                    );
+                                                                })()}
+                                                            </div>
+
+                                                            {/* Text Area */}
+                                                            <div className="flex-1 flex flex-col overflow-hidden">
+                                                                <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
+                                                                    <p className="leading-relaxed" style={{ color: colors.textColor, fontSize: getScaledFontSize(1.0) }}>
+                                                                        {t('UIEditor.aparencia.sampleDesc1', 'Esta é uma descrição de exemplo para a cena. O texto flui conforme as')}
+                                                                        <span className="preview-interactive-text" style={{ color: colors.titleColor, fontWeight: 'bold', marginLeft: '4px', marginRight: '4px' }}>{t('UIEditor.aparencia.sampleDescHighlight', 'CONFIGURAÇÕES')}</span>
+                                                                        {t('UIEditor.aparencia.sampleDesc2', 'escolhidas.')}
+                                                                    </p>
+                                                                    <p className="mt-4 opacity-70" style={{ color: colors.textColor, fontFamily: fontFamily, fontSize: getScaledFontSize(1.0) }}>
+                                                                        {'>'} {t('UIEditor.aparencia.sampleCommand', 'VERBO DE EXEMPLO')}
+                                                                    </p>
+                                                                </div>
+
+                                                                {/* Nav + Input Column */}
+                                                                <div className="flex-shrink-0 space-y-2 pt-2">
+                                                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                                                        {enableInventory && (
+                                                                            <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: colors.systemButtonBorderColor, color: colors.systemButtonTextColor, backgroundColor: colors.systemButtonColor }}>
+                                                                                {t('newProject.features.inventory', 'Inventário')}
+                                                                            </button>
+                                                                        )}
+                                                                        {enableDiary && (
+                                                                            <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: colors.systemButtonBorderColor, color: colors.systemButtonTextColor, backgroundColor: colors.systemButtonColor }}>
+                                                                                {t('newProject.features.diary', 'Diário')}
+                                                                            </button>
+                                                                        )}
+                                                                        {enableTrackers && (
+                                                                            <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: colors.systemButtonBorderColor, color: colors.systemButtonTextColor, backgroundColor: colors.systemButtonColor }}>
+                                                                                {t('newProject.features.trackers', 'Status')}
+                                                                            </button>
+                                                                        )}
                                                                     </div>
+
+                                                                    {interactionType === 'parser' ? (
+                                                                        <div className="flex gap-1.5 pt-1.5">
+                                                                            <div 
+                                                                                className="flex-1 rounded-md h-8 flex items-center px-2 border-2 transition-all duration-200 outline-none cursor-text" 
+                                                                                style={{ 
+                                                                                    backgroundColor: `color-mix(in srgb, ${gameBackgroundColor} 98%, #000 2%)`,
+                                                                                    borderColor: isInputFocused ? colors.focusColor : colors.systemButtonBorderColor,
+                                                                                    boxShadow: isInputFocused ? `0 0 0 1px ${colors.focusColor}40` : 'none'
+                                                                                }}
+                                                                                onClick={() => setIsInputFocused(!isInputFocused)}
+                                                                            >
+                                                                                <span className="font-mono truncate" style={{ fontSize: getScaledFontSize(1.0), fontFamily: fontFamily, color: `color-mix(in srgb, ${colors.textColor} 70%, ${gameBackgroundColor} 30%)` }}>{t('UIEditor.textos.commandInputValue', 'o que você faz?')}</span>
+                                                                            </div>
+                                                                            <button
+                                                                                className="preview-btn-action px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
+                                                                                style={{ fontSize: getScaledFontSize(1.0), backgroundColor: colors.actionButtonColor, color: colors.actionButtonTextColor, fontFamily: fontFamily }}
+                                                                            >
+                                                                                {t('UIEditor.aparencia.action', 'AÇÃO')}
+                                                                            </button>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="grid grid-cols-2 gap-2 pt-1.5 animate-in fade-in slide-in-from-bottom-1">
+                                                                            {previewStandardScene.choices.map((choice) => (
+                                                                                <button
+                                                                                    key={choice.id}
+                                                                                    className="preview-btn-action px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-md flex items-center justify-center truncate"
+                                                                                    style={{ 
+                                                                                        backgroundColor: colors.actionButtonColor, 
+                                                                                        color: colors.actionButtonTextColor, 
+                                                                                        fontFamily: fontFamily,
+                                                                                        fontSize: getScaledFontSize(1.0),
+                                                                                        border: `1px solid ${colors.systemButtonBorderColor}40`
+                                                                                    }}
+                                                                                >
+                                                                                    {choice.label}
+                                                                                </button>
+                                                                            ))}
+                                                                        </div>
+                                                                    )}
                                                                 </div>
                                                             </div>
-                                                        );
-                                                    })()}
-                                                </div>
-
-                                                {/* Text Area */}
-                                                <div className="flex-1 flex flex-col overflow-hidden">
-                                                    <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
-                                                        <p className="leading-relaxed" style={{ color: colors.textColor, fontSize: getScaledFontSize(1.0) }}>
-                                                            {t('UIEditor.aparencia.sampleDesc1', 'Esta é uma descrição de exemplo para a cena. O texto flui conforme as')}
-                                                            <span className="preview-interactive-text" style={{ color: colors.titleColor, fontWeight: 'bold', marginLeft: '4px', marginRight: '4px' }}>{t('UIEditor.aparencia.sampleDescHighlight', 'CONFIGURAÇÕES')}</span>
-                                                            {t('UIEditor.aparencia.sampleDesc2', 'escolhidas.')}
-                                                        </p>
-                                                        <p className="mt-4 opacity-70" style={{ color: colors.textColor, fontFamily: fontFamily, fontSize: getScaledFontSize(1.0) }}>
-                                                            {'>'} {t('UIEditor.aparencia.sampleCommand', 'VERBO DE EXEMPLO')}
-                                                        </p>
-                                                    </div>
-
-                                                    {/* Nav + Input Column */}
-                                                    <div className="flex-shrink-0 space-y-2 pt-2">
-                                                        <div className="flex items-center gap-1.5 flex-wrap">
-                                                            {enableInventory && (
-                                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: colors.systemButtonBorderColor, color: colors.systemButtonTextColor, backgroundColor: colors.systemButtonColor }}>
-                                                                    {t('newProject.features.inventory', 'Inventário')}
-                                                                </button>
-                                                            )}
-                                                            {enableDiary && (
-                                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: colors.systemButtonBorderColor, color: colors.systemButtonTextColor, backgroundColor: colors.systemButtonColor }}>
-                                                                    {t('newProject.features.diary', 'Diário')}
-                                                                </button>
-                                                            )}
-                                                            {enableTrackers && (
-                                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: colors.systemButtonBorderColor, color: colors.systemButtonTextColor, backgroundColor: colors.systemButtonColor }}>
-                                                                    {t('newProject.features.trackers', 'Status')}
-                                                                </button>
-                                                            )}
                                                         </div>
 
-                                                        {interactionType === 'parser' ? (
-                                                            <div className="flex gap-1.5 pt-1.5">
-                                                                <div 
-                                                                    className="flex-1 rounded-md h-8 flex items-center px-2 border-2 transition-all duration-200 outline-none cursor-text" 
-                                                                    style={{ 
-                                                                        backgroundColor: `color-mix(in srgb, ${gameBackgroundColor} 98%, #000 2%)`,
-                                                                        borderColor: isInputFocused ? colors.focusColor : colors.systemButtonBorderColor,
-                                                                        boxShadow: isInputFocused ? `0 0 0 1px ${colors.focusColor}40` : 'none'
-                                                                    }}
-                                                                    onClick={() => setIsInputFocused(!isInputFocused)}
-                                                                >
-                                                                    <span className="font-mono truncate" style={{ fontSize: getScaledFontSize(1.0), fontFamily: fontFamily, color: `color-mix(in srgb, ${colors.textColor} 70%, ${gameBackgroundColor} 30%)` }}>{t('UIEditor.textos.commandInputValue', 'o que você faz?')}</span>
-                                                                </div>
-                                                                <button
-                                                                    className="preview-btn-action px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
-                                                                    style={{ fontSize: getScaledFontSize(1.0), backgroundColor: colors.actionButtonColor, color: colors.actionButtonTextColor, fontFamily: fontFamily }}
-                                                                >
-                                                                    {t('UIEditor.aparencia.action', 'AÇÃO')}
-                                                                </button>
-                                                            </div>
-                                                        ) : (
-                                                            <div className="grid grid-cols-2 gap-2 pt-1.5 animate-in fade-in slide-in-from-bottom-1">
-                                                                {previewStandardScene.choices.map((choice) => (
-                                                                    <button
-                                                                        key={choice.id}
-                                                                        className="preview-btn-action px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-md flex items-center justify-center truncate"
-                                                                        style={{ 
-                                                                            backgroundColor: colors.actionButtonColor, 
-                                                                            color: colors.actionButtonTextColor, 
-                                                                            fontFamily: fontFamily,
-                                                                            fontSize: getScaledFontSize(1.0),
-                                                                            border: `1px solid ${colors.systemButtonBorderColor}40`
-                                                                        }}
-                                                                    >
-                                                                        {choice.label}
-                                                                    </button>
+                                                        {enableChances && (
+                                                            <div className="absolute top-6 right-6 flex gap-1 z-20">
+                                                                {[1, 2, 3].map(i => (
+                                                                    <Heart key={i} className="w-4 h-4 fill-current shadow-none drop-shadow-none" style={{ color: colors.chanceIconColor }} />
                                                                 ))}
                                                             </div>
                                                         )}
                                                     </div>
-                                                </div>
-                                            </div>
+                                                );
+                                            }
+                                        })()}
+                                    </div>
 
-                                            {enableChances && (
-                                                <div className="absolute top-6 right-6 flex gap-1 z-20">
-                                                    {[1, 2, 3].map(i => (
-                                                        <Heart key={i} className="w-4 h-4 fill-current" style={{ color: colors.chanceIconColor }} />
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                }
-                                })()}
+                                    {/* Footer buttons moved to right column - Aligned to bottom-right of preview */}
+                                    <div className="w-full flex justify-end gap-3 pt-6 pb-2">
+                                        <button
+                                            onClick={onClose}
+                                            className="px-6 py-2.5 text-xs font-bold text-zinc-500 hover:text-white transition-colors"
+                                        >
+                                            {t('common.cancel', 'Cancelar')}
+                                        </button>
+
+                                        {tab === 'system' ? (
+                                            <button
+                                                onClick={handleCreate}
+                                                disabled={!title}
+                                                className="px-8 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all text-xs disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20 flex items-center gap-2"
+                                            >
+                                                <Play className="w-3 h-3 fill-current" />
+                                                {t('newProject.createBtn', 'Criar Projeto')}
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={handleNext}
+                                                className="px-8 py-2.5 bg-zinc-100 text-zinc-900 font-bold rounded-xl hover:bg-white transition-all text-xs shadow-lg flex items-center gap-2"
+                                            >
+                                                {t('newProject.nextBtn', 'Avançar')}
+                                                <ArrowRight className="w-3 h-3" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
                             </div>
-
-                    {/* Footer buttons moved to right column */}
-                        <div className="flex justify-end gap-3 p-6 pt-4 bg-zinc-950/20 backdrop-blur-sm z-50">
-                            <button
-                                onClick={onClose}
-                                className="px-6 py-2.5 text-xs font-bold text-zinc-400 hover:text-white transition-colors"
-                            >
-                                {t('common.cancel', 'Cancelar')}
-                            </button>
-
-                            {tab === 'system' ? (
-                                <button
-                                    onClick={handleCreate}
-                                    disabled={!title}
-                                    className="px-8 py-2.5 bg-primary text-primary-foreground font-bold rounded-xl hover:bg-primary/90 transition-all text-xs disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary/20 flex items-center gap-2"
-                                >
-                                    <Play className="w-3 h-3 fill-current" />
-                                    {t('newProject.createBtn', 'Criar Projeto')}
-                                </button>
-                            ) : (
-                                <button
-                                    onClick={handleNext}
-                                    className="px-8 py-2.5 bg-zinc-100 text-zinc-900 font-bold rounded-xl hover:bg-white transition-all text-xs shadow-lg flex items-center gap-2"
-                                >
-                                    {t('newProject.nextBtn', 'Avançar')}
-                                    <ArrowRight className="w-3 h-3" />
-                                </button>
-                            )}
                         </div>
                     </div>
                 </div>

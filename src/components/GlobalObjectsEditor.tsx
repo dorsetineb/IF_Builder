@@ -159,6 +159,14 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         setDeleteModal({ isOpen: false, objectId: null });
     };
 
+    // Standardized deletion handler for Global Objects
+    const handleDeleteObject = (id: string) => {
+        const obj = globalObjects[id];
+        if (!obj) return;
+
+        setDeleteModal({ isOpen: true, objectId: id });
+    };
+
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0] && selectedObjectId) {
             const reader = new FileReader();
@@ -304,8 +312,8 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                             </button>
                         </div>
                     </div>
-                <div className="absolute left-0 right-0 -bottom-2 h-2 bg-gradient-to-b from-background to-transparent pointer-events-none" />
-            </div>
+                    <div className="absolute left-0 right-0 -bottom-2 h-2 bg-gradient-to-b from-background to-transparent pointer-events-none" />
+                </div>
 
             <div className="mt-4">
                 <div key={selectedObject?.id || 'empty'} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -394,6 +402,17 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                             />
                                         </div>
                                     </div>
+
+                                    {/* Action buttons (Delete) */}
+                                    <div className="pt-6 border-t border-muted-foreground/30 flex justify-end">
+                                        <button
+                                            onClick={() => handleDeleteObject(selectedObject.id)}
+                                            className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-all text-[10px] font-bold uppercase tracking-widest border border-red-500/20"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                            {t('globalObjectsEditor.deleteObjectTooltip', 'Excluir Objeto')}
+                                        </button>
+                                    </div>
                                 </div>
 
                                 {/* Usages Card */}
@@ -451,7 +470,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                         <button
                                                             onClick={(e) => { e.preventDefault(); handleObjectChange(selectedObject.id, 'image', ''); }}
                                                             className="flex flex-col items-center gap-2 text-white hover:text-red-400 transition-colors"
-                                                            title={t('editor.delete', 'Excluir')}
+                                                            title={t('common.delete', 'Excluir')}
                                                         >
                                                             <div className="p-2 bg-white/10 rounded-full hover:bg-red-500/20 transition-all">
                                                                 <Trash2 className="w-5 h-5" />
@@ -508,9 +527,9 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
             <ConfirmationModal
                 isOpen={deleteModal.isOpen}
                 title={t('globalObjectsEditor.deleteTitle', 'Excluir Objeto')}
-                message={t('globalObjectsEditor.deleteConfirm', 'Tem certeza?\\n\\nIsso excluirá o objeto de todo o jogo.')}
-                confirmText={t('editor.delete', 'Excluir')}
-                cancelText={t('editor.cancelLeave', 'Cancelar')}
+                message={`${t('common.deleteConfirm', 'Tem certeza?')}\n\n${t('globalObjectsEditor.deleteDesc', 'Isso excluirá o objeto de todo o jogo.')}`}
+                confirmText={t('common.delete', 'Excluir')}
+                cancelText={t('common.cancel', 'Cancelar')}
                 onConfirm={confirmDelete}
                 onCancel={() => setDeleteModal({ isOpen: false, objectId: null })}
                 isDanger={true}

@@ -33,7 +33,7 @@ interface UIEditorProps {
     splashButtonTextColor: string;
     actionButtonColor: string;
     actionButtonTextColor: string;
-    actionButtonHoverColor: string;
+    actionButtonHoverColor?: string;
     focusColor: string;
     chanceIconColor: string;
     gameFontFamily: string;
@@ -47,18 +47,24 @@ interface UIEditorProps {
     frameTradingCardColor: string;
     frameRoundedTopColor: string;
 
-    systemButtonColor: string;
-    systemButtonTextColor: string;
-    systemButtonBorderColor: string;
-    systemButtonHoverColor: string;
+    systemButtonColor?: string;
+    systemButtonTextColor?: string;
+    systemButtonBorderColor?: string;
+    systemButtonHoverColor?: string;
 
     gameSceneNameOverlayBg: string;
     gameSceneNameOverlayTextColor: string;
     gameFrameColor: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onUpdate: (field: keyof GameData, value: any, skipDirty?: boolean) => void;
+    onUpdate: (field: any, value?: any, skipDirty?: boolean) => void;
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
+    setConfirmationModal: (modal: any) => void;
+    closeConfirmationModal: () => void;
+    enableInventory: boolean;
+    enableChances: boolean;
+    enableTrackers: boolean;
+
     gameShowTrackersUI?: boolean;
     gameShowSystemButton?: boolean;
     gameInteractionType?: 'parser' | 'choice';
@@ -103,12 +109,9 @@ interface UIEditorProps {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onAnnotate?: (annotation: any) => void;
     // New System Props
-    enableTrackers?: boolean;
-    enableInventory?: boolean;
     enableSuggestions?: boolean;
     enableDiary?: boolean;
     enableFixedVerbs?: boolean;
-    enableChances?: boolean;
     enableImages?: boolean;
     enableTextControl?: boolean;
     enableRetrospective?: boolean;

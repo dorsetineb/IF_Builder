@@ -33,6 +33,8 @@ interface TrackersEditorProps {
     onSetDirty: (isDirty: boolean) => void;
     onSelectScene: (sceneId: string, tab?: string) => void;
     allObjects: Record<string, GameObject>;
+    setConfirmationModal: (modal: any) => void;
+    closeConfirmationModal: () => void;
 }
 
 const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
@@ -43,10 +45,18 @@ const generateUniqueId = (prefix: 'trk', existingIds: string[]): string => {
     return id;
 };
 
-
-
-
-const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrackers, allScenes, allTrackerIds, isDirty, onSetDirty, onSelectScene, allObjects }) => {
+const TrackersEditor: React.FC<TrackersEditorProps> = ({ 
+    trackers, 
+    onUpdateTrackers, 
+    allScenes, 
+    allTrackerIds, 
+    isDirty, 
+    onSetDirty, 
+    onSelectScene, 
+    allObjects,
+    setConfirmationModal,
+    closeConfirmationModal
+}) => {
     const sortedTrackers = useMemo(() => {
         return [...trackers].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     }, [trackers]);
@@ -62,13 +72,16 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
 
     useEffect(() => {
         setLocalTrackers(sortedTrackers);
-        // If selected tracker was deleted or doesn't exist, select first or null
-        if (selectedTrackerId && !sortedTrackers.find(t => t.id === selectedTrackerId)) {
-            setSelectedTrackerId(sortedTrackers.length > 0 ? sortedTrackers[0].id : null);
-        } else if (!selectedTrackerId && sortedTrackers.length > 0) {
-            setSelectedTrackerId(sortedTrackers[0].id);
-        }
     }, [sortedTrackers]);
+
+    useEffect(() => {
+        // If selected tracker was deleted or doesn't exist, select first or null
+        if (selectedTrackerId && !localTrackers.find(t => t.id === selectedTrackerId)) {
+            setSelectedTrackerId(localTrackers.length > 0 ? localTrackers[0].id : null);
+        } else if (!selectedTrackerId && localTrackers.length > 0) {
+            setSelectedTrackerId(localTrackers[0].id);
+        }
+    }, [localTrackers, selectedTrackerId]);
 
     useEffect(() => {
         setIsIconPickerOpen(false);
@@ -92,18 +105,29 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
         const updatedTrackers = [...localTrackers, newTracker];
         setLocalTrackers(updatedTrackers);
         setSelectedTrackerId(newTracker.id);
-
-        // Immediate save for creation to simplify ID management, or follow "Save Changes" pattern?
-        // Pattern here seems to be "Save Changes" for everything.
     };
 
-    const handleRemoveTracker = (id: string) => {
-        if (window.confirm(t('trackersEditor.deleteConfirm', 'Tem certeza?\\n\\nIsso excluirá o rastreador. Interações que o usam podem quebrar.'))) {
-            setLocalTrackers(localTrackers.filter(t => t.id !== id));
-            if (selectedTrackerId === id) {
-                setSelectedTrackerId(null);
-            }
-        }
+    const handleDelete = (id: string) => {
+        const tracker = localTrackers.find(t => t.id === id);
+        if (!tracker) return;
+
+        setConfirmationModal({
+            isOpen: true,
+            title: t('trackersEditor.deleteTitle', 'Excluir Rastreador'),
+            message: `${t('common.deleteConfirm', 'Tem certeza?')}\n\n${t('trackersEditor.deleteDesc', 'Isso excluirá o rastreador. Interações que o usam podem quebrar.')}`,
+            confirmText: t('common.delete', 'Excluir'),
+            cancelText: t('common.cancel', 'Cancelar'),
+            onConfirm: () => {
+                const updatedTrackers = localTrackers.filter(t => t.id !== id);
+                setLocalTrackers(updatedTrackers);
+                if (selectedTrackerId === id) {
+                    setSelectedTrackerId(updatedTrackers.length > 0 ? updatedTrackers[0].id : null);
+                }
+                closeConfirmationModal();
+            },
+            isDanger: true,
+            onCancel: closeConfirmationModal
+        });
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -171,14 +195,6 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
         return groups.sort((a, b) => (a.scene.name || '').localeCompare(b.scene.name || ''));
     }, [usages]);
 
-    // Determine consequence scene name for display
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const consequenceSceneName = useMemo(() => {
-        if (!selectedTracker?.consequenceSceneId) return null;
-        return allScenes.find(s => s.id === selectedTracker.consequenceSceneId)?.name || selectedTracker.consequenceSceneId;
-    }, [selectedTracker?.consequenceSceneId, allScenes]);
-
-
     return (
         <div className="flex w-full h-full overflow-hidden bg-background" onClick={() => isIconPickerOpen && setIsIconPickerOpen(false)}>
             {/* LEFT SIDEBAR (Standardized Layout) */}
@@ -234,7 +250,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                handleRemoveTracker(tracker.id);
+                                                handleDelete(tracker.id);
                                             }}
                                             className={`absolute top-0 right-0 h-full w-12 flex items-center justify-center text-white transform translate-x-full group-hover:translate-x-0 focus:translate-x-0 transition-transform duration-200 ease-in-out z-20 cursor-pointer ${
                                                 selectedTrackerId === tracker.id
@@ -505,7 +521,16 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({ trackers, onUpdateTrack
                                                 </div>
                                             </div>
 
-
+                                            {/* Action buttons (Delete) */}
+                                            <div className="pt-6 border-t border-border/50 flex justify-end">
+                                                <button
+                                                    onClick={() => handleDelete(selectedTracker.id)}
+                                                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-all text-[10px] font-bold uppercase tracking-widest border border-red-500/20"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                    {t('trackersEditor.deleteBtn', 'Excluir Rastreador')}
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
 
