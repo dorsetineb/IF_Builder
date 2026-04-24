@@ -82,7 +82,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
         <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden bg-zinc-950">
             <div className="absolute inset-0 z-0">
                 <DitherShader
-                    src="/background.png"
+                    src="/background.webp"
                     gridSize={2}
                     ditherMode="bayer"
                     colorMode="duotone"

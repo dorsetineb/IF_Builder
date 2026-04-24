@@ -252,7 +252,7 @@ export function Auth() {
             {/* Global Dither Background */}
             <div className="absolute inset-0 z-0 bg-background overflow-hidden pointer-events-none">
                 <DitherShader
-                    src="/background.png"
+                    src="/background.webp"
                     gridSize={2}
                     ditherMode="bayer"
                     colorMode="duotone"

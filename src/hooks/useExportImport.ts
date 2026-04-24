@@ -418,7 +418,7 @@ DATE:        ${exportDate.toLocaleString()}
     const zipContent = await zip.generateAsync({
       type: 'blob',
       compression: 'DEFLATE',
-      compressionOptions: { level: 1 },
+      compressionOptions: { level: 6 },
     });
     const finalBlob = new Blob([zipContent], { type: 'application/zip' });
     const link = document.createElement('a');

@@ -30,7 +30,7 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
             {/* Background Dither */}
             <div className="absolute inset-0 z-0 bg-neutral-950">
                 <DitherShader
-                    src="/background.png"
+                    src="/background.webp"
                     gridSize={2}
                     ditherMode="bayer"
                     colorMode="duotone"

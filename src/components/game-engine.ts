@@ -830,10 +830,19 @@ document.addEventListener('DOMContentLoaded', () => {
         // Auto-start game, bypassing splash screen
         startGame();
         endingRestartButtons.forEach(btn => btn.addEventListener('click', () => {
-             positiveEndingScreen.classList.add('hidden'); 
-             negativeEndingScreen.classList.add('hidden'); 
-             gameContainer.classList.remove('fade-out');
+             // Prepare the game behind the ending screen
              startGame();
+             gameContainer.classList.remove('hidden');
+             gameContainer.classList.remove('fade-out');
+
+             positiveEndingScreen.classList.add('fade-out');
+             negativeEndingScreen.classList.add('fade-out');
+             setTimeout(() => {
+                 positiveEndingScreen.classList.add('hidden'); 
+                 negativeEndingScreen.classList.add('hidden');
+                 positiveEndingScreen.classList.remove('fade-out');
+                 negativeEndingScreen.classList.remove('fade-out');
+             }, 1000);
         }));
         submitVerb.addEventListener('click', handleInput);
         verbInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleInput(); });
@@ -893,6 +902,9 @@ document.addEventListener('DOMContentLoaded', () => {
         isGameEnded = false;
         gameStartTime = Date.now();
         gameEndTime = null;
+
+        // Hide retrospective button on restart
+        if (vignetteDiaryButton) vignetteDiaryButton.classList.add('hidden');
         (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
         
         // Fix Audio Persistence: If the starting scene has no specific music.
@@ -1044,12 +1056,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const showVignetteScreen = (scene) => {
-        // Hide game container and show vignette screen
-        gameContainer.classList.add('hidden');
+        // Hide retrospective button by default, only show for conclusions
+        if (vignetteDiaryButton) vignetteDiaryButton.classList.add('hidden');
 
-        // NEW: If it's a conclusion, activate ending UI immediately to set end time and show diary button
+        // If it's a conclusion vignette, set the end state flags manually
+        // We avoid calling activateEndingUI here because that would swap action bars 
+        // in the game container, causing buttons to "pop in" during the cross-fade.
         if (scene.vignetteType === 'conclusion') {
-             activateEndingUI('win');
+             isGameEnded = 'win';
+             gameEndTime = Date.now();
+             
+             // Show the diary button on the vignette screen if enabled
+             if (vignetteDiaryButton && gameData.enableRetrospective !== false) {
+                 vignetteDiaryButton.classList.remove('hidden');
+             }
         }
         
         // Set vignette content
@@ -1090,44 +1110,77 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Handle button click
         const handleVignetteClick = () => {
-            vignetteContinueButton.removeEventListener('click', handleVignetteClick);
             if (typeof rainEffect !== 'undefined') rainEffect.stop();
             
             if (scene.vignetteType === 'conclusion') {
-                // Restart game: Reset music FIRST, hide vignette, show splash
+                // Restart game
                 playBgm(gameData.gameBackgroundMusic || "");
-                vignetteScreen.classList.add('hidden');
-                gameContainer.classList.remove('hidden');
                 startGame();
-
-            } else if (scene.vignetteNextSceneId) {
-                // Go to next scene: Load it FIRST (behind the vignette), then fade out
-                if (gameData.cenas[scene.vignetteNextSceneId]) {
+                
+                // CRITICAL FIX: If the game starts with a vignette (opening), 
+                // we must NOT fade out the vignette screen, or it will be skipped.
+                const nextScene = gameData.cenas[currentSceneId];
+                const isNextVignette = nextScene && nextScene.vignetteType && nextScene.vignetteType !== 'none';
+                
+                if (!isNextVignette) {
+                    // Only reveal game container if we are transitioning to a narrative scene
                     gameContainer.classList.remove('hidden');
-                    gameContainer.classList.add('ready'); // Ensure gameContainer visually appears
-                    loadScene(scene.vignetteNextSceneId, false);
-                    
+                    gameContainer.classList.remove('fade-out');
+
                     vignetteScreen.classList.add('fade-out');
                     setTimeout(() => {
                         vignetteScreen.classList.add('hidden');
                         vignetteScreen.classList.remove('fade-out');
                     }, 1000);
+                }
+                return;
+
+            } else if (scene.vignetteNextSceneId) {
+                const nextSceneId = scene.vignetteNextSceneId;
+                const nextScene = gameData.cenas[nextSceneId];
+                
+                if (nextScene) {
+                    const isNextVignette = nextScene.vignetteType && nextScene.vignetteType !== 'none';
+                    
+                    if (isNextVignette) {
+                        // Vignette to Vignette: Just load the next one instantly
+                        // The showVignetteScreen call inside loadScene will update the content
+                        loadScene(nextSceneId, false);
+                    } else {
+                        // Vignette to Narrative: Load narrative behind, then fade out vignette
+                        loadScene(nextSceneId, false);
+                        gameContainer.classList.remove('hidden');
+                        gameContainer.classList.remove('fade-out');
+                        
+                        vignetteScreen.classList.add('fade-out');
+                        setTimeout(() => {
+                            vignetteScreen.classList.add('hidden');
+                            vignetteScreen.classList.remove('fade-out');
+                        }, 1000);
+                    }
                 } else {
-                    // Safety fallback: If scene doesn't exist, just hide vignette to show game
-                    console.warn('Vignette target scene not found:', scene.vignetteNextSceneId);
-                    vignetteScreen.classList.add('hidden');
-                    gameContainer.classList.remove('hidden');
-                    gameContainer.classList.add('ready');
+                    console.warn('Vignette target scene not found:', nextSceneId);
+                    vignetteScreen.classList.add('fade-out');
+                    setTimeout(() => {
+                        vignetteScreen.classList.add('hidden');
+                        vignetteScreen.classList.remove('fade-out');
+                        gameContainer.classList.remove('hidden');
+                        gameContainer.classList.remove('fade-out');
+                    }, 1000);
                 }
             } else {
-                // No next scene defined, just hide vignette and show game
-                vignetteScreen.classList.add('hidden');
+                // No next scene defined: Fade out vignette to show current game container
                 gameContainer.classList.remove('hidden');
-                gameContainer.classList.add('ready'); // Ensure gameContainer visually appears
+                gameContainer.classList.remove('fade-out');
+                vignetteScreen.classList.add('fade-out');
+                setTimeout(() => {
+                    vignetteScreen.classList.add('hidden');
+                    vignetteScreen.classList.remove('fade-out');
+                }, 1000);
             }
         };
         
-        vignetteContinueButton.addEventListener('click', handleVignetteClick);
+        vignetteContinueButton.onclick = handleVignetteClick;
 
         // Credits rendering for conclusion vignettes
         const existingCredits = vignetteScreen.querySelector('.vignette-credits');
@@ -1341,7 +1394,28 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Check if this is a vignette scene
         if (scene.vignetteType && scene.vignetteType !== 'none') {
-            showVignetteScreen(scene);
+            if (transition) {
+                // Prepare vignette screen with fade-out before making it visible
+                vignetteScreen.classList.add('fade-out');
+                showVignetteScreen(scene);
+                
+                // Cross-fade: fade out game and fade in vignette
+                gameContainer.classList.add('fade-out');
+                
+                // Trigger fade-in for vignette
+                requestAnimationFrame(() => {
+                    vignetteScreen.classList.remove('fade-out');
+                });
+
+                setTimeout(() => {
+                    gameContainer.classList.add('hidden');
+                    gameContainer.classList.remove('fade-out');
+                }, 1000);
+            } else {
+                showVignetteScreen(scene);
+                // If no transition, hide game container immediately
+                gameContainer.classList.add('hidden');
+            }
             autoSaveGame();
             return;
         }
