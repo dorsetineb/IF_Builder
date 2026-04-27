@@ -289,6 +289,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             .replace(/__SYSTEM_BUTTON_TEXT_COLOR__/g, gameData.gameSystemButtonTextColor || gameData.gameTextColor || '#c9d1d9')
             .replace(/__SYSTEM_BUTTON_BORDER_COLOR__/g, gameData.gameSystemButtonBorderColor || (gameData.gameTextColor ? (gameData.gameTextColor + '40') : '#c9d1d940'))
             .replace(/__SYSTEM_BUTTON_HOVER_COLOR__/g, gameData.gameSystemButtonHoverColor || gameData.gameFocusColor || '#58a6ff')
+            .replace(/__SYSTEM_BUTTON_HOVER_TEXT_COLOR__/g, gameData.gameSystemButtonHoverTextColor || gameData.gameSystemButtonTextColor || gameData.gameTextColor || '#c9d1d9')
             .replace(/__FRAME_BOOK_COLOR__/g, gameData.frameBookColor || gameData.gameFrameColor || '#FFFFFF')
             .replace(/__FRAME_TRADING_CARD_COLOR__/g, gameData.frameTradingCardColor || gameData.gameFrameColor || '#FFFFFF')
             .replace(/__FRAME_ROUNDED_TOP_COLOR__/g, gameData.frameRoundedTopColor || gameData.gameFrameColor || '#FFFFFF')

@@ -181,6 +181,7 @@ export interface GameData {
   gameSystemButtonTextColor?: string;
   gameSystemButtonBorderColor?: string;
   gameSystemButtonHoverColor?: string;
+  gameSystemButtonHoverTextColor?: string;
   gameSystemEnabled?: 'none' | 'chances' | 'trackers'; // Legacy, keep for migration
   enableTrackers?: boolean;
   enableInventory?: boolean;

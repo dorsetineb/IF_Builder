@@ -65,6 +65,8 @@ interface AppearanceTabProps {
     setLocalSystemButtonBorderColor: (val: string) => void;
     localSystemButtonHoverColor: string;
     setLocalSystemButtonHoverColor: (val: string) => void;
+    localSystemButtonHoverTextColor: string;
+    setLocalSystemButtonHoverTextColor: (val: string) => void;
     
     localGameSceneNameOverlayBg: string;
     setLocalGameSceneNameOverlayBg: (val: string) => void;
@@ -142,6 +144,8 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     setLocalSystemButtonBorderColor,
     localSystemButtonHoverColor,
     setLocalSystemButtonHoverColor,
+    localSystemButtonHoverTextColor,
+    setLocalSystemButtonHoverTextColor,
     localGameSceneNameOverlayBg,
     setLocalGameSceneNameOverlayBg,
     localGameSceneNameOverlayTextColor,
@@ -186,7 +190,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '50ms' }}>
                     <div className="flex items-center w-full text-left">
                         <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
-                            <Split className="w-4 h-4 rotate-90" /> {t('UIEditor.aparencia.estrutura', 'Layout das Cenas')}
+                            {t('UIEditor.aparencia.estrutura', 'Layout das Cenas')}
                         </h3>
                     </div>
 
@@ -365,7 +369,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
                     <div className="flex items-center w-full text-left">
                         <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
-                            <Palette className="w-4 h-4" /> {t('UIEditor.aparencia.styleTheme')}
+                            {t('UIEditor.aparencia.styleTheme')}
                         </h3>
                     </div>
 
@@ -402,7 +406,6 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                         {/* GRUPO 1: ATMOSFERA DO JOGO */}
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
-                                                <Sun className="w-3 h-3 text-primary" />
                                                 <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.atmosphere', 'Atmosfera do Jogo')}</h4>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
@@ -444,11 +447,10 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                             </div>
                                         </div>
 
-                                        {/* GRUPO 2: IDENTIDADE DE CENA */}
+                                        {/* GRUPO 2: NOME DA CENA */}
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
-                                                <ImageIcon className="w-3 h-3 text-primary" />
-                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.sceneIdentity', 'Identidade de Cena')}</h4>
+                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.sceneIdentity', 'Nome da Cena')}</h4>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                 <ColorInput label={t('UIEditor.aparencia.sceneNameBg', 'Fundo (Nome da Cena)')} id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
@@ -463,11 +465,10 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                             </div>
                                         </div>
 
-                                        {/* GRUPO 3: CONTROLES DE VINHETA */}
+                                        {/* GRUPO 3: INTERFACE DAS VINHETAS */}
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
-                                                <ArrowRight className="w-3 h-3 text-primary" />
-                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.vignetteControls', 'Controles de Vinheta')}</h4>
+                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.vignetteControls', 'Interface das Vinhetas')}</h4>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                 <ColorInput label={t('UIEditor.aparencia.splashButton', 'Fundo do Botão')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
@@ -476,30 +477,20 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                             </div>
                                         </div>
 
-                                        {/* GRUPO 4: CONTROLES DE AÇÃO */}
+                                        {/* GRUPO 5: INTERFACE DAS CENAS */}
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
-                                                <Command className="w-3 h-3 text-primary" />
-                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.actionControls', 'Controles de Ação (Gameplay)')}</h4>
+                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.systemInterface', 'Interface das Cenas')}</h4>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                 <ColorInput label={t('UIEditor.aparencia.actionButton', 'Fundo do Botão')} id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.actionButtonTextColor', 'Texto do Botão')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.actionButtonHover', 'Fundo no Hover')} id="actionButtonHoverColor" value={localActionButtonHoverColor} onChange={setLocalActionButtonHoverColor} placeholder="#FFFFFF" />
-                                            </div>
-                                        </div>
-
-                                        {/* GRUPO 5: INTERFACE DO SISTEMA */}
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
-                                                <Package className="w-3 h-3 text-primary" />
-                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.systemInterface', 'Interface do Sistema (Menus)')}</h4>
-                                            </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                 <ColorInput label={t('UIEditor.aparencia.systemButton', 'Fundo dos Botões')} id="systemButtonColor" value={localSystemButtonColor} onChange={setLocalSystemButtonColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.systemButtonTextColor', 'Texto dos Botões')} id="systemButtonTextColor" value={localSystemButtonTextColor} onChange={setLocalSystemButtonTextColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.systemButtonBorder', 'Cor da Borda')} id="systemButtonBorderColor" value={localSystemButtonBorderColor} onChange={setLocalSystemButtonBorderColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.systemButtonHover', 'Fundo no Hover')} id="systemButtonHoverColor" value={localSystemButtonHoverColor} onChange={setLocalSystemButtonHoverColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.systemButtonHoverTextColor', 'Texto no Hover')} id="systemButtonHoverTextColor" value={localSystemButtonHoverTextColor} onChange={setLocalSystemButtonHoverTextColor} placeholder="#FFFFFF" />
                                             </div>
                                         </div>
                                     </div>
@@ -544,6 +535,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                             .preview-btn-system { transition: all 0.2s ease; }
                             .preview-btn-system:hover { 
                                 background-color: ${localSystemButtonHoverColor} !important;
+                                color: ${localSystemButtonHoverTextColor} !important;
                                 transform: translateY(-1px);
                             }
                             

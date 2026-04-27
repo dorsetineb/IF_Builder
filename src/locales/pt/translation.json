@@ -960,6 +960,12 @@
       }
     },
     "aparencia": {
+      "groups": {
+        "atmosphere": "Atmosfera do Jogo",
+        "sceneIdentity": "Nome da Cena",
+        "vignetteControls": "Interface das Vinhetas",
+        "systemInterface": "Interface das Cenas"
+      },
       "estrutura": "Layout das Cenas",
       "scenes": "LAYOUT DAS CENAS",
       "vinhetas": "Layout das Vinhetas",
@@ -979,6 +985,11 @@
       "splashButtonHover": "Botão Início (Hover)",
       "actionButton": "Botão de Ação",
       "actionButtonTextColor": "Texto Botão de Ação",
+      "systemButton": "Fundo dos Botões",
+      "systemButtonTextColor": "Texto dos Botões",
+      "systemButtonBorder": "Cor da Borda",
+      "systemButtonHover": "Fundo no Hover",
+      "systemButtonHoverTextColor": "Texto no Hover",
       "sceneNameBox": "Box de Nome da Cena",
       "bgColor": "Cor de fundo",
       "text": "Texto",

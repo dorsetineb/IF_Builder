@@ -978,6 +978,12 @@
       }
     },
     "aparencia": {
+      "groups": {
+        "atmosphere": "Game Atmosphere",
+        "sceneIdentity": "Scene Name",
+        "vignetteControls": "Vignettes Interface",
+        "systemInterface": "Scenes Interface"
+      },
       "estrutura": "Scene Layout",
       "scenes": "SCENE LAYOUT",
       "vinhetas": "Vignette Layout",
@@ -997,6 +1003,11 @@
       "splashButtonHover": "Start Button (Hover)",
       "actionButton": "Action Button",
       "actionButtonTextColor": "Action Button Text",
+      "systemButton": "Buttons Background",
+      "systemButtonTextColor": "Buttons Text",
+      "systemButtonBorder": "Border Color",
+      "systemButtonHover": "Hover Background",
+      "systemButtonHoverTextColor": "Hover Text",
       "sceneNameBox": "Scene Name Box",
       "bgColor": "Background color",
       "text": "Text",
