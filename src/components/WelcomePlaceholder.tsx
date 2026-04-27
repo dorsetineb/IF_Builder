@@ -105,7 +105,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     {/* Botão 1: Começar a Criar */}
                     <button
                         onClick={() => setIsNewProjectModalOpen(true)}
-                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-primary hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20"
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 shadow-lg shadow-black/20"
                     >
                         <div className="w-10 h-10 bg-primary group-hover:bg-white transition-colors" style={{ maskImage: 'url(/icons/criar.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/criar.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.createNew', 'Crie uma ficção')}</span>
@@ -114,7 +114,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     {/* Botão 2: Jogar a Demo */}
                     <button
                         onClick={() => setIsGamePopupOpen(true)}
-                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-primary hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300"
                     >
                         <div className="w-10 h-10 bg-primary group-hover:bg-white transition-colors" style={{ maskImage: 'url(/icons/demo.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/demo.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('welcome.playDemo', 'Acesse a demo')}</span>
@@ -125,7 +125,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                         onClick={handleDownloadClick}
                         className={`group flex flex-col items-center justify-center gap-4 p-8 rounded-xl border hover:scale-[1.02] transition-all duration-300 ${isFlashing
                             ? 'bg-white border-white scale-[1.02]'
-                            : 'bg-black/40 backdrop-blur-sm border-primary/50 hover:border-primary hover:bg-black/50'
+                            : 'bg-black/40 backdrop-blur-sm border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50'
                             }`}
                     >
                         <div className={`w-10 h-10 transition-colors ${isFlashing ? 'bg-white' : 'bg-primary group-hover:bg-white'}`} style={{ maskImage: 'url(/icons/exemplo.svg)', maskSize: 'contain', maskRepeat: 'no-repeat', maskPosition: 'center', WebkitMaskImage: 'url(/icons/exemplo.svg)', WebkitMaskSize: 'contain', WebkitMaskRepeat: 'no-repeat', WebkitMaskPosition: 'center' }} />
@@ -139,7 +139,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     {/* Botão: Guia Rápido */}
                     <button
                         onClick={onGuidePage}
-                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-primary hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full md:w-[calc(33.333%-16px)]"
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full md:w-[calc(33.333%-16px)]"
                     >
                         <CircleHelp className="w-10 h-10 text-primary group-hover:text-white transition-colors" />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
@@ -148,7 +148,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
                     {/* Botão: Sobre o Projeto */}
                     <button
                         onClick={onMeetProject}
-                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-primary hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full md:w-[calc(33.333%-16px)]"
+                        className="group flex flex-col items-center justify-center gap-4 p-8 bg-black/40 backdrop-blur-sm rounded-xl border border-primary/50 hover:border-transparent hover:ring-2 hover:ring-white hover:bg-black/50 hover:scale-[1.02] transition-all duration-300 w-full md:w-[calc(33.333%-16px)]"
                     >
                         <Zap className="w-10 h-10 text-primary group-hover:text-white transition-colors" />
                         <span className="font-bold text-zinc-200 text-lg group-hover:text-white transition-colors">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
