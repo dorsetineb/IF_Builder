@@ -890,9 +890,9 @@
       }
     },
     "aparencia": {
-      "estrutura": "ESTRUCTURA",
+      "estrutura": "Diseño de Escenas",
       "scenes": "DISEÑO DE ESCENAS",
-      "vinhetas": "DISEÑO DE VIÑETAS",
+      "vinhetas": "Diseño de Viñetas",
       "frameColor": "Color",
       "styleTheme": "ESTILO Y TEMA",
       "predefinedThemes": "Temas Predefinidos",

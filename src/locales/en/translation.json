@@ -978,9 +978,9 @@
       }
     },
     "aparencia": {
-      "estrutura": "STRUCTURE",
+      "estrutura": "Scene Layout",
       "scenes": "SCENE LAYOUT",
-      "vinhetas": "VIGNETTE LAYOUT",
+      "vinhetas": "Vignette Layout",
       "frameColor": "Color",
       "styleTheme": "STYLE & THEME",
       "predefinedThemes": "Predefined Themes",

@@ -960,9 +960,9 @@
       }
     },
     "aparencia": {
-      "estrutura": "ESTRUTURA DAS CENAS",
+      "estrutura": "Layout das Cenas",
       "scenes": "LAYOUT DAS CENAS",
-      "vinhetas": "Layout",
+      "vinhetas": "Layout das Vinhetas",
       "frameColor": "Cor",
       "styleTheme": "CORES E TEMAS",
       "predefinedThemes": "Temas Predefinidos",
