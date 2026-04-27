@@ -1001,6 +1001,7 @@
       "splashButton": "Start Button",
       "splashButtonTextColor": "Start Button Text",
       "splashButtonHover": "Start Button (Hover)",
+      "vignetteTitle": "Vignette Title",
       "actionButton": "Action Button",
       "actionButtonTextColor": "Action Button Text",
       "systemButton": "Buttons Background",

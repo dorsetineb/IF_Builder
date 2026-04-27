@@ -401,14 +401,6 @@ DATE:        ${exportDate.toLocaleString()}
         .replace(
           /__SCENE_NAME_OVERLAY_TEXT_COLOR__/g,
           exportData.gameSceneNameOverlayTextColor || '#c9d1d9'
-        )
-        .replace(
-          /__SCENE_NAME_OVERLAY_TEXT_COLOR__/g,
-          exportData.gameSceneNameOverlayTextColor || '#c9d1d9'
-        )
-        .replace(
-          /__CONTINUE_INDICATOR_COLOR__/g,
-          exportData.gameContinueIndicatorColor || exportData.gameTitleColor || '#58a6ff'
         ) + OVERLAY_CSS;
 
     zip.file('index.html', htmlContent);
@@ -725,14 +717,6 @@ DATE:        ${exportDate.toLocaleString()}
         .replace(
           /__SCENE_NAME_OVERLAY_TEXT_COLOR__/g,
           exportData.gameSceneNameOverlayTextColor || '#c9d1d9'
-        )
-        .replace(
-          /__SCENE_NAME_OVERLAY_TEXT_COLOR__/g,
-          exportData.gameSceneNameOverlayTextColor || '#c9d1d9'
-        )
-        .replace(
-          /__CONTINUE_INDICATOR_COLOR__/g,
-          exportData.gameContinueIndicatorColor || exportData.gameTitleColor || '#58a6ff'
         ) + OVERLAY_CSS;
 
     // Inline CSS into the HTML (replace <link rel="stylesheet" href="style.css"> if present)

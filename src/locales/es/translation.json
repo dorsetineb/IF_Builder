@@ -913,6 +913,7 @@
       "splashButton": "Botón de Inicio",
       "splashButtonTextColor": "Texto del Botón de Inicio",
       "splashButtonHover": "Botón Inicio (Hover)",
+      "vignetteTitle": "Título de la Viñeta",
       "actionButton": "Botón de Acción",
       "actionButtonTextColor": "Texto del Botón de Acción",
       "systemButton": "Fondo de los Botones",

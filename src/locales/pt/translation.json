@@ -983,6 +983,7 @@
       "splashButton": "Botão de Início",
       "splashButtonTextColor": "Texto Botão de Início",
       "splashButtonHover": "Botão Início (Hover)",
+      "vignetteTitle": "Título da Vinheta",
       "actionButton": "Botão de Ação",
       "actionButtonTextColor": "Texto Botão de Ação",
       "systemButton": "Fundo dos Botões",

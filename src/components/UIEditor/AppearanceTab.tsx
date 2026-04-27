@@ -328,7 +328,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                     </div>
 
                     <div className="mt-6 space-y-6">
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-3 gap-4">
                             <div className="space-y-2">
                                 <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-2">{t('UIEditor.aparencia.font')}</label>
                                 <div className="relative">
@@ -361,6 +361,13 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                     <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                                 </div>
                             </div>
+                            <ColorInput
+                                label={t('UIEditor.aparencia.defaultText', 'Texto da narração')}
+                                id="textColor"
+                                value={localTextColor}
+                                onChange={setLocalTextColor}
+                                placeholder="#FFFFFF"
+                            />
                         </div>
                     </div>
                 </div>
@@ -403,50 +410,6 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                 </div>
                                 {isColorsExpanded && (
                                     <div className="mt-3 space-y-8 animate-in fade-in slide-in-from-top-1 px-1">
-                                        {/* GRUPO 1: ATMOSFERA DO JOGO */}
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
-                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.atmosphere', 'Atmosfera do Jogo')}</h4>
-                                            </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                <ColorInput 
-                                                    label={t('UIEditor.aparencia.gameBgColor', 'Cor de fundo')} 
-                                                    id="gameBackgroundColor" 
-                                                    value={localGameBackgroundColor} 
-                                                    onChange={setLocalGameBackgroundColor} 
-                                                    placeholder="#000000" 
-                                                />
-                                                <ColorInput 
-                                                    label={t('UIEditor.aparencia.defaultText', 'Texto da narração')} 
-                                                    id="textColor" 
-                                                    value={localTextColor} 
-                                                    onChange={setLocalTextColor} 
-                                                    placeholder="#FFFFFF" 
-                                                />
-                                                <ColorInput 
-                                                    label={t('UIEditor.aparencia.titleHighlight', 'Acento (Títulos)')} 
-                                                    id="titleColor" 
-                                                    value={localTitleColor} 
-                                                    onChange={setLocalTitleColor} 
-                                                    placeholder="#58A6FF" 
-                                                />
-                                                <ColorInput 
-                                                    label={t('UIEditor.aparencia.focusHighlight', 'Destaque de Interação')} 
-                                                    id="focusColor" 
-                                                    value={localFocusColor} 
-                                                    onChange={setLocalFocusColor} 
-                                                    placeholder="#FFFFFF" 
-                                                />
-                                                <ColorInput 
-                                                    label={t('UIEditor.aparencia.indicatorArrow', 'Indicador de Continuação')} 
-                                                    id="gameContinueIndicatorColor" 
-                                                    value={localGameContinueIndicatorColor} 
-                                                    onChange={setLocalGameContinueIndicatorColor} 
-                                                    placeholder="#FFFFFF" 
-                                                />
-                                            </div>
-                                        </div>
-
                                         {/* GRUPO 2: NOME DA CENA */}
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
@@ -471,6 +434,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                                 <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.vignetteControls', 'Interface das Vinhetas')}</h4>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                                <ColorInput label={t('UIEditor.aparencia.vignetteTitle', 'Título da vinheta')} id="vignetteTitleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
                                                 <ColorInput label={t('UIEditor.aparencia.splashButton', 'Fundo do Botão')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.splashButtonTextColor', 'Texto do Botão')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.splashButtonHover', 'Fundo no Hover')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
@@ -483,6 +447,8 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                                 <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.systemInterface', 'Interface das Cenas')}</h4>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                                <ColorInput label={t('UIEditor.aparencia.gameBgColor', 'Cor de fundo')} id="gameBackgroundColor" value={localGameBackgroundColor} onChange={setLocalGameBackgroundColor} placeholder="#000000" />
+                                                <ColorInput label={t('UIEditor.aparencia.focusHighlight', 'Palavra destacada')} id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#58A6FF" />
                                                 <ColorInput label={t('UIEditor.aparencia.actionButton', 'Fundo do Botão')} id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.actionButtonTextColor', 'Texto do Botão')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
                                                 <ColorInput label={t('UIEditor.aparencia.actionButtonHover', 'Fundo no Hover')} id="actionButtonHoverColor" value={localActionButtonHoverColor} onChange={setLocalActionButtonHoverColor} placeholder="#FFFFFF" />
@@ -627,7 +593,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                     <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
                                         <p className="leading-relaxed" style={{ color: localTextColor, fontSize: getScaledFontSize(1.0) }}>
                                             {t('UIEditor.aparencia.sampleDesc1')}
-                                            <span className="preview-interactive-text" style={{ color: localTitleColor }}>{t('UIEditor.aparencia.sampleDescHighlight')}</span>
+                                            <span className="preview-interactive-text" style={{ color: localFocusColor }}>{t('UIEditor.aparencia.sampleDescHighlight')}</span>
                                             {t('UIEditor.aparencia.sampleDesc2')}
                                         </p>
                                         <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: getScaledFontSize(1.0) }}>
