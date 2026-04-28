@@ -5,6 +5,19 @@
     "guideTitle": "IF Builder / Guía Rápida",
     "aboutTitle": "IF Builder / Sobre el Proyecto"
   },
+  "welcome": {
+    "title": "Bienvenido a IF Builder",
+    "subtitle": "¿Qué quieres hacer?",
+    "createNew": "Crear una ficción",
+    "downloadExample": "Descargar un ejemplo",
+    "playDemo": "Jugar la demo",
+    "meetProject": "Conocer el proyecto",
+    "helpTItle": "Cómo usar el ejemplo descargado",
+    "helpPlayTitle": "Offline",
+    "helpPlayDesc": "Extrae el contenido de <strong>archivo.zip</strong> y abre el archivo <strong>index.html</strong> para acceder a la ficción interactiva offline.",
+    "helpEditTitle": "Online",
+    "helpEditDesc": "Haz clic en el botón <strong>CARGAR</strong> en el lado izquierdo del encabezado para acceder y editar el proyecto en IF Builder."
+  },
   "common": {
     "back": "Volver",
     "close": "Cerrar",
@@ -104,7 +117,10 @@
       "sidebar": {
         "title": "Apoya el Proyecto",
         "desc": "Este sitio se mantiene con amor y donaciones. ¡Si te es útil, considera contribuir con un PIX! o un Ko-fi!",
-        "btn": "Ver Código"
+        "btn": "Ver Código",
+        "kofiTitle": "Apoya por Ko-fi",
+        "kofiDesc": "Ko-fi actualizó sus políticas de seguridad. Haz clic en el botón de abajo para abrir la página oficial de apoyo.",
+        "kofiBtn": "Acceder a Ko-fi"
       },
       "modal": {
         "title": "Información",
@@ -493,13 +509,15 @@
   },
   "globalObjectsEditor": {
     "deleteConfirm": "¿Estás seguro? Esto eliminará el objeto de todo el juego.",
+    "deleteTitle": "Eliminar",
+    "deleteObjectTooltip": "Eliminar",
     "headerDesc": "Crea y modifica objetos que se usarán en las escenas. Las actualizaciones realizadas aquí se reflejarán en las escenas donde se utilizan los objetos.",
     "unsavedChanges": "Cambios no guardados",
     "undoBtn": "Deshacer",
     "saveBtn": "Guardar Cambios",
     "searchPlaceholder": "Buscar objeto...",
     "objectList": "Lista de Objetos",
-    "deleteBtn": "Eliminar Objeto",
+    "deleteBtn": "Eliminar",
     "imageHint": "Esta imagen aparece en el pop-up de detalles del objeto durante el juego.",
     "usedInScenes": "Usado en las escenas",
     "notUsedAnywhere": "Este objeto aún no ha sido añadido a ninguna escena.",
@@ -547,8 +565,9 @@
     "newCommand": "Nuevo Verbo",
     "createCommandBtn": "Crear Verbo",
     "editCommandTitle": "Editar Verbo",
-    "deleteCommandTooltip": "Eliminar verbo",
+    "deleteCommandTooltip": "Eliminar",
     "deleteConfirm": "¿Estás seguro? Esto eliminará este comando global y todas sus configuraciones.",
+    "deleteTitle": "Eliminar",
     "verbsLabel": "Verbos (separados por coma)",
     "chooseIconTooltip": "Elegir icono",
     "verbsPlaceholder": "ej: ayuda, help, ?",
@@ -1011,7 +1030,7 @@
   },
   "editor": {
     "unsavedChanges": "Cambios no guardados",
-    "unsavedChangesMessage": "Tienes cambios sin guardar. Si sales ahora, se perderán. ¿Deseas continuar?",
+    "unsavedChangesMessage": "Tienes cambios sin guardar. Si sales ahora, se perderán...\n\n¿Deseas continuar?",
     "confirmLeave": "Salir sin guardar",
     "cancelLeave": "Cancelar",
     "newOpeningVignetteName": "Apertura",

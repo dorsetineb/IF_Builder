@@ -218,16 +218,25 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     </button>
                                 </>
                             ) : (
-                                <div className="w-full flex justify-center rounded-lg overflow-hidden border border-muted-foreground/50 bg-transparent min-h-[450px]">
-                                    <iframe
-                                        id='kofiframe'
-                                        src='https://ko-fi.com/ifbuildr/?hidefeed=true&widget=true&embed=true&preview=true'
-                                        style={{ border: 'none', width: '100%', backgroundColor: 'transparent' }}
-                                        height='450'
-                                        title='ifbuildr'
-                                        scrolling='no'
-                                    />
-                                </div>
+                                <>
+                                    <div className="bg-white p-2 rounded-lg flex justify-center mb-6 animate-in fade-in duration-300">
+                                        <img
+                                            src="/qrcode-kofi.png"
+                                            alt="QR Code Ko-fi"
+                                            className="w-full h-auto object-contain"
+                                        />
+                                    </div>
+
+                                    <a
+                                        href="https://ko-fi.com/ifbuildr"
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="w-full py-2 bg-[#29abe0] hover:bg-[#228cb8] text-white font-bold rounded-lg text-xs flex items-center justify-center gap-2 transition-all shadow-lg shadow-[#29abe0]/20 hover:-translate-y-0.5"
+                                    >
+                                        <ExternalLink className="w-4 h-4" />
+                                        {t('about.support.sidebar.kofiBtn', 'Acessar Ko-fi')}
+                                    </a>
+                                </>
                             )}
                         </div>
                     </div>

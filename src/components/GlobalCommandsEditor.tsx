@@ -114,7 +114,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
     const handleDelete = (verbId: string) => {
         setConfirmationModal({
             isOpen: true,
-            title: t('globalCommandsEditor.deleteTitle', 'Excluir Verbo'),
+            title: t('globalCommandsEditor.deleteTitle', 'Excluir'),
             message: `${t('common.deleteConfirm', 'Tem certeza?')}\n\n${t('globalCommandsEditor.deleteDesc', 'Isso excluirá este comando global e todas as suas configurações.')}`,
             confirmText: t('common.delete', 'Excluir'),
             cancelText: t('common.cancel', 'Cancelar'),
@@ -201,7 +201,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                                     ? 'bg-red-500 rounded-none' // flush with right edge
                                                     : 'bg-red-500 rounded-r-lg' // match the rounded-lg of container
                                             }`}
-                                            title={t('globalCommandsEditor.deleteCommandTooltip', 'Excluir comando')}
+                                            title={t('globalCommandsEditor.deleteCommandTooltip', 'Excluir')}
                                         >
                                             <Trash2 className="w-5 h-5 pointer-events-none" />
                                         </button>
@@ -348,7 +348,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                                     className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-all text-[10px] font-bold uppercase tracking-widest border border-red-500/20"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
-                                                    {t('globalCommandsEditor.deleteCommandTooltip', 'Excluir Verbo')}
+                                                    {t('globalCommandsEditor.deleteCommandTooltip', 'Excluir')}
                                                 </button>
                                             </div>
                                         </div>

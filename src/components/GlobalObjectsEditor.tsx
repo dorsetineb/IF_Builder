@@ -259,7 +259,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                 ? 'bg-red-500 rounded-none' // flush with right edge
                                                 : 'bg-red-500 rounded-r-lg' // match the rounded-lg of container
                                         }`}
-                                        title={t('globalObjectsEditor.deleteObjectTooltip', 'Excluir objeto')}
+                                        title={t('globalObjectsEditor.deleteObjectTooltip', 'Excluir')}
                                     >
                                         <Trash2 className="w-5 h-5 pointer-events-none" />
                                     </button>
@@ -410,7 +410,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                             className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-all text-[10px] font-bold uppercase tracking-widest border border-red-500/20"
                                         >
                                             <Trash2 className="w-4 h-4" />
-                                            {t('globalObjectsEditor.deleteObjectTooltip', 'Excluir Objeto')}
+                                            {t('globalObjectsEditor.deleteObjectTooltip', 'Excluir')}
                                         </button>
                                     </div>
                                 </div>
@@ -511,9 +511,10 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
             <ConfirmationModal
                 isOpen={pendingAction !== null}
                 title={t('editor.unsavedChanges', 'Alterações não salvas')}
-                message={t('editor.unsavedChangesMessage', 'Você tem alterações não salvas.\\n\\nSe sair agora, elas serão perdidas.\\n\\nDeseja continuar?')}
+                message={t('editor.unsavedChangesMessage', 'Você tem alterações não salvas. Se sair agora, elas serão perdidas.\n\nDeseja continuar?')}
                 confirmText={t('editor.confirmLeave', 'Sair sem salvar')}
                 cancelText={t('editor.cancelLeave', 'Cancelar')}
+                isDanger={true}
                 onConfirm={() => {
                     if (pendingAction) {
                         setLocalObjects(sortedObjects);
@@ -526,7 +527,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
 
             <ConfirmationModal
                 isOpen={deleteModal.isOpen}
-                title={t('globalObjectsEditor.deleteTitle', 'Excluir Objeto')}
+                title={t('globalObjectsEditor.deleteTitle', 'Excluir')}
                 message={`${t('common.deleteConfirm', 'Tem certeza?')}\n\n${t('globalObjectsEditor.deleteDesc', 'Isso excluirá o objeto de todo o jogo.')}`}
                 confirmText={t('common.delete', 'Excluir')}
                 cancelText={t('common.cancel', 'Cancelar')}

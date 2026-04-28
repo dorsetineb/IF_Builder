@@ -106,7 +106,10 @@
       "sidebar": {
         "title": "Support the Project",
         "desc": "This site is maintained with love and donations. If it's useful to you, consider contributing with a PIX! or a Ko-fi!",
-        "btn": "View PIX Key"
+        "btn": "View PIX Key",
+        "kofiTitle": "Support via Ko-fi",
+        "kofiDesc": "Ko-fi updated their security policies. Click the button below to open the official support page.",
+        "kofiBtn": "Access Ko-fi"
       },
       "modal": {
         "title": "PIX Key",
@@ -569,7 +572,8 @@
   "globalObjectsEditor": {
     "deleteConfirm": "Are you sure?\n\nThis will delete the object from the entire game.",
     "deleteDesc": "This will delete the object from the entire game.",
-    "deleteTitle": "Delete Object",
+    "deleteTitle": "Delete",
+    "deleteObjectTooltip": "Delete",
     "headerDesc": "Create and modify objects to be used in scenes. Updates made here will be reflected in the scenes where the objects are used.",
     "unsavedChanges": "Unsaved changes",
     "undoBtn": "Undo",
@@ -627,10 +631,10 @@
     "newCommand": "New Verb",
     "createCommandBtn": "Create Verb",
     "editCommandTitle": "Edit Verb",
-    "deleteCommandTooltip": "Delete verb",
+    "deleteCommandTooltip": "Delete",
     "deleteConfirm": "Are you sure?\n\nThis will delete this global command and all its settings.",
     "deleteDesc": "This will delete this global command and all its settings.",
-    "deleteTitle": "Delete Verb",
+    "deleteTitle": "Delete",
     "verbsLabel": "Verbs (comma separated)",
     "chooseIconTooltip": "Choose icon",
     "verbsPlaceholder": "e.g.: help, ?",
@@ -1100,7 +1104,7 @@
   },
   "editor": {
     "unsavedChanges": "Unsaved Changes",
-    "unsavedChangesMessage": "You have unsaved changes.\n\nIf you leave now, they will be lost.\n\nDo you want to continue?",
+    "unsavedChangesMessage": "You have unsaved changes. If you leave now, they will be lost...\n\nDo you want to continue?",
     "confirmLeave": "Leave without saving",
     "cancelLeave": "Cancel",
     "newOpeningVignetteName": "Opening",

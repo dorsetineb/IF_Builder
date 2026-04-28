@@ -5,6 +5,19 @@
     "guideTitle": "IF Builder / Guia Rápido",
     "aboutTitle": "IF Builder / Sobre o Projeto"
   },
+  "welcome": {
+    "title": "Boas-vindas ao IF Builder",
+    "subtitle": "O que você deseja fazer?",
+    "createNew": "Criar uma ficção",
+    "downloadExample": "Baixar um exemplo",
+    "playDemo": "Jogar a demo",
+    "meetProject": "Conhecer o projeto",
+    "helpTItle": "Como usar o exemplo baixado",
+    "helpPlayTitle": "Offline",
+    "helpPlayDesc": "Extraia o conteúdo do arquivo <strong>arquivo.zip</strong> e abra o arquivo <strong>index.html</strong> para acessar a ficção interativa offline.",
+    "helpEditTitle": "Online",
+    "helpEditDesc": "Clique no botão <strong>CARREGAR</strong> no lado esquerdo do cabeçalho para acessar e editar o projeto no IF Builder."
+  },
   "common": {
     "back": "Voltar",
     "close": "Fechar",
@@ -106,7 +119,10 @@
       "sidebar": {
         "title": "Apoie o Projeto",
         "desc": "Este site é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX! ou um Ko-fi!",
-        "btn": "Ver Chave PIX"
+        "btn": "Ver Chave PIX",
+        "kofiTitle": "Apoie pelo Ko-fi",
+        "kofiDesc": "O Ko-fi atualizou suas políticas de segurança. Clique no botão abaixo para abrir a página oficial de apoio.",
+        "kofiBtn": "Acessar Ko-fi"
       },
       "modal": {
         "title": "Chave PIX",
@@ -574,7 +590,8 @@
   "globalObjectsEditor": {
     "deleteConfirm": "Tem certeza?\n\nIsso excluirá o objeto de todo o jogo.",
     "deleteDesc": "Isso excluirá o objeto de todo o jogo.",
-    "deleteTitle": "Excluir Objeto",
+    "deleteTitle": "Excluir",
+    "deleteObjectTooltip": "Excluir",
     "headerDesc": "Crie e modifique objetos que serão usados nas cenas. Atualizações feitas aqui serão refletidas nas cenas onde os objetos são utilizados.",
     "unsavedChanges": "Alterações não salvas",
     "undoBtn": "Desfazer",
@@ -635,10 +652,10 @@
     "newCommand": "Novo Verbo",
     "createCommandBtn": "Criar Verbo",
     "editCommandTitle": "Descrição dos verbos",
-    "deleteCommandTooltip": "Excluir verbo",
+    "deleteCommandTooltip": "Excluir",
     "deleteConfirm": "Tem certeza?\n\nIsso excluirá este comando global e todas as suas configurações.",
     "deleteDesc": "Isso excluirá este comando global e todas as suas configurações.",
-    "deleteTitle": "Excluir Verbo",
+    "deleteTitle": "Excluir",
     "verbsLabel": "Verbos (separados por vírgula)",
     "chooseIconTooltip": "Escolher ícone",
     "verbsPlaceholder": "ex: ajuda, help, ?",
@@ -1102,7 +1119,7 @@
     "delete": "Excluir",
     "importing_fiction": "IMPORTANDO FICÇÃO",
     "unsavedChanges": "Alterações não salvas",
-    "unsavedChangesMessage": "Você tem alterações não salvas.\n\nSe sair agora, elas serão perdidas.\n\nDeseja continuar?",
+    "unsavedChangesMessage": "Você tem alterações não salvas. Se sair agora, elas serão perdidas...\n\nDeseja continuar?",
     "confirmLeave": "Sair sem salvar",
     "cancelLeave": "Cancelar",
     "sceneDeletedTitle": "Cena excluída",
