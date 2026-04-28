@@ -155,6 +155,42 @@ document.addEventListener('DOMContentLoaded', () => {
     document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
     document.documentElement.style.setProperty('--image-anim-speed', imageAnimDuration);
 
+    const updateFogSizes = (fogContainer) => {
+        if (!fogContainer) return;
+        const img1 = new Image();
+        const img2 = new Image();
+        img1.src = "https://raw.githubusercontent.com/WebDevSHORTS/Fog-Overlay-Animation/master/img/fog-1.png";
+        img2.src = "https://raw.githubusercontent.com/WebDevSHORTS/Fog-Overlay-Animation/master/img/fog-2.png";
+
+        const update = () => {
+            const rect = fogContainer.getBoundingClientRect();
+            const W = rect.width;
+            const H = rect.height;
+            if (W === 0 || H === 0) return;
+
+            if (img1.complete && img1.naturalWidth) {
+                const R1 = img1.naturalWidth / img1.naturalHeight;
+                const vw = W / H > R1 ? W : H * R1;
+                const vh = W / H > R1 ? W / R1 : H;
+                fogContainer.style.setProperty('--fog-width-1', vw + 'px');
+                fogContainer.style.setProperty('--fog-height-1', vh + 'px');
+            }
+            if (img2.complete && img2.naturalWidth) {
+                const R2 = img2.naturalWidth / img2.naturalHeight;
+                const vw = W / H > R2 ? W : H * R2;
+                const vh = W / H > R2 ? W / R2 : H;
+                fogContainer.style.setProperty('--fog-width-2', vw + 'px');
+                fogContainer.style.setProperty('--fog-height-2', vh + 'px');
+            }
+        };
+
+        img1.onload = update;
+        img2.onload = update;
+        
+        window.addEventListener('resize', update);
+        update(); 
+    };
+
     (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
 
     const positiveEndingScreen = document.getElementById('positive-ending-screen');
@@ -1363,6 +1399,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
                     vOverlay.appendChild(fogContainer);
                     vOverlay.classList.add('overlay-fog');
+                    
+                    updateFogSizes(fogContainer);
                 }
             });
         } else {
@@ -1597,6 +1635,8 @@ document.addEventListener('DOMContentLoaded', () => {
              fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
              sceneOverlay.appendChild(fogContainer);
              sceneOverlay.classList.add('overlay-fog');
+             
+             updateFogSizes(fogContainer);
         } else {
              sceneOverlay.classList.remove('overlay-fog');
              const existing = sceneOverlay.querySelector('.fog-container');

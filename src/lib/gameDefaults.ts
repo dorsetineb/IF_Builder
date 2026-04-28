@@ -834,7 +834,7 @@ export const OVERLAY_CSS = `
 .fog-img {
   position: absolute;
   height: 100%;
-  width: 300%;
+  width: 1000%;
   z-index: 2;
   top: 0;
   left: 0;
@@ -842,24 +842,28 @@ export const OVERLAY_CSS = `
 .fog-img-first {
   background: url("https://raw.githubusercontent.com/WebDevSHORTS/Fog-Overlay-Animation/master/img/fog-1.png");
   background-repeat: repeat-x;
-  background-size: contain;
+  background-size: var(--fog-width-1, cover) var(--fog-height-1, auto);
   background-position: center;
-  animation: marquee 60s linear infinite;
   filter: brightness(2.5) contrast(1.2);
   opacity: 1;
+  animation: marquee-first 13.3s linear infinite;
 }
 .fog-img-second {
   background: url("https://raw.githubusercontent.com/WebDevSHORTS/Fog-Overlay-Animation/master/img/fog-2.png");
   background-repeat: repeat-x;
-  background-size: contain;
+  background-size: var(--fog-width-2, cover) var(--fog-height-2, auto);
   background-position: center;
-  animation: marquee 30s linear infinite;
   filter: brightness(2.5) contrast(1.2);
   opacity: 1;
+  animation: marquee-second 6.65s linear infinite;
 }
-@keyframes marquee {
+@keyframes marquee-first {
   0% { transform: translate3d(0, 0, 0); }
-  100% { transform: translate3d(-200%, 0, 0); }
+  100% { transform: translate3d(calc(-1 * var(--fog-width-1, 100%)), 0, 0); }
+}
+@keyframes marquee-second {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(calc(-1 * var(--fog-width-2, 100%)), 0, 0); }
 }
 
 .scene-overlay.overlay-grain {
