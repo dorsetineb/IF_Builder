@@ -3,6 +3,7 @@ import { Scene, GameData, Vignette } from '../types';
 import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split, BarChart3, List, Columns3 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import EditorStatsModal from './EditorStatsModal';
+import { useTheme } from './ThemeProvider';
 
 interface SceneMapProps {
   allScenesMap: GameData['scenes'];
@@ -77,6 +78,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
   selectedSceneId,
 }) => {
   const { t } = useTranslation();
+  const { theme } = useTheme();
+  const hoverTextClass = theme === 'terminal' ? 'hover:text-zinc-950' : 'hover:text-white';
   const containerRef = useRef<HTMLDivElement>(null);
   const [view, setView] = useState({ x: 0, y: 0, scale: 1 });
   const [isPanning, setIsPanning] = useState(false);
@@ -720,7 +723,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
               e.stopPropagation();
               onAddNode?.('vignette');
             }}
-            className="w-full flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-primary hover:text-white border border-transparent whitespace-nowrap"
+            className={`w-full flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-primary ${hoverTextClass} border border-transparent whitespace-nowrap`}
           >
             <ArrowRight className="w-3.5 h-3.5 mr-1.5" />
             {t('sceneList.nodeSelection.vignette.title', 'Criar Vinheta')}
@@ -734,7 +737,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
             className={`w-full flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent whitespace-nowrap ${
               !hasOpeningVignette 
                 ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed grayscale' 
-                : 'bg-white text-zinc-950 hover:bg-primary hover:text-white'
+                : `bg-white text-zinc-950 hover:bg-primary ${hoverTextClass}`
             }`}
             title={!hasOpeningVignette ? t('sceneList.nodeSelection.scene.lockedDesc', 'Crie uma vinheta de abertura para habilitar cenas.') : ''}
           >
@@ -1120,14 +1123,14 @@ const SceneMap: React.FC<SceneMapProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={onReorganizeScenes}
-            className={`flex items-center justify-center w-[160px] h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary hover:text-white hover:border-primary`}
+            className={`flex items-center justify-center w-[160px] h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
           >
             <LayoutGrid className="w-4 h-4 mr-2" />
             {t('sceneMap.reorganize', 'Reorganizar')}
           </button>
           <button
             onClick={handleViewAll}
-            className={`flex items-center justify-center w-[160px] h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary hover:text-white hover:border-primary`}
+            className={`flex items-center justify-center w-[160px] h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
           >
             <Maximize2 className="w-4 h-4 mr-2" />
             {t('sceneMap.viewAll', 'Ver Tudo')}
@@ -1137,7 +1140,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
             className={`flex items-center justify-center w-[160px] h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
               highlightOrphans
                 ? 'bg-red-600 text-white border-red-500 hover:bg-red-700'
-                : 'bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary hover:text-white hover:border-primary'
+                : `bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`
             }`}
           >
             <AlertTriangle className="w-4 h-4 mr-2" />
