@@ -301,6 +301,12 @@
   --dither-overlay: #000000;
 }
 
+.terminal input:not([type="checkbox"]):not([type="radio"]):not(:disabled),
+.terminal select:not(:disabled),
+.terminal textarea:not(:disabled) {
+  color: #ffffff;
+}
+
 .windows {
   --background: #0F0F0F;
   --foreground: #FFFFFF;
