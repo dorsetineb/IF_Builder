@@ -24,7 +24,7 @@ export const ColorInput: React.FC<ColorInputProps> = memo(({ label, id, value, o
                     id={`${id}-picker`}
                     value={pickerValue}
                     onChange={(e) => onChange(e.target.value)}
-                    className="w-10 h-8 p-0 border-none rounded cursor-pointer bg-transparent"
+                    className="w-10 h-6 p-0 border-none rounded cursor-pointer bg-transparent"
                     aria-label={`Seletor de cor para ${label}`}
                 />
                 <input

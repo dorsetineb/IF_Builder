@@ -323,7 +323,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '150ms' }}>
                     <div className="flex items-center w-full text-left">
                         <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
-                            <Type className="w-4 h-4" /> {t('UIEditor.aparencia.fontsText')}
+                            <Type className="w-4 h-4" /> {t('UIEditor.aparencia.fontsText', 'Fontes e Textos')}
                         </h3>
                     </div>
 
@@ -362,7 +362,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                 </div>
                             </div>
                             <ColorInput
-                                label={t('UIEditor.aparencia.defaultText', 'Texto da narração')}
+                                label={t('UIEditor.aparencia.defaultText', 'Cor')}
                                 id="textColor"
                                 value={localTextColor}
                                 onChange={setLocalTextColor}
@@ -410,24 +410,6 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                 </div>
                                 {isColorsExpanded && (
                                     <div className="mt-3 space-y-8 animate-in fade-in slide-in-from-top-1 px-1">
-                                        {/* GRUPO 2: NOME DA CENA */}
-                                        <div className="space-y-4">
-                                            <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
-                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.sceneIdentity', 'Nome da Cena')}</h4>
-                                            </div>
-                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                <ColorInput label={t('UIEditor.aparencia.sceneNameBg', 'Fundo (Nome da Cena)')} id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
-                                                <ColorInput label={t('UIEditor.aparencia.sceneNameText', 'Texto (Nome da Cena)')} id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
-                                                <ColorInput 
-                                                    label={t('UIEditor.aparencia.frameColor', 'Moldura da Imagem')} 
-                                                    id="gameFrameColor" 
-                                                    value={localGameFrameColor} 
-                                                    onChange={setLocalGameFrameColor} 
-                                                    placeholder="#000000" 
-                                                />
-                                            </div>
-                                        </div>
-
                                         {/* GRUPO 3: INTERFACE DAS VINHETAS */}
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
@@ -435,9 +417,9 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                 <ColorInput label={t('UIEditor.aparencia.vignetteTitle', 'Título da vinheta')} id="vignetteTitleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
-                                                <ColorInput label={t('UIEditor.aparencia.splashButton', 'Fundo do Botão')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.splashButtonTextColor', 'Texto do Botão')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.splashButtonHover', 'Fundo no Hover')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.splashButton', 'Botão da vinheta')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.splashButtonTextColor', 'Texto do botão da vinheta')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.splashButtonHover', 'Hover do botão da vinheta')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
                                             </div>
                                         </div>
 
@@ -448,15 +430,33 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                 <ColorInput label={t('UIEditor.aparencia.gameBgColor', 'Cor de fundo')} id="gameBackgroundColor" value={localGameBackgroundColor} onChange={setLocalGameBackgroundColor} placeholder="#000000" />
-                                                <ColorInput label={t('UIEditor.aparencia.focusHighlight', 'Palavra destacada')} id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#58A6FF" />
+                                                <ColorInput label={t('UIEditor.aparencia.focusHighlight', 'Destaques (Palavras e Input do usuário)')} id="focusColor" value={localFocusColor} onChange={setLocalFocusColor} placeholder="#58A6FF" />
                                                 <ColorInput label={t('UIEditor.aparencia.actionButton', 'Fundo do Botão')} id="actionButtonColor" value={localActionButtonColor} onChange={setLocalActionButtonColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.actionButtonTextColor', 'Texto do Botão')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.actionButtonHover', 'Fundo no Hover')} id="actionButtonHoverColor" value={localActionButtonHoverColor} onChange={setLocalActionButtonHoverColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.systemButton', 'Fundo dos Botões')} id="systemButtonColor" value={localSystemButtonColor} onChange={setLocalSystemButtonColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.systemButtonTextColor', 'Texto dos Botões')} id="systemButtonTextColor" value={localSystemButtonTextColor} onChange={setLocalSystemButtonTextColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.systemButtonBorder', 'Cor da Borda')} id="systemButtonBorderColor" value={localSystemButtonBorderColor} onChange={setLocalSystemButtonBorderColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.systemButtonHover', 'Fundo no Hover')} id="systemButtonHoverColor" value={localSystemButtonHoverColor} onChange={setLocalSystemButtonHoverColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.systemButtonHoverTextColor', 'Texto no Hover')} id="systemButtonHoverTextColor" value={localSystemButtonHoverTextColor} onChange={setLocalSystemButtonHoverTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.actionButtonTextColor', 'Texto do botão de Ação')} id="actionButtonTextColor" value={localActionButtonTextColor} onChange={setLocalActionButtonTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.actionButtonHover', 'Hover do botão de Ação')} id="actionButtonHoverColor" value={localActionButtonHoverColor} onChange={setLocalActionButtonHoverColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.systemButton', 'Botões de ferramentas')} id="systemButtonColor" value={localSystemButtonColor} onChange={setLocalSystemButtonColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.systemButtonTextColor', 'Texto dos botões de ferramentas')} id="systemButtonTextColor" value={localSystemButtonTextColor} onChange={setLocalSystemButtonTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.systemButtonBorder', 'Contorno dos botões e input')} id="systemButtonBorderColor" value={localSystemButtonBorderColor} onChange={setLocalSystemButtonBorderColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.systemButtonHover', 'Hover dos botões de ferramentas')} id="systemButtonHoverColor" value={localSystemButtonHoverColor} onChange={setLocalSystemButtonHoverColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.systemButtonHoverTextColor', 'Hover do texto dos botões')} id="systemButtonHoverTextColor" value={localSystemButtonHoverTextColor} onChange={setLocalSystemButtonHoverTextColor} placeholder="#FFFFFF" />
+                                            </div>
+                                        </div>
+
+                                        {/* GRUPO 2: NOME DA CENA */}
+                                        <div className="space-y-4">
+                                            <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
+                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.sceneIdentity', 'Nome da Cena')}</h4>
+                                            </div>
+                                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
+                                                <ColorInput label={t('UIEditor.aparencia.sceneNameBg', 'Cor de fundo da caixa')} id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
+                                                <ColorInput label={t('UIEditor.aparencia.sceneNameText', 'Texto (Nome da Cena)')} id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput 
+                                                    label={t('UIEditor.aparencia.frameColor', 'Moldura da Imagem')} 
+                                                    id="gameFrameColor" 
+                                                    value={localGameFrameColor} 
+                                                    onChange={setLocalGameFrameColor} 
+                                                    placeholder="#000000" 
+                                                />
                                             </div>
                                         </div>
                                     </div>
