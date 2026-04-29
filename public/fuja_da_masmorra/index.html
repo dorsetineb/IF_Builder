@@ -4,19 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.11/purify.min.js"></script>
     <title>Fuja da Masmorra</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Silkscreen&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=1777493518813">
 </head>
-<body class="dark-theme with-spacing frame-trading-card __FONT_ADJUST_CLASS__ behavior-immersive">
+<body class="frame-trading-card __FONT_ADJUST_CLASS__ behavior-immersive with-spacing is-demo">
     <audio id="scene-sound-effect" preload="auto"></audio>
     <audio id="bgm-audio" preload="auto" loop></audio>
     <div class="main-wrapper" id="main-wrapper">
 
 
-        <div id="positive-ending-screen" class="splash-screen hidden " style="background-image: url('assets/splash_image.png')">
+        <div id="positive-ending-screen" class="splash-screen vignette-scale-md hidden " style="background-image: url('assets/splash_image.png')">
             <div class="splash-content">
                 <div class="splash-text">
                     <p>Você conseguiu fugir da masmorra!</p>
@@ -24,7 +25,7 @@
                 <button class="ending-restart-button">RECOMEÇAR</button>
             </div>
         </div>
-        <div id="negative-ending-screen" class="splash-screen hidden " style="background-image: url('assets/splash_image.png')">
+        <div id="negative-ending-screen" class="splash-screen vignette-scale-md hidden " style="background-image: url('assets/splash_image.png')">
             <div class="splash-content">
                 <div class="splash-text">
                     <p>Você morreu...</p>
@@ -33,7 +34,7 @@
             </div>
         </div>
 
-        <div id="vignette-screen" class="splash-screen hidden">
+        <div id="vignette-screen" class="splash-screen vignette-scale-md hidden">
             <div id="vignette-overlay" class="scene-overlay" style="z-index: 1;"></div>
             <div class="splash-content" style="z-index: 10;">
                 <div class="splash-text">
@@ -66,7 +67,7 @@
                         <button id="suggestions-button">Sugestões</button>
                         <button id="inventory-button">Inventário</button>
                         <button id="diary-button">Diário</button>
-                        
+                        <button id="trackers-button">Status</button>
                         
                     </div>
                     <div class="input-area">
@@ -85,7 +86,7 @@
     <div id="trackers-modal" class="modal-overlay hidden">
         <div class="modal-content trackers-modal-content">
             <button class="modal-close-button">&times;</button>
-            <h2>Rastreadores</h2>
+            <h2>Status</h2>
             <div id="trackers-content"></div>
         </div>
     </div>
@@ -134,6 +135,22 @@
                 <div id="item-modal-text-container" class="item-modal-text-container">
                     <h3 id="item-modal-name" class="item-modal-name"></h3>
                     <p id="item-modal-description"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Acquisition Modal -->
+    <div id="acquisition-modal" class="modal-overlay hidden">
+        <div class="modal-content acquisition-modal-content">
+            <button class="modal-close-button">&times;</button>
+            <h2 id="acquisition-modal-title"></h2>
+            <div class="acquisition-modal-body">
+                <div id="acquisition-modal-image-container" class="acquisition-modal-image-container hidden">
+                    <img id="acquisition-modal-image" src="" alt="Item Image">
+                </div>
+                <div id="acquisition-modal-text-container" class="acquisition-modal-text-container text-center">
+                    <p id="acquisition-modal-description"></p>
                 </div>
             </div>
         </div>
@@ -239,5 +256,5 @@
       </filter>
     </defs>
   </svg>
-<script src="game.js"></script></body>
+<script src="game.js?v=1777493518813"></script></body>
 </html>

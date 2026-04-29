@@ -9,11 +9,11 @@ export const prepareGameDataForEngine = (data: GameData): object => {
 
             // Cleanse "ghost" strings that stuck to legacy scenes from old defaults
             let finalVignetteButtonText = scene.vignetteButtonText;
-            if (scene.vignetteType === 'opening' && ['COMEÇAR', 'START', 'INICIAR'].includes(finalVignetteButtonText || '')) {
+            if (scene.vignetteType === 'opening' && ['COMEÇAR', 'INICIAR'].includes(finalVignetteButtonText || '')) {
                 finalVignetteButtonText = data.gameSplashButtonText || finalVignetteButtonText;
-            } else if ((scene.vignetteType === 'conclusion' || scene.isDefeatOutcome) && ['REINICIAR', 'RESTART'].includes(finalVignetteButtonText || '')) {
+            } else if ((scene.vignetteType === 'conclusion' || scene.isDefeatOutcome) && ['REINICIAR'].includes(finalVignetteButtonText || '')) {
                 finalVignetteButtonText = data.gameRestartButtonText || finalVignetteButtonText;
-            } else if (scene.vignetteType === 'transition' && ['CONTINUAR', 'CONTINUE'].includes(finalVignetteButtonText || '')) {
+            } else if (scene.vignetteType === 'transition' && ['CONTINUAR'].includes(finalVignetteButtonText || '')) {
                 finalVignetteButtonText = data.gameContinueButtonText || finalVignetteButtonText;
             }
 

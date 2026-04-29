@@ -2,10 +2,10 @@
                     GAME INFORMATION
 ================================================================
 
-TITLE:       Escapa de la Mazmorra
+TITLE:       Fuja da Masmorra
 PLATFORM:    IF Builder
 EXPORTED BY: IF Builder User
-DATE:        01/04/2026, 22:59:09
+DATE:        29/04/2026, 16:54:19
 
 ================================================================
         THANK YOU FOR CREATING WITH IF BUILDER
