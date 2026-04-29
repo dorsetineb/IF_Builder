@@ -132,8 +132,8 @@ const BranchingPreview: React.FC<BranchingPreviewProps> = ({ currentScene, allSc
                     <div className={`px-4 py-3 bg-card border-2 rounded-lg flex flex-col items-center ${currentColorClasses.border} ${currentColorClasses.shadow}`}>
                         <span className={`text-[10px] font-bold uppercase tracking-widest whitespace-nowrap ${currentColorClasses.text}`}>
                             {currentScene.vignetteType && currentScene.vignetteType !== 'none'
-                                ? t('branchingPreview.thisVignette', 'Esta Vinheta')
-                                : t('branchingPreview.thisScene', 'Esta Cena')}
+                                ? t('branchingPreview.thisVignette', 'Este Capítulo')
+                                : t('branchingPreview.thisScene', 'Esta Ramificação')}
                         </span>
                     </div>
                 </div>

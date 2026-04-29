@@ -169,7 +169,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
     // Helper for preview scene (Standard Scene)
     const previewStandardScene: Scene = useMemo(() => ({
         id: 'preview_scene',
-        name: t('newProject.previewOverlay.sceneName', 'Scene Name'),
+        name: t('newProject.previewOverlay.sceneName', 'Nome da Ramificação'),
         image: splashImage || '', // Use splash image if available for context
         description: t('newProject.previewOverlay.exampleDesc', 'This is an example description for the scene. The text flows according to the') + ' ' + t('newProject.previewOverlay.exampleDescBold', 'SETTINGS') + ' ' + t('newProject.previewOverlay.exampleDesc2', 'chosen.'),
         interactions: [],
@@ -262,7 +262,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
             id: 'VNT_OPENING',
             name: t('editor.newOpeningVignetteName', 'Abertura'),
             title: title || t('editor.newOpeningVignetteName', 'Abertura'),
-            description: description || t('editor.newVignetteDescription', 'Descrição da nova vinheta.'),
+            description: description || t('editor.newVignetteDescription', 'Descrição do novo capítulo.'),
             buttonText: startButtonText,
             showTitle: !omitSplashTitle,
             showDescription: !omitSplashDescription,
@@ -276,7 +276,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         const startSceneId = 'SCN_OPENING';
 
         const defaultTitle = t('editor.newOpeningVignetteName', 'Abertura');
-        const defaultDescription = t('editor.newVignetteDescription', 'Descrição da nova vinheta.');
+        const defaultDescription = t('editor.newVignetteDescription', 'Descrição do novo capítulo.');
         const finalTitle = title || defaultTitle;
         const finalDescription = description || defaultDescription;
 
@@ -554,7 +554,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             </div>
                                             <div className="flex-1 space-y-2 pt-1">
                                                 <p className="text-[11px] text-zinc-400 leading-relaxed">
-                                                    {t('newProject.info.coverImageDesc', 'Esta imagem será usada como fundo da tela inicial e da cena de abertura caso não seja definida outra.')}
+                                                    {t('newProject.info.coverImageDesc', 'Esta imagem será usada como fundo da tela inicial e do capítulo de abertura caso não seja definida outra.')}
                                                 </p>
                                                 <p className="text-[9px] text-zinc-600 uppercase tracking-wider font-bold">{t('newProject.info.recommendedDimensions', 'Recomendado: 1920x1080')}</p>
                                             </div>
@@ -564,7 +564,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     <div className="space-y-3 animate-in fade-in duration-500">
                                         <div className="flex items-center gap-2 text-zinc-300">
                                             <ArrowRight className="w-4 h-4" />
-                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.info.vignetteLayoutTitle', 'Layout das Vinhetas')}</h3>
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.info.vignetteLayoutTitle', 'Layout dos Capítulos')}</h3>
                                         </div>
                                         
                                         <div className="grid grid-cols-2 gap-4 items-end">
@@ -706,12 +706,12 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                         <div className="space-y-3 pt-4">
                                                             <div className="flex items-center gap-2 text-zinc-300 pb-2">
                                                                 <Monitor className="w-4 h-4" />
-                                                                <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.appearance.scenesAndInterfaces', 'Cenas e Interfaces')}</h3>
+                                                                <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.appearance.scenesAndInterfaces', 'Ramificações e Interfaces')}</h3>
                                                             </div>
                                                             <div className="grid grid-cols-1 gap-4">
                                                                 <ColorInput label={t('newProject.appearance.focus', 'Cor de Foco/Interação')} id="focusColor" value={colors.focusColor} onChange={(val) => setColors({ ...colors, focusColor: val })} />
-                                                                <ColorInput label={t('newProject.appearance.sceneOverlayBg', 'Nome da Cena (Fundo)')} id="overlayBg" value={colors.gameSceneNameOverlayBg} onChange={(val) => setColors({ ...colors, gameSceneNameOverlayBg: val })} />
-                                                                <ColorInput label={t('newProject.appearance.sceneOverlayText', 'Nome da Cena (Texto)')} id="overlayText" value={colors.gameSceneNameOverlayTextColor} onChange={(val) => setColors({ ...colors, gameSceneNameOverlayTextColor: val })} />
+                                                                <ColorInput label={t('newProject.appearance.sceneOverlayBg', 'Nome da Ramificação (Fundo)')} id="overlayBg" value={colors.gameSceneNameOverlayBg} onChange={(val) => setColors({ ...colors, gameSceneNameOverlayBg: val })} />
+                                                                <ColorInput label={t('newProject.appearance.sceneOverlayText', 'Nome da Ramificação (Texto)')} id="overlayText" value={colors.gameSceneNameOverlayTextColor} onChange={(val) => setColors({ ...colors, gameSceneNameOverlayTextColor: val })} />
                                                                 <ColorInput label={t('newProject.appearance.hearts', 'Cor dos Corações')} id="heartsColor" value={colors.chanceIconColor} onChange={(val) => setColors({ ...colors, chanceIconColor: val })} />
                                                             </div>
                                                         </div>
@@ -755,7 +755,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-zinc-300">
                                             <LayoutTemplate className="w-4 h-4" />
-                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.appearance.layoutScenes', 'Layout das Cenas')}</h3>
+                                            <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.appearance.layoutScenes', 'Layout das Ramificações')}</h3>
                                         </div>
                                         
                                         <div className="grid grid-cols-2 gap-4">
@@ -849,13 +849,13 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                         onClick={() => setPreviewType('vignette')}
                                         className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'vignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                                     >
-                                        {t('newProject.info.vignetteLayout', 'Layout das Vinhetas')}
+                                        {t('newProject.info.vignetteLayout', 'Layout dos Capítulos')}
                                     </button>
                                     <button
                                         onClick={() => setPreviewType('scene')}
                                         className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'scene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                                     >
-                                        {t('newProject.appearance.layoutScenes', 'Layout das Cenas')}
+                                        {t('newProject.appearance.layoutScenes', 'Layout das Ramificações')}
                                     </button>
                                 </div>
                             </div>
@@ -957,7 +957,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                                                             fontSize: getScaledFontSize(1.0)
                                                                                         }}
                                                                                     >
-                                                                                        {t('UIEditor.aparencia.sceneName', 'Nome da Cena')}
+                                                                                        {t('UIEditor.aparencia.sceneName', 'Nome da Ramificação')}
                                                                                     </div>
                                                                                 </div>
                                                                             </div>
@@ -970,7 +970,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                             <div className="flex-1 flex flex-col overflow-hidden">
                                                                 <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
                                                                     <p className="leading-relaxed" style={{ color: colors.textColor, fontSize: getScaledFontSize(1.0) }}>
-                                                                        {t('UIEditor.aparencia.sampleDesc1', 'Esta é uma descrição de exemplo para a cena. O texto flui conforme as')}
+                                                                        {t('UIEditor.aparencia.sampleDesc1', 'Esta é uma descrição de exemplo para a ramificação. O texto flui conforme as')}
                                                                         <span className="preview-interactive-text" style={{ color: colors.titleColor, fontWeight: 'bold', marginLeft: '4px', marginRight: '4px' }}>{t('UIEditor.aparencia.sampleDescHighlight', 'CONFIGURAÇÕES')}</span>
                                                                         {t('UIEditor.aparencia.sampleDesc2', 'escolhidas.')}
                                                                     </p>

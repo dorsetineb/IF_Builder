@@ -17,7 +17,7 @@ export const GuideView: React.FC = () => {
         <div className="max-w-4xl mx-auto px-8 pb-20 animate-in fade-in duration-500">
             {/* Sticky Header: Intro + TOC */}
             <div className="sticky top-0 z-40 bg-background pt-8 pb-4 -mx-8 px-8 shadow-sm">
-                <p className="text-muted-foreground max-w-3xl text-sm leading-relaxed mb-6" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guide.intro', 'O IF Builder permite criar ficções interativas, narrativas textuais onde o jogador interage com a história por meio de escolhas ou comandos (verbos). A ficção é composta por <strong>Cenas</strong>, onde o usuário lê descrições, observa imagens e toma decisões para interagir com <strong>objetos</strong> e <strong>navegar pelo mundo</strong>.')) }}></p>
+                <p className="text-muted-foreground max-w-3xl text-sm leading-relaxed mb-6" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guide.intro', 'O IF Builder permite criar ficções interativas, narrativas textuais onde o jogador interage com a história por meio de escolhas ou comandos (verbos). A ficção é composta por <strong>Ramificações</strong>, onde o usuário lê descrições, observa imagens e toma decisões para interagir com <strong>objetos</strong> e <strong>navegar pelo mundo</strong>.')) }}></p>
 
                 {/* Table of Contents Listbox */}
                 <div className="p-4 bg-muted/30 rounded-lg border border-muted-foreground/50 mb-2">
@@ -32,11 +32,11 @@ export const GuideView: React.FC = () => {
                             defaultValue=""
                         >
                             <option value="" disabled>{t('guide.tocSelect', 'Selecione um capítulo para navegar...')}</option>
-                            <option value="section-scenes">{t('guide.sections.scenes.title', '1. Editor de Cenas')}</option>
+                            <option value="section-scenes">{t('guide.sections.scenes.title', '1. Editor de Ramificações')}</option>
                             <option value="section-objects">{t('guide.sections.objects.title', '2. Biblioteca de Objetos')}</option>
                             <option value="section-interactions">{t('guide.sections.interactions.title', '3. Interações')}</option>
                             <option value="section-globals">{t('guide.sections.globals.title', '4. Verbos Globais')}</option>
-                            <option value="section-vignettes">{t('guide.sections.vignettes.title', '5. Vinhetas')}</option>
+                            <option value="section-vignettes">{t('guide.sections.vignettes.title', '5. Capítulos')}</option>
                             <option value="section-trackers">{t('guide.sections.trackers.title', '6. Rastreadores de Consequência')}</option>
                             <option value="section-map">{t('guide.sections.map.title', '7. Mapa de Conexões')}</option>
                             <option value="section-settings">{t('guide.sections.settings.title', '8. Configurações do Jogo')}</option>
@@ -52,22 +52,22 @@ export const GuideView: React.FC = () => {
             </div>
 
             <div className="space-y-10 mt-12">
-                {/* 1. Editor de Cenas */}
+                {/* 1. Editor de Ramificações */}
                 <div id="section-scenes" className="space-y-3 scroll-mt-72">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-purple-500/10 rounded-lg text-purple-500">
                             <BookOpen className="w-5 h-5" />
                         </div>
-                        <h3 className="text-lg font-bold text-foreground">{t('guide.sections.scenes.title', '1. Editor de Cenas')}</h3>
+                        <h3 className="text-lg font-bold text-foreground">{t('guide.sections.scenes.title', '1. Editor de Ramificações')}</h3>
                     </div>
                     <div className="text-sm text-muted-foreground space-y-3 pl-12">
-                        <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guideView.section1.desc', 'O IF Builder usa um sistema de nós simples. Cada cena possui uma &quot;Ação Principal&quot; que conecta a outras cenas.')) }}></p>
+                        <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guideView.section1.desc', 'O IF Builder usa um sistema de nós simples. Cada ramificação possui uma &quot;Ação Principal&quot; que conecta a outras ramificações.')) }}></p>
                         <ul className="list-disc pl-4 space-y-1">
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item1', '<strong>Nome e Descrição:</strong> Defina o título e o texto que o jogador verá ao entrar na cena.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item1', '<strong>Nome e Descrição:</strong> Defina o título e o texto que o jogador verá ao entrar na ramificação.') }}></li>
                             <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guide.sections.scenes.item2', '<strong>Texto Interativo:</strong> Utilize <code className="bg-muted px-1 rounded">&lt; &gt;</code> em uma palavra para torná-la clicável (ex: <code className="bg-muted px-1 rounded">&lt;porta&gt;</code>).')) }}></li>
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item3', '<strong>Imagem e Música:</strong> Cada cena pode ter uma imagem de fundo e trilha sonora próprias.') }}></li>
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item4', '<strong>Cena Inicial:</strong> Defina qual cena será o ponto de partida no menu lateral.') }}></li>
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item5', '<strong>Cena de Encerramento:</strong> Marque uma cena como final para encerrar a narrativa.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item3', '<strong>Imagem e Música:</strong> Cada ramificação pode ter uma imagem de fundo e trilha sonora próprias.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item4', '<strong>Ramificação Inicial:</strong> Defina qual ramificação será o ponto de partida no menu lateral.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item5', '<strong>Ramificação de Encerramento:</strong> Marque uma ramificação como final para encerrar a narrativa.') }}></li>
                         </ul>
                     </div>
                 </div>
@@ -81,7 +81,7 @@ export const GuideView: React.FC = () => {
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.objects.title', '2. Biblioteca de Objetos')}</h3>
                     </div>
                     <div className="text-sm text-muted-foreground space-y-3 pl-12">
-                        <p dangerouslySetInnerHTML={{ __html: t('guide.sections.objects.desc', 'Os objetos são <strong>globais</strong> e podem ser reutilizados em múltiplas cenas.') }}></p>
+                        <p dangerouslySetInnerHTML={{ __html: t('guide.sections.objects.desc', 'Os objetos são <strong>globais</strong> e podem ser reutilizados em múltiplas ramificações.') }}></p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.objects.item1', '<strong>Nome:</strong> Identificador do objeto (ex: "Chave de Ouro").') }}></li>
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.objects.item2', '<strong>Exame:</strong> Descrição detalhada que o jogador vê ao usar "examinar" ou "olhar".') }}></li>
@@ -105,15 +105,15 @@ export const GuideView: React.FC = () => {
                             <div className="space-y-3">
                                 <ul className="space-y-1.5 text-xs">
                                     <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guide.sections.interactions.item1', '<strong>Verbos:</strong> Palavras que ativam a ação (ex: abrir, usar, pegar).')) }}></li>
-                                    <li dangerouslySetInnerHTML={{ __html: t('guide.sections.interactions.item2', '<strong>Alvo:</strong> Objeto da cena afetado (ex: Porta).') }}></li>
+                                    <li dangerouslySetInnerHTML={{ __html: t('guide.sections.interactions.item2', '<strong>Alvo:</strong> Objeto da ramificação afetado (ex: Porta).') }}></li>
                                     <li dangerouslySetInnerHTML={{ __html: t('guide.sections.interactions.item3', '<strong>Requisito:</strong> Item necessário no inventário (ex: Chave).') }}></li>
-                                    <li dangerouslySetInnerHTML={{ __html: t('guide.sections.interactions.item4', '<strong>Resultado:</strong> Ir para cena, mudar texto, ou tocar vinheta.') }}></li>
+                                    <li dangerouslySetInnerHTML={{ __html: t('guide.sections.interactions.item4', '<strong>Resultado:</strong> Ir para ramificação, mudar texto, ou tocar capítulo.') }}></li>
                                 </ul>
                                 <div className="text-xs space-y-1 pt-2 border-t border-muted-foreground/50">
                                     <p className="font-medium text-foreground">{t('guide.sections.interactions.advancedOptions', 'Opções Avançadas:')}</p>
                                     <ul className="space-y-0.5 opacity-80">
                                         <li>{t('guide.sections.interactions.advanced1', '• Adicionar ao Inventário')}</li>
-                                        <li>{t('guide.sections.interactions.advanced2', '• Consumir Item / Remover da Cena')}</li>
+                                        <li>{t('guide.sections.interactions.advanced2', '• Consumir Item / Remover da Ramificação')}</li>
                                         <li>{t('guide.sections.interactions.advanced3', '• Efeitos em Rastreadores')}</li>
                                     </ul>
                                 </div>
@@ -165,7 +165,7 @@ export const GuideView: React.FC = () => {
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.globals.title', '4. Verbos Globais')}</h3>
                     </div>
                     <div className="text-sm text-muted-foreground space-y-2 pl-12">
-                        <p dangerouslySetInnerHTML={{ __html: t('guide.sections.globals.desc', 'Verbos que funcionam em <strong>qualquer cena</strong> do jogo.') }}></p>
+                        <p dangerouslySetInnerHTML={{ __html: t('guide.sections.globals.desc', 'Verbos que funcionam em <strong>qualquer ramificação</strong> do jogo.') }}></p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.globals.item1', '<strong>Verbos Fixos:</strong> Palavras-chave universais (ex: "ajuda", "inventário").') }}></li>
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.globals.item2', '<strong>Descrição:</strong> Resposta padrão para cada comando global.') }}></li>
@@ -179,7 +179,7 @@ export const GuideView: React.FC = () => {
                         <div className="p-2 bg-amber-500/10 rounded-lg text-amber-500">
                             <Scroll className="w-5 h-5" />
                         </div>
-                        <h3 className="text-lg font-bold text-foreground">{t('guide.sections.vignettes.title', '5. Vinhetas')} <span className="text-xs font-normal text-amber-500 ml-2">✨ {t('guide.sections.vignettes.new', 'NOVO')}</span></h3>
+                        <h3 className="text-lg font-bold text-foreground">{t('guide.sections.vignettes.title', '5. Capítulos')} <span className="text-xs font-normal text-amber-500 ml-2">✨ {t('guide.sections.vignettes.new', 'NOVO')}</span></h3>
                     </div>
                     <div className="text-sm text-muted-foreground space-y-2 pl-12">
                         <p>{t('guide.sections.vignettes.desc', 'Telas cinematográficas que enriquecem a narrativa.')}</p>
@@ -204,7 +204,7 @@ export const GuideView: React.FC = () => {
                         <p dangerouslySetInnerHTML={{ __html: t('guide.sections.trackers.desc', 'Crie sistemas numéricos como <strong>Vida</strong>, <strong>Dinheiro</strong> ou <strong>Estresse</strong>.') }}></p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.trackers.item1', '<strong>Valor Inicial e Máximo:</strong> Definem a escala (ex: 0/100).') }}></li>
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.trackers.item2', '<strong>Cena de Consequência:</strong> Para onde o jogador vai ao atingir o limite.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.trackers.item2', '<strong>Ramificação de Consequência:</strong> Para onde o jogador vai ao atingir o limite.') }}></li>
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.trackers.item3', '<strong>Personalização:</strong> Escolha cor, ícone e modo da barra (normal ou invertida).') }}></li>
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.trackers.item4', 'Interações podem <strong>aumentar</strong> ou <strong>diminuir</strong> valores.') }}></li>
                         </ul>
@@ -222,9 +222,9 @@ export const GuideView: React.FC = () => {
                     <div className="text-sm text-muted-foreground space-y-2 pl-12">
                         <p>{t('guide.sections.map.desc', 'Visualize a estrutura do seu jogo de forma gráfica.')}</p>
                         <ul className="list-disc pl-4 space-y-1">
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.map.item1', '<strong>Visão Panorâmica:</strong> Veja todas as cenas e como elas se conectam.') }}></li>
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.map.item2', '<strong>Navegação Rápida:</strong> Clique em uma cena no mapa para editá-la.') }}></li>
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.map.item3', '<strong>Posicionamento:</strong> Arraste cenas para organizar o layout visual.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.map.item1', '<strong>Visão Panorâmica:</strong> Veja todas as ramificações e como elas se conectam.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.map.item2', '<strong>Navegação Rápida:</strong> Clique em uma ramificação no mapa para editá-la.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.map.item3', '<strong>Posicionamento:</strong> Arraste ramificações para organizar o layout visual.') }}></li>
                         </ul>
                     </div>
                 </div>
@@ -287,7 +287,7 @@ export const GuideView: React.FC = () => {
                     <div className="text-sm text-muted-foreground space-y-2 pl-12">
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.preview.item1', 'Use o botão <strong>Pré-visualizar</strong> para testar toda a experiência.') }}></li>
-                            <li>{t('guide.sections.preview.item2', 'Teste a partir de qualquer cena que está editando.')}</li>
+                            <li>{t('guide.sections.preview.item2', 'Teste a partir de qualquer ramificação que está editando.')}</li>
                             <li>{t('guide.sections.preview.item3', 'Verifique se os comandos e interações funcionam como esperado.')}</li>
                         </ul>
                     </div>
@@ -304,7 +304,7 @@ export const GuideView: React.FC = () => {
                     <div className="text-sm text-muted-foreground pl-12 space-y-3">
                         <p>{t('guide.sections.export.desc', 'Quando seu jogo estiver pronto (ou para guardar seu progresso):')}</p>
                         <ol className="list-decimal pl-4 space-y-1">
-                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item1', '<strong>Teste completamente todas as cenas</strong> e finais utilizando a Pré-visualização.') }}></li>
+                            <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item1', '<strong>Teste completamente todas as ramificações</strong> e finais utilizando a Pré-visualização.') }}></li>
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item2', '<strong>Clique no botão Salvar</strong> (ícone de disquete) no menu superior.') }}></li>
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item3', 'Dê um nome ao projeto. O editor irá baixar um arquivo <strong>.zip</strong> unificado.') }}></li>
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item4', '<strong>Para jogar/compartilhar:</strong> Extraia o .zip e abra <strong>index.html</strong>.') }}></li>

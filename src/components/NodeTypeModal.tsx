@@ -37,12 +37,12 @@ const NodeTypeModal: React.FC<NodeTypeModalProps> = ({ isOpen, onClose, onSelect
                             </div>
 
                             <h3 className="text-2xl font-bold text-foreground mb-3">
-                                {t('sceneList.nodeSelection.vignette.title', 'Vinheta')}
+                                {t('sceneList.nodeSelection.vignette.title', 'Capítulo')}
                             </h3>
 
                             <p className="whitespace-pre-line text-muted-foreground text-sm max-w-xs mb-8 group-hover:text-foreground transition-colors">
                                 {!hasOpeningVignette
-                                    ? t('sceneList.nodeSelection.vignette.openingRequired', 'Comece sua história aqui.\nA primeira vinheta de abertura.')
+                                    ? t('sceneList.nodeSelection.vignette.openingRequired', 'Comece sua história aqui.\nO primeiro capítulo de abertura.')
                                     : t('sceneList.nodeSelection.vignette.description', 'Uma ponte narrativa.\nConecte pontos da história.')}
                             </p>
 
@@ -75,12 +75,12 @@ const NodeTypeModal: React.FC<NodeTypeModalProps> = ({ isOpen, onClose, onSelect
                             </div>
 
                             <h3 className="text-2xl font-bold text-foreground mb-3">
-                                {t('sceneList.nodeSelection.scene.title', 'Cena')}
+                                {t('sceneList.nodeSelection.scene.title', 'Ramificação')}
                             </h3>
 
                             <p className="whitespace-pre-line text-muted-foreground text-sm max-w-xs mb-8 group-hover:text-foreground transition-colors">
                                 {!hasOpeningVignette
-                                    ? t('sceneList.nodeSelection.scene.lockedDesc', 'Crie uma vinheta de abertura\npara habilitar cenas.')
+                                    ? t('sceneList.nodeSelection.scene.lockedDesc', 'Crie um capítulo de abertura\npara habilitar ramificações.')
                                     : t('sceneList.nodeSelection.scene.description', 'Momentos de divergência.\nFaça escolhas e mude o destino.')}
                             </p>
 

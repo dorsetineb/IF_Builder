@@ -288,7 +288,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                     
                     <div className="flex justify-between items-center p-4 bg-card rounded-xl border border-muted-foreground/50 shadow-sm relative z-10">
                         <p className="text-muted-foreground text-xs font-medium">
-                            {t('globalObjectsEditor.headerDesc', 'Gerenciador Global: Objetos criados aqui podem ser usados em qualquer cena.')}
+                            {t('globalObjectsEditor.headerDesc', 'Gerenciador Global: Objetos criados aqui podem ser usados em qualquer ramificação.')}
                         </p>
                         <div className="flex items-center gap-3">
                             {isDirty && (
@@ -419,7 +419,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                                     <h3 className="text-[10px] font-bold text-foreground mb-6 uppercase tracking-widest flex items-center gap-2">
                                         <Link className="w-4 h-4 opacity-70" />
-                                        {t('globalObjectsEditor.usedInScenes', 'Usado nas cenas')}
+                                        {t('globalObjectsEditor.usedInScenes', 'Usado nas ramificações')}
                                     </h3>
                                     <div className="flex flex-wrap gap-2">
                                         {usages.length > 0 ? (
@@ -434,7 +434,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                 </button>
                                             ))
                                         ) : (
-                                            <p className="text-[10px] text-muted-foreground italic">{t('globalObjectsEditor.notUsedAnywhere', 'Este objeto ainda não foi adicionado a nenhuma cena.')}</p>
+                                            <p className="text-[10px] text-muted-foreground italic">{t('globalObjectsEditor.notUsedAnywhere', 'Este objeto ainda não foi adicionado a nenhuma ramificação.')}</p>
                                         )}
                                     </div>
                                 </div>

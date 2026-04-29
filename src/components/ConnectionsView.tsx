@@ -34,7 +34,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
           </span>
         </h4>
         <p className="text-[10px] text-muted-foreground -mt-2 italic">
-          {t('connectionsView.inputsDesc1', 'Cenas que')} <b>{t('connectionsView.inputsDesc2', 'trazem')}</b> {currentScene.vignetteType && currentScene.vignetteType !== 'none' ? t('connectionsView.inputsDesc3Vignette', 'o jogador para esta vinheta.') : t('connectionsView.inputsDesc3', 'o jogador para esta cena.')}
+          {t('connectionsView.inputsDesc1', 'Ramificações que')} <b>{t('connectionsView.inputsDesc2', 'trazem')}</b> {currentScene.vignetteType && currentScene.vignetteType !== 'none' ? t('connectionsView.inputsDesc3Vignette', 'o jogador para este capítulo.') : t('connectionsView.inputsDesc3', 'o jogador para esta ramificação.')}
         </p>
         <div className="space-y-3">
           {inputConnections.length > 0 ? (
@@ -74,7 +74,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
               </div>
             ))
           ) : (
-            <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/50 rounded-xl italic">{t('connectionsView.noneBring', 'Nenhuma cena traz o jogador para cá.')}</p>
+            <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/50 rounded-xl italic">{t('connectionsView.noneBring', 'Nenhuma ramificação traz o jogador para cá.')}</p>
           )}
         </div>
       </div>
@@ -88,7 +88,7 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
           </span>
         </h4>
         <p className="text-[10px] text-muted-foreground -mt-2 italic">
-          {t('connectionsView.outputsDesc1', 'Cenas que o usuário pode chegar')} <b>{t('connectionsView.outputsDesc2', 'partindo')}</b> {currentScene.vignetteType && currentScene.vignetteType !== 'none' ? t('connectionsView.outputsDesc3Vignette', 'desta vinheta.') : t('connectionsView.outputsDesc3', 'desta cena.')}
+          {t('connectionsView.outputsDesc1', 'Ramificações que o usuário pode chegar')} <b>{t('connectionsView.outputsDesc2', 'partindo')}</b> {currentScene.vignetteType && currentScene.vignetteType !== 'none' ? t('connectionsView.outputsDesc3Vignette', 'deste capítulo.') : t('connectionsView.outputsDesc3', 'desta ramificação.')}
         </p>
         <div className="space-y-3">
           {outputConnections.length > 0 ? (
@@ -130,8 +130,8 @@ const ConnectionsView: React.FC<ConnectionsViewProps> = ({
           ) : (
             <p className="text-muted-foreground text-xs text-center py-8 bg-muted/20 border-2 border-solid border-muted-foreground/50 rounded-xl italic">
               {currentScene.vignetteType && currentScene.vignetteType !== 'none'
-                ? t('connectionsView.noneConnectVignette', 'Esta vinheta não se conecta a nenhuma outra.')
-                : t('connectionsView.noneConnect', 'Esta cena não se conecta a nenhuma outra.')}
+                ? t('connectionsView.noneConnectVignette', 'Este capítulo não se conecta a nenhum outro.')
+                : t('connectionsView.noneConnect', 'Esta ramificação não se conecta a nenhuma outra.')}
             </p>
           )}
         </div>

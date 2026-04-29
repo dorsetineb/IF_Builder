@@ -322,9 +322,9 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                         {/* Row 5: Go To Scene & Sound Effect */}
                         <div className="flex gap-4 items-start">
                             <div className="w-2/3 space-y-1.5">
-                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.goToSceneLabel', 'Ir para Cena')}</label>
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.goToSceneLabel', 'Ir para Ramificação')}</label>
                                 <select value={selectedInteraction.goToScene || ''} onChange={e => handleInteractionChange('goToScene', e.target.value)} className="w-full bg-input border border-input rounded p-2.5 text-xs text-foreground h-[42px]">
-                                    <option value="">{t('interactionEditor.stayInScene', '(Permanecer na cena)')}</option>
+                                    <option value="">{t('interactionEditor.stayInScene', '(Permanecer na ramificação)')}</option>
                                     {allScenes.filter(s => s.id !== currentSceneId).map(s => <option key={s.id} value={s.id}>{s.name} ({s.id})</option>)}
                                 </select>
                             </div>
@@ -344,7 +344,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
 
                         {/* Row 6: Update Scene Description */}
                         <div className="space-y-1.5">
-                            <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.updateSceneDescLabel', 'Atualizar descrição da cena')}</label>
+                            <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.updateSceneDescLabel', 'Atualizar descrição da ramificação')}</label>
                             <textarea
                                 value={selectedInteraction.successMessage || ''} // Using legacy field for backward compatibility, UI says "Description"
                                 onChange={e => handleInteractionChange('successMessage', e.target.value)}

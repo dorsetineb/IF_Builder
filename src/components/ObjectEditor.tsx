@@ -132,7 +132,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                             onClick={() => setIsLinkMode(false)}
                             className={`flex-1 py-2 text-[10px] font-bold uppercase tracking-wide rounded-md transition-all ${!isLinkMode ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                         >
-                            {t('objectEditor.inThisScene', 'Nesta Cena ({{count}})', { count: objects.length })}
+                            {t('objectEditor.inThisScene', 'Nesta Ramificação ({{count}})', { count: objects.length })}
                         </button>
                         <button
                             onClick={() => setIsLinkMode(true)}
@@ -236,7 +236,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                             <button
                                                 onClick={() => handleLinkExistingObject(obj.id)}
                                                 className="p-1.5 bg-primary/10 text-primary rounded hover:bg-primary hover:text-primary-foreground transition-colors"
-                                                title={t('objectEditor.linkToSceneTooltip', 'Vincular à cena')}
+                                                title={t('objectEditor.linkToSceneTooltip', 'Vincular à ramificação')}
                                             >
                                                 <Plus className="w-4 h-4" />
                                             </button>
@@ -424,7 +424,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                     <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center">
                         <Box className="w-12 h-12 mb-4 opacity-20" />
                         <h4 className="text-sm font-bold text-muted-foreground mb-1">{t('objectEditor.noObjectSelected', 'Nenhum objeto selecionado')}</h4>
-                        <p className="text-xs max-w-xs opacity-60">{t('objectEditor.noObjectDesc', 'Selecione um objeto da lista ao lado para editar suas propriedades ou vincule um novo objeto à cena.')}</p>
+                        <p className="text-xs max-w-xs opacity-60">{t('objectEditor.noObjectDesc', 'Selecione um objeto da lista ao lado para editar suas propriedades ou vincule um novo objeto à ramificação.')}</p>
                     </div>
                 )}
             </div>
@@ -432,7 +432,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
             <ConfirmationModal
                 isOpen={unlinkModal.isOpen}
                 title={t('objectEditor.unlinkTitle', 'Desvincular Objeto')}
-                message={`${t('common.deleteConfirm', 'Tem certeza?')}\n\n${t('objectEditor.unlinkDesc', 'Isso removerá o objeto desta cena, mas ele ainda existirá no projeto.')}`}
+                message={`${t('common.deleteConfirm', 'Tem certeza?')}\n\n${t('objectEditor.unlinkDesc', 'Isso removerá o objeto desta ramificação, mas ele ainda existirá no projeto.')}`}
                 confirmText={t('objectEditor.unlinkBtn', 'Desvincular')}
                 cancelText={t('common.cancel', 'Cancelar')}
                 isDanger={true}

@@ -190,7 +190,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
               items.push({
                 id: i.id,
                 targetId: i.vignetteId,
-                label: i.verbs?.[0] || t('sceneMap.vignette', 'Vinheta'),
+                label: i.verbs?.[0] || t('sceneMap.vignette', 'Capítulo'),
                 type: 'vignette',
                 original: i,
               });
@@ -726,7 +726,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
             className={`w-full flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-primary ${hoverTextClass} border border-transparent whitespace-nowrap`}
           >
             <ArrowRight className="w-3.5 h-3.5 mr-1.5" />
-            {t('sceneList.nodeSelection.vignette.title', 'Criar Vinheta')}
+            {t('sceneList.nodeSelection.vignette.title', 'Criar Capítulo')}
           </button>
           <button
             onClick={(e) => {
@@ -739,10 +739,10 @@ const SceneMap: React.FC<SceneMapProps> = ({
                 ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed grayscale' 
                 : `bg-white text-zinc-950 hover:bg-primary ${hoverTextClass}`
             }`}
-            title={!hasOpeningVignette ? t('sceneList.nodeSelection.scene.lockedDesc', 'Crie uma vinheta de abertura para habilitar cenas.') : ''}
+            title={!hasOpeningVignette ? t('sceneList.nodeSelection.scene.lockedDesc', 'Crie um capítulo de abertura para habilitar ramificações.') : ''}
           >
             <Split className="w-3.5 h-3.5 mr-1.5 rotate-90" />
-            {t('sceneList.nodeSelection.scene.title', 'Criar Cena')}
+            {t('sceneList.nodeSelection.scene.title', 'Criar Ramificação')}
           </button>
         </div>
 
@@ -1188,7 +1188,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
             <li className="flex items-center gap-2">
               <div className="w-2.5 h-2.5 rounded-full border-2 border-amber-500 bg-amber-500/20"></div>
               <span className={`text-[10px] font-bold uppercase tracking-wider text-zinc-400`}>
-                {t('sceneMap.sceneVignette', 'Cena / Vinheta')}
+                {t('sceneMap.sceneVignette', 'Ramificação / Capítulo')}
               </span>
             </li>
             <li className="flex items-center gap-2">

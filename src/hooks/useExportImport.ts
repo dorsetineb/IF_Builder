@@ -777,7 +777,7 @@ DATE:        ${exportDate.toLocaleString()}
 
           const newScene: Scene = {
             id: v.id,
-            name: v.name || v.title || 'Vinheta',
+            name: v.name || v.title || 'Cena',
             description: v.description || '',
             image: v.image,
             backgroundMusic: v.backgroundMusic,
@@ -838,7 +838,7 @@ DATE:        ${exportDate.toLocaleString()}
 
       if (newStartSceneId && cleanedScenes[newStartSceneId]) {
         const startScene = cleanedScenes[newStartSceneId];
-        const isGenericName = startScene.name === 'Abertura' || startScene.name === 'Vinheta';
+        const isGenericName = startScene.name === 'Abertura' || startScene.name === 'Vinheta' || startScene.name === 'Cena';
 
         if (isGenericName && data.gameTitle && data.gameTitle.trim() !== '') {
           cleanedScenes[newStartSceneId] = {

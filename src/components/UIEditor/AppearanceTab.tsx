@@ -190,7 +190,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '50ms' }}>
                     <div className="flex items-center w-full text-left">
                         <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
-                            {t('UIEditor.aparencia.estrutura', 'Layout das Cenas')}
+                            {t('UIEditor.aparencia.estrutura', 'Layout das Ramificações')}
                         </h3>
                     </div>
 
@@ -272,7 +272,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                     <div className="flex items-center w-full text-left">
                         <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
-                            <ArrowRight className="w-4 h-4" /> {t('UIEditor.aparencia.vinhetas', 'Layout das Vinhetas')}
+                            <ArrowRight className="w-4 h-4" /> {t('UIEditor.aparencia.vinhetas', 'Layout dos Capítulos')}
                         </h3>
                     </div>
 
@@ -413,20 +413,20 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                         {/* GRUPO 3: INTERFACE DAS VINHETAS */}
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
-                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.vignetteControls', 'Interface das Vinhetas')}</h4>
+                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.vignetteControls', 'Interface dos Capítulos')}</h4>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
-                                                <ColorInput label={t('UIEditor.aparencia.vignetteTitle', 'Título da vinheta')} id="vignetteTitleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
-                                                <ColorInput label={t('UIEditor.aparencia.splashButton', 'Botão da vinheta')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.splashButtonTextColor', 'Texto do botão da vinheta')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
-                                                <ColorInput label={t('UIEditor.aparencia.splashButtonHover', 'Hover do botão da vinheta')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.vignetteTitle', 'Título do Capítulo')} id="vignetteTitleColor" value={localTitleColor} onChange={setLocalTitleColor} placeholder="#58A6FF" />
+                                                <ColorInput label={t('UIEditor.aparencia.splashButton', 'Botão do capítulo')} id="splashButtonColor" value={localSplashButtonColor} onChange={setLocalSplashButtonColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.splashButtonTextColor', 'Texto do botão do capítulo')} id="splashButtonTextColor" value={localSplashButtonTextColor} onChange={setLocalSplashButtonTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.splashButtonHover', 'Hover do botão do capítulo')} id="splashButtonHoverColor" value={localSplashButtonHoverColor} onChange={setLocalSplashButtonHoverColor} placeholder="#FFFFFF" />
                                             </div>
                                         </div>
 
                                         {/* GRUPO 5: INTERFACE DAS CENAS */}
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
-                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.systemInterface', 'Interface das Cenas')}</h4>
+                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.systemInterface', 'Interface das Ramificações')}</h4>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                 <ColorInput label={t('UIEditor.aparencia.gameBgColor', 'Cor de fundo')} id="gameBackgroundColor" value={localGameBackgroundColor} onChange={setLocalGameBackgroundColor} placeholder="#000000" />
@@ -445,11 +445,11 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                         {/* GRUPO 2: NOME DA CENA */}
                                         <div className="space-y-4">
                                             <div className="flex items-center gap-2 border-b border-muted-foreground/30 pb-1">
-                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.sceneIdentity', 'Nome da Cena')}</h4>
+                                                <h4 className="text-[10px] font-bold text-foreground uppercase tracking-widest">{t('UIEditor.aparencia.groups.sceneIdentity', 'Nome da Ramificação')}</h4>
                                             </div>
                                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-4">
                                                 <ColorInput label={t('UIEditor.aparencia.sceneNameBg', 'Cor de fundo da caixa')} id="scenaNameBg" value={localGameSceneNameOverlayBg} onChange={setLocalGameSceneNameOverlayBg} placeholder="#000000" />
-                                                <ColorInput label={t('UIEditor.aparencia.sceneNameText', 'Texto (Nome da Cena)')} id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
+                                                <ColorInput label={t('UIEditor.aparencia.sceneNameText', 'Texto (Nome da Ramificação)')} id="sceneNameText" value={localGameSceneNameOverlayTextColor} onChange={setLocalGameSceneNameOverlayTextColor} placeholder="#FFFFFF" />
                                                 <ColorInput 
                                                     label={t('UIEditor.aparencia.frameColor', 'Moldura da Imagem')} 
                                                     id="gameFrameColor" 
@@ -477,13 +477,13 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                 onClick={() => setPreviewType('scene')}
                                 className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'scene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                             >
-                                {t('newProject.appearance.layoutScenes', 'Layout das Cenas')}
+                                {t('newProject.appearance.layoutScenes', 'Layout das Ramificações')}
                             </button>
                             <button
                                 onClick={() => setPreviewType('vignette')}
                                 className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'vignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                             >
-                                {t('newProject.info.vignetteLayout', 'Layout das Vinhetas')}
+                                {t('newProject.info.vignetteLayout', 'Layout dos Capítulos')}
                             </button>
                         </div>
                     </div>
@@ -673,10 +673,10 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                 </div>
                                 <div className={`relative z-10 w-full flex flex-col gap-2 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
                                     {!localOmitSplashTitle && (
-                                        <div className="font-bold uppercase tracking-widest leading-tight" style={{ color: localTitleColor, fontSize: getScaledFontSize(1.2), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sceneName', 'Título da vinheta')}</div>
+                                        <div className="font-bold uppercase tracking-widest leading-tight" style={{ color: localTitleColor, fontSize: getScaledFontSize(1.2), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sceneName', 'Título do Capítulo')}</div>
                                     )}
                                     {!localOmitSplashDescription && (
-                                        <p className="leading-relaxed" style={{ color: localTextColor, fontSize: getScaledFontSize(1.0), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sampleVignetteDesc', 'Esta é uma descrição de exemplo para a vinheta.')}</p>
+                                        <p className="leading-relaxed" style={{ color: localTextColor, fontSize: getScaledFontSize(1.0), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sampleVignetteDesc', 'Esta é uma descrição de exemplo para o capítulo.')}</p>
                                     )}
                                     <button
                                         className="preview-btn-splash px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate mt-1"

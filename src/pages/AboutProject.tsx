@@ -108,7 +108,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     </div>
                                     <div className="space-y-6 text-muted-foreground leading-relaxed font-light text-sm">
                                         <p>{t('about.project.p1', 'O IF Builder é um editor que desenvolvi para criar ficções interativas - narrativas textuais onde quem joga decide o que acontecerá em seguida.')}</p>
-                                        <p>{t('about.project.p2', 'Aqui, as ficções interativas são escritas em cenas. É fácil visualizar para onde cada escolha leva o jogador e como os caminhos se cruzam. Se você quer que algo aconteça apenas se o jogador tiver um item específico ou tiver feito uma escolha anterior, o editor resolve isso.')}</p>
+                                        <p>{t('about.project.p2', 'Aqui, as ficções interativas são escritas em ramificações. É fácil visualizar para onde cada escolha leva o jogador e como os caminhos se cruzam. Se você quer que algo aconteça apenas se o jogador tiver um item específico ou tiver feito uma escolha anterior, o editor resolve isso.')}</p>
                                         <p>{t('about.project.p3', 'Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?')}</p>
                                     </div>
                                 </div>

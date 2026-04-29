@@ -441,14 +441,14 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({
                                                         <button
                                                             onClick={() => onSelectScene(selectedTracker.consequenceSceneId)}
                                                             className="h-[38px] aspect-square flex items-center justify-center bg-card border border-muted-foreground/50 rounded-lg hover:bg-accent hover:border-primary/50 hover:text-primary text-muted-foreground transition-all shrink-0"
-                                                            title={t('trackersEditor.goToSceneTooltip', 'Ir para a cena de consequência')}
+                                                            title={t('trackersEditor.goToSceneTooltip', 'Ir para a ramificação de consequência')}
                                                         >
                                                             <ExternalLink className="w-4 h-4" />
                                                         </button>
                                                     )}
                                                 </div>
                                                 <p className="text-[10px] text-muted-foreground italic">
-                                                    {t('trackersEditor.consequenceDesc', 'O jogador será enviado para esta cena quando o valor do rastreador for maior ou igual ao máximo.')}
+                                                    {t('trackersEditor.consequenceDesc', 'O jogador será enviado para esta ramificação quando o valor do rastreador for maior ou igual ao máximo.')}
                                                 </p>
                                             </div>
 

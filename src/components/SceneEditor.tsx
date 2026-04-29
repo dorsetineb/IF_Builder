@@ -534,7 +534,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                     <h3 className="text-[10px] font-bold text-foreground mb-4 flex items-center gap-2 uppercase tracking-widest">
                       <FileText className="w-4 h-4" />
                       {isVignetteMode
-                        ? t('sceneEditor.vignetteNarrativeTitle', 'Detalhes da Vinheta')
+                        ? t('sceneEditor.vignetteNarrativeTitle', 'Detalhes do Capítulo')
                         : t('sceneEditor.narrativeTitle')}
                     </h3>
 
@@ -542,7 +542,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                       {isVignetteMode && localScene.vignetteType !== 'opening' && (
                         <div className="mb-6">
                           <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
-                            {t('sceneEditor.roleLabel', 'NATUREZA DA VINHETA')}
+                            {t('sceneEditor.roleLabel', 'NATUREZA DO CAPÍTULO')}
                           </label>
                           <div className="grid grid-cols-2 gap-2">
                             {[
@@ -566,7 +566,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                                         vignetteType: type.id as 'opening' | 'transition' | 'conclusion'
                                       };
 
-                                      if (type.id === 'conclusion' && localScene.name.startsWith(t('editor.newVignetteNamePrefix', 'Vinheta #'))) {
+                                      if (type.id === 'conclusion' && localScene.name.startsWith(t('editor.newVignetteNamePrefix', 'Capítulo #'))) {
                                         updates.name = t('editor.newConclusionVignetteName', 'Conclusão');
                                       }
 
@@ -1343,7 +1343,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
                           <div className="space-y-1.5">
                             <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                              {t('sceneEditor.targetSceneChoiceLabel', 'Cena de Destino')}
+                              {t('sceneEditor.targetSceneChoiceLabel', 'Ramificação de Destino')}
                             </label>
                             <div className="relative">
                               <select
@@ -1372,7 +1372,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                     {(localScene.choices || []).length === 0 && (
                       <div className="col-span-full py-12 flex flex-col items-center justify-center bg-muted/20 border-2 border-dashed border-muted-foreground/20 rounded-2xl text-muted-foreground">
                         <ArrowRight className="w-12 h-12 mb-4 opacity-10" />
-                        <p className="text-sm">{t('sceneEditor.noChoicesAdded', 'Nenhuma decisão adicionada a esta cena.')}</p>
+                        <p className="text-sm">{t('sceneEditor.noChoicesAdded', 'Nenhuma decisão adicionada a esta ramificação.')}</p>
                       </div>
                     )}
                   </div>

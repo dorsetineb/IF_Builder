@@ -155,7 +155,7 @@ const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<Sce
                   : 'bg-red-500 rounded-r-lg' // match the rounded-lg of container
                 : 'bg-red-500 rounded-r-lg' 
             }`}
-            title={t('sceneList.deleteScene', 'Deletar cena')}
+            title={t('sceneList.deleteScene', 'Deletar ramificação')}
           >
             <Trash2 className="w-5 h-5 pointer-events-none" />
           </button>

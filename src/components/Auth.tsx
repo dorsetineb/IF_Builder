@@ -159,7 +159,7 @@ export function Auth() {
 
                 <div className="space-y-4 text-muted-foreground leading-relaxed text-sm">
                     <p>
-                        {t('auth.about.p1', 'Crie cenas, objetos e defina as interações que avançam a sua ficção interativa.')}
+                        {t('auth.about.p1', 'Crie ramificações, objetos e defina as interações que avançam a sua ficção interativa.')}
                     </p>
                     <p>
                         {t('auth.about.p2', 'Todas as ficções interativas criadas aqui são exportadas em um arquivo .zip. Ele não precisa de internet nem do editor para funcionar - apenas um navegador. Pense nesse arquivo como um pendrive: você pode guardá-lo em uma gaveta, ou entregá-lo a alguém.')}

@@ -35,24 +35,24 @@ const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) =>
         <div className="p-10 overflow-y-auto space-y-12 text-zinc-300 leading-relaxed scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
 
           <section className="bg-zinc-900/30 p-6 rounded-xl border border-muted-foreground/50">
-            <p className="text-sm" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.intro', 'O <strong className="text-white">IF Builder</strong> permite criar jogos de ficção interativa (Interactive Fiction). O jogo é composto por <strong>Cenas</strong>, onde o jogador lê descrições, observa imagens e digita comandos (verbos) para interagir com <strong>Objetos</strong> e navegar pelo mundo.')) }}></p>
+            <p className="text-sm" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.intro', 'O <strong className="text-white">IF Builder</strong> permite criar jogos de ficção interativa (Interactive Fiction). O jogo é composto por <strong>Ramificações</strong>, onde o jogador lê descrições, observa imagens e digita comandos (verbos) para interagir com <strong>Objetos</strong> e navegar pelo mundo.')) }}></p>
           </section>
 
           <section>
-            <h3 className="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4">{t('manualModal.section1Title', '1. Editor de Cenas')}</h3>
+            <h3 className="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4">{t('manualModal.section1Title', '1. Editor de Ramificações')}</h3>
             <div className="space-y-4 text-sm">
-              <p>{t('manualModal.section1Intro', 'Cada cena é um local ou momento no seu jogo. Configure:')}</p>
+              <p>{t('manualModal.section1Intro', 'Cada ramificação é um local ou momento no seu jogo. Configure:')}</p>
               <ul className="list-disc ml-6 space-y-3 marker:text-primary">
                 <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.section1Item1', '<strong className="text-zinc-200">Texto Interativo:</strong> Use a sintaxe <code>&lt;palavra&gt;</code> na descrição. Isso tornará a palavra clicável no jogo, facilitando a digitação de comandos para o jogador.')) }}></li>
-                <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.section1Item2', '<strong className="text-zinc-200">Imagem e Música:</strong> Cada cena pode ter uma imagem de fundo única e uma trilha sonora que começa a tocar assim que o jogador entra nela.')) }}></li>
-                <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.section1Item3', '<strong className="text-zinc-200">Cena Inicial:</strong> Defina qual cena será o ponto de partida do seu jogo no menu lateral.')) }}></li>
+                <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.section1Item2', '<strong className="text-zinc-200">Imagem e Música:</strong> Cada ramificação pode tener uma imagem de fundo única e uma trilha sonora que começa a tocar assim que o jogador entra nela.')) }}></li>
+                <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.section1Item3', '<strong className="text-zinc-200">Ramificação Inicial:</strong> Defina qual ramificação será o ponto de partida do seu jogo no menu lateral.')) }}></li>
               </ul>
             </div>
           </section>
 
           <section>
             <h3 className="text-xs font-bold text-primary uppercase tracking-[0.2em] mb-4">{t('manualModal.section2Title', '2. Biblioteca de Objetos')}</h3>
-            <p className="text-sm" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.section2Intro', 'Os objetos são itens que podem estar em uma cena. Eles são <strong className="text-white">globais</strong>: você cria um objeto uma vez (ex: "Chave de Ouro") e pode vinculá-lo a múltiplas cenas ou usá-lo em interações em qualquer lugar do jogo.')) }}></p>
+            <p className="text-sm" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.section2Intro', 'Os objetos são itens que podem estar em uma ramificação. Eles são <strong className="text-white">globais</strong>: você cria um objeto uma vez (ex: "Chave de Ouro") e pode vinculá-lo a múltiplas ramificações ou usá-lo em interações em qualquer lugar do jogo.')) }}></p>
             <ul className="list-disc ml-6 mt-4 space-y-2 text-sm marker:text-primary">
               <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.section2Item1', '<strong className="text-zinc-200">Exame:</strong> Defina uma descrição detalhada que o jogador verá ao usar o comando "olhar" ou "examinar" o objeto.')) }}></li>
             </ul>
@@ -69,7 +69,7 @@ const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) =>
                 </div>
                 <div className="p-4 bg-zinc-950 rounded-lg border border-muted-foreground/50">
                   <p className="font-bold text-zinc-500 uppercase tracking-widest mb-2">{t('manualModal.targetTitle', 'Alvo')}</p>
-                  <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.targetDesc', 'O objeto da cena com o qual o jogador quer interagir (ex: <code>Porta</code>).')) }}></p>
+                  <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.targetDesc', 'O objeto da ramificação com o qual o jogador quer interagir (ex: <code>Porta</code>).')) }}></p>
                 </div>
                 <div className="p-4 bg-zinc-950 rounded-lg border border-muted-foreground/50">
                   <p className="font-bold text-zinc-500 uppercase tracking-widest mb-2">{t('manualModal.reqTitle', 'Requisito')}</p>
@@ -77,7 +77,7 @@ const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) =>
                 </div>
                 <div className="p-4 bg-zinc-950 rounded-lg border border-muted-foreground/50">
                   <p className="font-bold text-zinc-500 uppercase tracking-widest mb-2">{t('manualModal.resTitle', 'Resultado')}</p>
-                  <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.resDesc', 'O que acontece após o comando (ex: ir para outra cena).')) }}></p>
+                  <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.resDesc', 'O que acontece após o comando (ex: ir para outra ramificação).')) }}></p>
                 </div>
               </div>
 
@@ -101,7 +101,7 @@ const UserManualModal: React.FC<UserManualModalProps> = ({ isOpen, onClose }) =>
             <p className="text-sm" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.section4Intro', 'Use rastreadores para criar sistemas complexos como <strong className="text-white">Vida, Dinheiro ou Estresse</strong>.')) }}></p>
             <ul className="list-disc ml-6 mt-4 space-y-3 text-sm marker:text-primary">
               <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.section4Item1', 'Interações podem aumentar ou diminuir o valor de um rastreador.')) }}></li>
-              <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.section4Item2', 'Quando um rastreador atinge seu <strong>valor máximo</strong>, o jogador é automaticamente transportado para uma <strong>Cena de Consequência</strong>.')) }}></li>
+              <li dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('manualModal.section4Item2', 'Quando um rastreador atinge seu <strong>valor máximo</strong>, o jogador é automaticamente transportado para uma <strong>Ramificação de Consequência</strong>.')) }}></li>
             </ul>
           </section>
 

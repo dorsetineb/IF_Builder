@@ -51,17 +51,17 @@ export const useSceneManagement = ({
             if (!hasOpeningVignette) {
                 defaultName = t('editor.newOpeningVignetteName', 'Abertura');
             } else {
-                defaultName = `${t('editor.newVignetteNamePrefix', 'Vinheta #')}${vignetteCount}`;
+                defaultName = `${t('editor.newVignetteNamePrefix', 'Cena #')}${vignetteCount}`;
             }
         } else {
-            defaultName = `${t('editor.newSceneNamePrefix', 'Cena #')}${sceneCount}`;
+            defaultName = `${t('editor.newSceneNamePrefix', 'Ramificação #')}${sceneCount}`;
         }
 
         const newScene: Scene = {
             id: newId,
             name: defaultName,
             image: '',
-            description: isVignette ? t('editor.newVignetteDescription', 'Descrição da nova vinheta.') : t('editor.newSceneDescription', 'Descrição da nova cena.'),
+            description: isVignette ? t('editor.newVignetteDescription', 'Descrição da nova cena.') : t('editor.newSceneDescription', 'Descrição da nova ramificação.'),
             objectIds: [],
             interactions: [],
             vignetteType: !hasOpeningVignette ? 'opening' : (type === 'vignette' ? 'transition' : 'none'),
@@ -105,7 +105,7 @@ export const useSceneManagement = ({
         if (sceneId === gameData.startScene && Object.keys(gameData.scenes).length > 1) {
             toast(
                 t('editor.actionNotAllowed', 'Ação não permitida'),
-                t('editor.deleteStartSceneError', 'Você não pode deletar a cena inicial. Defina outra cena como inicial antes de excluir esta.'),
+                t('editor.deleteStartSceneError', 'Você não pode deletar a ramificação inicial. Defina outra ramificação como inicial antes de excluir esta.'),
                 "error"
             );
             return;
@@ -223,7 +223,7 @@ export const useSceneManagement = ({
         const newId = `VNT_${Math.random().toString(36).substring(2, 9).toUpperCase()}`;
         const newVignette: Vignette = {
             id: newId,
-            name: 'Nova Vinheta',
+            name: 'Nova Cena',
             title: '',
             description: '',
             contentAlignment: 'left',
@@ -235,8 +235,8 @@ export const useSceneManagement = ({
         }));
         setIsDirty(true);
         toast(
-            t('editor.vignetteCreatedTitle', 'Vinheta Criada'),
-            t('editor.vignetteCreatedDesc', 'Nova vinheta criada com sucesso.'),
+            t('editor.vignetteCreatedTitle', 'Cena Criada'),
+            t('editor.vignetteCreatedDesc', 'Nova cena criada com sucesso.'),
             "success"
         );
     }, [setGameData, setIsDirty, toast, t]);
