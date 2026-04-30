@@ -9,10 +9,12 @@
  * Run: node scripts/optimize-demos.mjs
  */
 
+/* eslint-env node */
 import { readFileSync, writeFileSync, existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { transform } from 'esbuild';
+import { Buffer } from 'buffer';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, '..');

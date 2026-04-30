@@ -8,6 +8,12 @@ interface TransitionScreenProps {
 
 export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible }) => {
     const { theme } = useTheme();
+    const [bgSrc, setBgSrc] = React.useState('/background.webp');
+
+    React.useEffect(() => {
+        const savedBg = localStorage.getItem('if-builder-bg-src');
+        if (savedBg) setBgSrc(savedBg);
+    }, []);
 
     const getDitherColors = () => {
         switch (theme) {
@@ -30,7 +36,7 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
             {/* Background Dither */}
             <div className="absolute inset-0 z-0 bg-neutral-950">
                 <DitherShader
-                    src="/background.webp"
+                    src={bgSrc}
                     gridSize={2}
                     ditherMode="bayer"
                     colorMode="duotone"

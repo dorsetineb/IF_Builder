@@ -7,7 +7,8 @@
  * Run: node scripts/optimize-background.mjs
  */
 
-import { existsSync, writeFileSync, readFileSync } from 'fs';
+/* eslint-env node */
+import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 

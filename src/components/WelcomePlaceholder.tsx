@@ -22,6 +22,12 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
     const [isGamePopupOpen, setIsGamePopupOpen] = useState(false);
     const [demoData, setDemoData] = useState<GameData | null>(null);
     const [isLoadingDemo, setIsLoadingDemo] = useState(false);
+    const [bgSrc, setBgSrc] = useState('/background.webp');
+
+    useEffect(() => {
+        const savedBg = localStorage.getItem('if-builder-bg-src');
+        if (savedBg) setBgSrc(savedBg);
+    }, []);
 
     const handleDownloadClick = () => {
         setIsFlashing(true);
@@ -82,7 +88,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
         <div className="relative w-full h-full flex flex-col items-center justify-center overflow-hidden bg-zinc-950">
             <div className="absolute inset-0 z-0">
                 <DitherShader
-                    src="/background.webp"
+                    src={bgSrc}
                     gridSize={2}
                     ditherMode="bayer"
                     colorMode="duotone"

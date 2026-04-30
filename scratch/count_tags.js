@@ -31,8 +31,8 @@ const tags = ['button', 'input', 'textarea', 'p', 'h3', 'h4', 'span', 'label', '
 
 tags.forEach(tag => {
     const open = (content.match(new RegExp(`<${tag}[\\s>]`, 'g')) || []).length;
-    const close = (content.match(new RegExp(`<\/${tag}>`, 'g')) || []).length;
-    const selfClosing = (content.match(new RegExp(`<${tag}[^>]*\/>`, 'g')) || []).length;
+    const close = (content.match(new RegExp(`</${tag}>`, 'g')) || []).length;
+    const selfClosing = (content.match(new RegExp(`<${tag}[^>]*/>`, 'g')) || []).length;
     if (open !== close + selfClosing) {
         console.log(`Tag mismatch: ${tag} (Open: ${open}, Close: ${close}, Self-closing: ${selfClosing})`);
     }

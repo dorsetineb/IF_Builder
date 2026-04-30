@@ -384,6 +384,9 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
         const prepareSource = () => {
             if (!imageRef.current) return;
             const img = imageRef.current;
+            
+            if (img.naturalWidth === 0 || img.naturalHeight === 0) return; // Prevent empty draws
+
             const offscreen = document.createElement("canvas");
             let dw = internalWidth;
             let dh = internalHeight;
@@ -412,7 +415,9 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             const loop = () => {
                 if (cancel) return;
                 timeRef.current += animationSpeed;
-                renderLoop(ctx, internalWidth, internalHeight, timeRef.current);
+                if (sourceDataRef.current) {
+                    renderLoop(ctx, internalWidth, internalHeight, timeRef.current);
+                }
                 if (animated || enableHover || isScanMode) {
                     animationRef.current = requestAnimationFrame(loop);
                 }
@@ -422,7 +427,10 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
             return () => { cancel = true; if (animationRef.current) cancelAnimationFrame(animationRef.current); };
         };
 
-        if (imageRef.current && imageRef.current.complete) {
+        const currentSrc = imageRef.current?.getAttribute('src') || imageRef.current?.src || '';
+        const isSameImage = currentSrc.endsWith(src) || currentSrc === src;
+
+        if (imageRef.current && imageRef.current.complete && isSameImage) {
             return startLoop();
         } else {
             const img = new Image();
@@ -432,7 +440,11 @@ export const DitherShader: React.FC<DitherShaderProps> = ({
                 imageRef.current = img;
                 prepareSource();
             };
-            imageRef.current = img;
+            img.onerror = () => {
+                console.error(`Failed to load dither image: ${src}`);
+            };
+            
+            // Start loop immediately with previous sourceData to avoid black screen
             return startLoop();
         }
 

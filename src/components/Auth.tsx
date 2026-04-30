@@ -9,6 +9,30 @@ import Preview from './Preview';
 
 type LandingView = 'landing' | 'about' | 'play';
 
+const BACKGROUNDS = [
+    {
+        src: '/background.webp',
+        line1Key: 'auth.sidebar.line1',
+        defaultLine1: 'Em uma caverna escura.',
+        line2Key: 'auth.sidebar.line2',
+        defaultLine2: 'Monitores CRT iluminam o mofo.'
+    },
+    {
+        src: '/bgs/bg1.jpg',
+        line1Key: 'auth.sidebar.bgs.egypt.line1',
+        defaultLine1: 'Em uma tumba milenar.',
+        line2Key: 'auth.sidebar.bgs.egypt.line2',
+        defaultLine2: 'Monitores CRT repousam sobre a areia.'
+    },
+    {
+        src: '/bgs/bg3.jpg',
+        line1Key: 'auth.sidebar.bgs.cell.line1',
+        defaultLine1: 'Em uma masmorra esquecida.',
+        line2Key: 'auth.sidebar.bgs.cell.line2',
+        defaultLine2: 'Monitores CRT emitem um zumbido opaco.'
+    }
+];
+
 export function Auth() {
     const { t, i18n } = useTranslation();
     const navigate = useNavigate();
@@ -16,6 +40,8 @@ export function Auth() {
 
     // Landing page view state
     const [currentView, setCurrentView] = useState<LandingView>('landing');
+    const [currentBgIndex, setCurrentBgIndex] = useState(() => Math.floor(Math.random() * BACKGROUNDS.length));
+    const activeBg = BACKGROUNDS[currentBgIndex];
     const [demoData, setDemoData] = useState<GameData | null>(null);
     const [isLoadingDemo, setIsLoadingDemo] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
@@ -28,6 +54,10 @@ export function Auth() {
         window.addEventListener('resize', checkMobile);
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
+
+    React.useEffect(() => {
+        localStorage.setItem('if-builder-bg-src', activeBg.src);
+    }, [activeBg.src]);
 
     const { theme } = useTheme();
 
@@ -50,6 +80,13 @@ export function Auth() {
 
         setIsClosing(true);
         setTimeout(() => {
+            setCurrentBgIndex(prev => {
+                let next = Math.floor(Math.random() * BACKGROUNDS.length);
+                while (next === prev && BACKGROUNDS.length > 1) {
+                    next = Math.floor(Math.random() * BACKGROUNDS.length);
+                }
+                return next;
+            });
             setCurrentView('landing');
             setIsClosing(false);
             // Optionally clear demo data or keep it for next time
@@ -97,8 +134,8 @@ export function Auth() {
                         </div>
                     ) : (
                         <>
-                            <p>{t('auth.sidebar.line1', 'Em uma caverna escura.')}</p>
-                            <p>{t('auth.sidebar.line2', 'Monitores CRT iluminam o mofo.')}</p>
+                            <p>{t(activeBg.line1Key, activeBg.defaultLine1)}</p>
+                            <p>{t(activeBg.line2Key, activeBg.defaultLine2)}</p>
                             <p className={`text-primary font-bold mt-2 drop-shadow-md`}>&gt; {t('auth.sidebar.action', 'O QUE VOCÊ FAZ?')}</p>
                         </>
                     )}
@@ -204,13 +241,14 @@ export function Auth() {
                         </span>
                     </div>
                     <div className="flex items-center">
-                        <button className="h-6 w-8 flex items-center justify-center hover:bg-black/10 transition-colors rounded-sm">
+                        <button title="Minimize" className="h-6 w-8 flex items-center justify-center hover:bg-black/10 transition-colors rounded-sm">
                             <Minus className={`w-3 h-3 text-primary-foreground/70`} />
                         </button>
-                        <button className="h-6 w-8 flex items-center justify-center hover:bg-black/10 transition-colors rounded-sm">
+                        <button title="Maximize" className="h-6 w-8 flex items-center justify-center hover:bg-black/10 transition-colors rounded-sm">
                             <Square className={`w-2.5 h-2.5 text-primary-foreground/70`} />
                         </button>
                         <button
+                            title="Close"
                             className="h-6 w-8 flex items-center justify-center hover:bg-red-500 transition-colors group rounded-sm"
                             onClick={resetToLanding}
                         >
@@ -252,7 +290,7 @@ export function Auth() {
             {/* Global Dither Background */}
             <div className="absolute inset-0 z-0 bg-background overflow-hidden pointer-events-none">
                 <DitherShader
-                    src="/background.webp"
+                    src={activeBg.src}
                     gridSize={2}
                     ditherMode="bayer"
                     colorMode="duotone"
