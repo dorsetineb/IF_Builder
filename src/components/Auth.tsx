@@ -18,18 +18,11 @@ const BACKGROUNDS = [
         defaultLine2: 'Monitores CRT iluminam o mofo.'
     },
     {
-        src: '/bgs/bg1.jpg',
-        line1Key: 'auth.sidebar.bgs.egypt.line1',
-        defaultLine1: 'Em uma tumba milenar.',
-        line2Key: 'auth.sidebar.bgs.egypt.line2',
-        defaultLine2: 'Monitores CRT repousam sobre a areia.'
-    },
-    {
         src: '/bgs/bg3.jpg',
         line1Key: 'auth.sidebar.bgs.cell.line1',
-        defaultLine1: 'Em uma masmorra esquecida.',
+        defaultLine1: 'Na masmorra do castelo.',
         line2Key: 'auth.sidebar.bgs.cell.line2',
-        defaultLine2: 'Monitores CRT emitem um zumbido opaco.'
+        defaultLine2: 'Monitores CRT iluminam as paredes úmidas.'
     }
 ];
 
@@ -39,12 +32,12 @@ export function Auth() {
     const [isClosing, setIsClosing] = useState(false);
 
     // Landing page view state
+    const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
     const [currentView, setCurrentView] = useState<LandingView>('landing');
     const [currentBgIndex, setCurrentBgIndex] = useState(() => Math.floor(Math.random() * BACKGROUNDS.length));
-    const activeBg = BACKGROUNDS[currentBgIndex];
+    const activeBg = isMobile ? BACKGROUNDS[0] : BACKGROUNDS[currentBgIndex];
     const [demoData, setDemoData] = useState<GameData | null>(null);
     const [isLoadingDemo, setIsLoadingDemo] = useState(false);
-    const [isMobile, setIsMobile] = useState(false);
 
     React.useEffect(() => {
         const checkMobile = () => {
@@ -81,6 +74,7 @@ export function Auth() {
         setIsClosing(true);
         setTimeout(() => {
             setCurrentBgIndex(prev => {
+                if (isMobile) return 0;
                 let next = Math.floor(Math.random() * BACKGROUNDS.length);
                 while (next === prev && BACKGROUNDS.length > 1) {
                     next = Math.floor(Math.random() * BACKGROUNDS.length);

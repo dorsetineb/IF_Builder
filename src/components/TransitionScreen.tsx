@@ -11,6 +11,10 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
     const [bgSrc, setBgSrc] = React.useState('/background.webp');
 
     React.useEffect(() => {
+        if (window.innerWidth < 768) {
+            setBgSrc('/background.webp');
+            return;
+        }
         const savedBg = localStorage.getItem('if-builder-bg-src');
         if (savedBg) setBgSrc(savedBg);
     }, []);

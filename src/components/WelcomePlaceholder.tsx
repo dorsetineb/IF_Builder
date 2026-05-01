@@ -25,6 +25,10 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
     const [bgSrc, setBgSrc] = useState('/background.webp');
 
     useEffect(() => {
+        if (window.innerWidth < 768) {
+            setBgSrc('/background.webp');
+            return;
+        }
         const savedBg = localStorage.getItem('if-builder-bg-src');
         if (savedBg) setBgSrc(savedBg);
     }, []);
