@@ -61,6 +61,17 @@
     "sidebar": {
       "line1": "Em uma caverna escura.",
       "line2": "Monitores CRT iluminam o mofo.",
+      "bgs": {
+        "cell": {
+          "line1": "Na masmorra do castelo.",
+          "line2": "Monitores CRT iluminam as paredes úmidas."
+        }
+      },
+      "mobile": {
+        "line1": "Por uma fresta, você enxerga uma caverna escura.",
+        "line2": "ACESSO NEGADO DEVIDO A SMARTPHONE.",
+        "line3": "Ache um computador com uma tela maior, e tente novamente."
+      },
       "action": "O QUE VOCÊ FAZ?",
       "access": "Acessar",
       "createAccount": "Criar Conta",
@@ -96,6 +107,11 @@
       "title": "Redefinir Senha",
       "subtitle": "Digite sua nova senha abaixo.",
       "submitBtn": "Redefinir Senha"
+    },
+    "about": {
+      "title": "Sobre o IF Builder",
+      "p1": "Crie ramificações, objetos e defina as interações que avançam a sua ficção interativa.",
+      "p2": "Todas as ficções interativas criadas aqui são exportadas em um arquivo .zip. Ele não precisa de internet nem do editor para funcionar - apenas um navegador. Pense nesse arquivo como um pendrive: você pode guardá-lo em uma gaveta, ou entregá-lo a alguém."
     }
   },
   "about": {

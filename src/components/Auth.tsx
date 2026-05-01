@@ -120,11 +120,11 @@ export function Auth() {
                 <div className={`${isMobile ? 'absolute top-0 left-0 p-12' : 'text-sm text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md'}`}>
                     {isMobile ? (
                         <div className="text-sm text-white/80 leading-relaxed text-left space-y-1 drop-shadow-md">
-                            <p>Por uma fresta, você enxerga uma caverna escura.</p>
+                            <p>{t('auth.sidebar.mobile.line1', 'Por uma fresta, você enxerga uma caverna escura.')}</p>
                             <p className="text-primary font-bold mt-2">
-                                &gt; ACESSO NEGADO DEVIDO A SMARTPHONE.
+                                &gt; {t('auth.sidebar.mobile.line2', 'ACESSO NEGADO DEVIDO A SMARTPHONE.')}
                             </p>
-                            <p className="mt-2 opacity-50">Ache um computador com uma tela maior, e tente novamente.</p>
+                            <p className="mt-2 opacity-50">{t('auth.sidebar.mobile.line3', 'Ache um computador com uma tela maior, e tente novamente.')}</p>
                         </div>
                     ) : (
                         <>
@@ -256,7 +256,7 @@ export function Auth() {
                     {isLoadingDemo ? (
                         <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-primary bg-black/40">
                             <Loader2 className="w-8 h-8 animate-spin" />
-                            <p className="animate-pulse font-mono text-xs uppercase tracking-widest">{t('UIEditor.textos.loading', 'Carregando...')}</p>
+                            <p className="animate-pulse font-mono text-xs uppercase tracking-widest">{t('common.loading', 'Carregando...')}</p>
                         </div>
                     ) : demoData ? (
                         <Preview

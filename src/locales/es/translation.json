@@ -59,6 +59,17 @@
     "sidebar": {
       "line1": "En una cueva oscura.",
       "line2": "Monitores CRT iluminan el moho.",
+      "bgs": {
+        "cell": {
+          "line1": "En la mazmorra del castillo.",
+          "line2": "Monitores CRT iluminan las paredes húmedas."
+        }
+      },
+      "mobile": {
+        "line1": "A través de una rendija, ves una cueva oscura.",
+        "line2": "ACCESO DENEGADO DEBIDO A SMARTPHONE.",
+        "line3": "Busca un ordenador con una pantalla más grande y vuelve a intentarlo."
+      },
       "action": "¿QUÉ HACES?",
       "access": "Acceder",
       "createAccount": "Crear Cuenta",
@@ -94,6 +105,11 @@
       "title": "Restablecer Contraseña",
       "subtitle": "Escribe tu nueva contraseña abajo.",
       "submitBtn": "Restablecer Contraseña"
+    },
+    "about": {
+      "title": "Sobre IF Builder",
+      "p1": "Crea ramificaciones, objetos y define las interacciones que hacen avanzar tu ficción interactiva.",
+      "p2": "Todas las ficciones interactivas creadas aquí se exportan en un archivo .zip. No necesita internet ni el editor para funcionar, solo un navegador. Piensa en este archivo como un pendrive: puedes guardarlo en un cajón o entregárselo a alguien."
     }
   },
   "about": {

@@ -48,6 +48,17 @@
     "sidebar": {
       "line1": "In a dark cave.",
       "line2": "CRT monitors illuminate the mold.",
+      "bgs": {
+        "cell": {
+          "line1": "In the castle dungeon.",
+          "line2": "CRT monitors illuminate the damp walls."
+        }
+      },
+      "mobile": {
+        "line1": "Through a crack, you see a dark cave.",
+        "line2": "ACCESS DENIED DUE TO SMARTPHONE.",
+        "line3": "Find a computer with a larger screen, and try again."
+      },
       "action": "WHAT DO YOU DO?",
       "access": "Sign In",
       "createAccount": "Create Account",
@@ -83,6 +94,11 @@
       "title": "Reset Password",
       "subtitle": "Enter your new password below.",
       "submitBtn": "Reset Password"
+    },
+    "about": {
+      "title": "About IF Builder",
+      "p1": "Create branches, objects, and define the interactions that advance your interactive fiction.",
+      "p2": "All interactive fictions created here are exported in a .zip file. It doesn't need internet or the editor to work - just a browser. Think of this file like a USB flash drive: you can keep it in a drawer, or give it to someone."
     }
   },
   "about": {
