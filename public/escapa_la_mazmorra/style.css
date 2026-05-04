@@ -1,7 +1,7 @@
 
 body { padding: 0; }
 body.with-spacing { padding: 30px; }
-:root { --bg-color: #0d1117; --text-color: #a1a1aa; --panel-bg: color-mix(in srgb, var(--bg-color) 90%, var(--text-color) 10%); --input-bg: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --button-bg: color-mix(in srgb, var(--bg-color) 85%, var(--text-color) 15%); --button-hover-bg: color-mix(in srgb, var(--bg-color) 70%, var(--text-color) 30%); --border-color: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --text-dim-color: color-mix(in srgb, var(--text-color) 70%, transparent); --accent-color: #d4af37; --highlight-color: #fbbf24; --danger-color: #f85149; --danger-hover-bg: #da3633; --font-family: 'Silkscreen', sans-serif; --font-size-base: 12px; --font-size-adjust: 1; --scale-factor: 1; --font-size: calc(var(--font-size-base) * var(--font-size-adjust) * var(--scale-factor)); --splash-button-bg: #d4af37; --splash-button-hover-bg: #a16207; --splash-button-text-color: #000000; --action-button-bg: #fbbf24; --action-button-text-color: #18181b; --action-button-hover-bg: #f0f0f0; --system-button-bg: transparent; --system-button-text: #a1a1aa; --system-button-border: #a1a1aa40; --system-button-hover-bg: #fbbf24; --system-button-hover-text: #a1a1aa; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: #000000; --scene-name-overlay-text-color: #FFFFFF; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: var(--highlight-color); --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
+:root { --bg-color: #0d1117; --text-color: #a1a1aa; --panel-bg: color-mix(in srgb, var(--bg-color) 90%, var(--text-color) 10%); --input-bg: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --button-bg: color-mix(in srgb, var(--bg-color) 85%, var(--text-color) 15%); --button-hover-bg: color-mix(in srgb, var(--bg-color) 70%, var(--text-color) 30%); --border-color: color-mix(in srgb, var(--bg-color) 80%, var(--text-color) 20%); --text-dim-color: color-mix(in srgb, var(--text-color) 70%, transparent); --accent-color: #d4af37; --highlight-color: #fbbf24; --danger-color: #f85149; --danger-hover-bg: #da3633; --font-family: 'Silkscreen', sans-serif; --font-size-base: 12px; --font-size-adjust: 1; --scale-factor: 1; --font-size: calc(var(--font-size-base) * var(--font-size-adjust) * var(--scale-factor)); --splash-button-bg: #d4af37; --splash-button-hover-bg: #a16207; --splash-button-text-color: #000000; --action-button-bg: #fbbf24; --action-button-text-color: #18181b; --action-button-hover-bg: #f0f0f0; --system-button-bg: transparent; --system-button-text: #a1a1aa; --system-button-border: #a1a1aa40; --system-button-hover-bg: #fbbf24; --system-button-hover-text: #000000; --splash-align-items: flex-end; --splash-justify-content: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; --scene-name-overlay-bg: #000000; --scene-name-overlay-text-color: #FFFFFF; --tracker-bar-fill-color: var(--accent-color); --tracker-bar-bg-color: var(--input-bg); --continue-indicator-color: var(--highlight-color); --text-anim-speed: 0.05s; --image-anim-speed: 0.5s; }
 body.is-demo { --scale-factor: 0.7; }
 body.is-demo .splash-content { gap: calc(20px * var(--scale-factor)); }
 body.is-demo .splash-logo { max-height: calc(150px * var(--scale-factor)); }
@@ -17,7 +17,7 @@ select { background-color: var(--button-bg); color: var(--text-color); border: 1
 option { background-color: var(--bg-color); color: var(--text-color); }
 .main-wrapper { height: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative; max-width: 1280px; margin: 0 auto; }
 body.with-spacing .main-wrapper { height: 100%; }
-.splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); background-size: cover; background-position: center; z-index: 2000; padding: 0; display: flex; align-items: var(--splash-align-items); justify-content: var(--splash-justify-content); transition: opacity 1s ease-in-out; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none; }
+.splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); background-size: cover; background-position: center; z-index: 2000; padding: 0; display: flex; align-items: var(--splash-align-items); justify-content: var(--splash-justify-content); transition: opacity 1s ease-in-out; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
 .splash-screen.fade-out { opacity: 0; pointer-events: none; }
 .splash-screen.align-left { --splash-justify-content: flex-start; --splash-align-items: flex-start; --splash-text-align: left; --splash-content-align-items: flex-start; }
 .splash-content { text-align: var(--splash-text-align); display: flex; flex-direction: column; align-items: var(--splash-content-align-items); gap: 20px; width: 100%; padding: 5vh max(40px, 6vw); position: relative; }
@@ -291,7 +291,6 @@ body.with-spacing .main-wrapper { height: 100%; }
         padding: 10px 4px;
         background: rgba(0,0,0,0.98) !important; 
         border: 1px solid rgba(255,255,255,0.25);
-        -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
     }
     
@@ -310,7 +309,6 @@ body.with-spacing .main-wrapper { height: 100%; }
     body.behavior-immersive .action-popup button {
         background: rgba(0,0,0,0.98) !important; 
         border: 1px solid rgba(255,255,255,0.3) !important;
-        -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
         width: auto !important;
         flex: 0 1 auto !important;
@@ -340,7 +338,6 @@ body.with-spacing .main-wrapper { height: 100%; }
         background: rgba(0,0,0,0.98) !important; 
         border: 1px solid rgba(255,255,255,0.35);
         box-sizing: border-box !important;
-        -webkit-backdrop-filter: none !important;
         backdrop-filter: none !important;
     }
     body.behavior-immersive #submit-verb {
@@ -469,7 +466,7 @@ body.font-adjust-gothic { font-size: 1.1em; }
 .tracker-bar-container { width: 100%; height: 20px; background-color: var(--tracker-bar-bg-color); border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden; }
 .tracker-bar { height: 100%; background-color: var(--tracker-bar-fill-color); transition: width 0.3s ease-in-out; }
 .empty-inventory-msg { font-size: 0.85em; color: var(--text-dim-color); font-style: italic; }
-.continue-indicator { text-align: left; cursor: pointer; padding: 0; color: var(--continue-indicator-color); animation: bounce 1s infinite; font-size: 1.3em; -webkit-user-select: none; user-select: none; width: 100%; margin-top: -10px; }
+.continue-indicator { text-align: left; cursor: pointer; padding: 0; color: var(--continue-indicator-color); animation: bounce 1s infinite; font-size: 1.3em; user-select: none; width: 100%; margin-top: -10px; }
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(5px); } }
 .scene-paragraph { margin: 0 0 10px 0; opacity: 0; animation: fadeIn var(--text-anim-speed) forwards; }
 .typewriter-cursor::after { content: '|'; animation: blink 1s step-end infinite; }
