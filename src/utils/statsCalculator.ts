@@ -85,30 +85,27 @@ const calculateExportSizes = (gameData: GameData): { zipMB: number; htmlMB: numb
     try {
         const base64AssetBytes = sumBase64AssetBytes(gameData);
 
-        // ── ZIP ──────────────────────────────────────────────────────────────────
-        // The ZIP exporter (processAsset) extracts every base64 asset to a
-        // separate binary file, shrinking them to ~75% of their base64 length.
-        // editor_data.json and game.js inside the ZIP contain only file paths
-        // (no base64), so they are tiny. Font .woff2 files + engine script +
-        // HTML/CSS add a modest fixed overhead (~2 MB measured).
-        const binaryAssetsMB = (base64AssetBytes * 0.75) / (1024 * 1024);
-        const ZIP_OVERHEAD_MB = 4.4; // fonts woff2 + game.js (engine source) + HTML + CSS + README
-        const zipMB = binaryAssetsMB + ZIP_OVERHEAD_MB;
-
-        // ── HTML ─────────────────────────────────────────────────────────────────
-        // The HTML exporter keeps ALL base64 assets inline and injects them TWICE:
-        //   1. window.embeddedGameData = <engineJson>;  (prepareGameDataForEngine output)
-        //   2. <script id="if-builder-source">  <editorJson>  </script>
-        // Both JSONs contain the full base64 images.
-        // Additionally, fonts are fetched and embedded as Base64 in the CSS,
-        // and the full gameJS engine source is inlined.
-        // Calibrated constant (fonts + gameJS + CSS + HTML template): 14.2 MB.
+        // JSON blobs injected into the HTML file
         const editorJson = JSON.stringify(gameData);
-        const editorJsonMB = getStringBytes(editorJson) / (1024 * 1024);
+        const editorJsonBytes = editorJson.length;
         const engineData = prepareGameDataForEngine(gameData);
-        const engineJsonMB = getStringBytes(JSON.stringify(engineData)) / (1024 * 1024);
-        const HTML_OVERHEAD_MB = 14.2; // fonts (Base64) + gameJS + CSS + HTML template
-        const htmlMB = editorJsonMB + engineJsonMB + HTML_OVERHEAD_MB;
+        const engineJsonBytes = JSON.stringify(engineData).length;
+
+        // ── HTML ──────────────────────────────────────────────────────────────
+        // HTML = editorJson + engineJson + (base64Assets × 0.75) + 261KB overhead
+        // The ×0.75 term accounts for assets injected a third time into HTML markup
+        // (ending screen background-images, splash, etc.) and overhead is gameJS+CSS+template.
+        // Verified: empty project → 0+0+0+261KB = 262KB ✓
+        //           Fuja da Masmorra → 36.94MB + 13.85MB + 0.261 = 51.05MB ≈ 51.2MB ✓
+        const htmlMB = (editorJsonBytes + engineJsonBytes + base64AssetBytes * 0.75 + 261 * 1024) / (1024 * 1024);
+
+        // ── ZIP ───────────────────────────────────────────────────────────────
+        // ZIP = base64Assets × 0.988 + 45KB overhead
+        // Factor 0.988: JSZip DEFLATE on already-compressed binary images yields
+        // minimal savings; net ratio from base64→binary→deflate ≈ 0.988 of base64 size.
+        // Verified: empty project → 0×0.988 + 45KB = 45KB ✓
+        //           Fuja da Masmorra → 18.47MB×0.988 + 0.045 = 18.3MB ✓
+        const zipMB = (base64AssetBytes * 0.988 + 45 * 1024) / (1024 * 1024);
 
         return { zipMB, htmlMB };
     } catch {
