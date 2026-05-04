@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { ConfirmationModal } from './ConfirmationModal';
 import { Interaction, Scene, GameObject, ConsequenceTracker, TrackerEffect, Vignette } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Plus, Trash2, Upload, Search, MousePointer2, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon } from 'lucide-react';
+import { Plus, Trash2, Upload, Search, MousePointer2, Box, ArrowRight, MessageSquare, Play, Volume2, Target, CheckCircle2, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, Sword, Key, Map as MapIcon, Eye, FlaskConical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const TRACKER_ICONS = [
@@ -23,10 +23,16 @@ const TRACKER_ICONS = [
     { name: 'droplet', component: Droplet },
     { name: 'sun', component: Sun },
     { name: 'moon', component: Moon },
+    { name: 'sword', component: Sword },
+    { name: 'key', component: Key },
+    { name: 'map', component: MapIcon },
+    { name: 'eye', component: Eye },
+    { name: 'flask', component: FlaskConical },
 ];
 
 const INTERACTION_ICONS = [
     { name: 'mouse', component: MousePointer2 },
+    { name: 'box', component: Box },
     ...TRACKER_ICONS
 ];
 
@@ -198,18 +204,11 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
 
                                 {isIconPickerOpen && (
                                     <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-card border border-input rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
-                                        <button
-                                            onClick={() => { handleInteractionChange('icon', undefined); setIsIconPickerOpen(false); }}
-                                            className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${!selectedInteraction.icon ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
-                                            title={t('interactionEditor.defaultIcon', 'Padrão')}
-                                        >
-                                            <MousePointer2 className="w-4 h-4" />
-                                        </button>
-                                        {TRACKER_ICONS.map(icon => (
+                                        {INTERACTION_ICONS.map(icon => (
                                             <button
                                                 key={icon.name}
                                                 onClick={() => { handleInteractionChange('icon', icon.name); setIsIconPickerOpen(false); }}
-                                                className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedInteraction.icon === icon.name ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
+                                                className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedInteraction.icon === icon.name || (!selectedInteraction.icon && icon.name === 'mouse') ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
                                                 title={icon.name}
                                             >
                                                 <icon.component className="w-4 h-4" />

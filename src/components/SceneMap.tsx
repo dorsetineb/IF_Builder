@@ -723,9 +723,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
               e.stopPropagation();
               onAddNode?.('vignette');
             }}
-            className={`w-full flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-primary ${hoverTextClass} border border-transparent whitespace-nowrap`}
+            className={`w-full flex items-center justify-start px-3 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs bg-white text-zinc-950 hover:bg-zinc-200 hover:text-zinc-950 border border-transparent whitespace-nowrap shadow-sm`}
           >
-            <ArrowRight className="w-3.5 h-3.5 mr-1.5" />
+            <ArrowRight className="w-4 h-4 mr-2" />
             {t('sceneList.nodeSelection.vignette.title', 'Criar Capítulo')}
           </button>
           <button
@@ -734,14 +734,14 @@ const SceneMap: React.FC<SceneMapProps> = ({
               if (hasOpeningVignette) onAddNode?.('scene');
             }}
             disabled={!hasOpeningVignette}
-            className={`w-full flex items-center justify-center px-4 h-[56px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent whitespace-nowrap ${
+            className={`w-full flex items-center justify-start px-3 h-[42px] font-bold rounded-lg transition-all active:scale-95 text-xs border border-transparent whitespace-nowrap shadow-sm ${
               !hasOpeningVignette 
                 ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed grayscale' 
-                : `bg-white text-zinc-950 hover:bg-primary ${hoverTextClass}`
+                : `bg-white text-zinc-950 hover:bg-zinc-200 hover:text-zinc-950`
             }`}
             title={!hasOpeningVignette ? t('sceneList.nodeSelection.scene.lockedDesc', 'Crie um capítulo de abertura para habilitar ramificações.') : ''}
           >
-            <Split className="w-3.5 h-3.5 mr-1.5 rotate-90" />
+            <Split className="w-4 h-4 mr-2 rotate-90" />
             {t('sceneList.nodeSelection.scene.title', 'Criar Ramificação')}
           </button>
         </div>
@@ -1123,21 +1123,21 @@ const SceneMap: React.FC<SceneMapProps> = ({
         <div className="flex items-center gap-2">
           <button
             onClick={onReorganizeScenes}
-            className={`flex items-center justify-center w-[160px] h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
+            className={`flex items-center justify-start px-3 w-[160px] h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
           >
             <LayoutGrid className="w-4 h-4 mr-2" />
             {t('sceneMap.reorganize', 'Reorganizar')}
           </button>
           <button
             onClick={handleViewAll}
-            className={`flex items-center justify-center w-[160px] h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
+            className={`flex items-center justify-start px-3 w-[160px] h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
           >
             <Maximize2 className="w-4 h-4 mr-2" />
             {t('sceneMap.viewAll', 'Ver Tudo')}
           </button>
           <button
             onClick={handleToggleOrphans}
-            className={`flex items-center justify-center w-[160px] h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
+            className={`flex items-center justify-start px-3 w-[160px] h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
               highlightOrphans
                 ? 'bg-red-600 text-white border-red-500 hover:bg-red-700'
                 : `bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`
@@ -1148,7 +1148,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
           </button>
           <button
             onClick={() => setIsStatsModalOpen(true)}
-            className={`flex items-center justify-center w-[160px] h-[56px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary hover:text-white hover:border-primary`}
+            className={`flex items-center justify-start px-3 w-[160px] h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary hover:text-white hover:border-primary`}
           >
             <BarChart3 className="w-4 h-4 mr-2" />
             {t('sceneMap.statistics', 'Estatísticas')}
@@ -1157,7 +1157,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
       </div>
 
       {/* Legend & Zoom Container */}
-      <div className="absolute bottom-4 right-4 z-10 flex flex-col items-end gap-2 pointer-events-none transition-all duration-300">
+      <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2 pointer-events-none transition-all duration-300">
         {/* Zoom Controls Moved here */}
         <div className={`flex w-[160px] h-[40px] rounded-lg overflow-hidden shadow-xl pointer-events-auto border bg-zinc-950 border-muted-foreground/50`}>
           <button

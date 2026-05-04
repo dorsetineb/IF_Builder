@@ -681,7 +681,7 @@
     "showObjectImage": "Show object image",
     "consumesItem": "Consumes Used Item",
     "outcomeTitle": "Outcome",
-    "goToSceneLabel": "Go to Branch",
+    "goToSceneLabel": "Destination",
     "stayInScene": "(Stay in branch)",
     "updateSceneDescLabel": "Update branch description",
     "updateSceneDescPlaceholder": "Describe what happens...",

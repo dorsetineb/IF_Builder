@@ -701,7 +701,7 @@
     "showObjectImage": "Exibir imagem do objeto",
     "consumesItem": "Consome item",
     "outcomeTitle": "Resultado",
-    "goToSceneLabel": "Ir para Ramificação",
+    "goToSceneLabel": "Destino",
     "stayInScene": "(Permanecer na ramificação)",
     "updateSceneDescLabel": "Atualizar descrição da ramificação",
     "updateSceneDescPlaceholder": "Descreve o que acontece...",

@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { ConfirmationModal } from './ConfirmationModal';
 import { GameObject } from '../types';
-import { Plus, Trash2, Upload, Search, Link as LinkIcon, Unlink, Box, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, ImageIcon } from 'lucide-react';
+import { Plus, Trash2, Upload, Search, Link as LinkIcon, Unlink, Box, MousePointer2, Activity, Heart, Zap, Shield, Coins, Clock, Skull, Star, User, Trophy, AlertTriangle, Book, Crown, Flame, Droplet, Sun, Moon, ImageIcon, Sword, Key, Map as MapIcon, Eye, FlaskConical } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const TRACKER_ICONS = [
@@ -22,6 +22,17 @@ const TRACKER_ICONS = [
     { name: 'droplet', component: Droplet },
     { name: 'sun', component: Sun },
     { name: 'moon', component: Moon },
+    { name: 'sword', component: Sword },
+    { name: 'key', component: Key },
+    { name: 'map', component: MapIcon },
+    { name: 'eye', component: Eye },
+    { name: 'flask', component: FlaskConical },
+];
+
+const OBJECT_ICONS = [
+    { name: 'box', component: Box },
+    { name: 'mouse', component: MousePointer2 },
+    ...TRACKER_ICONS
 ];
 
 interface ObjectEditorProps {
@@ -177,7 +188,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                         <>
                             {filteredSceneObjects.length > 0 && (
                                 filteredSceneObjects.map(obj => {
-                                    const IconComponent = TRACKER_ICONS.find(i => i.name === obj.icon)?.component || Box;
+                                    const IconComponent = OBJECT_ICONS.find(i => i.name === obj.icon)?.component || Box;
                                     return (
                                         <button
                                             key={obj.id}
@@ -215,7 +226,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                         <>
                             {availableObjectsToLink.length > 0 && (
                                 availableObjectsToLink.map(obj => {
-                                    const IconComponent = TRACKER_ICONS.find(i => i.name === obj.icon)?.component || Box;
+                                    const IconComponent = OBJECT_ICONS.find(i => i.name === obj.icon)?.component || Box;
                                     return (
                                         <div
                                             key={obj.id}
@@ -287,17 +298,17 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                                     className="w-10 h-10 flex items-center justify-center bg-input border border-input rounded-lg text-muted-foreground hover:text-foreground hover:border-primary/50 transition-all"
                                                 >
                                                     {(() => {
-                                                        const Icon = TRACKER_ICONS.find(i => i.name === selectedObject.icon)?.component || Box;
+                                                        const Icon = OBJECT_ICONS.find(i => i.name === selectedObject.icon)?.component || Box;
                                                         return <Icon className="w-5 h-5" />;
                                                     })()}
                                                 </button>
                                                 {isIconPickerOpen && (
-                                                    <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-card border border-muted-foreground/50 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
-                                                        {TRACKER_ICONS.map(icon => (
+                                                    <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-card border border-input rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                                        {OBJECT_ICONS.map(icon => (
                                                             <button
                                                                 key={icon.name}
                                                                 onClick={() => { onUpdateGlobalObject(selectedObject.id, { icon: icon.name }); setIsIconPickerOpen(false); }}
-                                                                className={`p-2 rounded hover:bg-accent flex items-center justify-center transition-colors ${selectedObject.icon === icon.name ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}
+                                                                className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedObject.icon === icon.name || (!selectedObject.icon && icon.name === 'box') ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
                                                                 title={icon.name}
                                                             >
                                                                 <icon.component className="w-4 h-4" />
