@@ -227,7 +227,7 @@
     "uselessObjects": "Objetos inúteis",
     "uselessObjectsDesc": "Não presentes em ramificações ou interações.",
     "hollowInteractions": "Ações vazias",
-    "assetWeight": "Tamanho do Projeto",
+    "assetWeight": "Tamanho do Projeto (aproximado)",
     "heaviestAsset": "Maior arquivo",
     "avgAssetWeight": "Média/ramificação",
     "estimatedSize": "Tamanho total estimado",

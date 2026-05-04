@@ -1220,7 +1220,7 @@
     "created": "Creados",
     "used": "Utilizados",
     "qaAudit": "Auditoría de Calidad (QA)",
-    "assetWeight": "Peso de los Archivos",
+    "assetWeight": "Peso de los Archivos (aproximado)",
     "total": "Peso Total",
     "max": "Archivo más pesado",
     "avg": "Peso promedio",

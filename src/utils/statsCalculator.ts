@@ -1,4 +1,5 @@
 import { GameData } from "../types";
+import { prepareGameDataForEngine } from "../components/game-engine";
 
 export interface ProjectStats {
     totalScenes: number;
@@ -35,10 +36,9 @@ export interface ProjectStats {
     uselessObjectsNames: string[];
     interactionsWithoutEffectCount: number;
     
-    // Asset Weight
-    estimatedAssetSizeMB: number;
-    maxAssetSizeMB: number;
-    avgAssetSizeMBPerScene: number;
+    // Export Weights
+    estimatedZipSizeMB: number;
+    estimatedHtmlSizeMB: number;
 
     accessibility: {
         scenesMissingImages: number;
@@ -56,29 +56,64 @@ const countWords = (text: string | undefined): number => {
     return text.trim().split(/\s+/).filter(word => word.length > 0).length;
 };
 
-const getAssetBytes = (val: string | undefined): number => {
-    if (!val || typeof val !== 'string') return 0;
-    
-    // 1. Data URIs (Base64) - Standard Binary Weight
-    if (val.startsWith('data:')) {
-        const commaIndex = val.indexOf(',');
-        if (commaIndex !== -1) {
-            return (val.length - commaIndex - 1) * 0.75;
-        }
-    }
+const getStringBytes = (s: string): number => s.length; // base64 chars are ASCII, 1 byte each
 
-    // 2. Assets/URLs - Based on common asset sizes in IF projects
-    if (val.startsWith('http') || val.startsWith('assets/')) {
-        const url = val.toLowerCase();
-        // High fidelity estimation for BGM files in "Fuja da Masmorra"
-        if (url.includes('.mpeg') || url.includes('.mp3') || url.includes('bgm')) return 4.98 * 1024 * 1024;
-        return 0.6 * 1024 * 1024; // Average image size
-    }
+// Scans all base64 data-URI assets embedded in the project and returns their total byte count.
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const sumBase64AssetBytes = (gameData: GameData): number => {
+    let total = 0;
+    const measure = (val: string | undefined | null) => {
+        if (val && typeof val === 'string' && val.startsWith('data:')) total += val.length;
+    };
+    measure(gameData.gameLogo);
+    measure(gameData.gameSplashImage);
+    measure(gameData.gameBackgroundMusic);
+    measure(gameData.positiveEndingImage);
+    measure(gameData.positiveEndingMusic);
+    measure(gameData.negativeEndingImage);
+    measure(gameData.negativeEndingMusic);
+    Object.values(gameData.scenes).forEach((scene: any) => {
+        measure(scene.image);
+        measure(scene.backgroundMusic);
+        scene.interactions?.forEach((i: any) => measure(i.soundEffect));
+    });
+    Object.values(gameData.globalObjects).forEach((obj: any) => measure(obj.image));
+    return total;
+};
 
-    // 3. Brute force check for huge base64 fields without headers
-    if (val.length > 5000) return val.length * 0.75;
-    
-    return 0;
+const calculateExportSizes = (gameData: GameData): { zipMB: number; htmlMB: number } => {
+    try {
+        const base64AssetBytes = sumBase64AssetBytes(gameData);
+
+        // ── ZIP ──────────────────────────────────────────────────────────────────
+        // The ZIP exporter (processAsset) extracts every base64 asset to a
+        // separate binary file, shrinking them to ~75% of their base64 length.
+        // editor_data.json and game.js inside the ZIP contain only file paths
+        // (no base64), so they are tiny. Font .woff2 files + engine script +
+        // HTML/CSS add a modest fixed overhead (~2 MB measured).
+        const binaryAssetsMB = (base64AssetBytes * 0.75) / (1024 * 1024);
+        const ZIP_OVERHEAD_MB = 4.4; // fonts woff2 + game.js (engine source) + HTML + CSS + README
+        const zipMB = binaryAssetsMB + ZIP_OVERHEAD_MB;
+
+        // ── HTML ─────────────────────────────────────────────────────────────────
+        // The HTML exporter keeps ALL base64 assets inline and injects them TWICE:
+        //   1. window.embeddedGameData = <engineJson>;  (prepareGameDataForEngine output)
+        //   2. <script id="if-builder-source">  <editorJson>  </script>
+        // Both JSONs contain the full base64 images.
+        // Additionally, fonts are fetched and embedded as Base64 in the CSS,
+        // and the full gameJS engine source is inlined.
+        // Calibrated constant (fonts + gameJS + CSS + HTML template): 14.2 MB.
+        const editorJson = JSON.stringify(gameData);
+        const editorJsonMB = getStringBytes(editorJson) / (1024 * 1024);
+        const engineData = prepareGameDataForEngine(gameData);
+        const engineJsonMB = getStringBytes(JSON.stringify(engineData)) / (1024 * 1024);
+        const HTML_OVERHEAD_MB = 14.2; // fonts (Base64) + gameJS + CSS + HTML template
+        const htmlMB = editorJsonMB + engineJsonMB + HTML_OVERHEAD_MB;
+
+        return { zipMB, htmlMB };
+    } catch {
+        return { zipMB: 0, htmlMB: 0 };
+    }
 };
 
 export const calculateEditorStats = (gameData: GameData): ProjectStats => {
@@ -107,28 +142,8 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
 
     const usedObjectIds = new Set<string>();
     let interactionsWithoutEffect = 0;
-    let totalAssetBytes = 0;
-    let maxAssetBytes = 0;
     const verbCounts: { [verb: string]: number } = {};
-
-    // 1. COMPREHENSIVE ASSET CRAWLER (LITERAL COUNT - NO DEDUPLICATION)
-    // Matches the physical file structure by counting every reference occurrence
-    const crawlAssets = (obj: any) => {
-        if (!obj || typeof obj !== 'object') return;
-        for (const key in obj) {
-            const val = obj[key];
-            if (typeof val === 'string') {
-                const size = getAssetBytes(val);
-                if (size > 1000) { 
-                    totalAssetBytes += size;
-                    if (size > maxAssetBytes) maxAssetBytes = size;
-                }
-            } else if (typeof val === 'object' && val !== null) {
-                crawlAssets(val);
-            }
-        }
-    };
-    crawlAssets(gameData);
+    const { zipMB, htmlMB } = calculateExportSizes(gameData);
 
     // 2. SCENE AUDIT (Full Metrics Restoration)
     scenes.forEach(scene => {
@@ -220,10 +235,12 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
         });
     }).length;
 
-    // 5. FINAL MB CALIBRATION
-    const totalAssetSizeMB = totalAssetBytes / (1024 * 1024);
-    // Standard IF-Builder Envelope (Engine + Assets Folder Struct + Dependencies)
-    const ENGINE_OVERHEAD_MB = 1.35; 
+    // 5. EXPORT SIZE ESTIMATION
+    // Sizes are calculated by simulating the real export serialization:
+    // htmlMB = engineJson (embeddedGameData) + editorJson (if-builder-source) + wrapper overhead
+    // zipMB  = binary assets (base64 decoded ~75%) + engineJson (in game.js) + wrapper overhead
+    const zipSize = zipMB;
+    const htmlSize = htmlMB;
     
     return {
         totalScenes: scenes.length,
@@ -251,9 +268,8 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
         uselessObjectsNames: objects.filter(obj => !usedObjectIds.has(obj.id)).map(obj => obj.name),
         interactionsWithoutEffectCount: interactionsWithoutEffect,
         
-        estimatedAssetSizeMB: Number((totalAssetSizeMB + ENGINE_OVERHEAD_MB).toFixed(2)),
-        maxAssetSizeMB: Number((maxAssetBytes / (1024 * 1024)).toFixed(2)),
-        avgAssetSizeMBPerScene: scenes.length > 0 ? Number(((totalAssetBytes / scenes.length) / (1024 * 1024)).toFixed(2)) : 0,
+        estimatedZipSizeMB: Number(zipSize.toFixed(1)),
+        estimatedHtmlSizeMB: Number(htmlSize.toFixed(1)),
         
         accessibility: {
             scenesMissingImages: missingSceneImages,

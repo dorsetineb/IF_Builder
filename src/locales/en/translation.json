@@ -536,7 +536,7 @@
     "uselessObjects": "Useless objects",
     "uselessObjectsDesc": "Not present in branches or interactions.",
     "hollowInteractions": "Hollow actions",
-    "assetWeight": "Project Size",
+    "assetWeight": "Project Size (approximate)",
     "heaviestAsset": "Heaviest file",
     "avgAssetWeight": "Avg/branch",
     "estimatedSize": "Estimated total size",

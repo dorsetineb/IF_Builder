@@ -163,18 +163,14 @@ const EditorStatsModal: React.FC<EditorStatsModalProps> = ({ isOpen, onClose, ga
             <div className="flex flex-col gap-3 h-full justify-between">
               <div className="flex flex-col gap-2 p-3 bg-background/30 rounded-lg border border-muted-foreground/20">
                 <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">{t('editorStats.assetWeight')}</span>
-                <div className="grid grid-cols-3 gap-2">
+                <div className="grid grid-cols-2 gap-2">
                   <div className="flex flex-col">
-                    <span className="text-[8px] text-muted-foreground font-bold uppercase">{t('editorStats.total')}</span>
-                    <span className="text-sm font-bold text-foreground tabular-nums">{stats.estimatedAssetSizeMB}MB</span>
+                    <span className="text-[8px] text-muted-foreground font-bold uppercase">.ZIP</span>
+                    <span className="text-sm font-bold text-foreground tabular-nums">{stats.estimatedZipSizeMB}MB</span>
                   </div>
                   <div className="flex flex-col">
-                    <span className="text-[8px] text-muted-foreground font-bold uppercase">{t('editorStats.max')}</span>
-                    <span className="text-sm font-bold text-foreground tabular-nums">{stats.maxAssetSizeMB}MB</span>
-                  </div>
-                  <div className="flex flex-col">
-                    <span className="text-[8px] text-muted-foreground font-bold uppercase">{t('editorStats.avg')}</span>
-                    <span className="text-sm font-bold text-foreground tabular-nums">{stats.avgAssetSizeMBPerScene}MB</span>
+                    <span className="text-[8px] text-muted-foreground font-bold uppercase">.HTML</span>
+                    <span className="text-sm font-bold text-foreground tabular-nums">{stats.estimatedHtmlSizeMB}MB</span>
                   </div>
                 </div>
               </div>
