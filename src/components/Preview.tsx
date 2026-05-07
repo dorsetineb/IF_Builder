@@ -4,6 +4,7 @@ import { GameData } from '../types';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { gameHTML, gameCSS, initialGameData, OVERLAY_CSS } from '../lib/gameDefaults';
 import { gameJS, prepareGameDataForEngine } from './game-engine';
+import dompurifyCode from 'dompurify/dist/purify.min.js?raw';
 import { useTranslation } from 'react-i18next';
 import { FONTS } from '../constants';
 
@@ -337,7 +338,8 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             .replace('<div id="negative-ending-screen" class="splash-screen"', `<div id="negative-ending-screen" class="splash-screen ${vignetteScaleClass}"`)
             .replace('<div id="vignette-screen" class="splash-screen"', `<div id="vignette-screen" class="splash-screen ${vignetteScaleClass}"`)
             .replace('</head>', `${baseTag}${testSceneCss}${styleTag}</head>`)
-            .replace('</body>', `${dataScript}${gameScriptTag}</body>`);
+            .replace('</body>', `${dataScript}${gameScriptTag}</body>`)
+            .replace('__DOMPURIFY_SCRIPT__', () => `<script>${dompurifyCode.replace(/<\//g, '<\\/')}</script>`);
 
     }, [gameData, testSceneId, t, basePath]);
 

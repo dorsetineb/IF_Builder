@@ -129,6 +129,20 @@ document.addEventListener('DOMContentLoaded', () => {
         diamond: '<svg fill="none" stroke="%COLOR%" stroke-width="3.5" viewBox="0 0 24 24"><path d="M12 2l10 10-10 10L2 12z"/></svg>'
     };
 
+    window.safeHTML = function(content, config) {
+        if (typeof DOMPurify !== 'undefined') {
+            const finalConfig = config || {};
+            finalConfig.ADD_ATTR = [...(finalConfig.ADD_ATTR || []), 'class', 'style', 'data-word'];
+            finalConfig.ADD_TAGS = [...(finalConfig.ADD_TAGS || []), 'span'];
+            return DOMPurify.sanitize(content, finalConfig);
+        }
+        // Fail Secure: If DOMPurify is missing, return raw text without HTML execution
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        // Basic escaping just in case it's used in innerHTML somewhere
+        return tempDiv.textContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    };
+
     const gameData = window.embeddedGameData;
     let currentSceneId = gameData.cena_inicial;
     let inventory = [];
@@ -1052,7 +1066,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + '</span><span class="slot-empty">Vazio</span></div>';
                 if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Salvar</span></div>';
             }
-            slotDiv.innerHTML = contentHtml;
+            slotDiv.innerHTML = window.safeHTML(contentHtml);
             slotDiv.addEventListener('click', (e) => { if (e.target.classList.contains('slot-delete-btn')) return; if (mode === 'save') performSave(i); else if (mode === 'load' && savedData) loadGameFromData(savedData); });
             slotsList.appendChild(slotDiv);
         }
@@ -1679,7 +1693,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const p = document.createElement('p'); const formattedHTML = formatText(paragraphs[pIndex]);
             if (textAnimType === 'typewriter') {
                 p.className = 'scene-paragraph typewriter-cursor'; p.style.opacity = '1'; 
-                p.innerHTML = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }) : formattedHTML;
+                p.innerHTML = window.safeHTML(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
                 sceneDescription.appendChild(p);
                 const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
                 let node; const textNodes = []; while((node = walker.nextNode())) textNodes.push(node);
@@ -1706,7 +1720,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 };
                 type();
             } else { 
-                p.innerHTML = (typeof DOMPurify !== 'undefined') ? DOMPurify.sanitize(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }) : formattedHTML;
+                p.innerHTML = window.safeHTML(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
                 p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); finishParagraph(); 
             }
         };
@@ -1970,7 +1984,7 @@ document.addEventListener('DOMContentLoaded', () => {
             sceneDescription.classList.add('typewriting-active');
             p.className = 'scene-paragraph typewriter-cursor'; 
             p.style.opacity = '1'; 
-            p.innerHTML = formattedHTML; 
+            p.innerHTML = window.safeHTML(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }); 
             sceneDescription.appendChild(p);
             const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
             let node; const textNodes = []; while((node = walker.nextNode())) textNodes.push(node);
@@ -1994,7 +2008,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (textAnimType === 'typewriter') {
                  // Already handled by if block above
             } else {
-                p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                p.innerHTML = window.safeHTML(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+                p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
             }
         }
     };
@@ -2094,14 +2109,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 const item = document.createElement('div');
                 item.className = 'tracker-item';
                 
-                item.innerHTML = 
+                item.innerHTML = window.safeHTML(
                     '<div class="tracker-item-header">' +
                         '<span class="tracker-item-name">' + def.name + '</span>' +
                         (!def.hideValue ? '<span class="tracker-item-values">' + currentVal + ' / ' + def.maxValue + '</span>' : '') +
                     '</div>' +
                     '<div class="tracker-bar-container">' +
                         '<div class="tracker-bar" style="width: ' + percentage + '%; background-color: ' + barColor + '; margin-left: ' + (def.invertBar ? 'auto' : '0') + '"></div>' +
-                    '</div>';
+                    '</div>'
+                , { ADD_ATTR: ['style'] });
                 trackersContent.appendChild(item);
             });
         }
@@ -2109,7 +2125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const openItemModal = (item) => {
-        itemModalName.textContent = item.name; itemModalDescription.innerHTML = formatText(item.examineDescription);
+        itemModalName.textContent = item.name; itemModalDescription.innerHTML = window.safeHTML(formatText(item.examineDescription), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
         setupHighlights(itemModalDescription);
         if (item.image) { itemModalImage.src = item.image; itemModalImageContainer.classList.remove('hidden'); }
         else itemModalImageContainer.classList.add('hidden');
@@ -2118,7 +2134,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const openAcquisitionModal = (item, customDescription) => {
         if (!acquisitionModal) return;
         acquisitionModalTitle.textContent = item.name;
-        acquisitionModalDescription.innerHTML = formatText(customDescription || item.examineDescription);
+        acquisitionModalDescription.innerHTML = window.safeHTML(formatText(customDescription || item.examineDescription), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
         setupHighlights(acquisitionModalDescription);
         if (item.image) { acquisitionModalImage.src = item.image; acquisitionModalImageContainer.classList.remove('hidden'); }
         else acquisitionModalImageContainer.classList.add('hidden');
@@ -2161,7 +2177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
 
-            statsContainer.innerHTML = 
+            statsContainer.innerHTML = window.safeHTML(
                 '<div class="diary-stat-box">' +
                     '<span class="diary-stat-label">' + gameData.gameTranslations.stats_visited + '</span>' +
                     '<span class="diary-stat-value">' + visitedCount + ' / ' + totalScenesCount + ' ' + gameData.gameTranslations.of_scenes + '</span>' +
@@ -2173,7 +2189,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 '<div class="diary-stat-box">' +
                     '<span class="diary-stat-label">' + gameData.gameTranslations.total_words_read + '</span>' +
                     '<span class="diary-stat-value">' + totalWords + '</span>' +
-                '</div>';
+                '</div>'
+            );
             diaryLog.appendChild(statsContainer);
         }
 
@@ -2182,14 +2199,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 const div = document.createElement('div'); div.className = 'diary-entry';
                 if (entry.image) { const img = document.createElement('img'); img.src = entry.image; div.appendChild(img); }
                 const txt = document.createElement('div'); txt.className = 'text-container'; 
-                txt.innerHTML = '<span class="scene-name">' + entry.name + '</span><p>' + formatText(entry.description) + '</p>';
+                txt.innerHTML = window.safeHTML('<span class="scene-name">' + entry.name + '</span><p>' + formatText(entry.description) + '</p>', { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
                 div.appendChild(txt); diaryLog.appendChild(div);
                 setupHighlights(txt);
                 currentInterContainer = document.createElement('div'); currentInterContainer.className = 'diary-interactions-container'; txt.appendChild(currentInterContainer);
             } else {
                 if (currentInterContainer) {
                     const p = document.createElement('p'); p.className = 'diary-' + entry.type; 
-                    if (entry.type === 'output') { p.innerHTML = formatText(entry.text); setupHighlights(p); } else p.textContent = entry.text;
+                    if (entry.type === 'output') { p.innerHTML = window.safeHTML(formatText(entry.text), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }); setupHighlights(p); } else p.textContent = entry.text;
                     currentInterContainer.appendChild(p);
                 }
             }

@@ -10,8 +10,8 @@ import {
   sanitizeLegacyI18n,
 } from '../lib/gameDefaults';
 import { FONTS } from '../constants';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import DOMPurify from 'dompurify';
+import dompurifyCode from 'dompurify/dist/purify.min.js?raw';
 import { useTranslation } from 'react-i18next';
 import { processAsset } from '../services/exportService';
 
@@ -363,7 +363,9 @@ DATE:        ${exportDate.toLocaleString()}
       .replace('<div id="negative-ending-screen" class="splash-screen', `<div id="negative-ending-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
       .replace('<div id="vignette-screen" class="splash-screen', `<div id="vignette-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`);
 
-    htmlContent = htmlContent.replace('</body>', '<script src="game.js"></script></body>');
+    htmlContent = htmlContent
+      .replace('</body>', '<script src="game.js"></script></body>')
+      .replace('__DOMPURIFY_SCRIPT__', () => `<script>${dompurifyCode.replace(/<\//g, '<\\/')}</script>`);
 
     const css =
       finalCss
@@ -402,6 +404,9 @@ DATE:        ${exportDate.toLocaleString()}
           /__SCENE_NAME_OVERLAY_TEXT_COLOR__/g,
           exportData.gameSceneNameOverlayTextColor || '#c9d1d9'
         ) + OVERLAY_CSS;
+
+    // Finalize DOMPurify injection last to avoid tag collisions
+    htmlContent = htmlContent.replace('__DOMPURIFY_SCRIPT__', () => `<script>${dompurifyCode}</script>`);
 
     zip.file('index.html', htmlContent);
     zip.file('style.css', css);
@@ -737,6 +742,9 @@ DATE:        ${exportDate.toLocaleString()}
       `<script id="if-builder-source" type="application/json">${safeEditorJson}<` + `/script>\n` +
       '</body>'
     );
+
+    // Finalize DOMPurify injection last to avoid tag collisions
+    htmlContent = htmlContent.replace('__DOMPURIFY_SCRIPT__', () => `<script>${dompurifyCode.replace(/<\//g, '<\\/')}</script>`);
 
     // Download as single HTML file
     const finalBlob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
