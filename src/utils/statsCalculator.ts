@@ -49,6 +49,12 @@ export interface ProjectStats {
         deadEndScenes: number;
         orphanScenes: number;
     };
+    performanceAlerts: Array<{
+        sceneId: string;
+        sceneName: string;
+        reason: 'heavy_image' | 'long_description' | 'many_interactions';
+        detail: string;
+    }>;
 }
 
 const countWords = (text: string | undefined): number => {
@@ -232,7 +238,43 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
         });
     }).length;
 
-    // 5. EXPORT SIZE ESTIMATION
+    // 5. PERFORMANCE ALERTS
+    const IMAGE_SIZE_THRESHOLD_BYTES = 500 * 1024; // 500KB in base64 chars
+    const DESCRIPTION_LENGTH_THRESHOLD = 2000; // characters
+    const MANY_INTERACTIONS_THRESHOLD = 15;
+
+    const performanceAlerts: ProjectStats['performanceAlerts'] = [];
+
+    scenes.forEach(scene => {
+        const name = scene.name || scene.id;
+        if (scene.image && scene.image.startsWith('data:') && scene.image.length > IMAGE_SIZE_THRESHOLD_BYTES) {
+            const sizeMB = (scene.image.length / (1024 * 1024)).toFixed(1);
+            performanceAlerts.push({
+                sceneId: scene.id,
+                sceneName: name,
+                reason: 'heavy_image',
+                detail: `Imagem com ~${sizeMB}MB (recomendado: < 0.5MB)`,
+            });
+        }
+        if (scene.description && scene.description.length > DESCRIPTION_LENGTH_THRESHOLD) {
+            performanceAlerts.push({
+                sceneId: scene.id,
+                sceneName: name,
+                reason: 'long_description',
+                detail: `Descrição com ${scene.description.length} caracteres (recomendado: < 2000)`,
+            });
+        }
+        if (scene.interactions && scene.interactions.length > MANY_INTERACTIONS_THRESHOLD) {
+            performanceAlerts.push({
+                sceneId: scene.id,
+                sceneName: name,
+                reason: 'many_interactions',
+                detail: `${scene.interactions.length} interações (recomendado: < 15)`,
+            });
+        }
+    });
+
+    // 6. EXPORT SIZE ESTIMATION
     // Sizes are calculated by simulating the real export serialization:
     // htmlMB = engineJson (embeddedGameData) + editorJson (if-builder-source) + wrapper overhead
     // zipMB  = binary assets (base64 decoded ~75%) + engineJson (in game.js) + wrapper overhead
@@ -277,5 +319,6 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
             deadEndScenes: deadEnds,
             orphanScenes: orphanCount,
         },
+        performanceAlerts,
     };
 };

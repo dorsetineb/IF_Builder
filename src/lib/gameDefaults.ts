@@ -1,4 +1,6 @@
 import { GameData } from '../types';
+import DOMPurify from 'dompurify';
+
 
 export const gameHTML = `
 <!DOCTYPE html>
@@ -1574,6 +1576,72 @@ export const initialGameData: GameData = {
 
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+/**
+ * Sanitizes all user-authored HTML text fields in an imported GameData object.
+ * Runs DOMPurify on scene descriptions, interaction messages, and other rich-text
+ * fields to prevent XSS payloads from entering the editor state via shared files.
+ * Preserves all legitimate formatting (spans, bold, colors, etc.).
+ */
+export const sanitizeGameDataContent = (data: any): any => {
+    if (!data || typeof DOMPurify === 'undefined') return data;
+
+    const purifyConfig = {
+        ADD_ATTR: ['class', 'style', 'data-word'],
+        ADD_TAGS: ['span'],
+    };
+
+    const clean = (s: any): string => {
+        if (typeof s !== 'string') return s;
+        return DOMPurify.sanitize(s, purifyConfig);
+    };
+
+    const result = { ...data };
+
+    // Sanitize top-level narrative text fields
+    const topLevelFields = [
+        'positiveEndingDescription', 'negativeEndingDescription',
+        'gameSplashDescription', 'gameSplashTitle',
+    ];
+    topLevelFields.forEach(field => {
+        if (result[field]) result[field] = clean(result[field]);
+    });
+
+    // Sanitize scenes
+    if (result.scenes && typeof result.scenes === 'object') {
+        const cleanedScenes: any = {};
+        Object.entries(result.scenes).forEach(([id, scene]: [string, any]) => {
+            const cleanedScene = { ...scene };
+            cleanedScene.description = clean(scene.description);
+            cleanedScene.name = clean(scene.name);
+            if (cleanedScene.interactions) {
+                cleanedScene.interactions = cleanedScene.interactions.map((inter: any) => ({
+                    ...inter,
+                    successMessage: clean(inter.successMessage),
+                    failureMessage: clean(inter.failureMessage),
+                    newSceneDescription: clean(inter.newSceneDescription),
+                }));
+            }
+            cleanedScenes[id] = cleanedScene;
+        });
+        result.scenes = cleanedScenes;
+    }
+
+    // Sanitize global objects
+    if (result.globalObjects && typeof result.globalObjects === 'object') {
+        const cleanedObjects: any = {};
+        Object.entries(result.globalObjects).forEach(([id, obj]: [string, any]) => {
+            cleanedObjects[id] = {
+                ...obj,
+                name: clean(obj.name),
+                examineDescription: clean(obj.examineDescription),
+            };
+        });
+        result.globalObjects = cleanedObjects;
+    }
+
+    return result;
+};
+
 export const sanitizeLegacyI18n = (data: any): any => {
     if (!data) return data;
     const d = { ...data };

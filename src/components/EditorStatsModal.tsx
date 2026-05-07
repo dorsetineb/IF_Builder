@@ -9,7 +9,9 @@ import {
   X,
   Activity,
   Search,
-  Type
+  Type,
+  Zap,
+  AlertTriangle
 } from 'lucide-react';
 import { calculateEditorStats } from '../utils/statsCalculator';
 import { GameData } from '../types';
@@ -295,6 +297,53 @@ const EditorStatsModal: React.FC<EditorStatsModalProps> = ({ isOpen, onClose, ga
                  </div>
                ))}
             </div>
+          </div>
+
+          {/* Alertas de Performance */}
+          <div className="lg:col-span-12 bg-card border border-muted-foreground/50 rounded-xl p-5 shadow-sm flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '400ms' }}>
+            <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2 mb-4">
+              <Zap className="w-4 h-4 text-primary" /> {t('editorStats.performanceAlerts', 'Alertas de Performance')}
+            </h3>
+            {stats.performanceAlerts.length === 0 ? (
+              <div className="flex items-center gap-2 text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
+                <Zap className="w-4 h-4 flex-shrink-0" />
+                <span className="text-xs font-bold">{t('editorStats.noPerformanceIssues', 'Nenhum problema de performance detectado. Projeto otimizado!')}</span>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {stats.performanceAlerts.map((alert, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex items-center justify-between gap-3 p-3 rounded-lg border transition-colors ${
+                      alert.reason === 'heavy_image'
+                        ? 'bg-amber-500/10 border-amber-500/30 hover:bg-amber-500/20'
+                        : alert.reason === 'long_description'
+                        ? 'bg-blue-500/10 border-blue-500/30 hover:bg-blue-500/20'
+                        : 'bg-red-500/10 border-red-500/30 hover:bg-red-500/20'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <AlertTriangle className={`w-4 h-4 flex-shrink-0 ${
+                        alert.reason === 'heavy_image' ? 'text-amber-400' :
+                        alert.reason === 'long_description' ? 'text-blue-400' : 'text-red-400'
+                      }`} />
+                      <div className="min-w-0">
+                        <p className="text-xs font-bold text-foreground truncate">{alert.sceneName}</p>
+                        <p className="text-[10px] text-muted-foreground">{alert.detail}</p>
+                      </div>
+                    </div>
+                    {onSceneClick && (
+                      <button
+                        onClick={() => { onSceneClick(alert.sceneId); onClose(); }}
+                        className="text-[10px] font-bold text-primary hover:underline flex-shrink-0"
+                      >
+                        {t('editorStats.goToScene', 'Ir para cena')} →
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

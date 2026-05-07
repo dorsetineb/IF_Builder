@@ -8,12 +8,14 @@ import {
   initialGameData,
   OVERLAY_CSS,
   sanitizeLegacyI18n,
+  sanitizeGameDataContent,
 } from '../lib/gameDefaults';
 import { FONTS } from '../constants';
 import DOMPurify from 'dompurify';
 import dompurifyCode from 'dompurify/dist/purify.min.js?raw';
 import { useTranslation } from 'react-i18next';
 import { processAsset } from '../services/exportService';
+import { generateIntegrityHash, getIntegrityVerificationScript } from '../utils/integrity';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 declare let JSZip: any;
@@ -293,6 +295,10 @@ DATE:        ${exportDate.toLocaleString()}
         exportData.gameSystemButtonText || t('UIEditor.textos.systemPlaceholder')
       )
       .replace(
+        /__DIARY_BUTTON_TEXT__/g,
+        exportData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder')
+      )
+      .replace(
         '__SAVE_MENU_TITLE__',
         exportData.gameSaveMenuTitle || t('UIEditor.textos.saveMenuPlaceholder', 'Save Game')
       )
@@ -363,10 +369,7 @@ DATE:        ${exportDate.toLocaleString()}
       .replace('<div id="negative-ending-screen" class="splash-screen', `<div id="negative-ending-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
       .replace('<div id="vignette-screen" class="splash-screen', `<div id="vignette-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`);
 
-    htmlContent = htmlContent
-      .replace('</body>', '<script src="game.js"></script></body>')
-      .replace('__DOMPURIFY_SCRIPT__', () => `<script>${dompurifyCode.replace(/<\//g, '<\\/')}</script>`);
-
+    // Build final CSS with replacements
     const css =
       finalCss
         .replace(/__FONT_FAMILY__/g, fontFamily)
@@ -405,8 +408,21 @@ DATE:        ${exportDate.toLocaleString()}
           exportData.gameSceneNameOverlayTextColor || '#c9d1d9'
         ) + OVERLAY_CSS;
 
+    // Calculate integrity hash before final injection
+    const editorJsonForHash = JSON.stringify(exportData);
+    const integrityHash = await generateIntegrityHash(editorJsonForHash);
+    const verificationScript = getIntegrityVerificationScript();
+
+    htmlContent = htmlContent
+      .replace('</head>', () => `<meta name="if-integrity" content="${integrityHash}">\n</head>`)
+      .replace(/<\/body>(?!.*<\/body>)/si, () => 
+        `<script src="game.js"><\/script>\n` +
+        `<script>${verificationScript}<\/script>\n` +
+        '</body>'
+      );
+
     // Finalize DOMPurify injection last to avoid tag collisions
-    htmlContent = htmlContent.replace('__DOMPURIFY_SCRIPT__', () => `<script>${dompurifyCode}</script>`);
+    htmlContent = htmlContent.replace('__DOMPURIFY_SCRIPT__', () => `<script>${dompurifyCode.replace(/<\//g, '<\\/')}</script>`);
 
     zip.file('index.html', htmlContent);
     zip.file('style.css', css);
@@ -615,6 +631,10 @@ DATE:        ${exportDate.toLocaleString()}
         exportData.gameSystemButtonText || t('UIEditor.textos.systemPlaceholder')
       )
       .replace(
+        /__DIARY_BUTTON_TEXT__/g,
+        exportData.gameDiaryButtonText || t('UIEditor.textos.diaryPlaceholder')
+      )
+      .replace(
         '__SAVE_MENU_TITLE__',
         exportData.gameSaveMenuTitle || t('UIEditor.textos.saveMenuPlaceholder', 'Save Game')
       )
@@ -734,14 +754,23 @@ DATE:        ${exportDate.toLocaleString()}
       htmlContent = htmlContent.replace('</head>', `<style>${css}</style>\n</head>`);
     }
 
-    // Inline JS + editor source data before </body>
+    // Calculate integrity hash before final injection
+    const editorJsonForHash = JSON.stringify(exportData);
+    const integrityHash = await generateIntegrityHash(editorJsonForHash);
+    const verificationScript = getIntegrityVerificationScript();
+
+    // Inline JS + editor source data + integrity verification before </body>
+    // We do this in one block and use a callback to avoid hitting tags inside the JSON data
     const safeEditorJson = JSON.stringify(exportData).replace(/<\/script/g, '<\\/script>');
-    htmlContent = htmlContent.replace(
-      '</body>',
-      `<script>${finalGameScript}<` + `/script>\n` +
-      `<script id="if-builder-source" type="application/json">${safeEditorJson}<` + `/script>\n` +
-      '</body>'
-    );
+    
+    htmlContent = htmlContent
+      .replace('</head>', () => `<meta name="if-integrity" content="${integrityHash}">\n</head>`)
+      .replace(/<\/body>(?!.*<\/body>)/si, () => 
+        `<script>${finalGameScript}<\/script>\n` +
+        `<script id="if-builder-source" type="application/json">${safeEditorJson}<\/script>\n` +
+        `<script>${verificationScript}<\/script>\n` +
+        '</body>'
+      );
 
     // Finalize DOMPurify injection last to avoid tag collisions
     htmlContent = htmlContent.replace('__DOMPURIFY_SCRIPT__', () => `<script>${dompurifyCode.replace(/<\//g, '<\\/')}</script>`);
@@ -873,7 +902,9 @@ DATE:        ${exportDate.toLocaleString()}
       // Only sanitize truly legacy projects (before metadata field was added).
       // Modern exports already have proper text values baked in.
       const isLegacyProject = !data.metadata;
-      const sanitizedData = isLegacyProject ? sanitizeLegacyI18n(data) : { ...data };
+      const i18nSanitized = isLegacyProject ? sanitizeLegacyI18n(data) : { ...data };
+      // Always sanitize HTML content in text fields to prevent XSS from shared files
+      const sanitizedData = sanitizeGameDataContent(i18nSanitized);
 
       // --- MIGRATE AND PURGE LEGACY FLAGS ---
       // Map legacy system flags to modern boolean flags if modern flags are missing
