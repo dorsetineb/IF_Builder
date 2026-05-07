@@ -1245,6 +1245,12 @@
     "objectsMissingImage": "Obj sin img",
     "uselessObjects": "Objetos inútiles",
     "hollowInteractions": "Acciones vacías",
+    "performanceAlerts": "Alertas de Rendimiento",
+    "noPerformanceIssues": "¡No se detectaron problemas de rendimiento. Proyecto optimizado!",
+    "goToScene": "Ir a la ramificación",
+    "heavyImageDetail": "Imagen con ~{{size}}MB (recomendado: < 0.5MB)",
+    "longDescriptionDetail": "Descripción con {{count}} caracteres (recomendado: < 2000)",
+    "manyInteractionsDetail": "{{count}} interacciones (recomendado: < 15)",
     "actions": {
       "fix": "Corregir"
     }

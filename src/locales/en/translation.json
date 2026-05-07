@@ -556,6 +556,12 @@
     "avg": "Average size",
     "noVerbs": "No verbs",
     "words": "words",
+    "performanceAlerts": "Performance Alerts",
+    "noPerformanceIssues": "No performance issues detected. Project optimized!",
+    "goToScene": "Go to branch",
+    "heavyImageDetail": "Image with ~{{size}}MB (recommended: < 0.5MB)",
+    "longDescriptionDetail": "Description with {{count}} characters (recommended: < 2000)",
+    "manyInteractionsDetail": "{{count}} interactions (recommended: < 15)",
     "actions": {
       "fix": "Fix"
     }

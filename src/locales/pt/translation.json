@@ -247,6 +247,12 @@
     "avg": "Média",
     "noVerbs": "Nenhum verbo",
     "words": "palavras",
+    "performanceAlerts": "Alertas de Performance",
+    "noPerformanceIssues": "Nenhum problema de performance detectado. Projeto otimizado!",
+    "goToScene": "Ir para ramificação",
+    "heavyImageDetail": "Imagem com ~{{size}}MB (recomendado: < 0.5MB)",
+    "longDescriptionDetail": "Descrição com {{count}} caracteres (recomendado: < 2000)",
+    "manyInteractionsDetail": "{{count}} interações (recomendado: < 15)",
     "actions": {
       "fix": "Corrigir"
     }

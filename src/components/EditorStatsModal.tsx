@@ -302,12 +302,12 @@ const EditorStatsModal: React.FC<EditorStatsModalProps> = ({ isOpen, onClose, ga
           {/* Alertas de Performance */}
           <div className="lg:col-span-12 bg-card border border-muted-foreground/50 rounded-xl p-5 shadow-sm flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '400ms' }}>
             <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2 mb-4">
-              <Zap className="w-4 h-4 text-primary" /> {t('editorStats.performanceAlerts', 'Alertas de Performance')}
+              <Zap className="w-4 h-4 text-primary" /> {t('editorStats.performanceAlerts', 'Performance Alerts')}
             </h3>
             {stats.performanceAlerts.length === 0 ? (
               <div className="flex items-center gap-2 text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-3">
                 <Zap className="w-4 h-4 flex-shrink-0" />
-                <span className="text-xs font-bold">{t('editorStats.noPerformanceIssues', 'Nenhum problema de performance detectado. Projeto otimizado!')}</span>
+                <span className="text-xs font-bold">{t('editorStats.noPerformanceIssues', 'No performance issues detected. Project optimized!')}</span>
               </div>
             ) : (
               <div className="flex flex-col gap-2">
@@ -329,7 +329,11 @@ const EditorStatsModal: React.FC<EditorStatsModalProps> = ({ isOpen, onClose, ga
                       }`} />
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-foreground truncate">{alert.sceneName}</p>
-                        <p className="text-[10px] text-muted-foreground">{alert.detail}</p>
+                        <p className="text-[10px] text-muted-foreground">
+                          {alert.reason === 'heavy_image' && t('editorStats.heavyImageDetail', { size: alert.value })}
+                          {alert.reason === 'long_description' && t('editorStats.longDescriptionDetail', { count: alert.value })}
+                          {alert.reason === 'many_interactions' && t('editorStats.manyInteractionsDetail', { count: alert.value })}
+                        </p>
                       </div>
                     </div>
                     {onSceneClick && (
@@ -337,7 +341,7 @@ const EditorStatsModal: React.FC<EditorStatsModalProps> = ({ isOpen, onClose, ga
                         onClick={() => { onSceneClick(alert.sceneId); onClose(); }}
                         className="text-[10px] font-bold text-primary hover:underline flex-shrink-0"
                       >
-                        {t('editorStats.goToScene', 'Ir para cena')} →
+                        {t('editorStats.goToScene', 'Go to branch')} →
                       </button>
                     )}
                   </div>

@@ -53,7 +53,8 @@ export interface ProjectStats {
         sceneId: string;
         sceneName: string;
         reason: 'heavy_image' | 'long_description' | 'many_interactions';
-        detail: string;
+        value: number | string;
+        threshold: number;
     }>;
 }
 
@@ -248,12 +249,13 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
     scenes.forEach(scene => {
         const name = scene.name || scene.id;
         if (scene.image && scene.image.startsWith('data:') && scene.image.length > IMAGE_SIZE_THRESHOLD_BYTES) {
-            const sizeMB = (scene.image.length / (1024 * 1024)).toFixed(1);
+            const sizeMB = (scene.image.length / (1024 * 1024));
             performanceAlerts.push({
                 sceneId: scene.id,
                 sceneName: name,
                 reason: 'heavy_image',
-                detail: `Imagem com ~${sizeMB}MB (recomendado: < 0.5MB)`,
+                value: sizeMB.toFixed(2),
+                threshold: 0.5,
             });
         }
         if (scene.description && scene.description.length > DESCRIPTION_LENGTH_THRESHOLD) {
@@ -261,7 +263,8 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
                 sceneId: scene.id,
                 sceneName: name,
                 reason: 'long_description',
-                detail: `Descrição com ${scene.description.length} caracteres (recomendado: < 2000)`,
+                value: scene.description.length,
+                threshold: DESCRIPTION_LENGTH_THRESHOLD,
             });
         }
         if (scene.interactions && scene.interactions.length > MANY_INTERACTIONS_THRESHOLD) {
@@ -269,7 +272,8 @@ export const calculateEditorStats = (gameData: GameData): ProjectStats => {
                 sceneId: scene.id,
                 sceneName: name,
                 reason: 'many_interactions',
-                detail: `${scene.interactions.length} interações (recomendado: < 15)`,
+                value: scene.interactions.length,
+                threshold: MANY_INTERACTIONS_THRESHOLD,
             });
         }
     });
