@@ -22,7 +22,7 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
     const getDitherColors = () => {
         switch (theme) {
             case 'terminal':
-                return { primary: '#0d1117', secondary: '#4af626' };
+                return { primary: '#001D2D', secondary: '#7EE0A1' };
             case 'windows':
                 return { primary: '#0f0f0f', secondary: '#008080' };
             default: // dark

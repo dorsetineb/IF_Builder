@@ -57,11 +57,11 @@ export const PREDEFINED_THEMES = [
     },
     {
         name: 'Terminal', nameKey: 'Terminal',
-        gameBackgroundColor: '#022c22',
-        textColor: '#34d399', titleColor: '#6ee7b7', focusColor: '#a7f3d0',
-        splashButtonColor: '#10b981', splashButtonHoverColor: '#059669', splashButtonTextColor: '#000000',
-        actionButtonColor: '#34d399', actionButtonTextColor: '#000000',
-        chanceIconColor: '#6ee7b7',
+        gameBackgroundColor: '#001D2D',
+        textColor: '#7EE0A1', titleColor: '#7EE0A1', focusColor: '#5FB580',
+        splashButtonColor: '#5FB580', splashButtonHoverColor: '#7EE0A1', splashButtonTextColor: '#001D2D',
+        actionButtonColor: '#7EE0A1', actionButtonTextColor: '#001D2D',
+        chanceIconColor: '#7EE0A1',
     },
     {
         name: 'Oceano', nameKey: 'Oceano',

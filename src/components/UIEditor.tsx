@@ -10,7 +10,7 @@ import { DitherShader } from '@/components/ui/dither-shader';
 import { SystemsTab } from './UIEditor/SystemsTab';
 import { AppearanceTab } from './UIEditor/AppearanceTab';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Terminal, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, History as HistoryIcon } from 'lucide-react';
+import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Leaf, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, History as HistoryIcon } from 'lucide-react';
 
 interface UIEditorProps {
     html: string;
@@ -134,7 +134,7 @@ const APP_THEME_COLORS = {
     dark: '#9D4EDD',      // Vibrant Purple
     light: '#18181b',     // Zinc-950 (Dark Grey/Black for Light theme as per :root --primary)
     cream: '#5c4033',     // Approx for warm brown oklch(0.40 0.08 30)
-    terminal: '#4AF626',   // Terminal Green
+    terminal: '#7EE0A1',   // Vibrant Mint
     windows: '#008080',    // Teal (W95 theme accent)
     system: '#9D4EDD'     // Default fallback
 };
@@ -208,7 +208,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const ditherColors = useMemo(() => {
         switch (theme) {
             case 'terminal':
-                return { primary: '#0d1117', secondary: '#4af626' };
+                return { primary: '#001D2D', secondary: '#7EE0A1' };
             case 'windows':
                 return { primary: '#0f0f0f', secondary: '#008080' };
             default: // dark
@@ -1270,7 +1270,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                                 onClick={() => handleAppThemeChange('terminal')}
                                                 className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'} animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '200ms' }}
                                             >
-                                                <Terminal size={16} className="text-muted-foreground" />
+                                                <Leaf size={16} className="text-muted-foreground" />
                                                 <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
                                             </button>
                                         </div>

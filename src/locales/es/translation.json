@@ -161,7 +161,7 @@
       "dark": "Noche",
       "light": "Día",
       "cream": "Crema",
-      "terminal": "Terminal",
+      "terminal": "Menta",
       "windows": "W95"
     },
     "language": {
@@ -365,7 +365,7 @@
         "MeiaNoite": "Medianoche",
         "Floresta": "Bosque",
         "Spia": "Sepia",
-        "Terminal": "Terminal",
+        "Terminal": "Menta",
         "Oceano": "Océano",
         "Vampiro": "Vampiro",
         "Cyberpunk": "Cyberpunk",
@@ -1033,7 +1033,7 @@
       "MeiaNoite": "Medianoche",
       "Floresta": "Bosque",
       "Spia": "Sepia",
-      "Terminal": "Terminal",
+      "Terminal": "Menta",
       "Oceano": "Océano",
       "Vampiro": "Vampiro",
       "Cyberpunk": "Cyberpunk",

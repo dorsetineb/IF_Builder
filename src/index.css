@@ -243,29 +243,29 @@
 }
 
 .terminal {
-  --background: #0D1117;
-  --foreground: #4AF626;
+  --background: #001D2D;
+  --foreground: #7EE0A1;
 
-  /* Cards & Surfaces */
-  --card: #0D1117;
-  --card-foreground: #4AF626;
-  --popover: #0D1117;
-  --popover-foreground: #4AF626;
+  /* Cards & Surfaces - Deepest Blue Gray */
+  --card: #00273F;
+  --card-foreground: #7EE0A1;
+  --popover: #00273F;
+  --popover-foreground: #7EE0A1;
 
-  /* Brand / Primary - Terminal Green */
-  --primary: #4AF626;
-  --primary-foreground: #000000;
+  /* Brand / Primary - Sage Green */
+  --primary: #7EE0A1;
+  --primary-foreground: #001D2D;
 
   /* Secondary */
-  --secondary: #161B22;
-  --secondary-foreground: #4AF626;
+  --secondary: #00273F;
+  --secondary-foreground: #7EE0A1;
 
   /* Muted */
-  --muted: #161B22;
-  --muted-foreground: #A1A1AA;
+  --muted: #00273F;
+  --muted-foreground: #5FB580;
 
   /* Accent */
-  --accent: #238636;
+  --accent: #5FB580;
   --accent-foreground: #ffffff;
 
   /* Destructive */
@@ -273,32 +273,32 @@
   --destructive-foreground: #ffffff;
 
   /* Borders & Inputs */
-  --border: #30363d;
-  --input: #161B22;
-  --ring: #4AF626;
+  --border: #004870;
+  --input: #00273F;
+  --ring: #7EE0A1;
 
   /* Charts */
-  --chart-1: #4AF626;
-  --chart-2: #238636;
-  --chart-3: #161B22;
-  --chart-4: #4AF626;
-  --chart-5: #238636;
+  --chart-1: #7EE0A1;
+  --chart-2: #5FB580;
+  --chart-3: #00273F;
+  --chart-4: #7EE0A1;
+  --chart-5: #5FB580;
 
   /* Sidebar */
-  --sidebar: #0D1117;
-  --sidebar-foreground: #4AF626;
-  --sidebar-primary: #4AF626;
-  --sidebar-primary-foreground: #000000;
-  --sidebar-accent: #161B22;
-  --sidebar-accent-foreground: #4AF626;
-  --sidebar-border: #30363d;
-  --sidebar-ring: #4AF626;
+  --sidebar: #001D2D;
+  --sidebar-foreground: #7EE0A1;
+  --sidebar-primary: #7EE0A1;
+  --sidebar-primary-foreground: #001D2D;
+  --sidebar-accent: #00273F;
+  --sidebar-accent-foreground: #7EE0A1;
+  --sidebar-border: #004870;
+  --sidebar-ring: #7EE0A1;
 
-  /* Dither Colors */
-  --dither-bg-1: #0D1117;
-  --dither-bg-2: #161B22;
-  --dither-bg-3: #000000;
-  --dither-overlay: #000000;
+  /* Dither Colors - Optimized for Terminal Green Effect */
+  --dither-bg-1: #001D2D;
+  --dither-bg-2: #7EE0A1;
+  --dither-bg-3: #001D2D;
+  --dither-overlay: #7EE0A1;
 }
 
 .terminal input:not([type="checkbox"]):not([type="radio"]):not(:disabled),

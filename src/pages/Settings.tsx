@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Sun, Moon, Coffee, Terminal, Globe, Monitor } from 'lucide-react';
+import { Sun, Moon, Coffee, Leaf, Globe, Monitor } from 'lucide-react';
 import { useTheme } from '../components/ThemeProvider';
 import { useToast } from '../components/ToastContext';
 import { useTranslation } from 'react-i18next';
@@ -106,7 +106,7 @@ const Settings: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                             onClick={() => handleThemeChange('terminal')}
                             className={`flex items-center justify-center gap-2 p-3 rounded-lg border transition-all ${theme === 'terminal' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'}`}
                         >
-                            <Terminal size={16} className={theme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
+                            <Leaf size={16} className={theme === 'terminal' ? 'text-primary' : 'text-muted-foreground'} />
                             <span className={`font-medium text-xs ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
                         </button>
                     </div>
