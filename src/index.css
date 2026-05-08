@@ -308,13 +308,13 @@
 }
 
 .windows {
-  --background: #0F0F0F;
+  --background: #252528;
   --foreground: #FFFFFF;
 
   /* Cards & Surfaces */
-  --card: #1A1A1A;
+  --card: #36363A;
   --card-foreground: #FFFFFF;
-  --popover: #1A1A1A;
+  --popover: #36363A;
   --popover-foreground: #FFFFFF;
 
   /* Brand / Primary - Windows Teal */
@@ -322,15 +322,15 @@
   --primary-foreground: #FFFFFF;
 
   /* Secondary */
-  --secondary: #2A2A2A;
+  --secondary: #44444A;
   --secondary-foreground: #FFFFFF;
 
   /* Muted */
-  --muted: #2A2A2A;
-  --muted-foreground: #A1A1AA;
+  --muted: #44444A;
+  --muted-foreground: #B8B8BC;
 
   /* Accent */
-  --accent: #2A2A2A;
+  --accent: #44444A;
   --accent-foreground: #FFFFFF;
 
   /* Destructive */
@@ -338,32 +338,32 @@
   --destructive-foreground: #fef2f2;
 
   /* Borders & Inputs */
-  --border: #2A2A2A;
-  --input: #2A2A2A;
+  --border: #58585E;
+  --input: #44444A;
   --ring: #008080;
 
   /* Charts */
   --chart-1: #008080;
   --chart-2: #238636;
-  --chart-3: #161B22;
+  --chart-3: #36363A;
   --chart-4: #008080;
   --chart-5: #238636;
 
   /* Sidebar */
-  --sidebar: #1A1A1A;
+  --sidebar: #36363A;
   --sidebar-foreground: #FFFFFF;
   --sidebar-primary: #008080;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #333333;
+  --sidebar-accent: #44444A;
   --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #2A2A2A;
+  --sidebar-border: #58585E;
   --sidebar-ring: #008080;
 
   /* Dither Colors */
-  --dither-bg-1: #18181b;
+  --dither-bg-1: #36363A;
   --dither-bg-2: #008080;
-  --dither-bg-3: #000000;
-  --dither-overlay: #000000;
+  --dither-bg-3: #252528;
+  --dither-overlay: #252528;
 }
 
 @layer base {
