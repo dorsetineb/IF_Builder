@@ -224,6 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const diaryButton = document.getElementById('diary-button');
     const trackersButton = document.getElementById('trackers-button');
     const systemButton = document.getElementById('system-button');
+    const exportPdfButton = document.getElementById('export-pdf-button');
     const sceneNameOverlay = document.getElementById('scene-name-overlay');
     // Overlay Injection if not present
     let sceneOverlay = document.getElementById('scene-overlay');
@@ -901,6 +902,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (diaryButton) diaryButton.addEventListener('click', () => showDiary(false));
         if (trackersButton) trackersButton.addEventListener('click', showTrackers);
         if (systemButton) systemButton.addEventListener('click', toggleSystemMenu);
+        if (exportPdfButton) {
+            console.log('Botão de exportação encontrado, anexando listener...');
+            exportPdfButton.addEventListener('click', exportDiaryToPDF);
+        } else {
+            console.error('ERRO: Botão de exportação (#export-pdf-button) NÃO encontrado no DOM durante init.');
+        }
         closeButtons.forEach(btn => btn.addEventListener('click', (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); }));
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.add('hidden'); });
@@ -941,6 +948,121 @@ document.addEventListener('DOMContentLoaded', () => {
             startGame();
         };
         if (window.isSceneTest) startGame();
+    };
+
+    const exportDiaryToPDF = () => {
+        console.log('Iniciando exportação de PDF...');
+        
+        const runExport = () => {
+            if (typeof html2pdf === 'undefined') {
+                console.error('Biblioteca html2pdf não encontrada.');
+                alert("Erro: Biblioteca de PDF não carregada.");
+                return;
+            }
+
+            const originalText = exportPdfButton.textContent;
+            exportPdfButton.textContent = 'Gerando...';
+            exportPdfButton.disabled = true;
+
+            const opt = {
+                margin:       [0, 0],
+                filename:     (gameData.gameTitle || 'Diario') + '_Log.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    logging: false,
+                    allowTaint: true,
+                    letterRendering: true
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Criar um container temporário no DOM para garantir que o html2canvas funcione
+            const container = document.createElement('div');
+            container.style.position = 'fixed';
+            container.style.left = '-10000px';
+            container.style.top = '0';
+            container.style.width = '1800px'; 
+            container.style.backgroundColor = '#ffffff';
+            document.body.appendChild(container);
+
+            const element = diaryLog.cloneNode(true);
+            element.style.height = 'auto';
+            element.style.maxHeight = 'none';
+            element.style.overflow = 'visible';
+            element.style.maskImage = 'none';
+            element.style.webkitMaskImage = 'none';
+            element.style.padding = '20px'; 
+            element.style.backgroundColor = '#ffffff';
+            element.style.color = '#333333';
+            element.style.display = 'block';
+            element.style.width = '100%';
+            
+            const allElements = element.querySelectorAll('*');
+            allElements.forEach(el => {
+                if (el instanceof HTMLElement) {
+                    el.style.backgroundImage = 'none';
+                    el.style.backgroundColor = 'transparent';
+                    el.style.color = '#333333';
+                    el.style.borderColor = '#eeeeee';
+                    el.style.boxShadow = 'none';
+                    el.style.textShadow = 'none';
+                    el.style.fontSize = '8pt';
+                    el.style.lineHeight = '1.4';
+                    el.style.margin = '0';
+                }
+            });
+
+            element.querySelectorAll('.diary-entry').forEach(entry => {
+                entry.style.display = 'flex';
+                entry.style.gap = '20px';
+                entry.style.marginBottom = '20px';
+                entry.style.paddingBottom = '15px';
+                entry.style.borderBottom = '1px solid #eeeeee';
+                entry.style.alignItems = 'flex-start';
+                entry.style.width = '100%';
+                entry.style.boxSizing = 'border-box';
+            });
+
+            element.querySelectorAll('img').forEach(img => {
+                img.style.width = '30%';
+                img.style.height = 'auto';
+                img.style.borderRadius = '2px';
+                img.style.display = 'block';
+                img.style.flexShrink = '0';
+            });
+
+            element.querySelectorAll('.text-container').forEach(text => {
+                text.style.flex = '1';
+                text.style.width = '65%';
+            });
+
+            element.querySelectorAll('.scene-name').forEach(name => {
+                name.style.fontSize = '10pt';
+                name.style.fontWeight = 'bold';
+                name.style.color = '#000000';
+                name.style.display = 'block';
+                name.style.marginBottom = '12px';
+            });
+
+            container.appendChild(element);
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                console.log('PDF gerado com sucesso.');
+                document.body.removeChild(container);
+                exportPdfButton.textContent = originalText;
+                exportPdfButton.disabled = false;
+            }).catch(err => {
+                console.error('Erro crítico na geração do PDF:', err);
+                document.body.removeChild(container);
+                alert("Erro ao gerar PDF: " + (err.message || "Verifique o console para detalhes técnicos."));
+                exportPdfButton.textContent = originalText;
+                exportPdfButton.disabled = false;
+            });
+        };
+
+        runExport();
     };
 
     const startGame = () => {

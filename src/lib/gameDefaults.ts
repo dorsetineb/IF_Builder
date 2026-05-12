@@ -101,8 +101,12 @@ export const gameHTML = `
             <button class="modal-close-button">&times;</button>
             <h2 id="diary-modal-title">__DIARY_BUTTON_TEXT__</h2>
             <div id="diary-log" class="diary-log"></div>
+            <div class="diary-footer">
+                <button id="export-pdf-button" class="diary-export-button">Exportar</button>
+            </div>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js" onload="console.log('✅ html2pdf.js carregado')" onerror="console.error('❌ Falha ao carregar html2pdf.js do CDN')"></script>
     
     <!-- System Modal -->
     <div id="system-modal" class="modal-overlay hidden">
@@ -394,6 +398,10 @@ body.with-spacing .main-wrapper { height: 100%; }
 .diary-interactions-container { margin-top: 12px; display: flex; flex-direction: column; gap: 14px; }
 .diary-input { color: var(--text-dim-color); font-style: italic; font-size: 0.9em; margin: 0; padding: 0 0 0 30px; border: none; }
 .diary-output { color: var(--text-color); margin: 0; padding: 0; border: none; line-height: 1.6; font-size: 0.95em; }
+.diary-footer { display: flex; justify-content: flex-end; padding: 15px 0 0 0; flex-shrink: 0; }
+.diary-export-button { padding: 8px 16px; background-color: var(--system-button-bg); color: var(--system-button-text); border: 2px solid var(--system-button-border); cursor: pointer; font-family: var(--font-family); font-size: 0.9em; font-weight: bold; transition: all 0.2s; }
+.diary-export-button:hover { background-color: var(--system-button-hover-bg); border-color: var(--accent-color); }
+.diary-export-button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 /* Diary Stats Header */
 .diary-stats-container { display: flex; gap: 40px; padding: 20px 40px; border-bottom: none; justify-content: center; }

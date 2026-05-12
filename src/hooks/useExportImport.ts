@@ -408,15 +408,18 @@ DATE:        ${exportDate.toLocaleString()}
           exportData.gameSceneNameOverlayTextColor || '#c9d1d9'
         ) + OVERLAY_CSS;
 
-    // Calculate integrity hash before final injection
-    const editorJsonForHash = JSON.stringify(exportData);
-    const integrityHash = await generateIntegrityHash(editorJsonForHash);
+    // Inline JS + editor source data + integrity verification before </body>
+    const safeEditorJson = JSON.stringify(exportData).replace(/<\/script/g, '<\\/script>');
+    
+    // Calculate integrity hash on the EXACT string that will be in the script tag
+    const integrityHash = await generateIntegrityHash(safeEditorJson);
     const verificationScript = getIntegrityVerificationScript();
 
     htmlContent = htmlContent
       .replace('</head>', () => `<meta name="if-integrity" content="${integrityHash}">\n</head>`)
       .replace(/<\/body>(?!.*<\/body>)/si, () => 
         `<script src="game.js"><\/script>\n` +
+        `<script id="if-builder-source" type="application/json">${safeEditorJson}<\/script>\n` +
         `<script>${verificationScript}<\/script>\n` +
         '</body>'
       );
@@ -754,14 +757,13 @@ DATE:        ${exportDate.toLocaleString()}
       htmlContent = htmlContent.replace('</head>', `<style>${css}</style>\n</head>`);
     }
 
-    // Calculate integrity hash before final injection
-    const editorJsonForHash = JSON.stringify(exportData);
-    const integrityHash = await generateIntegrityHash(editorJsonForHash);
-    const verificationScript = getIntegrityVerificationScript();
-
     // Inline JS + editor source data + integrity verification before </body>
     // We do this in one block and use a callback to avoid hitting tags inside the JSON data
     const safeEditorJson = JSON.stringify(exportData).replace(/<\/script/g, '<\\/script>');
+    
+    // Calculate integrity hash on the EXACT string that will be in the script tag
+    const integrityHash = await generateIntegrityHash(safeEditorJson);
+    const verificationScript = getIntegrityVerificationScript();
     
     htmlContent = htmlContent
       .replace('</head>', () => `<meta name="if-integrity" content="${integrityHash}">\n</head>`)
