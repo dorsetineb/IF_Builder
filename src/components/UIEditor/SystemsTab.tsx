@@ -55,6 +55,8 @@ interface SystemsTabProps {
     setLocalDiaryShowSceneImage: (val: boolean) => void;
     localDiaryShowPlayerAction: boolean;
     setLocalDiaryShowPlayerAction: (val: boolean) => void;
+    localDiaryAllowExport: boolean;
+    setLocalDiaryAllowExport: (val: boolean) => void;
     localEnableTrackers: boolean;
     setLocalEnableTrackers: (val: boolean) => void;
     localEnableRetrospective: boolean;
@@ -98,6 +100,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
     setLocalDiaryShowSceneImage,
     localDiaryShowPlayerAction,
     setLocalDiaryShowPlayerAction,
+    localDiaryAllowExport,
+    setLocalDiaryAllowExport,
     localEnableTrackers,
     setLocalEnableTrackers,
     localEnableRetrospective,
@@ -458,6 +462,10 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                             <div className="flex items-center gap-2 cursor-pointer" onClick={() => setLocalDiaryShowPlayerAction(!localDiaryShowPlayerAction)}>
                                                 <input type="checkbox" checked={localDiaryShowPlayerAction} onChange={(e) => setLocalDiaryShowPlayerAction(e.target.checked)} className="custom-checkbox" />
                                                 <span className="text-[11px] text-muted-foreground">{t('UIEditor.sistemas.showPlayerAction')}</span>
+                                            </div>
+                                            <div className="flex items-center gap-2 cursor-pointer" onClick={() => setLocalDiaryAllowExport(!localDiaryAllowExport)}>
+                                                <input type="checkbox" checked={localDiaryAllowExport} onChange={(e) => setLocalDiaryAllowExport(e.target.checked)} className="custom-checkbox" />
+                                                <span className="text-[11px] text-muted-foreground">{t('UIEditor.sistemas.allowExport')}</span>
                                             </div>
                                         </div>
                                     </div>

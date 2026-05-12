@@ -919,6 +919,8 @@
       "diaryDesc": "Registro de eventos",
       "showSceneImage": "Mostrar Imagem da Ramificação",
       "showPlayerAction": "Mostrar Ação do Jogador",
+      "allowExport": "Permitir Exportação PDF",
+      "allowExportDesc": "Habilita o botão de exportar no diário",
       "imagesInScenes": "Imagens nas Ramificações",
       "imagesInScenesDesc": "Ramificações ilustradas por imagens",
       "imageTransition": "Transição de Imagem",

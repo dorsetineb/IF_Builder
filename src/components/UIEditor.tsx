@@ -389,7 +389,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localInventoryMaxWeight, setLocalInventoryMaxWeight] = useState(inventoryMaxWeight ?? 0);
 
     const [localDiaryAutoScroll, setLocalDiaryAutoScroll] = useState(diaryAutoScroll ?? true);
-    const [localDiaryAllowExport, setLocalDiaryAllowExport] = useState(diaryAllowExport ?? false);
+    const [localDiaryAllowExport, setLocalDiaryAllowExport] = useState(diaryAllowExport ?? true);
     const [localDiaryMaxMessages, setLocalDiaryMaxMessages] = useState(diaryMaxMessages ?? 100);
     const [localDiaryShowSceneImage, setLocalDiaryShowSceneImage] = useState(diaryShowSceneImage ?? false);
     const [localDiaryShowPlayerAction, setLocalDiaryShowPlayerAction] = useState(diaryShowPlayerAction ?? true);
@@ -681,6 +681,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
 
         if (localSuggestionsEmptyFeedback !== (props.gameSuggestionsEmptyFeedback || '')) onUpdate('gameSuggestionsEmptyFeedback', localSuggestionsEmptyFeedback, true);
         if (localInventoryEmptyFeedback !== (props.gameInventoryEmptyFeedback || '')) onUpdate('gameInventoryEmptyFeedback', localInventoryEmptyFeedback, true);
+        if (localDiaryAllowExport !== (diaryAllowExport ?? false)) onUpdate('diaryAllowExport', localDiaryAllowExport, true);
 
         if (localLanguage !== (i18n.language || 'pt')) {
             i18n.changeLanguage(localLanguage);
@@ -790,7 +791,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalInventoryCapacity(inventoryCapacity ?? 10);
         setLocalInventoryMaxWeight(inventoryMaxWeight ?? 0);
         setLocalDiaryAutoScroll(diaryAutoScroll ?? true);
-        setLocalDiaryAllowExport(diaryAllowExport ?? false);
+        setLocalDiaryAllowExport(diaryAllowExport ?? true);
         setLocalDiaryMaxMessages(diaryMaxMessages ?? 100);
         setLocalDiaryShowSceneImage(diaryShowSceneImage ?? false);
         setLocalDiaryShowPlayerAction(diaryShowPlayerAction ?? true);
@@ -991,6 +992,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             setLocalEnableTrackers={setLocalEnableTrackers}
                             localEnableRetrospective={localEnableRetrospective}
                             setLocalEnableRetrospective={setLocalEnableRetrospective}
+                            localDiaryAllowExport={localDiaryAllowExport}
+                            setLocalDiaryAllowExport={setLocalDiaryAllowExport}
                             onNavigateToTrackers={props.onNavigateToTrackers}
                         />
                     )}

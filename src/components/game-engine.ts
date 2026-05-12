@@ -98,6 +98,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         enableImages: data.enableImages ?? true,
         enableTextControl: data.enableTextControl ?? true,
         enableRetrospective: data.enableRetrospective ?? true,
+        diaryAllowExport: data.diaryAllowExport ?? true,
         gameInteractionType: data.gameInteractionType || 'parser',
         gameSuggestionsEmptyFeedback: data.gameSuggestionsEmptyFeedback,
         gameInventoryEmptyFeedback: data.gameInventoryEmptyFeedback,
@@ -903,6 +904,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if (trackersButton) trackersButton.addEventListener('click', showTrackers);
         if (systemButton) systemButton.addEventListener('click', toggleSystemMenu);
         if (exportPdfButton) {
+            if (gameData.diaryAllowExport === false) {
+                exportPdfButton.classList.add('hidden');
+            } else {
+                exportPdfButton.classList.remove('hidden');
+            }
             console.log('Botão de exportação encontrado, anexando listener...');
             exportPdfButton.addEventListener('click', exportDiaryToPDF);
         } else {

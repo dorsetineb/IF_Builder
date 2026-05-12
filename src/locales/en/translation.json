@@ -924,6 +924,8 @@
       "diaryDesc": "Event log",
       "showSceneImage": "Show Branch Image",
       "showPlayerAction": "Show Player Action",
+      "allowExport": "Allow PDF Export",
+      "allowExportDesc": "Enables the export button in the diary",
       "imagesInScenes": "Images in Branches",
       "imagesInScenesDesc": "Branches illustrated by images",
       "imageTransition": "Image Transition",
