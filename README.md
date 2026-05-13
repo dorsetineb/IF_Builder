@@ -1,4 +1,4 @@
-# 🎭 IF Builder
+# IF Builder
 
 **IF Builder** é um motor narrativo moderno e poderoso para a criação de Ficções Interativas (IF). Com foco em acessibilidade e estética, o editor permite que escritores e desenvolvedores criem narrativas ramificadas complexas sem a necessidade de programação profunda, exportando jogos prontos para rodar em qualquer navegador.
 
@@ -6,7 +6,7 @@
 
 ---
 
-## ✨ Funcionalidades Principais
+## Funcionalidades Principais
 
 - **Visual Storytelling**: Editor visual de cenas com suporte a imagens, áudio e descrições ricas.
 - **Sistemas de Jogo Integrados**:
@@ -18,7 +18,7 @@
 - **Multilíngue**: Suporte nativo para Português, Inglês e Espanhol.
 - **Exportação Standalone**: Gere um arquivo `.zip` contendo tudo o que é necessário para rodar o jogo offline.
 
-## 🎨 Aparências (Themes)
+## Aparências (Themes)
 
 O IF Builder permite trocar a pele do editor para combinar com o seu humor ou estilo de escrita:
 
@@ -29,7 +29,7 @@ O IF Builder permite trocar a pele do editor para combinar com o seu humor ou es
 - **Ristretto**: Tons terrosos e quentes inspirados em café.
 - **Abismo (Abyss)**: Alto contraste monocromático (Preto & Branco).
 
-## 🚀 Tecnologias Utilizadas
+## Tecnologias Utilizadas
 
 - **Core**: [React](https://reactjs.org/) + [Vite](https://vitejs.dev/)
 - **Linguagem**: [TypeScript](https://www.typescriptlang.org/)
@@ -38,9 +38,3 @@ O IF Builder permite trocar a pele do editor para combinar com o seu humor ou es
 - **Ícones**: [Lucide React](https://lucide.dev/)
 - **Localização**: [i18next](https://www.i18next.com/)
 - **Efeitos Visuais**: React Three Fiber + Shaders customizados.
-
-## 🛠️ Como Executar o Projeto
-
-1. **Clone o repositório**:
-   ```bash
-   git clone https://github.com/seu-usuario/if-builder.git
