@@ -2,7 +2,11 @@
 
 **IF Builder** é um motor narrativo moderno e poderoso para a criação de Ficções Interativas (IF). Com foco em acessibilidade e estética, o editor permite que escritores e desenvolvedores criem narrativas ramificadas complexas sem a necessidade de programação profunda, exportando jogos prontos para rodar em qualquer navegador.
 
-![IF Builder Preview](https://raw.githubusercontent.com/username/repo/main/public/preview.png) *(Substitua pelo link de uma screenshot real do seu projeto)*
+http://www.ifbuildr.com
+
+<img width="1906" height="942" alt="BBBBB151217" src="https://github.com/user-attachments/assets/dff2a76e-a4d4-4584-a59f-3a18599191b5" />
+
+<img width="1906" height="943" alt="image" src="https://github.com/user-attachments/assets/74d5998a-01fb-411e-af8e-0808046f54f6" />
 
 ---
 
