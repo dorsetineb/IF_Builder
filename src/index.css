@@ -366,6 +366,183 @@
   --dither-overlay: #252528;
 }
 
+.ether {
+  --background: #1f1f28;
+  --foreground: #dcd7ba;
+
+  /* Cards & Surfaces */
+  --card: #2a2a37;
+  --card-foreground: #dcd7ba;
+  --popover: #2a2a37;
+  --popover-foreground: #dcd7ba;
+
+  /* Brand / Primary - Sage Green */
+  --primary: #98bb6c;
+  --primary-foreground: #1f1f28;
+
+  /* Secondary */
+  --secondary: #223249;
+  --secondary-foreground: #dcd7ba;
+
+  /* Muted */
+  --muted: #16161d;
+  --muted-foreground: #727169;
+
+  /* Accent */
+  --accent: #e6c384;
+  --accent-foreground: #1f1f28;
+
+  /* Destructive */
+  --destructive: #c34043;
+  --destructive-foreground: #ffffff;
+
+  /* Borders & Inputs */
+  --border: #363646;
+  --input: #1f1f28;
+  --ring: #98bb6c;
+
+  /* Charts */
+  --chart-1: #98bb6c;
+  --chart-2: #e6c384;
+  --chart-3: #7e9cd8;
+  --chart-4: #ffa066;
+  --chart-5: #957fb8;
+
+  /* Sidebar */
+  --sidebar: #1f1f28;
+  --sidebar-foreground: #dcd7ba;
+  --sidebar-primary: #98bb6c;
+  --sidebar-primary-foreground: #1f1f28;
+  --sidebar-accent: #2a2a37;
+  --sidebar-accent-foreground: #dcd7ba;
+  --sidebar-border: #363646;
+  --sidebar-ring: #98bb6c;
+
+  /* Dither Colors */
+  --dither-bg-1: #1f1f28;
+  --dither-bg-2: #98bb6c;
+  --dither-bg-3: #1f1f28;
+  --dither-overlay: #98bb6c;
+}
+
+.ristretto {
+  --background: #120d0a;
+  --foreground: #f5f5f5;
+
+  /* Cards & Surfaces */
+  --card: #1c1511;
+  --card-foreground: #f5f5f5;
+  --popover: #1c1511;
+  --popover-foreground: #f5f5f5;
+
+  /* Brand / Primary - Amber Yellow */
+  --primary: #fbbf24;
+  --primary-foreground: #120d0a;
+
+  /* Secondary */
+  --secondary: #2c1e14;
+  --secondary-foreground: #fbbf24;
+
+  /* Muted */
+  --muted: #0a0807;
+  --muted-foreground: #8a7b6f;
+
+  /* Accent */
+  --accent: #d97706;
+  --accent-foreground: #f5f5f5;
+
+  /* Destructive */
+  --destructive: #991b1b;
+  --destructive-foreground: #fef2f2;
+
+  /* Borders & Inputs */
+  --border: #2c1e14;
+  --input: #120d0a;
+  --ring: #fbbf24;
+
+  /* Charts */
+  --chart-1: #fbbf24;
+  --chart-2: #d97706;
+  --chart-3: #f59e0b;
+  --chart-4: #b45309;
+  --chart-5: #78350f;
+
+  /* Sidebar */
+  --sidebar: #120d0a;
+  --sidebar-foreground: #f5f5f5;
+  --sidebar-primary: #fbbf24;
+  --sidebar-primary-foreground: #120d0a;
+  --sidebar-accent: #1c1511;
+  --sidebar-accent-foreground: #fbbf24;
+  --sidebar-border: #2c1e14;
+  --sidebar-ring: #fbbf24;
+
+  /* Dither Colors */
+  --dither-bg-1: #120d0a;
+  --dither-bg-2: #fbbf24;
+  --dither-bg-3: #120d0a;
+  --dither-overlay: #fbbf24;
+}
+
+.abismo {
+  --background: #000000;
+  --foreground: #ffffff;
+
+  /* Cards & Surfaces */
+  --card: #050505;
+  --card-foreground: #ffffff;
+  --popover: #050505;
+  --popover-foreground: #ffffff;
+
+  /* Brand / Primary - Pure White */
+  --primary: #ffffff;
+  --primary-foreground: #000000;
+
+  /* Secondary */
+  --secondary: #111111;
+  --secondary-foreground: #ffffff;
+
+  /* Muted */
+  --muted: #0a0a0a;
+  --muted-foreground: #888888;
+
+  /* Accent */
+  --accent: #ffffff;
+  --accent-foreground: #000000;
+
+  /* Destructive */
+  --destructive: #ff0000;
+  --destructive-foreground: #ffffff;
+
+  /* Borders & Inputs */
+  --border: #222222;
+  --input: #000000;
+  --ring: #ffffff;
+
+  /* Charts */
+  --chart-1: #ffffff;
+  --chart-2: #cccccc;
+  --chart-3: #999999;
+  --chart-4: #666666;
+  --chart-5: #333333;
+
+  /* Sidebar */
+  --sidebar: #000000;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #111111;
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: #222222;
+  --sidebar-ring: #ffffff;
+
+  /* Dither Colors */
+  --dither-bg-1: #000000;
+  --dither-bg-2: #ffffff;
+  --dither-bg-3: #000000;
+  --dither-overlay: #ffffff;
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

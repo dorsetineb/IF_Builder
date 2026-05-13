@@ -7,10 +7,11 @@ import { FONTS, PREDEFINED_THEMES, MAX_IMAGE_SIZE, MAX_AUDIO_SIZE } from '../con
 import { GameData, FixedVerb } from '../types';
 import { useTranslation } from 'react-i18next';
 import { DitherShader } from '@/components/ui/dither-shader';
+import { getDitherColors } from '../utils/themeStyles';
 import { SystemsTab } from './UIEditor/SystemsTab';
 import { AppearanceTab } from './UIEditor/AppearanceTab';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Leaf, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, History as HistoryIcon } from 'lucide-react';
+import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Leaf, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, Zap, Sparkles, History as HistoryIcon } from 'lucide-react';
 
 interface UIEditorProps {
     html: string;
@@ -136,6 +137,9 @@ const APP_THEME_COLORS = {
     cream: '#5c4033',     // Approx for warm brown oklch(0.40 0.08 30)
     terminal: '#7EE0A1',   // Vibrant Mint
     windows: '#008080',    // Teal (W95 theme accent)
+    ether: '#98bb6c',      // Sage Green (Ether theme accent)
+    ristretto: '#fbbf24',  // Amber Yellow (Ristretto theme accent)
+    abismo: '#ffffff',     // Pure White (Abismo theme accent)
     system: '#9D4EDD'     // Default fallback
 };
 
@@ -206,14 +210,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const currentSliderColor = APP_THEME_COLORS[theme as keyof typeof APP_THEME_COLORS] || APP_THEME_COLORS.dark;
 
     const ditherColors = useMemo(() => {
-        switch (theme) {
-            case 'terminal':
-                return { primary: '#001D2D', secondary: '#7EE0A1' };
-            case 'windows':
-                return { primary: '#0f0f0f', secondary: '#008080' };
-            default: // dark
-                return { primary: '#000000', secondary: currentSliderColor };
-        }
+        return getDitherColors(theme, currentSliderColor);
     }, [theme, currentSliderColor]);
 
     const {
@@ -1275,6 +1272,27 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                             >
                                                 <Leaf size={16} className="text-muted-foreground" />
                                                 <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'terminal' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.terminal', 'Terminal')}</span>
+                                            </button>
+                                            <button
+                                                onClick={() => handleAppThemeChange('ether')}
+                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'ether' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'} animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '300ms' }}
+                                            >
+                                                <Sparkles size={16} className="text-muted-foreground" />
+                                                <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'ether' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.ether', 'Ether')}</span>
+                                            </button>
+                                            <button
+                                                onClick={() => handleAppThemeChange('ristretto')}
+                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'ristretto' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'} animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '350ms' }}
+                                            >
+                                                <Coffee size={16} className="text-muted-foreground" />
+                                                <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'ristretto' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.ristretto', 'Ristretto')}</span>
+                                            </button>
+                                            <button
+                                                onClick={() => handleAppThemeChange('abismo')}
+                                                className={`flex flex-col justify-center items-center gap-2 p-4 rounded-lg border transition-all ${theme === 'abismo' ? 'border-primary bg-primary/10' : 'border-muted-foreground/50 bg-card hover:bg-muted'} animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '400ms' }}
+                                            >
+                                                <Skull size={16} className="text-muted-foreground" />
+                                                <span className={`font-medium text-[10px] uppercase tracking-wider ${theme === 'abismo' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('settings.themes.abismo', 'Abismo')}</span>
                                             </button>
                                         </div>
                                     </div>

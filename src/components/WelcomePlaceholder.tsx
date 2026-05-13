@@ -5,6 +5,7 @@ import { NewProjectModal } from './NewProjectModal';
 import { GameData } from '../types';
 import { useTranslation } from 'react-i18next';
 import Preview from './Preview';
+import { getDitherColors } from '../utils/themeStyles';
 
 interface WelcomePlaceholderProps {
     onCreateScene: (data?: Partial<GameData>) => void;
@@ -40,18 +41,7 @@ export const WelcomePlaceholder: React.FC<WelcomePlaceholderProps> = ({ onCreate
         setShowDownloadHelp(true);
     };
 
-    const getDitherColors = () => {
-        switch (theme) {
-            case 'terminal':
-                return { primary: '#001D2D', secondary: '#7EE0A1' };
-            case 'windows':
-                return { primary: '#0f0f0f', secondary: '#008080' };
-            default: // dark
-                return { primary: '#000000', secondary: '#9d4edd' };
-        }
-    };
-
-    const ditherColors = getDitherColors();
+    const ditherColors = getDitherColors(theme);
 
     const handleCreateProject = (data: Partial<GameData>) => {
         setIsNewProjectModalOpen(false);

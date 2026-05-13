@@ -1,6 +1,7 @@
 import React from 'react';
 import { DitherShader } from '@/components/ui/dither-shader';
 import { useTheme } from './ThemeProvider';
+import { getDitherColors } from '../utils/themeStyles';
 
 interface TransitionScreenProps {
     isVisible: boolean;
@@ -19,18 +20,7 @@ export const TransitionScreen: React.FC<TransitionScreenProps> = ({ isVisible })
         if (savedBg) setBgSrc(savedBg);
     }, []);
 
-    const getDitherColors = () => {
-        switch (theme) {
-            case 'terminal':
-                return { primary: '#001D2D', secondary: '#7EE0A1' };
-            case 'windows':
-                return { primary: '#0f0f0f', secondary: '#008080' };
-            default: // dark
-                return { primary: '#000000', secondary: '#9d4edd' };
-        }
-    };
-
-    const ditherColors = getDitherColors();
+    const ditherColors = getDitherColors(theme);
 
     return (
         <div

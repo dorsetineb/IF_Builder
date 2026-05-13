@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from './ThemeProvider';
 import { GameData } from '../types';
 import Preview from './Preview';
+import { getDitherColors } from '../utils/themeStyles';
 
 type LandingView = 'landing' | 'about' | 'play';
 
@@ -54,18 +55,7 @@ export function Auth() {
 
     const { theme } = useTheme();
 
-    const getDitherColors = () => {
-        switch (theme) {
-            case 'terminal':
-                return { primary: '#001D2D', secondary: '#7EE0A1' };
-            case 'windows':
-                return { primary: '#0f0f0f', secondary: '#008080' };
-            default: // dark
-                return { primary: '#000000', secondary: '#9d4edd' };
-        }
-    };
-
-    const ditherColors = getDitherColors();
+    const ditherColors = getDitherColors(theme);
 
     const resetToLanding = (e?: React.MouseEvent) => {
         if (e) e.stopPropagation();

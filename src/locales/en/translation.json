@@ -272,7 +272,10 @@
       "light": "Day",
       "cream": "Cream",
       "terminal": "Mint",
-      "windows": "W95"
+      "windows": "W95",
+      "ether": "Ether",
+      "ristretto": "Ristretto",
+      "abismo": "Abyss"
     },
     "language": {
       "label": "Language",

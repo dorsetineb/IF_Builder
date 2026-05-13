@@ -267,7 +267,10 @@
       "light": "Dia",
       "cream": "Creme",
       "terminal": "Menta",
-      "windows": "W95"
+      "windows": "W95",
+      "ether": "Ether",
+      "ristretto": "Ristretto",
+      "abismo": "Abismo"
     },
     "language": {
       "label": "Idioma",
