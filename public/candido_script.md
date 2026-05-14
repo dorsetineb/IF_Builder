@@ -76,10 +76,12 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 ---
 
 ### R1: O Bar
-> *"A cidade é bruta com quem vem de fora sem malícia. O barulho do bar é ensurdecedor. Sete cachaças acabaram com as poucas ideias que você tinha. A `<cachaça>` está no balcão. A `<porta>` é a saída."*
+> *"A cidade é bruta com quem vem de fora sem malícia. O barulho do bar é ensurdecedor. Sete cachaças acabaram com as poucas ideias que você tinha. O `<chão>` é pegajoso. Um `<espelho>` trincado reflete o salão. A `<cachaça>` está no balcão. A `<porta>` é a saída."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
+| `examinar` | `chão` | — | *Muda Texto:* "Marcas de botas pesadas e restos de cigarro grudados no linóleo." | Permanece em R1 |
+| `examinar` | `espelho` | — | -10 LUCIDEZ / *Muda Texto:* "Você vê um rosto cansado e triste, instantes antes do caos começar." | Permanece em R1 |
 | `beber` | `cachaça` | — | — | Capítulo: O Corte → R2 |
 | `abrir` | `porta` | — | — | Capítulo: O Corte → R2 |
 
@@ -107,25 +109,40 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 ---
 
 ### R4: O Beco
-> *"O cheiro ferroso acordou algo. Um `<cadáver>` ensanguentado está no chão de um beco estreito. A poça de sangue solta um aroma metálico. A `<rua>` iluminada parece a única saída."*
+> *"O cheiro ferroso acordou algo. Um `<cadáver>` ensanguentado está no chão de um beco estreito. Uma `<poça>` de sangue escorre para um ralo e há um `<pôster>` rasgado na parede. A `<rua>` iluminada parece a única saída."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
 | `examinar` | `cadáver` | — | +10 VOZ DO DIABO / *Muda Texto:* "O rosto está irreconhecível. Alguém passou aqui antes." | Permanece em R4 |
 | `vasculhar` | `cadáver` | — | -20 LUCIDEZ / +15 VOZ DO DIABO / Adiciona: Jaqueta, Carteira | Permanece em R4 |
+| `examinar` | `poça` | — | +15 VOZ DO DIABO / *Muda Texto:* "O sangue escuro reflete algo com chifres tortos. Não é você." | Permanece em R4 |
+| `ler` | `pôster` | — | +10 LUCIDEZ / *Muda Texto:* "Um circo que passou na cidade há anos. Coisas normais do mundo passado." | Permanece em R4 |
 | `ir` | `rua` | **Jaqueta** | — | → R5A |
 | `ir` | `rua` | *(sem Jaqueta)* | — | → R5B |
 
 ---
 
 ### R5A: Praça Camuflado
-> *"A jaqueta esconde o horror. Você se mistura na multidão. O artista Zé São joga `<facas>` enquanto a plateia aplaude. Há uma `<lanchonete>` brilhando na esquina. Um `<boné>` esquecido num banco."*
+> *"A jaqueta esconde o horror. Você se mistura na multidão. A `<estátua>` central vigia o caos silencioso. O artista `<Zé São>` joga facas enquanto a plateia aplaude. Há uma `<lanchonete>` brilhando na esquina. Um `<boné>` esquecido num banco."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
+| `examinar` | `estátua` | — | *Muda Texto:* "Um herói de guerra sem rosto. Pombos defecam no bronze inútil." | Permanece em R5A |
 | `pegar` | `boné` | — | Adiciona: Boné de Aba | Permanece em R5A |
-| `assistir` | `facas` | — | *Muda Texto:* "Zé São exibe um corpo oleoso e sem marcas. O dinheiro deles vale mais sem gastos médicos." | Permanece em R5A |
+| `assistir` | `Zé São` | — | *Muda Texto:* "Ele joga facas com precisão cirúrgica." | Permanece em R5A |
+| `falar` | `Zé São` | — | — | → R5A.1 |
 | `ir` | `lanchonete` | — | — | → R6 |
+
+---
+
+### R5A.1: Conversa com Zé São *(Cena de Diálogo)*
+> *"Você se aproxima ao final da apresentação. A plateia se dispersa. Zé São guarda as lâminas e encara você. Os olhos dele são escuros e afundados. 'Você não tem pulso, irmão', ele sussurra rápido, não querendo chamar atenção. 'O que você quer?'"*
+
+| Verbo | Alvo | Requisito | Efeito | Resultado |
+|---|---|---|---|---|
+| `perguntar` | `cidade` | — | +10 LUCIDEZ / *Muda Texto:* "'A cidade mastiga os fracos', diz ele. 'E vomita os monstros'." | Permanece em R5A.1 |
+| `mostrar` | `cicatriz` | — | +20 VOZ DO DIABO / *Muda Texto:* "Ele recua um passo apavorado. 'O diabo te marcou. Sai de perto de mim.'" | → R5A |
+| `despedir` | `Zé São` | — | — | → R5A |
 
 ---
 
@@ -152,24 +169,37 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 ---
 
 ### R6: Lanchonete Frente
-> *"O `<chapeiro>` está de costas. A gordura crepita. A artéria do pescoço dele salta num movimento hipnótico. Você pode pedir o `<cardápio>`."*
+> *"O `<chapeiro>` está de costas fritando hambúrgueres. A gordura crepita. A artéria do pescoço dele salta num movimento hipnótico. Você pode pedir o `<cardápio>` ou chamar a atenção dele."*
 
 **Nota:** Pedir o cardápio duas vezes eleva FOME BRUTA a 100, disparando RT1 automaticamente.
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
+| `falar` | `chapeiro` | — | — | → R6.1 |
 | `pedir` | `cardápio` | **Carteira** | +30 FOME BRUTA / *Muda Texto:* "A carne tem gosto de papel." | Permanece em R6 |
 | `atacar` | `chapeiro` | — | -30 LUCIDEZ / +40 RASTRO | → R9 |
 | `ir` | `cozinha` | — | — | → R8 |
 
 ---
 
-### R7: Esgotos
-> *"Escuridão e ecos. O lixo da cidade escorre por tubulações acima. Há uma `<grade>` que dá para a rua de trás da lanchonete. Um caminho pela `<escuridão>` profunda."*
+### R6.1: O Balcão da Lanchonete *(Cena de Diálogo)*
+> *"O chapeiro vira de frente. O avental está imundo de mostarda e sangue. Ele apoia as mãos no balcão e repara na sua jaqueta suja. 'Noite difícil, parceiro?', ele pergunta coçando o próprio pescoço suado. 'Vai querer o quê?'"*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `vasculhar` | `lixo` | — | Adiciona: Faca Enferrujada / *Muda Texto:* "Uma lâmina no lodo." | Permanece em R7 |
+| `pedir` | `comida` | **Carteira** | +30 FOME BRUTA / *Muda Texto:* "Você mastiga com raiva, mas a fome verdadeira rasga as paredes do seu estômago por dentro." | → R6 |
+| `perguntar` | `sangue` | — | +15 VOZ DO DIABO / *Muda Texto:* "Ele ri alto. 'Sangue de boi, amigão. Fresquinho do abatedouro municipal.' Sua boca enche d'água." | Permanece em R6.1 |
+| `ignorar` | `chapeiro` | — | — | → R6 |
+
+---
+
+### R7: Esgotos
+> *"Escuridão e ecos. O lixo da cidade escorre por tubulações acima. Há uma `<inscrição>` apagada na parede de cimento. Há uma `<grade>` que dá para a rua de trás da lanchonete. Um caminho pela `<escuridão>` profunda."*
+
+| Verbo | Alvo | Requisito | Efeito | Resultado |
+|---|---|---|---|---|
+| `ler` | `inscrição` | — | +10 VOZ DO DIABO / *Muda Texto:* "'O rato engoliu o sol', diz a pichação torta em tinta vermelha." | Permanece em R7 |
+| `vasculhar` | `lixo` | — | Adiciona: Faca Enferrujada / *Muda Texto:* "Uma lâmina velha achada no lodo." | Permanece em R7 |
 | `seguir` | `escuridão` | — | -20 LUCIDEZ / +15 VOZ DO DIABO | → R7.1 |
 | `abrir` | `grade` | — | — | → R8 |
 
@@ -198,10 +228,11 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 ---
 
 ### R9: O Massacre
-> *"O sangue está nas paredes. Capítulo: O Demônio Sangrento. A confusão em volta vai explodir em pouco tempo. Ao longe, três homens de `<ternos>` observam o caos com calma suspeita, como se esperassem por isso. Um `<prédio>` comercial abre seu saguão na esquina."*
+> *"O sangue está nas paredes. Capítulo: O Demônio Sangrento. A confusão em volta vai explodir em pouco tempo. Um `<rádio>` de pilha toca uma música alegre que contrasta de forma bizarra com a morte. Ao longe, três homens de `<ternos>` observam o caos com calma suspeita, como se esperassem por isso. Um `<prédio>` comercial abre seu saguão na esquina."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
+| `desligar` | `rádio` | — | +10 LUCIDEZ / *Muda Texto:* "O silêncio é pior que a música. O som abafado do massacre agora é mais real." | Permanece em R9 |
 | `atacar` | `ternos` | — | -30 LUCIDEZ / +30 VOZ DO DIABO / +50 RASTRO | **Fim: Açougueiro Corporativo** |
 | `fugir` | `prédio` | — | — | → R10 |
 
