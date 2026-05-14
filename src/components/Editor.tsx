@@ -861,6 +861,7 @@ const Editor: React.FC = () => {
   const [biosStep, setBiosStep] = useState(0); // 0: Info, 1: Prompt Wait, 2: Typing
   const [typedCommand, setTypedCommand] = useState('');
   const [isBiosFinished, setIsBiosFinished] = useState(false);
+  const [isBiosFading, setIsBiosFading] = useState(false);
 
   const [importKey, setImportKey] = useState(0);
 
@@ -875,6 +876,11 @@ const Editor: React.FC = () => {
 
   // BIOS Animation Sequence (runs once on mount)
   useEffect(() => {
+    // Play startup sound
+    const startupSound = new Audio('/787576__nazarhk__pc-startup-sound.mp3');
+    startupSound.volume = 0.5;
+    startupSound.play().catch((e) => console.warn('BIOS sound autoplay blocked or failed:', e));
+
     const fullCommand = 'RUN IF-BUILDER.EXE';
 
     // Step 1: Show prompt A:\> fast (0.5s)
@@ -897,9 +903,13 @@ const Editor: React.FC = () => {
       }, 50); // Speed of typing: 50ms per char
     }, 1500);
 
-    // Finish: End animation after typing completes
-    // 1.5s (start) + ~1s (typing) + 2.5s (pause) = 5s
+    // Step 3: Start fading out at 4s
     const timer3 = setTimeout(() => {
+      setIsBiosFading(true);
+    }, 4000);
+
+    // Finish: End animation after 5s (1s fade duration)
+    const timer4 = setTimeout(() => {
       setIsBiosFinished(true);
     }, 5000);
 
@@ -907,6 +917,7 @@ const Editor: React.FC = () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
+      clearTimeout(timer4);
       if (typingInterval) clearInterval(typingInterval);
     };
   }, []);
@@ -1234,11 +1245,14 @@ const Editor: React.FC = () => {
 
   // Show BIOS animation first
 
-  // Show BIOS animation first (after authentication)
-  if (!isBiosFinished) {
-    return (
-      <div className="fixed inset-0 z-[9999] bg-black text-white font-['Silkscreen'] text-sm p-4 sm:p-8 flex flex-col justify-start overflow-hidden selection:bg-white selection:text-black cursor-none">
-        <style>{`
+  return (
+    <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans selection:bg-primary/30">
+      <TransitionScreen isVisible={isTransitioning} />
+
+      {/* Show BIOS animation as an overlay that fades out */}
+      {!isBiosFinished && (
+        <div className={`fixed inset-0 z-[10000] bg-black text-white font-['Silkscreen'] text-sm p-4 sm:p-8 flex flex-col justify-start overflow-hidden selection:bg-white selection:text-black cursor-none transition-opacity duration-1000 ${isBiosFading ? 'opacity-0' : 'opacity-100'}`}>
+          <style>{`
                     @keyframes hard-blink {
                         0%, 100% { opacity: 1; }
                         50% { opacity: 0; }
@@ -1247,9 +1261,9 @@ const Editor: React.FC = () => {
                         animation: hard-blink 0.5s step-end infinite;
                     }
                 `}</style>
-        <div className="space-y-1 max-w-3xl">
-          {/* Logo ASCII - Denser Version */}
-          <pre className="text-primary mb-10 font-mono leading-none opacity-90 scale-[0.65] origin-left sm:scale-90">
+          <div className="space-y-1 max-w-3xl">
+            {/* Logo ASCII - Denser Version */}
+            <pre className="text-primary mb-10 font-mono leading-none opacity-90 scale-[0.65] origin-left sm:scale-90">
 {`
            ██████   █████████      ████████   ██      ██  ██  ██      ██████    ████████  ███████ 
           ░░████   ░█████████     ░█████████ ░██     ░██ ░██ ░██     ░███████  ░████████ ░███████
@@ -1260,38 +1274,33 @@ const Editor: React.FC = () => {
      ██████  ░██           ░█████████ ░██████████ ░██ ░████████░███████  ░████████ ░██   ░██
     ░░░░░░   ░░            ░░░░░░░░   ░░░░░░░░░░  ░░  ░░░░░░░░ ░░░░░░    ░░░░░░░░  ░░     ░░ 
 `}
-          </pre>
-          <p>IF-BUILDER BIOS V.1.0.0</p>
-          <p className="mb-4">Copyright (C) 2026 @DORSETINEB</p>
+            </pre>
+            <p>IF-BUILDER BIOS V.1.0.0</p>
+            <p className="mb-4">Copyright (C) 2026 @DORSETINEB</p>
 
-          <p>System Memory: 640KB OK</p>
-          <p>Extended Memory: 32MB OK</p>
-          <p>Shadow RAM: Cached</p>
-          <br />
-          <p>Detecting Primary Master ... IF_BUILDER_CORE</p>
-          <p>Detecting Primary Slave ... USER_DATA</p>
-          <br />
-          <p>Booting from Hard Disk...</p>
-          <p>Loading interactive_fiction_engine.sys ... OK</p>
-          <p>Mounting file system ... OK</p>
-          <br />
+            <p>System Memory: 640KB OK</p>
+            <p>Extended Memory: 32MB OK</p>
+            <p>Shadow RAM: Cached</p>
+            <br />
+            <p>Detecting Primary Master ... IF_BUILDER_CORE</p>
+            <p>Detecting Primary Slave ... USER_DATA</p>
+            <br />
+            <p>Booting from Hard Disk...</p>
+            <p>Loading interactive_fiction_engine.sys ... OK</p>
+            <p>Mounting file system ... OK</p>
+            <br />
 
-          {/* Prompt appears in Step 1 */}
-          <div className={`flex items-center ${biosStep >= 1 ? 'opacity-100' : 'opacity-0'}`}>
-            <span className="mr-2">A:\&gt;</span>
-            {/* Command Typed Character by Character */}
-            {biosStep >= 2 && <span>{typedCommand}</span>}
-            {/* Blinking Cursor */}
-            <span className="w-2.5 h-5 bg-white animate-hard-blink"></span>
+            {/* Prompt appears in Step 1 */}
+            <div className={`flex items-center ${biosStep >= 1 ? 'opacity-100' : 'opacity-0'}`}>
+              <span className="mr-2">A:\&gt;</span>
+              {/* Command Typed Character by Character */}
+              {biosStep >= 2 && <span>{typedCommand}</span>}
+              {/* Blinking Cursor */}
+              <span className="w-2.5 h-5 bg-white animate-hard-blink"></span>
+            </div>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex h-screen bg-background text-foreground overflow-hidden font-sans selection:bg-primary/30">
-      <TransitionScreen isVisible={isTransitioning} />
+      )}
 
       {isImporting && (
         <div className="fixed inset-0 z-[9998] bg-black/80 backdrop-blur-sm flex items-center justify-center">
