@@ -242,7 +242,9 @@
     "quickGuide": "Guía Rápida",
     "aboutProject": "Sobre el Proyecto",
     "settings": "Ajustes",
-    "openEditor": "Abrir Editor"
+    "openEditor": "Abrir Editor",
+    "showNarrative": "Ver lista de narrativas",
+    "hideNarrative": "Ocultar lista de narrativas"
   },
   "sceneList": {
     "search": "Buscar narrativa...",

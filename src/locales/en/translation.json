@@ -466,7 +466,9 @@
     "quickGuide": "Quick Guide",
     "aboutProject": "About Project",
     "settings": "Settings",
-    "openEditor": "Open Editor"
+    "openEditor": "Open Editor",
+    "showNarrative": "View narrative list",
+    "hideNarrative": "Hide narrative list"
   },
   "sceneList": {
     "search": "Search narrative...",

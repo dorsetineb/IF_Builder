@@ -348,7 +348,9 @@
     "quickGuide": "Guia Rápido",
     "aboutProject": "Sobre o Projeto",
     "settings": "Configurações",
-    "openEditor": "Abrir Editor"
+    "openEditor": "Abrir Editor",
+    "showNarrative": "Ver lista de narrativas",
+    "hideNarrative": "Ocultar lista de narrativas"
   },
   "welcome": {
     "title": "Bem-vindo ao IF Builder",
