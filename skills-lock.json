@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "interactive-fiction": {
+      "source": "jwynia/agent-skills",
+      "sourceType": "github",
+      "skillPath": "skills/creative/fiction/application/interactive-fiction/SKILL.md",
+      "computedHash": "ab97fed13721796c11ab9ab55b65a8eed5f4ea862effd4beb20266b9469f62fa"
+    },
     "interface-design": {
       "source": "dammyjay93/interface-design",
       "sourceType": "github",
