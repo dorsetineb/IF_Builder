@@ -71,8 +71,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     const { t } = useTranslation();
 
     const attemptAction = (action: () => void) => {
-        const isDifferent = JSON.stringify(localObjects) !== JSON.stringify(sortedObjects);
-        if (isDifferent || isDirty) {
+        if (isDirty) {
             setPendingAction({ run: action });
         } else {
             action();
@@ -80,8 +79,9 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     };
 
     useEffect(() => {
-        // Deep compare to avoid unnecessary updates and infinite loops
-        const areObjectsDifferent = JSON.stringify(localObjects) !== JSON.stringify(sortedObjects);
+        // Comparison to avoid unnecessary updates and infinite loops
+        const areObjectsDifferent = localObjects.length !== sortedObjects.length || 
+                                   localObjects.some((obj, index) => obj.id !== sortedObjects[index]?.id);
 
         if (areObjectsDifferent) {
             setLocalObjects(sortedObjects);
@@ -99,9 +99,23 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
         setIsIconPickerOpen(false);
     }, [selectedObjectId]);
 
-    // Comparison for dirty state
+    // Comparison for dirty state - Optimized to avoid expensive JSON.stringify on large assets
     useEffect(() => {
-        const isDifferent = JSON.stringify(localObjects) !== JSON.stringify(sortedObjects);
+        if (localObjects.length !== sortedObjects.length) {
+            onSetDirty(true);
+            return;
+        }
+
+        const isDifferent = localObjects.some((obj, index) => {
+            const sorted = sortedObjects[index];
+            return !sorted || 
+                   obj.id !== sorted.id || 
+                   obj.name !== sorted.name || 
+                   obj.examineDescription !== sorted.examineDescription ||
+                   obj.image !== sorted.image ||
+                   obj.icon !== sorted.icon;
+        });
+
         onSetDirty(isDifferent);
     }, [localObjects, sortedObjects, onSetDirty]);
 
@@ -117,8 +131,15 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
     const handleSave = () => {
         localObjects.forEach(localObj => {
             const originalObj = globalObjects[localObj.id];
-            // Update if changed or if it's new (not in original)
-            if (!originalObj || JSON.stringify(localObj) !== JSON.stringify(originalObj)) {
+            
+            // Check if object is new or has changed
+            const hasChanged = !originalObj || 
+                localObj.name !== originalObj.name ||
+                localObj.examineDescription !== originalObj.examineDescription ||
+                localObj.image !== originalObj.image ||
+                localObj.icon !== originalObj.icon;
+
+            if (hasChanged) {
                 onUpdateObject(localObj.id, {
                     name: localObj.name,
                     examineDescription: localObj.examineDescription,
@@ -451,7 +472,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '200ms' }}>
                                     <div className="flex justify-between items-center mb-4">
                                         <h3 className="text-[10px] font-bold text-foreground uppercase tracking-widest flex items-center gap-2">
-                                            <Image className="w-4 h-4" />
+                                            <ImageIcon className="w-4 h-4" />
                                             {t('sceneEditor.multimediaTitle')}
                                         </h3>
                                         <span className="text-[10px] text-muted-foreground">
@@ -487,7 +508,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                             ) : (
                                                 <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-foreground/5 transition-colors group">
                                                     <div className="w-12 h-12 rounded-full bg-background border border-muted-foreground/50 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:border-primary/50 transition-all">
-                                                        <Image className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
+                                                        <ImageIcon className="w-5 h-5 text-muted-foreground group-hover:text-primary" />
                                                     </div>
                                                     <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground">
                                                         {t('sceneEditor.loadImage', 'Carregar Imagem')}
