@@ -266,7 +266,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                         {/* Row 3: Target */}
                         <div className="space-y-3">
                             <div className="space-y-1.5">
-                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.targetLabel', 'Alvo da Ação (Opcional)')}</label>
+                                <label className="block text-[10px] font-bold text-zinc-400 uppercase tracking-widest">{t('interactionEditor.targetLabel', 'Objeto alvo da Ação (Opcional)')}</label>
                                 <select
                                     value={selectedInteraction.target}
                                     onChange={e => handleInteractionChange('target', e.target.value)}
@@ -288,7 +288,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                             className="custom-checkbox"
                                         />
                                     </div>
-                                    <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.removesTarget', 'Remove alvo')}</span>
+                                    <span className="text-[10px] text-zinc-400 group-hover:text-zinc-300 uppercase font-bold tracking-wide transition-colors">{t('interactionEditor.removesTarget', 'Remove objeto')}</span>
                                 </label>
 
                                 <label className="flex items-center gap-2 cursor-pointer group">
@@ -370,20 +370,33 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                 </button>
                             </div>
                             <div className="space-y-2">
-                                {(selectedInteraction.trackerEffects || []).map((effect, i) => (
-                                    <div key={i} className="flex items-center gap-2 bg-input p-2 rounded border border-input">
-                                        <Activity className="w-3 h-3 text-muted-foreground" />
-                                        <select value={effect.trackerId} onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)} className="flex-1 bg-transparent border-none text-xs text-zinc-200 focus:ring-0 p-0">
-                                            <option value="">{t('interactionEditor.selectTracker', 'Selecione um rastreador...')}</option>
-                                            {consequenceTrackers.map(tOption => <option key={tOption.id} value={tOption.id}>{tOption.name}</option>)}
-                                        </select>
-                                        <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-muted-foreground/50">
-                                            <span className="text-[10px] text-zinc-500">{t('interactionEditor.valueLabel', 'Valor:')}</span>
-                                            <input type="number" value={effect.valueChange} onChange={e => handleTrackerEffectChange(i, 'valueChange', e.target.value === '' ? '' : Number(e.target.value))} className="w-12 bg-transparent border-none text-xs h-auto p-0 text-right text-foreground font-mono focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]" />
+                                {(selectedInteraction.trackerEffects || []).map((effect, i) => {
+                                    const tracker = consequenceTrackers.find(t => t.id === effect.trackerId);
+                                    const TrackerIcon = TRACKER_ICONS.find(icon => icon.name === tracker?.icon)?.component || Activity;
+                                    
+                                    return (
+                                        <div key={i} className="flex items-center gap-2 bg-input p-2 rounded border border-input">
+                                            <TrackerIcon className="w-3 h-3 text-muted-foreground" />
+                                            <select 
+                                                value={effect.trackerId} 
+                                                onChange={e => handleTrackerEffectChange(i, 'trackerId', e.target.value)} 
+                                                className="flex-1 bg-transparent border-none text-xs text-foreground focus:ring-0 p-0"
+                                            >
+                                                <option value="" className="bg-card text-foreground">{t('interactionEditor.selectTracker', 'Selecione um rastreador...')}</option>
+                                                {consequenceTrackers.map(tOption => (
+                                                    <option key={tOption.id} value={tOption.id} className="bg-card text-foreground">
+                                                        {tOption.name}
+                                                    </option>
+                                                ))}
+                                            </select>
+                                            <div className="flex items-center gap-1 bg-muted px-2 py-1 rounded border border-muted-foreground/50">
+                                                <span className="text-[10px] text-zinc-500">{t('interactionEditor.valueLabel', 'Valor:')}</span>
+                                                <input type="number" value={effect.valueChange} onChange={e => handleTrackerEffectChange(i, 'valueChange', e.target.value === '' ? '' : Number(e.target.value))} className="w-12 bg-transparent border-none text-xs h-auto p-0 text-right text-foreground font-mono focus:ring-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]" />
+                                            </div>
+                                            <button onClick={() => handleRemoveTrackerEffect(i)} className="p-1 text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                                         </div>
-                                        <button onClick={() => handleRemoveTrackerEffect(i)} className="p-1 text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                                 {(selectedInteraction.trackerEffects || []).length === 0 && (
                                     <div className="text-center py-4 border border-dashed border-muted-foreground/50 rounded bg-muted/20">
                                         <p className="text-[10px] text-zinc-600 italic">{t('interactionEditor.noTrackerEffects', 'Em Rastreadores, crie um rastreador que verifique esta interação')}</p>

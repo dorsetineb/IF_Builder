@@ -19,6 +19,9 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 | Cena / Ação | FOME BRUTA | LUCIDEZ | VOZ DO DIABO | RASTRO |
 |---|---|---|---|---|
 | R3: `beber cervejas` | +20 | — | — | — |
+| R3.5: `examinar luz amarela` | — | -10 | — | — |
+| R3.5: `tocar cicatriz` | — | — | +10 | — |
+| R3.5: `berrar alguém` | — | — | +15 | — |
 | R4: `examinar cadáver` | — | — | +10 | — |
 | R4: `vasculhar cadáver` | — | -20 | +15 | — |
 | R5B: `enfrentar multidão` | — | -30 | — | +40 |
@@ -40,114 +43,126 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 
 | Objeto | Descrição | Função no Jogo |
 |---|---|---|
-| **Jaqueta** | "Jaqueta de basquete velha. Esconde o pescoço rasgado." | Requisito para acessar R5A |
-| **Carteira** | "Notas manchadas. Cheiram a metal." | Requisito para pedir comida em R6 |
-| **Faca Enferrujada** | "Lâmina dobrada encontrada no lodo." | Requisito para assassinato furtivo em R8 |
-| **Pedaço de Cano** | "Ferro pesado. Pode abrir qualquer porta." | Requisito para forçar saída em R10 |
-| **Boné de Aba** | "Esquecido num banco da praça. Complementa o disfarce." | Requisito para acessar R5C |
+| **Jaqueta** | "A `<jaqueta>` de basquete velha cheira a suor antigo. Esconde o pescoço rasgado." | Requisito para acessar R5A |
+| **Carteira** | "A `<carteira>` tem notas manchadas que cheiram a metal." | Requisito para pedir comida em R6 |
+| **Faca Enferrujada** | "A `<faca>` tem uma lâmina dobrada achada no lodo." | Requisito para assassinato furtivo em R8 |
+| **Pedaço de Cano** | "O `<cano>` é um ferro pesado que pode abrir qualquer coisa." | Requisito para forçar saída em R10 |
+| **Boné de Aba** | "O `<boné>` esquecido complementa a ilusão de que você é gente." | Requisito para acessar R5C |
 
 ---
 
-## 🎬 3. CAPÍTULOS (Telas Cinematográficas)
+## 🎬 3. CAPÍTULOS E RAMIFICAÇÕES (Telas Cinematográficas)
 
 | Tipo | Nome | Acionado em |
 |---|---|---|
-| Abertura | **Cândido e o Sol do Diabo** | Início do jogo |
-| Transição | **O Corte** | R1 → R2 |
-| Transição | **O Rasgo da Ilusão** | R3 → R4 |
-| Transição | **O Demônio Sangrento** | Entrada em R9 |
-| **Gatilho** | **RT1: O Colapso** | FOME BRUTA = 100 |
-| **Gatilho** | **RT2: O Silêncio Branco** | LUCIDEZ = 0 |
-| **Gatilho** | **RT3: A Chama do Inferno** | VOZ DO DIABO = 100 |
-| **Gatilho** | **RT4: O Cerco** | RASTRO DE SANGUE = 100 |
-| Fim (Game Over) | **Estátua de Celulose** | R3 |
-| Fim (Game Over) | **Linchamento** | R5B |
-| Fim (Game Over) | **Chumbo e Asfalto** | R10 / RT4 |
-| Fim (Game Over) | **Devorado de Dentro** | RT1 |
-| Fim (Alternativo) | **Fantasma de Vidro** | RT2 |
-| Fim (Alternativo) | **O Rei Rato** | R7.1 |
-| Fim (Alternativo) | **Açougueiro Corporativo** | R8 ou R9 |
-| Fim (Canônico) | **O Caco de Vidro** | R11 |
+| Capítulo (Abertura) | **Cândido e o Sol do Diabo** | Início do jogo |
+| Capítulo (Transição) | **O Corte** | R1 → R2 |
+| Capítulo (Transição) | **O Rasgo da Ilusão** | R3 → R3.5 |
+| Capítulo (Transição) | **O Demônio Sangrento** | Entrada em R9 |
+| **Capítulo (Gatilho)** | **RT1: O Colapso** | FOME BRUTA = 100 |
+| **Capítulo (Gatilho)** | **RT2: O Silêncio Branco** | LUCIDEZ = 0 |
+| **Capítulo (Gatilho)** | **RT3: A Chama do Inferno** | VOZ DO DIABO = 100 |
+| **Capítulo (Gatilho)** | **RT4: O Cerco** | RASTRO DE SANGUE = 100 |
+| Capítulo (Fim / Game Over) | **Estátua de Celulose** | R3 |
+| Capítulo (Fim / Game Over) | **Linchamento** | R5B |
+| Capítulo (Fim / Game Over) | **Chumbo e Asfalto** | R10 / RT4 |
+| Capítulo (Fim / Game Over) | **Devorado de Dentro** | RT1 |
+| Capítulo (Fim Alternativo) | **Fantasma de Vidro** | RT2 |
+| Capítulo (Fim Alternativo) | **O Rei Rato** | R7.1 |
+| Capítulo (Fim Alternativo) | **Açougueiro Corporativo** | R8 ou R9 |
+| Capítulo (Fim Canônico) | **O Caco de Vidro** | R11 |
 
 ---
 
-## 🗺️ 4. CENAS NARRATIVAS (13 cenas)
+## 🗺️ 4. CENAS NARRATIVAS (14 cenas)
 
 ---
 
-### R1: O Bar
-> *"A cidade é bruta com quem vem de fora sem malícia. O barulho do bar é ensurdecedor. Sete cachaças acabaram com as poucas ideias que você tinha. O `<chão>` é pegajoso. Um `<espelho>` trincado reflete o salão. A `<cachaça>` está no balcão. A `<porta>` é a saída."*
+### R1: O Bar (Ramificação)
+> *"A cidade bate primeiro e pergunta depois. O barulho do bar é um soco contínuo. Sete cachaças derreteram as suas ideias. O `<chão>` gruda na bota. O `<espelho>` na parede tá trincado, dividindo sua cara em duas. A `<cachaça>` no balcão te encara de volta. A `<porta>` é a saída. Se você conseguir levantar."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `examinar` | `chão` | — | *Muda Texto:* "Marcas de botas pesadas e restos de cigarro grudados no linóleo." | Permanece em R1 |
-| `examinar` | `espelho` | — | -10 LUCIDEZ / *Muda Texto:* "Você vê um rosto cansado e triste, instantes antes do caos começar." | Permanece em R1 |
+| `examinar` | `chão` | — | *Muda Texto:* "Chiclete preto, cigarro amassado e cuspe. O mosaico da sexta-feira." | Permanece em R1 |
+| `examinar` | `espelho` | — | -10 LUCIDEZ / *Muda Texto:* "Você vê um rosto cansado de ser seu. Daqui a pouco ele nem será." | Permanece em R1 |
 | `beber` | `cachaça` | — | — | Capítulo: O Corte → R2 |
 | `abrir` | `porta` | — | — | Capítulo: O Corte → R2 |
 
 ---
 
-### R2: Ladrilhos
-> *"A faca de serra abriu seu pescoço num esbarrão. O chão pisca em preto e vermelho. Você enfiou a cara na calçada. Os `<ladrilhos>` têm o cheiro da cidade inteira. As pernas das pessoas se agitam horrorizadas ao redor, protegendo as calças do sangue derramado."*
+### R2: Ladrilhos (Ramificação)
+> *"Você enfiou a cara na calçada. O chão pisca, preto, vermelho, preto, vermelho. Os `<ladrilhos>` têm o cheiro da cidade toda misturado com urina velha. As `<pernas>` das pessoas se agitam horrorizadas ao redor, como baratas gigantes, tentando proteger as calças do sangue derramado. Sua faca de serra abriu seu próprio pescoço num esbarrão torto."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
 | `examinar` | `ladrilhos` | — | — | → R3 |
-| `pedir ajuda` | `pernas` | — | *Muda Texto:* "As pernas se agitam horrorizadas. Ninguém para." | → R3 |
+| `pedir ajuda` | `pernas` | — | *Muda Texto:* "As baratas vestem sapatos caros. Elas correm, desviando da poça que é você." | → R3 |
 
 ---
 
-### R3: A Praia (Alucinação)
-> *"Uma toalha estendida, uma `<loira>` e `<cervejas>` geladas numa praia de águas cristalinas. O sol não atordoa. A fome está saciada. A `<areia>` é quente. Tudo parece estático demais."*
+### R3: A Praia - Alucinação (Ramificação)
+> *"Tudo vira branco. Depois, azul. Uma toalha fina, uma `<loira>` de comercial e `<cervejas>` suando frio numa praia perfeitamente cristalina. O sol aqui não morde. A fome sumiu. A `<areia>` aquece as costas como um cobertor. A paz é tão artificial que dá enjoo."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `beber` | `cervejas` | — | +20 FOME BRUTA / *Muda Texto:* "A cerveja não tem gosto. A fome dói." | Permanece em R3 |
+| `beber` | `cervejas` | — | +20 FOME BRUTA / *Muda Texto:* "A garrafa tá gelada, mas o líquido tem gosto de isopor. A fome rasga de novo." | Permanece em R3 |
 | `dormir` | `areia` | — | — | **Fim: Estátua de Celulose** |
-| `tocar` | `loira` | — | — | Capítulo: O Rasgo da Ilusão → R4 |
+| `tocar` | `loira` | — | — | Capítulo: O Rasgo da Ilusão → R3.5 |
 
 ---
 
-### R4: O Beco
-> *"O cheiro ferroso acordou algo. Um `<cadáver>` ensanguentado está no chão de um beco estreito. Uma `<poça>` de sangue escorre para um ralo e há um `<pôster>` rasgado na parede. A `<rua>` iluminada parece a única saída."*
+### R3.5: O Sol do Diabo (Ramificação)
+> *"O sol te achou. A `<luz amarela>` engoliu tudo — parede, chão, você. A mala sumiu. A pele arde como plástico derretendo. Passou a mão no pescoço e a `<cicatriz>` respondeu. Grossa. Viva. Tentou gritar mas a boca só abriu. Nem som, nem cheiro. Só calor. E um fôlego na nuca que não é seu. Tem `<alguém>` ali. Na luz. Parado como poste. Sorrindo sem ter boca."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `examinar` | `cadáver` | — | +10 VOZ DO DIABO / *Muda Texto:* "O rosto está irreconhecível. Alguém passou aqui antes." | Permanece em R4 |
+| `examinar` | `luz amarela` | — | -10 LUCIDEZ / *Muda Texto:* "A luz cega e queima as memórias da sua infância." | Permanece em R3.5 |
+| `tocar` | `cicatriz` | — | +10 VOZ DO DIABO / *Muda Texto:* "Ela pulsa grossa. O ritmo bate igual ao fôlego na sua nuca." | Permanece em R3.5 |
+| `berrar` | `alguém` | — | +15 VOZ DO DIABO / *Muda Texto:* "Nenhum som sai. Mas a presença na luz parece sorrir mais largo." | Permanece em R3.5 |
+| `correr` | `luz amarela` | — | — | → R4 |
+
+---
+
+### R4: O Beco (Ramificação)
+> *"O cheiro de ferro enferrujado acordou alguma coisa nas suas tripas. O `<cadáver>` ensanguentado esparramado no chão do beco parece obra de um açougueiro amador. Uma `<poça>` grossa escorre mole pro ralo. Um `<pôster>` rasgado chora na parede de tijolo sujo. A `<rua>` iluminada grita buzinas lá na frente."*
+
+| Verbo | Alvo | Requisito | Efeito | Resultado |
+|---|---|---|---|---|
+| `examinar` | `cadáver` | — | +10 VOZ DO DIABO / *Muda Texto:* "O rosto tá uma pasta. Alguém chegou primeiro. E esse alguém tava com raiva." | Permanece em R4 |
 | `vasculhar` | `cadáver` | — | -20 LUCIDEZ / +15 VOZ DO DIABO / Adiciona: Jaqueta, Carteira | Permanece em R4 |
-| `examinar` | `poça` | — | +15 VOZ DO DIABO / *Muda Texto:* "O sangue escuro reflete algo com chifres tortos. Não é você." | Permanece em R4 |
-| `ler` | `pôster` | — | +10 LUCIDEZ / *Muda Texto:* "Um circo que passou na cidade há anos. Coisas normais do mundo passado." | Permanece em R4 |
+| `examinar` | `poça` | — | +15 VOZ DO DIABO / *Muda Texto:* "O sangue escuro reflete algo com chifres tortos. Não é a sua cara." | Permanece em R4 |
+| `ler` | `pôster` | — | +10 LUCIDEZ / *Muda Texto:* "Um circo que passou na cidade há anos. Coisas normais. Mundo velho." | Permanece em R4 |
 | `ir` | `rua` | **Jaqueta** | — | → R5A |
 | `ir` | `rua` | *(sem Jaqueta)* | — | → R5B |
 
 ---
 
-### R5A: Praça Camuflado
-> *"A jaqueta esconde o horror. Você se mistura na multidão. A `<estátua>` central vigia o caos silencioso. O artista `<Zé São>` joga facas enquanto a plateia aplaude. Há uma `<lanchonete>` brilhando na esquina. Um `<boné>` esquecido num banco."*
+### R5A: Praça Camuflado (Ramificação)
+> *"A jaqueta esconde o desastre no seu pescoço. Você é só mais um fantasma na multidão. A `<estátua>` caga bronze e vigia o caos surdo. O artista `<Zé São>` joga facas com uma tranquilidade irritante. O povo aplaude como macacos amestrados. A `<lanchonete>` brilha letreiros de neon. Tem um `<boné>` jogado no banco."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `examinar` | `estátua` | — | *Muda Texto:* "Um herói de guerra sem rosto. Pombos defecam no bronze inútil." | Permanece em R5A |
+| `examinar` | `estátua` | — | *Muda Texto:* "Um herói sem rosto. Pombos defecam no ombro de quem já morreu." | Permanece em R5A |
 | `pegar` | `boné` | — | Adiciona: Boné de Aba | Permanece em R5A |
-| `assistir` | `Zé São` | — | *Muda Texto:* "Ele joga facas com precisão cirúrgica." | Permanece em R5A |
+| `assistir` | `Zé São` | — | *Muda Texto:* "A lâmina corta o ar. Ele não erra. Parece ter pacto com o vento." | Permanece em R5A |
 | `falar` | `Zé São` | — | — | → R5A.1 |
 | `ir` | `lanchonete` | — | — | → R6 |
 
 ---
 
-### R5A.1: Conversa com Zé São *(Cena de Diálogo)*
-> *"Você se aproxima ao final da apresentação. A plateia se dispersa. Zé São guarda as lâminas e encara você. Os olhos dele são escuros e afundados. 'Você não tem pulso, irmão', ele sussurra rápido, não querendo chamar atenção. 'O que você quer?'"*
+### R5A.1: Conversa com Zé São (Ramificação de Diálogo)
+> *"Você chega perto quando os macacos amestrados vão embora. Zé São guarda as lâminas. Encara sua alma furada. 'Você não tem pulso, irmão', ele murmura de lado, com cara de quem cheirou pólvora. 'O que você quer da minha vida?'"*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `perguntar` | `cidade` | — | +10 LUCIDEZ / *Muda Texto:* "'A cidade mastiga os fracos', diz ele. 'E vomita os monstros'." | Permanece em R5A.1 |
-| `mostrar` | `cicatriz` | — | +20 VOZ DO DIABO / *Muda Texto:* "Ele recua um passo apavorado. 'O diabo te marcou. Sai de perto de mim.'" | → R5A |
+| `perguntar` | `cidade` | — | +10 LUCIDEZ / *Muda Texto:* "'A cidade mastiga os fracos', diz ele. 'E vomita bicho ruim igual a você'." | Permanece em R5A.1 |
+| `mostrar` | `cicatriz` | — | +20 VOZ DO DIABO / *Muda Texto:* "Ele recua, pálido. 'O diabo te assinou. Tira o pé daqui.'" | → R5A |
 | `despedir` | `Zé São` | — | — | → R5A |
 
 ---
 
-### R5B: Praça Pânico
-> *"Você sai com o pescoço aberto e jorrando. A `<multidão>` recua em pânico, saca pedras e garrafas. Há um `<bueiro>` aberto na calçada."*
+### R5B: Praça Pânico (Ramificação)
+> *"Você sai na luz com o pescoço pingando miúdos. Como num desenho animado mal desenhado, a `<multidão>` congela, solta gritos esganiçados e recua. Logo começam a puxar tijolos e garrafas quebradas. Um `<bueiro>` te olha da calçada, aberto e faminto."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
@@ -156,107 +171,108 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 
 ---
 
-### R5C: A Cafeteria Quieta *(Acesso: Jaqueta + Boné)*
-> *"Com a jaqueta e o boné, você parece quase humano. Uma `<cafeteria>` pequena está aberta. Há um `<jornal>` abandonado na mesa. O `<espelho>` atrás do balcão reflete alguém que você não reconhece."*
+### R5C: A Cafeteria Quieta (Ramificação)
+*(Acesso: Jaqueta + Boné)*
+> *"A jaqueta e o boné enganam os trouxas. Você parece gente. Uma `<cafeteria>` de merda tá aberta. O `<jornal>` tá largo na mesa cheirando a café velho. O `<espelho>` atrás da máquina de espresso reflete um manequim morto. Você."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `examinar` | `espelho` | — | +20 VOZ DO DIABO / *Muda Texto:* "A cicatriz pulsa. Você não tem batimentos. Mas continua de pé." | Permanece em R5C |
-| `ler` | `jornal` | — | *Muda Texto:* "A manchete: 'Série de mortes inexplicáveis no centro'." | Permanece em R5C |
-| `pedir` | `café` | Carteira | +10 LUCIDEZ / *Muda Texto:* "O café queima a boca. Você sente algo. Talvez ainda haja um fio." | Permanece em R5C |
+| `examinar` | `espelho` | — | +20 VOZ DO DIABO / *Muda Texto:* "A cicatriz pula. O coração não bate, mas o pescoço respira." | Permanece em R5C |
+| `ler` | `jornal` | — | *Muda Texto:* "A manchete chia miúdo: 'Série de mortes no centro'. Ninguém liga de verdade." | Permanece em R5C |
+| `pedir` | `café` | Carteira | +10 LUCIDEZ / *Muda Texto:* "O preto quente queima a língua mole. Parece que ainda tem um fiozinho de vida aí dentro." | Permanece em R5C |
 | `sair` | `rua` | — | — | → R6 |
 
 ---
 
-### R6: Lanchonete Frente
-> *"O `<chapeiro>` está de costas fritando hambúrgueres. A gordura crepita. A artéria do pescoço dele salta num movimento hipnótico. Você pode pedir o `<cardápio>` ou chamar a atenção dele."*
+### R6: Lanchonete Frente (Ramificação)
+> *"O `<chapeiro>` frita hambúrgueres de costas. A gordura chia igual rádio fora do ar. A artéria no pescoço do homem pula grossa. Tum, tum, tum. Hipnótico. Você pode pedir o `<cardápio>` ou chamar a porra da atenção dele."*
 
-**Nota:** Pedir o cardápio duas vezes eleva FOME BRUTA a 100, disparando RT1 automaticamente.
+**Nota:** Pedir o cardápio duas vezes eleva FOME BRUTA a 100, disparando RT1.
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
 | `falar` | `chapeiro` | — | — | → R6.1 |
-| `pedir` | `cardápio` | **Carteira** | +30 FOME BRUTA / *Muda Texto:* "A carne tem gosto de papel." | Permanece em R6 |
+| `pedir` | `cardápio` | **Carteira** | +30 FOME BRUTA / *Muda Texto:* "A carne do lanche tem gosto de papelão. Você mastiga isopor." | Permanece em R6 |
 | `atacar` | `chapeiro` | — | -30 LUCIDEZ / +40 RASTRO | → R9 |
 | `ir` | `cozinha` | — | — | → R8 |
 
 ---
 
-### R6.1: O Balcão da Lanchonete *(Cena de Diálogo)*
-> *"O chapeiro vira de frente. O avental está imundo de mostarda e sangue. Ele apoia as mãos no balcão e repara na sua jaqueta suja. 'Noite difícil, parceiro?', ele pergunta coçando o próprio pescoço suado. 'Vai querer o quê?'"*
+### R6.1: O Balcão da Lanchonete (Ramificação de Diálogo)
+> *"O chapeiro vira. A cara gorda pingando óleo e suor. O avental de lona tá sujo com uma mancha esquisita. Ele encosta as patas no balcão e olha torto pra sua jaqueta fudida. 'Noite longa, parceiro?', ele raspa a garganta. 'Vai querer ração de quê?'"*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `pedir` | `comida` | **Carteira** | +30 FOME BRUTA / *Muda Texto:* "Você mastiga com raiva, mas a fome verdadeira rasga as paredes do seu estômago por dentro." | → R6 |
-| `perguntar` | `sangue` | — | +15 VOZ DO DIABO / *Muda Texto:* "Ele ri alto. 'Sangue de boi, amigão. Fresquinho do abatedouro municipal.' Sua boca enche d'água." | Permanece em R6.1 |
+| `pedir` | `comida` | **Carteira** | +30 FOME BRUTA / *Muda Texto:* "Mastigar não adianta. A fome verdadeira tá comendo o estômago de dentro pra fora." | → R6 |
+| `perguntar` | `sangue` | — | +15 VOZ DO DIABO / *Muda Texto:* "Ele arrota uma risada. 'É de boi, amigão. Fresco. Do abatedouro.' Sua boca saliva." | Permanece em R6.1 |
 | `ignorar` | `chapeiro` | — | — | → R6 |
 
 ---
 
-### R7: Esgotos
-> *"Escuridão e ecos. O lixo da cidade escorre por tubulações acima. Há uma `<inscrição>` apagada na parede de cimento. Há uma `<grade>` que dá para a rua de trás da lanchonete. Um caminho pela `<escuridão>` profunda."*
+### R7: Esgotos (Ramificação)
+> *"Um túnel de concreto podre. O vômito da cidade inteira escorre pelas paredes. Uma `<inscrição>` de tinta velha grita na parede torta. A `<grade>` nos fundos aponta pra rua de cima. Mais pra baixo, a `<escuridão>` te convida pra entrar num buraco sem fundo. Esgoto é o intestino do mundo."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `ler` | `inscrição` | — | +10 VOZ DO DIABO / *Muda Texto:* "'O rato engoliu o sol', diz a pichação torta em tinta vermelha." | Permanece em R7 |
-| `vasculhar` | `lixo` | — | Adiciona: Faca Enferrujada / *Muda Texto:* "Uma lâmina velha achada no lodo." | Permanece em R7 |
+| `ler` | `inscrição` | — | +10 VOZ DO DIABO / *Muda Texto:* "'O rato engoliu o sol'. Pichação de profeta bêbado." | Permanece em R7 |
+| `vasculhar` | `lixo` | — | Adiciona: Faca Enferrujada / *Muda Texto:* "Uma lâmina torta escondida na merda." | Permanece em R7 |
 | `seguir` | `escuridão` | — | -20 LUCIDEZ / +15 VOZ DO DIABO | → R7.1 |
 | `abrir` | `grade` | — | — | → R8 |
 
 ---
 
-### R7.1: A Galeria dos Ratos
-> *"Centenas de ratos observam. Um `<cano>` de ferro enferrujado flutua na água suja. Mais fundo, a `<escuridão>` engole qualquer sinal de saída."*
+### R7.1: A Galeria dos Ratos (Ramificação)
+> *"O chão mexe. São ratos. Centenas de ratinhos espertos vigiando os seus tornozelos de defunto. Um `<cano>` de chumbo boia na bosta líquida. O fundo do cano é uma `<escuridão>` grossa, que chupa toda a luz da cidade lá em cima."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `pegar` | `cano` | — | Adiciona: Pedaço de Cano | Permanece em R7.1 |
+| `pegar` | `cano` | — | Adiciona: Pedaço de Cano / *Muda Texto:* "Pesado. Frio. Um argumento forte." | Permanece em R7.1 |
 | `seguir` | `escuridão` | — | -20 LUCIDEZ / +20 VOZ DO DIABO | **Fim: O Rei Rato** |
 | `voltar` | `grade` | — | — | → R8 |
 
 ---
 
-### R8: Lanchonete Fundos
-> *"Você emergiu dos esgotos direto na despensa. Cheira a gordura rançosa. O `<chapeiro>` trabalha distraído na sala à frente. Uma `<prateleira>` tem potes e garrafas."*
+### R8: Lanchonete Fundos (Ramificação)
+> *"A tampa do bueiro te cospe na despensa. Gordura velha. O `<chapeiro>` tá lá na frente de costas, alheio à podridão. Uma `<prateleira>` capenga exibe lixo enlatado. Um pote de picles. Nada demais."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `examinar` | `prateleira` | — | *Muda Texto:* "Sal grosso, vinagre, caixas de isopor. Nada útil." | Permanece em R8 |
+| `examinar` | `prateleira` | — | *Muda Texto:* "Sal. Vinagre. Uma barata passeando de férias. Tudo inútil." | Permanece em R8 |
 | `assassinar` | `chapeiro` | **Faca Enferrujada** | -30 LUCIDEZ / +20 RASTRO | **Fim: Açougueiro Corporativo** |
 | `ir` | `frente` | — | — | → R9 |
 
 ---
 
-### R9: O Massacre
-> *"O sangue está nas paredes. Capítulo: O Demônio Sangrento. A confusão em volta vai explodir em pouco tempo. Um `<rádio>` de pilha toca uma música alegre que contrasta de forma bizarra com a morte. Ao longe, três homens de `<ternos>` observam o caos com calma suspeita, como se esperassem por isso. Um `<prédio>` comercial abre seu saguão na esquina."*
+### R9: O Massacre (Ramificação)
+> *"O sangue virou tinta e a parede virou tela. Capítulo: O Demônio Sangrento. O ar cheira a cobre quente. Um `<rádio>` toca uma musiquinha imbecil, sorrindo de tudo. Longe dali, três homens de `<ternos>` te observam fumando. Eles não estão nem aí pro caos. Um `<prédio>` aponta pro céu, com a porta de vidro arreganhada."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `desligar` | `rádio` | — | +10 LUCIDEZ / *Muda Texto:* "O silêncio é pior que a música. O som abafado do massacre agora é mais real." | Permanece em R9 |
+| `desligar` | `rádio` | — | +10 LUCIDEZ / *Muda Texto:* "O silêncio é pior. Agora os gemidos mortos aparecem mais vivos." | Permanece em R9 |
 | `atacar` | `ternos` | — | -30 LUCIDEZ / +30 VOZ DO DIABO / +50 RASTRO | **Fim: Açougueiro Corporativo** |
 | `fugir` | `prédio` | — | — | → R10 |
 
 ---
 
-### R10: As Escadas do Prédio
-> *"Você sobe tropeçando, deixando um rastro vermelho nos degraus. As sirenes explodem lá fora. A `<porta>` do telhado está trancada. Uma `<janela>` lateral está aberta sobre o vazio."*
+### R10: As Escadas do Prédio (Ramificação)
+> *"O pé bate no degrau. Respira. Sangra. Bate no degrau. As sirenes cantam pneu lá fora, latindo fino. A `<porta>` pro telhado não quer abrir. Trancada pra burro. Uma `<janela>` lateral te mostra o asfalto. Vazio. Sem rede de segurança."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
 | `quebrar` | `porta` | **Pedaço de Cano** | — | → R11 |
-| `pular` | `janela` | — | +20 VOZ DO DIABO / +20 RASTRO / *Muda Texto:* "Você cai sobre uma marquise. Os ossos estalam. Você levanta." | → R11 |
+| `pular` | `janela` | — | +20 VOZ DO DIABO / +20 RASTRO / *Muda Texto:* "O corpo tomba mole na marquise. Quebrou algo, mas e daí? Você levanta." | → R11 |
 | `esperar` | `polícia` | — | — | **Fim: Chumbo e Asfalto** |
 
 ---
 
-### R11: O Telhado
-> *"O vento sopra frio. O sol amarelo queima a nuca. Uma voz sem origem diz: 'Todos vocês são bichos. Você já está morto, Cândido. Escolhi você justamente pela forma que você morreu.' O `<asfalto>` clama por você lá embaixo."*
+### R11: O Telhado (Ramificação)
+> *"O ar corta o rosto. O sol é uma gema de ovo podre. Uma voz que não vem de lugar nenhum assobia na orelha: 'Todo mundo é bicho de abatedouro. Você morreu, Cândido. E só por isso eu te escolhi.' O `<asfalto>` lá embaixo chama teu nome."*
 
 | Verbo | Alvo | Requisito | Efeito | Resultado |
 |---|---|---|---|---|
-| `examinar` | `cicatriz` | — | +30 VOZ DO DIABO / *Muda Texto:* "O corte é profundo demais. Ninguém sobrevive a isso. E ainda assim." | Permanece em R11 |
+| `examinar` | `cicatriz` | — | +30 VOZ DO DIABO / *Muda Texto:* "Um corte de ponta a ponta. Um sorriso no gogó. Ninguém vive com isso." | Permanece em R11 |
 | `pular` | `asfalto` | — | — | **Fim Canônico: O Caco de Vidro** |
-| `aceitar` | `voz` | — | *Muda Texto:* "O sol engole tudo. Você sorri pela primeira vez desde que desceu do ônibus." | **Fim Canônico: O Caco de Vidro** *(variante com epílogo diferente)* |
+| `aceitar` | `voz` | — | *Muda Texto:* "O amarelo engole o prédio. Você ri pro chão lá embaixo." | **Fim Canônico: O Caco de Vidro** *(variante)* |
 
 ---
 
@@ -266,18 +282,18 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 
 ---
 
-### RT1: O Colapso *(FOME BRUTA = 100)*
-> *"Não houve aviso. A fome não pediu licença. O vermelho que estava nas bordas da visão engoliu tudo de uma vez. Não há memória do que aconteceu nos segundos que se seguiram. Só o gosto de ferro na língua e o silêncio depois. Você está de pé. Não sabe quanto tempo passou. As mãos estão quentes."*
+### RT1: O Colapso (Capítulo Gatilho - FOME BRUTA = 100)
+> *"Ninguém bate na porta. A fome arrebenta a dobradiça e invade a sala. O vermelho come as beiradas da tua visão. O corpo assume o volante. O branco apaga o rastro. Não sobrou nada na memória. Só gosto de cobre nos dentes. Você volta a si. De pé. Não sabe que dia é, não sabe quem é. Suas `<mãos>` estão quentes pra caralho."*
 
 | Verbo | Alvo | Efeito | Resultado |
 |---|---|---|---|
-| `examinar` | `mãos` | *Muda Texto:* "Você prefere não pensar no que está nelas." | → R9 |
+| `examinar` | `mãos` | *Muda Texto:* "O cheiro sobe. Você decide que é melhor não investigar de quem é o resto." | → R9 |
 | `recusar` | `tudo` | — | **Fim: Devorado de Dentro** |
 
 ---
 
-### RT2: O Silêncio Branco *(LUCIDEZ = 0)*
-> *"Em algum momento você parou de tentar entender. Não há nome. Não há dor. Não há fome. Há apenas o próximo passo e a próxima porta. O corpo sabe o caminho. A mente foi embora sem se despedir. Você não sabe se isso é paz ou se é o fim."*
+### RT2: O Silêncio Branco (Capítulo Gatilho - LUCIDEZ = 0)
+> *"O cérebro desligou o disjuntor. Chega. Não tem nome. Não tem calçada. Não tem dor. O corpo balança as pernas por inércia, como um zumbi de corda rumo a lugar nenhum. A mente evaporou como mijo quente no asfalto. Um `<caminho>` qualquer estica os dedos pro seu pé."*
 
 | Verbo | Alvo | Efeito | Resultado |
 |---|---|---|---|
@@ -286,12 +302,12 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 
 ---
 
-### RT3: A Chama do Inferno *(VOZ DO DIABO = 100)*
-> *"A voz não vem de fora. Não há boca, não há direção. Ela simplesmente está dentro, como se sempre tivesse estado lá esperando você parar de fazer barulho o suficiente para ouvi-la.*
+### RT3: A Chama do Inferno (Capítulo Gatilho - VOZ DO DIABO = 100)
+> *"A `<voz>` não sussurra de fora. Ela nasce nas entranhas. Ocupa o lugar que a alma largou na calçada.*
 >
-> *'Você põe medo nas pessoas. Lá, de onde você veio, você era grão de areia. Aqui, você é um caco de vidro perdido na praia.'*
+> *'Você mete medo neles. Larga a mão. Na tua terra tu era farelo de terra seca. Aqui, tu é caco de vidro cortando pé de bacana.'*
 >
-> *A voz não pergunta. Ela apenas constata. E espera."*
+> *A voz não faz pergunta. Ela bate o carimbo. E espera você assinar."*
 
 | Verbo | Alvo | Efeito | Resultado |
 |---|---|---|---|
@@ -301,12 +317,12 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 
 ---
 
-### RT3.1: O Debate *(Cena filha de RT3)*
-> *"'Por que eu?' A pergunta sai antes de você poder segurar. A voz considera, como se tivesse tempo infinito para responder.*
+### RT3.1: O Debate (Ramificação - Filha de RT3)
+> *"'Por que eu?' escapa do buraco do teu pescoço. A voz mastiga as palavras antes de responder.*
 >
-> *'Porque você morreu da maneira certa. Com raiva. Com fome. Sem ninguém para lamentar. Isso é raro.'*
+> *'Por causa da raiva na tua morte. Porque não tem ninguém pra rezar por você. É assim que o capeta escolhe os apóstolos.'*
 >
-> *Você sente a cicatriz no pescoço latejar. Ela sempre lateja quando a voz fala. Como se o corte fosse uma boca que ela usa para te lembrar do que aconteceu."*
+> *A ferida lateja apertado. Cada vez que o bicho fala de dentro de ti, a tua carne acende."*
 
 | Verbo | Alvo | Efeito | Resultado |
 |---|---|---|---|
@@ -315,10 +331,10 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 
 ---
 
-### RT4: O Cerco *(RASTRO DE SANGUE = 100)*
-> *"Você não ouviu chegarem. De repente estavam lá. Muitos. De todos os lados. Alguns com uniformes, outros com roupas comuns, outros com expressões que não têm nome. Eles te viram. Você não sabe há quanto tempo te seguiam, mas sabe que estava deixando rastros que qualquer um conseguiria seguir.*
+### RT4: O Cerco (Capítulo Gatilho - RASTRO DE SANGUE = 100)
+> *"Mágica urbana. O vazio vira um inferno num segundo. O `<cerco>` tá armado. De farda, à paisana, revólver e cacete. Não importa. O seu sangue desenhou um rastro grosso pra qualquer idiota seguir. A caça acabou.*
 >
-> *Há uma saída. Sempre há uma saída. Mas ela vai custar algo."*
+> *Sempre tem uma `<saída>`. Mas a porta tem dente."*
 
 | Verbo | Alvo | Efeito | Resultado |
 |---|---|---|---|
@@ -328,15 +344,13 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 
 ---
 
-### RT4.1: O Espetáculo *(Cena filha de RT4)*
-> *"Você avança. Eles recuam. Um por um ou todos de vez, não importa — o monstro atravessa o cerco deixando um corredor de horror atrás de si. Quando para, está sozinho novamente. Sempre sozinho.*
->
-> *A cidade inteira sabe que você existe agora. Não tem mais volta para o anonimato. Mas tem volta para algum lugar."*
+### RT4.1: O Espetáculo (Ramificação - Filha de RT4)
+> *"O monstro levanta o pelo. Eles recuam de nojo. Você rasga o cerco, e a cada passo a cidade aprende seu nome em código Morse de bala e osso quebrado. E aí... o silêncio. Sozinho de novo. O `<caminho>` tá livre. E o `<chão>` é teu trono."*
 
 | Verbo | Alvo | Efeito | Resultado |
 |---|---|---|---|
 | `seguir` | `caminho` | — | → R9 *(se ainda não passou)* / → R10 *(se já passou por R9)* |
-| `sentar` | `chão` | +20 LUCIDEZ / *Muda Texto:* "Você para. O silêncio depois do caos dói de um jeito diferente." | → R11 *(atalho direto)* |
+| `sentar` | `chão` | +20 LUCIDEZ / *Muda Texto:* "Você deita a bunda no frio de concreto. O silêncio bate no tímpano." | → R11 *(atalho direto)* |
 
 ---
 
@@ -344,14 +358,14 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 
 | # | Nome | Tipo | Descrição |
 |---|---|---|---|
-| 1 | **Estátua de Celulose** | Game Over | Cândido adormece na alucinação da praia e nunca mais volta. |
-| 2 | **Linchamento** | Game Over | Morto pela multidão em pânico na praça. |
-| 3 | **Chumbo e Asfalto** | Game Over | Rendido ou baleado pela polícia nas escadas. |
-| 4 | **Devorado de Dentro** | Game Over | Recusa o colapso e se autodestrói por não aceitar o que é. |
-| 5 | **Fantasma de Vidro** | Alternativo | LUCIDEZ zerando sem violência — Cândido para no meio da rua e se dissolve. |
-| 6 | **O Rei Rato** | Alternativo | Foge pela escuridão dos esgotos e desaparece nas entranhas da cidade. |
-| 7 | **Açougueiro Corporativo** | Alternativo | Aceita a proposta dos homens de terno ou elimina o chapeiro furtivamente. |
-| 8 | **O Caco de Vidro** | Canônico | Pula do telhado. O sol amarelo engole tudo. O diabo cumprimenta seu novo servo. |
+| 1 | **Estátua de Celulose** | Capítulo Final (Game Over) | Cândido adormece na alucinação da praia e nunca mais volta. |
+| 2 | **Linchamento** | Capítulo Final (Game Over) | Morto pela multidão em pânico na praça. |
+| 3 | **Chumbo e Asfalto** | Capítulo Final (Game Over) | Rendido ou baleado pela polícia nas escadas. |
+| 4 | **Devorado de Dentro** | Capítulo Final (Game Over) | Recusa o colapso e se autodestrói por não aceitar o que é. |
+| 5 | **Fantasma de Vidro** | Capítulo Final (Alternativo) | LUCIDEZ zerando sem violência — Cândido para no meio da rua e se dissolve. |
+| 6 | **O Rei Rato** | Capítulo Final (Alternativo) | Foge pela escuridão dos esgotos e desaparece nas entranhas da cidade. |
+| 7 | **Açougueiro Corporativo** | Capítulo Final (Alternativo) | Aceita a proposta dos homens de terno ou elimina o chapeiro furtivamente. |
+| 8 | **O Caco de Vidro** | Capítulo Final (Canônico) | Pula do telhado. O sol amarelo engole tudo. O diabo cumprimenta seu novo servo. |
 
 ---
 
@@ -359,10 +373,10 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 
 | Categoria | Quantidade |
 |---|---|
-| Cenas Narrativas | 13 (R1–R11 + R5C + R7.1) |
+| Cenas Narrativas | 14 (R1–R11 + R5C + R7.1 + R3.5) |
 | Cenas de Gatilho (Raiz) | 4 (RT1, RT2, RT3, RT4) |
 | Cenas Filhas de Gatilho | 2 (RT3.1, RT4.1) |
-| **Total de Cenas** | **19** |
+| **Total de Cenas** | **20** |
 | Rastreadores | 4 |
 | Objetos Globais | 5 |
 | Finais | 8 |
@@ -374,36 +388,19 @@ Quatro rastreadores funcionam em paralelo e criam tensões cruzadas. O jogador q
 ```
 R1 → R2 → R3 ──[dormir areia]──────────────────────► FIM: Estátua de Celulose
               │
-              └──[tocar loira]──► R4
-                                   │
-                              [sem Jaqueta]──► R5B ──[enfrentar]──► FIM: Linchamento
-                                   │                 └──[bueiro]──► R7 → R7.1 → FIM: Rei Rato
-                              [com Jaqueta]──► R5A ──[pegar boné]──► R5C
-                                                      │               │
-                                                      └───────────────┴──► R6
-                                                                           │
-                                                                     [ir cozinha]──► R8 ──[assassinar+faca]──► FIM: Açougueiro
-                                                                           │              └──[ir frente]──► R9
-                                                                     [atacar]──► R9
-                                                                                  │
-                                                                            [atacar ternos]──► FIM: Açougueiro
-                                                                                  │
-                                                                            [fugir prédio]──► R10
-                                                                                              │
-                                                                                        [esperar]──► FIM: Chumbo e Asfalto
-                                                                                              │
-                                                                                        [subir]──► R11
-                                                                                                    │
-                                                                                              [pular/aceitar]──► FIM: O Caco de Vidro
-
-RASTREADORES (disparam em qualquer momento):
-  FOME BRUTA = 100   ──► RT1 ──► R9 ou FIM: Devorado de Dentro
-  LUCIDEZ = 0        ──► RT2 ──► R9 ou FIM: Fantasma de Vidro
-  VOZ DO DIABO = 100 ──► RT3 → RT3.1 ──► R11 (atalho) ou volta à cena
-  RASTRO = 100       ──► RT4 → RT4.1 ──► R9/R10 (atalho) ou FIM: Chumbo
+              └──[tocar loira]──► R3.5 ──[correr luz amarela]──► R4
+                                                                │
+                               [sem Jaqueta]──► R5B ──[enfrentar]──► FIM: Linchamento
+                                    │                 └──[bueiro]──► R7 → R7.1 → FIM: Rei Rato
+                               [com Jaqueta]──► R5A ──[pegar boné]──► R5C
+                                                       │               │
+                                                       └───────────────┴──► R6
+                                                                            │
+                                                                      [ir cozinha]──► R8 ──[assassinar+faca]──► FIM: Açougueiro
+                                                                            │              └──[ir frente]──► R9
+                                                                      [atacar]──► R9
+                                                                                   │
+                                                                       [fugir]──► R10 ──[esperar]──► FIM: Chumbo e Asfalto
+                                                                                   │
+                                                                        [quebrar / pular]──► R11 ──[pular]──► FIM CANÔNICO: O Caco de Vidro
 ```
-
----
-
-*Documento gerado para uso no IF Builder — Parser Mode.*
-*Versão 1.0 | Maio 2026*

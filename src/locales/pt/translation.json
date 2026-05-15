@@ -159,6 +159,7 @@
     "start": "Início",
     "deleteScene": "Deletar ramificação",
     "createNode": "Criar Capítulo ou Ramificação",
+    "viewMore": "Ver mais",
     "viewMap": "Ver mapa narrativo",
     "nodeSelection": {
       "vignette": {
@@ -703,11 +704,11 @@
     "verbsLabel": "Verbos (separados por vírgula)",
     "verbsPlaceholder": "ex: pegar, usar, abrir",
     "verbsDesc": "O jogador deve digitar um destes para iniciar a ação.",
-    "targetLabel": "Alvo da Ação (Opcional)",
+    "targetLabel": "Objeto alvo da Ação (Opcional)",
     "noTarget": "Nenhum (Ação no ambiente)",
     "requiresItemLabel": "Requer Item (Inventário)",
     "noItemRequired": "Não requer item",
-    "removesTarget": "Remove Alvo",
+    "removesTarget": "Remove objeto",
     "addsToInventory": "Adiciona ao inventário",
     "showObjectImage": "Exibir imagem do objeto",
     "consumesItem": "Consome item",

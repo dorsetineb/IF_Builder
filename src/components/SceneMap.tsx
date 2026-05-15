@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, Vignette } from '../types';
-import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split, BarChart3, List, Columns3 } from 'lucide-react';
+import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split, BarChart3, List, Columns3, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import EditorStatsModal from './EditorStatsModal';
 import { useTheme } from './ThemeProvider';
@@ -22,6 +22,7 @@ interface SceneMapProps {
   isNarrativeMenuOpen?: boolean;
   onToggleNarrative?: () => void;
   selectedSceneId?: string | null;
+  onDeleteScene: (id: string) => void;
 }
 
 const NODE_WIDTH = 250;
@@ -76,6 +77,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
   isNarrativeMenuOpen,
   onToggleNarrative,
   selectedSceneId,
+  onDeleteScene,
 }) => {
   const { t } = useTranslation();
   const { theme } = useTheme();
@@ -753,16 +755,15 @@ const SceneMap: React.FC<SceneMapProps> = ({
             transformOrigin: '0 0',
           }}
         >
-          {/* Narrative Map Background Dots - Now inside the transform for perfect sync */}
-          <div
+            <div
             className="absolute pointer-events-none text-primary opacity-50"
             style={{
               backgroundImage: 'radial-gradient(circle, currentColor 1.5px, transparent 1px)',
               backgroundSize: '25px 25px',
-              top: -10000,
-              left: -10000,
-              width: 20000,
-              height: 20000,
+              top: -250000,
+              left: -250000,
+              width: 500000,
+              height: 500000,
               zIndex: -1
             }}
           />
@@ -882,14 +883,33 @@ const SceneMap: React.FC<SceneMapProps> = ({
                       onSelectScene(isAlreadySelected ? null : node.id);
                     }
                   }}
-                  className={`absolute bg-zinc-900 rounded-xl flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} ${borderClass} cursor-pointer shadow-[0_10px_30px_rgba(0,0,0,0.3)] ${shadowClass} overflow-hidden group`}
+                  className={`absolute z-${selectedSceneId === node.id ? '50' : '0'}`}
                   style={{
-                    width: NODE_WIDTH,
                     transform: `translate(${node.x}px, ${node.y}px)`,
-                    height: node.height,
                     userSelect: 'none',
                   }}
                 >
+                  {/* Delete Button - Floating outside */}
+                  {selectedSceneId === node.id && !isOpening && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDeleteScene(node.id);
+                      }}
+                      className="absolute top-0 left-full w-10 h-10 bg-red-600 hover:bg-red-500 text-white flex items-center justify-center z-[60] transition-colors shadow-lg rounded-r-xl border-y-2 border-r-2 border-white/10"
+                      title={t('sceneList.deleteScene', 'Deletar ramificação')}
+                    >
+                      <Trash2 className="w-5 h-5" />
+                    </button>
+                  )}
+
+                  <div 
+                    className={`bg-zinc-900 rounded-xl flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} ${borderClass} cursor-pointer shadow-[0_10px_30px_rgba(0,0,0,0.3)] ${shadowClass} overflow-hidden group`}
+                    style={{
+                      width: NODE_WIDTH,
+                      height: node.height,
+                    }}
+                  >
                   <div
                     className="p-3 relative flex-shrink-0 text-center bg-zinc-900/50"
                     style={{ height: NODE_HEADER_HEIGHT }}
@@ -961,7 +981,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
                     </div>
                   )}
                 </div>
-              );
+              </div>
+            );
             }
 
             // --- STANDARD SCENE NODE STYLE ---
@@ -1015,14 +1036,33 @@ const SceneMap: React.FC<SceneMapProps> = ({
                     onSelectScene(isAlreadySelected ? null : node.id);
                   }
                 }}
-                className={`absolute bg-zinc-900 rounded-xl flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} border-2 ${borderColorClass} cursor-pointer hover:border-${colorBase}-400 overflow-hidden group ${isSelected ? 'shadow-[0_0_50px_rgba(255,255,255,0.7)] z-50' : 'shadow-[0_10px_30px_rgba(0,0,0,0.3)]'}`}
+                className={`absolute z-${isSelected ? '50' : '0'}`}
                 style={{
-                  width: NODE_WIDTH,
                   transform: `translate(${node.x}px, ${node.y}px)`,
-                  height: node.height,
                   userSelect: 'none',
                 }}
               >
+                {/* Delete Button - Floating outside */}
+                {isSelected && !node.isStart && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDeleteScene(node.id);
+                    }}
+                    className="absolute top-0 left-full w-10 h-10 bg-red-600 hover:bg-red-500 text-white flex items-center justify-center z-[60] transition-colors shadow-lg rounded-r-xl border-y-2 border-r-2 border-white/10"
+                    title={t('sceneList.deleteScene', 'Deletar ramificação')}
+                  >
+                    <Trash2 className="w-5 h-5" />
+                  </button>
+                )}
+
+                <div 
+                  className={`bg-zinc-900 rounded-xl flex flex-col ${dragInfo?.id === node.id ? '' : 'transition-all duration-300'} border-2 ${borderColorClass} cursor-pointer hover:border-${colorBase}-400 overflow-hidden group ${isSelected ? 'shadow-[0_0_50px_rgba(255,255,255,0.7)]' : 'shadow-[0_10px_30px_rgba(0,0,0,0.3)]'}`}
+                  style={{
+                    width: NODE_WIDTH,
+                    height: node.height,
+                  }}
+                >
                 <div
                   className="p-3 relative flex-shrink-0 text-center bg-zinc-900/50"
                   style={{ height: NODE_HEADER_HEIGHT }}
@@ -1111,8 +1151,9 @@ const SceneMap: React.FC<SceneMapProps> = ({
                         </div>
                       );
                     })}
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
               </div>
             );
           })}

@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useRef, CSSProperties, useState, useMemo, useCallback } from 'react';
 import { Scene, View } from '../types';
-import { Trash2, Menu, ArrowRight, Search, Split, Map, Columns3 } from 'lucide-react';
+import { Trash2, Menu, ArrowRight, ArrowDown, Search, Split, Map, Columns3 } from 'lucide-react';
 import { FixedSizeList as List, ListChildComponentProps } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { useTranslation } from 'react-i18next';
@@ -102,7 +102,19 @@ const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<Sce
         draggable={!searchTerm && scene.id !== startSceneId}
       >
         <div className={`flex items-center flex-grow p-2 px-4`}>
-
+          {scene.id !== startSceneId && (
+            <Menu
+              className={`w-4 h-4 mr-2 flex-shrink-0 ${isDraggable ? 'cursor-move' : 'cursor-default opacity-50'} ${
+                isLateralMenu 
+                  ? selectedSceneId === scene.id && currentView === 'scenes' 
+                    ? 'text-primary-foreground/70' 
+                    : 'text-muted-foreground'
+                  : selectedSceneId === scene.id && currentView === 'scenes' 
+                    ? (isDirty ? 'text-yellow-500' : 'text-primary') 
+                    : 'text-muted-foreground'
+              }`}
+            />
+          )}
 
           <div className="flex items-center justify-between w-full min-w-0">
             <span className="truncate font-medium text-xs">{scene.name}</span>
@@ -124,19 +136,6 @@ const SceneRow = React.memo(({ index, style, data }: ListChildComponentProps<Sce
                 >
                   {t('sceneList.start', 'Início')}
                 </span>
-              )}
-              {scene.id !== startSceneId && scene.vignetteType !== 'transition' && scene.vignetteType !== 'conclusion' && (
-                <Menu
-                  className={`w-4 h-4 ml-1 flex-shrink-0 ${isDraggable ? 'cursor-move' : 'cursor-default opacity-50'} ${
-                    isLateralMenu 
-                      ? selectedSceneId === scene.id && currentView === 'scenes' 
-                        ? 'text-primary-foreground/70' 
-                        : 'text-muted-foreground'
-                      : selectedSceneId === scene.id && currentView === 'scenes' 
-                        ? (isDirty ? 'text-yellow-500' : 'text-primary') 
-                        : 'text-muted-foreground'
-                  }`}
-                />
               )}
             </div>
           </div>
@@ -326,6 +325,17 @@ const SceneList: React.FC<SceneListProps> = ({
                 
                 {/* Creation Buttons */}
                 {/* Moved Map Button Here */}
+                
+                {/* "See More" / Scroll to Bottom Button */}
+                {filteredScenes.length > 5 && (
+                  <button
+                    onClick={() => listRef.current?.scrollToItem(filteredScenes.length - 1, 'end')}
+                    className="flex items-center justify-center gap-2 py-3 px-4 mt-2 text-[10px] font-bold uppercase tracking-widest text-muted-foreground hover:text-primary transition-colors group border-t border-muted-foreground/20"
+                  >
+                    <span>{t('sceneList.viewMore', 'Ver mais')}</span>
+                    <ArrowDown className="w-3 h-3 transition-transform group-hover:translate-y-0.5" />
+                  </button>
+                )}
               </div>
             );
           }}

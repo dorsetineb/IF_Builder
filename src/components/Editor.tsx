@@ -1093,7 +1093,7 @@ const Editor: React.FC = () => {
 
   const handleAddNodeType = (type: 'scene' | 'vignette') => {
     setIsNodeTypeModalOpen(false);
-    setIsNarrativeMenuOpen(true);
+    setIsNarrativeMenuOpen(false);
     handleAddScene(type);
   };
 
@@ -1568,6 +1568,7 @@ const Editor: React.FC = () => {
                         isNarrativeMenuOpen={isNarrativeMenuOpen}
                         onToggleNarrative={() => setIsNarrativeMenuOpen(!isNarrativeMenuOpen)}
                         selectedSceneId={selectedSceneId}
+                        onDeleteScene={handleDeleteScene}
                       />
                     </Suspense>
                   </div>
