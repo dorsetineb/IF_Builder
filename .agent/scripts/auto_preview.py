@@ -19,6 +19,14 @@ import argparse
 import subprocess
 from pathlib import Path
 
+# Fix Windows console encoding issues for emojis
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except AttributeError:
+        pass
+
 AGENT_DIR = Path(".agent")
 PID_FILE = AGENT_DIR / "preview.pid"
 LOG_FILE = AGENT_DIR / "preview.log"

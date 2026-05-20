@@ -38,6 +38,9 @@ import {
   Hammer,
   Columns3,
   Heart,
+  SlidersHorizontal,
+  Package,
+  Hand,
 } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { useTranslation, Trans } from 'react-i18next';
@@ -501,18 +504,35 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                   const isTabDisabled =
                     (localScene.isEndingScene || isVignette) &&
                     (key === 'objects' || key === 'interactions');
+
+                  const getTabIcon = (tabKey: string) => {
+                    switch (tabKey) {
+                      case 'properties':
+                        return <SlidersHorizontal className="w-3.5 h-3.5" />;
+                      case 'objects':
+                        return <Package className="w-3.5 h-3.5" />;
+                      case 'interactions':
+                        return <Hand className="w-3.5 h-3.5" />;
+                      case 'choices':
+                        return <GitBranch className="w-3.5 h-3.5" />;
+                      default:
+                        return null;
+                    }
+                  };
+
                   return (
                     <button
                       key={key}
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       onClick={() => !isTabDisabled && setActiveTab(key as any)}
                       disabled={isTabDisabled}
-                      className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 ${activeTab === key
+                      className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 flex items-center gap-1.5 justify-center ${activeTab === key
                           ? 'border-primary text-primary bg-primary/5'
                           : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
                         } ${isTabDisabled ? 'opacity-30 cursor-not-allowed' : ''} `}
                     >
-                      {name}
+                      {getTabIcon(key)}
+                      <span>{name}</span>
                     </button>
                   );
                 })}

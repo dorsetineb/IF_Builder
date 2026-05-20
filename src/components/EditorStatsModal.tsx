@@ -331,8 +331,8 @@ const EditorStatsModal: React.FC<EditorStatsModalProps> = ({ isOpen, onClose, ga
                         <p className="text-xs font-bold text-foreground truncate">{alert.sceneName}</p>
                         <p className="text-[10px] text-muted-foreground">
                           {alert.reason === 'heavy_image' && t('editorStats.heavyImageDetail', { size: alert.value })}
-                          {alert.reason === 'long_description' && t('editorStats.longDescriptionDetail', { count: alert.value })}
-                          {alert.reason === 'many_interactions' && t('editorStats.manyInteractionsDetail', { count: alert.value })}
+                          {alert.reason === 'long_description' && t('editorStats.longDescriptionDetail', { count: Number(alert.value) })}
+                          {alert.reason === 'many_interactions' && t('editorStats.manyInteractionsDetail', { count: Number(alert.value) })}
                         </p>
                       </div>
                     </div>
