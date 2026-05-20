@@ -321,15 +321,18 @@ export function Auth() {
             {/* Game Popup (overlay) */}
             {currentView === 'play' && renderGamePopup()}
 
-            {/* IF Logo & Status - Bottom Right Group */}
-            <div className="fixed bottom-12 right-12 z-10 flex flex-col gap-0 select-none pointer-events-none opacity-20 items-end">
-                <h1 className="text-[120px] font-black text-foreground tracking-tighter italic leading-[0.8] notranslate" translate="no" style={{ fontFamily: 'Inter, sans-serif' }}>
-                    IF
-                </h1>
-                <div className="font-mono text-[10px] text-muted-foreground tracking-wider pr-2 mt-2 border-r-2 border-muted-foreground/50 text-right">
-                    <p>SYS.STATUS: ONLINE</p>
-                    <p>VER: 1.0.0</p>
-                </div>
+            {/* IF Logo - Bottom Right Group */}
+            <div className="fixed bottom-12 right-12 z-10 select-none pointer-events-none opacity-20">
+                <pre className="font-mono leading-none text-foreground text-[10px] sm:text-[14px] tracking-normal notranslate" translate="no">
+{`           ██████   █████████
+          ░░████   ░█████████
+         ░████   ░██         
+        ░████   ░█████████   
+       ░████   ░█████████   
+      ░████   ░██           
+     ██████  ░██            
+    ░░░░░░   ░░             `}
+                </pre>
             </div>
         </div>
     );
