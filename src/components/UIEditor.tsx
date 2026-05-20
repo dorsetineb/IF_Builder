@@ -11,7 +11,7 @@ import { getDitherColors } from '../utils/themeStyles';
 import { SystemsTab } from './UIEditor/SystemsTab';
 import { AppearanceTab } from './UIEditor/AppearanceTab';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Leaf, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, Zap, Sparkles, History as HistoryIcon } from 'lucide-react';
+import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Leaf, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, Zap, Sparkles, History as HistoryIcon, Settings } from 'lucide-react';
 
 interface UIEditorProps {
     html: string;
@@ -926,17 +926,33 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 <div className="border-b border-muted-foreground/50 flex items-center justify-between relative">
                     <div className="flex space-x-1 overflow-x-auto">
                         {Object.entries(TABS).map(([key, name]) => {
+                            const getTabIcon = (tabKey: string) => {
+                                switch (tabKey) {
+                                    case 'aparencia':
+                                        return <Palette className="w-3.5 h-3.5" />;
+                                    case 'sistemas':
+                                        return <SlidersHorizontal className="w-3.5 h-3.5" />;
+                                    case 'textos':
+                                        return <Type className="w-3.5 h-3.5" />;
+                                    case 'config':
+                                        return <Settings className="w-3.5 h-3.5" />;
+                                    default:
+                                        return null;
+                                }
+                            };
+
                             return (
                                 <button
                                     key={key}
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     onClick={() => setActiveTab(key as any)}
-                                    className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 ${activeTab === key
+                                    className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 flex items-center gap-1.5 justify-center ${activeTab === key
                                         ? 'border-primary text-primary bg-primary/5'
                                         : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
                                         }`}
                                 >
-                                    {name}
+                                    {getTabIcon(key)}
+                                    <span>{name}</span>
                                 </button>
                             );
                         })}
@@ -1246,7 +1262,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 {/* Aparência Section */}
                                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm transition-all duration-300 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '100ms' }}>
                                     <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground mb-6 flex items-center gap-2">
-                                        <Palette className="w-4 h-4" />
+                                        <Sparkles className="w-4 h-4" />
                                         {t('settings.appearance', 'Aparência')}
                                     </h3>
 

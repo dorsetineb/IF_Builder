@@ -435,7 +435,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
 
     return (
       <div className={`flex flex-col ${isSidePanel ? 'h-full overflow-hidden' : 'pb-8 px-4'}`}>
-        <div className={`sticky top-0 z-40 bg-background flex flex-col ${isSidePanel ? 'pt-2 pb-0 px-4 border-b border-muted-foreground/30 shadow-md' : 'pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm border-b border-muted-foreground/50'}`}>
+        <div className={`sticky top-0 z-40 bg-background flex flex-col ${isSidePanel ? 'pt-3 pb-0 px-4 border-b border-muted-foreground/30 shadow-md' : 'pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm border-b border-muted-foreground/50'}`}>
           {/* Solid background shield to perfectly hide scrolled content */}
           <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
           
@@ -497,7 +497,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
           )}
 
           {!isVignetteMode && (
-            <div className={`${isSidePanel ? '' : 'border-b border-muted-foreground/50'} flex items-center justify-between`}>
+            <div className="border-b border-muted-foreground/50 flex items-center justify-between -mx-4">
               <div className="flex space-x-1 overflow-x-auto">
                 {Object.entries(TABS).map(([key, name]) => {
                   const isVignette = localScene.vignetteType && localScene.vignetteType !== 'none';
@@ -543,7 +543,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
           <div className="absolute left-0 right-0 -bottom-4 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none z-[100]" />
         </div>
 
-        <div className={`pt-4 relative flex-1 flex flex-col h-full min-h-0 ${isSidePanel && !['objects', 'interactions', 'choices'].includes(activeTab) ? 'overflow-y-auto pt-6 px-4 pb-24' : ''}`}>
+        <div className={`relative flex-1 flex flex-col h-full min-h-0 ${isSidePanel && !['objects', 'interactions', 'choices'].includes(activeTab) ? 'overflow-y-auto pt-6 px-4 pb-24' : isSidePanel ? 'pt-0' : 'pt-4'}`}>
           <div className="bg-background flex flex-col flex-1 h-full min-h-0">
             {activeTab === 'properties' && (
               <div key={localScene.id} className={`grid grid-cols-1 ${isSidePanel ? 'gap-6' : 'md:grid-cols-2 gap-8'}`}>
@@ -1407,11 +1407,6 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
             {/* Gradient transition below footer */}
             <div className="absolute bottom-full left-0 right-0 h-4 bg-gradient-to-t from-background to-transparent pointer-events-none" />
 
-            {activeTab === 'objects' && (
-              <div className="text-[10px] text-yellow-500/90 italic text-right leading-tight px-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                * {t('sceneEditor.objectWarning')}
-              </div>
-            )}
 
             <div className={`flex w-full items-center ${activeTab === 'properties' || activeTab === 'choices' ? 'justify-between' : 'justify-between'}`}>
               <div className={`flex items-center ${activeTab === 'properties' || activeTab === 'choices' ? 'gap-2 w-full justify-between' : 'gap-2'}`}>
