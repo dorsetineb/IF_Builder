@@ -539,11 +539,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
               </div>
             </div>
           )}
-          {/* Soft gradient transition - Overlapping the padding of the container below */}
-          <div className="absolute left-0 right-0 -bottom-4 h-4 bg-gradient-to-b from-background to-transparent pointer-events-none z-[100]" />
         </div>
 
-        <div className={`relative flex-1 flex flex-col h-full min-h-0 ${isSidePanel && !['objects', 'interactions', 'choices'].includes(activeTab) ? 'overflow-y-auto pt-6 px-4 pb-24' : isSidePanel ? 'pt-0' : 'pt-4'}`}>
+        <div className={`relative flex-1 flex flex-col h-full min-h-0 ${isSidePanel && !['objects', 'interactions', 'choices'].includes(activeTab) ? 'overflow-y-auto pt-6 px-4 pb-28' : isSidePanel ? 'pt-0' : 'pt-4'}`}>
           <div className="bg-background flex flex-col flex-1 h-full min-h-0">
             {activeTab === 'properties' && (
               <div key={localScene.id} className={`grid grid-cols-1 ${isSidePanel ? 'gap-6' : 'md:grid-cols-2 gap-8'}`}>
@@ -1403,9 +1401,9 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
         </div>
 
         {isSidePanel && (
-          <div className="sticky bottom-0 left-0 right-0 bg-background/80 backdrop-blur-md px-4 pb-4 pt-4 flex flex-col gap-3 z-50">
+          <div className="sticky bottom-0 left-0 right-0 bg-background px-4 pb-4 pt-2 flex flex-col gap-3 z-50">
             {/* Gradient transition below footer */}
-            <div className="absolute bottom-full left-0 right-0 h-4 bg-gradient-to-t from-background to-transparent pointer-events-none" />
+            <div className="absolute bottom-full left-0 right-0 h-8 bg-gradient-to-t from-background to-transparent pointer-events-none" />
 
 
             <div className={`flex w-full items-center ${activeTab === 'properties' || activeTab === 'choices' ? 'justify-between' : 'justify-between'}`}>
