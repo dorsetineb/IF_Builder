@@ -757,7 +757,7 @@
       "interactions": "Interações",
       "choices": "Decisões"
     },
-    "objectWarning": "Alterações feitas aqui afetam o mesmo objeto caso utilizado em outras ramificações.",
+    "objectWarning": "Alterações feitas em objetos nesta aba afetam o mesmo objeto caso ele esteja em uso em outras ramificações.",
     "narrativeTitle": "DETALHES DA RAMIFICAÇÃO",
     "vignetteNarrativeTitle": "DETALHES DO CAPÍTULO",
     "vignetteTitleLabel": "NOME DO CAPÍTULO",
