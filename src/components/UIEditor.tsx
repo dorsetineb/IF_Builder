@@ -946,9 +946,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     key={key}
                                     // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                     onClick={() => setActiveTab(key as any)}
-                                    className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 flex items-center gap-1.5 justify-center ${activeTab === key
-                                        ? 'border-primary text-primary bg-primary/5'
-                                        : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                                    className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-1.5 justify-center ${activeTab === key
+                                        ? 'bg-primary text-primary-foreground font-bold'
+                                        : 'text-muted-foreground hover:bg-primary/25 hover:text-white'
                                         }`}
                                 >
                                     {getTabIcon(key)}

@@ -285,7 +285,7 @@
     "subtitle": "Configura los detalles iniciales de tu aventura",
     "previewLabel": "Ejemplo de",
     "tabs": {
-      "info": "Apertura",
+      "info": "Capítulo de apertura",
       "system": "Mecánicas",
       "appearance": "Estilo Visual"
     },

@@ -1,13 +1,16 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useState, useMemo, useRef } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { X, Layout, Type, Palette, Play, Upload, Image as ImageIcon, Trash2, ChevronDown, ChevronUp, LayoutTemplate, BookOpen, ArrowRight, Terminal, MousePointerClick, Package, BookText, Heart, SlidersHorizontal, Monitor, MousePointer2, PenTool, AlignLeft } from 'lucide-react';
+import { X, Layout, Type, Palette, Play, Upload, Image as ImageIcon, Trash2, ChevronDown, ChevronUp, LayoutTemplate, BookOpen, ArrowRight, Terminal, MousePointerClick, Package, BookText, Heart, SlidersHorizontal, Monitor, MousePointer2, PenTool, AlignLeft, Paintbrush, Split } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { GameData, Vignette, Scene } from '../types';
 import { initialGameData } from '../lib/gameDefaults';
 import { FONTS, PREDEFINED_THEMES } from '../constants';
 import { useTranslation } from 'react-i18next';
 import { getFramePreviewStyles } from '../utils/frameStyles';
+import { useTheme } from './ThemeProvider';
+import { DitherShader } from './ui/dither-shader';
+import { getDitherColors } from '../utils/themeStyles';
 
 interface NewProjectModalProps {
     isOpen: boolean;
@@ -41,8 +44,28 @@ const ColorInput: React.FC<{ label: string, id: string, value: string, onChange:
     </div>
 );
 
+// Define App Theme Primary Colors based on index.css
+const APP_THEME_COLORS = {
+    dark: '#9D4EDD',      // Vibrant Purple
+    light: '#18181b',     // Zinc-950 (Dark Grey/Black for Light theme as per :root --primary)
+    cream: '#5c4033',     // Approx for warm brown oklch(0.40 0.08 30)
+    terminal: '#7EE0A1',   // Vibrant Mint
+    windows: '#008080',    // Teal (W95 theme accent)
+    ether: '#98bb6c',      // Sage Green (Ether theme accent)
+    ristretto: '#fbbf24',  // Amber Yellow (Ristretto theme accent)
+    abismo: '#ffffff',     // Pure White (Abismo theme accent)
+    system: '#9D4EDD'     // Default fallback
+};
+
 export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClose, onCreate }) => {
     const { t } = useTranslation();
+    const { theme } = useTheme();
+    const currentSliderColor = APP_THEME_COLORS[theme as keyof typeof APP_THEME_COLORS] || APP_THEME_COLORS.dark;
+    
+    const ditherColors = useMemo(() => {
+        return getDitherColors(theme, currentSliderColor);
+    }, [theme, currentSliderColor]);
+
     const [tab, setTab] = useState<Tab>('info');
     const [isInputFocused, setIsInputFocused] = useState(false);
     const [isColorsExpanded, setIsColorsExpanded] = useState(false);
@@ -348,19 +371,19 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                 <div className="flex border-b border-muted-foreground/50 bg-zinc-950/50">
                     <button
                         onClick={() => setTab('info')}
-                        className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'info' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
+                        className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all ${tab === 'info' ? 'bg-primary text-primary-foreground font-bold' : 'text-zinc-500 hover:text-white hover:bg-primary/25'}`}
                     >
-                        {t('newProject.tabs.info', 'Abertura')}
+                        {t('newProject.tabs.info', 'Capítulo de abertura')}
                     </button>
                     <button
                         onClick={() => setTab('appearance')}
-                        className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'appearance' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
+                        className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all ${tab === 'appearance' ? 'bg-primary text-primary-foreground font-bold' : 'text-zinc-500 hover:text-white hover:bg-primary/25'}`}
                     >
                         {t('newProject.tabs.appearance', 'Estilo Visual')}
                     </button>
                     <button
                         onClick={() => setTab('system')}
-                        className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all border-b-2 ${tab === 'system' ? 'border-primary text-primary bg-primary/5' : 'border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50'}`}
+                        className={`flex-1 py-4 text-xs font-bold uppercase tracking-widest transition-all ${tab === 'system' ? 'bg-primary text-primary-foreground font-bold' : 'text-zinc-500 hover:text-white hover:bg-primary/25'}`}
                     >
                         {t('newProject.tabs.system', 'Mecânicas')}
                     </button>
@@ -652,7 +675,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     {/* SECTION: ESTILO & TEMA */}
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-zinc-300">
-                                            <Palette className="w-4 h-4" />
+                                            <Paintbrush className="w-4 h-4" />
                                             <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.appearance.styleTheme', 'Estilo & Tema')}</h3>
                                         </div>
 
@@ -754,7 +777,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                     {/* SECTION: LAYOUT DAS CENAS */}
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-zinc-300">
-                                            <LayoutTemplate className="w-4 h-4" />
+                                            <Split className="w-4 h-4 rotate-90" />
                                             <h3 className="text-xs font-bold uppercase tracking-widest">{t('newProject.appearance.layoutScenes', 'Layout das Ramificações')}</h3>
                                         </div>
                                         
@@ -861,7 +884,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                             </div>
 
                             <div className="flex-1 flex flex-col items-center justify-center overflow-hidden">
-                                <div className={`flex flex-col w-full h-full max-h-[500px] ${layoutOrientation === 'horizontal' ? 'max-w-[282px]' : 'max-w-[889px]'}`}>
+                                <div className="flex flex-col w-full h-full max-h-[500px] max-w-[889px]">
                                     <div className="flex-1 flex flex-col items-center justify-start overflow-hidden">
                                         {/* Custom Preview Logic from UIEditor */}
                                         {(() => {
@@ -878,13 +901,20 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                             textAlign: splashContentAlignment === 'left' ? 'left' : 'right',
                                                         }}
                                                     >
-                                                        <div className="absolute inset-0 opacity-40">
+                                                        <div className="absolute inset-0 opacity-60">
                                                             {splashImage ? (
                                                                 <img src={splashImage} alt="" className="w-full h-full object-cover" />
                                                             ) : (
-                                                                <div className="w-full h-full bg-zinc-900 flex items-center justify-center">
-                                                                    <ImageIcon className="w-16 h-16 text-zinc-800" />
-                                                                </div>
+                                                                <DitherShader
+                                                                    src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
+                                                                    gridSize={2}
+                                                                    ditherMode="bayer"
+                                                                    colorMode="duotone"
+                                                                    primaryColor={ditherColors.primary}
+                                                                    secondaryColor={ditherColors.secondary}
+                                                                    className="w-full h-full"
+                                                                    objectFit="cover"
+                                                                />
                                                             )}
                                                         </div>
                                                         <div className={`relative z-10 w-full flex flex-col gap-3 max-w-[80%] ${splashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
@@ -945,7 +975,22 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                                                                 style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
                                                                                 className={containerClass}
                                                                             >
-                                                                                <ImageIcon className="w-12 h-12 text-zinc-500 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 opacity-50" />
+                                                                                {splashImage ? (
+                                                                                    <img src={splashImage} alt="" className="w-full h-full object-cover" />
+                                                                                ) : (
+                                                                                    <div className="absolute inset-0 opacity-60">
+                                                                                        <DitherShader
+                                                                                            src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
+                                                                                            gridSize={2}
+                                                                                            ditherMode="bayer"
+                                                                                            colorMode="duotone"
+                                                                                            primaryColor={ditherColors.primary}
+                                                                                            secondaryColor={ditherColors.secondary}
+                                                                                            className="w-full h-full"
+                                                                                            objectFit="cover"
+                                                                                        />
+                                                                                    </div>
+                                                                                )}
                                                                                 <div className="absolute top-4 left-4 z-20">
                                                                                     <div
                                                                                         className="px-2 py-0.5 border uppercase leading-none"

@@ -345,7 +345,7 @@
     "warningMessage": "The new project will replace the current one.\n\nDo you wish to proceed?",
     "subtitle": "Configure the initial details of your adventure",
     "tabs": {
-      "info": "Opening",
+      "info": "Opening chapter",
       "system": "Mechanics",
       "appearance": "Visual Style"
     },

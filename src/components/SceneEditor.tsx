@@ -431,11 +431,16 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
       !!localScene.restoresChanceOnEntry;
 
     const isVignetteMode = localScene.vignetteType && localScene.vignetteType !== 'none';
+    const showTabs = !isVignetteMode;
     const copyLabel = t('sceneEditor.copyBtn', 'Copiar');
 
     return (
       <div className={`flex flex-col ${isSidePanel ? 'h-full overflow-hidden' : 'pb-8 px-4'}`}>
-        <div className={`sticky top-0 z-40 bg-background flex flex-col ${isSidePanel ? 'pt-3 pb-0 px-4 border-b border-muted-foreground/30 shadow-md' : 'pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm border-b border-muted-foreground/50'}`}>
+        <div className={`sticky top-0 z-40 bg-background flex flex-col ${
+          isSidePanel
+            ? `pt-4 pb-0 gap-3 px-4 shadow-md ${!showTabs ? 'border-b border-muted-foreground/30' : ''}`
+            : `pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm ${!showTabs ? 'border-b border-muted-foreground/50' : ''}`
+        }`}>
           {/* Solid background shield to perfectly hide scrolled content */}
           <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
           
@@ -497,7 +502,7 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
           )}
 
           {!isVignetteMode && (
-            <div className="border-b border-muted-foreground/50 flex items-center justify-between -mx-4">
+            <div className="border-b border-muted-foreground/50 flex items-center justify-between -mx-4 px-4">
               <div className="flex space-x-1 overflow-x-auto">
                 {Object.entries(TABS).map(([key, name]) => {
                   const isVignette = localScene.vignetteType && localScene.vignetteType !== 'none';
@@ -526,9 +531,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
                       // eslint-disable-next-line @typescript-eslint/no-explicit-any
                       onClick={() => !isTabDisabled && setActiveTab(key as any)}
                       disabled={isTabDisabled}
-                      className={`px-6 py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap border-b-4 flex items-center gap-1.5 justify-center ${activeTab === key
-                          ? 'border-primary text-primary bg-primary/5'
-                          : 'border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30'
+                      className={`py-3 font-bold text-[10px] uppercase tracking-widest transition-all whitespace-nowrap flex items-center gap-1.5 justify-center ${
+                        isSidePanel ? 'px-4' : 'px-6'
+                      } ${activeTab === key
+                          ? 'bg-primary text-primary-foreground font-bold'
+                          : 'text-muted-foreground hover:bg-primary/25 hover:text-white'
                         } ${isTabDisabled ? 'opacity-30 cursor-not-allowed' : ''} `}
                     >
                       {getTabIcon(key)}
