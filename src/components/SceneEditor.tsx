@@ -437,9 +437,11 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
     return (
       <div className={`flex flex-col ${isSidePanel ? 'h-full overflow-hidden' : 'pb-8 px-4'}`}>
         <div className={`sticky top-0 z-40 bg-background flex flex-col ${
-          isSidePanel
-            ? `pt-4 pb-0 gap-3 px-4 shadow-md ${!showTabs ? 'border-b border-muted-foreground/30' : ''}`
-            : `pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm ${!showTabs ? 'border-b border-muted-foreground/50' : ''}`
+          isSidePanel && isVignetteMode
+            ? 'h-0 overflow-hidden pt-0 pb-0 gap-0 border-b-0 shadow-none pointer-events-none'
+            : isSidePanel
+              ? `pt-4 pb-0 gap-3 px-4 shadow-md ${!showTabs ? 'border-b border-muted-foreground/30' : ''}`
+              : `pt-4 pb-4 gap-3 -mx-4 px-4 shadow-sm ${!showTabs ? 'border-b border-muted-foreground/50' : ''}`
         }`}>
           {/* Solid background shield to perfectly hide scrolled content */}
           <div className="absolute top-0 left-0 right-0 h-4 bg-background pointer-events-none" />
