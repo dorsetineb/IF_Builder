@@ -66,7 +66,6 @@ const countWords = (text: string | undefined): number => {
 const getStringBytes = (s: string): number => s.length; // base64 chars are ASCII, 1 byte each
 
 // Scans all base64 data-URI assets embedded in the project and returns their total byte count.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const sumBase64AssetBytes = (gameData: GameData): number => {
     let total = 0;
     const measure = (val: string | undefined | null) => {

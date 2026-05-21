@@ -64,6 +64,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
     consequenceTrackers,
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     vignettes,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     isSidePanel
 }) => {
     const [selectedIndex, setSelectedIndex] = useState<number | null>(interactions.length > 0 ? 0 : null);
@@ -335,7 +336,7 @@ const InteractionEditor: React.FC<InteractionEditorProps> = ({
                                         <input type="file" accept="audio/*" onChange={handleSoundUpload} className="hidden" />
                                     </label>
                                     {selectedInteraction.soundEffect && (
-                                        <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="h-full px-3 bg-red-500/10 text-red-500 rounded border border-red-500/20 hover:bg-red-500/20"><Trash2 className="w-4 h-4" /></button>
+                                        <button onClick={() => handleInteractionChange('soundEffect', undefined)} className="h-full px-3 bg-red-600 hover:bg-red-700 text-white rounded transition-colors shadow-sm"><Trash2 className="w-4 h-4" /></button>
                                     )}
                                 </div>
                             </div>

@@ -4,12 +4,10 @@ import { useTranslation } from 'react-i18next';
 import { 
   BarChart3, 
   FileText, 
-  Package, 
   Layers, 
   X,
   Activity,
   Search,
-  Type,
   Zap,
   AlertTriangle
 } from 'lucide-react';

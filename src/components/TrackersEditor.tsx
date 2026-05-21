@@ -38,6 +38,7 @@ interface TrackersEditorProps {
     onSetDirty: (isDirty: boolean) => void;
     onSelectScene: (sceneId: string, tab?: string) => void;
     allObjects: Record<string, GameObject>;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setConfirmationModal: (modal: any) => void;
     closeConfirmationModal: () => void;
 }
@@ -372,7 +373,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({
                                                             type="text"
                                                             value={selectedTracker.name}
                                                             onChange={(e) => handleTrackerChange(selectedTracker.id, 'name', e.target.value)}
-                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-muted-foreground"
+                                                            className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground"
                                                             placeholder={t('trackersEditor.noName', 'Sem nome')}
                                                         />
                                                     </div>
@@ -406,7 +407,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({
                                                         type="number"
                                                         value={selectedTracker.invertBar ? selectedTracker.maxValue : selectedTracker.initialValue}
                                                         onChange={e => handleTrackerChange(selectedTracker.id, selectedTracker.invertBar ? 'maxValue' : 'initialValue', e.target.value === '' ? '' : Number(e.target.value))}
-                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/50 transition-all [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
+                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
                                                     />
                                                 </div>
 
@@ -421,7 +422,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({
                                                         type="number"
                                                         value={selectedTracker.invertBar ? selectedTracker.initialValue : selectedTracker.maxValue}
                                                         onChange={e => handleTrackerChange(selectedTracker.id, selectedTracker.invertBar ? 'initialValue' : 'maxValue', e.target.value === '' ? '' : Number(e.target.value))}
-                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/50 transition-all [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
+                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none [appearance:textfield]"
                                                     />
                                                 </div>
                                             </div>
@@ -433,7 +434,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({
                                                     <select
                                                         value={selectedTracker.consequenceSceneId || ''}
                                                         onChange={e => handleTrackerChange(selectedTracker.id, 'consequenceSceneId', e.target.value)}
-                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-0 [&>option]:bg-card"
+                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all [&>option]:bg-card"
                                                     >
                                                         <option value="" className="bg-card text-muted-foreground">{t('trackersEditor.noConsequence', 'Nenhuma (Nada acontece)')}</option>
                                                         {allScenes.map(scene => (
@@ -527,13 +528,13 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({
                                             </div>
 
                                             {/* Action buttons (Delete) */}
-                                            <div className="pt-6 border-t border-border/50 flex justify-end">
+                                            <div className="pt-6 flex justify-end">
                                                 <button
                                                     onClick={() => handleDelete(selectedTracker.id)}
-                                                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-all text-[10px] font-bold uppercase tracking-widest border border-red-500/20"
+                                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
-                                                    {t('trackersEditor.deleteBtn', 'Excluir Rastreador')}
+                                                    {t('common.delete', 'Excluir')}
                                                 </button>
                                             </div>
                                         </div>

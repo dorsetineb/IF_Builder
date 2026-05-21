@@ -14,7 +14,6 @@ interface ConnectionsViewProps {
 }
 
 const ConnectionsView: React.FC<ConnectionsViewProps> = ({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   currentScene,
   inputConnections,
   outputConnections,

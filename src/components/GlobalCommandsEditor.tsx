@@ -31,6 +31,7 @@ interface GlobalCommandsEditorProps {
     onUpdate: (field: keyof GameData | Partial<GameData>, value?: any, skipDirty?: boolean) => void;
     isDirty: boolean;
     onSetDirty: (isDirty: boolean) => void;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     setConfirmationModal: (modal: any) => void;
     closeConfirmationModal: () => void;
 }
@@ -324,7 +325,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                                             handleVerbChange(selectedVerb.id, 'verbs', cleanedVerbs);
                                                         }}
                                                         placeholder={t('globalCommandsEditor.verbsPlaceholder', 'ex: ajuda, help, ?')}
-                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all"
+                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all"
                                                     />
                                                 </div>
                                             </div>
@@ -337,15 +338,15 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                                     onChange={(e) => handleVerbChange(selectedVerb.id, 'description', e.target.value)}
                                                     placeholder={t('globalCommandsEditor.descriptionPlaceholder', 'Texto que será exibido para o jogador quando usar este verbo.')}
                                                     rows={16}
-                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all resize-none"
+                                                    className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all resize-none"
                                                 />
                                             </div>
 
                                             {/* Action buttons (Delete) */}
-                                            <div className="pt-6 border-t border-muted-foreground/30 flex justify-end">
+                                            <div className="pt-6 flex justify-end">
                                                 <button
                                                     onClick={() => handleDelete(selectedVerb.id)}
-                                                    className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-all text-[10px] font-bold uppercase tracking-widest border border-red-500/20"
+                                                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
                                                     {t('globalCommandsEditor.deleteCommandTooltip', 'Excluir')}

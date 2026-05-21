@@ -1587,13 +1587,13 @@ export const initialGameData: GameData = {
 
 
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 /**
  * Sanitizes all user-authored HTML text fields in an imported GameData object.
  * Runs DOMPurify on scene descriptions, interaction messages, and other rich-text
  * fields to prevent XSS payloads from entering the editor state via shared files.
  * Preserves all legitimate formatting (spans, bold, colors, etc.).
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const sanitizeGameDataContent = (data: any): any => {
     if (!data || typeof DOMPurify === 'undefined') return data;
 

@@ -418,9 +418,9 @@ DATE:        ${exportDate.toLocaleString()}
     htmlContent = htmlContent
       .replace('</head>', () => `<meta name="if-integrity" content="${integrityHash}">\n</head>`)
       .replace(/<\/body>(?!.*<\/body>)/si, () => 
-        `<script src="game.js"><\/script>\n` +
-        `<script id="if-builder-source" type="application/json">${safeEditorJson}<\/script>\n` +
-        `<script>${verificationScript}<\/script>\n` +
+        `<script src="game.js"></script>\n` +
+        `<script id="if-builder-source" type="application/json">${safeEditorJson}</script>\n` +
+        `<script>${verificationScript}</script>\n` +
         '</body>'
       );
 
@@ -768,9 +768,9 @@ DATE:        ${exportDate.toLocaleString()}
     htmlContent = htmlContent
       .replace('</head>', () => `<meta name="if-integrity" content="${integrityHash}">\n</head>`)
       .replace(/<\/body>(?!.*<\/body>)/si, () => 
-        `<script>${finalGameScript}<\/script>\n` +
-        `<script id="if-builder-source" type="application/json">${safeEditorJson}<\/script>\n` +
-        `<script>${verificationScript}<\/script>\n` +
+        `<script>${finalGameScript}</script>\n` +
+        `<script id="if-builder-source" type="application/json">${safeEditorJson}</script>\n` +
+        `<script>${verificationScript}</script>\n` +
         '</body>'
       );
 

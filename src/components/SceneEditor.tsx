@@ -1,5 +1,4 @@
 import React, { useState, useEffect, DragEvent, useRef, useMemo, memo } from 'react';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import {
   Scene,
   Interaction,
@@ -19,7 +18,6 @@ import InteractionEditor from './InteractionEditor';
 import BranchingPreview from './BranchingPreview';
 import {
   Upload,
-  Eye,
   Trash2,
   Plus,
   ArrowRight,
@@ -27,7 +25,6 @@ import {
   Image as ImageIcon,
   Flag,
   FileText,
-  Scroll,
   GitBranch,
   Copy,
   RotateCcw,
@@ -152,8 +149,6 @@ const SceneEditor: React.FC<SceneEditorProps> = memo(
     const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
     const [choicesSearchQuery, setChoicesSearchQuery] = useState('');
     const [suggestionsInput, setSuggestionsInput] = useState('');
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
 
     const initialSceneJson = useRef(JSON.stringify(getCleanSceneState(scene)));
 

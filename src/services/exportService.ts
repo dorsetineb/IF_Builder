@@ -2,10 +2,10 @@
  * Service to handle project export logic, specifically asset processing.
  */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const processAsset = (
   base64String: string | undefined,
   baseName: string,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   assetsFolder: any,
   assetMap: Map<string, string>
 ): string | undefined => {

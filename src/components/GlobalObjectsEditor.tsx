@@ -394,7 +394,7 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                         type="text"
                                                         value={selectedObject.name}
                                                         onChange={(e) => handleObjectChange(selectedObject.id, 'name', e.target.value)}
-                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary transition-all placeholder:text-muted-foreground"
+                                                        className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary transition-all placeholder:text-muted-foreground"
                                                         placeholder={t('objectEditor.namePlaceholder', 'Nome do objeto')}
                                                     />
                                                 </div>
@@ -423,17 +423,17 @@ const GlobalObjectsEditor: React.FC<GlobalObjectsEditorProps> = ({
                                                 rows={8}
                                                 value={selectedObject.examineDescription}
                                                 onChange={(e) => handleObjectChange(selectedObject.id, 'examineDescription', e.target.value)}
-                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary resize-none min-h-[160px]"
+                                                className="w-full bg-input border border-input rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary focus:border-primary resize-none min-h-[160px]"
                                                 placeholder={t('objectEditor.examinePlaceholder', 'O que o jogador vê ao examinar este objeto?')}
                                             />
                                         </div>
                                     </div>
 
                                     {/* Action buttons (Delete) */}
-                                    <div className="pt-6 border-t border-muted-foreground/30 flex justify-end">
+                                    <div className="pt-6 flex justify-end">
                                         <button
                                             onClick={() => handleDeleteObject(selectedObject.id)}
-                                            className="flex items-center gap-2 px-4 py-2 bg-red-500/10 hover:bg-red-500/20 text-red-500 rounded-lg transition-all text-[10px] font-bold uppercase tracking-widest border border-red-500/20"
+                                            className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-all text-[10px] font-bold uppercase tracking-widest shadow-sm"
                                         >
                                             <Trash2 className="w-4 h-4" />
                                             {t('globalObjectsEditor.deleteObjectTooltip', 'Excluir')}

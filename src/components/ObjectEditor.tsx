@@ -62,6 +62,7 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
     onLinkObject,
     onUnlinkObject,
     onUpdateGlobalObject,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     isSidePanel
 }) => {
     const [selectedObjectId, setSelectedObjectId] = useState<string | null>(objects.length > 0 ? objects[0].id : null);
