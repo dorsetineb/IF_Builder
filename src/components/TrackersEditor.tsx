@@ -603,7 +603,7 @@ const TrackersEditor: React.FC<TrackersEditorProps> = ({
                             </div>
                         ) : (
                             <div className="flex-1 flex flex-col items-center justify-center text-muted-foreground p-8 text-center mt-20">
-                                <SlidersHorizontal className="w-12 h-12 mb-4 opacity-20" />
+                                <Activity className="w-12 h-12 mb-4 opacity-20" />
                                 <h4 className="text-sm font-bold text-muted-foreground mb-1">{t('trackersEditor.noTrackerSelected', 'Nenhum rastreador selecionado')}</h4>
                                 <p className="text-xs text-muted-foreground max-w-xs">{t('trackersEditor.noTrackerDesc', 'Selecione um rastreador da lista ao lado para editar suas propriedades.')}</p>
                             </div>

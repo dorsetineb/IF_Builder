@@ -11,7 +11,7 @@ import { getDitherColors } from '../utils/themeStyles';
 import { SystemsTab } from './UIEditor/SystemsTab';
 import { AppearanceTab } from './UIEditor/AppearanceTab';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Upload, Trash2, Plus, TriangleAlert, SlidersHorizontal, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, LayoutTemplate, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Leaf, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, Zap, Sparkles, History as HistoryIcon, Settings } from 'lucide-react';
+import { Upload, Trash2, Plus, TriangleAlert, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Leaf, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, Zap, Sparkles, History as HistoryIcon, SquareDashedMousePointer } from 'lucide-react';
 
 interface UIEditorProps {
     html: string;
@@ -931,11 +931,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                     case 'aparencia':
                                         return <Palette className="w-3.5 h-3.5" />;
                                     case 'sistemas':
-                                        return <SlidersHorizontal className="w-3.5 h-3.5" />;
+                                        return <SquareDashedMousePointer className="w-3.5 h-3.5" />;
                                     case 'textos':
                                         return <Type className="w-3.5 h-3.5" />;
                                     case 'config':
-                                        return <Settings className="w-3.5 h-3.5" />;
+                                        return <Monitor className="w-3.5 h-3.5" />;
                                     default:
                                         return null;
                                 }

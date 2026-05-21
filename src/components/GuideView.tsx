@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BookOpen, Map, Box, Gamepad2, Play, Command, Scroll, Activity, SlidersHorizontal, Download, Lightbulb, ChevronDown } from 'lucide-react';
+import { BookOpen, Map, Box, Gamepad2, Play, Command, Scroll, Activity, Settings, Download, Lightbulb, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import DOMPurify from 'dompurify';
 
@@ -233,7 +233,7 @@ export const GuideView: React.FC = () => {
                 <div id="section-settings" className="space-y-3 scroll-mt-72">
                     <div className="flex items-center gap-3">
                         <div className="p-2 bg-slate-500/10 rounded-lg text-slate-500">
-                            <SlidersHorizontal className="w-5 h-5" />
+                            <Settings className="w-5 h-5" />
                         </div>
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.settings.title', '8. Configurações do Jogo')}</h3>
                     </div>

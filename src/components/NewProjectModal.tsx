@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React, { useState, useMemo, useRef } from 'react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { X, Layout, Type, Palette, Play, Upload, Image as ImageIcon, Trash2, ChevronDown, ChevronUp, LayoutTemplate, BookOpen, ArrowRight, Terminal, MousePointerClick, Package, BookText, Heart, SlidersHorizontal, Monitor, MousePointer2, PenTool, AlignLeft, Paintbrush, Split } from 'lucide-react';
+import { X, Layout, Type, Palette, Play, Upload, Image as ImageIcon, Trash2, ChevronDown, ChevronUp, LayoutTemplate, BookOpen, ArrowRight, Terminal, MousePointerClick, Package, BookText, Heart, Activity, Monitor, MousePointer2, PenTool, AlignLeft, Paintbrush, Split } from 'lucide-react';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { GameData, Vignette, Scene } from '../types';
 import { initialGameData } from '../lib/gameDefaults';
@@ -496,7 +496,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
                                             </button>
                                             <div className="flex items-center gap-4">
                                                 <div className={`p-3 rounded-lg ${enableTrackers ? 'bg-primary/20 text-primary' : 'bg-zinc-800 text-zinc-500'}`}>
-                                                    <SlidersHorizontal className="w-6 h-6" />
+                                                    <Activity className="w-6 h-6" />
                                                 </div>
                                                 <div>
                                                     <h4 className={`text-xs font-bold uppercase tracking-widest mb-1 ${enableTrackers ? 'text-zinc-100' : 'text-zinc-500'}`}>{t('newProject.features.trackers', 'Rastreadores')}</h4>
