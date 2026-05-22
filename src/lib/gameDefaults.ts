@@ -728,11 +728,17 @@ body.with-spacing .main-wrapper { height: 100%; }
         border: none !important;
         border-radius: 0 !important;
         margin: 0 !important;
-        padding: 45px 15px 15px 15px !important;
+        padding: 15px 15px 15px 15px !important;
         background-color: var(--bg-color) !important;
         display: flex !important;
         flex-direction: column !important;
         box-shadow: none !important;
+    }
+    body.behavior-immersive #diary-modal h2 {
+        margin: 0 !important;
+        height: 2.2em !important;
+        display: flex !important;
+        align-items: center !important;
     }
     body.behavior-immersive #diary-modal .modal-close-button {
         top: 15px !important;
@@ -740,6 +746,11 @@ body.with-spacing .main-wrapper { height: 100%; }
         font-size: 2.2em !important;
         z-index: 1000 !important;
         color: var(--text-color) !important;
+    }
+    body.behavior-immersive #diary-modal .diary-log {
+        padding-bottom: 60px !important;
+        mask-image: linear-gradient(to bottom, transparent, black 15px, black calc(100% - 40px), transparent) !important;
+        -webkit-mask-image: linear-gradient(to bottom, transparent, black 15px, black calc(100% - 40px), transparent) !important;
     }
     body.behavior-immersive .diary-entry {
         flex-direction: column;
