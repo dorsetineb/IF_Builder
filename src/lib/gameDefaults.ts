@@ -577,11 +577,11 @@ body.with-spacing .main-wrapper { height: 100%; }
         border: 2px solid var(--system-button-border) !important;
         color: var(--system-button-text) !important;
         backdrop-filter: none !important;
+        border-radius: 0 !important;
         transition: all 0.2s !important;
     }
     body.behavior-immersive .action-buttons button:hover,
-    body.behavior-immersive .action-buttons button:active,
-    body.behavior-immersive .action-buttons button:focus {
+    body.behavior-immersive .action-buttons button:active {
         background-color: var(--system-button-hover-bg) !important;
         color: var(--system-button-hover-text, var(--system-button-text)) !important;
         border-color: var(--system-button-hover-bg) !important;
@@ -603,27 +603,27 @@ body.with-spacing .main-wrapper { height: 100%; }
         text-align: left !important;
     }
     body.behavior-immersive .action-popup button {
-        background-color: var(--system-button-bg) !important; 
-        border: 2px solid var(--system-button-border) !important;
+        background-color: var(--button-bg) !important; 
+        border: 1px solid var(--border-color) !important;
         backdrop-filter: none !important;
         width: auto !important;
         flex: 0 1 auto !important;
         display: inline-block !important;
-        padding: 6px 12px !important; 
+        padding: 6px 10px !important; 
         border-radius: 0 !important;
         pointer-events: auto !important;
         font-size: 0.85em !important;
+        font-weight: bold !important;
         margin-bottom: 2px !important;
         line-height: 1.2 !important;
-        color: var(--system-button-text) !important;
+        color: var(--highlight-color) !important;
         transition: all 0.2s !important;
     }
     body.behavior-immersive .action-popup button:hover,
-    body.behavior-immersive .action-popup button:active,
-    body.behavior-immersive .action-popup button:focus {
-        background-color: var(--system-button-hover-bg) !important;
-        color: var(--system-button-hover-text, var(--system-button-text)) !important;
-        border-color: var(--system-button-hover-bg) !important;
+    body.behavior-immersive .action-popup button:active {
+        background-color: var(--border-color) !important;
+        color: var(--highlight-color) !important;
+        border-color: var(--border-color) !important;
     }
     body.behavior-immersive .action-popup-list p {
         background: rgba(0,0,0,0.98) !important; 
