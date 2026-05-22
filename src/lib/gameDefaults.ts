@@ -282,6 +282,7 @@ body.is-demo .diary-entry { padding: calc(20px * var(--scale-factor)); gap: calc
 body.is-demo .diary-entry img { width: calc(200px * var(--scale-factor)); height: calc(200px * var(--scale-factor)); }
 body.is-demo .item-modal-image-container { width: calc(300px * var(--scale-factor)); min-width: calc(300px * var(--scale-factor)); height: calc(300px * var(--scale-factor)); }
 * { box-sizing: border-box; }
+button, input, select, textarea, .action-popup button, .action-popup-list button, .action-popup-row button, .action-popup-list p { border-radius: 0 !important; }
 body { font-family: var(--font-family); font-size: var(--font-size); background-color: var(--bg-color); color: var(--text-color); margin: 0; height: 100vh; overflow: hidden; }
 select { background-color: var(--button-bg); color: var(--text-color); border: 1px solid var(--border-color); }
 option { background-color: var(--bg-color); color: var(--text-color); }
@@ -481,12 +482,15 @@ body.with-spacing .main-wrapper { height: 100%; }
     body.behavior-immersive .image-panel {
         position: fixed;
         top: 0; left: 0;
-        width: 100vw; height: 100vh;
+        width: 100vw; height: 55vh;
         z-index: 1;
         max-width: none;
         border: none !important;
         padding: 0 !important;
         background: black;
+        overflow: hidden;
+        mask-image: linear-gradient(to bottom, black 60%, transparent 100%) !important;
+        -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%) !important;
     }
     body.behavior-immersive .image-container, 
     body.behavior-immersive .scene-image {
@@ -495,7 +499,9 @@ body.with-spacing .main-wrapper { height: 100%; }
         box-shadow: none !important;
         padding: 0 !important;
         width: 100vw !important;
-        height: 100vh !important;
+        height: 100% !important;
+        object-fit: cover !important;
+        object-position: center center !important;
     }
     body.behavior-immersive .text-panel {
         position: absolute;
@@ -518,8 +524,8 @@ body.with-spacing .main-wrapper { height: 100%; }
         flex-direction: column !important;
         justify-content: flex-end !important;
         padding: 100px 15px 10px 15px !important; 
-        max-height: 60vh !important; 
-        min-height: 35vh !important; 
+        max-height: 50vh !important; 
+        min-height: 30vh !important; 
         width: 100vw !important;
         flex-grow: 0;
         border-radius: 0;
@@ -545,8 +551,8 @@ body.with-spacing .main-wrapper { height: 100%; }
         background: rgba(0,0,0,0.98) !important; 
         border: none !important;
         margin: 0 !important; 
-        padding: 10px 15px !important; 
-        width: 100vw !important; 
+        padding: 10px 0 !important; 
+        width: 100% !important; 
         box-sizing: border-box !important;
         pointer-events: auto !important;
         display: flex !important;
@@ -567,9 +573,18 @@ body.with-spacing .main-wrapper { height: 100%; }
         flex: 1 1 calc(33.33% - 6px);
         min-width: 0;
         padding: 10px 4px;
-        background: rgba(0,0,0,0.98) !important; 
-        border: 1px solid rgba(255,255,255,0.25);
+        background-color: var(--system-button-bg) !important; 
+        border: 2px solid var(--system-button-border) !important;
+        color: var(--system-button-text) !important;
         backdrop-filter: none !important;
+        transition: all 0.2s !important;
+    }
+    body.behavior-immersive .action-buttons button:hover,
+    body.behavior-immersive .action-buttons button:active,
+    body.behavior-immersive .action-buttons button:focus {
+        background-color: var(--system-button-hover-bg) !important;
+        color: var(--system-button-hover-text, var(--system-button-text)) !important;
+        border-color: var(--system-button-hover-bg) !important;
     }
     
     body.behavior-immersive .action-popup-container,
@@ -583,47 +598,96 @@ body.with-spacing .main-wrapper { height: 100%; }
         background: none !important;
         border: none !important;
         padding: 0 !important;
+        justify-content: flex-start !important;
+        align-items: flex-start !important;
+        text-align: left !important;
     }
     body.behavior-immersive .action-popup button {
-        background: rgba(0,0,0,0.98) !important; 
-        border: 1px solid rgba(255,255,255,0.3) !important;
+        background-color: var(--system-button-bg) !important; 
+        border: 2px solid var(--system-button-border) !important;
         backdrop-filter: none !important;
         width: auto !important;
         flex: 0 1 auto !important;
         display: inline-block !important;
         padding: 6px 12px !important; 
-        border-radius: 6px;
+        border-radius: 0 !important;
         pointer-events: auto !important;
         font-size: 0.85em !important;
         margin-bottom: 2px !important;
         line-height: 1.2 !important;
-        color: var(--highlight-color) !important;
+        color: var(--system-button-text) !important;
+        transition: all 0.2s !important;
+    }
+    body.behavior-immersive .action-popup button:hover,
+    body.behavior-immersive .action-popup button:active,
+    body.behavior-immersive .action-popup button:focus {
+        background-color: var(--system-button-hover-bg) !important;
+        color: var(--system-button-hover-text, var(--system-button-text)) !important;
+        border-color: var(--system-button-hover-bg) !important;
     }
     body.behavior-immersive .action-popup-list p {
         background: rgba(0,0,0,0.98) !important; 
         color: var(--text-dim-color) !important;
         padding: 12px !important;
-        border-radius: 6px;
+        border-radius: 0 !important;
         font-size: 0.85em !important;
         width: 100% !important;
+        text-align: left !important;
+    }
+    body.behavior-immersive .empty-inventory-msg {
+        background: transparent !important;
+        border: none !important;
+        padding: 10px 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        text-align: left !important;
+        color: var(--text-dim-color) !important;
+        font-style: italic !important;
     }
     body.behavior-immersive .input-area {
         gap: 6px;
         width: 100%;
     }
     body.behavior-immersive #verb-input {
-        padding: 12px;
-        background: rgba(0,0,0,0.98) !important; 
-        border: 1px solid rgba(255,255,255,0.35);
+        display: block !important;
+        padding: 0 12px !important;
+        height: 40px !important;
+        line-height: 36px !important;
+        background: rgba(0,0,0,0.3) !important;
+        border: 2px solid rgba(255,255,255,0.2) !important;
+        color: var(--text-color, white) !important;
         box-sizing: border-box !important;
         backdrop-filter: none !important;
+        transition: all 0.2s !important;
+    }
+    body.behavior-immersive #verb-input:empty::before {
+        line-height: 36px !important;
+    }
+    body.behavior-immersive #verb-input:focus,
+    body.behavior-immersive #verb-input:active {
+        outline: none !important;
+        border-color: var(--action-button-bg, #4fd1c5) !important;
+        background: rgba(0,0,0,0.4) !important;
     }
     body.behavior-immersive #submit-verb {
-        padding: 8px 12px !important;
+        padding: 0 12px !important;
+        height: 40px !important;
+        line-height: 36px !important;
         background-color: var(--action-button-bg) !important;
         color: var(--action-button-text-color) !important;
-        border: 1px solid rgba(255,255,255,0.2) !important;
+        border: 2px solid var(--border-color) !important;
         white-space: nowrap !important;
+        transition: all 0.2s !important;
+        box-sizing: border-box !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    body.behavior-immersive #submit-verb:hover,
+    body.behavior-immersive #submit-verb:active,
+    body.behavior-immersive #submit-verb:focus {
+        background-color: var(--action-button-hover-bg) !important;
+        border-color: var(--border-color) !important;
     }
     body.behavior-immersive .chances-container {
         position: fixed;
@@ -652,6 +716,30 @@ body.with-spacing .main-wrapper { height: 100%; }
     /* ADAPTAÇÃO DIÁRIO E INVENTÁRIO MOBILE */
     body.behavior-immersive .modal-content {
         padding: 12px !important; 
+    }
+    body.behavior-immersive #diary-modal {
+        background-color: var(--bg-color) !important;
+    }
+    body.behavior-immersive #diary-modal .diary-modal-content {
+        width: 100vw !important;
+        height: 100vh !important;
+        max-width: none !important;
+        max-height: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        padding: 45px 15px 15px 15px !important;
+        background-color: var(--bg-color) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        box-shadow: none !important;
+    }
+    body.behavior-immersive #diary-modal .modal-close-button {
+        top: 15px !important;
+        right: 15px !important;
+        font-size: 2.2em !important;
+        z-index: 1000 !important;
+        color: var(--text-color) !important;
     }
     body.behavior-immersive .diary-entry {
         flex-direction: column;
@@ -689,8 +777,10 @@ body.with-spacing .main-wrapper { height: 100%; }
     /* UNIFICAÇÃO DE FONTES EM 0.85em */
     body.behavior-immersive .action-bar button,
     body.behavior-immersive .action-bar input,
+    body.behavior-immersive #verb-input,
     body.behavior-immersive .action-popup button,
     body.behavior-immersive .action-popup p,
+    body.behavior-immersive .empty-inventory-msg,
     body.behavior-immersive .scene-name-overlay,
     body.behavior-immersive .diary-entry p,
     body.behavior-immersive .diary-entry .scene-name,

@@ -2168,12 +2168,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.createElement('div'); container.className = 'action-popup-container';
         
         if (sceneSuggestions.length === 0) {
-            const row1 = document.createElement('div'); row1.className = 'action-popup-row mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            const row1 = document.createElement('div'); row1.className = 'action-popup-row empty-inventory-msg mb-2 text-center text-sm font-medium text-zinc-400 p-4';
             row1.textContent = gameData.gameSuggestionsEmptyFeedback || 'não há sugestões';
             container.appendChild(row1);
         } else {
 
-            const row1 = document.createElement('div'); row1.className = 'action-popup-row max-w-full flex-wrap justify-center';
+            const row1 = document.createElement('div'); row1.className = 'action-popup-row max-w-full flex-wrap justify-start';
             sceneSuggestions.forEach(v => { 
                 const btn = document.createElement('button'); btn.textContent = v; 
                 btn.addEventListener('click', () => { 
@@ -2200,7 +2200,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.createElement('div'); container.className = 'action-popup-container';
         if (inventory.length === 0) { 
             const msg = document.createElement('div'); 
-            msg.className = 'action-popup-row mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            msg.className = 'action-popup-row empty-inventory-msg mb-2 text-center text-sm font-medium text-zinc-400 p-4';
             msg.textContent = gameData.gameInventoryEmptyFeedback || 'não há itens no inventário'; 
             container.appendChild(msg); 
         }

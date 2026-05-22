@@ -205,10 +205,25 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             
             body.behavior-immersive #verb-input,
             body.behavior-immersive #submit-verb {
-                height: 46px !important;
+                height: 40px !important;
             }
             body.behavior-immersive #verb-input {
+                 display: block !important;
                  padding: 0 12px !important;
+                 height: 40px !important;
+                 line-height: 36px !important;
+                 background: rgba(0,0,0,0.3) !important;
+                 border: 2px solid rgba(255,255,255,0.2) !important;
+                 color: var(--text-color, white) !important;
+            }
+            body.behavior-immersive #verb-input:empty::before {
+                 line-height: 36px !important;
+            }
+            body.behavior-immersive #verb-input:focus,
+            body.behavior-immersive #verb-input:active {
+                 outline: none !important;
+                 border-color: var(--action-button-bg, #4fd1c5) !important;
+                 background: rgba(0,0,0,0.4) !important;
             }
 
             /* Mobile Responsive Fix */
