@@ -220,36 +220,38 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                     </label>
                                 </div>
                                 {localEnableImages && (
-                                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                                        <div className="space-y-2">
-                                            <label htmlFor="imageTransitionType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.imageTransition')}</label>
-                                            <select
-                                                id="imageTransitionType"
-                                                value={localImageTransitionType}
-                                                onChange={(e) => setLocalImageTransitionType(e.target.value as any)}
-                                                className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
-                                            >
-                                                <option value="fade">{t('UIEditor.sistemas.transFade')}</option>
-                                                <option value="slide">{t('UIEditor.sistemas.transSlide')}</option>
-                                                <option value="none">{t('UIEditor.sistemas.transNone')}</option>
-                                            </select>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.speed')}</label>
-                                            <div className="flex items-center gap-4">
-                                                <input
-                                                    type="range"
-                                                    min="0.1"
-                                                    max="3"
-                                                    step="0.1"
-                                                    value={localImageSpeed}
-                                                    onChange={(e) => setLocalImageSpeed(parseFloat(e.target.value))}
-                                                    style={{
-                                                        background: `linear-gradient(to right, ${currentSliderColor} ${((localImageSpeed - 0.1) / 2.9) * 100}%, ${currentSliderColor}33 ${((localImageSpeed - 0.1) / 2.9) * 100}%)`
-                                                    }}
-                                                    className="flex-grow h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
-                                                />
-                                                <span className="text-xl font-mono font-bold w-6 text-center">{localImageSpeed}</span>
+                                    <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                                        <div className="flex gap-4 items-start">
+                                            <div className="space-y-2 flex-1">
+                                                <label htmlFor="imageTransitionType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.imageTransition')}</label>
+                                                <select
+                                                    id="imageTransitionType"
+                                                    value={localImageTransitionType}
+                                                    onChange={(e) => setLocalImageTransitionType(e.target.value as any)}
+                                                    className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
+                                                >
+                                                    <option value="fade">{t('UIEditor.sistemas.transFade')}</option>
+                                                    <option value="slide">{t('UIEditor.sistemas.transSlide')}</option>
+                                                    <option value="none">{t('UIEditor.sistemas.transNone')}</option>
+                                                </select>
+                                            </div>
+                                            <div className="space-y-2 flex-1">
+                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.speed')}</label>
+                                                <div className="flex items-center gap-4">
+                                                    <input
+                                                        type="range"
+                                                        min="0.1"
+                                                        max="3"
+                                                        step="0.1"
+                                                        value={localImageSpeed}
+                                                        onChange={(e) => setLocalImageSpeed(parseFloat(e.target.value))}
+                                                        style={{
+                                                            background: `linear-gradient(to right, ${currentSliderColor} ${((localImageSpeed - 0.1) / 2.9) * 100}%, ${currentSliderColor}33 ${((localImageSpeed - 0.1) / 2.9) * 100}%)`
+                                                        }}
+                                                        className="flex-grow h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
+                                                    />
+                                                    <span className="text-xl font-mono font-bold w-6 text-center">{localImageSpeed}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -280,20 +282,20 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                 </div>
                                 {localEnableTextControl && (
                                     <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.animationStyle')}</label>
-                                                <select
-                                                    id="textAnimationType"
-                                                    value={localTextAnimationType}
-                                                    onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
-                                                    className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
-                                                >
-                                                    <option value="fade">{t('UIEditor.sistemas.animFade')}</option>
-                                                    <option value="typewriter">{t('UIEditor.sistemas.animTypewriter')}</option>
-                                                </select>
-                                            </div>
-                                            <div className="space-y-2">
+                                        <div className="space-y-2 w-[calc(50%-0.5rem)]">
+                                            <label htmlFor="textAnimationType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.animationStyle')}</label>
+                                            <select
+                                                id="textAnimationType"
+                                                value={localTextAnimationType}
+                                                onChange={(e) => setLocalTextAnimationType(e.target.value as 'fade' | 'typewriter')}
+                                                className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30"
+                                            >
+                                                <option value="fade">{t('UIEditor.sistemas.animFade')}</option>
+                                                <option value="typewriter">{t('UIEditor.sistemas.animTypewriter')}</option>
+                                            </select>
+                                        </div>
+                                        <div className="flex gap-4 items-start">
+                                            <div className="space-y-2 flex-1">
                                                 <label htmlFor="textReadingFlow" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.readingFlow')}</label>
                                                 <select
                                                     id="textReadingFlow"
@@ -305,22 +307,22 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                                     <option value="continuous">{t('UIEditor.sistemas.flowContinuous')}</option>
                                                 </select>
                                             </div>
-                                        </div>
-                                        <div className="space-y-2">
-                                            <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.speed')}</label>
-                                            <div className="flex items-center gap-4">
-                                                <input
-                                                    type="range"
-                                                    min="1"
-                                                    max="10"
-                                                    value={localTextSpeed}
-                                                    onChange={(e) => setLocalTextSpeed(parseFloat(e.target.value))}
-                                                    style={{
-                                                        background: `linear-gradient(to right, ${currentSliderColor} ${((localTextSpeed - 1) / 9) * 100}%, ${currentSliderColor}33 ${((localTextSpeed - 1) / 9) * 100}%)`
-                                                    }}
-                                                    className="flex-grow h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
-                                                />
-                                                <span className="text-xl font-mono font-bold w-6 text-center">{localTextSpeed}</span>
+                                            <div className="space-y-2 flex-1">
+                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">{t('UIEditor.sistemas.speed')}</label>
+                                                <div className="flex items-center gap-4">
+                                                    <input
+                                                        type="range"
+                                                        min="1"
+                                                        max="10"
+                                                        value={localTextSpeed}
+                                                        onChange={(e) => setLocalTextSpeed(parseFloat(e.target.value))}
+                                                        style={{
+                                                            background: `linear-gradient(to right, ${currentSliderColor} ${((localTextSpeed - 1) / 9) * 100}%, ${currentSliderColor}33 ${((localTextSpeed - 1) / 9) * 100}%)`
+                                                        }}
+                                                        className="flex-grow h-1 rounded-lg appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3.5 [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:shadow-sm transition-all"
+                                                    />
+                                                    <span className="text-xl font-mono font-bold w-6 text-center">{localTextSpeed}</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -357,10 +359,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    {/* --- RIGHT COLUMN --- */}
-                    <div className="flex-1 w-full space-y-6">
                         {/* CHANCES/VIDAS */}
                         <div className="w-full">
                             <div className={`w-full p-6 bg-card border-2 ${localEnableChances ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col gap-4 animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '400ms' }}>
@@ -439,6 +438,10 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                 )}
                             </div>
                         </div>
+                    </div>
+
+                    {/* --- RIGHT COLUMN --- */}
+                    <div className="flex-1 w-full space-y-6">
 
                         {/* INVENTORY */}
                         <div className="w-full">
@@ -617,7 +620,7 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
 
                                             {/* Right Column: Checkbox: Exibir Título */}
                                             <div 
-                                                className="flex items-center gap-3 w-72 shrink-0 sm:pb-2.5 cursor-pointer select-none" 
+                                                className="flex items-center gap-2 shrink-0 sm:pb-2.5 cursor-pointer select-none" 
                                                 onClick={() => setLocalShowStartScreenTitle(!localShowStartScreenTitle)}
                                             >
                                                 <input 
@@ -627,14 +630,9 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                                     onChange={(e) => setLocalShowStartScreenTitle(e.target.checked)} 
                                                     className="custom-checkbox shrink-0" 
                                                 />
-                                                <div className="space-y-0.5">
-                                                    <span className="block text-[10px] font-bold text-foreground uppercase tracking-widest cursor-pointer select-none">
-                                                        {t('UIEditor.startScreen.showTitle', 'Exibir Título')}
-                                                    </span>
-                                                    <p className="text-[10px] text-muted-foreground font-medium">
-                                                        {t('UIEditor.startScreen.showTitleDesc', 'Desative se o título já estiver na imagem.')}
-                                                    </p>
-                                                </div>
+                                                <span className="text-[11px] text-muted-foreground cursor-pointer select-none">
+                                                    {t('UIEditor.startScreen.showTitle', 'Exibir Título')}
+                                                </span>
                                             </div>
                                         </div>
 
