@@ -187,6 +187,10 @@ export interface GameData {
   enableInventory?: boolean;
   enableSuggestions?: boolean;
   enableDiary?: boolean;
+  enableSystemMenu?: boolean;
+  startScreenBgImage?: string;
+  showStartScreenTitle?: boolean;
+  startScreenTitle?: string;
   enableFixedVerbs?: boolean;
   enableChances?: boolean; // Legacy/Basic system
   enableRetrospective?: boolean;

@@ -63,6 +63,7 @@ export const useExportImport = ({
 
     exportData.gameLogo = processAsset(exportData.gameLogo, 'logo', assetsFolder, assetMap);
     exportData.gameSplashImage = processAsset(exportData.gameSplashImage, 'splash_image', assetsFolder, assetMap);
+    exportData.startScreenBgImage = processAsset(exportData.startScreenBgImage, 'start_screen_bg', assetsFolder, assetMap);
     exportData.gameBackgroundMusic = processAsset(exportData.gameBackgroundMusic, 'project_bgm', assetsFolder, assetMap);
     exportData.positiveEndingImage = processAsset(
       exportData.positiveEndingImage,
@@ -364,6 +365,20 @@ DATE:        ${exportDate.toLocaleString()}
         exportData.negativeEndingContentAlignment === 'left' ? 'align-left' : ''
       )
       .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '')
+      .replace(
+        '__START_SCREEN_BG_STYLE__',
+        exportData.startScreenBgImage
+          ? `style="background-image: url('${exportData.startScreenBgImage}')"`
+          : ''
+      )
+      .replace(
+        '__START_SCREEN_TITLE__',
+        exportData.startScreenTitle || exportData.gameTitle || 'Minha Aventura de Texto'
+      )
+      .replace(
+        '__START_SCREEN_TITLE_HIDDEN_CLASS__',
+        exportData.showStartScreenTitle !== false ? '' : 'hidden'
+      )
       .replace('<div id="splash-screen" class="splash-screen', `<div id="splash-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
       .replace('<div id="positive-ending-screen" class="splash-screen', `<div id="positive-ending-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
       .replace('<div id="negative-ending-screen" class="splash-screen', `<div id="negative-ending-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
@@ -703,6 +718,20 @@ DATE:        ${exportDate.toLocaleString()}
         exportData.negativeEndingContentAlignment === 'left' ? 'align-left' : ''
       )
       .replace('__NEGATIVE_ENDING_DESCRIPTION__', exportData.negativeEndingDescription || '')
+      .replace(
+        '__START_SCREEN_BG_STYLE__',
+        exportData.startScreenBgImage
+          ? `style="background-image: url('${exportData.startScreenBgImage}')"`
+          : ''
+      )
+      .replace(
+        '__START_SCREEN_TITLE__',
+        exportData.startScreenTitle || exportData.gameTitle || 'Minha Aventura de Texto'
+      )
+      .replace(
+        '__START_SCREEN_TITLE_HIDDEN_CLASS__',
+        exportData.showStartScreenTitle !== false ? '' : 'hidden'
+      )
       .replace('<div id="splash-screen" class="splash-screen', `<div id="splash-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
       .replace('<div id="positive-ending-screen" class="splash-screen', `<div id="positive-ending-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)
       .replace('<div id="negative-ending-screen" class="splash-screen', `<div id="negative-ending-screen" class="splash-screen vignette-scale-${exportData.vignetteScaling || 'md'}`)

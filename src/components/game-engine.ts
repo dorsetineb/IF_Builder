@@ -160,6 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isPrinting = false;
     let activePopupType = null;
     let renderSessionId = 0; // Prevent race conditions in rendering
+    let isGameSessionActive = false;
 
     const textSpeedVal = gameData.gameTextSpeed || 3; 
     const imgSpeedVal = gameData.gameImageSpeed || 3;
@@ -879,8 +880,131 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mousedown', startAudioOnInteraction);
         document.addEventListener('keydown', startAudioOnInteraction);
 
-        // Auto-start game, bypassing splash screen
-        startGame();
+        // Menu Principal & System Button Hooks
+        const gearSystemButton = document.getElementById('gear-system-button');
+        if (gearSystemButton) {
+            if (gameData.enableSystemMenu && !window.isSceneTest) {
+                gearSystemButton.classList.remove('hidden');
+                gearSystemButton.addEventListener('click', () => {
+                    const startScreen = document.getElementById('start-screen');
+                    if (startScreen.classList.contains('hidden')) {
+                        showStartScreen();
+                    } else {
+                        if (isGameSessionActive) {
+                            startScreen.classList.add('hidden');
+                            gameContainer.classList.remove('hidden');
+                            gearSystemButton.classList.remove('hidden');
+                        }
+                    }
+                });
+            } else {
+                gearSystemButton.classList.add('hidden');
+            }
+        }
+
+        const resumeBtn = document.getElementById('start-resume-game-btn');
+        if (resumeBtn) {
+            resumeBtn.addEventListener('click', () => {
+                const startScreen = document.getElementById('start-screen');
+                if (startScreen) startScreen.classList.add('hidden');
+                gameContainer.classList.remove('hidden');
+                
+                if (gearSystemButton && gameData.enableSystemMenu && !window.isSceneTest) {
+                    gearSystemButton.classList.remove('hidden');
+                }
+            });
+        }
+
+        const newGameBtn = document.getElementById('start-new-game-btn');
+        if (newGameBtn) {
+            newGameBtn.addEventListener('click', () => {
+                if (isGameSessionActive) {
+                    if (!confirm('Iniciar um Novo Jogo apagará seu progresso atual e o save automático. Deseja continuar?')) {
+                        return;
+                    }
+                }
+                const startScreen = document.getElementById('start-screen');
+                if (startScreen) startScreen.classList.add('hidden');
+                
+                // Novo jogo apaga o autosave imediatamente!
+                localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+                
+                startGame();
+                gameContainer.classList.remove('hidden');
+                
+                if (gearSystemButton && gameData.enableSystemMenu && !window.isSceneTest) {
+                    gearSystemButton.classList.remove('hidden');
+                }
+            });
+        }
+
+        const continueBtn = document.getElementById('start-continue-btn');
+        if (continueBtn) {
+            continueBtn.addEventListener('click', () => {
+                const latestSave = getLatestSave();
+                if (latestSave) {
+                    const startScreen = document.getElementById('start-screen');
+                    if (startScreen) startScreen.classList.add('hidden');
+                    loadGameFromData(latestSave);
+                    
+                    if (gearSystemButton && gameData.enableSystemMenu && !window.isSceneTest) {
+                        gearSystemButton.classList.remove('hidden');
+                    }
+                }
+            });
+        }
+
+        const savesOptionsBtn = document.getElementById('start-saves-options-btn');
+        if (savesOptionsBtn) {
+            savesOptionsBtn.addEventListener('click', () => {
+                renderSlots('load');
+                systemModal.classList.remove('hidden');
+            });
+        }
+
+        // ESC Key listener
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                // If any modal is visible, close it instead of showing start screen
+                let modalClosed = false;
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    if (!modal.classList.contains('hidden')) {
+                        modal.classList.add('hidden');
+                        modalClosed = true;
+                    }
+                });
+                if (modalClosed) return;
+
+                if (gameData.enableSystemMenu && !window.isSceneTest) {
+                    const startScreen = document.getElementById('start-screen');
+                    if (startScreen.classList.contains('hidden')) {
+                        if (isGameSessionActive) {
+                            showStartScreen();
+                        }
+                    } else {
+                        if (isGameSessionActive) {
+                            startScreen.classList.add('hidden');
+                            gameContainer.classList.remove('hidden');
+                            if (gearSystemButton) gearSystemButton.classList.remove('hidden');
+                        }
+                    }
+                } else {
+                    toggleSystemMenu();
+                }
+            }
+        });
+
+        // Hide main menu button inside modal if Menu Principal is enabled
+        if (gameData.enableSystemMenu && btnMainMenu) {
+            btnMainMenu.classList.add('hidden');
+        }
+
+        // Auto-start game or show Start Screen
+        if (gameData.enableSystemMenu && !window.isSceneTest) {
+            showStartScreen();
+        } else {
+            startGame();
+        }
         endingRestartButtons.forEach(btn => btn.addEventListener('click', () => {
              // Prepare the game behind the ending screen
              startGame();
@@ -1081,6 +1205,7 @@ document.addEventListener('DOMContentLoaded', () => {
         trackers = {}; 
         removedObjectsFromScenes = {};
         isGameEnded = false;
+        isGameSessionActive = true;
         gameStartTime = Date.now();
         gameEndTime = null;
 
@@ -1156,6 +1281,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 trackers = save.trackers || {}; 
                 removedObjectsFromScenes = save.removedObjectsFromScenes || {};
                 isGameEnded = false;
+                isGameSessionActive = true;
                 standardActionBar.classList.remove('hidden');
                 endingActionBar.classList.add('hidden');
                 systemModal.classList.add('hidden');
@@ -1164,6 +1290,77 @@ document.addEventListener('DOMContentLoaded', () => {
                 gameContainer.classList.add('ready');
             }
         } catch (e) { startGame(); }
+    };
+
+    const getLatestSave = () => {
+        const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const manual1Key = 'if_builder_manual_1_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const manual2Key = 'if_builder_manual_2_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        
+        const autoSave = localStorage.getItem(autoKey);
+        const m1Save = localStorage.getItem(manual1Key);
+        const m2Save = localStorage.getItem(manual2Key);
+        
+        let latestSave = null;
+        let latestTime = 0;
+        
+        [autoSave, m1Save, m2Save].forEach(saveStr => {
+            if (saveStr) {
+                try {
+                    const data = JSON.parse(saveStr);
+                    const time = Date.parse(data.timestamp) || 0;
+                    if (time > latestTime) {
+                        latestTime = time;
+                        latestSave = saveStr;
+                    }
+                } catch (e) {}
+            }
+        });
+        return latestSave;
+    };
+
+    const showStartScreen = () => {
+        const startScreen = document.getElementById('start-screen');
+        const startTitle = document.getElementById('start-screen-title');
+        const resumeBtn = document.getElementById('start-resume-game-btn');
+        const continueBtn = document.getElementById('start-continue-btn');
+        const gearBtn = document.getElementById('gear-system-button');
+
+        if (!startScreen) return;
+
+        // Hide game container
+        gameContainer.classList.add('hidden');
+        
+        // Show start screen
+        startScreen.classList.remove('hidden');
+
+        // Render custom title if configured
+        if (startTitle) {
+            if (gameData.showStartScreenTitle !== false) {
+                startTitle.textContent = gameData.startScreenTitle || gameData.gameTitle || 'Minha Aventura de Texto';
+                startTitle.classList.remove('hidden');
+            } else {
+                startTitle.classList.add('hidden');
+            }
+        }
+
+        // Handle buttons visibility
+        if (isGameSessionActive) {
+            if (resumeBtn) resumeBtn.classList.remove('hidden');
+        } else {
+            if (resumeBtn) resumeBtn.classList.add('hidden');
+        }
+
+        // Check if there are any saves to show the "Continuar" button
+        const latestSave = getLatestSave();
+        if (latestSave && continueBtn) {
+            continueBtn.classList.remove('hidden');
+        } else if (continueBtn) {
+            continueBtn.classList.add('hidden');
+        }
+
+        // Hide gear button when we are on the Menu Principal itself
+        if (gearBtn) gearBtn.classList.add('hidden');
     };
 
     const autoSaveGame = () => {
@@ -1183,28 +1380,140 @@ document.addEventListener('DOMContentLoaded', () => {
     const renderSlots = (mode) => {
         systemMenuMain.classList.add('hidden'); systemSlotsContainer.classList.remove('hidden'); slotsList.innerHTML = '';
         systemModalTitle.textContent = mode === 'save' ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') : (gameData.gameLoadMenuTitle || 'Carregar Jogo');
-        for (let i = 1; i <= 3; i++) {
-            const slotKey = 'if_builder_slot_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
-            const savedData = localStorage.getItem(slotKey);
-            const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
-            let contentHtml = '';
-            if (savedData) {
-                const data = JSON.parse(savedData); const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
-                contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
-                if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Sobrescrever</span></div>';
-                else contentHtml += '<div class="slot-actions"><button class="slot-delete-btn" data-slot="' + i + '">×</button></div>';
+
+        if (gameData.enableSystemMenu) {
+            // Render 1 Autosave + 2 Manual Saves
+            // --- 1. AUTOSAVE SLOT ---
+            const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+            const autoData = localStorage.getItem(autoKey);
+            const autoDiv = document.createElement('div'); autoDiv.className = 'slot-item';
+            let autoHtml = '';
+            if (autoData) {
+                try {
+                    const data = JSON.parse(autoData);
+                    const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                    autoHtml = '<div class="slot-info"><span class="slot-title">Save Automático - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                    autoHtml += '<div class="slot-actions"><button class="slot-load-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Carregar</button></div>';
+                } catch (e) {
+                    autoHtml = '<div class="slot-info"><span class="slot-title">Save Automático</span><span class="slot-empty">Erro ao ler dados</span></div>';
+                }
             } else {
-                contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + '</span><span class="slot-empty">Vazio</span></div>';
-                if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Salvar</span></div>';
+                autoHtml = '<div class="slot-info"><span class="slot-title">Save Automático</span><span class="slot-empty">Sem dados</span></div>';
             }
-            slotDiv.innerHTML = window.safeHTML(contentHtml);
-            slotDiv.addEventListener('click', (e) => { if (e.target.classList.contains('slot-delete-btn')) return; if (mode === 'save') performSave(i); else if (mode === 'load' && savedData) loadGameFromData(savedData); });
-            slotsList.appendChild(slotDiv);
+            autoDiv.innerHTML = window.safeHTML(autoHtml);
+            if (autoData) {
+                const loadBtn = autoDiv.querySelector('.slot-load-btn');
+                if (loadBtn) {
+                    loadBtn.addEventListener('click', () => {
+                        loadGameFromData(autoData);
+                    });
+                }
+            }
+            slotsList.appendChild(autoDiv);
+
+            // --- 2. MANUAL SAVES (Slots 1 & 2) ---
+            for (let i = 1; i <= 2; i++) {
+                const slotKey = 'if_builder_manual_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+                const savedData = localStorage.getItem(slotKey);
+                const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
+                let contentHtml = '';
+                if (savedData) {
+                    try {
+                        const data = JSON.parse(savedData);
+                        const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                        contentHtml = '<div class="slot-info"><span class="slot-title">Save Manual ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                        
+                        let actionsHtml = '<div class="slot-actions" style="display: flex; gap: 6px; align-items: center;">';
+                        if (mode === 'save') {
+                            actionsHtml += '<button class="slot-save-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Sobrescrever</button>';
+                        }
+                        actionsHtml += '<button class="slot-load-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Carregar</button>';
+                        actionsHtml += '<button class="slot-delete-btn" style="background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1.5em; padding: 0 5px; line-height: 1;">&times;</button>';
+                        actionsHtml += '</div>';
+                        contentHtml += actionsHtml;
+                    } catch (e) {
+                        contentHtml = '<div class="slot-info"><span class="slot-title">Save Manual ' + i + '</span><span class="slot-empty">Erro ao ler dados</span></div>';
+                    }
+                } else {
+                    contentHtml = '<div class="slot-info"><span class="slot-title">Save Manual ' + i + '</span><span class="slot-empty">Vazio</span></div>';
+                    if (mode === 'save') {
+                        contentHtml += '<div class="slot-actions"><button class="slot-save-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Salvar</button></div>';
+                    }
+                }
+                slotDiv.innerHTML = window.safeHTML(contentHtml);
+                
+                // Add button listeners
+                const saveBtn = slotDiv.querySelector('.slot-save-btn');
+                const loadBtn = slotDiv.querySelector('.slot-load-btn');
+                const deleteBtn = slotDiv.querySelector('.slot-delete-btn');
+
+                if (saveBtn) {
+                    saveBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (savedData) {
+                            if (confirm('Deseja sobrescrever este arquivo de salvamento?')) {
+                                performSave(i);
+                            }
+                        } else {
+                            performSave(i);
+                        }
+                    });
+                }
+                if (loadBtn && savedData) {
+                    loadBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        loadGameFromData(savedData);
+                    });
+                }
+                if (deleteBtn && savedData) {
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        if (confirm('Tem certeza que deseja deletar este arquivo de progresso?')) {
+                            localStorage.removeItem(slotKey);
+                            renderSlots(mode);
+                        }
+                    });
+                }
+                slotsList.appendChild(slotDiv);
+            }
+        } else {
+            // Legacy / Standard behavior
+            for (let i = 1; i <= 3; i++) {
+                const slotKey = 'if_builder_slot_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+                const savedData = localStorage.getItem(slotKey);
+                const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
+                let contentHtml = '';
+                if (savedData) {
+                    const data = JSON.parse(savedData); const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                    contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                    if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Sobrescrever</span></div>';
+                    else contentHtml += '<div class="slot-actions"><button class="slot-delete-btn" data-slot="' + i + '">×</button></div>';
+                } else {
+                    contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + '</span><span class="slot-empty">Vazio</span></div>';
+                    if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Salvar</span></div>';
+                }
+                slotDiv.innerHTML = window.safeHTML(contentHtml);
+                slotDiv.addEventListener('click', (e) => { 
+                    if (e.target.classList.contains('slot-delete-btn')) {
+                        const slot = e.target.getAttribute('data-slot');
+                        if (confirm('Tem certeza que deseja deletar este arquivo de progresso?')) {
+                            localStorage.removeItem('if_builder_slot_' + slot + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+                            renderSlots(mode);
+                        }
+                        return;
+                    } 
+                    if (mode === 'save') performSave(i); 
+                    else if (mode === 'load' && savedData) loadGameFromData(savedData); 
+                });
+                slotsList.appendChild(slotDiv);
+            }
         }
     };
 
     const performSave = (slotIndex) => {
-        const slotKey = 'if_builder_slot_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const slotKey = gameData.enableSystemMenu
+            ? 'if_builder_manual_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas')
+            : 'if_builder_slot_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
         localStorage.setItem(slotKey, JSON.stringify(save)); renderSlots('save');
     };

@@ -10,6 +10,7 @@ import { DitherShader } from '@/components/ui/dither-shader';
 import { getDitherColors } from '../utils/themeStyles';
 import { SystemsTab } from './UIEditor/SystemsTab';
 import { AppearanceTab } from './UIEditor/AppearanceTab';
+import { StartScreenTab } from './UIEditor/StartScreenTab';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Upload, Trash2, Plus, TriangleAlert, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Leaf, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, Zap, Sparkles, History as HistoryIcon, SquareDashedMousePointer } from 'lucide-react';
 
@@ -117,6 +118,10 @@ interface UIEditorProps {
     enableImages?: boolean;
     enableTextControl?: boolean;
     enableRetrospective?: boolean;
+    enableSystemMenu?: boolean;
+    startScreenBgImage?: string;
+    showStartScreenTitle?: boolean;
+    startScreenTitle?: string;
     inventoryCapacity?: number;
     inventoryMaxWeight?: number;
     diaryAutoScroll?: boolean;
@@ -232,6 +237,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription, positiveEndingMusic,
         negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription, negativeEndingMusic,
         fixedVerbs, textAnimationType, textSpeed, textReadingFlow, imageTransitionType, imageSpeed,
+        enableSystemMenu, startScreenBgImage, showStartScreenTitle, startScreenTitle,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         onAnnotate, enableTrackers, enableInventory, enableSuggestions, enableDiary, enableFixedVerbs, enableChances,
         enableImages, enableTextControl, inventoryCapacity, inventoryMaxWeight, diaryAutoScroll,
@@ -269,7 +275,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localMainMenuButtonText, setLocalMainMenuButtonText] = useState(gameMainMenuButtonText);
     const [localViewEndingButtonText, setLocalViewEndingButtonText] = useState(gameViewEndingButtonText);
     const [localRetrospectiveButtonText, setLocalRetrospectiveButtonText] = useState(gameRetrospectiveButtonText);
-    const [activeTab, setActiveTab] = useState<'sistemas' | 'aparencia' | 'textos' | 'config'>('aparencia');
+    const [activeTab, setActiveTab] = useState<'sistemas' | 'aparencia' | 'tela_opcoes' | 'textos' | 'config'>('sistemas');
     const [originalTheme, setOriginalTheme] = useState(theme);
     const [localLanguage, setLocalLanguage] = useState(i18n.language || 'pt');
     const handleAppThemeChange = (newTheme: string) => {
@@ -339,9 +345,15 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localImageTransitionType, setLocalImageTransitionType] = useState<GameData['gameImageTransitionType']>(props.imageTransitionType || 'fade');
     const [localImageSpeed, setLocalImageSpeed] = useState(imageSpeed);
 
+    const [localEnableSystemMenu, setLocalEnableSystemMenu] = useState(enableSystemMenu || false);
+    const [localStartScreenBgImage, setLocalStartScreenBgImage] = useState(startScreenBgImage || '');
+    const [localShowStartScreenTitle, setLocalShowStartScreenTitle] = useState(showStartScreenTitle !== false);
+    const [localStartScreenTitle, setLocalStartScreenTitle] = useState(startScreenTitle || '');
+
     const TABS = {
-        aparencia: t('UIEditor.tabs.aparencia'),
         sistemas: t('UIEditor.tabs.sistemas'),
+        aparencia: t('UIEditor.tabs.aparencia'),
+        tela_opcoes: t('UIEditor.tabs.menu_principal', 'Menu Principal'),
         textos: t('UIEditor.tabs.textos'),
         config: t('UIEditor.tabs.config', 'Área de trabalho'),
     };
@@ -676,6 +688,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localEnableChances !== (enableChances ?? (gameSystemEnabled === 'chances'))) onUpdate('enableChances', localEnableChances, true);
         if (localEnableRetrospective !== (props.enableRetrospective ?? true)) onUpdate('enableRetrospective', localEnableRetrospective, true);
 
+        if (localEnableSystemMenu !== (enableSystemMenu || false)) onUpdate('enableSystemMenu', localEnableSystemMenu, true);
+        if (localStartScreenBgImage !== (startScreenBgImage || '')) onUpdate('startScreenBgImage', localStartScreenBgImage, true);
+        if (localShowStartScreenTitle !== (showStartScreenTitle !== false)) onUpdate('showStartScreenTitle', localShowStartScreenTitle, true);
+        if (localStartScreenTitle !== (startScreenTitle || '')) onUpdate('startScreenTitle', localStartScreenTitle, true);
+
         if (localSuggestionsEmptyFeedback !== (props.gameSuggestionsEmptyFeedback || '')) onUpdate('gameSuggestionsEmptyFeedback', localSuggestionsEmptyFeedback, true);
         if (localInventoryEmptyFeedback !== (props.gameInventoryEmptyFeedback || '')) onUpdate('gameInventoryEmptyFeedback', localInventoryEmptyFeedback, true);
         if (localDiaryAllowExport !== (diaryAllowExport ?? false)) onUpdate('diaryAllowExport', localDiaryAllowExport, true);
@@ -784,6 +801,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalEnableChances(enableChances ?? (gameSystemEnabled === 'chances'));
         setLocalEnableImages(enableImages ?? true);
         setLocalEnableTextControl(enableTextControl ?? true);
+
+        setLocalEnableSystemMenu(enableSystemMenu || false);
+        setLocalStartScreenBgImage(startScreenBgImage || '');
+        setLocalShowStartScreenTitle(showStartScreenTitle !== false);
+        setLocalStartScreenTitle(startScreenTitle || '');
 
         setLocalInventoryCapacity(inventoryCapacity ?? 10);
         setLocalInventoryMaxWeight(inventoryMaxWeight ?? 0);
@@ -1007,6 +1029,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             setLocalEnableRetrospective={setLocalEnableRetrospective}
                             localDiaryAllowExport={localDiaryAllowExport}
                             setLocalDiaryAllowExport={setLocalDiaryAllowExport}
+                            localEnableSystemMenu={localEnableSystemMenu}
+                            setLocalEnableSystemMenu={setLocalEnableSystemMenu}
                             onNavigateToTrackers={props.onNavigateToTrackers}
                         />
                     )}
@@ -1079,6 +1103,29 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 isColorsExpanded={isColorsExpanded}
                                 setIsColorsExpanded={setIsColorsExpanded}
                                 ditherColors={ditherColors}
+                            />
+                        )
+                    }
+
+                    {
+                        activeTab === 'tela_opcoes' && (
+                            <StartScreenTab
+                                localStartScreenBgImage={localStartScreenBgImage}
+                                setLocalStartScreenBgImage={setLocalStartScreenBgImage}
+                                localShowStartScreenTitle={localShowStartScreenTitle}
+                                setLocalShowStartScreenTitle={setLocalShowStartScreenTitle}
+                                localStartScreenTitle={localStartScreenTitle}
+                                setLocalStartScreenTitle={setLocalStartScreenTitle}
+                                localTitle={localTitle}
+                                localTitleColor={localTitleColor}
+                                localSystemButtonColor={localSystemButtonColor}
+                                localSystemButtonTextColor={localSystemButtonTextColor}
+                                localSystemButtonBorderColor={localSystemButtonBorderColor}
+                                localSystemButtonHoverColor={localSystemButtonHoverColor}
+                                localSystemButtonHoverTextColor={localSystemButtonHoverTextColor}
+                                localTextColor={localTextColor}
+                                localGameBackgroundColor={localGameBackgroundColor}
+                                localFontFamily={localFontFamily}
                             />
                         )
                     }

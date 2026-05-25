@@ -20,6 +20,26 @@ export const gameHTML = `
     <audio id="bgm-audio" preload="auto" loop></audio>
     <div class="main-wrapper" id="main-wrapper">
 
+        <!-- Gear System Option Button -->
+        <button id="gear-system-button" class="gear-system-btn hidden" title="Menu Principal">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.1a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        </button>
+
+        <!-- Menu Principal Screen -->
+        <div id="start-screen" class="splash-screen hidden __POSITIVE_ENDING_ALIGN_CLASS__" __START_SCREEN_BG_STYLE__>
+            <div class="start-screen-overlay"></div>
+            <div class="splash-content" style="z-index: 10;">
+                <div class="splash-text">
+                    <h1 id="start-screen-title" class="__START_SCREEN_TITLE_HIDDEN_CLASS__">__START_SCREEN_TITLE__</h1>
+                </div>
+                <div class="splash-buttons start-screen-buttons">
+                    <button id="start-resume-game-btn" class="ending-restart-button hidden">Voltar ao Jogo</button>
+                    <button id="start-new-game-btn" class="ending-restart-button">Novo Jogo</button>
+                    <button id="start-continue-btn" class="ending-restart-button hidden">Continuar</button>
+                    <button id="start-saves-options-btn" class="ending-restart-button">Saves & Opções</button>
+                </div>
+            </div>
+        </div>
 
         <div id="positive-ending-screen" class="splash-screen hidden __POSITIVE_ENDING_ALIGN_CLASS__" __POSITIVE_ENDING_BG_STYLE__>
             <div class="splash-content">
@@ -1613,6 +1633,92 @@ export const OVERLAY_CSS = `
     z-index: 0;
     transform: translateZ(0); /* Hardware accel */
 }
+
+/* SYSTEM MENU & GEAR BUTTON */
+.gear-system-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--system-button-border);
+    background-color: var(--system-button-bg);
+    color: var(--system-button-text);
+    cursor: pointer;
+    z-index: 1500;
+    transition: all 0.2s ease-in-out;
+    outline: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.gear-system-btn svg {
+    transition: transform 0.3s ease;
+}
+.gear-system-btn:hover {
+    background-color: var(--system-button-hover-bg);
+    color: var(--system-button-hover-text, var(--system-button-text));
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+}
+.gear-system-btn:hover svg {
+    transform: rotate(45deg);
+}
+.gear-system-btn:active {
+    transform: translateY(0);
+}
+
+.start-screen-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0.7) 100%);
+    z-index: 1;
+}
+
+.start-screen-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 220px;
+    z-index: 10;
+}
+
+.start-screen-buttons button {
+    font-family: var(--font-family);
+    padding: 12px 24px;
+    border: 2px solid var(--system-button-border) !important;
+    background-color: var(--system-button-bg) !important;
+    color: var(--system-button-text) !important;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-size: 1em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    outline: none;
+}
+
+.start-screen-buttons button:hover {
+    background-color: var(--system-button-hover-bg) !important;
+    color: var(--system-button-hover-text, var(--system-button-text)) !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.start-screen-buttons button:active {
+    transform: translateY(0);
+}
+
+/* Adjustments for immersive mobile behavior and top-right positioning */
+@media (max-width: 768px) {
+    .gear-system-btn {
+        top: 10px;
+        right: 10px;
+        width: 38px;
+        height: 38px;
+    }
+}
 `;
 
 export const initialGameData: GameData = {
@@ -1677,6 +1783,10 @@ export const initialGameData: GameData = {
     gameFontSize: '12',
     gameShowTrackersUI: true,
     gameShowSystemButton: true,
+    enableSystemMenu: false,
+    startScreenBgImage: '',
+    showStartScreenTitle: true,
+    startScreenTitle: '',
     fixedVerbs: [],
     consequenceTrackers: [],
     positiveEndingMusic: '',

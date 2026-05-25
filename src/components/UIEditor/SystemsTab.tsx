@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { 
     Shuffle, Type, List, Image as ImageIcon, Heart, 
     Lightbulb, Package, Book, History as HistoryIcon,
-    Star, Square, Circle, X, Activity
+    Star, Square, Circle, X, Activity, Settings
 } from 'lucide-react';
 import { GameData } from '../../types';
 
@@ -61,6 +61,8 @@ interface SystemsTabProps {
     setLocalEnableTrackers: (val: boolean) => void;
     localEnableRetrospective: boolean;
     setLocalEnableRetrospective: (val: boolean) => void;
+    localEnableSystemMenu: boolean;
+    setLocalEnableSystemMenu: (val: boolean) => void;
     onNavigateToTrackers?: () => void;
 }
 
@@ -106,6 +108,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
     setLocalEnableTrackers,
     localEnableRetrospective,
     setLocalEnableRetrospective,
+    localEnableSystemMenu,
+    setLocalEnableSystemMenu,
     onNavigateToTrackers
 }) => {
     const { t } = useTranslation();
@@ -527,6 +531,30 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                             <div 
                                                 className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableRetrospective ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
                                                 style={{ transform: localEnableRetrospective ? 'translateX(16px)' : 'translateX(0)' }}
+                                            ></div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* SISTEMA (MENU PRINCIPAL E SAVES) */}
+                        <div className="w-full">
+                            <div className={`w-full p-6 bg-card border-2 ${localEnableSystemMenu ? 'border-primary shadow-md opacity-100' : 'border-muted-foreground/50 opacity-50'} rounded-2xl transition-all hover:shadow-lg group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '900ms' }}>
+                                <div className="flex items-center justify-between gap-4 w-full">
+                                    <div className="flex items-center gap-3">
+                                        <Settings className="w-5 h-5" />
+                                        <div>
+                                            <h4 className={`text-[10px] font-bold uppercase tracking-widest transition-colors ${localEnableSystemMenu ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.systemMenu', 'Sistema')}</h4>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5 font-medium">{t('UIEditor.sistemas.systemMenuDesc', 'Habilita o Menu Principal, salvamento manual e o botão/tecla ESC de sistema.')}</p>
+                                        </div>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer shrink-0">
+                                        <input type="checkbox" checked={localEnableSystemMenu} onChange={(e) => setLocalEnableSystemMenu(e.target.checked)} className="sr-only peer" />
+                                        <div className="w-10 h-6 bg-muted border-2 border-muted-foreground/50 rounded-md peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary/20 peer peer-checked:bg-primary peer-checked:border-primary transition-all relative">
+                                            <div 
+                                                className={`absolute top-1 left-1 w-3 h-3 rounded-[2px] shadow-sm transition-all ${localEnableSystemMenu ? 'bg-primary-foreground' : 'bg-muted-foreground/50'}`}
+                                                style={{ transform: localEnableSystemMenu ? 'translateX(16px)' : 'translateX(0)' }}
                                             ></div>
                                         </div>
                                     </label>
