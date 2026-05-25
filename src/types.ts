@@ -191,6 +191,7 @@ export interface GameData {
   startScreenBgImage?: string;
   showStartScreenTitle?: boolean;
   startScreenTitle?: string;
+  startScreenButtonAlignment?: 'left' | 'center' | 'right';
   enableFixedVerbs?: boolean;
   enableChances?: boolean; // Legacy/Basic system
   enableRetrospective?: boolean;

@@ -10,7 +10,6 @@ import { DitherShader } from '@/components/ui/dither-shader';
 import { getDitherColors } from '../utils/themeStyles';
 import { SystemsTab } from './UIEditor/SystemsTab';
 import { AppearanceTab } from './UIEditor/AppearanceTab';
-import { StartScreenTab } from './UIEditor/StartScreenTab';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Upload, Trash2, Plus, TriangleAlert, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Leaf, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, Zap, Sparkles, History as HistoryIcon, SquareDashedMousePointer } from 'lucide-react';
 
@@ -122,6 +121,7 @@ interface UIEditorProps {
     startScreenBgImage?: string;
     showStartScreenTitle?: boolean;
     startScreenTitle?: string;
+    startScreenButtonAlignment?: 'left' | 'center' | 'right';
     inventoryCapacity?: number;
     inventoryMaxWeight?: number;
     diaryAutoScroll?: boolean;
@@ -237,7 +237,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription, positiveEndingMusic,
         negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription, negativeEndingMusic,
         fixedVerbs, textAnimationType, textSpeed, textReadingFlow, imageTransitionType, imageSpeed,
-        enableSystemMenu, startScreenBgImage, showStartScreenTitle, startScreenTitle,
+        enableSystemMenu, startScreenBgImage, showStartScreenTitle, startScreenTitle, startScreenButtonAlignment,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         onAnnotate, enableTrackers, enableInventory, enableSuggestions, enableDiary, enableFixedVerbs, enableChances,
         enableImages, enableTextControl, inventoryCapacity, inventoryMaxWeight, diaryAutoScroll,
@@ -275,7 +275,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localMainMenuButtonText, setLocalMainMenuButtonText] = useState(gameMainMenuButtonText);
     const [localViewEndingButtonText, setLocalViewEndingButtonText] = useState(gameViewEndingButtonText);
     const [localRetrospectiveButtonText, setLocalRetrospectiveButtonText] = useState(gameRetrospectiveButtonText);
-    const [activeTab, setActiveTab] = useState<'sistemas' | 'aparencia' | 'tela_opcoes' | 'textos' | 'config'>('sistemas');
+    const [activeTab, setActiveTab] = useState<'sistemas' | 'aparencia' | 'textos' | 'config'>('sistemas');
     const [originalTheme, setOriginalTheme] = useState(theme);
     const [localLanguage, setLocalLanguage] = useState(i18n.language || 'pt');
     const handleAppThemeChange = (newTheme: string) => {
@@ -323,7 +323,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localSplashContentAlignment, setLocalSplashContentAlignment] = useState(splashContentAlignment);
     const [localSplashContentVerticalAlignment, setLocalSplashContentVerticalAlignment] = useState(splashContentVerticalAlignment || 'bottom');
     const [localSplashDescription, setLocalSplashDescription] = useState(splashDescription);
-    const [previewType, setPreviewType] = useState<'scene' | 'vignette'>('scene');
+    const [previewType, setPreviewType] = useState<'scene' | 'vignette' | 'menu'>('scene');
     const [isColorsExpanded, setIsColorsExpanded] = useState(false);
     const [localBackgroundMusic, setLocalBackgroundMusic] = useState(backgroundMusic);
     const [localPositiveEndingImage, setLocalPositiveEndingImage] = useState(positiveEndingImage);
@@ -349,11 +349,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localStartScreenBgImage, setLocalStartScreenBgImage] = useState(startScreenBgImage || '');
     const [localShowStartScreenTitle, setLocalShowStartScreenTitle] = useState(showStartScreenTitle !== false);
     const [localStartScreenTitle, setLocalStartScreenTitle] = useState(startScreenTitle || '');
+    const [localStartScreenButtonAlignment, setLocalStartScreenButtonAlignment] = useState<'left' | 'center' | 'right'>(startScreenButtonAlignment || 'center');
 
     const TABS = {
         sistemas: t('UIEditor.tabs.sistemas'),
         aparencia: t('UIEditor.tabs.aparencia'),
-        tela_opcoes: t('UIEditor.tabs.menu_principal', 'Menu Principal'),
         textos: t('UIEditor.tabs.textos'),
         config: t('UIEditor.tabs.config', 'Área de trabalho'),
     };
@@ -692,6 +692,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localStartScreenBgImage !== (startScreenBgImage || '')) onUpdate('startScreenBgImage', localStartScreenBgImage, true);
         if (localShowStartScreenTitle !== (showStartScreenTitle !== false)) onUpdate('showStartScreenTitle', localShowStartScreenTitle, true);
         if (localStartScreenTitle !== (startScreenTitle || '')) onUpdate('startScreenTitle', localStartScreenTitle, true);
+        if (localStartScreenButtonAlignment !== (startScreenButtonAlignment || 'center')) onUpdate('startScreenButtonAlignment', localStartScreenButtonAlignment, true);
 
         if (localSuggestionsEmptyFeedback !== (props.gameSuggestionsEmptyFeedback || '')) onUpdate('gameSuggestionsEmptyFeedback', localSuggestionsEmptyFeedback, true);
         if (localInventoryEmptyFeedback !== (props.gameInventoryEmptyFeedback || '')) onUpdate('gameInventoryEmptyFeedback', localInventoryEmptyFeedback, true);
@@ -806,6 +807,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalStartScreenBgImage(startScreenBgImage || '');
         setLocalShowStartScreenTitle(showStartScreenTitle !== false);
         setLocalStartScreenTitle(startScreenTitle || '');
+        setLocalStartScreenButtonAlignment(startScreenButtonAlignment || 'center');
 
         setLocalInventoryCapacity(inventoryCapacity ?? 10);
         setLocalInventoryMaxWeight(inventoryMaxWeight ?? 0);
@@ -1031,6 +1033,15 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             setLocalDiaryAllowExport={setLocalDiaryAllowExport}
                             localEnableSystemMenu={localEnableSystemMenu}
                             setLocalEnableSystemMenu={setLocalEnableSystemMenu}
+                            localStartScreenBgImage={localStartScreenBgImage}
+                            setLocalStartScreenBgImage={setLocalStartScreenBgImage}
+                            localShowStartScreenTitle={localShowStartScreenTitle}
+                            setLocalShowStartScreenTitle={setLocalShowStartScreenTitle}
+                            localStartScreenTitle={localStartScreenTitle}
+                            setLocalStartScreenTitle={setLocalStartScreenTitle}
+                            localStartScreenButtonAlignment={localStartScreenButtonAlignment}
+                            setLocalStartScreenButtonAlignment={setLocalStartScreenButtonAlignment}
+                            localTitle={localTitle}
                             onNavigateToTrackers={props.onNavigateToTrackers}
                         />
                     )}
@@ -1103,29 +1114,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 isColorsExpanded={isColorsExpanded}
                                 setIsColorsExpanded={setIsColorsExpanded}
                                 ditherColors={ditherColors}
-                            />
-                        )
-                    }
-
-                    {
-                        activeTab === 'tela_opcoes' && (
-                            <StartScreenTab
                                 localStartScreenBgImage={localStartScreenBgImage}
-                                setLocalStartScreenBgImage={setLocalStartScreenBgImage}
                                 localShowStartScreenTitle={localShowStartScreenTitle}
-                                setLocalShowStartScreenTitle={setLocalShowStartScreenTitle}
                                 localStartScreenTitle={localStartScreenTitle}
-                                setLocalStartScreenTitle={setLocalStartScreenTitle}
+                                localStartScreenButtonAlignment={localStartScreenButtonAlignment}
                                 localTitle={localTitle}
-                                localTitleColor={localTitleColor}
-                                localSystemButtonColor={localSystemButtonColor}
-                                localSystemButtonTextColor={localSystemButtonTextColor}
-                                localSystemButtonBorderColor={localSystemButtonBorderColor}
-                                localSystemButtonHoverColor={localSystemButtonHoverColor}
-                                localSystemButtonHoverTextColor={localSystemButtonHoverTextColor}
-                                localTextColor={localTextColor}
-                                localGameBackgroundColor={localGameBackgroundColor}
-                                localFontFamily={localFontFamily}
                             />
                         )
                     }

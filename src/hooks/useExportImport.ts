@@ -372,6 +372,10 @@ DATE:        ${exportDate.toLocaleString()}
           : ''
       )
       .replace(
+        '__START_SCREEN_ALIGN_CLASS__',
+        exportData.startScreenButtonAlignment === 'left' ? 'align-left' : (exportData.startScreenButtonAlignment === 'right' ? 'align-right' : 'align-center')
+      )
+      .replace(
         '__START_SCREEN_TITLE__',
         exportData.startScreenTitle || exportData.gameTitle || 'Minha Aventura de Texto'
       )
@@ -723,6 +727,10 @@ DATE:        ${exportDate.toLocaleString()}
         exportData.startScreenBgImage
           ? `style="background-image: url('${exportData.startScreenBgImage}')"`
           : ''
+      )
+      .replace(
+        '__START_SCREEN_ALIGN_CLASS__',
+        exportData.startScreenButtonAlignment === 'left' ? 'align-left' : (exportData.startScreenButtonAlignment === 'right' ? 'align-right' : 'align-center')
       )
       .replace(
         '__START_SCREEN_TITLE__',

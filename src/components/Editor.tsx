@@ -1600,7 +1600,6 @@ const Editor: React.FC = () => {
                                className={`flex items-center gap-2 px-1 py-1 transition-colors group relative z-50 ${isNarrativeMenuOpen ? 'text-primary' : 'text-zinc-400 hover:text-white'}`}
                                title={isNarrativeMenuOpen ? t('sidebar.hideNarrative', 'Ocultar lista de narrativas') : t('sidebar.showNarrative', 'Ver lista de narrativas')}
                              >
-                               <List className={`w-4 h-4 transition-transform group-hover:scale-110 ${isNarrativeMenuOpen ? 'text-primary' : ''}`} />
                                <span className={`text-[10px] uppercase font-bold tracking-widest border-b border-transparent group-hover:border-current/30`}>
                                  {isNarrativeMenuOpen ? t('sidebar.hideNarrative', 'Ocultar lista de narrativas') : t('sidebar.showNarrative', 'Ver lista de narrativas')}
                                </span>

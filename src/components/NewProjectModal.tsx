@@ -239,6 +239,7 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
         startScreenBgImage: '',
         showStartScreenTitle: true,
         startScreenTitle: '',
+        startScreenButtonAlignment: 'center',
         // Since we are toggling them, we also need to make sure the UI reflect it
         gameShowSystemButton: false, // User requested REMOVAL of system button
         gameShowTrackersUI: true, // Always show trackers UI if enabled

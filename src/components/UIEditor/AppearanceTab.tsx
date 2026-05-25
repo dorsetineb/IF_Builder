@@ -99,11 +99,18 @@ interface AppearanceTabProps {
     applyTheme: (theme: any) => void;
     
     // Preview Management
-    previewType: 'scene' | 'vignette';
-    setPreviewType: (type: 'scene' | 'vignette') => void;
+    previewType: 'scene' | 'vignette' | 'menu';
+    setPreviewType: (type: 'scene' | 'vignette' | 'menu') => void;
     isColorsExpanded: boolean;
     setIsColorsExpanded: (expanded: boolean) => void;
     ditherColors: { primary: string; secondary: string };
+
+    // Start Screen / Menu Preview Props
+    localStartScreenBgImage?: string;
+    localShowStartScreenTitle?: boolean;
+    localStartScreenTitle?: string;
+    localStartScreenButtonAlignment?: 'left' | 'center' | 'right';
+    localTitle?: string;
 }
 
 export const AppearanceTab: React.FC<AppearanceTabProps> = ({
@@ -171,7 +178,12 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     setPreviewType,
     isColorsExpanded,
     setIsColorsExpanded,
-    ditherColors
+    ditherColors,
+    localStartScreenBgImage = '',
+    localShowStartScreenTitle = true,
+    localStartScreenTitle = '',
+    localStartScreenButtonAlignment = 'center',
+    localTitle = ''
 }) => {
     const { t } = useTranslation();
     const [isInputFocused, setIsInputFocused] = React.useState(false);
@@ -475,7 +487,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 <div className="space-y-6 flex flex-col">
                     <div className="flex items-center justify-start gap-3 mb-4 w-full">
                         <span className="text-[10px] font-bold text-muted-foreground uppercase whitespace-nowrap text-zinc-400">{t('UIEditor.aparencia.previewLabel', 'Example of')}</span>
-                        <div className="flex bg-background rounded-lg p-1 border border-muted-foreground/50 w-full max-w-[340px]">
+                        <div className="flex bg-background rounded-lg p-1 border border-muted-foreground/50 w-full max-w-[480px]">
                             <button
                                 onClick={() => setPreviewType('scene')}
                                 className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'scene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
@@ -487,6 +499,12 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                 className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'vignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
                             >
                                 {t('newProject.info.vignetteLayout', 'Layout dos Capítulos')}
+                            </button>
+                            <button
+                                onClick={() => setPreviewType('menu')}
+                                className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'menu' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
+                            >
+                                {t('UIEditor.tabs.menu_principal', 'Menu Principal')}
                             </button>
                         </div>
                     </div>
@@ -522,7 +540,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                         `}
                     </style>
 
-                    {previewType === 'scene' ? (
+                    {previewType === 'scene' && (
                             <div
                                 className={`
                                     rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300 flex-1 w-full
@@ -652,8 +670,10 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                 </div>
                             </div>
                         </div>
-                    ) : (
-                        <div className="flex items-center justify-center w-full flex-1">
+                    )}
+
+                    {previewType === 'vignette' && (
+                        <div className="flex items-center justify-center w-full flex-1 animate-in fade-in duration-300">
                             <div
                                 className="relative w-full aspect-video bg-muted border border-muted-foreground/50 rounded-xl flex flex-col justify-end overflow-hidden p-6 box-border shadow-2xl"
                                 style={{
@@ -686,6 +706,90 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                         style={{ fontSize: getScaledFontSize(1.0), backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor, fontFamily: localFontFamily }}
                                     >
                                         {localSplashButtonText || t('UIEditor.aparencia.homeButton', 'Começar')}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {previewType === 'menu' && (
+                        <div className="flex items-center justify-center w-full flex-1 animate-in fade-in duration-300">
+                            <div 
+                                className={`w-full aspect-video rounded-2xl border-2 border-muted-foreground/30 relative flex flex-col select-none overflow-hidden justify-center p-8 lg:p-12 ${localStartScreenButtonAlignment === 'left' ? 'items-start text-left' : localStartScreenButtonAlignment === 'right' ? 'items-end text-right' : 'items-center text-center'}`}
+                                style={{ backgroundColor: localGameBackgroundColor, maxHeight: '500px' }}
+                            >
+                                {/* Background image in mockup */}
+                                {localStartScreenBgImage && (
+                                    <div 
+                                        className="absolute inset-0 bg-cover bg-center transition-all duration-300"
+                                        style={{ backgroundImage: `url(${localStartScreenBgImage})` }}
+                                    />
+                                )}
+
+                                {/* Vignette Overlay (Darkening background to allow reading text) */}
+                                <div className="absolute inset-0 bg-black/40 z-0" />
+
+                                {/* Title of mock screen */}
+                                <div className={`relative z-10 max-w-[80%] mb-6 flex flex-col ${localStartScreenButtonAlignment === 'left' ? 'items-start' : localStartScreenButtonAlignment === 'right' ? 'items-end' : 'items-center'}`}>
+                                    {localShowStartScreenTitle && (
+                                        <h1 
+                                            className="text-xl font-bold tracking-wider uppercase drop-shadow-md transition-all"
+                                            style={{ color: localTitleColor, fontFamily: localFontFamily }}
+                                        >
+                                            {localStartScreenTitle.trim() || localTitle || 'Título do Jogo'}
+                                        </h1>
+                                    )}
+                                </div>
+
+                                {/* Mock Buttons Container */}
+                                <div className={`relative z-10 flex flex-col gap-2 w-44 ${localStartScreenButtonAlignment === 'left' ? 'items-start' : localStartScreenButtonAlignment === 'right' ? 'items-end' : 'items-center'}`}>
+                                    <button 
+                                        className="preview-btn-system w-full px-4 py-1.5 border-2 rounded font-bold uppercase tracking-widest transition-all cursor-default"
+                                        style={{ 
+                                            fontFamily: localFontFamily, 
+                                            fontSize: '9px',
+                                            borderColor: localSystemButtonBorderColor, 
+                                            color: localSystemButtonTextColor, 
+                                            backgroundColor: localSystemButtonColor 
+                                        }}
+                                    >
+                                        {t('UIEditor.startScreen.newGame', 'Começar de novo')}
+                                    </button>
+                                    <button 
+                                        className="preview-btn-system w-full px-4 py-1.5 border-2 rounded font-bold uppercase tracking-widest transition-all cursor-default"
+                                        style={{ 
+                                            fontFamily: localFontFamily, 
+                                            fontSize: '9px',
+                                            borderColor: localSystemButtonBorderColor, 
+                                            color: localSystemButtonTextColor, 
+                                            backgroundColor: localSystemButtonColor 
+                                        }}
+                                    >
+                                        {t('UIEditor.startScreen.continueGame', 'Continuar')}
+                                    </button>
+                                    <button 
+                                        className="preview-btn-system w-full px-4 py-1.5 border-2 rounded font-bold uppercase tracking-widest transition-all cursor-default"
+                                        style={{ 
+                                            fontFamily: localFontFamily, 
+                                            fontSize: '9px',
+                                            borderColor: localSystemButtonBorderColor, 
+                                            color: localSystemButtonTextColor, 
+                                            backgroundColor: localSystemButtonColor 
+                                        }}
+                                    >
+                                        {t('UIEditor.startScreen.saves', 'Caminhos salvos')}
+                                    </button>
+                                    <button 
+                                        className="preview-btn-system w-full px-4 py-1.5 border-2 rounded font-bold uppercase tracking-widest transition-all cursor-default"
+                                        style={{ 
+                                            fontFamily: localFontFamily, 
+                                            fontSize: '9px',
+                                            borderColor: localSystemButtonBorderColor, 
+                                            color: localSystemButtonTextColor, 
+                                            backgroundColor: localSystemButtonColor 
+                                        }}
+                                    >
+                                        {t('UIEditor.startScreen.options', 'Opções')}
                                     </button>
                                 </div>
                             </div>

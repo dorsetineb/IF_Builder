@@ -162,10 +162,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let renderSessionId = 0; // Prevent race conditions in rendering
     let isGameSessionActive = false;
 
-    const textSpeedVal = gameData.gameTextSpeed || 3; 
+    let textSpeedVal = gameData.gameTextSpeed || 3; 
     const imgSpeedVal = gameData.gameImageSpeed || 3;
-    const typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
-    const textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
+    let typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
+    let textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
     const imageAnimDuration = Math.max(0.3, 5.0 - (imgSpeedVal * 0.9)) + 's';
     
     document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
@@ -261,6 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const acquisitionModalDescription = document.getElementById('acquisition-modal-description');
     
     const systemModal = document.getElementById('system-modal');
+    const settingsModal = document.getElementById('settings-modal');
     const systemModalTitle = document.getElementById('system-modal-title');
     const systemMenuMain = document.getElementById('system-menu-main');
     const systemSlotsContainer = document.getElementById('system-slots-container');
@@ -919,7 +920,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (newGameBtn) {
             newGameBtn.addEventListener('click', () => {
                 if (isGameSessionActive) {
-                    if (!confirm('Iniciar um Novo Jogo apagará seu progresso atual e o save automático. Deseja continuar?')) {
+                    if (!confirm('Começar de novo apagará seu progresso atual e o caminho salvo automaticamente. Deseja continuar?')) {
                         return;
                     }
                 }
@@ -954,11 +955,66 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        const savesOptionsBtn = document.getElementById('start-saves-options-btn');
-        if (savesOptionsBtn) {
-            savesOptionsBtn.addEventListener('click', () => {
-                renderSlots('load');
+        const startSavesBtn = document.getElementById('start-saves-btn');
+        if (startSavesBtn) {
+            startSavesBtn.addEventListener('click', () => {
+                renderSlots(isGameSessionActive ? 'save' : 'load');
                 systemModal.classList.remove('hidden');
+            });
+        }
+
+        const startOptionsBtn = document.getElementById('start-options-btn');
+        if (startOptionsBtn) {
+            startOptionsBtn.addEventListener('click', () => {
+                if (settingsModal) settingsModal.classList.remove('hidden');
+            });
+        }
+
+        // Initialize Options Sliders
+        const bgm = bgmAudio;
+        const sfx = soundEffectAudio;
+
+        const volumeSlider = document.getElementById('settings-volume-slider');
+        if (volumeSlider) {
+            const savedVol = localStorage.getItem('if_builder_settings_volume');
+            if (savedVol !== null) {
+                volumeSlider.value = savedVol;
+                if (bgm) bgm.volume = parseFloat(savedVol) / 100;
+                if (sfx) sfx.volume = parseFloat(savedVol) / 100;
+            } else {
+                if (bgm) volumeSlider.value = (bgm.volume * 100).toString();
+            }
+
+            volumeSlider.addEventListener('input', (e) => {
+                const target = e.target;
+                const volVal = parseFloat(target.value);
+                if (bgm) bgm.volume = volVal / 100;
+                if (sfx) sfx.volume = volVal / 100;
+                localStorage.setItem('if_builder_settings_volume', volVal.toString());
+            });
+        }
+
+        const speedSlider = document.getElementById('settings-speed-slider');
+        if (speedSlider) {
+            const savedSpeed = localStorage.getItem('if_builder_settings_text_speed');
+            if (savedSpeed !== null) {
+                speedSlider.value = savedSpeed;
+                textSpeedVal = parseInt(savedSpeed);
+                typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15));
+                textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
+                document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
+            } else {
+                speedSlider.value = textSpeedVal.toString();
+            }
+
+            speedSlider.addEventListener('input', (e) => {
+                const target = e.target;
+                const speed = parseInt(target.value);
+                textSpeedVal = speed;
+                typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15));
+                textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
+                document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
+                localStorage.setItem('if_builder_settings_text_speed', speed.toString());
             });
         }
 
@@ -1379,7 +1435,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderSlots = (mode) => {
         systemMenuMain.classList.add('hidden'); systemSlotsContainer.classList.remove('hidden'); slotsList.innerHTML = '';
-        systemModalTitle.textContent = mode === 'save' ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') : (gameData.gameLoadMenuTitle || 'Carregar Jogo');
+        systemModalTitle.textContent = gameData.enableSystemMenu ? 'Caminhos salvos' : (mode === 'save' ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') : (gameData.gameLoadMenuTitle || 'Carregar Jogo'));
 
         if (gameData.enableSystemMenu) {
             // Render 1 Autosave + 2 Manual Saves
@@ -1392,13 +1448,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const data = JSON.parse(autoData);
                     const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
-                    autoHtml = '<div class="slot-info"><span class="slot-title">Save Automático - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                    autoHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo automaticamente - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
                     autoHtml += '<div class="slot-actions"><button class="slot-load-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Carregar</button></div>';
                 } catch (e) {
-                    autoHtml = '<div class="slot-info"><span class="slot-title">Save Automático</span><span class="slot-empty">Erro ao ler dados</span></div>';
+                    autoHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo automaticamente</span><span class="slot-empty">Erro ao ler dados</span></div>';
                 }
             } else {
-                autoHtml = '<div class="slot-info"><span class="slot-title">Save Automático</span><span class="slot-empty">Sem dados</span></div>';
+                autoHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo automaticamente</span><span class="slot-empty">Sem dados</span></div>';
             }
             autoDiv.innerHTML = window.safeHTML(autoHtml);
             if (autoData) {
@@ -1421,23 +1477,23 @@ document.addEventListener('DOMContentLoaded', () => {
                     try {
                         const data = JSON.parse(savedData);
                         const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
-                        contentHtml = '<div class="slot-info"><span class="slot-title">Save Manual ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                        contentHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
                         
                         let actionsHtml = '<div class="slot-actions" style="display: flex; gap: 6px; align-items: center;">';
                         if (mode === 'save') {
-                            actionsHtml += '<button class="slot-save-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Sobrescrever</button>';
+                            actionsHtml += '<button class="slot-save-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Sobrescrever caminho</button>';
                         }
                         actionsHtml += '<button class="slot-load-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Carregar</button>';
                         actionsHtml += '<button class="slot-delete-btn" style="background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1.5em; padding: 0 5px; line-height: 1;">&times;</button>';
                         actionsHtml += '</div>';
                         contentHtml += actionsHtml;
                     } catch (e) {
-                        contentHtml = '<div class="slot-info"><span class="slot-title">Save Manual ' + i + '</span><span class="slot-empty">Erro ao ler dados</span></div>';
+                        contentHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo ' + i + '</span><span class="slot-empty">Erro ao ler dados</span></div>';
                     }
                 } else {
-                    contentHtml = '<div class="slot-info"><span class="slot-title">Save Manual ' + i + '</span><span class="slot-empty">Vazio</span></div>';
+                    contentHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo ' + i + '</span><span class="slot-empty">Vazio</span></div>';
                     if (mode === 'save') {
-                        contentHtml += '<div class="slot-actions"><button class="slot-save-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Salvar</button></div>';
+                        contentHtml += '<div class="slot-actions"><button class="slot-save-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Salvar caminho</button></div>';
                     }
                 }
                 slotDiv.innerHTML = window.safeHTML(contentHtml);
@@ -1451,7 +1507,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     saveBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         if (savedData) {
-                            if (confirm('Deseja sobrescrever este arquivo de salvamento?')) {
+                            if (confirm('Deseja sobrescrever este caminho salvo?')) {
                                 performSave(i);
                             }
                         } else {
@@ -1468,7 +1524,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (deleteBtn && savedData) {
                     deleteBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        if (confirm('Tem certeza que deseja deletar este arquivo de progresso?')) {
+                        if (confirm('Tem certeza que deseja deletar este caminho salvo?')) {
                             localStorage.removeItem(slotKey);
                             renderSlots(mode);
                         }

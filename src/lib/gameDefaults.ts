@@ -26,7 +26,7 @@ export const gameHTML = `
         </button>
 
         <!-- Menu Principal Screen -->
-        <div id="start-screen" class="splash-screen hidden __POSITIVE_ENDING_ALIGN_CLASS__" __START_SCREEN_BG_STYLE__>
+        <div id="start-screen" class="splash-screen hidden __START_SCREEN_ALIGN_CLASS__" __START_SCREEN_BG_STYLE__>
             <div class="start-screen-overlay"></div>
             <div class="splash-content" style="z-index: 10;">
                 <div class="splash-text">
@@ -34,9 +34,10 @@ export const gameHTML = `
                 </div>
                 <div class="splash-buttons start-screen-buttons">
                     <button id="start-resume-game-btn" class="ending-restart-button hidden">Voltar ao Jogo</button>
-                    <button id="start-new-game-btn" class="ending-restart-button">Novo Jogo</button>
+                    <button id="start-new-game-btn" class="ending-restart-button">Começar de novo</button>
                     <button id="start-continue-btn" class="ending-restart-button hidden">Continuar</button>
-                    <button id="start-saves-options-btn" class="ending-restart-button">Saves & Opções</button>
+                    <button id="start-saves-btn" class="ending-restart-button">Caminhos salvos</button>
+                    <button id="start-options-btn" class="ending-restart-button">Opções</button>
                 </div>
             </div>
         </div>
@@ -147,6 +148,26 @@ export const gameHTML = `
                     <!-- Slots will be injected here -->
                 </div>
                 <button id="btn-back-system" class="mt-4">Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-content system-modal-content">
+            <button class="modal-close-button">&times;</button>
+            <h2 style="margin-top: 0; font-size: 1.3em; color: var(--accent-color); font-family: var(--font-family);">Opções</h2>
+            
+            <div class="settings-body" style="text-align: left; margin-top: 20px; display: flex; flex-direction: column; gap: 16px;">
+                <div class="setting-item" style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.9em; font-weight: bold; text-transform: uppercase; tracking-widest; color: var(--text-color); margin-bottom: 8px; font-family: var(--font-family); opacity: 0.8;">Volume da Música/Efeitos</label>
+                    <input type="range" id="settings-volume-slider" min="0" max="100" value="50" style="width: 100%; accent-color: var(--primary-color); cursor: pointer;" />
+                </div>
+                
+                <div class="setting-item" style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.9em; font-weight: bold; text-transform: uppercase; tracking-widest; color: var(--text-color); margin-bottom: 8px; font-family: var(--font-family); opacity: 0.8;">Velocidade de Exibição do Texto</label>
+                    <input type="range" id="settings-speed-slider" min="1" max="10" value="3" style="width: 100%; accent-color: var(--primary-color); cursor: pointer;" />
+                </div>
             </div>
         </div>
     </div>
@@ -311,6 +332,8 @@ body.with-spacing .main-wrapper { height: 100%; }
 .splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-color); background-size: cover; background-position: center; z-index: 2000; padding: 0; display: flex; align-items: var(--splash-align-items); justify-content: var(--splash-justify-content); transition: opacity 1s ease-in-out; user-select: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; }
 .splash-screen.fade-out { opacity: 0; pointer-events: none; }
 .splash-screen.align-left { --splash-justify-content: flex-start; --splash-align-items: flex-start; --splash-text-align: left; --splash-content-align-items: flex-start; }
+.splash-screen.align-center { --splash-justify-content: center; --splash-align-items: center; --splash-text-align: center; --splash-content-align-items: center; }
+.splash-screen.align-right { --splash-justify-content: flex-end; --splash-align-items: flex-end; --splash-text-align: right; --splash-content-align-items: flex-end; }
 .splash-content { text-align: var(--splash-text-align); display: flex; flex-direction: column; align-items: var(--splash-content-align-items); gap: 20px; width: 100%; padding: 5vh max(40px, 6vw); position: relative; }
 .splash-logo { max-height: 150px; width: auto; margin-bottom: 20px; }
 .splash-text h1 { font-size: 2.2em; color: var(--accent-color); margin: 0; text-shadow: none; line-height: 1.1; }
@@ -1787,6 +1810,7 @@ export const initialGameData: GameData = {
     startScreenBgImage: '',
     showStartScreenTitle: true,
     startScreenTitle: '',
+    startScreenButtonAlignment: 'center',
     fixedVerbs: [],
     consequenceTrackers: [],
     positiveEndingMusic: '',
