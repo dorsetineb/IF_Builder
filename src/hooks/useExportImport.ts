@@ -1021,6 +1021,94 @@ DATE:        ${exportDate.toLocaleString()}
     ]
   );
 
+  const optimizeImportedGameData = async (data: any): Promise<any> => {
+    try {
+      const { compressImageToWebP } = await import('../utils/imageOptimizer');
+
+      let totalOriginalLength = 0;
+      let totalCompressedLength = 0;
+      let optimizedCount = 0;
+      let skippedCount = 0;
+
+      const optimizeField = async (val: any): Promise<any> => {
+        if (typeof val === 'string' && val.startsWith('data:image/') && !val.startsWith('data:image/webp')) {
+          try {
+            const originalLen = val.length;
+            const compressed = await compressImageToWebP(val);
+            
+            // ONLY use compressed WebP if it actually reduces the file size!
+            if (compressed.length < originalLen) {
+              totalOriginalLength += originalLen;
+              totalCompressedLength += compressed.length;
+              optimizedCount++;
+              return compressed;
+            } else {
+              skippedCount++;
+              return val;
+            }
+          } catch (err) {
+            console.warn('Failed to compress legacy image, using original:', err);
+            return val;
+          }
+        }
+        return val;
+      };
+
+      // Global assets
+      if (data.gameLogo) data.gameLogo = await optimizeField(data.gameLogo);
+      if (data.gameSplashImage) data.gameSplashImage = await optimizeField(data.gameSplashImage);
+      if (data.startScreenBgImage) data.startScreenBgImage = await optimizeField(data.startScreenBgImage);
+      if (data.positiveEndingImage) data.positiveEndingImage = await optimizeField(data.positiveEndingImage);
+      if (data.negativeEndingImage) data.negativeEndingImage = await optimizeField(data.negativeEndingImage);
+
+      // Scenes
+      if (data.scenes) {
+        const scenePromises = Object.values(data.scenes).map(async (scene: any) => {
+          if (scene.image) scene.image = await optimizeField(scene.image);
+        });
+        await Promise.all(scenePromises);
+      }
+
+      // Vignettes
+      if (data.vignettes && Array.isArray(data.vignettes)) {
+        const vignettePromises = data.vignettes.map(async (vignette: any) => {
+          if (vignette.image) vignette.image = await optimizeField(vignette.image);
+        });
+        await Promise.all(vignettePromises);
+      }
+
+      // Global Objects
+      if (data.globalObjects) {
+        const objPromises = Object.values(data.globalObjects).map(async (obj: any) => {
+          if (obj.image) obj.image = await optimizeField(obj.image);
+        });
+        await Promise.all(objPromises);
+      }
+
+      if (optimizedCount > 0) {
+        const savedBytes = Math.max(0, Math.round((totalOriginalLength - totalCompressedLength) * 0.75));
+        const savedStr = savedBytes > 1024 * 1024 
+          ? `${(savedBytes / (1024 * 1024)).toFixed(1)} MB` 
+          : `${Math.round(savedBytes / 1024)} KB`;
+          
+        toast(
+          t('editor.projectOptimizedTitle', 'Otimização Concluída'),
+          `Otimizamos ${optimizedCount} imagem(ns) legada(s) para WebP, economizando ${savedStr}!`,
+          'success'
+        );
+      } else if (skippedCount > 0) {
+        toast(
+          t('editor.projectAlreadyOptimizedTitle', 'Imagens Otimizadas'),
+          'Todas as imagens do projeto já estavam totalmente otimizadas para o menor tamanho possível.',
+          'info'
+        );
+      }
+    } catch (err) {
+      console.error('Failed to run image optimization on import:', err);
+    }
+    return data;
+  };
+
   const handleImportFile = async (file: File) => {
     if (typeof JSZip === 'undefined') {
       alert('A biblioteca JSZip não foi carregada. Não é possível importar.');
@@ -1115,7 +1203,8 @@ DATE:        ${exportDate.toLocaleString()}
             );
           }
 
-          handleImportGame(data);
+          const optimizedData = await optimizeImportedGameData(data);
+          handleImportGame(optimizedData);
         } catch (err) {
           alert('Erro ao importar ZIP: ' + (err as Error).message);
         } finally {
@@ -1125,7 +1214,7 @@ DATE:        ${exportDate.toLocaleString()}
       reader.readAsArrayBuffer(file);
     } else if (file.name.endsWith('.html') || file.name.endsWith('.htm')) {
       // Single HTML Bundle import — extract editor data from invisible JSON block
-      reader.onload = (ev) => {
+      reader.onload = async (ev) => {
         try {
           const htmlText = ev.target?.result as string;
           const parser = new DOMParser();
@@ -1138,7 +1227,9 @@ DATE:        ${exportDate.toLocaleString()}
           }
           const data = JSON.parse(sourceTag.textContent);
           if (!data || typeof data !== 'object') throw new Error('Arquivo inválido');
-          handleImportGame(data);
+          
+          const optimizedData = await optimizeImportedGameData(data);
+          handleImportGame(optimizedData);
         } catch (error) {
           console.error('Erro ao importar HTML:', error);
           toast(
@@ -1155,12 +1246,14 @@ DATE:        ${exportDate.toLocaleString()}
       };
       reader.readAsText(file);
     } else {
-      reader.onload = (ev) => {
+      reader.onload = async (ev) => {
         try {
           const content = ev.target?.result as string;
           const parsed = JSON.parse(content);
           if (!parsed || typeof parsed !== 'object') throw new Error('Arquivo inválido');
-          handleImportGame(parsed);
+          
+          const optimizedData = await optimizeImportedGameData(parsed);
+          handleImportGame(optimizedData);
         } catch (error) {
           console.error('Erro ao importar:', error);
           toast(

@@ -889,13 +889,22 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 return;
             }
 
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if (event.target && typeof event.target.result === 'string') {
-                    setter(event.target.result);
-                }
-            };
-            reader.readAsDataURL(file);
+            import('../utils/imageOptimizer').then(({ compressImageToWebP }) => {
+                compressImageToWebP(file)
+                    .then((optimizedBase64) => {
+                        setter(optimizedBase64);
+                    })
+                    .catch((err) => {
+                        console.error('Failed to compress image:', err);
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            if (event.target && typeof event.target.result === 'string') {
+                                setter(event.target.result);
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    });
+            });
         }
         if (e.target) {
             (e.target as HTMLInputElement).value = '';

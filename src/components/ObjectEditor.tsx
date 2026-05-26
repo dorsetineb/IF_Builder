@@ -123,13 +123,23 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
     // Image Upload Logic for Selected Object
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0] && selectedObjectId) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if (event.target && typeof event.target.result === 'string') {
-                    onUpdateGlobalObject(selectedObjectId, { image: event.target.result });
-                }
-            };
-            reader.readAsDataURL(e.target.files[0]);
+            const file = e.target.files[0];
+            import('../utils/imageOptimizer').then(({ compressImageToWebP }) => {
+                compressImageToWebP(file)
+                    .then((optimizedBase64) => {
+                        onUpdateGlobalObject(selectedObjectId, { image: optimizedBase64 });
+                    })
+                    .catch((err) => {
+                        console.error('Failed to compress image:', err);
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            if (event.target && typeof event.target.result === 'string') {
+                                onUpdateGlobalObject(selectedObjectId, { image: event.target.result });
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    });
+            });
         }
     };
 

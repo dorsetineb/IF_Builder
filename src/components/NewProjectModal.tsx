@@ -148,13 +148,23 @@ export const NewProjectModal: React.FC<NewProjectModalProps> = ({ isOpen, onClos
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                if (event.target && typeof event.target.result === 'string') {
-                    setSplashImage(event.target.result);
-                }
-            };
-            reader.readAsDataURL(e.target.files[0]);
+            const file = e.target.files[0];
+            import('../utils/imageOptimizer').then(({ compressImageToWebP }) => {
+                compressImageToWebP(file)
+                    .then((optimizedBase64) => {
+                        setSplashImage(optimizedBase64);
+                    })
+                    .catch((err) => {
+                        console.error('Failed to compress image:', err);
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                            if (event.target && typeof event.target.result === 'string') {
+                                setSplashImage(event.target.result);
+                            }
+                        };
+                        reader.readAsDataURL(file);
+                    });
+            });
         }
         if (e.target) e.target.value = '';
     };
