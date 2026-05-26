@@ -26,7 +26,7 @@ export const gameHTML = `
         </button>
 
         <!-- Menu Principal Screen -->
-        <div id="start-screen" class="splash-screen hidden __START_SCREEN_ALIGN_CLASS__" __START_SCREEN_BG_STYLE__>
+        <div id="start-screen" class="splash-screen hidden __START_SCREEN_ALIGN_CLASS__ __START_SCREEN_VALIGN_CLASS__" __START_SCREEN_BG_STYLE__>
              <div class="start-screen-overlay"></div>
              <div class="splash-content" style="z-index: 10;">
                  <div class="splash-text">
@@ -45,30 +45,30 @@ export const gameHTML = `
                  </div>
                  <!-- Embedded Options Container -->
                  <div id="start-screen-options-container" class="splash-buttons start-screen-options-container hidden" style="width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 15px; align-items: var(--splash-content-align-items);">
-                     <button id="start-screen-options-back-btn" class="ending-restart-button" style="margin-bottom: 5px; width: 100%;">&lt; Voltar</button>
-                     <div class="start-screen-options-list" style="display: flex; flex-direction: column; gap: 18px; width: 100%; padding: 10px 0; box-sizing: border-box; align-items: var(--splash-content-align-items);">
-                         <div class="option-slider-wrapper" style="display: flex; flex-direction: column; gap: 6px; width: 100%; text-align: var(--splash-text-align);">
-                             <span style="font-size: 0.9em; font-weight: bold; color: var(--splash-button-text-color); opacity: 0.85; text-align: var(--splash-text-align); width: 100%; display: block;">Volume da Música</span>
-                             <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
-                                 <input type="range" id="start-square-volume" min="0" max="100" value="100" class="start-square-slider" style="flex: 1;">
-                                 <span id="start-square-volume-val" style="font-size: 0.85em; font-weight: bold; min-width: 40px; text-align: right; color: var(--splash-button-text-color);">100%</span>
-                             </div>
-                         </div>
-                         <div class="option-slider-wrapper" style="display: flex; flex-direction: column; gap: 6px; width: 100%; text-align: var(--splash-text-align);">
-                             <span style="font-size: 0.9em; font-weight: bold; color: var(--splash-button-text-color); opacity: 0.85; text-align: var(--splash-text-align); width: 100%; display: block;">Velocidade do Texto</span>
-                             <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
-                                 <input type="range" id="start-square-text-speed" min="1" max="5" value="3" class="start-square-slider" style="flex: 1;">
-                                 <span id="start-square-text-speed-val" style="font-size: 0.85em; font-weight: bold; min-width: 40px; text-align: right; color: var(--splash-button-text-color);">3</span>
-                             </div>
-                         </div>
-                         <div class="option-slider-wrapper" style="display: flex; flex-direction: column; gap: 6px; width: 100%; text-align: var(--splash-text-align);">
-                             <span style="font-size: 0.9em; font-weight: bold; color: var(--splash-button-text-color); opacity: 0.85; text-align: var(--splash-text-align); width: 100%; display: block;">Velocidade da Imagem</span>
-                             <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
-                                 <input type="range" id="start-square-image-speed" min="1" max="5" value="3" class="start-square-slider" style="flex: 1;">
-                                 <span id="start-square-image-speed-val" style="font-size: 0.85em; font-weight: bold; min-width: 40px; text-align: right; color: var(--splash-button-text-color);">3</span>
-                             </div>
-                         </div>
-                     </div>
+                      <button id="start-screen-options-back-btn" class="ending-restart-button" style="margin-bottom: 5px; width: 100%;">&lt; Voltar</button>
+                      <div class="start-screen-options-list" style="display: flex; flex-direction: column; gap: 18px; width: 100%; padding: 10px 0; box-sizing: border-box; align-items: var(--splash-content-align-items);">
+                           <div class="option-slider-wrapper" style="display: flex; flex-direction: column; gap: 6px; width: 100%; text-align: var(--splash-text-align);">
+                               <span style="font-family: var(--font-family); font-size: 1.1em; font-weight: bold; color: var(--text-color); text-align: var(--splash-text-align); width: 100%; display: block;">Volume da Música</span>
+                               <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                                   <input type="range" id="start-square-volume" min="0" max="100" value="100" class="start-square-slider" style="flex: 1;">
+                                   <span id="start-square-volume-val" style="font-family: var(--font-family); font-size: 1.1em; font-weight: bold; min-width: 120px; display: inline-block; text-align: right; color: var(--text-color);">100%</span>
+                               </div>
+                           </div>
+                           <div class="option-slider-wrapper" style="display: flex; flex-direction: column; gap: 6px; width: 100%; text-align: var(--splash-text-align);">
+                               <span style="font-family: var(--font-family); font-size: 1.1em; font-weight: bold; color: var(--text-color); text-align: var(--splash-text-align); width: 100%; display: block;">Velocidade do Texto</span>
+                               <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                                   <input type="range" id="start-square-text-speed" min="1" max="4" value="3" class="start-square-slider" style="flex: 1;">
+                                   <span id="start-square-text-speed-val" style="font-family: var(--font-family); font-size: 1.1em; font-weight: bold; min-width: 120px; display: inline-block; text-align: right; color: var(--text-color);">Normal</span>
+                               </div>
+                           </div>
+                           <div class="option-slider-wrapper" style="display: flex; flex-direction: column; gap: 6px; width: 100%; text-align: var(--splash-text-align);">
+                               <span style="font-family: var(--font-family); font-size: 1.1em; font-weight: bold; color: var(--text-color); text-align: var(--splash-text-align); width: 100%; display: block;">Velocidade da Imagem</span>
+                               <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                                   <input type="range" id="start-square-image-speed" min="1" max="4" value="3" class="start-square-slider" style="flex: 1;">
+                                   <span id="start-square-image-speed-val" style="font-family: var(--font-family); font-size: 1.1em; font-weight: bold; min-width: 120px; display: inline-block; text-align: right; color: var(--text-color);">Normal</span>
+                               </div>
+                           </div>
+                      </div>
                  </div>
              </div>
          </div>
@@ -527,12 +527,12 @@ body.with-spacing .main-wrapper { height: 100%; }
 .slot-delete-btn:hover { background-color: #da3633 !important; }
 
 /* Custom Square Slider track & thumb styling */
-.start-square-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; background: color-mix(in srgb, var(--splash-button-text-color) 45%, transparent); outline: none; margin: 12px 0; padding: 0; box-sizing: border-box; border-radius: 0 !important; cursor: pointer; }
+.start-square-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; background: color-mix(in srgb, var(--text-color) 45%, transparent); outline: none; margin: 12px 0; padding: 0; box-sizing: border-box; border-radius: 0 !important; cursor: pointer; }
 .start-square-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: var(--highlight-color, var(--splash-button-hover-bg)); cursor: pointer; border: none; border-radius: 0 !important; margin-top: -6px; transition: background 0.2s, opacity 0.2s; }
 .start-square-slider::-webkit-slider-thumb:hover { opacity: 0.85; }
 .start-square-slider::-moz-range-thumb { width: 16px; height: 16px; background: var(--highlight-color, var(--splash-button-hover-bg)); cursor: pointer; border: none; border-radius: 0 !important; transition: background 0.2s, opacity 0.2s; }
 .start-square-slider::-moz-range-thumb:hover { opacity: 0.85; }
-.start-square-slider::-moz-range-track { background: color-mix(in srgb, var(--splash-button-text-color) 45%, transparent); height: 4px; border: none; border-radius: 0 !important; }
+.start-square-slider::-moz-range-track { background: color-mix(in srgb, var(--text-color) 45%, transparent); height: 4px; border: none; border-radius: 0 !important; }
 #btn-back-system { width: auto; padding: 10px 20px; align-self: center; margin-top: 10px; background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); cursor: pointer; font-family: var(--font-family); font-size: 0.9em; transition: all 0.2s; }
 #btn-back-system:hover { background-color: var(--system-button-hover-bg); transform: translateY(-2px); }
 
@@ -1734,18 +1734,25 @@ export const OVERLAY_CSS = `
     transform: translateY(0);
 }
 
-/* Transições do Menu Principal */
+/* Transições do Menu Principal e Painel de Jogo */
 .menu-trans-fade-in {
-    animation: menuFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation: menuFadeIn var(--menu-anim-speed, 0.3s) cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 .menu-trans-fade-out {
-    animation: menuFadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation: menuFadeOut var(--menu-anim-speed, 0.3s) cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 .menu-trans-slide-in {
-    animation: menuSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation: menuSlideIn var(--menu-anim-speed, 0.3s) cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 .menu-trans-slide-out {
-    animation: menuSlideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+    animation: menuSlideOut var(--menu-anim-speed, 0.3s) cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.game-trans-slide-in {
+    animation: gameSlideIn var(--menu-anim-speed, 0.3s) cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.game-trans-slide-out {
+    animation: gameSlideOut var(--menu-anim-speed, 0.3s) cubic-bezier(0.4, 0, 0.2, 1) both;
 }
 
 @keyframes menuFadeIn {
@@ -1757,12 +1764,20 @@ export const OVERLAY_CSS = `
     to { opacity: 0; }
 }
 @keyframes menuSlideIn {
-    from { transform: translateX(100%); }
+    from { transform: translateX(-100%); }
     to { transform: translateX(0); }
 }
 @keyframes menuSlideOut {
     from { transform: translateX(0); }
     to { transform: translateX(-100%); }
+}
+@keyframes gameSlideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+@keyframes gameSlideOut {
+    from { transform: translateX(0); }
+    to { transform: translateX(100%); }
 }
 
 .start-screen-overlay {
@@ -1814,6 +1829,26 @@ export const OVERLAY_CSS = `
         width: 38px;
         height: 38px;
     }
+}
+
+/* Ensure Main Menu start screen is always stacked on top of other splash screens for correct visual transitions */
+#start-screen {
+    z-index: 9999 !important;
+}
+
+/* Vertical Alignment for Main Menu / Start Screen */
+#start-screen.align-v-center {
+    align-items: center !important;
+}
+#start-screen.align-v-center .splash-content {
+    justify-content: center !important;
+}
+
+#start-screen.align-v-bottom {
+    align-items: flex-end !important;
+}
+#start-screen.align-v-bottom .splash-content {
+    justify-content: flex-end !important;
 }
 `;
 
@@ -1875,7 +1910,7 @@ export const initialGameData: GameData = {
     gameTextAnimationType: 'fade',
     gameTextSpeed: 5,
     gameImageTransitionType: 'fade',
-    gameImageSpeed: 5,
+    gameImageSpeed: 0.5,
     gameFontSize: '12',
     gameShowTrackersUI: true,
     gameShowSystemButton: true,
@@ -1884,7 +1919,9 @@ export const initialGameData: GameData = {
     showStartScreenTitle: true,
     startScreenTitle: '',
     startScreenButtonAlignment: 'center',
+    startScreenVerticalAlignment: 'center',
     gameMenuTransitionType: 'fade',
+    gameMenuTransitionSpeed: 500,
     gameMenuTransitionSound: '',
     fixedVerbs: [],
     consequenceTrackers: [],

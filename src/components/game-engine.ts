@@ -108,6 +108,10 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         showStartScreenTitle: data.showStartScreenTitle,
         startScreenTitle: data.startScreenTitle,
         startScreenButtonAlignment: data.startScreenButtonAlignment,
+        startScreenVerticalAlignment: data.startScreenVerticalAlignment,
+        gameMenuTransitionType: data.gameMenuTransitionType,
+        gameMenuTransitionSpeed: data.gameMenuTransitionSpeed,
+        gameMenuTransitionSound: data.gameMenuTransitionSound,
         gameTranslations: data.gameTranslations || {
             view_diary_btn: "Ver Diário",
             stats_visited: "Você visitou",
@@ -197,11 +201,33 @@ document.addEventListener('DOMContentLoaded', () => {
     let textSpeedVal = savedTextSpeed ? parseInt(savedTextSpeed) : (gameData.gameTextSpeed || 3); 
     
     const savedImgSpeed = localStorage.getItem('if_builder_settings_image_speed');
-    const imgSpeedVal = savedImgSpeed ? parseInt(savedImgSpeed) : (gameData.gameImageSpeed || 3);
+    let imgSpeedVal = 0.5;
+    if (savedImgSpeed) {
+        const speedVal = parseInt(savedImgSpeed);
+        if (speedVal === 1) imgSpeedVal = 2.0;
+        else if (speedVal === 2) imgSpeedVal = 1.0;
+        else if (speedVal === 3) imgSpeedVal = 0.5;
+        else if (speedVal === 4) imgSpeedVal = 0.2;
+        else {
+            const parsed = parseFloat(savedImgSpeed);
+            imgSpeedVal = isNaN(parsed) ? 0.5 : parsed;
+        }
+    } else {
+        const speedVal = gameData.gameImageSpeed || 0.5;
+        if (speedVal === 1) imgSpeedVal = 2.0;
+        else if (speedVal === 2) imgSpeedVal = 1.0;
+        else if (speedVal === 3) imgSpeedVal = 0.5;
+        else if (speedVal === 4) imgSpeedVal = 0.2;
+        else imgSpeedVal = speedVal;
+    }
+    
+    if (isNaN(imgSpeedVal) || imgSpeedVal < 0.1 || imgSpeedVal > 5.0) {
+        imgSpeedVal = 0.5;
+    }
     
     let typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
     let textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
-    const imageAnimDuration = Math.max(0.3, 5.0 - (imgSpeedVal * 0.9)) + 's';
+    const imageAnimDuration = imgSpeedVal + 's';
     
     document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
     document.documentElement.style.setProperty('--image-anim-speed', imageAnimDuration);
@@ -925,11 +951,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const resumeBtn = document.getElementById('start-resume-game-btn');
         if (resumeBtn) {
             resumeBtn.addEventListener('click', () => {
-                hideStartScreen(() => {
-                    gameContainer.classList.remove('hidden');
-                    if (gearSystemButton) {
-                        gearSystemButton.classList.add('hidden');
-                    }
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        hideStartScreen(() => {
+                            if (gearSystemButton) {
+                                gearSystemButton.classList.add('hidden');
+                            }
+                        });
+                    });
                 });
             });
         }
@@ -943,16 +972,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
                 
-                hideStartScreen(() => {
-                    // Novo jogo apaga o autosave imediatamente!
-                    removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
-                    
-                    startGame();
-                    gameContainer.classList.remove('hidden');
-                    
-                    if (gearSystemButton) {
-                        gearSystemButton.classList.add('hidden');
-                    }
+                // Novo jogo apaga o autosave imediatamente!
+                removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+                
+                // Start game first so the first scene is rendered behind the menu
+                startGame();
+                
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        hideStartScreen(() => {
+                            if (gearSystemButton) {
+                                gearSystemButton.classList.add('hidden');
+                            }
+                        });
+                    });
                 });
             });
         }
@@ -961,17 +994,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (continueBtn) {
             continueBtn.addEventListener('click', () => {
                 if (isGameSessionActive) {
-                    hideStartScreen(() => {
-                        gameContainer.classList.remove('hidden');
-                    });
+                    hideStartScreen();
                 } else {
                     const latestSave = getLatestSave();
                     if (latestSave) {
-                        hideStartScreen(() => {
-                            loadGameFromData(latestSave);
-                            if (gearSystemButton) {
-                                gearSystemButton.classList.add('hidden');
-                            }
+                        // Load save first so it is rendered behind the menu
+                        loadGameFromData(latestSave);
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                hideStartScreen(() => {
+                                    if (gearSystemButton) {
+                                        gearSystemButton.classList.add('hidden');
+                                    }
+                                });
+                            });
                         });
                     }
                 }
@@ -995,7 +1031,7 @@ document.addEventListener('DOMContentLoaded', () => {
             startScreenSavesBackBtn.addEventListener('click', () => {
                 if (startScreenSavesContainer) startScreenSavesContainer.classList.add('hidden');
                 if (startScreenButtons) startScreenButtons.classList.remove('hidden');
-                showStartScreen();
+                showStartScreen(true);
             });
         }
 
@@ -1014,9 +1050,18 @@ document.addEventListener('DOMContentLoaded', () => {
             startScreenOptionsBackBtn.addEventListener('click', () => {
                 if (startScreenOptionsContainer) startScreenOptionsContainer.classList.add('hidden');
                 if (startScreenButtons) startScreenButtons.classList.remove('hidden');
-                showStartScreen();
+                showStartScreen(true);
             });
         }
+
+        const getSpeedLabel = (level) => {
+            const l = parseInt(level);
+            if (l === 1) return "Muito Lento";
+            if (l === 2) return "Lento";
+            if (l === 3) return "Normal";
+            if (l === 4) return "Rápido";
+            return "Normal";
+        };
 
         const syncSquareSliders = () => {
             const sqVolume = document.getElementById('start-square-volume');
@@ -1035,13 +1080,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const savedTextSpeed = localStorage.getItem('if_builder_settings_text_speed') || '3';
             if (sqTextSpeed) {
                 sqTextSpeed['value'] = savedTextSpeed;
-                if (sqTextSpeedVal) sqTextSpeedVal.textContent = savedTextSpeed;
+                if (sqTextSpeedVal) sqTextSpeedVal.textContent = getSpeedLabel(savedTextSpeed);
             }
 
             const savedImageSpeed = localStorage.getItem('if_builder_settings_image_speed') || '3';
             if (sqImageSpeed) {
                 sqImageSpeed['value'] = savedImageSpeed;
-                if (sqImageSpeedVal) sqImageSpeedVal.textContent = savedImageSpeed;
+                if (sqImageSpeedVal) sqImageSpeedVal.textContent = getSpeedLabel(savedImageSpeed);
             }
         };
 
@@ -1067,10 +1112,24 @@ document.addEventListener('DOMContentLoaded', () => {
             sqTextSpeed.addEventListener('input', (e) => {
                 const target = e.target;
                 const speed = parseInt(target['value']);
-                if (sqTextSpeedVal) sqTextSpeedVal.textContent = speed.toString();
+                if (sqTextSpeedVal) sqTextSpeedVal.textContent = getSpeedLabel(speed);
                 textSpeedVal = speed;
-                typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15));
-                textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
+                
+                // Map qualitative text speed: 1 = Muito Lento (150ms), 2 = Lento (80ms), 3 = Normal (40ms), 4 = Rápido (15ms)
+                if (speed === 1) {
+                    typeSpeedBase = 150;
+                    textAnimDuration = '2.0s';
+                } else if (speed === 2) {
+                    typeSpeedBase = 80;
+                    textAnimDuration = '1.0s';
+                } else if (speed === 3) {
+                    typeSpeedBase = 40;
+                    textAnimDuration = '0.5s';
+                } else {
+                    typeSpeedBase = 15;
+                    textAnimDuration = '0.2s';
+                }
+                
                 document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
                 localStorage.setItem('if_builder_settings_text_speed', speed.toString());
             });
@@ -1082,9 +1141,16 @@ document.addEventListener('DOMContentLoaded', () => {
             sqImageSpeed.addEventListener('input', (e) => {
                 const target = e.target;
                 const speed = parseInt(target['value']);
-                if (sqImageSpeedVal) sqImageSpeedVal.textContent = speed.toString();
+                if (sqImageSpeedVal) sqImageSpeedVal.textContent = getSpeedLabel(speed);
                 localStorage.setItem('if_builder_settings_image_speed', speed.toString());
-                const imageDuration = Math.max(0.3, 5.0 - (speed * 0.9)) + 's';
+                
+                // Map qualitative image transition speed: 1 = Muito Lento (2.0s), 2 = Lento (1.0s), 3 = Normal (0.5s), 4 = Rápido (0.2s)
+                let imageDuration = '0.5s';
+                if (speed === 1) imageDuration = '2.0s';
+                else if (speed === 2) imageDuration = '1.0s';
+                else if (speed === 3) imageDuration = '0.5s';
+                else if (speed === 4) imageDuration = '0.2s';
+                
                 document.documentElement.style.setProperty('--image-anim-speed', imageDuration);
             });
         }
@@ -1113,12 +1179,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const speedSlider = document.getElementById('settings-speed-slider');
         if (speedSlider) {
+            speedSlider.setAttribute('min', '1');
+            speedSlider.setAttribute('max', '4');
+            speedSlider.setAttribute('step', '1');
+
             const savedSpeed = localStorage.getItem('if_builder_settings_text_speed');
             if (savedSpeed !== null) {
                 speedSlider.value = savedSpeed;
                 textSpeedVal = parseInt(savedSpeed);
-                typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15));
-                textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
+                if (textSpeedVal === 1) {
+                    typeSpeedBase = 150;
+                    textAnimDuration = '2.0s';
+                } else if (textSpeedVal === 2) {
+                    typeSpeedBase = 80;
+                    textAnimDuration = '1.0s';
+                } else if (textSpeedVal === 3) {
+                    typeSpeedBase = 40;
+                    textAnimDuration = '0.5s';
+                } else {
+                    typeSpeedBase = 15;
+                    textAnimDuration = '0.2s';
+                }
                 document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
             } else {
                 speedSlider.value = textSpeedVal.toString();
@@ -1128,8 +1209,19 @@ document.addEventListener('DOMContentLoaded', () => {
                 const target = e.target;
                 const speed = parseInt(target.value);
                 textSpeedVal = speed;
-                typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15));
-                textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
+                if (speed === 1) {
+                    typeSpeedBase = 150;
+                    textAnimDuration = '2.0s';
+                } else if (speed === 2) {
+                    typeSpeedBase = 80;
+                    textAnimDuration = '1.0s';
+                } else if (speed === 3) {
+                    typeSpeedBase = 40;
+                    textAnimDuration = '0.5s';
+                } else {
+                    typeSpeedBase = 15;
+                    textAnimDuration = '0.2s';
+                }
                 document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
                 localStorage.setItem('if_builder_settings_text_speed', speed.toString());
             });
@@ -1138,6 +1230,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // ESC Key listener
         window.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
+                const startScreen = document.getElementById('start-screen');
+                const isTransitioning = startScreen && (
+                    startScreen.classList.contains('menu-trans-fade-in') ||
+                    startScreen.classList.contains('menu-trans-fade-out') ||
+                    startScreen.classList.contains('menu-trans-slide-in') ||
+                    startScreen.classList.contains('menu-trans-slide-out')
+                );
+                if (isTransitioning) return;
                 // If any modal is visible, close it instead of showing start screen
                 let modalClosed = false;
                 document.querySelectorAll('.modal-overlay').forEach(modal => {
@@ -1175,7 +1275,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Auto-start game or show Start Screen
         if (gameData.enableSystemMenu && !window.isSceneTest) {
-            showStartScreen();
+            showStartScreen(true);
         } else {
             startGame();
         }
@@ -1493,7 +1593,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return latestSave;
     };
 
-    const showStartScreen = () => {
+    const showStartScreen = (skipTransition = false) => {
         const startScreen = document.getElementById('start-screen');
         const startTitle = document.getElementById('start-screen-title');
         const newGameBtn = document.getElementById('start-new-game-btn');
@@ -1502,6 +1602,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const gearBtn = document.getElementById('gear-system-button');
 
         if (!startScreen) return;
+
+        if (!skipTransition) {
+            const isTransitioning = startScreen.classList.contains('menu-trans-fade-in') ||
+                                    startScreen.classList.contains('menu-trans-fade-out') ||
+                                    startScreen.classList.contains('menu-trans-slide-in') ||
+                                    startScreen.classList.contains('menu-trans-slide-out');
+            if (isTransitioning) return;
+        }
 
         // Reset containers back to root start screen
         const startScreenButtons = startScreen.querySelector('.start-screen-buttons');
@@ -1512,22 +1620,42 @@ document.addEventListener('DOMContentLoaded', () => {
         if (startScreenSavesContainer) startScreenSavesContainer.classList.add('hidden');
         if (startScreenOptionsContainer) startScreenOptionsContainer.classList.add('hidden');
 
-        // Hide game container
-        gameContainer.classList.add('hidden');
-        
+        // Main Menu transitions speed - Unified
+        const menuTransition = gameData.gameMenuTransitionType || 'fade';
+        let speed = gameData.gameMenuTransitionSpeed !== undefined ? Number(gameData.gameMenuTransitionSpeed) : 500;
+        if (speed > 10) {
+            speed = speed / 1000;
+        }
+        if (speed > 5.0) speed = 0.5;
+        document.documentElement.style.setProperty('--menu-anim-speed', speed + 's');
+
+        startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+
         // Show start screen
         startScreen.classList.remove('hidden');
 
-        // Transition animation
-        const menuTransition = gameData.gameMenuTransitionType || 'fade';
-        startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
-        if (menuTransition === 'fade') {
-            startScreen.classList.add('menu-trans-fade-in');
-        } else if (menuTransition === 'slide') {
-            startScreen.classList.add('menu-trans-slide-in');
-        }
-        if (gameData.gameMenuTransitionSound) {
-            playSound(gameData.gameMenuTransitionSound);
+        if (skipTransition) {
+            // No transitions on first load or instant resets
+        } else {
+            // Force reflow to ensure CSS animations play correctly
+            void startScreen.offsetWidth;
+            
+            if (menuTransition === 'none') {
+                // No anim
+            } else if (menuTransition === 'fade') {
+                startScreen.classList.add('menu-trans-fade-in');
+                setTimeout(() => {
+                    startScreen.classList.remove('menu-trans-fade-in');
+                }, speed * 1000 + 100);
+            } else if (menuTransition === 'slide') {
+                startScreen.classList.add('menu-trans-slide-in');
+                setTimeout(() => {
+                    startScreen.classList.remove('menu-trans-slide-in');
+                }, speed * 1000 + 100);
+            }
+            if (gameData.gameMenuTransitionSound) {
+                playSound(gameData.gameMenuTransitionSound);
+            }
         }
 
         // Render custom title if configured
@@ -1577,17 +1705,34 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const isTransitioning = startScreen.classList.contains('menu-trans-fade-in') ||
+                                startScreen.classList.contains('menu-trans-fade-out') ||
+                                startScreen.classList.contains('menu-trans-slide-in') ||
+                                startScreen.classList.contains('menu-trans-slide-out');
+        if (isTransitioning) return;
+
         if (gameData.gameMenuTransitionSound) {
             playSound(gameData.gameMenuTransitionSound);
         }
 
         const transition = gameData.gameMenuTransitionType || 'fade';
+        let speed = gameData.gameMenuTransitionSpeed !== undefined ? Number(gameData.gameMenuTransitionSpeed) : 500;
+        if (speed > 10) {
+            speed = speed / 1000;
+        }
+        if (speed > 5.0) speed = 0.5;
+        document.documentElement.style.setProperty('--menu-anim-speed', speed + 's');
+
         if (transition === 'none') {
             startScreen.classList.add('hidden');
             startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
             if (callback) callback();
         } else {
             startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+            
+            // Force reflow
+            void startScreen.offsetWidth;
+            
             if (transition === 'fade') {
                 startScreen.classList.add('menu-trans-fade-out');
             } else if (transition === 'slide') {
@@ -1598,7 +1743,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 startScreen.classList.add('hidden');
                 startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
                 if (callback) callback();
-            }, 300);
+            }, speed * 1000 + 100);
         }
     };
 
@@ -1768,8 +1913,15 @@ document.addEventListener('DOMContentLoaded', () => {
         autoDiv.innerHTML = window.safeHTML(autoHtml);
         if (autoData) {
             autoDiv.addEventListener('click', () => {
-                hideStartScreen(() => {
-                    loadGameFromData(autoData);
+                loadGameFromData(autoData);
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        hideStartScreen(() => {
+                            if (gearSystemButton) {
+                                gearSystemButton.classList.add('hidden');
+                            }
+                        });
+                    });
                 });
             });
         }
@@ -1823,8 +1975,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!savedData && isGameSessionActive) {
                     performStartScreenSave(i);
                 } else if (savedData) {
-                    hideStartScreen(() => {
-                        loadGameFromData(savedData);
+                    loadGameFromData(savedData);
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            hideStartScreen(() => {
+                                if (gearSystemButton) {
+                                    gearSystemButton.classList.add('hidden');
+                                }
+                            });
+                        });
                     });
                 }
             });
@@ -2236,13 +2395,31 @@ document.addEventListener('DOMContentLoaded', () => {
         
         let effectiveTransition = !transitionType || transitionType === 'none' ? (gameData.gameImageTransitionType || 'fade') : transitionType;
         if (effectiveTransition === 'none') transition = false;
-        if (transitionSpeed !== null) {
-            const dynamicDuration = Math.max(0.3, 5.0 - (transitionSpeed * 0.9)) + 's';
-            document.documentElement.style.setProperty('--image-anim-speed', dynamicDuration);
+        let speed = 0.5;
+        const savedImageSpeedStr = localStorage.getItem('if_builder_settings_image_speed');
+        if (savedImageSpeedStr) {
+            const speedVal = parseInt(savedImageSpeedStr);
+            if (speedVal === 1) speed = 2.0;
+            else if (speedVal === 2) speed = 1.0;
+            else if (speedVal === 3) speed = 0.5;
+            else if (speedVal === 4) speed = 0.2;
+        } else if (transitionSpeed !== null) {
+            speed = transitionSpeed;
+            if (speed === 1) speed = 2.0;
+            else if (speed === 2) speed = 1.0;
+            else if (speed === 3) speed = 0.5;
+            else if (speed === 4) speed = 0.2;
+            else if (speed > 2.0) speed = 0.5;
         } else {
-            const defaultDuration = Math.max(0.3, 5.0 - ((gameData.gameImageSpeed || 3) * 0.9)) + 's';
-            document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
+            speed = gameData.gameImageSpeed || 0.5;
+            if (speed === 1) speed = 2.0;
+            else if (speed === 2) speed = 1.0;
+            else if (speed === 3) speed = 0.5;
+            else if (speed === 4) speed = 0.2;
+            else if (speed > 2.0) speed = 0.5;
         }
+        const defaultDuration = speed + 's';
+        document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
         if (transition && sceneImage && sceneImageBack && gameData.enableImages !== false) {
              sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
              if (sceneImage.src) {

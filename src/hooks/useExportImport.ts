@@ -377,6 +377,10 @@ DATE:        ${exportDate.toLocaleString()}
         exportData.startScreenButtonAlignment === 'left' ? 'align-left' : (exportData.startScreenButtonAlignment === 'right' ? 'align-right' : 'align-center')
       )
       .replace(
+        '__START_SCREEN_VALIGN_CLASS__',
+        exportData.startScreenVerticalAlignment === 'bottom' ? 'align-v-bottom' : 'align-v-center'
+      )
+      .replace(
         '__START_SCREEN_TITLE__',
         exportData.startScreenTitle || exportData.gameTitle || 'Minha Aventura de Texto'
       )
@@ -426,7 +430,7 @@ DATE:        ${exportDate.toLocaleString()}
         .replace(
           /__SCENE_NAME_OVERLAY_TEXT_COLOR__/g,
           exportData.gameSceneNameOverlayTextColor || '#c9d1d9'
-        ) + OVERLAY_CSS;
+        ) + OVERLAY_CSS + `\n:root { --menu-anim-speed: ${(exportData.gameMenuTransitionSpeed !== undefined ? Number(exportData.gameMenuTransitionSpeed) : 500) / 1000}s; }\n`;
 
     // Inline JS + editor source data + integrity verification before </body>
     const safeEditorJson = JSON.stringify(exportData).replace(/<\/script/g, '<\\/script>');
@@ -735,6 +739,10 @@ DATE:        ${exportDate.toLocaleString()}
         exportData.startScreenButtonAlignment === 'left' ? 'align-left' : (exportData.startScreenButtonAlignment === 'right' ? 'align-right' : 'align-center')
       )
       .replace(
+        '__START_SCREEN_VALIGN_CLASS__',
+        exportData.startScreenVerticalAlignment === 'bottom' ? 'align-v-bottom' : 'align-v-center'
+      )
+      .replace(
         '__START_SCREEN_TITLE__',
         exportData.startScreenTitle || exportData.gameTitle || 'Minha Aventura de Texto'
       )
@@ -784,7 +792,7 @@ DATE:        ${exportDate.toLocaleString()}
         .replace(
           /__SCENE_NAME_OVERLAY_TEXT_COLOR__/g,
           exportData.gameSceneNameOverlayTextColor || '#c9d1d9'
-        ) + OVERLAY_CSS;
+        ) + OVERLAY_CSS + `\n:root { --menu-anim-speed: ${(exportData.gameMenuTransitionSpeed !== undefined ? Number(exportData.gameMenuTransitionSpeed) : 500) / 1000}s; }\n`;
 
     // Inline CSS into the HTML (replace <link rel="stylesheet" href="style.css"> if present)
     htmlContent = htmlContent.replace(

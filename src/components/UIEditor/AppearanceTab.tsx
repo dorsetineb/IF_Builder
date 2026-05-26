@@ -111,6 +111,8 @@ interface AppearanceTabProps {
     localStartScreenTitle?: string;
     localStartScreenButtonAlignment?: 'left' | 'center' | 'right';
     setLocalStartScreenButtonAlignment?: (val: 'left' | 'center' | 'right') => void;
+    localStartScreenVerticalAlignment?: 'center' | 'bottom';
+    setLocalStartScreenVerticalAlignment?: (val: 'center' | 'bottom') => void;
     localTitle?: string;
 }
 
@@ -185,6 +187,8 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     localStartScreenTitle = '',
     localStartScreenButtonAlignment = 'center',
     setLocalStartScreenButtonAlignment,
+    localStartScreenVerticalAlignment = 'center',
+    setLocalStartScreenVerticalAlignment,
     localTitle = ''
 }) => {
     const { t } = useTranslation();
@@ -356,6 +360,20 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                         <option value="left">{t('appearance.left', 'Esquerda')}</option>
                                         <option value="center">{t('UIEditor.startScreen.center', 'Centro')}</option>
                                         <option value="right">{t('appearance.right', 'Direita')}</option>
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
+                                </div>
+                            </div>
+                            <div className="space-y-2">
+                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('UIEditor.startScreen.verticalAlignment', 'Alinhamento vertical')}</label>
+                                <div className="relative">
+                                    <select
+                                        value={localStartScreenVerticalAlignment}
+                                        onChange={(e) => setLocalStartScreenVerticalAlignment && setLocalStartScreenVerticalAlignment(e.target.value as 'center' | 'bottom')}
+                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer pr-10 font-bold"
+                                    >
+                                        <option value="center">{t('appearance.verticalCenter', 'Centro')}</option>
+                                        <option value="bottom">{t('appearance.verticalBottom', 'Parte inferior')}</option>
                                     </select>
                                     <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                                 </div>
@@ -746,15 +764,28 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                     {previewType === 'menu' && (
                         <div className="flex items-center justify-center w-full flex-1 animate-in fade-in duration-300">
                             <div 
-                                className={`w-full aspect-video rounded-2xl border-2 border-muted-foreground/30 relative flex flex-col select-none overflow-hidden justify-center p-8 lg:p-12 ${localStartScreenButtonAlignment === 'left' ? 'items-start text-left' : localStartScreenButtonAlignment === 'right' ? 'items-end text-right' : 'items-center text-center'}`}
+                                className={`w-full aspect-video rounded-2xl border-2 border-muted-foreground/30 relative flex flex-col select-none overflow-hidden p-8 lg:p-12 ${localStartScreenVerticalAlignment === 'bottom' ? 'justify-end' : 'justify-center'} ${localStartScreenButtonAlignment === 'left' ? 'items-start text-left' : localStartScreenButtonAlignment === 'right' ? 'items-end text-right' : 'items-center text-center'}`}
                                 style={{ backgroundColor: localGameBackgroundColor, maxHeight: '500px' }}
                             >
                                 {/* Background image in mockup */}
-                                {localStartScreenBgImage && (
+                                {localStartScreenBgImage ? (
                                     <div 
                                         className="absolute inset-0 bg-cover bg-center transition-all duration-300"
                                         style={{ backgroundImage: `url(${localStartScreenBgImage})` }}
                                     />
+                                ) : (
+                                    <div className="absolute inset-0 opacity-60">
+                                        <DitherShader
+                                            src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
+                                            gridSize={2}
+                                            ditherMode="bayer"
+                                            colorMode="duotone"
+                                            primaryColor={ditherColors.primary}
+                                            secondaryColor={ditherColors.secondary}
+                                            className="w-full h-full"
+                                            objectFit="cover"
+                                        />
+                                    </div>
                                 )}
 
                                 {/* Vignette Overlay (Darkening background to allow reading text) */}

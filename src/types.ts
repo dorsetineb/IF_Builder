@@ -192,6 +192,7 @@ export interface GameData {
   showStartScreenTitle?: boolean;
   startScreenTitle?: string;
   startScreenButtonAlignment?: 'left' | 'center' | 'right';
+  startScreenVerticalAlignment?: 'center' | 'bottom';
   enableFixedVerbs?: boolean;
   enableChances?: boolean; // Legacy/Basic system
   enableRetrospective?: boolean;
@@ -263,6 +264,7 @@ export interface GameData {
   gameImageTransitionType?: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom' | 'blur' | 'none';
   gameImageSpeed?: number; // 1 (slow) to 10 (fast)
   gameMenuTransitionType?: 'fade' | 'slide' | 'none';
+  gameMenuTransitionSpeed?: number;
   gameMenuTransitionSound?: string;
   gameTextReadingFlow?: 'continuous' | 'paused';
 

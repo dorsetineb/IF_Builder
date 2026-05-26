@@ -102,12 +102,16 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             .replace('__NEGATIVE_ENDING_DESCRIPTION__', gameData.negativeEndingDescription || '')
             .replace('__START_SCREEN_BG_STYLE__', gameData.startScreenBgImage ? `style="background-image: url('${gameData.startScreenBgImage}')"` : '')
             .replace('__START_SCREEN_ALIGN_CLASS__', gameData.startScreenButtonAlignment === 'left' ? 'align-left' : (gameData.startScreenButtonAlignment === 'right' ? 'align-right' : 'align-center'))
+            .replace('__START_SCREEN_VALIGN_CLASS__', gameData.startScreenVerticalAlignment === 'bottom' ? 'align-v-bottom' : 'align-v-center')
             .replace('__START_SCREEN_TITLE__', gameData.startScreenTitle || gameData.gameTitle || 'Minha Aventura de Texto')
             .replace('__START_SCREEN_TITLE_HIDDEN_CLASS__', gameData.showStartScreenTitle !== false ? '' : 'hidden');
 
 
         // CSS Overrides to fix legacy/stale gameCSS state
         const cssOverrides = `
+            :root {
+                --menu-anim-speed: ${(gameData.gameMenuTransitionSpeed !== undefined ? Number(gameData.gameMenuTransitionSpeed) : 500) / 1000}s;
+            }
             body.frame-rounded-top .game-container .image-panel { padding: 5px; background: __FRAME_ROUNDED_TOP_COLOR__; border: none; border-radius: 40px 40px 4px 4px; box-shadow: none; }
             body.frame-rounded-top .game-container .image-container { border-radius: 35px 35px 0 0; }
             body.frame-trading-card .image-panel { padding: 4px; background: __FRAME_TRADING_CARD_COLOR__; border-radius: 12px; }
