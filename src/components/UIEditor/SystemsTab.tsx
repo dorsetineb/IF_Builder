@@ -69,8 +69,10 @@ interface SystemsTabProps {
     setLocalShowStartScreenTitle: (val: boolean) => void;
     localStartScreenTitle: string;
     setLocalStartScreenTitle: (val: string) => void;
-    localStartScreenButtonAlignment: 'left' | 'center' | 'right';
-    setLocalStartScreenButtonAlignment: (val: 'left' | 'center' | 'right') => void;
+    localMenuTransitionType: 'fade' | 'slide' | 'none';
+    setLocalMenuTransitionType: (val: 'fade' | 'slide' | 'none') => void;
+    localMenuTransitionSound?: string;
+    setLocalMenuTransitionSound?: (val: string | undefined) => void;
     localTitle: string;
     onNavigateToTrackers?: () => void;
 }
@@ -125,8 +127,10 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
     setLocalShowStartScreenTitle,
     localStartScreenTitle,
     setLocalStartScreenTitle,
-    localStartScreenButtonAlignment,
-    setLocalStartScreenButtonAlignment,
+    localMenuTransitionType,
+    setLocalMenuTransitionType,
+    localMenuTransitionSound,
+    setLocalMenuTransitionSound,
     localTitle,
     onNavigateToTrackers
 }) => {
@@ -138,6 +142,19 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
             reader.onload = (event) => {
                 if (event.target && typeof event.target.result === 'string') {
                     setLocalStartScreenBgImage(event.target.result);
+                }
+            };
+            reader.readAsDataURL(e.target.files[0]);
+        }
+        if (e.target) e.target.value = '';
+    };
+
+    const handleSoundUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                if (event.target && typeof event.target.result === 'string') {
+                    setLocalMenuTransitionSound?.(event.target.result);
                 }
             };
             reader.readAsDataURL(e.target.files[0]);
@@ -695,26 +712,37 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                                 </div>
                                             </div>
 
-                                            {/* Right Column: Posição dos botões */}
-                                            <div className="space-y-2 w-72 shrink-0 sm:pt-[22px]">
-                                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-                                                    {t('UIEditor.startScreen.buttonPosition', 'Posição dos botões')}
-                                                </label>
-                                                <div className="flex bg-background rounded-lg p-1 border border-input w-full font-bold">
-                                                    {[
-                                                        { key: 'left', label: t('appearance.left', 'Esquerda') },
-                                                        { key: 'center', label: t('UIEditor.startScreen.center', 'Centro') },
-                                                        { key: 'right', label: t('appearance.right', 'Direita') }
-                                                    ].map((option) => (
-                                                        <button
-                                                            key={option.key}
-                                                            type="button"
-                                                            onClick={() => setLocalStartScreenButtonAlignment(option.key as any)}
-                                                            className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${localStartScreenButtonAlignment === option.key ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-                                                        >
-                                                            {option.label}
-                                                        </button>
-                                                    ))}
+                                            {/* Right Column: Transição & Som */}
+                                            <div className="space-y-3 w-72 shrink-0 sm:pt-[22px]">
+                                                <div className="space-y-1.5">
+                                                    <label htmlFor="menuTransitionType" className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                                        {t('UIEditor.startScreen.transition', 'Transição')}
+                                                    </label>
+                                                    <select
+                                                        id="menuTransitionType"
+                                                        value={localMenuTransitionType}
+                                                        onChange={(e) => setLocalMenuTransitionType(e.target.value as any)}
+                                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 font-bold"
+                                                    >
+                                                        <option value="fade">{t('UIEditor.sistemas.transFade', 'Esmaecer')}</option>
+                                                        <option value="slide">{t('UIEditor.sistemas.transSlide', 'Deslizar')}</option>
+                                                        <option value="none">{t('UIEditor.sistemas.transNone', 'Nenhuma')}</option>
+                                                    </select>
+                                                </div>
+
+                                                <div className="space-y-1.5">
+                                                    <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+                                                        {t('interactionEditor.soundEffectLabel', 'Efeito Sonoro (.mp3)')}
+                                                    </label>
+                                                    <div className="flex items-center gap-2 h-[38px] w-full">
+                                                        <label className="flex-1 h-full flex items-center justify-center px-3 py-2 bg-background border border-muted-foreground/50 rounded-lg hover:bg-muted cursor-pointer text-xs font-bold transition-colors">
+                                                            <Upload className="w-3.5 h-3.5 mr-2 text-muted-foreground" /> {localMenuTransitionSound ? t('interactionEditor.changeBtn', 'Alterar') : t('interactionEditor.uploadBtn', 'Upload')}
+                                                            <input type="file" accept="audio/*" onChange={handleSoundUpload} className="hidden" />
+                                                        </label>
+                                                        {localMenuTransitionSound && (
+                                                            <button onClick={() => setLocalMenuTransitionSound?.(undefined)} className="h-full px-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors shadow-sm"><Trash2 className="w-4 h-4" /></button>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

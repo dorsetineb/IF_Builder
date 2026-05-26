@@ -27,20 +27,51 @@ export const gameHTML = `
 
         <!-- Menu Principal Screen -->
         <div id="start-screen" class="splash-screen hidden __START_SCREEN_ALIGN_CLASS__" __START_SCREEN_BG_STYLE__>
-            <div class="start-screen-overlay"></div>
-            <div class="splash-content" style="z-index: 10;">
-                <div class="splash-text">
-                    <h1 id="start-screen-title" class="__START_SCREEN_TITLE_HIDDEN_CLASS__">__START_SCREEN_TITLE__</h1>
-                </div>
-                <div class="splash-buttons start-screen-buttons">
-                    <button id="start-resume-game-btn" class="ending-restart-button hidden">Voltar ao Jogo</button>
-                    <button id="start-new-game-btn" class="ending-restart-button">Começar de novo</button>
-                    <button id="start-continue-btn" class="ending-restart-button hidden">Continuar</button>
-                    <button id="start-saves-btn" class="ending-restart-button">Caminhos salvos</button>
-                    <button id="start-options-btn" class="ending-restart-button">Opções</button>
-                </div>
-            </div>
-        </div>
+             <div class="start-screen-overlay"></div>
+             <div class="splash-content" style="z-index: 10;">
+                 <div class="splash-text">
+                     <h1 id="start-screen-title" class="__START_SCREEN_TITLE_HIDDEN_CLASS__">__START_SCREEN_TITLE__</h1>
+                 </div>
+                 <div class="splash-buttons start-screen-buttons">
+                     <button id="start-continue-btn" class="ending-restart-button hidden">Continuar</button>
+                     <button id="start-new-game-btn" class="ending-restart-button">Começar de novo</button>
+                     <button id="start-saves-btn" class="ending-restart-button">Caminhos salvos</button>
+                     <button id="start-options-btn" class="ending-restart-button">Opções</button>
+                 </div>
+                 <!-- Embedded Saves/Slots Container -->
+                 <div id="start-screen-saves-container" class="splash-buttons start-screen-saves-container hidden" style="width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 15px; align-items: var(--splash-content-align-items);">
+                     <button id="start-screen-saves-back-btn" class="ending-restart-button" style="margin-bottom: 5px; width: 100%;">&lt; Voltar</button>
+                     <div id="start-screen-slots-list" class="slots-list start-screen-slots" style="display: flex; flex-direction: column; gap: 12px; width: 100%; align-items: var(--splash-content-align-items);"></div>
+                 </div>
+                 <!-- Embedded Options Container -->
+                 <div id="start-screen-options-container" class="splash-buttons start-screen-options-container hidden" style="width: 100%; max-width: 350px; display: flex; flex-direction: column; gap: 15px; align-items: var(--splash-content-align-items);">
+                     <button id="start-screen-options-back-btn" class="ending-restart-button" style="margin-bottom: 5px; width: 100%;">&lt; Voltar</button>
+                     <div class="start-screen-options-list" style="display: flex; flex-direction: column; gap: 18px; width: 100%; padding: 10px 0; box-sizing: border-box; align-items: var(--splash-content-align-items);">
+                         <div class="option-slider-wrapper" style="display: flex; flex-direction: column; gap: 6px; width: 100%; text-align: var(--splash-text-align);">
+                             <span style="font-size: 0.9em; font-weight: bold; color: var(--splash-button-text-color); opacity: 0.85; text-align: var(--splash-text-align); width: 100%; display: block;">Volume da Música</span>
+                             <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                                 <input type="range" id="start-square-volume" min="0" max="100" value="100" class="start-square-slider" style="flex: 1;">
+                                 <span id="start-square-volume-val" style="font-size: 0.85em; font-weight: bold; min-width: 40px; text-align: right; color: var(--splash-button-text-color);">100%</span>
+                             </div>
+                         </div>
+                         <div class="option-slider-wrapper" style="display: flex; flex-direction: column; gap: 6px; width: 100%; text-align: var(--splash-text-align);">
+                             <span style="font-size: 0.9em; font-weight: bold; color: var(--splash-button-text-color); opacity: 0.85; text-align: var(--splash-text-align); width: 100%; display: block;">Velocidade do Texto</span>
+                             <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                                 <input type="range" id="start-square-text-speed" min="1" max="5" value="3" class="start-square-slider" style="flex: 1;">
+                                 <span id="start-square-text-speed-val" style="font-size: 0.85em; font-weight: bold; min-width: 40px; text-align: right; color: var(--splash-button-text-color);">3</span>
+                             </div>
+                         </div>
+                         <div class="option-slider-wrapper" style="display: flex; flex-direction: column; gap: 6px; width: 100%; text-align: var(--splash-text-align);">
+                             <span style="font-size: 0.9em; font-weight: bold; color: var(--splash-button-text-color); opacity: 0.85; text-align: var(--splash-text-align); width: 100%; display: block;">Velocidade da Imagem</span>
+                             <div style="display: flex; align-items: center; gap: 12px; width: 100%;">
+                                 <input type="range" id="start-square-image-speed" min="1" max="5" value="3" class="start-square-slider" style="flex: 1;">
+                                 <span id="start-square-image-speed-val" style="font-size: 0.85em; font-weight: bold; min-width: 40px; text-align: right; color: var(--splash-button-text-color);">3</span>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
 
         <div id="positive-ending-screen" class="splash-screen hidden __POSITIVE_ENDING_ALIGN_CLASS__" __POSITIVE_ENDING_BG_STYLE__>
             <div class="splash-content">
@@ -347,7 +378,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .vignette-scale-lg h1 { font-size: 3.2em !important; }
 .vignette-scale-lg p, .vignette-scale-lg .description { font-size: 1.25em !important; }
 .splash-buttons { display: flex; flex-direction: column; gap: 15px; width: 100%; align-items: var(--splash-content-align-items); }
-#splash-start-button, .ending-restart-button, #continue-button, #vignette-continue-button { font-family: var(--font-family); padding: 12px 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; }
+#splash-start-button, .ending-restart-button, #continue-button, #vignette-continue-button { font-family: var(--font-family); height: 48px; display: flex; align-items: center; justify-content: center; padding: 0 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; box-sizing: border-box; }
 #splash-start-button, .ending-restart-button, #vignette-continue-button { background-color: var(--splash-button-bg); }
 #continue-button { background-color: #1d4ed8; }
 #splash-start-button:hover, .ending-restart-button:hover, #continue-button:hover { transform: translateY(-3px); box-shadow: 0 3px 0px rgba(0, 0, 0, 0.4); }
@@ -482,15 +513,26 @@ body.with-spacing .main-wrapper { height: 100%; }
 .system-menu button.danger-button { color: var(--danger-color); border-color: var(--danger-color); background-color: transparent; }
 .system-menu button.danger-button:hover { background-color: var(--danger-hover-bg); color: #fff; border-color: var(--danger-hover-bg); }
 .system-slots { display: flex; flex-direction: column; gap: 15px; margin-top: 20px; text-align: left; }
-.slot-item { background-color: var(--input-bg); border: 2px solid var(--border-color); padding: 15px; cursor: pointer; transition: border-color 0.2s; display: flex; justify-content: space-between; align-items: center; }
-.slot-item:hover { border-color: var(--accent-color); }
-.slot-info { display: flex; flex-direction: column; gap: 5px; flex: 1; min-width: 0; }
-.slot-title { font-weight: bold; color: var(--accent-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.slot-meta { font-size: 0.8em; color: var(--text-dim-color); }
-.slot-empty { font-style: italic; color: var(--text-dim-color); }
+.slot-item { font-family: var(--font-family); font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color) !important; background-color: var(--splash-button-bg) !important; transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; height: 48px; display: flex; align-items: center; position: relative; padding: 0; margin: 0 auto; box-sizing: border-box; overflow: hidden; box-shadow: none; }
+.slot-item:hover { transform: translateY(-3px); box-shadow: 0 3px 0px rgba(0, 0, 0, 0.4); background-color: var(--splash-button-hover-bg) !important; }
+.slot-item.dashed-slot { border: 2px dashed var(--splash-button-bg) !important; background: transparent !important; color: var(--splash-button-text-color) !important; opacity: 0.75; }
+.slot-item.dashed-slot:hover { border-style: dashed !important; border-color: var(--splash-button-hover-bg) !important; background-color: rgba(255, 255, 255, 0.05) !important; }
+.slot-item.dashed-slot.disabled { opacity: 0.35; cursor: not-allowed; pointer-events: none; }
+.slot-info { display: flex; flex-direction: column; justify-content: center; height: 100%; width: 100%; box-sizing: border-box; pointer-events: none; padding: 0 24px; }
+.slot-title { font-size: 1em; font-weight: bold; color: inherit; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 1.2; }
+.slot-meta { font-size: 0.75em; font-weight: normal; color: inherit; opacity: 0.7; margin-top: 2px; }
+.slot-empty { font-size: 1em; font-weight: normal; color: inherit; opacity: 0.5; }
 .slot-actions { display: flex; gap: 10px; align-items: center; }
-.slot-delete-btn { background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1.5em; padding: 0 10px; line-height: 1; }
-.slot-delete-btn:hover { color: #fff; background-color: var(--danger-color); border-radius: 4px; }
+.slot-delete-btn { position: absolute; left: 0; top: 0; bottom: 0; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background-color: #f85149 !important; border: none; border-radius: 0 !important; color: #fff !important; cursor: pointer; z-index: 10; transition: background-color 0.2s, transform 0.2s; padding: 0; }
+.slot-delete-btn:hover { background-color: #da3633 !important; }
+
+/* Custom Square Slider track & thumb styling */
+.start-square-slider { -webkit-appearance: none; appearance: none; width: 100%; height: 4px; background: color-mix(in srgb, var(--splash-button-text-color) 45%, transparent); outline: none; margin: 12px 0; padding: 0; box-sizing: border-box; border-radius: 0 !important; cursor: pointer; }
+.start-square-slider::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 16px; height: 16px; background: var(--highlight-color, var(--splash-button-hover-bg)); cursor: pointer; border: none; border-radius: 0 !important; margin-top: -6px; transition: background 0.2s, opacity 0.2s; }
+.start-square-slider::-webkit-slider-thumb:hover { opacity: 0.85; }
+.start-square-slider::-moz-range-thumb { width: 16px; height: 16px; background: var(--highlight-color, var(--splash-button-hover-bg)); cursor: pointer; border: none; border-radius: 0 !important; transition: background 0.2s, opacity 0.2s; }
+.start-square-slider::-moz-range-thumb:hover { opacity: 0.85; }
+.start-square-slider::-moz-range-track { background: color-mix(in srgb, var(--splash-button-text-color) 45%, transparent); height: 4px; border: none; border-radius: 0 !important; }
 #btn-back-system { width: auto; padding: 10px 20px; align-self: center; margin-top: 10px; background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); cursor: pointer; font-family: var(--font-family); font-size: 0.9em; transition: all 0.2s; }
 #btn-back-system:hover { background-color: var(--system-button-hover-bg); transform: translateY(-2px); }
 
@@ -1692,6 +1734,37 @@ export const OVERLAY_CSS = `
     transform: translateY(0);
 }
 
+/* Transições do Menu Principal */
+.menu-trans-fade-in {
+    animation: menuFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.menu-trans-fade-out {
+    animation: menuFadeOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.menu-trans-slide-in {
+    animation: menuSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.menu-trans-slide-out {
+    animation: menuSlideOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+@keyframes menuFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+@keyframes menuFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+@keyframes menuSlideIn {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+}
+@keyframes menuSlideOut {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+}
+
 .start-screen-overlay {
     position: absolute;
     inset: 0;
@@ -1707,7 +1780,7 @@ export const OVERLAY_CSS = `
     z-index: 10;
 }
 
-.start-screen-buttons button {
+.start-screen-buttons button, #start-screen-saves-back-btn, #start-screen-options-back-btn {
     font-family: var(--font-family);
     padding: 12px 24px;
     border: 2px solid var(--system-button-border) !important;
@@ -1722,14 +1795,14 @@ export const OVERLAY_CSS = `
     outline: none;
 }
 
-.start-screen-buttons button:hover {
+.start-screen-buttons button:hover, #start-screen-saves-back-btn:hover, #start-screen-options-back-btn:hover {
     background-color: var(--system-button-hover-bg) !important;
     color: var(--system-button-hover-text, var(--system-button-text)) !important;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-.start-screen-buttons button:active {
+.start-screen-buttons button:active, #start-screen-saves-back-btn:active, #start-screen-options-back-btn:active {
     transform: translateY(0);
 }
 
@@ -1811,6 +1884,8 @@ export const initialGameData: GameData = {
     showStartScreenTitle: true,
     startScreenTitle: '',
     startScreenButtonAlignment: 'center',
+    gameMenuTransitionType: 'fade',
+    gameMenuTransitionSound: '',
     fixedVerbs: [],
     consequenceTrackers: [],
     positiveEndingMusic: '',

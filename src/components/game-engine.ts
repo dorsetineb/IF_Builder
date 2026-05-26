@@ -102,6 +102,12 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameInteractionType: data.gameInteractionType || 'parser',
         gameSuggestionsEmptyFeedback: data.gameSuggestionsEmptyFeedback,
         gameInventoryEmptyFeedback: data.gameInventoryEmptyFeedback,
+        // Main Menu / System Menu
+        enableSystemMenu: data.enableSystemMenu,
+        startScreenBgImage: data.startScreenBgImage,
+        showStartScreenTitle: data.showStartScreenTitle,
+        startScreenTitle: data.startScreenTitle,
+        startScreenButtonAlignment: data.startScreenButtonAlignment,
         gameTranslations: data.gameTranslations || {
             view_diary_btn: "Ver Diário",
             stats_visited: "Você visitou",
@@ -162,8 +168,37 @@ document.addEventListener('DOMContentLoaded', () => {
     let renderSessionId = 0; // Prevent race conditions in rendering
     let isGameSessionActive = false;
 
-    let textSpeedVal = gameData.gameTextSpeed || 3; 
-    const imgSpeedVal = gameData.gameImageSpeed || 3;
+    const previewSaves = {};
+
+    const getGameSave = (key) => {
+        if (window.isPreview) {
+            return previewSaves[key] || null;
+        }
+        return localStorage.getItem(key);
+    };
+
+    const setGameSave = (key, value) => {
+        if (window.isPreview) {
+            previewSaves[key] = value;
+            return;
+        }
+        localStorage.setItem(key, value);
+    };
+
+    const removeGameSave = (key) => {
+        if (window.isPreview) {
+            delete previewSaves[key];
+            return;
+        }
+        localStorage.removeItem(key);
+    };
+
+    const savedTextSpeed = localStorage.getItem('if_builder_settings_text_speed');
+    let textSpeedVal = savedTextSpeed ? parseInt(savedTextSpeed) : (gameData.gameTextSpeed || 3); 
+    
+    const savedImgSpeed = localStorage.getItem('if_builder_settings_image_speed');
+    const imgSpeedVal = savedImgSpeed ? parseInt(savedImgSpeed) : (gameData.gameImageSpeed || 3);
+    
     let typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
     let textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
     const imageAnimDuration = Math.max(0.3, 5.0 - (imgSpeedVal * 0.9)) + 's';
@@ -211,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const positiveEndingScreen = document.getElementById('positive-ending-screen');
     const negativeEndingScreen = document.getElementById('negative-ending-screen');
-    const endingRestartButtons = document.querySelectorAll('.ending-restart-button:not(#vignette-continue-button)');
+    const endingRestartButtons = document.querySelectorAll('#positive-ending-screen .ending-restart-button, #negative-ending-screen .ending-restart-button');
     
     const gameContainer = document.getElementById('game-container');
     const imageContainer = document.getElementById('image-container');
@@ -884,95 +919,177 @@ document.addEventListener('DOMContentLoaded', () => {
         // Menu Principal & System Button Hooks
         const gearSystemButton = document.getElementById('gear-system-button');
         if (gearSystemButton) {
-            if (gameData.enableSystemMenu && !window.isSceneTest) {
-                gearSystemButton.classList.remove('hidden');
-                gearSystemButton.addEventListener('click', () => {
-                    const startScreen = document.getElementById('start-screen');
-                    if (startScreen.classList.contains('hidden')) {
-                        showStartScreen();
-                    } else {
-                        if (isGameSessionActive) {
-                            startScreen.classList.add('hidden');
-                            gameContainer.classList.remove('hidden');
-                            gearSystemButton.classList.remove('hidden');
-                        }
-                    }
-                });
-            } else {
-                gearSystemButton.classList.add('hidden');
-            }
+            gearSystemButton.classList.add('hidden');
         }
 
         const resumeBtn = document.getElementById('start-resume-game-btn');
         if (resumeBtn) {
             resumeBtn.addEventListener('click', () => {
-                const startScreen = document.getElementById('start-screen');
-                if (startScreen) startScreen.classList.add('hidden');
-                gameContainer.classList.remove('hidden');
-                
-                if (gearSystemButton && gameData.enableSystemMenu && !window.isSceneTest) {
-                    gearSystemButton.classList.remove('hidden');
-                }
+                hideStartScreen(() => {
+                    gameContainer.classList.remove('hidden');
+                    if (gearSystemButton) {
+                        gearSystemButton.classList.add('hidden');
+                    }
+                });
             });
         }
 
         const newGameBtn = document.getElementById('start-new-game-btn');
         if (newGameBtn) {
             newGameBtn.addEventListener('click', () => {
-                if (isGameSessionActive) {
+                if (isGameSessionActive && !window.isPreview) {
                     if (!confirm('Começar de novo apagará seu progresso atual e o caminho salvo automaticamente. Deseja continuar?')) {
                         return;
                     }
                 }
-                const startScreen = document.getElementById('start-screen');
-                if (startScreen) startScreen.classList.add('hidden');
                 
-                // Novo jogo apaga o autosave imediatamente!
-                localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
-                
-                startGame();
-                gameContainer.classList.remove('hidden');
-                
-                if (gearSystemButton && gameData.enableSystemMenu && !window.isSceneTest) {
-                    gearSystemButton.classList.remove('hidden');
-                }
+                hideStartScreen(() => {
+                    // Novo jogo apaga o autosave imediatamente!
+                    removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+                    
+                    startGame();
+                    gameContainer.classList.remove('hidden');
+                    
+                    if (gearSystemButton) {
+                        gearSystemButton.classList.add('hidden');
+                    }
+                });
             });
         }
 
         const continueBtn = document.getElementById('start-continue-btn');
         if (continueBtn) {
             continueBtn.addEventListener('click', () => {
-                const latestSave = getLatestSave();
-                if (latestSave) {
-                    const startScreen = document.getElementById('start-screen');
-                    if (startScreen) startScreen.classList.add('hidden');
-                    loadGameFromData(latestSave);
-                    
-                    if (gearSystemButton && gameData.enableSystemMenu && !window.isSceneTest) {
-                        gearSystemButton.classList.remove('hidden');
+                if (isGameSessionActive) {
+                    hideStartScreen(() => {
+                        gameContainer.classList.remove('hidden');
+                    });
+                } else {
+                    const latestSave = getLatestSave();
+                    if (latestSave) {
+                        hideStartScreen(() => {
+                            loadGameFromData(latestSave);
+                            if (gearSystemButton) {
+                                gearSystemButton.classList.add('hidden');
+                            }
+                        });
                     }
                 }
             });
         }
 
         const startSavesBtn = document.getElementById('start-saves-btn');
+        const startScreenButtons = document.querySelector('.start-screen-buttons');
+        const startScreenSavesContainer = document.getElementById('start-screen-saves-container');
+        
         if (startSavesBtn) {
             startSavesBtn.addEventListener('click', () => {
-                renderSlots(isGameSessionActive ? 'save' : 'load');
-                systemModal.classList.remove('hidden');
+                if (startScreenButtons) startScreenButtons.classList.add('hidden');
+                if (startScreenSavesContainer) startScreenSavesContainer.classList.remove('hidden');
+                renderStartScreenSlots();
+            });
+        }
+
+        const startScreenSavesBackBtn = document.getElementById('start-screen-saves-back-btn');
+        if (startScreenSavesBackBtn) {
+            startScreenSavesBackBtn.addEventListener('click', () => {
+                if (startScreenSavesContainer) startScreenSavesContainer.classList.add('hidden');
+                if (startScreenButtons) startScreenButtons.classList.remove('hidden');
+                showStartScreen();
             });
         }
 
         const startOptionsBtn = document.getElementById('start-options-btn');
+        const startScreenOptionsContainer = document.getElementById('start-screen-options-container');
         if (startOptionsBtn) {
             startOptionsBtn.addEventListener('click', () => {
-                if (settingsModal) settingsModal.classList.remove('hidden');
+                if (startScreenButtons) startScreenButtons.classList.add('hidden');
+                if (startScreenOptionsContainer) startScreenOptionsContainer.classList.remove('hidden');
+                syncSquareSliders();
             });
         }
 
-        // Initialize Options Sliders
+        const startScreenOptionsBackBtn = document.getElementById('start-screen-options-back-btn');
+        if (startScreenOptionsBackBtn) {
+            startScreenOptionsBackBtn.addEventListener('click', () => {
+                if (startScreenOptionsContainer) startScreenOptionsContainer.classList.add('hidden');
+                if (startScreenButtons) startScreenButtons.classList.remove('hidden');
+                showStartScreen();
+            });
+        }
+
+        const syncSquareSliders = () => {
+            const sqVolume = document.getElementById('start-square-volume');
+            const sqVolumeVal = document.getElementById('start-square-volume-val');
+            const sqTextSpeed = document.getElementById('start-square-text-speed');
+            const sqTextSpeedVal = document.getElementById('start-square-text-speed-val');
+            const sqImageSpeed = document.getElementById('start-square-image-speed');
+            const sqImageSpeedVal = document.getElementById('start-square-image-speed-val');
+
+            const savedVol = localStorage.getItem('if_builder_settings_volume') || '100';
+            if (sqVolume) {
+                sqVolume['value'] = savedVol;
+                if (sqVolumeVal) sqVolumeVal.textContent = savedVol + '%';
+            }
+
+            const savedTextSpeed = localStorage.getItem('if_builder_settings_text_speed') || '3';
+            if (sqTextSpeed) {
+                sqTextSpeed['value'] = savedTextSpeed;
+                if (sqTextSpeedVal) sqTextSpeedVal.textContent = savedTextSpeed;
+            }
+
+            const savedImageSpeed = localStorage.getItem('if_builder_settings_image_speed') || '3';
+            if (sqImageSpeed) {
+                sqImageSpeed['value'] = savedImageSpeed;
+                if (sqImageSpeedVal) sqImageSpeedVal.textContent = savedImageSpeed;
+            }
+        };
+
         const bgm = bgmAudio;
         const sfx = soundEffectAudio;
+
+        const sqVolume = document.getElementById('start-square-volume');
+        const sqVolumeVal = document.getElementById('start-square-volume-val');
+        if (sqVolume) {
+            sqVolume.addEventListener('input', (e) => {
+                const target = e.target;
+                const volVal = parseFloat(target['value']);
+                if (sqVolumeVal) sqVolumeVal.textContent = volVal + '%';
+                if (bgm) bgm.volume = volVal / 100;
+                if (sfx) sfx.volume = volVal / 100;
+                localStorage.setItem('if_builder_settings_volume', volVal.toString());
+            });
+        }
+
+        const sqTextSpeed = document.getElementById('start-square-text-speed');
+        const sqTextSpeedVal = document.getElementById('start-square-text-speed-val');
+        if (sqTextSpeed) {
+            sqTextSpeed.addEventListener('input', (e) => {
+                const target = e.target;
+                const speed = parseInt(target['value']);
+                if (sqTextSpeedVal) sqTextSpeedVal.textContent = speed.toString();
+                textSpeedVal = speed;
+                typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15));
+                textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
+                document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
+                localStorage.setItem('if_builder_settings_text_speed', speed.toString());
+            });
+        }
+
+        const sqImageSpeed = document.getElementById('start-square-image-speed');
+        const sqImageSpeedVal = document.getElementById('start-square-image-speed-val');
+        if (sqImageSpeed) {
+            sqImageSpeed.addEventListener('input', (e) => {
+                const target = e.target;
+                const speed = parseInt(target['value']);
+                if (sqImageSpeedVal) sqImageSpeedVal.textContent = speed.toString();
+                localStorage.setItem('if_builder_settings_image_speed', speed.toString());
+                const imageDuration = Math.max(0.3, 5.0 - (speed * 0.9)) + 's';
+                document.documentElement.style.setProperty('--image-anim-speed', imageDuration);
+            });
+        }
+
+
 
         const volumeSlider = document.getElementById('settings-volume-slider');
         if (volumeSlider) {
@@ -1039,9 +1156,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     } else {
                         if (isGameSessionActive) {
-                            startScreen.classList.add('hidden');
-                            gameContainer.classList.remove('hidden');
-                            if (gearSystemButton) gearSystemButton.classList.remove('hidden');
+                            hideStartScreen(() => {
+                                gameContainer.classList.remove('hidden');
+                                if (gearSystemButton) gearSystemButton.classList.add('hidden');
+                            });
                         }
                     }
                 } else {
@@ -1252,7 +1370,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const startGame = () => {
-        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+        removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
         currentSceneId = gameData.cena_inicial; 
         inventory = []; 
         visitedScenes = []; 
@@ -1353,9 +1471,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const manual1Key = 'if_builder_manual_1_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
         const manual2Key = 'if_builder_manual_2_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
         
-        const autoSave = localStorage.getItem(autoKey);
-        const m1Save = localStorage.getItem(manual1Key);
-        const m2Save = localStorage.getItem(manual2Key);
+        const autoSave = getGameSave(autoKey);
+        const m1Save = getGameSave(manual1Key);
+        const m2Save = getGameSave(manual2Key);
         
         let latestSave = null;
         let latestTime = 0;
@@ -1378,17 +1496,39 @@ document.addEventListener('DOMContentLoaded', () => {
     const showStartScreen = () => {
         const startScreen = document.getElementById('start-screen');
         const startTitle = document.getElementById('start-screen-title');
-        const resumeBtn = document.getElementById('start-resume-game-btn');
+        const newGameBtn = document.getElementById('start-new-game-btn');
         const continueBtn = document.getElementById('start-continue-btn');
+        const savesBtn = document.getElementById('start-saves-btn');
         const gearBtn = document.getElementById('gear-system-button');
 
         if (!startScreen) return;
+
+        // Reset containers back to root start screen
+        const startScreenButtons = startScreen.querySelector('.start-screen-buttons');
+        const startScreenSavesContainer = document.getElementById('start-screen-saves-container');
+        const startScreenOptionsContainer = document.getElementById('start-screen-options-container');
+
+        if (startScreenButtons) startScreenButtons.classList.remove('hidden');
+        if (startScreenSavesContainer) startScreenSavesContainer.classList.add('hidden');
+        if (startScreenOptionsContainer) startScreenOptionsContainer.classList.add('hidden');
 
         // Hide game container
         gameContainer.classList.add('hidden');
         
         // Show start screen
         startScreen.classList.remove('hidden');
+
+        // Transition animation
+        const menuTransition = gameData.gameMenuTransitionType || 'fade';
+        startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+        if (menuTransition === 'fade') {
+            startScreen.classList.add('menu-trans-fade-in');
+        } else if (menuTransition === 'slide') {
+            startScreen.classList.add('menu-trans-slide-in');
+        }
+        if (gameData.gameMenuTransitionSound) {
+            playSound(gameData.gameMenuTransitionSound);
+        }
 
         // Render custom title if configured
         if (startTitle) {
@@ -1400,30 +1540,72 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // Handle buttons visibility
+        // Handle buttons visibility and texts
         if (isGameSessionActive) {
-            if (resumeBtn) resumeBtn.classList.remove('hidden');
+            if (newGameBtn) newGameBtn.textContent = gameData.gameRestartButtonText || 'Começar de novo';
         } else {
-            if (resumeBtn) resumeBtn.classList.add('hidden');
+            if (newGameBtn) newGameBtn.textContent = 'Começar';
         }
 
-        // Check if there are any saves to show the "Continuar" button
+        // Check if there are any saves OR active session to show the "Continuar" button
         const latestSave = getLatestSave();
-        if (latestSave && continueBtn) {
+        if ((latestSave || isGameSessionActive) && continueBtn) {
             continueBtn.classList.remove('hidden');
         } else if (continueBtn) {
             continueBtn.classList.add('hidden');
+        }
+
+        // Check autosave presence to show/hide "Caminhos salvos" button
+        const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const autoData = getGameSave(autoKey);
+        if (savesBtn) {
+            if (autoData) {
+                savesBtn.classList.remove('hidden');
+            } else {
+                savesBtn.classList.add('hidden');
+            }
         }
 
         // Hide gear button when we are on the Menu Principal itself
         if (gearBtn) gearBtn.classList.add('hidden');
     };
 
+    const hideStartScreen = (callback) => {
+        const startScreen = document.getElementById('start-screen');
+        if (!startScreen) {
+            if (callback) callback();
+            return;
+        }
+
+        if (gameData.gameMenuTransitionSound) {
+            playSound(gameData.gameMenuTransitionSound);
+        }
+
+        const transition = gameData.gameMenuTransitionType || 'fade';
+        if (transition === 'none') {
+            startScreen.classList.add('hidden');
+            startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+            if (callback) callback();
+        } else {
+            startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+            if (transition === 'fade') {
+                startScreen.classList.add('menu-trans-fade-out');
+            } else if (transition === 'slide') {
+                startScreen.classList.add('menu-trans-slide-out');
+            }
+
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+                if (callback) callback();
+            }, 300);
+        }
+    };
+
     const autoSaveGame = () => {
-        if (window.isPreview) return; 
         if (isGameEnded) return;
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
-        localStorage.setItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'), JSON.stringify(save));
+        setGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'), JSON.stringify(save));
     };
 
     const toggleSystemMenu = () => {
@@ -1441,7 +1623,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Render 1 Autosave + 2 Manual Saves
             // --- 1. AUTOSAVE SLOT ---
             const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
-            const autoData = localStorage.getItem(autoKey);
+            const autoData = getGameSave(autoKey);
             const autoDiv = document.createElement('div'); autoDiv.className = 'slot-item';
             let autoHtml = '';
             if (autoData) {
@@ -1449,7 +1631,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const data = JSON.parse(autoData);
                     const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
                     autoHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo automaticamente - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
-                    autoHtml += '<div class="slot-actions"><button class="slot-load-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Carregar</button></div>';
                 } catch (e) {
                     autoHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo automaticamente</span><span class="slot-empty">Erro ao ler dados</span></div>';
                 }
@@ -1458,19 +1639,16 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             autoDiv.innerHTML = window.safeHTML(autoHtml);
             if (autoData) {
-                const loadBtn = autoDiv.querySelector('.slot-load-btn');
-                if (loadBtn) {
-                    loadBtn.addEventListener('click', () => {
-                        loadGameFromData(autoData);
-                    });
-                }
+                autoDiv.addEventListener('click', () => {
+                    loadGameFromData(autoData);
+                });
             }
             slotsList.appendChild(autoDiv);
 
             // --- 2. MANUAL SAVES (Slots 1 & 2) ---
             for (let i = 1; i <= 2; i++) {
                 const slotKey = 'if_builder_manual_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
-                const savedData = localStorage.getItem(slotKey);
+                const savedData = getGameSave(slotKey);
                 const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
                 let contentHtml = '';
                 if (savedData) {
@@ -1480,10 +1658,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         contentHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
                         
                         let actionsHtml = '<div class="slot-actions" style="display: flex; gap: 6px; align-items: center;">';
-                        if (mode === 'save') {
-                            actionsHtml += '<button class="slot-save-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Sobrescrever caminho</button>';
-                        }
-                        actionsHtml += '<button class="slot-load-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Carregar</button>';
                         actionsHtml += '<button class="slot-delete-btn" style="background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1.5em; padding: 0 5px; line-height: 1;">&times;</button>';
                         actionsHtml += '</div>';
                         contentHtml += actionsHtml;
@@ -1491,41 +1665,30 @@ document.addEventListener('DOMContentLoaded', () => {
                         contentHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo ' + i + '</span><span class="slot-empty">Erro ao ler dados</span></div>';
                     }
                 } else {
-                    contentHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo ' + i + '</span><span class="slot-empty">Vazio</span></div>';
                     if (mode === 'save') {
-                        contentHtml += '<div class="slot-actions"><button class="slot-save-btn" style="background-color: var(--system-button-bg); border: 2px solid var(--system-button-border); color: var(--system-button-text); padding: 5px 10px; cursor: pointer; font-family: var(--font-family); font-size: 0.8em; font-weight: bold; text-transform: uppercase;">Salvar caminho</button></div>';
+                        contentHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title" style="font-weight: normal; color: rgba(255,255,255,0.75); cursor: pointer;">Clique para salvar</span></div>';
+                    } else {
+                        contentHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title" style="font-weight: normal; color: rgba(255,255,255,0.3);">Slot vazio</span></div>';
                     }
                 }
                 slotDiv.innerHTML = window.safeHTML(contentHtml);
                 
                 // Add button listeners
-                const saveBtn = slotDiv.querySelector('.slot-save-btn');
-                const loadBtn = slotDiv.querySelector('.slot-load-btn');
                 const deleteBtn = slotDiv.querySelector('.slot-delete-btn');
-
-                if (saveBtn) {
-                    saveBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        if (savedData) {
-                            if (confirm('Deseja sobrescrever este caminho salvo?')) {
-                                performSave(i);
-                            }
-                        } else {
-                            performSave(i);
-                        }
-                    });
-                }
-                if (loadBtn && savedData) {
-                    loadBtn.addEventListener('click', (e) => {
-                        e.stopPropagation();
+                
+                slotDiv.addEventListener('click', () => {
+                    if (savedData) {
                         loadGameFromData(savedData);
-                    });
-                }
+                    } else if (mode === 'save') {
+                        performSave(i);
+                    }
+                });
+
                 if (deleteBtn && savedData) {
                     deleteBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         if (confirm('Tem certeza que deseja deletar este caminho salvo?')) {
-                            localStorage.removeItem(slotKey);
+                            removeGameSave(slotKey);
                             renderSlots(mode);
                         }
                     });
@@ -1536,7 +1699,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Legacy / Standard behavior
             for (let i = 1; i <= 3; i++) {
                 const slotKey = 'if_builder_slot_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
-                const savedData = localStorage.getItem(slotKey);
+                const savedData = getGameSave(slotKey);
                 const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
                 let contentHtml = '';
                 if (savedData) {
@@ -1553,7 +1716,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (e.target.classList.contains('slot-delete-btn')) {
                         const slot = e.target.getAttribute('data-slot');
                         if (confirm('Tem certeza que deseja deletar este arquivo de progresso?')) {
-                            localStorage.removeItem('if_builder_slot_' + slot + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+                            removeGameSave('if_builder_slot_' + slot + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
                             renderSlots(mode);
                         }
                         return;
@@ -1571,7 +1734,110 @@ document.addEventListener('DOMContentLoaded', () => {
             ? 'if_builder_manual_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas')
             : 'if_builder_slot_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
-        localStorage.setItem(slotKey, JSON.stringify(save)); renderSlots('save');
+        setGameSave(slotKey, JSON.stringify(save)); renderSlots('save');
+    };
+
+    const renderStartScreenSlots = () => {
+        const slotsList = document.getElementById('start-screen-slots-list');
+        if (!slotsList) return;
+        slotsList.innerHTML = '';
+
+        const alignment = gameData.startScreenButtonAlignment || 'center';
+
+        // Render 1 Autosave + 2 Manual Saves
+        // --- 1. AUTOSAVE SLOT ---
+        const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const autoData = getGameSave(autoKey);
+        const autoDiv = document.createElement('div');
+        autoDiv.className = 'slot-item';
+        
+        let autoHtml = '';
+        if (autoData) {
+            try {
+                const data = JSON.parse(autoData);
+                const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                const textAlignment = alignment === 'right' ? 'right' : (alignment === 'center' ? 'center' : 'left');
+                autoHtml = '<div class="slot-info" style="text-align: ' + textAlignment + '; width: 100%;"><span class="slot-title">Progresso automático - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+            } catch (e) {
+                autoHtml = '<div class="slot-info"><span class="slot-title">Progresso automático</span><span class="slot-empty">Erro ao ler dados</span></div>';
+            }
+        } else {
+            autoHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title">Progresso automático</span><span class="slot-empty">Nenhum progresso automático disponível</span></div>';
+        }
+        
+        autoDiv.innerHTML = window.safeHTML(autoHtml);
+        if (autoData) {
+            autoDiv.addEventListener('click', () => {
+                hideStartScreen(() => {
+                    loadGameFromData(autoData);
+                });
+            });
+        }
+        slotsList.appendChild(autoDiv);
+
+        // --- 2. MANUAL SAVES (Slots 1 & 2) ---
+        for (let i = 1; i <= 2; i++) {
+            const slotKey = 'if_builder_manual_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+            const savedData = getGameSave(slotKey);
+            const slotDiv = document.createElement('div');
+            
+            const deleteBtnHtml = '<button class="slot-delete-btn" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>';
+            let contentHtml = '';
+            
+            if (savedData) {
+                slotDiv.className = 'slot-item';
+                try {
+                    const data = JSON.parse(savedData);
+                    const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                    const textAlignment = alignment === 'right' ? 'right' : (alignment === 'center' ? 'center' : 'left');
+                    contentHtml = deleteBtnHtml + '<div class="slot-info" style="text-align: ' + textAlignment + '; padding-left: 58px; padding-right: 24px; width: 100%;"><span class="slot-title">Caminho salvo ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                } catch (e) {
+                    contentHtml = '<div class="slot-info" style="padding-left: 58px; padding-right: 24px;"><span class="slot-title">Caminho salvo ' + i + '</span><span class="slot-empty">Erro ao ler dados</span></div>';
+                }
+            } else {
+                const disabledClass = isGameSessionActive ? '' : ' disabled';
+                slotDiv.className = 'slot-item dashed-slot' + disabledClass;
+                
+                if (isGameSessionActive) {
+                    contentHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title" style="font-weight: normal; color: rgba(255,255,255,0.75);">Clique para salvar</span></div>';
+                } else {
+                    contentHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title" style="font-weight: normal; color: rgba(255,255,255,0.3);">Slot vazio</span></div>';
+                }
+            }
+            
+            slotDiv.innerHTML = window.safeHTML(contentHtml);
+            
+            const deleteBtn = slotDiv.querySelector('.slot-delete-btn');
+
+            if (deleteBtn && savedData) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (window.isPreview || confirm('Tem certeza que deseja deletar este caminho salvo?')) {
+                        removeGameSave(slotKey);
+                        renderStartScreenSlots();
+                    }
+                });
+            }
+            
+            slotDiv.addEventListener('click', () => {
+                if (!savedData && isGameSessionActive) {
+                    performStartScreenSave(i);
+                } else if (savedData) {
+                    hideStartScreen(() => {
+                        loadGameFromData(savedData);
+                    });
+                }
+            });
+
+            slotsList.appendChild(slotDiv);
+        }
+    };
+
+    const performStartScreenSave = (slotIndex) => {
+        const slotKey = 'if_builder_manual_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
+        setGameSave(slotKey, JSON.stringify(save));
+        renderStartScreenSlots();
     };
 
     const getObjectsForScene = (sceneId) => {
@@ -2373,7 +2639,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (vignetteDiaryButton) vignetteDiaryButton.classList.add('hidden');
         }
 
-        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+        removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
     };
 
     const gameOver = () => { 

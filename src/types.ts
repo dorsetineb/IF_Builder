@@ -262,6 +262,8 @@ export interface GameData {
   gameTextSpeed?: number; // 1 (slow) to 10 (fast)
   gameImageTransitionType?: 'fade' | 'slide-left' | 'slide-right' | 'slide-up' | 'slide-down' | 'zoom' | 'blur' | 'none';
   gameImageSpeed?: number; // 1 (slow) to 10 (fast)
+  gameMenuTransitionType?: 'fade' | 'slide' | 'none';
+  gameMenuTransitionSound?: string;
   gameTextReadingFlow?: 'continuous' | 'paused';
 
   // Export metadata (added by modern exports)

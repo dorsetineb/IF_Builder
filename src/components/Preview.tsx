@@ -39,7 +39,8 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>'
             : '';
 
-        const systemButtonHTML = (gameData.gameShowSystemButton ?? true)
+        // When enableSystemMenu is on, ESC / gear icon is the trigger — no toolbar button.
+        const systemButtonHTML = (!gameData.enableSystemMenu && (gameData.gameShowSystemButton ?? true))
             ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>'
             : '';
 
@@ -85,7 +86,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             .replace('__LOAD_MENU_TITLE__', gameData.gameLoadMenuTitle || t('UIEditor.textos.loadMenuPlaceholder', 'Load Game'))
             .replace('__MAIN_MENU_BUTTON_TEXT__', gameData.gameMainMenuButtonText || t('UIEditor.textos.mainMenuPlaceholder'))
             .replace('__VIEW_ENDING_BUTTON_TEXT__', gameData.gameViewEndingButtonText || t('UIEditor.textos.viewEndingPlaceholder'))
-            .replace(/(<button(?:(?!\bid="vignette-continue-button")[^>])*class="[^"]*ending-restart-button[^"]*"[^>]*>)(.*?)(<\/button>)/g, `$1${gameData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder')}$3`)
+            .replace(/(<button(?:(?!\b(vignette-continue-button|start-))[^>])*class="[^"]*ending-restart-button[^"]*"[^>]*>)(.*?)(<\/button>)/g, `$1${gameData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder')}$3`)
             .replace(/<button id="continue-button"([^>]*)>.*?<\/button>/g, `<button id="continue-button"$1>${gameData.gameContinueButtonText || t('UIEditor.textos.continueButtonPlaceholder')}</button>`)
             .replace(/<button id="system-button"([^>]*)>.*?<\/button>/g, `<button id="system-button"$1>${gameData.gameSystemButtonText || t('UIEditor.textos.systemPlaceholder')}</button>`)
             .replace('__CONTINUE_BUTTON_TEXT__', gameData.gameContinueButtonText || t('UIEditor.textos.continueButtonPlaceholder'))
@@ -98,7 +99,11 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
             .replace('__POSITIVE_ENDING_DESCRIPTION__', gameData.positiveEndingDescription || '')
             .replace('__NEGATIVE_ENDING_BG_STYLE__', gameData.negativeEndingImage ? `style="background-image: url('${gameData.negativeEndingImage}')"` : '')
             .replace('__NEGATIVE_ENDING_ALIGN_CLASS__', gameData.negativeEndingContentAlignment === 'left' ? 'align-left' : '')
-            .replace('__NEGATIVE_ENDING_DESCRIPTION__', gameData.negativeEndingDescription || '');
+            .replace('__NEGATIVE_ENDING_DESCRIPTION__', gameData.negativeEndingDescription || '')
+            .replace('__START_SCREEN_BG_STYLE__', gameData.startScreenBgImage ? `style="background-image: url('${gameData.startScreenBgImage}')"` : '')
+            .replace('__START_SCREEN_ALIGN_CLASS__', gameData.startScreenButtonAlignment === 'left' ? 'align-left' : (gameData.startScreenButtonAlignment === 'right' ? 'align-right' : 'align-center'))
+            .replace('__START_SCREEN_TITLE__', gameData.startScreenTitle || gameData.gameTitle || 'Minha Aventura de Texto')
+            .replace('__START_SCREEN_TITLE_HIDDEN_CLASS__', gameData.showStartScreenTitle !== false ? '' : 'hidden');
 
 
         // CSS Overrides to fix legacy/stale gameCSS state

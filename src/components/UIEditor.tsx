@@ -122,6 +122,8 @@ interface UIEditorProps {
     showStartScreenTitle?: boolean;
     startScreenTitle?: string;
     startScreenButtonAlignment?: 'left' | 'center' | 'right';
+    gameMenuTransitionType?: 'fade' | 'slide' | 'none';
+    gameMenuTransitionSound?: string;
     inventoryCapacity?: number;
     inventoryMaxWeight?: number;
     diaryAutoScroll?: boolean;
@@ -237,7 +239,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         positiveEndingImage, positiveEndingContentAlignment, positiveEndingDescription, positiveEndingMusic,
         negativeEndingImage, negativeEndingContentAlignment, negativeEndingDescription, negativeEndingMusic,
         fixedVerbs, textAnimationType, textSpeed, textReadingFlow, imageTransitionType, imageSpeed,
-        enableSystemMenu, startScreenBgImage, showStartScreenTitle, startScreenTitle, startScreenButtonAlignment,
+        enableSystemMenu, startScreenBgImage, showStartScreenTitle, startScreenTitle, startScreenButtonAlignment, gameMenuTransitionType, gameMenuTransitionSound,
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         onAnnotate, enableTrackers, enableInventory, enableSuggestions, enableDiary, enableFixedVerbs, enableChances,
         enableImages, enableTextControl, inventoryCapacity, inventoryMaxWeight, diaryAutoScroll,
@@ -350,6 +352,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localShowStartScreenTitle, setLocalShowStartScreenTitle] = useState(showStartScreenTitle !== false);
     const [localStartScreenTitle, setLocalStartScreenTitle] = useState(startScreenTitle || '');
     const [localStartScreenButtonAlignment, setLocalStartScreenButtonAlignment] = useState<'left' | 'center' | 'right'>(startScreenButtonAlignment || 'center');
+    const [localMenuTransitionType, setLocalMenuTransitionType] = useState<'fade' | 'slide' | 'none'>(props.gameMenuTransitionType || 'fade');
+    const [localMenuTransitionSound, setLocalMenuTransitionSound] = useState<string | undefined>(props.gameMenuTransitionSound);
 
     const TABS = {
         sistemas: t('UIEditor.tabs.sistemas'),
@@ -505,6 +509,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     useEffect(() => { setLocalEnableImages(enableImages ?? true); }, [enableImages]);
     useEffect(() => { setLocalEnableTextControl(enableTextControl ?? true); }, [enableTextControl]);
     useEffect(() => { setLocalEnableRetrospective(props.enableRetrospective ?? true); }, [props.enableRetrospective]);
+    useEffect(() => { setLocalMenuTransitionType(props.gameMenuTransitionType || 'fade'); }, [props.gameMenuTransitionType]);
+    useEffect(() => { setLocalMenuTransitionSound(props.gameMenuTransitionSound); }, [props.gameMenuTransitionSound]);
 
     // 8. Specific System Settings
     useEffect(() => { setLocalInventoryCapacity(inventoryCapacity ?? 10); }, [inventoryCapacity]);
@@ -543,7 +549,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localEnableChances, localEnableImages, localEnableTextControl, localEnableRetrospective, localInventoryCapacity,
         localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
         localDiaryShowSceneImage, localDiaryShowPlayerAction,
-        localSuggestionsEmptyFeedback, localInventoryEmptyFeedback
+        localSuggestionsEmptyFeedback, localInventoryEmptyFeedback,
+        // Main Menu / System Menu
+        localEnableSystemMenu, localStartScreenBgImage, localShowStartScreenTitle,
+        localStartScreenTitle, localStartScreenButtonAlignment, localMenuTransitionType, localMenuTransitionSound
     });
 
 
@@ -593,7 +602,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         localEnableChances, localEnableImages, localEnableTextControl, localEnableRetrospective, localInventoryCapacity,
         localInventoryMaxWeight, localDiaryAutoScroll, localDiaryAllowExport, localDiaryMaxMessages,
         localDiaryShowSceneImage, localDiaryShowPlayerAction,
-        localSuggestionsEmptyFeedback, localInventoryEmptyFeedback
+        localSuggestionsEmptyFeedback, localInventoryEmptyFeedback,
+        // Main Menu / System Menu
+        localEnableSystemMenu, localStartScreenBgImage, localShowStartScreenTitle,
+        localStartScreenTitle, localStartScreenButtonAlignment, localMenuTransitionType
     ]);
 
 
@@ -693,6 +705,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         if (localShowStartScreenTitle !== (showStartScreenTitle !== false)) onUpdate('showStartScreenTitle', localShowStartScreenTitle, true);
         if (localStartScreenTitle !== (startScreenTitle || '')) onUpdate('startScreenTitle', localStartScreenTitle, true);
         if (localStartScreenButtonAlignment !== (startScreenButtonAlignment || 'center')) onUpdate('startScreenButtonAlignment', localStartScreenButtonAlignment, true);
+        if (localMenuTransitionType !== (props.gameMenuTransitionType || 'fade')) onUpdate('gameMenuTransitionType', localMenuTransitionType, true);
+        if (localMenuTransitionSound !== props.gameMenuTransitionSound) onUpdate('gameMenuTransitionSound', localMenuTransitionSound, true);
 
         if (localSuggestionsEmptyFeedback !== (props.gameSuggestionsEmptyFeedback || '')) onUpdate('gameSuggestionsEmptyFeedback', localSuggestionsEmptyFeedback, true);
         if (localInventoryEmptyFeedback !== (props.gameInventoryEmptyFeedback || '')) onUpdate('gameInventoryEmptyFeedback', localInventoryEmptyFeedback, true);
@@ -808,6 +822,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         setLocalShowStartScreenTitle(showStartScreenTitle !== false);
         setLocalStartScreenTitle(startScreenTitle || '');
         setLocalStartScreenButtonAlignment(startScreenButtonAlignment || 'center');
+        setLocalMenuTransitionType(props.gameMenuTransitionType || 'fade');
 
         setLocalInventoryCapacity(inventoryCapacity ?? 10);
         setLocalInventoryMaxWeight(inventoryMaxWeight ?? 0);
@@ -1039,8 +1054,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             setLocalShowStartScreenTitle={setLocalShowStartScreenTitle}
                             localStartScreenTitle={localStartScreenTitle}
                             setLocalStartScreenTitle={setLocalStartScreenTitle}
-                            localStartScreenButtonAlignment={localStartScreenButtonAlignment}
-                            setLocalStartScreenButtonAlignment={setLocalStartScreenButtonAlignment}
+                            localMenuTransitionType={localMenuTransitionType}
+                            setLocalMenuTransitionType={setLocalMenuTransitionType}
+                            localMenuTransitionSound={localMenuTransitionSound}
+                            setLocalMenuTransitionSound={setLocalMenuTransitionSound}
                             localTitle={localTitle}
                             onNavigateToTrackers={props.onNavigateToTrackers}
                         />
@@ -1118,6 +1135,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 localShowStartScreenTitle={localShowStartScreenTitle}
                                 localStartScreenTitle={localStartScreenTitle}
                                 localStartScreenButtonAlignment={localStartScreenButtonAlignment}
+                                setLocalStartScreenButtonAlignment={setLocalStartScreenButtonAlignment}
                                 localTitle={localTitle}
                             />
                         )

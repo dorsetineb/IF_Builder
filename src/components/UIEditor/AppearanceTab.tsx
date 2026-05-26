@@ -110,6 +110,7 @@ interface AppearanceTabProps {
     localShowStartScreenTitle?: boolean;
     localStartScreenTitle?: string;
     localStartScreenButtonAlignment?: 'left' | 'center' | 'right';
+    setLocalStartScreenButtonAlignment?: (val: 'left' | 'center' | 'right') => void;
     localTitle?: string;
 }
 
@@ -183,6 +184,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     localShowStartScreenTitle = true,
     localStartScreenTitle = '',
     localStartScreenButtonAlignment = 'center',
+    setLocalStartScreenButtonAlignment,
     localTitle = ''
 }) => {
     const { t } = useTranslation();
@@ -327,6 +329,35 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                                         className="custom-checkbox"
                                     />
                                     <label htmlFor="omitSplashDescription" className="ml-2 text-[11px] text-muted-foreground group-hover:text-foreground cursor-pointer select-none transition-colors">{t('UIEditor.layout.hideDescription')}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* SECTION: LAYOUT DO MENU PRINCIPAL */}
+                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '125ms' }}>
+                    <div className="flex items-center w-full text-left">
+                        <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
+                            <LayoutTemplate className="w-4 h-4" /> {t('UIEditor.aparencia.menuLayout', 'Layout do menu principal')}
+                        </h3>
+                    </div>
+
+                    <div className="space-y-4 pt-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-wider">{t('UIEditor.startScreen.buttonPosition', 'Posição dos botões')}</label>
+                                <div className="relative">
+                                    <select
+                                        value={localStartScreenButtonAlignment}
+                                        onChange={(e) => setLocalStartScreenButtonAlignment && setLocalStartScreenButtonAlignment(e.target.value as 'left' | 'center' | 'right')}
+                                        className="w-full bg-background border border-muted-foreground/50 rounded-lg px-3 py-2 text-xs text-foreground focus:ring-1 focus:ring-primary/30 transition-all appearance-none cursor-pointer pr-10 font-bold"
+                                    >
+                                        <option value="left">{t('appearance.left', 'Esquerda')}</option>
+                                        <option value="center">{t('UIEditor.startScreen.center', 'Centro')}</option>
+                                        <option value="right">{t('appearance.right', 'Direita')}</option>
+                                    </select>
+                                    <ChevronDown className="absolute right-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                                 </div>
                             </div>
                         </div>

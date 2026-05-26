@@ -235,8 +235,9 @@ DATE:        ${exportDate.toLocaleString()}
       exportData.enableTrackers && (exportData.gameShowTrackersUI ?? true)
         ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>'
         : '';
+    // When enableSystemMenu is on, ESC / gear icon is the trigger — no toolbar button.
     const systemButtonHTML =
-      (exportData.gameShowSystemButton ?? true)
+      (!exportData.enableSystemMenu && (exportData.gameShowSystemButton ?? true))
         ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>'
         : '';
 
@@ -312,7 +313,7 @@ DATE:        ${exportDate.toLocaleString()}
         exportData.gameMainMenuButtonText || t('UIEditor.textos.mainMenuPlaceholder')
       )
       .replace(
-        /(<button(?:(?!\bid="vignette-continue-button")[^>])*class="[^"]*ending-restart-button[^"]*"[^>]*>)(.*?)(<\/button>)/g,
+        /(<button(?:(?!\b(vignette-continue-button|start-))[^>])*class="[^"]*ending-restart-button[^"]*"[^>]*>)(.*?)(<\/button>)/g,
         `$1${exportData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder')}$3`
       )
       .replace(
@@ -592,8 +593,9 @@ DATE:        ${exportDate.toLocaleString()}
       exportData.enableTrackers && (exportData.gameShowTrackersUI ?? true)
         ? '<button id="trackers-button">__TRACKERS_BUTTON_TEXT__</button>'
         : '';
+    // When enableSystemMenu is on, ESC / gear icon is the trigger — no toolbar button.
     const systemButtonHTML =
-      (exportData.gameShowSystemButton ?? true)
+      (!exportData.enableSystemMenu && (exportData.gameShowSystemButton ?? true))
         ? '<button id="system-button">__SYSTEM_BUTTON_TEXT__</button>'
         : '';
 
@@ -669,7 +671,7 @@ DATE:        ${exportDate.toLocaleString()}
         exportData.gameMainMenuButtonText || t('UIEditor.textos.mainMenuPlaceholder')
       )
       .replace(
-        /(<button(?:(?!\bid="vignette-continue-button")[^>])*class="[^"]*ending-restart-button[^"]*"[^>]*>)(.*?)(<\/button>)/g,
+        /(<button(?:(?!\b(vignette-continue-button|start-))[^>])*class="[^"]*ending-restart-button[^"]*"[^>]*>)(.*?)(<\/button>)/g,
         `$1${exportData.gameRestartButtonText || t('UIEditor.textos.restartButtonPlaceholder')}$3`
       )
       .replace(
