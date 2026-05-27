@@ -13,13 +13,15 @@ import {
     Image as ImageIcon,
     Command,
     Package,
-    Split
+    Split,
+    List
 } from 'lucide-react';
 import { FONTS, PREDEFINED_THEMES } from '../../constants';
 import { GameData } from '../../types';
 import { ColorInput } from './ColorInput';
 import { DitherShader } from '@/components/ui/dither-shader';
 import { getFramePreviewStyles } from '../../utils/frameStyles';
+import { UIPreviewPanel } from './UIPreviewPanel';
 
 interface AppearanceTabProps {
     // Layout
@@ -94,6 +96,9 @@ interface AppearanceTabProps {
     localEnableDiary: boolean;
     localEnableTrackers: boolean;
     localGameShowSystemButton: boolean;
+    localEnableImages: boolean;
+    localEnableSuggestions: boolean;
+    localEnableSystemMenu?: boolean;
     
     // Theme Handlers
     applyTheme: (theme: any) => void;
@@ -114,6 +119,13 @@ interface AppearanceTabProps {
     localStartScreenVerticalAlignment?: 'center' | 'bottom';
     setLocalStartScreenVerticalAlignment?: (val: 'center' | 'bottom') => void;
     localTitle?: string;
+
+    // Chances and Interaction variables
+    localEnableChances?: boolean;
+    localChanceIcon?: 'circle' | 'cross' | 'heart' | 'square' | 'diamond' | 'star';
+    localChanceIconColor?: string;
+    localMaxChances?: number;
+    localGameInteractionType?: 'parser' | 'choice';
 }
 
 export const AppearanceTab: React.FC<AppearanceTabProps> = ({
@@ -176,6 +188,9 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     localEnableDiary,
     localEnableTrackers,
     localGameShowSystemButton,
+    localEnableImages,
+    localEnableSuggestions,
+    localEnableSystemMenu,
     applyTheme,
     previewType,
     setPreviewType,
@@ -189,7 +204,12 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
     setLocalStartScreenButtonAlignment,
     localStartScreenVerticalAlignment = 'center',
     setLocalStartScreenVerticalAlignment,
-    localTitle = ''
+    localTitle = '',
+    localEnableChances = false,
+    localChanceIcon = 'heart',
+    localChanceIconColor = '#ff4d4d',
+    localMaxChances = 3,
+    localGameInteractionType = 'parser'
 }) => {
     const { t } = useTranslation();
     const [isInputFocused, setIsInputFocused] = React.useState(false);
@@ -343,7 +363,7 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '125ms' }}>
                     <div className="flex items-center w-full text-left">
                         <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground flex items-center gap-2">
-                            <LayoutTemplate className="w-4 h-4" /> {t('UIEditor.aparencia.menuLayout', 'Layout do menu principal')}
+                            <List className="w-4 h-4" /> {t('UIEditor.aparencia.menuLayout', 'Layout do menu principal')}
                         </h3>
                     </div>
 
@@ -532,333 +552,57 @@ export const AppearanceTab: React.FC<AppearanceTabProps> = ({
             </div>
 
             {/* Right Column: Preview */}
-            <div className="col-span-1 lg:col-span-7 relative sticky top-0 self-start z-10">
-                <div className="space-y-6 flex flex-col">
-                    <div className="flex items-center justify-start gap-3 mb-4 w-full">
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase whitespace-nowrap text-zinc-400">{t('UIEditor.aparencia.previewLabel', 'Example of')}</span>
-                        <div className="flex bg-background rounded-lg p-1 border border-muted-foreground/50 w-full max-w-[480px]">
-                            <button
-                                onClick={() => setPreviewType('scene')}
-                                className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'scene' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-                            >
-                                {t('newProject.appearance.layoutScenes', 'Layout das Ramificações')}
-                            </button>
-                            <button
-                                onClick={() => setPreviewType('vignette')}
-                                className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'vignette' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-                            >
-                                {t('newProject.info.vignetteLayout', 'Layout dos Capítulos')}
-                            </button>
-                            <button
-                                onClick={() => setPreviewType('menu')}
-                                className={`flex-1 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase transition-all whitespace-nowrap ${previewType === 'menu' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground hover:text-foreground'}`}
-                            >
-                                {t('UIEditor.tabs.menu_principal', 'Menu Principal')}
-                            </button>
-                        </div>
-                    </div>
-                    
-                    {/* Estilos dinâmicos para o Hover do Preview */}
-                    <style>
-                        {`
-                            .preview-btn-action { transition: all 0.2s ease; }
-                            .preview-btn-action:hover { 
-                                background-color: ${localActionButtonHoverColor} !important;
-                                transform: translateY(-1px);
-                                shadow: 0 4px 12px rgba(0,0,0,0.3);
-                            }
-                            
-                            .preview-btn-system { transition: all 0.2s ease; }
-                            .preview-btn-system:hover { 
-                                background-color: ${localSystemButtonHoverColor} !important;
-                                color: ${localSystemButtonHoverTextColor} !important;
-                                transform: translateY(-1px);
-                            }
-                            
-                            .preview-btn-splash { transition: all 0.2s ease; }
-                            .preview-btn-splash:hover { 
-                                background-color: ${localSplashButtonHoverColor} !important;
-                                transform: translateY(-1px);
-                            }
-
-                            .preview-interactive-text { transition: color 0.2s ease; }
-                            .preview-interactive-text:hover {
-                                color: ${localFocusColor} !important;
-                                cursor: pointer;
-                            }
-                        `}
-                    </style>
-
-                    {previewType === 'scene' && (
-                            <div
-                                className={`
-                                    rounded-xl border shadow-2xl overflow-hidden flex flex-col relative transition-all duration-300 flex-1 w-full
-                                    border-muted-foreground/50
-                                    ${localLayoutOrientation === 'horizontal' ? 'aspect-[9/16]' : 'aspect-video'}
-                                `}
-                                style={{ fontFamily: localFontFamily, maxHeight: '500px', backgroundColor: localGameBackgroundColor }}
-                            >
-                            <div className={`flex-1 p-[30px] flex gap-[30px] overflow-hidden relative ${localLayoutOrientation === 'vertical' ? 'flex-row' : 'flex-col'}`}>
-                                {/* Image Area */}
-                                <div
-                                    className={`
-                                        relative flex items-center justify-center flex-shrink-0 transition-all duration-300
-                                        ${localLayoutOrientation === 'vertical' ? 'w-2/5 h-full' : 'w-full h-1/2 min-h-[50%]'}
-                                        ${localLayoutOrder === 'image-first' ? 'order-first' : 'order-last'}
-                                    `}
-                                >
-                                    {(() => {
-                                        const { panelStyles, containerStyles, panelClass, containerClass } = getFramePreviewStyles(localImageFrame as any, localGameBackgroundColor, localGameFrameColor);
-
-                                        return (
-                                            <div
-                                                className={`game-preview-safe-zone ${panelClass}`}
-                                                style={{
-                                                    ...panelStyles,
-                                                    width: '100%',
-                                                    height: '100%',
-                                                    display: 'flex',
-                                                    alignItems: 'center',
-                                                    justifyContent: 'center'
-                                                }}
-                                            >
-                                                <div
-                                                    style={{ ...containerStyles, width: '100%', height: '100%', overflow: 'hidden', position: 'relative' }}
-                                                    className={containerClass}
-                                                >
-                                                    <div className="absolute inset-0 opacity-60">
-                                                        <DitherShader
-                                                            src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
-                                                            gridSize={2}
-                                                            ditherMode="bayer"
-                                                            colorMode="duotone"
-                                                            primaryColor={ditherColors.primary}
-                                                            secondaryColor={ditherColors.secondary}
-                                                            className="w-full h-full"
-                                                            objectFit="cover"
-                                                        />
-                                                    </div>
-                                                    <div className="absolute top-4 left-4 z-20">
-                                                        <div
-                                                            className="px-2 py-0.5 border uppercase leading-none"
-                                                            style={{ 
-                                                                backgroundColor: localGameSceneNameOverlayBg, 
-                                                                color: localGameSceneNameOverlayTextColor,
-                                                                borderColor: `color-mix(in srgb, ${localGameBackgroundColor} 80%, ${localTextColor} 20%)`,
-                                                                borderWidth: '2px',
-                                                                fontSize: getScaledFontSize(1.0)
-                                                            }}
-                                                        >
-                                                            {t('UIEditor.aparencia.sceneName')}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        );
-                                    })()}
-                                </div>
-
-                                {/* Text Area */}
-                                <div className="flex-1 flex flex-col overflow-hidden">
-                                    <div className="flex-1 space-y-2 overflow-y-auto custom-scrollbar">
-                                        <p className="leading-relaxed" style={{ color: localTextColor, fontSize: getScaledFontSize(1.0) }}>
-                                            {t('UIEditor.aparencia.sampleDesc1')}
-                                            <span className="preview-interactive-text" style={{ color: localFocusColor }}>{t('UIEditor.aparencia.sampleDescHighlight')}</span>
-                                            {t('UIEditor.aparencia.sampleDesc2')}
-                                        </p>
-                                        <p className="mt-4 opacity-70" style={{ color: localTextColor, fontFamily: localFontFamily, fontSize: getScaledFontSize(1.0) }}>
-                                            {'>'} {t('UIEditor.aparencia.sampleCommand')}
-                                        </p>
-                                    </div>
-
-                                    {/* Nav + Input Column */}
-                                    <div className="flex-shrink-0 space-y-2 pt-2">
-                                        <div className="flex items-center gap-1.5 flex-wrap">
-                                            {localEnableInventory && (
-                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
-                                                    {t('UIEditor.textos.inventoryPlaceholder')}
-                                                </button>
-                                            )}
-                                            {localEnableDiary && (
-                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
-                                                    {t('UIEditor.textos.diaryPlaceholder')}
-                                                </button>
-                                            )}
-                                            {localEnableTrackers && (
-                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
-                                                    {t('UIEditor.textos.trackersPlaceholder')}
-                                                </button>
-                                            )}
-                                            {localGameShowSystemButton && (
-                                                <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
-                                                    {t('UIEditor.textos.systemPlaceholder')}
-                                                </button>
-                                            )}
-                                        </div>
-
-                                        <div className="flex gap-1.5 pt-1.5">
-                                            <div 
-                                                className="flex-1 rounded-md h-8 flex items-center px-2 border-2 transition-all duration-200 outline-none cursor-text" 
-                                                style={{ 
-                                                    backgroundColor: `color-mix(in srgb, ${localGameBackgroundColor} 98%, #000 2%)`,
-                                                    borderColor: isInputFocused ? localFocusColor : localSystemButtonBorderColor,
-                                                    boxShadow: isInputFocused ? `0 0 0 1px ${localFocusColor}40` : 'none'
-                                                }}
-                                                onClick={() => setIsInputFocused(!isInputFocused)}
-                                            >
-                                                <span className="font-mono truncate" style={{ fontSize: getScaledFontSize(1.0), fontFamily: localFontFamily, color: `color-mix(in srgb, ${localTextColor} 70%, ${localGameBackgroundColor} 30%)` }}>{t('UIEditor.textos.commandInputValue')}</span>
-                                            </div>
-                                            <button
-                                                className="preview-btn-action px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
-                                                style={{ fontSize: getScaledFontSize(1.0), backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily }}
-                                            >
-                                                {t('UIEditor.aparencia.action')}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {previewType === 'vignette' && (
-                        <div className="flex items-center justify-center w-full flex-1 animate-in fade-in duration-300">
-                            <div
-                                className="relative w-full aspect-video bg-muted border border-muted-foreground/50 rounded-xl flex flex-col justify-end overflow-hidden p-6 box-border shadow-2xl"
-                                style={{
-                                    alignItems: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
-                                    textAlign: localSplashContentAlignment === 'left' ? 'left' : 'right',
-                                    maxHeight: '500px'
-                                }}
-                            >
-                                <div className="absolute inset-0 opacity-60">
-                                    <DitherShader
-                                        src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
-                                        gridSize={2}
-                                        ditherMode="bayer"
-                                        colorMode="duotone"
-                                        primaryColor={ditherColors.primary}
-                                        secondaryColor={ditherColors.secondary}
-                                        className="w-full h-full"
-                                        objectFit="cover"
-                                    />
-                                </div>
-                                <div className={`relative z-10 w-full flex flex-col gap-2 ${localSplashContentAlignment === 'left' ? 'items-start' : 'items-end'}`}>
-                                    {!localOmitSplashTitle && (
-                                        <div className="font-bold uppercase tracking-widest leading-tight" style={{ color: localTitleColor, fontSize: getScaledFontSize(1.2), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sceneName', 'Título do Capítulo')}</div>
-                                    )}
-                                    {!localOmitSplashDescription && (
-                                        <p className="leading-relaxed" style={{ color: localTextColor, fontSize: getScaledFontSize(1.0), fontFamily: localFontFamily }}>{t('UIEditor.aparencia.sampleVignetteDesc', 'Esta é uma descrição de exemplo para o capítulo.')}</p>
-                                    )}
-                                    <button
-                                        className="preview-btn-splash px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate mt-1"
-                                        style={{ fontSize: getScaledFontSize(1.0), backgroundColor: localSplashButtonColor, color: localSplashButtonTextColor, fontFamily: localFontFamily }}
-                                    >
-                                        {localSplashButtonText || t('UIEditor.aparencia.homeButton', 'Começar')}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-
-                    {previewType === 'menu' && (
-                        <div className="flex items-center justify-center w-full flex-1 animate-in fade-in duration-300">
-                            <div 
-                                className={`w-full aspect-video rounded-2xl border-2 border-muted-foreground/30 relative flex flex-col select-none overflow-hidden p-8 lg:p-12 ${localStartScreenVerticalAlignment === 'bottom' ? 'justify-end' : 'justify-center'} ${localStartScreenButtonAlignment === 'left' ? 'items-start text-left' : localStartScreenButtonAlignment === 'right' ? 'items-end text-right' : 'items-center text-center'}`}
-                                style={{ backgroundColor: localGameBackgroundColor, maxHeight: '500px' }}
-                            >
-                                {/* Background image in mockup */}
-                                {localStartScreenBgImage ? (
-                                    <div 
-                                        className="absolute inset-0 bg-cover bg-center transition-all duration-300"
-                                        style={{ backgroundImage: `url(${localStartScreenBgImage})` }}
-                                    />
-                                ) : (
-                                    <div className="absolute inset-0 opacity-60">
-                                        <DitherShader
-                                            src="https://images.unsplash.com/photo-1574169208507-84376144848b?w=500&auto=format&fit=crop&q=60"
-                                            gridSize={2}
-                                            ditherMode="bayer"
-                                            colorMode="duotone"
-                                            primaryColor={ditherColors.primary}
-                                            secondaryColor={ditherColors.secondary}
-                                            className="w-full h-full"
-                                            objectFit="cover"
-                                        />
-                                    </div>
-                                )}
-
-                                {/* Vignette Overlay (Darkening background to allow reading text) */}
-                                <div className="absolute inset-0 bg-black/40 z-0" />
-
-                                {/* Title of mock screen */}
-                                <div className={`relative z-10 max-w-[80%] mb-6 flex flex-col ${localStartScreenButtonAlignment === 'left' ? 'items-start' : localStartScreenButtonAlignment === 'right' ? 'items-end' : 'items-center'}`}>
-                                    {localShowStartScreenTitle && (
-                                        <h1 
-                                            className="text-xl font-bold tracking-wider uppercase drop-shadow-md transition-all"
-                                            style={{ color: localTitleColor, fontFamily: localFontFamily }}
-                                        >
-                                            {localStartScreenTitle.trim() || localTitle || 'Título do Jogo'}
-                                        </h1>
-                                    )}
-                                </div>
-
-                                {/* Mock Buttons Container */}
-                                <div className={`relative z-10 flex flex-col gap-2 w-44 ${localStartScreenButtonAlignment === 'left' ? 'items-start' : localStartScreenButtonAlignment === 'right' ? 'items-end' : 'items-center'}`}>
-                                    <button 
-                                        className="preview-btn-system w-full px-4 py-1.5 border-2 rounded font-bold uppercase tracking-widest transition-all cursor-default"
-                                        style={{ 
-                                            fontFamily: localFontFamily, 
-                                            fontSize: '9px',
-                                            borderColor: localSystemButtonBorderColor, 
-                                            color: localSystemButtonTextColor, 
-                                            backgroundColor: localSystemButtonColor 
-                                        }}
-                                    >
-                                        {t('UIEditor.startScreen.newGame', 'Começar de novo')}
-                                    </button>
-                                    <button 
-                                        className="preview-btn-system w-full px-4 py-1.5 border-2 rounded font-bold uppercase tracking-widest transition-all cursor-default"
-                                        style={{ 
-                                            fontFamily: localFontFamily, 
-                                            fontSize: '9px',
-                                            borderColor: localSystemButtonBorderColor, 
-                                            color: localSystemButtonTextColor, 
-                                            backgroundColor: localSystemButtonColor 
-                                        }}
-                                    >
-                                        {t('UIEditor.startScreen.continueGame', 'Continuar')}
-                                    </button>
-                                    <button 
-                                        className="preview-btn-system w-full px-4 py-1.5 border-2 rounded font-bold uppercase tracking-widest transition-all cursor-default"
-                                        style={{ 
-                                            fontFamily: localFontFamily, 
-                                            fontSize: '9px',
-                                            borderColor: localSystemButtonBorderColor, 
-                                            color: localSystemButtonTextColor, 
-                                            backgroundColor: localSystemButtonColor 
-                                        }}
-                                    >
-                                        {t('UIEditor.startScreen.saves', 'Caminhos salvos')}
-                                    </button>
-                                    <button 
-                                        className="preview-btn-system w-full px-4 py-1.5 border-2 rounded font-bold uppercase tracking-widest transition-all cursor-default"
-                                        style={{ 
-                                            fontFamily: localFontFamily, 
-                                            fontSize: '9px',
-                                            borderColor: localSystemButtonBorderColor, 
-                                            color: localSystemButtonTextColor, 
-                                            backgroundColor: localSystemButtonColor 
-                                        }}
-                                    >
-                                        {t('UIEditor.startScreen.options', 'Opções')}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
+            <UIPreviewPanel
+                localFontFamily={localFontFamily}
+                localGameFontSize={localGameFontSize}
+                localGameBackgroundColor={localGameBackgroundColor}
+                localGameFrameColor={localGameFrameColor}
+                localTextColor={localTextColor}
+                localTitleColor={localTitleColor}
+                localFocusColor={localFocusColor}
+                localGameContinueIndicatorColor={localGameContinueIndicatorColor}
+                localSplashButtonColor={localSplashButtonColor}
+                localSplashButtonTextColor={localSplashButtonTextColor}
+                localSplashButtonHoverColor={localSplashButtonHoverColor}
+                localActionButtonColor={localActionButtonColor}
+                localActionButtonTextColor={localActionButtonTextColor}
+                localActionButtonHoverColor={localActionButtonHoverColor}
+                localSystemButtonColor={localSystemButtonColor}
+                localSystemButtonTextColor={localSystemButtonTextColor}
+                localSystemButtonBorderColor={localSystemButtonBorderColor}
+                localSystemButtonHoverColor={localSystemButtonHoverColor}
+                localSystemButtonHoverTextColor={localSystemButtonHoverTextColor}
+                localGameSceneNameOverlayBg={localGameSceneNameOverlayBg}
+                localGameSceneNameOverlayTextColor={localGameSceneNameOverlayTextColor}
+                localLayoutOrientation={localLayoutOrientation}
+                localLayoutOrder={localLayoutOrder}
+                localImageFrame={localImageFrame}
+                ditherColors={ditherColors}
+                localEnableInventory={localEnableInventory}
+                localEnableDiary={localEnableDiary}
+                localEnableTrackers={localEnableTrackers}
+                localGameShowSystemButton={localGameShowSystemButton}
+                localEnableImages={localEnableImages}
+                localEnableSuggestions={localEnableSuggestions}
+                localEnableSystemMenu={localEnableSystemMenu}
+                previewType={previewType}
+                setPreviewType={setPreviewType}
+                localSplashContentAlignment={localSplashContentAlignment}
+                localOmitSplashTitle={localOmitSplashTitle}
+                localOmitSplashDescription={localOmitSplashDescription}
+                localSplashButtonText={localSplashButtonText}
+                localStartScreenBgImage={localStartScreenBgImage}
+                localShowStartScreenTitle={localShowStartScreenTitle}
+                localStartScreenTitle={localStartScreenTitle}
+                localStartScreenButtonAlignment={localStartScreenButtonAlignment}
+                localStartScreenVerticalAlignment={localStartScreenVerticalAlignment}
+                localTitle={localTitle}
+                localEnableChances={localEnableChances}
+                localChanceIcon={localChanceIcon}
+                localChanceIconColor={localChanceIconColor}
+                localMaxChances={localMaxChances}
+                localGameInteractionType={localGameInteractionType}
+            />
         </div>
     );
 };

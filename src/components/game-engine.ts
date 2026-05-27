@@ -2456,8 +2456,133 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     };
 
+    const adjustLayoutForImagesAndChances = (scene) => {
+        const imagePanel = imageContainer ? imageContainer.parentElement : null;
+        const textPanel = document.querySelector('.text-panel');
+        const chancesContainer = document.getElementById('chances-container');
+        
+        const isImagesEnabled = gameData.enableImages !== false;
+        
+        if (sceneNameOverlay) {
+            sceneNameOverlay.style.whiteSpace = 'nowrap';
+        }
+        
+        if (!isImagesEnabled) {
+            // Completely hide image panel and container
+            if (imagePanel) imagePanel.style.display = 'none';
+            if (imageContainer) imageContainer.style.display = 'none';
+            if (textPanel) textPanel.style.padding = '0';
+            
+            // Create text-scene-header if not present
+            let textSceneHeader = document.getElementById('text-scene-header');
+            if (!textSceneHeader && textPanel) {
+                textSceneHeader = document.createElement('div');
+                textSceneHeader.id = 'text-scene-header';
+                textSceneHeader.className = 'text-scene-header';
+                
+                // Style the header container using standard CSS tokens
+                textSceneHeader.style.display = 'flex';
+                textSceneHeader.style.justifyContent = 'space-between';
+                textSceneHeader.style.alignItems = 'center';
+                textSceneHeader.style.marginBottom = '20px';
+                textSceneHeader.style.paddingBottom = '10px';
+                textSceneHeader.style.borderBottom = '2px solid var(--border-color)';
+                
+                // Insert before scene-description
+                if (sceneDescription) {
+                    textPanel.insertBefore(textSceneHeader, sceneDescription);
+                } else {
+                    textPanel.appendChild(textSceneHeader);
+                }
+            }
+            
+            if (textSceneHeader) {
+                // Move scene-name-overlay and chances-container to the text-scene-header
+                if (sceneNameOverlay) {
+                    textSceneHeader.appendChild(sceneNameOverlay);
+                    
+                    // Reset styling for inline text display
+                    sceneNameOverlay.style.position = 'relative';
+                    sceneNameOverlay.style.top = '0';
+                    sceneNameOverlay.style.left = '0';
+                    sceneNameOverlay.style.border = '2px solid var(--border-color)';
+                    sceneNameOverlay.style.backgroundColor = 'var(--scene-name-overlay-bg)';
+                    sceneNameOverlay.style.color = 'var(--scene-name-overlay-text-color)';
+                    sceneNameOverlay.style.pointerEvents = 'none';
+                    sceneNameOverlay.style.padding = '6px 12px';
+                    sceneNameOverlay.style.margin = '0';
+                    sceneNameOverlay.style.boxSizing = 'border-box';
+                }
+                
+                if (chancesContainer) {
+                    textSceneHeader.appendChild(chancesContainer);
+                    
+                    // Reset chances styling for inline display
+                    chancesContainer.style.position = 'relative';
+                    chancesContainer.style.top = '0';
+                    chancesContainer.style.right = '0';
+                    chancesContainer.style.margin = '0';
+                    chancesContainer.style.padding = '0';
+                    chancesContainer.style.backgroundColor = 'transparent';
+                    chancesContainer.style.border = 'none';
+                    chancesContainer.style.backdropFilter = 'none';
+                }
+            }
+        } else {
+            // Restore default panels visibility
+            if (imagePanel) imagePanel.style.display = '';
+            if (imageContainer) imageContainer.style.display = '';
+            if (textPanel) textPanel.style.padding = '';
+            
+            // Remove text-scene-header if present
+            const textSceneHeader = document.getElementById('text-scene-header');
+            if (textSceneHeader) {
+                textSceneHeader.remove();
+            }
+            
+            // Move scene-name-overlay back inside imageContainer
+            if (sceneNameOverlay && imageContainer) {
+                imageContainer.appendChild(sceneNameOverlay);
+                
+                // Style scene-name-overlay for absolute overlay mode
+                sceneNameOverlay.style.position = 'absolute';
+                sceneNameOverlay.style.top = '20px';
+                sceneNameOverlay.style.left = '20px';
+                sceneNameOverlay.style.border = '2px solid var(--border-color)';
+                sceneNameOverlay.style.backgroundColor = 'var(--scene-name-overlay-bg)';
+                sceneNameOverlay.style.color = 'var(--scene-name-overlay-text-color)';
+                sceneNameOverlay.style.padding = '6px 12px';
+                sceneNameOverlay.style.margin = '0';
+                sceneNameOverlay.style.boxSizing = 'border-box';
+            }
+            
+            // Move chances-container inside imageContainer in the top-right corner
+            if (chancesContainer && imageContainer) {
+                imageContainer.appendChild(chancesContainer);
+                
+                // Absolute overlay positioning (floating directly over image)
+                chancesContainer.style.position = 'absolute';
+                chancesContainer.style.top = '20px'; // Matching top padding of sceneNameOverlay
+                chancesContainer.style.right = '20px';
+                chancesContainer.style.margin = '0';
+                chancesContainer.style.zIndex = '30';
+                chancesContainer.style.display = 'flex';
+                chancesContainer.style.alignItems = 'center';
+                chancesContainer.style.gap = '8px';
+                chancesContainer.style.justifyContent = 'flex-end';
+                chancesContainer.style.backgroundColor = 'transparent';
+                chancesContainer.style.padding = '0';
+                chancesContainer.style.border = 'none';
+                chancesContainer.style.borderRadius = '0';
+                chancesContainer.style.backdropFilter = 'none';
+                chancesContainer.style.boxSizing = 'border-box';
+            }
+        }
+    };
+
     const renderScene = (scene, successPrefix = null) => {
-        if (scene.image) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
+        const isImagesEnabled = gameData.enableImages !== false;
+        if (scene.image && isImagesEnabled) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
         else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
         if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
         
@@ -2725,6 +2850,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             lastChanceChange = null;
         }
+        
+        adjustLayoutForImagesAndChances(scene);
         
         // CHOICE MODE HANDLING
         if (gameData.gameInteractionType === 'choice') {

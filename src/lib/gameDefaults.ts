@@ -430,7 +430,7 @@ body.with-spacing .main-wrapper { height: 100%; }
 .highlight-word:hover { filter: brightness(1.2); text-decoration: underline; }
 
 /* Desktop Action Bar with Popup Inside - Removido fundo cinza do popup */
-.action-bar { border-top: 2px solid var(--border-color); padding-top: 15px; margin-top: auto; flex-shrink: 0; display: flex; flex-direction: column; }
+.action-bar { border-top: none; padding-top: 15px; margin-top: auto; flex-shrink: 0; display: flex; flex-direction: column; }
 .action-popup { margin-bottom: 12px; background-color: transparent; border: none; padding: 0; }
 .action-popup.hidden { display: none !important; }
 .action-popup-container { display: flex; flex-direction: column; gap: 10px; }

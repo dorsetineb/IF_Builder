@@ -1018,13 +1018,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-4 pb-12 pt-4 custom-scrollbar">
-                <div className="bg-background">
-
-
-                    {activeTab === 'sistemas' && (
-                        <SystemsTab
-                            localGameInteractionType={localGameInteractionType}
+            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar pb-32">
+                        {activeTab === 'sistemas' && (
+                            <SystemsTab
+                                {...props}
+                                localGameInteractionType={localGameInteractionType}
                             setLocalGameInteractionType={setLocalGameInteractionType}
                             localEnableImages={localEnableImages}
                             setLocalEnableImages={setLocalEnableImages}
@@ -1081,12 +1079,46 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             setLocalMenuTransitionSound={setLocalMenuTransitionSound}
                             localTitle={localTitle}
                             onNavigateToTrackers={props.onNavigateToTrackers}
+
+                            // Visual styling and appearance variables passed for preview panel integration
+                            localFontFamily={localFontFamily}
+                            localGameFontSize={localGameFontSize}
+                            localGameBackgroundColor={localGameBackgroundColor}
+                            localGameFrameColor={localGameFrameColor}
+                            localTextColor={localTextColor}
+                            localTitleColor={localTitleColor}
+                            localFocusColor={localFocusColor}
+                            localGameContinueIndicatorColor={localGameContinueIndicatorColor}
+                            localSplashButtonColor={localSplashButtonColor}
+                            localSplashButtonTextColor={localSplashButtonTextColor}
+                            localSplashButtonHoverColor={localSplashButtonHoverColor}
+                            localActionButtonColor={localActionButtonColor}
+                            localActionButtonTextColor={localActionButtonTextColor}
+                            localActionButtonHoverColor={localActionButtonHoverColor}
+                            localSystemButtonColor={localSystemButtonColor}
+                            localSystemButtonTextColor={localSystemButtonTextColor}
+                            localSystemButtonBorderColor={localSystemButtonBorderColor}
+                            localSystemButtonHoverColor={localSystemButtonHoverColor}
+                            localSystemButtonHoverTextColor={localSystemButtonHoverTextColor}
+                            localGameSceneNameOverlayBg={localGameSceneNameOverlayBg}
+                            localGameSceneNameOverlayTextColor={localGameSceneNameOverlayTextColor}
+                            localLayoutOrientation={localLayoutOrientation}
+                            localLayoutOrder={localLayoutOrder}
+                            localImageFrame={localImageFrame}
+                            ditherColors={ditherColors}
+                            previewType={previewType}
+                            setPreviewType={setPreviewType}
+                            localSplashContentAlignment={localSplashContentAlignment}
+                            localOmitSplashTitle={localOmitSplashTitle}
+                            localOmitSplashDescription={localOmitSplashDescription}
+                            localSplashButtonText={localSplashButtonText}
+                            localGameShowSystemButton={localGameShowSystemButton}
                         />
                     )}
 
-                    {
-                        activeTab === 'aparencia' && (
+                        {activeTab === 'aparencia' && (
                             <AppearanceTab
+                                {...props}
                                 localLayoutOrientation={localLayoutOrientation}
                                 setLocalLayoutOrientation={setLocalLayoutOrientation}
                                 localLayoutOrder={localLayoutOrder}
@@ -1146,6 +1178,9 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 localEnableDiary={localEnableDiary}
                                 localEnableTrackers={localEnableTrackers}
                                 localGameShowSystemButton={localGameShowSystemButton}
+                                localEnableImages={localEnableImages}
+                                localEnableSuggestions={localEnableSuggestions}
+                                localEnableSystemMenu={localEnableSystemMenu}
                                 applyTheme={applyTheme}
                                 previewType={previewType}
                                 setPreviewType={setPreviewType}
@@ -1160,6 +1195,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 localStartScreenVerticalAlignment={localStartScreenVerticalAlignment}
                                 setLocalStartScreenVerticalAlignment={setLocalStartScreenVerticalAlignment}
                                 localTitle={localTitle}
+                                localEnableChances={localEnableChances}
+                                localChanceIcon={localChanceIcon}
+                                localChanceIconColor={localChanceIconColor}
+                                localMaxChances={localMaxChances}
+                                localGameInteractionType={localGameInteractionType}
                             />
                         )
                     }
@@ -1398,7 +1438,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         )
                     }
 
-                </div>
             </div>
         </div>
     );
