@@ -62,6 +62,7 @@ import { gameJS, prepareGameDataForEngine } from './game-engine';
 import { Info, Settings as SettingsIcon, CircleHelp, X, Save, FileArchive, FileCode, Columns3, List } from 'lucide-react';
 import Settings from '../pages/Settings';
 import AboutProject from '../pages/AboutProject';
+import EditorInterface from '../pages/EditorInterface';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
 declare let JSZip: any;
@@ -1731,6 +1732,7 @@ const Editor: React.FC = () => {
 
             {currentView === 'settings' && <Settings hideHeader />}
             {currentView === 'about' && <AboutProject hideHeader />}
+            {currentView === 'editor_interface' && <EditorInterface hideHeader />}
           </main>
         </div>
       </div>

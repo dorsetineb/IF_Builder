@@ -279,7 +279,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
     const [localMainMenuButtonText, setLocalMainMenuButtonText] = useState(gameMainMenuButtonText);
     const [localViewEndingButtonText, setLocalViewEndingButtonText] = useState(gameViewEndingButtonText);
     const [localRetrospectiveButtonText, setLocalRetrospectiveButtonText] = useState(gameRetrospectiveButtonText);
-    const [activeTab, setActiveTab] = useState<'sistemas' | 'aparencia' | 'textos' | 'config'>('sistemas');
+    const [activeTab, setActiveTab] = useState<'sistemas' | 'aparencia' | 'textos'>('sistemas');
     const [originalTheme, setOriginalTheme] = useState(theme);
     const [localLanguage, setLocalLanguage] = useState(i18n.language || 'pt');
     const handleAppThemeChange = (newTheme: string) => {
@@ -363,7 +363,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
         sistemas: t('UIEditor.tabs.sistemas'),
         aparencia: t('UIEditor.tabs.aparencia'),
         textos: t('UIEditor.tabs.textos'),
-        config: t('UIEditor.tabs.config', 'Área de trabalho'),
     };
 
 
@@ -1352,31 +1351,6 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         )
                     }
 
-                    {
-                        activeTab === 'config' && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                                {/* Idioma Section */}
-                                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm transition-all duration-300 flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
-                                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-foreground mb-6 flex items-center gap-2">
-                                        <Globe className="w-4 h-4" />
-                                        {t('settings.language.label', 'Idioma')}
-                                    </h3>
-
-                                    <div className="space-y-4">
-                                        <div className="space-y-2">
-                                            <select
-                                                value={localLanguage}
-                                                onChange={(e) => setLocalLanguage(e.target.value)}
-                                                className="w-full bg-input border border-input rounded-lg px-3 py-2.5 text-foreground text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all font-medium"
-                                            >
-                                                <option value="pt">{t('common.languages.pt', 'Português')}</option>
-                                                <option value="en">{t('common.languages.en', 'English')}</option>
-                                                <option value="es">{t('common.languages.es', 'Español')}</option>
-                                            </select>
-                                        </div>
-                                        <p className="text-[10px] text-muted-foreground italic leading-relaxed">
-                                            {t('settings.language.description', 'Altere o idioma para que a interface do editor seja traduzida conforme sua preferência.')}
-                                        </p>
                                     </div>
                                 </div>
 

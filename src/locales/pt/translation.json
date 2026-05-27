@@ -351,7 +351,8 @@
     "settings": "Configurações",
     "openEditor": "Abrir Editor",
     "showNarrative": "Ver lista de narrativas",
-    "hideNarrative": "Ocultar lista de narrativas"
+    "hideNarrative": "Ocultar lista de narrativas",
+    "editorInterface": "Interface do Editor"
   },
   "newProject": {
     "title": "Nova Ficção",
@@ -1285,5 +1286,9 @@
       "total_words_read": "Palavras lidas",
       "of_scenes": "ramificações"
     }
+  },
+  "editorInterface": {
+    "title": "Interface do Editor",
+    "subtitle": "Configure a linguagem do sistema e personalize a aparência do editor escolhendo seu tema visual preferido."
   }
 }
