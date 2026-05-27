@@ -956,7 +956,9 @@
       "contentVerticalAlignment": "Vertical Alignment",
       "alignBottom": "Bottom",
       "alignTop": "Top",
-      "colorPicker": "Color picker"
+      "colorPicker": "Color picker",
+      "startMenuTitle": "Main Menu",
+      "systemMenuDesc": "Enables the Main Menu, manual saving and the system ESC button/key."
     },
     "textos": {
       "interfaceTexts": "Interface Texts",
@@ -1066,6 +1068,12 @@
       "homeButton": "START BUTTON",
       "sampleVignetteDesc": "This is a sample description for the chapter.",
       "previewLabel": "Example of"
+    },
+    "startScreen": {
+      "titleText": "Fiction Title",
+      "showTitle": "Show Title",
+      "bgImage": "Background Image",
+      "suggestedRes": "1920x1080 suggested"
     }
   },
   "ThemeEditor": {

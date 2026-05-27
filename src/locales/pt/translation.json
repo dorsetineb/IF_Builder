@@ -6,17 +6,17 @@
     "aboutTitle": "IF Builder / Sobre o Projeto"
   },
   "welcome": {
-    "title": "Boas-vindas ao IF Builder",
-    "subtitle": "O que você deseja fazer?",
-    "createNew": "Criar uma ficção",
-    "downloadExample": "Baixar um exemplo",
-    "playDemo": "Jogar a demo",
-    "meetProject": "Conhecer o projeto",
+    "title": "Bem-vindo ao IF Builder",
+    "subtitle": "O que você quer fazer?",
+    "createNew": "Crie uma ficção",
+    "downloadExample": "Baixe um exemplo",
+    "playDemo": "Acesse a demo",
+    "meetProject": "Conheça o projeto",
     "helpTItle": "Como usar o exemplo baixado",
     "helpPlayTitle": "Offline",
-    "helpPlayDesc": "Extraia o conteúdo do arquivo <strong>arquivo.zip</strong> e abra o arquivo <strong>index.html</strong> para acessar a ficção interativa offline.",
+    "helpPlayDesc": "Extraia o conteúdo do <strong>arquivo.zip</strong> e abra o arquivo <strong>index.html</strong> para acessar a ficção interativa de modo offline.",
     "helpEditTitle": "Online",
-    "helpEditDesc": "Clique no botão <strong>CARREGAR</strong> no lado esquerdo do cabeçalho para acessar e editar o projeto no IF Builder."
+    "helpEditDesc": "Clique no botão <strong>CARREGAR</strong> no canto esquerdo do cabeçalho para acessar e editar o projeto no IF Builder."
   },
   "common": {
     "back": "Voltar",
@@ -352,19 +352,6 @@
     "openEditor": "Abrir Editor",
     "showNarrative": "Ver lista de narrativas",
     "hideNarrative": "Ocultar lista de narrativas"
-  },
-  "welcome": {
-    "title": "Bem-vindo ao IF Builder",
-    "subtitle": "O que você quer fazer?",
-    "createNew": "Crie uma ficção",
-    "downloadExample": "Baixe um exemplo",
-    "playDemo": "Acesse a demo",
-    "meetProject": "Conheça o projeto",
-    "helpTItle": "Como usar o exemplo baixado",
-    "helpPlayTitle": "Offline",
-    "helpPlayDesc": "Extraia o conteúdo do <strong>arquivo.zip</strong> e abra o arquivo <strong>index.html</strong> para acessar a ficção interativa de modo offline.",
-    "helpEditTitle": "Online",
-    "helpEditDesc": "Clique no botão <strong>CARREGAR</strong> no canto esquerdo do cabeçalho para acessar e editar o projeto no IF Builder."
   },
   "newProject": {
     "title": "Nova Ficção",
@@ -952,7 +939,9 @@
       "contentVerticalAlignment": "Alinhamento Vertical",
       "alignBottom": "Inferior",
       "alignTop": "Superior",
-      "colorPicker": "Seletor de cor"
+      "colorPicker": "Seletor de cor",
+      "startMenuTitle": "Menu Principal",
+      "systemMenuDesc": "Habilita o Menu Principal, salvamento manual e o botão/tecla ESC de sistema."
     },
     "textos": {
       "interfaceTexts": "Navegação",
@@ -1062,6 +1051,12 @@
       "homeButton": "BOTÃO DE INÍCIO",
       "sampleVignetteDesc": "Esta é uma descrição de exemplo para o capítulo.",
       "previewLabel": "Exemplo de"
+    },
+    "startScreen": {
+      "titleText": "Título da ficção",
+      "showTitle": "Exibir Título",
+      "bgImage": "Imagem de Fundo",
+      "suggestedRes": "1920x1080 sugerido"
     }
   },
   "ThemeEditor": {
