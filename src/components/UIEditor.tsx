@@ -11,6 +11,7 @@ import { getDitherColors } from '../utils/themeStyles';
 import { SystemsTab } from './UIEditor/SystemsTab';
 import { AppearanceTab } from './UIEditor/AppearanceTab';
 import { TextosTab } from './UIEditor/TextosTab';
+import { UIPreviewPanel } from './UIEditor/UIPreviewPanel';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Upload, Trash2, Plus, TriangleAlert, Heart, Circle, X, Square, Diamond, Check, Image as ImageIcon, RotateCcw, Save, Palette, Type, ChevronDown, ChevronUp, Smartphone, Monitor, Book, Package, Trophy, Command, Skull, Ghost, Grid, List, Sun, Moon, Coffee, Leaf, Globe, Split, ArrowRight, Wrench, Lightbulb, Hand, Zap, Sparkles, History as HistoryIcon, SquareDashedMousePointer } from 'lucide-react';
 
@@ -1019,6 +1020,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 custom-scrollbar pb-32">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pb-32">
                         {activeTab === 'sistemas' && (
                             <SystemsTab
                                 {...props}
@@ -1303,6 +1305,64 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         )
                     }
 
+                    <UIPreviewPanel
+                        localFontFamily={localFontFamily}
+                        localGameFontSize={localGameFontSize}
+                        localGameBackgroundColor={localGameBackgroundColor}
+                        localGameFrameColor={localGameFrameColor}
+                        localTextColor={localTextColor}
+                        localTitleColor={localTitleColor}
+                        localFocusColor={localFocusColor}
+                        localGameContinueIndicatorColor={localGameContinueIndicatorColor}
+                        localSplashButtonColor={localSplashButtonColor}
+                        localSplashButtonTextColor={localSplashButtonTextColor}
+                        localSplashButtonHoverColor={localSplashButtonHoverColor}
+                        localActionButtonColor={localActionButtonColor}
+                        localActionButtonTextColor={localActionButtonTextColor}
+                        localActionButtonHoverColor={localActionButtonHoverColor}
+                        localSystemButtonColor={localSystemButtonColor}
+                        localSystemButtonTextColor={localSystemButtonTextColor}
+                        localSystemButtonBorderColor={localSystemButtonBorderColor}
+                        localSystemButtonHoverColor={localSystemButtonHoverColor}
+                        localSystemButtonHoverTextColor={localSystemButtonHoverTextColor}
+                        localGameSceneNameOverlayBg={localGameSceneNameOverlayBg}
+                        localGameSceneNameOverlayTextColor={localGameSceneNameOverlayTextColor}
+                        localLayoutOrientation={localLayoutOrientation}
+                        localLayoutOrder={localLayoutOrder}
+                        localImageFrame={localImageFrame}
+                        ditherColors={ditherColors}
+                        localEnableInventory={localEnableInventory}
+                        localEnableDiary={localEnableDiary}
+                        localEnableTrackers={localEnableTrackers}
+                        localGameShowSystemButton={localGameShowSystemButton}
+                        localEnableImages={localEnableImages}
+                        localEnableSuggestions={localEnableSuggestions}
+                        localEnableSystemMenu={localEnableSystemMenu}
+                        previewType={previewType}
+                        setPreviewType={setPreviewType}
+                        localSplashContentAlignment={localSplashContentAlignment}
+                        localOmitSplashTitle={localOmitSplashTitle}
+                        localOmitSplashDescription={localOmitSplashDescription}
+                        localSplashButtonText={localSplashButtonText}
+                        localStartScreenBgImage={localStartScreenBgImage}
+                        localShowStartScreenTitle={localShowStartScreenTitle}
+                        localStartScreenTitle={localStartScreenTitle}
+                        localStartScreenButtonAlignment={localStartScreenButtonAlignment}
+                        localStartScreenVerticalAlignment={localStartScreenVerticalAlignment}
+                        localTitle={localTitle}
+                        localEnableChances={localEnableChances}
+                        localChanceIcon={localChanceIcon}
+                        localChanceIconColor={localChanceIconColor}
+                        localMaxChances={localMaxChances}
+                        localGameInteractionType={localGameInteractionType}
+                        localSuggestionsButtonText={localSuggestionsButtonText}
+                        localInventoryButtonText={localInventoryButtonText}
+                        localDiaryButtonText={localDiaryButtonText}
+                        localTrackersButtonText={localTrackersButtonText}
+                        localActionButtonText={localActionButtonText}
+                        localVerbInputPlaceholder={localVerbInputPlaceholder}
+                    />
+                </div>
             </div>
         </div>
     );

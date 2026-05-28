@@ -303,7 +303,7 @@ const GlobalCommandsEditor: React.FC<GlobalCommandsEditorProps> = ({
                                                             })()}
                                                         </button>
                                                         {isIconPickerOpen && (
-                                                            <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-popover border border-muted-foreground/50 rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                                            <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-popover border border-muted-foreground/50 rounded-lg z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
                                                                 {COMMAND_ICONS.map(icon => (
                                                                     <button
                                                                         key={icon.name}

@@ -207,10 +207,8 @@ export const TextosTab: React.FC<TextosTabProps> = ({
     const { t } = useTranslation();
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pb-32">
-            {/* Left Column: Controls */}
-            <div className="col-span-1 lg:col-span-5 space-y-8">
-                {/* SECTION: AÇÕES & INTERAÇÃO */}
+        <div className="col-span-1 lg:col-span-5 space-y-8">
+            {/* SECTION: AÇÕES & INTERAÇÃO */}
                 <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
                     <div className="flex items-center gap-3 mb-6">
                         <Hand className="w-5 h-5" />
@@ -351,68 +349,6 @@ export const TextosTab: React.FC<TextosTabProps> = ({
                         </div>
                     </div>
                 </div>
-            </div>
-
-            {/* Right Column: Preview */}
-            <UIPreviewPanel
-                localFontFamily={localFontFamily}
-                localGameFontSize={localGameFontSize}
-                localGameBackgroundColor={localGameBackgroundColor}
-                localGameFrameColor={localGameFrameColor}
-                localTextColor={localTextColor}
-                localTitleColor={localTitleColor}
-                localFocusColor={localFocusColor}
-                localGameContinueIndicatorColor={localGameContinueIndicatorColor}
-                localSplashButtonColor={localSplashButtonColor}
-                localSplashButtonTextColor={localSplashButtonTextColor}
-                localSplashButtonHoverColor={localSplashButtonHoverColor}
-                localActionButtonColor={localActionButtonColor}
-                localActionButtonTextColor={localActionButtonTextColor}
-                localActionButtonHoverColor={localActionButtonHoverColor}
-                localSystemButtonColor={localSystemButtonColor}
-                localSystemButtonTextColor={localSystemButtonTextColor}
-                localSystemButtonBorderColor={localSystemButtonBorderColor}
-                localSystemButtonHoverColor={localSystemButtonHoverColor}
-                localSystemButtonHoverTextColor={localSystemButtonHoverTextColor}
-                localGameSceneNameOverlayBg={localGameSceneNameOverlayBg}
-                localGameSceneNameOverlayTextColor={localGameSceneNameOverlayTextColor}
-                localLayoutOrientation={localLayoutOrientation}
-                localLayoutOrder={localLayoutOrder}
-                localImageFrame={localImageFrame}
-                ditherColors={ditherColors}
-                localEnableInventory={localEnableInventory}
-                localEnableDiary={localEnableDiary}
-                localEnableTrackers={localEnableTrackers}
-                localGameShowSystemButton={localGameShowSystemButton}
-                localEnableImages={localEnableImages}
-                localEnableSuggestions={localEnableSuggestions}
-                localEnableSystemMenu={localEnableSystemMenu}
-                previewType={previewType}
-                setPreviewType={setPreviewType}
-                localSplashContentAlignment={localSplashContentAlignment}
-                localOmitSplashTitle={localOmitSplashTitle}
-                localOmitSplashDescription={localOmitSplashDescription}
-                localSplashButtonText={localSplashButtonText}
-                localStartScreenBgImage={localStartScreenBgImage}
-                localShowStartScreenTitle={localShowStartScreenTitle}
-                localStartScreenTitle={localStartScreenTitle}
-                localStartScreenButtonAlignment={localStartScreenButtonAlignment}
-                localStartScreenVerticalAlignment={localStartScreenVerticalAlignment}
-                localTitle={localTitle}
-                localEnableChances={localEnableChances}
-                localChanceIcon={localChanceIcon}
-                localChanceIconColor={localChanceIconColor}
-                localMaxChances={localMaxChances}
-                localGameInteractionType={localGameInteractionType}
-
-                // Add texts reflections to preview panel
-                localSuggestionsButtonText={localSuggestionsButtonText}
-                localInventoryButtonText={localInventoryButtonText}
-                localDiaryButtonText={localDiaryButtonText}
-                localTrackersButtonText={localTrackersButtonText}
-                localActionButtonText={localActionButtonText}
-                localVerbInputPlaceholder={localVerbInputPlaceholder}
-            />
         </div>
     );
 };

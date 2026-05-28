@@ -318,12 +318,12 @@ const ObjectEditor: React.FC<ObjectEditorProps> = ({
                                                     })()}
                                                 </button>
                                                 {isIconPickerOpen && (
-                                                    <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-card border border-input rounded-lg shadow-xl z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
+                                                    <div className="absolute left-0 top-full mt-2 w-64 p-2 bg-popover border border-muted-foreground/50 rounded-lg z-20 grid grid-cols-6 gap-1 animate-in fade-in zoom-in-95 duration-100" onClick={(e) => e.stopPropagation()}>
                                                         {OBJECT_ICONS.map(icon => (
                                                             <button
                                                                 key={icon.name}
                                                                 onClick={() => { onUpdateGlobalObject(selectedObject.id, { icon: icon.name }); setIsIconPickerOpen(false); }}
-                                                                className={`p-2 rounded hover:bg-zinc-800 flex items-center justify-center transition-colors ${selectedObject.icon === icon.name || (!selectedObject.icon && icon.name === 'box') ? 'bg-green-500/20 text-green-400' : 'text-zinc-500'}`}
+                                                                className={`p-2 rounded hover:bg-accent flex items-center justify-center transition-colors ${selectedObject.icon === icon.name || (!selectedObject.icon && icon.name === 'box') ? 'bg-primary/20 text-primary' : 'text-muted-foreground'}`}
                                                                 title={icon.name}
                                                             >
                                                                 <icon.component className="w-4 h-4" />

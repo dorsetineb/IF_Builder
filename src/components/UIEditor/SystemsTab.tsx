@@ -4,7 +4,7 @@ import {
     Shuffle, Type, List, Image as ImageIcon, Heart, 
     Lightbulb, Package, Book, History as HistoryIcon,
     Star, Square, Circle, X, Activity, Settings, Upload, Trash2,
-    Check, BookOpen
+    Check, BookOpen, TextCursorInput, CopyCheck
 } from 'lucide-react';
 import { GameData } from '../../types';
 import { UIPreviewPanel } from './UIPreviewPanel';
@@ -260,10 +260,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
     };
 
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pb-32">
-            {/* Left Column: Controls */}
-            <div className="col-span-1 lg:col-span-5 space-y-8">
-                        {/* --- GAME STYLE --- */}
+        <div className="col-span-1 lg:col-span-5 space-y-8">
+            {/* --- GAME STYLE --- */}
                         <div className={`w-full p-6 bg-card border ${localGameInteractionType ? 'border-muted-foreground/50 opacity-100' : 'border-muted-foreground/50 opacity-50 grayscale-[0.5]'} rounded-xl shadow-sm transition-all hover:shadow-md group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '0ms' }}>
                             <div className="flex justify-between items-start mb-6">
                                 <div className="flex items-center gap-3">
@@ -280,28 +278,24 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                                     onClick={() => setLocalGameInteractionType('parser')}
                                     className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'parser' ? 'border-primary bg-primary/20 shadow-md opacity-100' : 'border-muted-foreground/50 bg-muted/30 hover:border-primary/30 opacity-50'}`}
                                 >
-                                    <div className={`p-3 rounded-lg transition-colors ${localGameInteractionType === 'parser' ? 'bg-primary text-white' : 'bg-background/40 text-muted-foreground'}`}>
-                                        <Check className="w-6 h-6" />
+                                    <div className={`p-3 rounded-lg transition-colors ${localGameInteractionType === 'parser' ? 'bg-primary text-primary-foreground' : 'bg-background/40 text-muted-foreground'}`}>
+                                        <TextCursorInput className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'parser' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.parser')}</span>
+                                        <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'parser' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.parser')}</span>
                                         <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.parserDesc')}</span>
                                     </div>
                                 </button>
                                 <button
-                                    onClick={() => {
-                                        setLocalGameInteractionType('choice');
-                                        setLocalEnableSuggestions(false);
-                                        setLocalEnableInventory(false);
-                                    }}
+                                    onClick={() => setLocalGameInteractionType('choice')}
                                     className={`flex items-center gap-4 p-4 rounded-xl border-2 transition-all text-left ${localGameInteractionType === 'choice' ? 'border-primary bg-primary/20 shadow-md opacity-100' : 'border-muted-foreground/50 bg-muted/30 hover:border-primary/30 opacity-50'}`}
                                 >
-                                    <div className={`p-3 rounded-lg transition-colors ${localGameInteractionType === 'choice' ? 'bg-primary text-white' : 'bg-background/40 text-muted-foreground'}`}>
-                                        <List className="w-6 h-6" />
+                                    <div className={`p-3 rounded-lg transition-colors ${localGameInteractionType === 'choice' ? 'bg-primary text-primary-foreground' : 'bg-background/40 text-muted-foreground'}`}>
+                                        <CopyCheck className="w-6 h-6" />
                                     </div>
                                     <div>
-                                        <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'choice' ? 'text-white' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.choice')}</span>
-                                        <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.choiceDesc')}</span>
+                                        <span className={`text-xs font-bold uppercase block transition-colors ${localGameInteractionType === 'choice' ? 'text-foreground' : 'text-muted-foreground'}`}>{t('UIEditor.sistemas.choice', 'Interactive Fiction')}</span>
+                                        <span className="text-[10px] text-muted-foreground mt-0.5 block">{t('UIEditor.sistemas.choiceDesc', 'O jogador clica em opções para avançar')}</span>
                                     </div>
                                 </button>
                             </div>
@@ -882,59 +876,5 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
                             </div>
                         </div>
             </div>
-
-            {/* Right Column: Preview */}
-            <UIPreviewPanel
-                localFontFamily={localFontFamily}
-                localGameFontSize={localGameFontSize}
-                localGameBackgroundColor={localGameBackgroundColor}
-                localGameFrameColor={localGameFrameColor}
-                localTextColor={localTextColor}
-                localTitleColor={localTitleColor}
-                localFocusColor={localFocusColor}
-                localGameContinueIndicatorColor={localGameContinueIndicatorColor}
-                localSplashButtonColor={localSplashButtonColor}
-                localSplashButtonTextColor={localSplashButtonTextColor}
-                localSplashButtonHoverColor={localSplashButtonHoverColor}
-                localActionButtonColor={localActionButtonColor}
-                localActionButtonTextColor={localActionButtonTextColor}
-                localActionButtonHoverColor={localActionButtonHoverColor}
-                localSystemButtonColor={localSystemButtonColor}
-                localSystemButtonTextColor={localSystemButtonTextColor}
-                localSystemButtonBorderColor={localSystemButtonBorderColor}
-                localSystemButtonHoverColor={localSystemButtonHoverColor}
-                localSystemButtonHoverTextColor={localSystemButtonHoverTextColor}
-                localGameSceneNameOverlayBg={localGameSceneNameOverlayBg}
-                localGameSceneNameOverlayTextColor={localGameSceneNameOverlayTextColor}
-                localLayoutOrientation={localLayoutOrientation}
-                localLayoutOrder={localLayoutOrder}
-                localImageFrame={localImageFrame}
-                ditherColors={ditherColors}
-                localEnableInventory={localEnableInventory}
-                localEnableDiary={localEnableDiary}
-                localEnableTrackers={localEnableTrackers}
-                localGameShowSystemButton={localGameShowSystemButton}
-                localEnableImages={localEnableImages}
-                localEnableSuggestions={localEnableSuggestions}
-                localEnableSystemMenu={localEnableSystemMenu}
-                previewType={previewType}
-                setPreviewType={setPreviewType}
-                localSplashContentAlignment={localSplashContentAlignment}
-                localOmitSplashTitle={localOmitSplashTitle}
-                localOmitSplashDescription={localOmitSplashDescription}
-                localSplashButtonText={localSplashButtonText}
-                localStartScreenBgImage={localStartScreenBgImage}
-                localShowStartScreenTitle={localShowStartScreenTitle}
-                localStartScreenTitle={localStartScreenTitle}
-                localStartScreenButtonAlignment={localStartScreenButtonAlignment}
-                localStartScreenVerticalAlignment={localStartScreenVerticalAlignment}
-                localTitle={localTitle}
-                localEnableChances={localEnableChances}
-                localChanceIcon={localChanceIcon}
-                localChanceIconColor={localChanceIconColor}
-                localMaxChances={localMaxChances}
-                localGameInteractionType={localGameInteractionType}
-            />
-        </div>
     );
 };
