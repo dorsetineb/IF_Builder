@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { Scene, GameData, Vignette } from '../types';
-import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split, BarChart3, List, Columns3, Trash2 } from 'lucide-react';
+import { Plus, Minus, LayoutGrid, Maximize2, AlertTriangle, ArrowRight, Split, BarChart3, List, Columns3, Trash2, ZoomIn, ZoomOut } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import EditorStatsModal from './EditorStatsModal';
 import { useTheme } from './ThemeProvider';
@@ -1159,62 +1159,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
           })}
         </div>
       </div>
-      <div className="absolute bottom-4 left-4 z-10 flex flex-col items-start gap-2 transition-all duration-300">
-        {/* Map Actions Row */}
-        <div className="flex items-center gap-2">
-          <button
-            onClick={onReorganizeScenes}
-            className={`flex items-center justify-start px-3 w-[160px] h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
-          >
-            <LayoutGrid className="w-4 h-4 mr-2" />
-            {t('sceneMap.reorganize', 'Reorganizar')}
-          </button>
-          <button
-            onClick={handleViewAll}
-            className={`flex items-center justify-start px-3 w-[160px] h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
-          >
-            <Maximize2 className="w-4 h-4 mr-2" />
-            {t('sceneMap.viewAll', 'Ver Tudo')}
-          </button>
-          <button
-            onClick={handleToggleOrphans}
-            className={`flex items-center justify-start px-3 w-[160px] h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
-              highlightOrphans
-                ? 'bg-red-600 text-white border-red-500 hover:bg-red-700'
-                : `bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`
-            }`}
-          >
-            <AlertTriangle className="w-4 h-4 mr-2" />
-            {t('sceneMap.orphans', 'Órfãs')} {orphanIds.size > 0 && `(${orphanIds.size})`}
-          </button>
-          <button
-            onClick={() => setIsStatsModalOpen(true)}
-            className={`flex items-center justify-start px-3 w-[160px] h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary hover:text-white hover:border-primary`}
-          >
-            <BarChart3 className="w-4 h-4 mr-2" />
-            {t('sceneMap.statistics', 'Estatísticas')}
-          </button>
-        </div>
-      </div>
-
-      {/* Legend & Zoom Container */}
-      <div className="absolute top-4 right-4 z-10 flex flex-col items-end gap-2 pointer-events-none transition-all duration-300">
-        {/* Zoom Controls Moved here */}
-        <div className={`flex w-[160px] h-[40px] rounded-lg overflow-hidden shadow-xl pointer-events-auto border bg-zinc-950 border-muted-foreground/50`}>
-          <button
-            onClick={() => handleZoom('in')}
-            className={`flex-1 flex items-center justify-center transition-all border-r text-zinc-400 hover:text-white hover:bg-zinc-900 border-muted-foreground/50`}
-          >
-            <Plus className="w-4 h-4" />
-          </button>
-          <button
-            onClick={() => handleZoom('out')}
-            className={`flex-1 flex items-center justify-center transition-all text-zinc-400 hover:text-white hover:bg-zinc-900`}
-          >
-            <Minus className="w-4 h-4" />
-          </button>
-        </div>
-
+      <div className="absolute bottom-4 left-4 z-10 flex flex-col items-start gap-4 transition-all duration-300">
+        
         <div className={`w-[160px] backdrop-blur-md p-4 rounded-xl shadow-xl pointer-events-auto border bg-zinc-950/80 border-muted-foreground/50`}>
           <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 text-zinc-500`}>
             {t('sceneMap.legend', 'Legenda')}
@@ -1240,6 +1186,60 @@ const SceneMap: React.FC<SceneMapProps> = ({
             </li>
           </ul>
         </div>
+
+        {/* Map Actions Row */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={onReorganizeScenes}
+            className={`flex items-center justify-center px-4 h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
+          >
+            <LayoutGrid className="w-4 h-4 mr-2" />
+            {t('sceneMap.reorganize', 'Reorganizar')}
+          </button>
+          <button
+            onClick={handleViewAll}
+            className={`flex items-center justify-center px-4 h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
+          >
+            <Maximize2 className="w-4 h-4 mr-2" />
+            {t('sceneMap.viewAll', 'Ver Tudo')}
+          </button>
+          <button
+            onClick={handleToggleOrphans}
+            className={`flex items-center justify-center px-4 h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border ${
+              highlightOrphans
+                ? 'bg-red-600 text-white border-red-500 hover:bg-red-700'
+                : `bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`
+            }`}
+          >
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            {t('sceneMap.orphans', 'Órfãs')} {orphanIds.size > 0 && `(${orphanIds.size})`}
+          </button>
+          <button
+            onClick={() => setIsStatsModalOpen(true)}
+            className={`flex items-center justify-center px-4 h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary hover:text-white hover:border-primary`}
+          >
+            <BarChart3 className="w-4 h-4 mr-2" />
+            {t('sceneMap.statistics', 'Estatísticas')}
+          </button>
+        </div>
+      </div>
+
+      {/* Zoom Container */}
+      <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2 transition-all duration-300">
+        <button
+          onClick={() => handleZoom('out')}
+          className={`flex items-center justify-center px-4 h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
+        >
+          <ZoomOut className="w-4 h-4 mr-2" />
+          Zoom Out
+        </button>
+        <button
+          onClick={() => handleZoom('in')}
+          className={`flex items-center justify-center px-4 h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
+        >
+          <ZoomIn className="w-4 h-4 mr-2" />
+          Zoom In
+        </button>
       </div>
 
       <EditorStatsModal
