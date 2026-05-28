@@ -329,6 +329,7 @@
     "settingsDesc": "Manage your preferences and account.",
     "aboutDesc": "Learn about the mission and values behind IF Builder.",
     "guideDesc": "Learn how to create your own interactive stories.",
+    "editorInterfaceDesc": "Configure the system language and personalize the editor's visual theme.",
     "expandSidebar": "Expand Sidebar",
     "collapseSidebar": "Collapse Sidebar",
     "closePreview": "Close Preview",

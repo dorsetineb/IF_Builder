@@ -185,22 +185,7 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
         </button>
       </nav>
 
-      {/* Bottom Menu Items - Pinned to Bottom */}
       <div className="mt-auto pt-2 pb-4 pl-3 pr-0 flex flex-col gap-1 relative border-t border-muted-foreground/50 bg-card z-20 flex-shrink-0">
-        <button
-          onClick={() => onSetView('editor_interface')}
-          className={getButtonClass('editor_interface')}
-          title={isCollapsed ? t('sidebar.editorInterface', 'Interface do Editor') : undefined}
-        >
-          <div
-            className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'editor_interface' ? 'translate-x-0' : ''}`}
-          />
-          <Monitor className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
-          {!isCollapsed && (
-            <span className="truncate relative z-10">{t('sidebar.editorInterface', 'Interface do Editor')}</span>
-          )}
-        </button>
-
         <button
           onClick={() => onSetView('guide')}
           className={getButtonClass('guide')}
@@ -228,6 +213,20 @@ const Sidebar: React.FC<SidebarProps> = (props) => {
             <span className="truncate relative z-10">
               {t('sidebar.aboutProject', 'Sobre o Projeto')}
             </span>
+          )}
+        </button>
+
+        <button
+          onClick={() => onSetView('editor_interface')}
+          className={getButtonClass('editor_interface')}
+          title={isCollapsed ? t('sidebar.editorInterface', 'Interface do Editor') : undefined}
+        >
+          <div
+            className={`absolute inset-0 bg-white/5 translate-x-[-100%] group-hover:translate-x-0 transition-transform duration-300 ${currentView === 'editor_interface' ? 'translate-x-0' : ''}`}
+          />
+          <Monitor className={`flex-shrink-0 relative z-10`} size={isCollapsed ? 20 : 16} />
+          {!isCollapsed && (
+            <span className="truncate relative z-10">{t('sidebar.editorInterface', 'Interface do Editor')}</span>
           )}
         </button>
       </div>

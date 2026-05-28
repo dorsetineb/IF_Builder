@@ -15,7 +15,7 @@ export const EditorInterface: React.FC<{ hideHeader?: boolean }> = ({ hideHeader
         }
     }, [localLanguage, i18n]);
 
-    const handleAppThemeChange = (newTheme: string) => {
+    const handleAppThemeChange = (newTheme: any) => {
         setTheme(newTheme);
     };
 

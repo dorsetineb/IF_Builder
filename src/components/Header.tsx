@@ -53,9 +53,8 @@ const Header: React.FC<{
         )}
       </div>
 
-      {/* Right Pane - Top Bar Content */}
       <div className="flex-1 flex items-center justify-start gap-4 bg-card border-b border-muted-foreground/50 px-6">
-        {['about', 'guide', 'settings'].includes(currentView) && (
+        {['about', 'guide', 'settings', 'editor_interface'].includes(currentView) && (
           <div className="flex items-center h-full">
             <div className="flex items-center">
               {/* Context-aware Sub-header Text */}
@@ -74,13 +73,18 @@ const Header: React.FC<{
                   <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
                   <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.aboutDesc', 'Saiba mais sobre o If Builder.')}</p>
                 </div>
+              ) : currentView === 'editor_interface' ? (
+                <div className="flex flex-col">
+                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.editorInterface', 'Interface do Editor')}</span>
+                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.editorInterfaceDesc', 'Configure o idioma do sistema e personalize o tema visual do editor.')}</p>
+                </div>
               ) : null}
             </div>
           </div>
         )}
 
         <div className="flex items-center gap-3 ml-auto">
-          {(!['about', 'guide', 'settings'].includes(currentView)) && (
+          {(!['about', 'guide', 'settings', 'editor_interface'].includes(currentView)) && (
             <>
               {isPreviewing ? (
                 <button onMouseDown={onTogglePreview} className="flex items-center px-4 py-2 bg-primary text-primary-foreground font-bold rounded-lg hover:bg-primary/90 transition-all text-xs uppercase tracking-wider">

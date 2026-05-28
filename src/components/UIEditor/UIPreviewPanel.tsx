@@ -79,6 +79,14 @@ interface UIPreviewPanelProps {
     localMaxChances?: number;
     localGameInteractionType?: 'parser' | 'choice';
     localEnableSystemMenu?: boolean;
+
+    // Custom Text variables
+    localSuggestionsButtonText?: string;
+    localInventoryButtonText?: string;
+    localDiaryButtonText?: string;
+    localTrackersButtonText?: string;
+    localActionButtonText?: string;
+    localVerbInputPlaceholder?: string;
 }
 
 export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
@@ -131,7 +139,13 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
     localChanceIcon = 'heart',
     localChanceIconColor = '#ff4d4d',
     localMaxChances = 3,
-    localGameInteractionType = 'parser'
+    localGameInteractionType = 'parser',
+    localSuggestionsButtonText = '',
+    localInventoryButtonText = '',
+    localDiaryButtonText = '',
+    localTrackersButtonText = '',
+    localActionButtonText = '',
+    localVerbInputPlaceholder = ''
 }) => {
     const { t } = useTranslation();
     const [isInputFocused, setIsInputFocused] = React.useState(false);
@@ -399,22 +413,22 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
                                     <div className="flex items-center gap-1.5 flex-wrap">
                                         {localEnableSuggestions && (
                                             <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
-                                                {t('UIEditor.textos.suggestionsPlaceholder', 'Sugestões')}
+                                                {localSuggestionsButtonText || t('UIEditor.textos.suggestionsPlaceholder', 'Sugestões')}
                                             </button>
                                         )}
                                         {localEnableInventory && (
                                             <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
-                                                {t('UIEditor.textos.inventoryPlaceholder')}
+                                                {localInventoryButtonText || t('UIEditor.textos.inventoryPlaceholder', 'Inventário')}
                                             </button>
                                         )}
                                         {localEnableDiary && (
                                             <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
-                                                {t('UIEditor.textos.diaryPlaceholder')}
+                                                {localDiaryButtonText || t('UIEditor.textos.diaryPlaceholder', 'Diário')}
                                             </button>
                                         )}
                                         {localEnableTrackers && (
                                             <button className="preview-btn-system px-2.5 py-1 rounded font-bold uppercase tracking-wider border-2" style={{ fontSize: getScaledFontSize(1.0), borderColor: localSystemButtonBorderColor, color: localSystemButtonTextColor, backgroundColor: localSystemButtonColor }}>
-                                                {t('UIEditor.textos.trackersPlaceholder')}
+                                                {localTrackersButtonText || t('UIEditor.textos.trackersPlaceholder', 'Rastreadores')}
                                             </button>
                                         )}
                                     </div>
@@ -472,14 +486,14 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
                                                  onClick={() => setIsInputFocused(!isInputFocused)}
                                              >
                                                  <span className="font-mono truncate" style={{ fontSize: getScaledFontSize(1.0), fontFamily: localFontFamily, color: `color-mix(in srgb, ${localTextColor} 70%, ${localGameBackgroundColor} 30%)` }}>
-                                                     {t('UIEditor.textos.commandInputValue')}
+                                                     {localVerbInputPlaceholder || t('UIEditor.textos.commandInputValue', 'o que deseja fazer?')}
                                                  </span>
                                              </div>
                                              <button
                                                  className="preview-btn-action px-3 h-8 rounded-md font-bold uppercase tracking-widest shadow-lg flex items-center justify-center truncate"
                                                  style={{ fontSize: getScaledFontSize(1.0), backgroundColor: localActionButtonColor, color: localActionButtonTextColor, fontFamily: localFontFamily }}
                                              >
-                                                 {t('UIEditor.aparencia.action')}
+                                                 {localActionButtonText || t('UIEditor.aparencia.action', 'Ação')}
                                              </button>
                                          </div>
                                      )}
