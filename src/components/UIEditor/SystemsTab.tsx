@@ -260,8 +260,8 @@ export const SystemsTab: React.FC<SystemsTabProps> = ({
     };
 
     return (
-        <div className="col-span-1 lg:col-span-5 space-y-8">
-            {/* --- GAME STYLE --- */}
+        <div className="col-span-1 lg:col-span-5 space-y-4">
+            {/* SECTION: ESTILO DE DECISÃO */}
                         <div className={`w-full p-6 bg-card border ${localGameInteractionType ? 'border-muted-foreground/50 opacity-100' : 'border-muted-foreground/50 opacity-50 grayscale-[0.5]'} rounded-xl shadow-sm transition-all hover:shadow-md group flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both`} style={{ animationDelay: '0ms' }}>
                             <div className="flex justify-between items-start mb-6">
                                 <div className="flex items-center gap-3">

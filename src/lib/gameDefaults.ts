@@ -1836,18 +1836,18 @@ export const OVERLAY_CSS = `
     z-index: 9999 !important;
 }
 
-/* Vertical Alignment for Main Menu / Start Screen */
-#start-screen.align-v-center {
+/* Vertical Alignment for Splash Screens */
+.splash-screen.align-v-center {
     align-items: center !important;
 }
-#start-screen.align-v-center .splash-content {
+.splash-screen.align-v-center .splash-content {
     justify-content: center !important;
 }
 
-#start-screen.align-v-bottom {
+.splash-screen.align-v-bottom {
     align-items: flex-end !important;
 }
-#start-screen.align-v-bottom .splash-content {
+.splash-screen.align-v-bottom .splash-content {
     justify-content: flex-end !important;
 }
 `;

@@ -62,6 +62,7 @@ export const prepareGameDataForEngine = (data: GameData): object => {
         gameTextReadingFlow: data.gameTextReadingFlow,
         gameBackgroundMusic: data.gameBackgroundMusic,
         positiveEndingImage: data.positiveEndingImage,
+        gameSplashContentVerticalAlignment: data.gameSplashContentVerticalAlignment,
         positiveEndingContentAlignment: data.positiveEndingContentAlignment,
         positiveEndingDescription: data.positiveEndingDescription,
         positiveEndingMusic: data.positiveEndingMusic,
@@ -2041,6 +2042,14 @@ document.addEventListener('DOMContentLoaded', () => {
              if (vignetteDiaryButton && gameData.enableRetrospective !== false) {
                  vignetteDiaryButton.classList.remove('hidden');
              }
+        }
+        
+        // Vertical Alignment
+        vignetteScreen.classList.remove('align-v-center', 'align-v-bottom');
+        if (gameData.gameSplashContentVerticalAlignment === 'center') {
+            vignetteScreen.classList.add('align-v-center');
+        } else {
+            vignetteScreen.classList.add('align-v-bottom');
         }
         
         // Set vignette content

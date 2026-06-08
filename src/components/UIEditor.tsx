@@ -1019,8 +1019,10 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 custom-scrollbar pb-32">
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pb-32">
+            <div className="flex-1 flex overflow-hidden px-4 pb-0">
+                <div className="w-full flex flex-col lg:grid lg:grid-cols-12 gap-8 h-full">
+                    {/* LEFT COLUMN: Scrollable Form */}
+                    <div className="col-span-1 lg:col-span-5 h-full overflow-y-auto custom-scrollbar pt-4 pr-2 pb-8">
                         {activeTab === 'sistemas' && (
                             <SystemsTab
                                 {...props}
@@ -1111,6 +1113,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             previewType={previewType}
                             setPreviewType={setPreviewType}
                             localSplashContentAlignment={localSplashContentAlignment}
+                            localSplashContentVerticalAlignment={localSplashContentVerticalAlignment}
                             localOmitSplashTitle={localOmitSplashTitle}
                             localOmitSplashDescription={localOmitSplashDescription}
                             localSplashButtonText={localSplashButtonText}
@@ -1171,6 +1174,8 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 setLocalGameFontSize={setLocalGameFontSize}
                                 localSplashContentAlignment={localSplashContentAlignment}
                                 setLocalSplashContentAlignment={setLocalSplashContentAlignment}
+                                localSplashContentVerticalAlignment={localSplashContentVerticalAlignment}
+                                setLocalSplashContentVerticalAlignment={setLocalSplashContentVerticalAlignment}
                                 localOmitSplashTitle={localOmitSplashTitle}
                                 setLocalOmitSplashTitle={setLocalOmitSplashTitle}
                                 localOmitSplashDescription={localOmitSplashDescription}
@@ -1285,6 +1290,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                                 previewType={previewType}
                                 setPreviewType={setPreviewType}
                                 localSplashContentAlignment={localSplashContentAlignment}
+                                localSplashContentVerticalAlignment={localSplashContentVerticalAlignment}
                                 localOmitSplashTitle={localOmitSplashTitle}
                                 localOmitSplashDescription={localOmitSplashDescription}
                                 localSplashButtonText={localSplashButtonText}
@@ -1304,8 +1310,11 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                             />
                         )
                     }
+                    </div>
 
-                    <UIPreviewPanel
+                    {/* RIGHT COLUMN: Fixed Preview */}
+                    <div className="col-span-1 lg:col-span-7 h-full overflow-y-auto custom-scrollbar pt-4 pb-4 pr-2">
+                        <UIPreviewPanel
                         localFontFamily={localFontFamily}
                         localGameFontSize={localGameFontSize}
                         localGameBackgroundColor={localGameBackgroundColor}
@@ -1341,6 +1350,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         previewType={previewType}
                         setPreviewType={setPreviewType}
                         localSplashContentAlignment={localSplashContentAlignment}
+                        localSplashContentVerticalAlignment={localSplashContentVerticalAlignment}
                         localOmitSplashTitle={localOmitSplashTitle}
                         localOmitSplashDescription={localOmitSplashDescription}
                         localSplashButtonText={localSplashButtonText}
@@ -1362,6 +1372,7 @@ export const UIEditor: React.FC<UIEditorProps> = (props) => {
                         localActionButtonText={localActionButtonText}
                         localVerbInputPlaceholder={localVerbInputPlaceholder}
                     />
+                    </div>
                 </div>
             </div>
         </div>

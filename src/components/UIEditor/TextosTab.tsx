@@ -207,9 +207,9 @@ export const TextosTab: React.FC<TextosTabProps> = ({
     const { t } = useTranslation();
 
     return (
-        <div className="col-span-1 lg:col-span-5 space-y-8">
+        <div className="col-span-1 lg:col-span-5 space-y-4">
             {/* SECTION: AÇÕES & INTERAÇÃO */}
-                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '0ms' }}>
+                <div className="bg-card border border-muted-foreground/50 rounded-xl p-6 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 fill-mode-both" style={{ animationDelay: '50ms' }}>
                     <div className="flex items-center gap-3 mb-6">
                         <Hand className="w-5 h-5" />
                         <h4 className="text-[10px] font-bold uppercase tracking-widest text-foreground">{t('UIEditor.textos.sections.actions')}</h4>

@@ -1159,7 +1159,7 @@ const SceneMap: React.FC<SceneMapProps> = ({
           })}
         </div>
       </div>
-      <div className="absolute bottom-4 left-4 z-10 flex flex-col items-start gap-4 transition-all duration-300">
+      <div className="absolute bottom-4 left-4 z-10 flex flex-col items-start gap-2 transition-all duration-300">
         
         <div className={`w-[160px] backdrop-blur-md p-4 rounded-xl shadow-xl pointer-events-auto border bg-zinc-950/80 border-muted-foreground/50`}>
           <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 text-zinc-500`}>
@@ -1225,17 +1225,17 @@ const SceneMap: React.FC<SceneMapProps> = ({
       </div>
 
       {/* Zoom Container */}
-      <div className="absolute bottom-4 right-4 z-10 flex items-center gap-2 transition-all duration-300">
+      <div className="absolute bottom-4 right-4 z-10 flex flex-col items-center gap-2 transition-all duration-300">
         <button
           onClick={() => handleZoom('out')}
-          className={`flex items-center justify-center px-4 h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
+          className={`flex items-center justify-center px-4 h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary w-full`}
         >
           <ZoomOut className="w-4 h-4 mr-2" />
           Zoom Out
         </button>
         <button
           onClick={() => handleZoom('in')}
-          className={`flex items-center justify-center px-4 h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary`}
+          className={`flex items-center justify-center px-4 h-[42px] font-bold rounded-lg transition-all shadow-xl active:scale-95 text-xs border bg-zinc-800 text-zinc-200 border-muted-foreground/50 hover:bg-primary ${hoverTextClass} hover:border-primary w-full`}
         >
           <ZoomIn className="w-4 h-4 mr-2" />
           Zoom In

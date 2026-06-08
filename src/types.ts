@@ -111,7 +111,7 @@ export interface Vignette {
   image?: string; // Base64 string
   backgroundMusic?: string; // Base64 Audio
   contentAlignment?: 'left' | 'right';
-  verticalAlignment?: 'top' | 'bottom';
+  verticalAlignment?: 'center' | 'bottom';
   omitTitle?: boolean; // Deprecated in favor of showTitle/showDescription
   showTitle?: boolean; // Controls visibility of the title
   showDescription?: boolean; // Controls visibility of the description
@@ -156,7 +156,7 @@ export interface GameData {
   gameOmitSplashDescription?: boolean;
   gameInteractionType?: 'parser' | 'choice';
   gameSplashContentAlignment?: 'left' | 'right';
-  gameSplashContentVerticalAlignment?: 'top' | 'bottom';
+  gameSplashContentVerticalAlignment?: 'center' | 'bottom';
   gameSplashDescription?: string;
   gameSplashButtonText?: string;
   // Added missing properties to support splash button customization

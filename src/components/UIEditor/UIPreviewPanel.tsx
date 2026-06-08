@@ -62,6 +62,7 @@ interface UIPreviewPanelProps {
     previewType: 'scene' | 'vignette' | 'menu';
     setPreviewType: (type: 'scene' | 'vignette' | 'menu') => void;
     localSplashContentAlignment: 'left' | 'right';
+    localSplashContentVerticalAlignment?: 'center' | 'bottom';
     localOmitSplashTitle: boolean;
     localOmitSplashDescription: boolean;
     localSplashButtonText: string;
@@ -125,6 +126,7 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
     previewType,
     setPreviewType,
     localSplashContentAlignment,
+    localSplashContentVerticalAlignment = 'bottom',
     localOmitSplashTitle,
     localOmitSplashDescription,
     localSplashButtonText,
@@ -213,7 +215,7 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
     };
 
     return (
-        <div className="col-span-1 lg:col-span-7 relative sticky top-0 self-start z-10">
+        <div className="relative h-full flex flex-col">
             <div className="space-y-6 flex flex-col">
                 <div className="flex items-center justify-start gap-3 mb-4 w-full">
                     <span className="text-[10px] font-bold text-muted-foreground uppercase whitespace-nowrap text-zinc-400">
@@ -506,7 +508,7 @@ export const UIPreviewPanel: React.FC<UIPreviewPanelProps> = ({
                 {previewType === 'vignette' && (
                     <div className="flex items-center justify-center w-full flex-1 animate-in fade-in duration-300">
                         <div
-                            className="relative w-full aspect-video bg-muted border border-muted-foreground/50 rounded-xl flex flex-col justify-end overflow-hidden p-6 box-border shadow-2xl"
+                            className={`relative w-full aspect-video bg-muted border border-muted-foreground/50 rounded-xl flex flex-col ${localSplashContentVerticalAlignment === 'center' ? 'justify-center' : 'justify-end'} overflow-hidden p-8 lg:p-12 box-border shadow-2xl`}
                             style={{
                                 alignItems: localSplashContentAlignment === 'left' ? 'flex-start' : 'flex-end',
                                 textAlign: localSplashContentAlignment === 'left' ? 'left' : 'right',
