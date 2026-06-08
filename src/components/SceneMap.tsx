@@ -83,6 +83,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
   const { theme } = useTheme();
   const hoverTextClass = theme === 'terminal' ? 'hover:text-zinc-950' : 'hover:text-white';
   const containerRef = useRef<HTMLDivElement>(null);
+  const mapTransformRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
   const [view, setView] = useState({ x: 0, y: 0, scale: 1 });
   const [isPanning, setIsPanning] = useState(false);
   const [panStart, setPanStart] = useState({ x: 0, y: 0 });
@@ -662,7 +664,11 @@ const SceneMap: React.FC<SceneMapProps> = ({
           currentNodes.map((n) => (n.id === dragInfo.id ? { ...n, x: newX, y: newY } : n))
         );
       } else if (isPanning) {
-        setView((v) => ({ ...v, x: e.clientX - panStart.x, y: e.clientY - panStart.y }));
+        if (mapTransformRef.current) {
+          const newX = e.clientX - panStart.x;
+          const newY = e.clientY - panStart.y;
+          mapTransformRef.current.style.transform = `translate3d(${newX}px, ${newY}px, 0) scale(${view.scale})`;
+        }
       }
     },
     [isPanning, panStart, dragInfo, view.x, view.y, view.scale]
@@ -689,9 +695,12 @@ const SceneMap: React.FC<SceneMapProps> = ({
         }
         setDragInfo(null);
       }
+      if (isPanning) {
+        setView((v) => ({ ...v, x: e.clientX - panStart.x, y: e.clientY - panStart.y }));
+      }
       setIsPanning(false);
     },
-    [dragInfo, nodes, onUpdateScenePosition, onUpdateVignettePosition]
+    [dragInfo, isPanning, panStart.x, panStart.y, nodes, onUpdateScenePosition, onUpdateVignettePosition]
   );
 
   const handleToggleOrphans = useCallback(() => {
@@ -704,6 +713,26 @@ const SceneMap: React.FC<SceneMapProps> = ({
     });
   }, [handleViewAll]);
 
+  useEffect(() => {
+    if (!isPanning && !dragInfo) return;
+
+    const onGlobalMouseMove = (e: MouseEvent) => {
+      handleMouseMove(e as unknown as React.MouseEvent);
+    };
+
+    const onGlobalMouseUp = (e: MouseEvent) => {
+      handleMouseUp(e as unknown as React.MouseEvent);
+    };
+
+    window.addEventListener('mousemove', onGlobalMouseMove);
+    window.addEventListener('mouseup', onGlobalMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', onGlobalMouseMove);
+      window.removeEventListener('mouseup', onGlobalMouseUp);
+    };
+  }, [isPanning, dragInfo, handleMouseMove, handleMouseUp]);
+
   return (
     <div className="h-full flex flex-col relative w-full">
       <div
@@ -712,9 +741,6 @@ const SceneMap: React.FC<SceneMapProps> = ({
         onWheel={handleWheel}
         onDragStart={(e) => e.preventDefault()}
         onMouseDown={handleCanvasMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={(e) => handleMouseUp(e)}
-        onMouseLeave={(e) => handleMouseUp(e)}
       >
 
 
@@ -749,7 +775,8 @@ const SceneMap: React.FC<SceneMapProps> = ({
         </div>
 
         <div
-          className={`${(dragInfo || isPanning) ? '' : 'transition-transform duration-500'} will-change-transform`}
+          ref={mapTransformRef}
+          className={`will-change-transform`}
           style={{
             transform: `translate3d(${view.x}px, ${view.y}px, 0) scale(${view.scale})`,
             transformOrigin: '0 0',
