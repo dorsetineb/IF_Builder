@@ -49,7 +49,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                 <div className="h-[61px] border-b border-muted-foreground/50 flex items-center justify-between px-8 sticky top-0 bg-background/95 backdrop-blur z-20 shrink-0">
                     <div className="flex flex-col justify-center h-full">
                         <h1 className="text-xl font-bold text-foreground">{t('about.title', 'Sobre o IF Builder')}</h1>
-                        <p className="text-[10px] text-muted-foreground hidden md:block">{t('about.subtitle', 'Saiba mais sobre o If Builder.')}</p>
+                        <p className="text-[10px] text-foreground/70 hidden md:block">{t('about.subtitle', 'Saiba mais sobre o If Builder.')}</p>
                     </div>
                 </div>
             )}
@@ -68,7 +68,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     onClick={() => setActiveTab('about_project')}
                                     className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'about_project'
                                         ? 'text-primary border-b-4 border-primary'
-                                        : 'text-muted-foreground hover:text-foreground'
+                                        : 'text-foreground/70 hover:text-foreground'
                                         }`}
                                 >
                                     {t('about.tabs.aboutProject', 'Sobre o Projeto')}
@@ -77,7 +77,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     onClick={() => setActiveTab('dev')}
                                     className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'dev'
                                         ? 'text-primary border-b-4 border-primary'
-                                        : 'text-muted-foreground hover:text-foreground'
+                                        : 'text-foreground/70 hover:text-foreground'
                                         }`}
                                 >
                                     {t('about.tabs.developer', 'Sobre o Desenvolvedor')}
@@ -86,7 +86,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                     onClick={() => setActiveTab('support')}
                                     className={`pb-4 text-[10px] font-bold uppercase tracking-widest transition-all ${activeTab === 'support'
                                         ? 'text-primary border-b-4 border-primary'
-                                        : 'text-muted-foreground hover:text-foreground'
+                                        : 'text-foreground/70 hover:text-foreground'
                                         }`}
                                 >
                                     {t('about.tabs.support', 'Apoie o IF Builder')}
@@ -106,7 +106,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                             {t('about.title', 'Sobre o IF Builder')}
                                         </h2>
                                     </div>
-                                    <div className="space-y-6 text-muted-foreground leading-relaxed font-light text-sm">
+                                    <div className="space-y-6 text-foreground leading-relaxed font-light text-sm">
                                         <p>{t('about.project.p1', 'O IF Builder é um editor que desenvolvi para criar ficções interativas - narrativas textuais onde quem joga decide o que acontecerá em seguida.')}</p>
                                         <p>{t('about.project.p2', 'Aqui, as ficções interativas são escritas em ramificações. É fácil visualizar para onde cada escolha leva o jogador e como os caminhos se cruzam. Se você quer que algo aconteça apenas se o jogador tiver um item específico ou tiver feito uma escolha anterior, o editor resolve isso.')}</p>
                                         <p>{t('about.project.p3', 'Ao terminar, o editor exporta um arquivo .zip que funciona em qualquer navegador. Sua história sai do editor e vai direto para quem quiser jogar. E se essa pessoa utilizar o IF Builder, ela pode importar o arquivo .zip no editor e ver como você criou sua história. Quem sabe até fazer um remix?')}</p>
@@ -125,7 +125,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                         </h2>
                                     </div>
 
-                                    <div className="space-y-6 text-muted-foreground leading-relaxed font-light text-sm">
+                                    <div className="space-y-6 text-foreground leading-relaxed font-light text-sm">
                                         <p>{t('about.support.p1', 'IF Builder é um projeto gratuito, sem fins lucrativos, e seu funcionamento é custeado pelo desenvolvedor.')}</p>
                                         <p>{t('about.support.p2', 'Se esta ferramenta é útil para você, considere fazer uma doação de qualquer valor. Todo o recurso arrecadado é destinado exclusivamente ao pagamento dos custos de infraestrutura do site, incluindo a manutenção e as futuras melhorias.')}</p>
                                         <p>
@@ -157,7 +157,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                                             </div>
                                         </div>
 
-                                        <div className="flex-1 space-y-6 text-muted-foreground leading-relaxed font-light text-sm text-left">
+                                        <div className="flex-1 space-y-6 text-foreground leading-relaxed font-light text-sm text-left">
                                             <p>{t('about.dev.p1', 'Sou bacharel em Artes Visuais, pós-graduado em Gestão da Inovação, e atuo há mais de uma década em projetos que envolvem design, educação e tecnologia.')}</p>
                                             <p>{t('about.dev.p2', 'Tive a sorte de trabalhar com desenho e com computadores, e adoro histórias que são contadas de um jeito diferente.')}</p>
                                             <p>
@@ -177,10 +177,10 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         <div className="bg-gradient-to-b from-primary/10 to-transparent border-2 border-primary/50 rounded-xl p-6 shadow-sm relative overflow-hidden group">
                             <div className="flex items-center gap-2 mb-2">
                                 <Heart className="w-4 h-4 text-primary fill-current" />
-                                <h3 className="font-bold text-sm text-white">{t('about.support.sidebar.title', 'Apoie o Projeto')}</h3>
+                                <h3 className="font-bold text-sm text-foreground">{t('about.support.sidebar.title', 'Apoie o Projeto')}</h3>
                             </div>
 
-                            <p className="text-[12px] text-zinc-400 leading-relaxed mb-4">
+                            <p className="text-[12px] text-foreground/80 leading-relaxed mb-4">
                                 {t('about.support.sidebar.desc', 'Este site é mantido com amor e doações. Se ele é útil pra você, considere contribuir com um PIX! ou um Ko-fi!')}
                             </p>
 
@@ -259,15 +259,15 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
                         </button>
 
                         <div className="text-center">
-                            <h3 className="text-xl font-bold mb-2 text-white">{t('about.support.modal.title', 'Chave PIX')}</h3>
-                            <p className="text-xs text-zinc-400 mb-6">
+                            <h3 className="text-xl font-bold mb-2 text-foreground">{t('about.support.modal.title', 'Chave PIX')}</h3>
+                            <p className="text-xs text-foreground/70 mb-6">
                                 {t('about.support.modal.desc', 'Chave aleatória se preferir não escanear o QR Code.')}
                             </p>
 
                             <div className="p-4 bg-zinc-900 border border-muted-foreground/50 rounded-xl mb-6 relative group cursor-pointer" onClick={handleCopyPix}>
                                 <p className="text-xs font-mono break-all text-primary/80">
                                     4f489a50-c458-4adf-b211-62075adebf13
-                                </p>
+                                  </p>
                                 <div className="absolute inset-0 bg-primary/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
                                     <span className="text-xs font-bold text-white flex items-center gap-1">
                                         <Copy size={12} /> {t('about.support.modal.copy', 'Copiar')}
@@ -277,7 +277,7 @@ const AboutProject: React.FC<{ hideHeader?: boolean }> = ({ hideHeader }) => {
 
                             <button
                                 onClick={() => setShowPixModal(false)}
-                                className="text-xs text-zinc-500 hover:text-zinc-300 underline"
+                                className="text-xs text-foreground/60 hover:text-foreground underline"
                             >
                                 {t('about.support.modal.close', 'Fechar')}
                             </button>

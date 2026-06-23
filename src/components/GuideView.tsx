@@ -17,7 +17,7 @@ export const GuideView: React.FC = () => {
         <div className="max-w-4xl mx-auto px-8 pb-20 animate-in fade-in duration-500">
             {/* Sticky Header: Intro + TOC */}
             <div className="sticky top-0 z-40 bg-background pt-8 pb-4 -mx-8 px-8 shadow-sm">
-                <p className="text-muted-foreground max-w-3xl text-sm leading-relaxed mb-6" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guide.intro', 'O IF Builder permite criar ficções interativas, narrativas textuais onde o jogador interage com a história por meio de escolhas ou comandos (verbos). A ficção é composta por <strong>Ramificações</strong>, onde o usuário lê descrições, observa imagens e toma decisões para interagir com <strong>objetos</strong> e <strong>navegar pelo mundo</strong>.')) }}></p>
+                <p className="text-foreground max-w-3xl text-sm leading-relaxed mb-6" dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guide.intro', 'O IF Builder permite criar ficções interativas, narrativas textuais onde o jogador interage com a história por meio de escolhas ou comandos (verbos). A ficção é composta por <strong>Ramificações</strong>, onde o usuário lê descrições, observa imagens e toma decisões para interagir com <strong>objetos</strong> e <strong>navegar pelo mundo</strong>.')) }}></p>
 
                 {/* Table of Contents Listbox */}
                 <div className="p-4 bg-muted/30 rounded-lg border border-muted-foreground/50 mb-2">
@@ -60,7 +60,7 @@ export const GuideView: React.FC = () => {
                         </div>
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.scenes.title', '1. Editor de Ramificações')}</h3>
                     </div>
-                    <div className="text-sm text-muted-foreground space-y-3 pl-12">
+                    <div className="text-sm text-foreground space-y-3 pl-12">
                         <p dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(t('guideView.section1.desc', 'O IF Builder usa um sistema de nós simples. Cada ramificação possui uma &quot;Ação Principal&quot; que conecta a outras ramificações.')) }}></p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.scenes.item1', '<strong>Nome e Descrição:</strong> Defina o título e o texto que o jogador verá ao entrar na ramificação.') }}></li>
@@ -80,7 +80,7 @@ export const GuideView: React.FC = () => {
                         </div>
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.objects.title', '2. Biblioteca de Objetos')}</h3>
                     </div>
-                    <div className="text-sm text-muted-foreground space-y-3 pl-12">
+                    <div className="text-sm text-foreground space-y-3 pl-12">
                         <p dangerouslySetInnerHTML={{ __html: t('guide.sections.objects.desc', 'Os objetos são <strong>globais</strong> e podem ser reutilizados em múltiplas ramificações.') }}></p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.objects.item1', '<strong>Nome:</strong> Identificador do objeto (ex: "Chave de Ouro").') }}></li>
@@ -99,7 +99,7 @@ export const GuideView: React.FC = () => {
                         </div>
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.interactions.title', '3. Interações (O coração do jogo)')}</h3>
                     </div>
-                    <div className="text-sm text-muted-foreground pl-12">
+                    <div className="text-sm text-foreground pl-12">
                         <p className="mb-4">{t('guide.sections.interactions.desc', 'Definem o que acontece quando o jogador digita um comando.')}</p>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-3">
@@ -164,7 +164,7 @@ export const GuideView: React.FC = () => {
                         </div>
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.globals.title', '4. Verbos Globais')}</h3>
                     </div>
-                    <div className="text-sm text-muted-foreground space-y-2 pl-12">
+                    <div className="text-sm text-foreground space-y-2 pl-12">
                         <p dangerouslySetInnerHTML={{ __html: t('guide.sections.globals.desc', 'Verbos que funcionam em <strong>qualquer ramificação</strong> do jogo.') }}></p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.globals.item1', '<strong>Verbos Fixos:</strong> Palavras-chave universais (ex: "ajuda", "inventário").') }}></li>
@@ -181,7 +181,7 @@ export const GuideView: React.FC = () => {
                         </div>
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.vignettes.title', '5. Capítulos')} <span className="text-xs font-normal text-amber-500 ml-2">✨ {t('guide.sections.vignettes.new', 'NOVO')}</span></h3>
                     </div>
-                    <div className="text-sm text-muted-foreground space-y-2 pl-12">
+                    <div className="text-sm text-foreground space-y-2 pl-12">
                         <p>{t('guide.sections.vignettes.desc', 'Telas cinematográficas que enriquecem a narrativa.')}</p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.vignettes.item1', '<strong>Abertura:</strong> Exibida antes do início do jogo (tela de título).') }}></li>
@@ -200,7 +200,7 @@ export const GuideView: React.FC = () => {
                         </div>
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.trackers.title', '6. Rastreadores de Consequência')}</h3>
                     </div>
-                    <div className="text-sm text-muted-foreground space-y-2 pl-12">
+                    <div className="text-sm text-foreground space-y-2 pl-12">
                         <p dangerouslySetInnerHTML={{ __html: t('guide.sections.trackers.desc', 'Crie sistemas numéricos como <strong>Vida</strong>, <strong>Dinheiro</strong> ou <strong>Estresse</strong>.') }}></p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.trackers.item1', '<strong>Valor Inicial e Máximo:</strong> Definem a escala (ex: 0/100).') }}></li>
@@ -219,7 +219,7 @@ export const GuideView: React.FC = () => {
                         </div>
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.map.title', '7. Mapa de Conexões')} <span className="text-xs font-normal text-indigo-500 ml-2">✨ {t('guide.sections.map.new', 'NOVO')}</span></h3>
                     </div>
-                    <div className="text-sm text-muted-foreground space-y-2 pl-12">
+                    <div className="text-sm text-foreground space-y-2 pl-12">
                         <p>{t('guide.sections.map.desc', 'Visualize a estrutura do seu jogo de forma gráfica.')}</p>
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.map.item1', '<strong>Visão Panorâmica:</strong> Veja todas as ramificações e como elas se conectam.') }}></li>
@@ -237,14 +237,14 @@ export const GuideView: React.FC = () => {
                         </div>
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.settings.title', '8. Configurações do Jogo')}</h3>
                     </div>
-                    <div className="text-sm text-muted-foreground pl-12">
+                    <div className="text-sm text-foreground pl-12">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                             <div className="bg-card border border-muted-foreground/50 p-4 rounded-xl shadow-sm hover:border-slate-400/30 transition-colors group">
                                 <div className="flex items-center gap-2 mb-3 text-slate-500 group-hover:text-slate-400 transition-colors">
                                     <Box className="w-4 h-4" />
                                     <p className="font-bold text-foreground">{t('guide.sections.settings.layout', 'Layout')}</p>
                                 </div>
-                                <ul className="space-y-2 text-muted-foreground">
+                                <ul className="space-y-2 text-foreground">
                                     <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-slate-400"></div>{t('guide.sections.settings.layoutitem1', 'Temas predefinidos')}</li>
                                     <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-slate-400"></div>{t('guide.sections.settings.layoutitem2', 'Orientação e molduras')}</li>
                                     <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-slate-400"></div>{t('guide.sections.settings.layoutitem3', 'Fontes e cores')}</li>
@@ -255,7 +255,7 @@ export const GuideView: React.FC = () => {
                                     <Activity className="w-4 h-4" />
                                     <p className="font-bold text-foreground">{t('guide.sections.settings.systems', 'Sistemas')}</p>
                                 </div>
-                                <ul className="space-y-2 text-muted-foreground">
+                                <ul className="space-y-2 text-foreground">
                                     <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-slate-400"></div>{t('guide.sections.settings.systemsitem1', 'Inventário')}</li>
                                     <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-slate-400"></div>{t('guide.sections.settings.systemsitem2', 'Diário de jogo')}</li>
                                     <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-slate-400"></div>{t('guide.sections.settings.systemsitem3', 'Verbos fixos')}</li>
@@ -266,7 +266,7 @@ export const GuideView: React.FC = () => {
                                     <Play className="w-4 h-4" />
                                     <p className="font-bold text-foreground">{t('guide.sections.settings.animations', 'Animações')}</p>
                                 </div>
-                                <ul className="space-y-2 text-muted-foreground">
+                                <ul className="space-y-2 text-foreground">
                                     <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-slate-400"></div>{t('guide.sections.settings.animationsitem1', 'Texto: fade ou digitação')}</li>
                                     <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-slate-400"></div>{t('guide.sections.settings.animationsitem2', 'Imagens: slide, zoom...')}</li>
                                     <li className="flex items-center gap-2"><div className="w-1 h-1 rounded-full bg-slate-400"></div>{t('guide.sections.settings.animationsitem3', 'Velocidade ajustável')}</li>
@@ -284,7 +284,7 @@ export const GuideView: React.FC = () => {
                         </div>
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.preview.title', '9. Pré-visualização e Teste')}</h3>
                     </div>
-                    <div className="text-sm text-muted-foreground space-y-2 pl-12">
+                    <div className="text-sm text-foreground space-y-2 pl-12">
                         <ul className="list-disc pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.preview.item1', 'Use o botão <strong>Pré-visualizar</strong> para testar toda a experiência.') }}></li>
                             <li>{t('guide.sections.preview.item2', 'Teste a partir de qualquer ramificação que está editando.')}</li>
@@ -301,7 +301,7 @@ export const GuideView: React.FC = () => {
                         </div>
                         <h3 className="text-lg font-bold text-foreground">{t('guide.sections.export.title', '10. Finalização e Exportação')}</h3>
                     </div>
-                    <div className="text-sm text-muted-foreground pl-12 space-y-3">
+                    <div className="text-sm text-foreground pl-12 space-y-3">
                         <p>{t('guide.sections.export.desc', 'Quando seu jogo estiver pronto (ou para guardar seu progresso):')}</p>
                         <ol className="list-decimal pl-4 space-y-1">
                             <li dangerouslySetInnerHTML={{ __html: t('guide.sections.export.item1', '<strong>Teste completamente todas as ramificações</strong> e finais utilizando a Pré-visualização.') }}></li>
