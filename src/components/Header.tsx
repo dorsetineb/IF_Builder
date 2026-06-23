@@ -60,8 +60,8 @@ const Header: React.FC<{
               {/* Context-aware Sub-header Text */}
               {currentView === 'guide' ? (
                 <div className="flex flex-col">
-                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
-                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.guideDesc', 'Aprenda como criar suas próprias ficções interativas.')}</p>
+                  <span className="text-xl font-bold text-white tracking-tight">{t('sidebar.quickGuide', 'Guia Rápido')}</span>
+                  <p className="text-[10px] text-white/60 hidden md:block">{t('header.guideDesc', 'Aprenda como criar suas próprias ficções interativas.')}</p>
                 </div>
               ) : currentView === 'settings' ? (
                 <div className="flex flex-col">
@@ -70,8 +70,8 @@ const Header: React.FC<{
                 </div>
               ) : currentView === 'about' ? (
                 <div className="flex flex-col">
-                  <span className="text-xl font-bold text-foreground tracking-tight">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
-                  <p className="text-[10px] text-muted-foreground hidden md:block">{t('header.aboutDesc', 'Saiba mais sobre o If Builder.')}</p>
+                  <span className="text-xl font-bold text-white tracking-tight">{t('sidebar.aboutProject', 'Sobre o Projeto')}</span>
+                  <p className="text-[10px] text-white/60 hidden md:block">{t('header.aboutDesc', 'Saiba mais sobre o If Builder.')}</p>
                 </div>
               ) : currentView === 'editor_interface' ? (
                 <div className="flex flex-col">
