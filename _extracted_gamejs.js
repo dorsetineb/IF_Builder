@@ -10,11 +10,25 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     
     const ICONS_OUTLINE = {
-        heart: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
-        circle: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
-        cross: '<svg stroke="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 5 V19 M5 12 H19"/></svg>',
-        square: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>',
-        diamond: '<svg fill="none" stroke="%COLOR%" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 2l10 10-10 10L2 12z"/></svg>'
+        heart: '<svg fill="none" stroke="%COLOR%" stroke-width="3.5" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>',
+        circle: '<svg fill="none" stroke="%COLOR%" stroke-width="3.5" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/></svg>',
+        cross: '<svg stroke="none" stroke="%COLOR%" stroke-width="3.5" viewBox="0 0 24 24"><path d="M12 5 V19 M5 12 H19"/></svg>',
+        square: '<svg fill="none" stroke="%COLOR%" stroke-width="3.5" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1"/></svg>',
+        diamond: '<svg fill="none" stroke="%COLOR%" stroke-width="3.5" viewBox="0 0 24 24"><path d="M12 2l10 10-10 10L2 12z"/></svg>'
+    };
+
+    window.safeHTML = function(content, config) {
+        if (typeof DOMPurify !== 'undefined') {
+            const finalConfig = config || {};
+            finalConfig.ADD_ATTR = [...(finalConfig.ADD_ATTR || []), 'class', 'style', 'data-word', 'data-slot', 'title', 'viewBox', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'd', 'x1', 'y1', 'x2', 'y2'];
+            finalConfig.ADD_TAGS = [...(finalConfig.ADD_TAGS || []), 'span', 'svg', 'path', 'line'];
+            return DOMPurify.sanitize(content, finalConfig);
+        }
+        // Fail Secure: If DOMPurify is missing, return raw text without HTML execution
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        // Basic escaping just in case it's used in innerHTML somewhere
+        return tempDiv.textContent.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     };
 
     const gameData = window.embeddedGameData;
@@ -23,31 +37,119 @@ document.addEventListener('DOMContentLoaded', () => {
     let visitedScenes = []; 
     let actionLog = []; 
     let chances = gameData.gameMaxChances || 3;
+    let lastChanceChange = null; 
     let isGameEnded = false;
+    let gameStartTime = null;
+    let gameEndTime = null;
     let trackers = {};
     let removedObjectsFromScenes = {}; 
     let currentBgmSrc = "";
     let isPrinting = false;
     let activePopupType = null;
     let renderSessionId = 0; // Prevent race conditions in rendering
+    let isGameSessionActive = false;
 
-    const textSpeedVal = gameData.gameTextSpeed || 3; 
-    const imgSpeedVal = gameData.gameImageSpeed || 3;
-    const typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
-    const textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
-    const imageAnimDuration = Math.max(0.3, 5.0 - (imgSpeedVal * 0.9)) + 's';
+    const previewSaves = {};
+
+    const getGameSave = (key) => {
+        if (window.isPreview) {
+            return previewSaves[key] || null;
+        }
+        return localStorage.getItem(key);
+    };
+
+    const setGameSave = (key, value) => {
+        if (window.isPreview) {
+            previewSaves[key] = value;
+            return;
+        }
+        localStorage.setItem(key, value);
+    };
+
+    const removeGameSave = (key) => {
+        if (window.isPreview) {
+            delete previewSaves[key];
+            return;
+        }
+        localStorage.removeItem(key);
+    };
+
+    const savedTextSpeed = localStorage.getItem('if_builder_settings_text_speed');
+    let textSpeedVal = savedTextSpeed ? parseInt(savedTextSpeed) : (gameData.gameTextSpeed || 3); 
+    
+    const savedImgSpeed = localStorage.getItem('if_builder_settings_image_speed');
+    let imgSpeedVal = 0.5;
+    if (savedImgSpeed) {
+        const speedVal = parseInt(savedImgSpeed);
+        if (speedVal === 1) imgSpeedVal = 2.0;
+        else if (speedVal === 2) imgSpeedVal = 1.0;
+        else if (speedVal === 3) imgSpeedVal = 0.5;
+        else if (speedVal === 4) imgSpeedVal = 0.2;
+        else {
+            const parsed = parseFloat(savedImgSpeed);
+            imgSpeedVal = isNaN(parsed) ? 0.5 : parsed;
+        }
+    } else {
+        const speedVal = gameData.gameImageSpeed || 0.5;
+        if (speedVal === 1) imgSpeedVal = 2.0;
+        else if (speedVal === 2) imgSpeedVal = 1.0;
+        else if (speedVal === 3) imgSpeedVal = 0.5;
+        else if (speedVal === 4) imgSpeedVal = 0.2;
+        else imgSpeedVal = speedVal;
+    }
+    
+    if (isNaN(imgSpeedVal) || imgSpeedVal < 0.1 || imgSpeedVal > 5.0) {
+        imgSpeedVal = 0.5;
+    }
+    
+    let typeSpeedBase = Math.max(5, 80 - (textSpeedVal * 15)); 
+    let textAnimDuration = Math.max(0.1, 3.0 - (textSpeedVal * 0.5)) + 's';
+    const imageAnimDuration = imgSpeedVal + 's';
     
     document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
     document.documentElement.style.setProperty('--image-anim-speed', imageAnimDuration);
 
+    const updateFogSizes = (fogContainer) => {
+        if (!fogContainer) return;
+        const img1 = new Image();
+        const img2 = new Image();
+        img1.src = "https://raw.githubusercontent.com/WebDevSHORTS/Fog-Overlay-Animation/master/img/fog-1.png";
+        img2.src = "https://raw.githubusercontent.com/WebDevSHORTS/Fog-Overlay-Animation/master/img/fog-2.png";
+
+        const update = () => {
+            const rect = fogContainer.getBoundingClientRect();
+            const W = rect.width;
+            const H = rect.height;
+            if (W === 0 || H === 0) return;
+
+            if (img1.complete && img1.naturalWidth) {
+                const R1 = img1.naturalWidth / img1.naturalHeight;
+                const vw = W / H > R1 ? W : H * R1;
+                const vh = W / H > R1 ? W / R1 : H;
+                fogContainer.style.setProperty('--fog-width-1', vw + 'px');
+                fogContainer.style.setProperty('--fog-height-1', vh + 'px');
+            }
+            if (img2.complete && img2.naturalWidth) {
+                const R2 = img2.naturalWidth / img2.naturalHeight;
+                const vw = W / H > R2 ? W : H * R2;
+                const vh = W / H > R2 ? W / R2 : H;
+                fogContainer.style.setProperty('--fog-width-2', vw + 'px');
+                fogContainer.style.setProperty('--fog-height-2', vh + 'px');
+            }
+        };
+
+        img1.onload = update;
+        img2.onload = update;
+        
+        window.addEventListener('resize', update);
+        update(); 
+    };
+
     (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
 
-    const splashScreen = document.getElementById('splash-screen');
     const positiveEndingScreen = document.getElementById('positive-ending-screen');
     const negativeEndingScreen = document.getElementById('negative-ending-screen');
-    const splashStartButton = document.getElementById('splash-start-button');
-    const continueButton = document.getElementById('continue-button');
-    const endingRestartButtons = document.querySelectorAll('.ending-restart-button');
+    const endingRestartButtons = document.querySelectorAll('#positive-ending-screen .ending-restart-button, #negative-ending-screen .ending-restart-button');
     
     const gameContainer = document.getElementById('game-container');
     const imageContainer = document.getElementById('image-container');
@@ -62,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const diaryButton = document.getElementById('diary-button');
     const trackersButton = document.getElementById('trackers-button');
     const systemButton = document.getElementById('system-button');
+    const exportPdfButton = document.getElementById('export-pdf-button');
     const sceneNameOverlay = document.getElementById('scene-name-overlay');
     // Overlay Injection if not present
     let sceneOverlay = document.getElementById('scene-overlay');
@@ -89,7 +192,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const itemModalImage = document.getElementById('item-modal-image');
     const itemModalDescription = document.getElementById('item-modal-description');
     
+    const acquisitionModal = document.getElementById('acquisition-modal');
+    const acquisitionModalTitle = document.getElementById('acquisition-modal-title');
+    const acquisitionModalImageContainer = document.getElementById('acquisition-modal-image-container');
+    const acquisitionModalImage = document.getElementById('acquisition-modal-image');
+    const acquisitionModalDescription = document.getElementById('acquisition-modal-description');
+    
     const systemModal = document.getElementById('system-modal');
+    const settingsModal = document.getElementById('settings-modal');
     const systemModalTitle = document.getElementById('system-modal-title');
     const systemMenuMain = document.getElementById('system-menu-main');
     const systemSlotsContainer = document.getElementById('system-slots-container');
@@ -112,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
     vDiv.className = 'splash-screen hidden';
     // Use inline styles as a fallback to guarantee the look matches splash button even if CSS is missing
     const btnStyle = 'font-family: var(--font-family); padding: 12px 24px; font-size: 1.1em; font-weight: bold; border: none; cursor: pointer; color: var(--splash-button-text-color); transition: all 0.2s ease-in-out; width: 100%; max-width: 350px; background-color: var(--splash-button-bg);';
-    vDiv.innerHTML = '<div id="vignette-overlay" class="scene-overlay"></div><div class="splash-content" style="z-index: 10;"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '">Continuar</button></div></div>';
+    vDiv.innerHTML = '<div id="vignette-overlay" class="scene-overlay"></div><div class="splash-content" style="z-index: 10;"><div class="splash-text"><h1 id="vignette-title"></h1><p id="vignette-description"></p></div><div class="splash-buttons"><button id="vignette-continue-button" class="ending-restart-button" style="' + btnStyle + '"></button></div></div>';
     document.body.appendChild(vDiv);
     vignetteScreen = vDiv;
 
@@ -120,20 +230,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const vignetteDescription = document.getElementById('vignette-description');
     const vignetteContinueButton = document.getElementById('vignette-continue-button');
 
-    const playSound = (src) => { if (src && soundEffectAudio) { soundEffectAudio.src = src; soundEffectAudio.play().catch(e => {}); } };
+    // View Diary button in vignettes
+    const vignetteDiaryButton = document.createElement('button');
+    vignetteDiaryButton.id = 'vignette-diary-button';
+    vignetteDiaryButton.className = 'ending-restart-button hidden';
+    vignetteDiaryButton.style.cssText = btnStyle + ' margin-top: 10px;';
+    vignetteDiaryButton.textContent = gameData.gameTranslations.view_diary_btn;
+    vignetteContinueButton.parentElement.appendChild(vignetteDiaryButton);
+    vignetteDiaryButton.addEventListener('click', () => showDiary(true));
+
+    // Also add to standard ending screens
+    [positiveEndingScreen, negativeEndingScreen].forEach(screen => {
+        if (!screen) return;
+        const btnContainer = screen.querySelector('.splash-buttons') || screen.querySelector('.splash-content');
+        if (btnContainer) {
+            const endDiaryBtn = document.createElement('button');
+            endDiaryBtn.className = 'ending-restart-button';
+            endDiaryBtn.style.cssText = btnStyle + ' margin-top: 10px;';
+            endDiaryBtn.textContent = gameData.gameTranslations.view_diary_btn;
+            btnContainer.appendChild(endDiaryBtn);
+            endDiaryBtn.addEventListener('click', () => showDiary(true));
+        }
+    });
+
+    const playSound = (src) => { if (src && soundEffectAudio) { soundEffectAudio.src = src; soundEffectAudio.play().catch(() => {}); } };
 
     let bgmFadeInterval = null;
     const playBgm = (src) => {
-        // STRICT BLOCK: Prevent legacy global_bgm from playing
-        if (src && typeof src === 'string' && src.includes('global_bgm')) {
-            console.log("Blocking legacy global_bgm");
-            src = ""; 
-        }
-        
         if (!bgmAudio) return;
         if (src === currentBgmSrc) {
             if (bgmAudio.paused && src) {
-                bgmAudio.play().catch(e => {});
+                bgmAudio.play().catch(() => {});
             }
             return;
         }
@@ -157,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const fadeIn = () => {
             if (bgmFadeInterval) clearInterval(bgmFadeInterval);
             bgmAudio.volume = 0;
-            bgmAudio.play().catch(e => {});
+            bgmAudio.play().catch(() => {});
             let vol = 0;
             bgmFadeInterval = setInterval(() => {
                 vol += 0.1;
@@ -681,7 +808,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         const startAudioOnInteraction = () => {
-            if (gameData.gameBackgroundMusic && bgmAudio.paused && !isGameEnded) {
+            if (bgmAudio.paused && !isGameEnded && bgmAudio.src && bgmAudio.src !== window.location.href && bgmAudio.src !== "") {
+                bgmAudio.play().catch(() => {});
+            } else if (gameData.gameBackgroundMusic && bgmAudio.paused && !isGameEnded) {
                 playBgm(gameData.gameBackgroundMusic);
             }
             document.removeEventListener('mousedown', startAudioOnInteraction);
@@ -690,29 +819,398 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('mousedown', startAudioOnInteraction);
         document.addEventListener('keydown', startAudioOnInteraction);
 
-        const hasAutoSave = localStorage.getItem('if_builder_autosave_' + document.title);
-        // Auto-start game, bypassing splash screen
-        startGame();
+        // Menu Principal & System Button Hooks
+        const gearSystemButton = document.getElementById('gear-system-button');
+        if (gearSystemButton) {
+            gearSystemButton.classList.add('hidden');
+        }
+
+        const resumeBtn = document.getElementById('start-resume-game-btn');
+        if (resumeBtn) {
+            resumeBtn.addEventListener('click', () => {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        hideStartScreen(() => {
+                            if (gearSystemButton) {
+                                gearSystemButton.classList.add('hidden');
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        const newGameBtn = document.getElementById('start-new-game-btn');
+        if (newGameBtn) {
+            newGameBtn.addEventListener('click', () => {
+                if (isGameSessionActive && !window.isPreview) {
+                    if (!confirm('Começar de novo apagará seu progresso atual e o caminho salvo automaticamente. Deseja continuar?')) {
+                        return;
+                    }
+                }
+                
+                // Novo jogo apaga o autosave imediatamente!
+                removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+                
+                // Start game first so the first scene is rendered behind the menu
+                startGame();
+                
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        hideStartScreen(() => {
+                            if (gearSystemButton) {
+                                gearSystemButton.classList.add('hidden');
+                            }
+                        });
+                    });
+                });
+            });
+        }
+
+        const continueBtn = document.getElementById('start-continue-btn');
+        if (continueBtn) {
+            continueBtn.addEventListener('click', () => {
+                if (isGameSessionActive) {
+                    hideStartScreen();
+                } else {
+                    const latestSave = getLatestSave();
+                    if (latestSave) {
+                        // Load save first so it is rendered behind the menu
+                        loadGameFromData(latestSave);
+                        requestAnimationFrame(() => {
+                            requestAnimationFrame(() => {
+                                hideStartScreen(() => {
+                                    if (gearSystemButton) {
+                                        gearSystemButton.classList.add('hidden');
+                                    }
+                                });
+                            });
+                        });
+                    }
+                }
+            });
+        }
+
+        const startSavesBtn = document.getElementById('start-saves-btn');
+        const startScreenButtons = document.querySelector('.start-screen-buttons');
+        const startScreenSavesContainer = document.getElementById('start-screen-saves-container');
+        
+        if (startSavesBtn) {
+            startSavesBtn.addEventListener('click', () => {
+                if (startScreenButtons) startScreenButtons.classList.add('hidden');
+                if (startScreenSavesContainer) startScreenSavesContainer.classList.remove('hidden');
+                renderStartScreenSlots();
+            });
+        }
+
+        const startScreenSavesBackBtn = document.getElementById('start-screen-saves-back-btn');
+        if (startScreenSavesBackBtn) {
+            startScreenSavesBackBtn.addEventListener('click', () => {
+                if (startScreenSavesContainer) startScreenSavesContainer.classList.add('hidden');
+                if (startScreenButtons) startScreenButtons.classList.remove('hidden');
+                showStartScreen(true);
+            });
+        }
+
+        const startOptionsBtn = document.getElementById('start-options-btn');
+        const startScreenOptionsContainer = document.getElementById('start-screen-options-container');
+        if (startOptionsBtn) {
+            startOptionsBtn.addEventListener('click', () => {
+                if (startScreenButtons) startScreenButtons.classList.add('hidden');
+                if (startScreenOptionsContainer) startScreenOptionsContainer.classList.remove('hidden');
+                syncSquareSliders();
+            });
+        }
+
+        const startScreenOptionsBackBtn = document.getElementById('start-screen-options-back-btn');
+        if (startScreenOptionsBackBtn) {
+            startScreenOptionsBackBtn.addEventListener('click', () => {
+                if (startScreenOptionsContainer) startScreenOptionsContainer.classList.add('hidden');
+                if (startScreenButtons) startScreenButtons.classList.remove('hidden');
+                showStartScreen(true);
+            });
+        }
+
+        const getSpeedLabel = (level) => {
+            const l = parseInt(level);
+            if (l === 1) return "Muito Lento";
+            if (l === 2) return "Lento";
+            if (l === 3) return "Normal";
+            if (l === 4) return "Rápido";
+            return "Normal";
+        };
+
+        const syncSquareSliders = () => {
+            const sqVolume = document.getElementById('start-square-volume');
+            const sqVolumeVal = document.getElementById('start-square-volume-val');
+            const sqTextSpeed = document.getElementById('start-square-text-speed');
+            const sqTextSpeedVal = document.getElementById('start-square-text-speed-val');
+            const sqImageSpeed = document.getElementById('start-square-image-speed');
+            const sqImageSpeedVal = document.getElementById('start-square-image-speed-val');
+
+            const savedVol = localStorage.getItem('if_builder_settings_volume') || '100';
+            if (sqVolume) {
+                sqVolume['value'] = savedVol;
+                if (sqVolumeVal) sqVolumeVal.textContent = savedVol + '%';
+            }
+
+            const savedTextSpeed = localStorage.getItem('if_builder_settings_text_speed') || '3';
+            if (sqTextSpeed) {
+                sqTextSpeed['value'] = savedTextSpeed;
+                if (sqTextSpeedVal) sqTextSpeedVal.textContent = getSpeedLabel(savedTextSpeed);
+            }
+
+            const savedImageSpeed = localStorage.getItem('if_builder_settings_image_speed') || '3';
+            if (sqImageSpeed) {
+                sqImageSpeed['value'] = savedImageSpeed;
+                if (sqImageSpeedVal) sqImageSpeedVal.textContent = getSpeedLabel(savedImageSpeed);
+            }
+        };
+
+        const bgm = bgmAudio;
+        const sfx = soundEffectAudio;
+
+        const sqVolume = document.getElementById('start-square-volume');
+        const sqVolumeVal = document.getElementById('start-square-volume-val');
+        if (sqVolume) {
+            sqVolume.addEventListener('input', (e) => {
+                const target = e.target;
+                const volVal = parseFloat(target['value']);
+                if (sqVolumeVal) sqVolumeVal.textContent = volVal + '%';
+                if (bgm) bgm.volume = volVal / 100;
+                if (sfx) sfx.volume = volVal / 100;
+                localStorage.setItem('if_builder_settings_volume', volVal.toString());
+            });
+        }
+
+        const sqTextSpeed = document.getElementById('start-square-text-speed');
+        const sqTextSpeedVal = document.getElementById('start-square-text-speed-val');
+        if (sqTextSpeed) {
+            sqTextSpeed.addEventListener('input', (e) => {
+                const target = e.target;
+                const speed = parseInt(target['value']);
+                if (sqTextSpeedVal) sqTextSpeedVal.textContent = getSpeedLabel(speed);
+                textSpeedVal = speed;
+                
+                // Map qualitative text speed: 1 = Muito Lento (150ms), 2 = Lento (80ms), 3 = Normal (40ms), 4 = Rápido (15ms)
+                if (speed === 1) {
+                    typeSpeedBase = 150;
+                    textAnimDuration = '2.0s';
+                } else if (speed === 2) {
+                    typeSpeedBase = 80;
+                    textAnimDuration = '1.0s';
+                } else if (speed === 3) {
+                    typeSpeedBase = 40;
+                    textAnimDuration = '0.5s';
+                } else {
+                    typeSpeedBase = 15;
+                    textAnimDuration = '0.2s';
+                }
+                
+                document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
+                localStorage.setItem('if_builder_settings_text_speed', speed.toString());
+            });
+        }
+
+        const sqImageSpeed = document.getElementById('start-square-image-speed');
+        const sqImageSpeedVal = document.getElementById('start-square-image-speed-val');
+        if (sqImageSpeed) {
+            sqImageSpeed.addEventListener('input', (e) => {
+                const target = e.target;
+                const speed = parseInt(target['value']);
+                if (sqImageSpeedVal) sqImageSpeedVal.textContent = getSpeedLabel(speed);
+                localStorage.setItem('if_builder_settings_image_speed', speed.toString());
+                
+                // Map qualitative image transition speed: 1 = Muito Lento (2.0s), 2 = Lento (1.0s), 3 = Normal (0.5s), 4 = Rápido (0.2s)
+                let imageDuration = '0.5s';
+                if (speed === 1) imageDuration = '2.0s';
+                else if (speed === 2) imageDuration = '1.0s';
+                else if (speed === 3) imageDuration = '0.5s';
+                else if (speed === 4) imageDuration = '0.2s';
+                
+                document.documentElement.style.setProperty('--image-anim-speed', imageDuration);
+            });
+        }
+
+
+
+        const volumeSlider = document.getElementById('settings-volume-slider');
+        if (volumeSlider) {
+            const savedVol = localStorage.getItem('if_builder_settings_volume');
+            if (savedVol !== null) {
+                volumeSlider.value = savedVol;
+                if (bgm) bgm.volume = parseFloat(savedVol) / 100;
+                if (sfx) sfx.volume = parseFloat(savedVol) / 100;
+            } else {
+                if (bgm) volumeSlider.value = (bgm.volume * 100).toString();
+            }
+
+            volumeSlider.addEventListener('input', (e) => {
+                const target = e.target;
+                const volVal = parseFloat(target.value);
+                if (bgm) bgm.volume = volVal / 100;
+                if (sfx) sfx.volume = volVal / 100;
+                localStorage.setItem('if_builder_settings_volume', volVal.toString());
+            });
+        }
+
+        const speedSlider = document.getElementById('settings-speed-slider');
+        if (speedSlider) {
+            speedSlider.setAttribute('min', '1');
+            speedSlider.setAttribute('max', '4');
+            speedSlider.setAttribute('step', '1');
+
+            const savedSpeed = localStorage.getItem('if_builder_settings_text_speed');
+            if (savedSpeed !== null) {
+                speedSlider.value = savedSpeed;
+                textSpeedVal = parseInt(savedSpeed);
+                if (textSpeedVal === 1) {
+                    typeSpeedBase = 150;
+                    textAnimDuration = '2.0s';
+                } else if (textSpeedVal === 2) {
+                    typeSpeedBase = 80;
+                    textAnimDuration = '1.0s';
+                } else if (textSpeedVal === 3) {
+                    typeSpeedBase = 40;
+                    textAnimDuration = '0.5s';
+                } else {
+                    typeSpeedBase = 15;
+                    textAnimDuration = '0.2s';
+                }
+                document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
+            } else {
+                speedSlider.value = textSpeedVal.toString();
+            }
+
+            speedSlider.addEventListener('input', (e) => {
+                const target = e.target;
+                const speed = parseInt(target.value);
+                textSpeedVal = speed;
+                if (speed === 1) {
+                    typeSpeedBase = 150;
+                    textAnimDuration = '2.0s';
+                } else if (speed === 2) {
+                    typeSpeedBase = 80;
+                    textAnimDuration = '1.0s';
+                } else if (speed === 3) {
+                    typeSpeedBase = 40;
+                    textAnimDuration = '0.5s';
+                } else {
+                    typeSpeedBase = 15;
+                    textAnimDuration = '0.2s';
+                }
+                document.documentElement.style.setProperty('--text-anim-speed', textAnimDuration);
+                localStorage.setItem('if_builder_settings_text_speed', speed.toString());
+            });
+        }
+
+        // ESC Key listener
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const startScreen = document.getElementById('start-screen');
+                const isTransitioning = startScreen && (
+                    startScreen.classList.contains('menu-trans-fade-in') ||
+                    startScreen.classList.contains('menu-trans-fade-out') ||
+                    startScreen.classList.contains('menu-trans-slide-in') ||
+                    startScreen.classList.contains('menu-trans-slide-out')
+                );
+                if (isTransitioning) return;
+                // If any modal is visible, close it instead of showing start screen
+                let modalClosed = false;
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    if (!modal.classList.contains('hidden')) {
+                        modal.classList.add('hidden');
+                        modalClosed = true;
+                    }
+                });
+                if (modalClosed) return;
+
+                if (gameData.enableSystemMenu && !window.isSceneTest) {
+                    const startScreen = document.getElementById('start-screen');
+                    if (startScreen.classList.contains('hidden')) {
+                        if (isGameSessionActive) {
+                            showStartScreen();
+                        }
+                    } else {
+                        if (isGameSessionActive) {
+                            hideStartScreen(() => {
+                                gameContainer.classList.remove('hidden');
+                                if (gearSystemButton) gearSystemButton.classList.add('hidden');
+                            });
+                        }
+                    }
+                } else {
+                    toggleSystemMenu();
+                }
+            }
+        });
+
+        // Hide main menu button inside modal if Menu Principal is enabled
+        if (gameData.enableSystemMenu && btnMainMenu) {
+            btnMainMenu.classList.add('hidden');
+        }
+
+        // Auto-start game or show Start Screen
+        if (gameData.enableSystemMenu && !window.isSceneTest) {
+            showStartScreen(true);
+        } else {
+            startGame();
+        }
         endingRestartButtons.forEach(btn => btn.addEventListener('click', () => {
-             positiveEndingScreen.classList.add('hidden'); 
-             negativeEndingScreen.classList.add('hidden'); 
-             gameContainer.classList.remove('fade-out');
+             // Prepare the game behind the ending screen
              startGame();
+             gameContainer.classList.remove('hidden');
+             gameContainer.classList.remove('fade-out');
+
+             positiveEndingScreen.classList.add('fade-out');
+             negativeEndingScreen.classList.add('fade-out');
+             setTimeout(() => {
+                 positiveEndingScreen.classList.add('hidden'); 
+                 negativeEndingScreen.classList.add('hidden');
+                 positiveEndingScreen.classList.remove('fade-out');
+                 negativeEndingScreen.classList.remove('fade-out');
+             }, 1000);
         }));
         submitVerb.addEventListener('click', handleInput);
         verbInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleInput(); });
-        suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
-        inventoryButton.addEventListener('click', () => togglePopup('inventory'));
-        diaryButton.addEventListener('click', showDiary);
+        if (suggestionsButton) suggestionsButton.addEventListener('click', () => togglePopup('suggestions'));
+        if (inventoryButton) inventoryButton.addEventListener('click', () => togglePopup('inventory'));
+        if (diaryButton) diaryButton.addEventListener('click', () => showDiary(false));
         if (trackersButton) trackersButton.addEventListener('click', showTrackers);
         if (systemButton) systemButton.addEventListener('click', toggleSystemMenu);
+        if (exportPdfButton) {
+            if (gameData.diaryAllowExport === false) {
+                exportPdfButton.classList.add('hidden');
+            } else {
+                exportPdfButton.classList.remove('hidden');
+            }
+            console.log('Botão de exportação encontrado, anexando listener...');
+            exportPdfButton.addEventListener('click', exportDiaryToPDF);
+        } else {
+            console.error('ERRO: Botão de exportação (#export-pdf-button) NÃO encontrado no DOM durante init.');
+        }
         closeButtons.forEach(btn => btn.addEventListener('click', (e) => { e.target.closest('.modal-overlay').classList.add('hidden'); }));
+        document.querySelectorAll('.modal-overlay').forEach(overlay => {
+            overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.add('hidden'); });
+        });
         btnSaveMenu.addEventListener('click', () => renderSlots('save'));
         btnLoadMenu.addEventListener('click', () => renderSlots('load'));
         btnBackSystem.addEventListener('click', () => { systemSlotsContainer.classList.add('hidden'); systemMenuMain.classList.remove('hidden'); systemModalTitle.textContent = gameData.gameSystemButtonText || 'Sistema'; });
         
         viewEndingButton.addEventListener('click', () => {
              const isWin = isGameEnded === 'win';
+             // For defeat: check if there's a defeat scene/vignette to navigate to
+             if (!isWin) {
+                 const defeatSceneId = Object.keys(gameData.cenas).find(id => gameData.cenas[id].isDefeatOutcome);
+                 if (defeatSceneId) {
+                     // Reset UI back to standard action bar for the defeat vignette
+                     standardActionBar.classList.remove('hidden');
+                     endingActionBar.classList.add('hidden');
+                     isGameEnded = false;
+                     loadScene(defeatSceneId, true);
+                     return;
+                 }
+             }
              const endScreen = isWin ? positiveEndingScreen : negativeEndingScreen;
              const endMusic = isWin ? gameData.positiveEndingMusic : gameData.negativeEndingMusic;
              if (endMusic) playBgm(endMusic); else playBgm("");
@@ -727,17 +1225,129 @@ document.addEventListener('DOMContentLoaded', () => {
         
         btnMainMenu.onclick = (e) => {
             systemModal.classList.add('hidden');
-            splashScreen.classList.remove('fade-out');
-            splashScreen.classList.remove('hidden');
             isGameEnded = false; 
-            if (gameData.gameBackgroundMusic) playBgm(gameData.gameBackgroundMusic);
-            else playBgm("");
+            startGame();
         };
         if (window.isSceneTest) startGame();
     };
 
+    const exportDiaryToPDF = () => {
+        console.log('Iniciando exportação de PDF...');
+        
+        const runExport = () => {
+            if (typeof html2pdf === 'undefined') {
+                console.error('Biblioteca html2pdf não encontrada.');
+                alert("Erro: Biblioteca de PDF não carregada.");
+                return;
+            }
+
+            const originalText = exportPdfButton.textContent;
+            exportPdfButton.textContent = 'Gerando...';
+            exportPdfButton.disabled = true;
+
+            const opt = {
+                margin:       [0, 0],
+                filename:     (gameData.gameTitle || 'Diario') + '_Log.pdf',
+                image:        { type: 'jpeg', quality: 0.98 },
+                html2canvas:  { 
+                    scale: 2, 
+                    useCORS: true, 
+                    logging: false,
+                    allowTaint: true,
+                    letterRendering: true
+                },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+
+            // Criar um container temporário no DOM para garantir que o html2canvas funcione
+            const container = document.createElement('div');
+            container.style.position = 'fixed';
+            container.style.left = '-10000px';
+            container.style.top = '0';
+            container.style.width = '1800px'; 
+            container.style.backgroundColor = '#ffffff';
+            document.body.appendChild(container);
+
+            const element = diaryLog.cloneNode(true);
+            element.style.height = 'auto';
+            element.style.maxHeight = 'none';
+            element.style.overflow = 'visible';
+            element.style.maskImage = 'none';
+            element.style.webkitMaskImage = 'none';
+            element.style.padding = '20px'; 
+            element.style.backgroundColor = '#ffffff';
+            element.style.color = '#333333';
+            element.style.display = 'block';
+            element.style.width = '100%';
+            
+            const allElements = element.querySelectorAll('*');
+            allElements.forEach(el => {
+                if (el instanceof HTMLElement) {
+                    el.style.backgroundImage = 'none';
+                    el.style.backgroundColor = 'transparent';
+                    el.style.color = '#333333';
+                    el.style.borderColor = '#eeeeee';
+                    el.style.boxShadow = 'none';
+                    el.style.textShadow = 'none';
+                    el.style.fontSize = '8pt';
+                    el.style.lineHeight = '1.4';
+                    el.style.margin = '0';
+                }
+            });
+
+            element.querySelectorAll('.diary-entry').forEach(entry => {
+                entry.style.display = 'flex';
+                entry.style.gap = '20px';
+                entry.style.marginBottom = '20px';
+                entry.style.paddingBottom = '15px';
+                entry.style.borderBottom = '1px solid #eeeeee';
+                entry.style.alignItems = 'flex-start';
+                entry.style.width = '100%';
+                entry.style.boxSizing = 'border-box';
+            });
+
+            element.querySelectorAll('img').forEach(img => {
+                img.style.width = '30%';
+                img.style.height = 'auto';
+                img.style.borderRadius = '2px';
+                img.style.display = 'block';
+                img.style.flexShrink = '0';
+            });
+
+            element.querySelectorAll('.text-container').forEach(text => {
+                text.style.flex = '1';
+                text.style.width = '65%';
+            });
+
+            element.querySelectorAll('.scene-name').forEach(name => {
+                name.style.fontSize = '10pt';
+                name.style.fontWeight = 'bold';
+                name.style.color = '#000000';
+                name.style.display = 'block';
+                name.style.marginBottom = '12px';
+            });
+
+            container.appendChild(element);
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                console.log('PDF gerado com sucesso.');
+                document.body.removeChild(container);
+                exportPdfButton.textContent = originalText;
+                exportPdfButton.disabled = false;
+            }).catch(err => {
+                console.error('Erro crítico na geração do PDF:', err);
+                document.body.removeChild(container);
+                alert("Erro ao gerar PDF: " + (err.message || "Verifique o console para detalhes técnicos."));
+                exportPdfButton.textContent = originalText;
+                exportPdfButton.disabled = false;
+            });
+        };
+
+        runExport();
+    };
+
     const startGame = () => {
-        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + document.title);
+        removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
         currentSceneId = gameData.cena_inicial; 
         inventory = []; 
         visitedScenes = []; 
@@ -746,6 +1356,12 @@ document.addEventListener('DOMContentLoaded', () => {
         trackers = {}; 
         removedObjectsFromScenes = {};
         isGameEnded = false;
+        isGameSessionActive = true;
+        gameStartTime = Date.now();
+        gameEndTime = null;
+
+        // Hide retrospective button on restart
+        if (vignetteDiaryButton) vignetteDiaryButton.classList.add('hidden');
         (gameData.consequenceTrackers || []).forEach(t => { trackers[t.id] = t.initialValue; });
         
         // Fix Audio Persistence: If the starting scene has no specific music.
@@ -767,48 +1383,40 @@ document.addEventListener('DOMContentLoaded', () => {
         standardActionBar.classList.remove('hidden');
         endingActionBar.classList.add('hidden');
         
-        // Handle Splash Screen visibility
-        if (window.isSceneTest) {
-            // In test mode, immediately hide splash and show game to avoid freezing/delays
-            splashScreen.classList.add('hidden');
-            splashScreen.style.display = 'none';
-            splashScreen.classList.remove('fade-out');
-            
-            // Allow game container to be visible in layout (display:block) but keep opacity 0 until ready
+        const isVignette = startScene && startScene.vignetteType && startScene.vignetteType !== 'none';
+        
+        if (!isVignette) {
             gameContainer.classList.remove('hidden');
+            if (window.isSceneTest) {
+                const hasImage = startScene && startScene.image && gameData.enableImages !== false;
+                
+                const showGame = () => {
+                     gameContainer.classList.add('ready');
+                };
 
-            const startScene = gameData.cenas[currentSceneId];
-            const hasImage = startScene && startScene.image && gameData.enableImages !== false;
-            
-            const showGame = () => {
-                 gameContainer.classList.add('ready');
-            };
-
-            if (hasImage) {
-                 const img = document.getElementById('scene-image');
-                 if (img && img instanceof HTMLImageElement) {
-                     if (img.complete && img.naturalHeight !== 0) {
-                         showGame();
+                if (hasImage) {
+                     const img = document.getElementById('scene-image');
+                     if (img && img instanceof HTMLImageElement) {
+                         if (img.complete && img.naturalHeight !== 0) {
+                             showGame();
+                         } else {
+                             img.onload = showGame;
+                             img.onerror = showGame;
+                             // Safety timeout
+                             setTimeout(showGame, 2000);
+                         }
                      } else {
-                         img.onload = showGame;
-                         img.onerror = showGame;
-                         // Safety timeout
-                         setTimeout(showGame, 2000);
+                         showGame();
                      }
-                 } else {
-                     showGame();
-                 }
-            } else {
-                 // Small delay to ensure layout frames are ready
-                 setTimeout(showGame, 50);
-            }
+                } else {
+                     // Small delay to ensure layout frames are ready
+                     setTimeout(showGame, 50);
+                }
 
-        } else {
-            // Restore smooth transition for normal play
-            splashScreen.style.display = '';
-            splashScreen.classList.remove('hidden');
-            splashScreen.classList.add('fade-out');
-            setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
+            } else {
+                // Unhide game container instantly in standard play
+                gameContainer.classList.add('ready');
+            }
         }
     };
 
@@ -824,21 +1432,202 @@ document.addEventListener('DOMContentLoaded', () => {
                 trackers = save.trackers || {}; 
                 removedObjectsFromScenes = save.removedObjectsFromScenes || {};
                 isGameEnded = false;
+                isGameSessionActive = true;
                 standardActionBar.classList.remove('hidden');
                 endingActionBar.classList.add('hidden');
                 systemModal.classList.add('hidden');
                 loadScene(currentSceneId, false);
-                splashScreen.classList.add('fade-out');
-                setTimeout(() => { splashScreen.classList.add('hidden'); splashScreen.classList.remove('fade-out'); }, 1000);
+                gameContainer.classList.remove('hidden');
+                gameContainer.classList.add('ready');
             }
         } catch (e) { startGame(); }
     };
 
+    const getLatestSave = () => {
+        const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const manual1Key = 'if_builder_manual_1_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const manual2Key = 'if_builder_manual_2_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        
+        const autoSave = getGameSave(autoKey);
+        const m1Save = getGameSave(manual1Key);
+        const m2Save = getGameSave(manual2Key);
+        
+        let latestSave = null;
+        let latestTime = 0;
+        
+        [autoSave, m1Save, m2Save].forEach(saveStr => {
+            if (saveStr) {
+                try {
+                    const data = JSON.parse(saveStr);
+                    const time = Date.parse(data.timestamp) || 0;
+                    if (time > latestTime) {
+                        latestTime = time;
+                        latestSave = saveStr;
+                    }
+                } catch (e) {}
+            }
+        });
+        return latestSave;
+    };
+
+    const showStartScreen = (skipTransition = false) => {
+        const startScreen = document.getElementById('start-screen');
+        const startTitle = document.getElementById('start-screen-title');
+        const newGameBtn = document.getElementById('start-new-game-btn');
+        const continueBtn = document.getElementById('start-continue-btn');
+        const savesBtn = document.getElementById('start-saves-btn');
+        const gearBtn = document.getElementById('gear-system-button');
+
+        if (!startScreen) return;
+
+        if (!skipTransition) {
+            const isTransitioning = startScreen.classList.contains('menu-trans-fade-in') ||
+                                    startScreen.classList.contains('menu-trans-fade-out') ||
+                                    startScreen.classList.contains('menu-trans-slide-in') ||
+                                    startScreen.classList.contains('menu-trans-slide-out');
+            if (isTransitioning) return;
+        }
+
+        // Reset containers back to root start screen
+        const startScreenButtons = startScreen.querySelector('.start-screen-buttons');
+        const startScreenSavesContainer = document.getElementById('start-screen-saves-container');
+        const startScreenOptionsContainer = document.getElementById('start-screen-options-container');
+
+        if (startScreenButtons) startScreenButtons.classList.remove('hidden');
+        if (startScreenSavesContainer) startScreenSavesContainer.classList.add('hidden');
+        if (startScreenOptionsContainer) startScreenOptionsContainer.classList.add('hidden');
+
+        // Main Menu transitions speed - Unified
+        const menuTransition = gameData.gameMenuTransitionType || 'fade';
+        let speed = gameData.gameMenuTransitionSpeed !== undefined ? Number(gameData.gameMenuTransitionSpeed) : 500;
+        if (speed > 10) {
+            speed = speed / 1000;
+        }
+        if (speed > 5.0) speed = 0.5;
+        document.documentElement.style.setProperty('--menu-anim-speed', speed + 's');
+
+        startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+
+        // Show start screen
+        startScreen.classList.remove('hidden');
+
+        if (skipTransition) {
+            // No transitions on first load or instant resets
+        } else {
+            // Force reflow to ensure CSS animations play correctly
+            void startScreen.offsetWidth;
+            
+            if (menuTransition === 'none') {
+                // No anim
+            } else if (menuTransition === 'fade') {
+                startScreen.classList.add('menu-trans-fade-in');
+                setTimeout(() => {
+                    startScreen.classList.remove('menu-trans-fade-in');
+                }, speed * 1000 + 100);
+            } else if (menuTransition === 'slide') {
+                startScreen.classList.add('menu-trans-slide-in');
+                setTimeout(() => {
+                    startScreen.classList.remove('menu-trans-slide-in');
+                }, speed * 1000 + 100);
+            }
+            if (gameData.gameMenuTransitionSound) {
+                playSound(gameData.gameMenuTransitionSound);
+            }
+        }
+
+        // Render custom title if configured
+        if (startTitle) {
+            if (gameData.showStartScreenTitle !== false) {
+                startTitle.textContent = gameData.startScreenTitle || gameData.gameTitle || 'Minha Aventura de Texto';
+                startTitle.classList.remove('hidden');
+            } else {
+                startTitle.classList.add('hidden');
+            }
+        }
+
+        // Handle buttons visibility and texts
+        if (isGameSessionActive) {
+            if (newGameBtn) newGameBtn.textContent = gameData.gameRestartButtonText || 'Começar de novo';
+        } else {
+            if (newGameBtn) newGameBtn.textContent = 'Começar';
+        }
+
+        // Check if there are any saves OR active session to show the "Continuar" button
+        const latestSave = getLatestSave();
+        if ((latestSave || isGameSessionActive) && continueBtn) {
+            continueBtn.classList.remove('hidden');
+        } else if (continueBtn) {
+            continueBtn.classList.add('hidden');
+        }
+
+        // Check autosave presence to show/hide "Caminhos salvos" button
+        const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const autoData = getGameSave(autoKey);
+        if (savesBtn) {
+            if (autoData) {
+                savesBtn.classList.remove('hidden');
+            } else {
+                savesBtn.classList.add('hidden');
+            }
+        }
+
+        // Hide gear button when we are on the Menu Principal itself
+        if (gearBtn) gearBtn.classList.add('hidden');
+    };
+
+    const hideStartScreen = (callback) => {
+        const startScreen = document.getElementById('start-screen');
+        if (!startScreen) {
+            if (callback) callback();
+            return;
+        }
+
+        const isTransitioning = startScreen.classList.contains('menu-trans-fade-in') ||
+                                startScreen.classList.contains('menu-trans-fade-out') ||
+                                startScreen.classList.contains('menu-trans-slide-in') ||
+                                startScreen.classList.contains('menu-trans-slide-out');
+        if (isTransitioning) return;
+
+        if (gameData.gameMenuTransitionSound) {
+            playSound(gameData.gameMenuTransitionSound);
+        }
+
+        const transition = gameData.gameMenuTransitionType || 'fade';
+        let speed = gameData.gameMenuTransitionSpeed !== undefined ? Number(gameData.gameMenuTransitionSpeed) : 500;
+        if (speed > 10) {
+            speed = speed / 1000;
+        }
+        if (speed > 5.0) speed = 0.5;
+        document.documentElement.style.setProperty('--menu-anim-speed', speed + 's');
+
+        if (transition === 'none') {
+            startScreen.classList.add('hidden');
+            startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+            if (callback) callback();
+        } else {
+            startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+            
+            // Force reflow
+            void startScreen.offsetWidth;
+            
+            if (transition === 'fade') {
+                startScreen.classList.add('menu-trans-fade-out');
+            } else if (transition === 'slide') {
+                startScreen.classList.add('menu-trans-slide-out');
+            }
+
+            setTimeout(() => {
+                startScreen.classList.add('hidden');
+                startScreen.classList.remove('menu-trans-fade-in', 'menu-trans-fade-out', 'menu-trans-slide-in', 'menu-trans-slide-out');
+                if (callback) callback();
+            }, speed * 1000 + 100);
+        }
+    };
+
     const autoSaveGame = () => {
-        if (window.isPreview) return; 
         if (isGameEnded) return;
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
-        localStorage.setItem('if_builder_autosave_' + document.title, JSON.stringify(save));
+        setGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'), JSON.stringify(save));
     };
 
     const toggleSystemMenu = () => {
@@ -850,31 +1639,241 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const renderSlots = (mode) => {
         systemMenuMain.classList.add('hidden'); systemSlotsContainer.classList.remove('hidden'); slotsList.innerHTML = '';
-        systemModalTitle.textContent = mode === 'save' ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') : (gameData.gameLoadMenuTitle || 'Carregar Jogo');
-        for (let i = 1; i <= 3; i++) {
-            const slotKey = 'if_builder_slot_' + i + '_' + document.title;
-            const savedData = localStorage.getItem(slotKey);
-            const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
-            let contentHtml = '';
-            if (savedData) {
-                const data = JSON.parse(savedData); const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
-                contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
-                if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Sobrescrever</span></div>';
-                else contentHtml += '<div class="slot-actions"><button class="slot-delete-btn" data-slot="' + i + '">×</button></div>';
+        systemModalTitle.textContent = gameData.enableSystemMenu ? 'Caminhos salvos' : (mode === 'save' ? (gameData.gameSaveMenuTitle || 'Salvar Jogo') : (gameData.gameLoadMenuTitle || 'Carregar Jogo'));
+
+        if (gameData.enableSystemMenu) {
+            // Render 1 Autosave + 2 Manual Saves
+            // --- 1. AUTOSAVE SLOT ---
+            const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+            const autoData = getGameSave(autoKey);
+            const autoDiv = document.createElement('div'); autoDiv.className = 'slot-item';
+            let autoHtml = '';
+            if (autoData) {
+                try {
+                    const data = JSON.parse(autoData);
+                    const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                    autoHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo automaticamente - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                } catch (e) {
+                    autoHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo automaticamente</span><span class="slot-empty">Erro ao ler dados</span></div>';
+                }
             } else {
-                contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + '</span><span class="slot-empty">Vazio</span></div>';
-                if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Salvar</span></div>';
+                autoHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo automaticamente</span><span class="slot-empty">Sem dados</span></div>';
             }
-            slotDiv.innerHTML = contentHtml;
-            slotDiv.addEventListener('click', (e) => { if (e.target.classList.contains('slot-delete-btn')) return; if (mode === 'save') performSave(i); else if (mode === 'load' && savedData) loadGameFromData(savedData); });
-            slotsList.appendChild(slotDiv);
+            autoDiv.innerHTML = window.safeHTML(autoHtml);
+            if (autoData) {
+                autoDiv.addEventListener('click', () => {
+                    loadGameFromData(autoData);
+                });
+            }
+            slotsList.appendChild(autoDiv);
+
+            // --- 2. MANUAL SAVES (Slots 1 & 2) ---
+            for (let i = 1; i <= 2; i++) {
+                const slotKey = 'if_builder_manual_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+                const savedData = getGameSave(slotKey);
+                const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
+                let contentHtml = '';
+                if (savedData) {
+                    try {
+                        const data = JSON.parse(savedData);
+                        const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                        contentHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                        contentHtml += '<button class="slot-delete-btn" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>';
+                    } catch (e) {
+                        contentHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo ' + i + '</span><span class="slot-empty">Erro ao ler dados</span></div>';
+                    }
+                } else {
+                    if (mode === 'save') {
+                        contentHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title" style="font-weight: normal; color: rgba(255,255,255,0.75); cursor: pointer;">Clique para salvar</span></div>';
+                    } else {
+                        contentHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title" style="font-weight: normal; color: rgba(255,255,255,0.3);">Slot vazio</span></div>';
+                    }
+                }
+                slotDiv.innerHTML = window.safeHTML(contentHtml);
+                
+                // Add button listeners
+                const deleteBtn = slotDiv.querySelector('.slot-delete-btn');
+                
+                slotDiv.addEventListener('click', (e) => {
+                    const deleteBtnClicked = e.target.closest('.slot-delete-btn');
+                    if (deleteBtnClicked) {
+                        return;
+                    }
+                    if (mode === 'save') {
+                        if (!savedData) {
+                            performSave(i);
+                        }
+                    } else if (savedData) {
+                        loadGameFromData(savedData);
+                    }
+                });
+
+                if (deleteBtn && savedData) {
+                    deleteBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        removeGameSave(slotKey);
+                        renderSlots(mode);
+                    });
+                }
+                slotsList.appendChild(slotDiv);
+            }
+        } else {
+            // Legacy / Standard behavior
+            for (let i = 1; i <= 3; i++) {
+                const slotKey = 'if_builder_slot_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+                const savedData = getGameSave(slotKey);
+                const slotDiv = document.createElement('div'); slotDiv.className = 'slot-item';
+                let contentHtml = '';
+                if (savedData) {
+                    const data = JSON.parse(savedData); const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                    contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                    contentHtml += '<button class="slot-delete-btn" data-slot="' + i + '" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>';
+                } else {
+                    contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + '</span><span class="slot-empty">Vazio</span></div>';
+                }
+                slotDiv.innerHTML = window.safeHTML(contentHtml);
+                slotDiv.addEventListener('click', (e) => { 
+                    const deleteBtn = e.target.closest('.slot-delete-btn');
+                    if (deleteBtn) {
+                        e.stopPropagation();
+                        const slot = deleteBtn.getAttribute('data-slot');
+                        removeGameSave('if_builder_slot_' + slot + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+                        renderSlots(mode);
+                        return;
+                    } 
+                    if (mode === 'save') {
+                        if (!savedData) {
+                            performSave(i);
+                        }
+                    } 
+                    else if (mode === 'load' && savedData) loadGameFromData(savedData); 
+                });
+                slotsList.appendChild(slotDiv);
+            }
         }
     };
 
     const performSave = (slotIndex) => {
-        const slotKey = 'if_builder_slot_' + slotIndex + '_' + document.title;
+        const slotKey = gameData.enableSystemMenu
+            ? 'if_builder_manual_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas')
+            : 'if_builder_slot_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
         const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
-        localStorage.setItem(slotKey, JSON.stringify(save)); renderSlots('save');
+        setGameSave(slotKey, JSON.stringify(save)); renderSlots('save');
+    };
+
+    const renderStartScreenSlots = () => {
+        const slotsList = document.getElementById('start-screen-slots-list');
+        if (!slotsList) return;
+        slotsList.innerHTML = '';
+
+        const alignment = gameData.startScreenButtonAlignment || 'center';
+
+        // Render 1 Autosave + 2 Manual Saves
+        // --- 1. AUTOSAVE SLOT ---
+        const autoKey = 'if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const autoData = getGameSave(autoKey);
+        const autoDiv = document.createElement('div');
+        autoDiv.className = 'slot-item';
+        
+        let autoHtml = '';
+        if (autoData) {
+            try {
+                const data = JSON.parse(autoData);
+                const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                const textAlignment = alignment === 'right' ? 'right' : (alignment === 'center' ? 'center' : 'left');
+                autoHtml = '<div class="slot-info" style="text-align: ' + textAlignment + '; width: 100%;"><span class="slot-title">Progresso automático - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+            } catch (e) {
+                autoHtml = '<div class="slot-info"><span class="slot-title">Progresso automático</span><span class="slot-empty">Erro ao ler dados</span></div>';
+            }
+        } else {
+            autoHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title">Progresso automático</span><span class="slot-empty">Nenhum progresso automático disponível</span></div>';
+        }
+        
+        autoDiv.innerHTML = window.safeHTML(autoHtml);
+        if (autoData) {
+            autoDiv.addEventListener('click', () => {
+                loadGameFromData(autoData);
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        hideStartScreen(() => {
+                            if (gearSystemButton) {
+                                gearSystemButton.classList.add('hidden');
+                            }
+                        });
+                    });
+                });
+            });
+        }
+        slotsList.appendChild(autoDiv);
+
+        // --- 2. MANUAL SAVES (Slots 1 & 2) ---
+        for (let i = 1; i <= 2; i++) {
+            const slotKey = 'if_builder_manual_' + i + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+            const savedData = getGameSave(slotKey);
+            const slotDiv = document.createElement('div');
+            
+            const deleteBtnHtml = '<button class="slot-delete-btn" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>';
+            let contentHtml = '';
+            
+            if (savedData) {
+                slotDiv.className = 'slot-item';
+                try {
+                    const data = JSON.parse(savedData);
+                    const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
+                    const textAlignment = alignment === 'right' ? 'right' : (alignment === 'center' ? 'center' : 'left');
+                    contentHtml = deleteBtnHtml + '<div class="slot-info" style="text-align: ' + textAlignment + '; padding-left: 58px; padding-right: 24px; width: 100%;"><span class="slot-title">Caminho salvo ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
+                } catch (e) {
+                    contentHtml = '<div class="slot-info" style="padding-left: 58px; padding-right: 24px;"><span class="slot-title">Caminho salvo ' + i + '</span><span class="slot-empty">Erro ao ler dados</span></div>';
+                }
+            } else {
+                const disabledClass = isGameSessionActive ? '' : ' disabled';
+                slotDiv.className = 'slot-item dashed-slot' + disabledClass;
+                
+                if (isGameSessionActive) {
+                    contentHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title" style="font-weight: normal; color: rgba(255,255,255,0.75);">Clique para salvar</span></div>';
+                } else {
+                    contentHtml = '<div class="slot-info" style="text-align: center; width: 100%;"><span class="slot-title" style="font-weight: normal; color: rgba(255,255,255,0.3);">Slot vazio</span></div>';
+                }
+            }
+            
+            slotDiv.innerHTML = window.safeHTML(contentHtml);
+            
+            const deleteBtn = slotDiv.querySelector('.slot-delete-btn');
+
+            if (deleteBtn && savedData) {
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    removeGameSave(slotKey);
+                    renderStartScreenSlots();
+                });
+            }
+            
+            slotDiv.addEventListener('click', () => {
+                if (!savedData && isGameSessionActive) {
+                    performStartScreenSave(i);
+                } else if (savedData) {
+                    loadGameFromData(savedData);
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(() => {
+                            hideStartScreen(() => {
+                                if (gearSystemButton) {
+                                    gearSystemButton.classList.add('hidden');
+                                }
+                            });
+                        });
+                    });
+                }
+            });
+
+            slotsList.appendChild(slotDiv);
+        }
+    };
+
+    const performStartScreenSave = (slotIndex) => {
+        const slotKey = 'if_builder_manual_' + slotIndex + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas');
+        const save = { currentSceneId, inventory, visitedScenes, actionLog, chances, trackers, removedObjectsFromScenes, timestamp: new Date().toLocaleString() };
+        setGameSave(slotKey, JSON.stringify(save));
+        renderStartScreenSlots();
     };
 
     const getObjectsForScene = (sceneId) => {
@@ -895,7 +1894,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const updateTrackers = (effects) => {
         if (!effects) return;
-        effects.forEach(effect => { if (trackers.hasOwnProperty(effect.trackerId)) trackers[effect.trackerId] += effect.valueChange; });
+        effects.forEach(effect => { if (Object.prototype.hasOwnProperty.call(trackers, effect.trackerId)) trackers[effect.trackerId] += effect.valueChange; });
         checkTrackers();
     };
 
@@ -905,15 +1904,42 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const showVignetteScreen = (scene) => {
-        // Hide game container and show vignette screen
-        gameContainer.classList.add('hidden');
+        // Hide retrospective button by default, only show for conclusions
+        if (vignetteDiaryButton) vignetteDiaryButton.classList.add('hidden');
+
+        // If it's a conclusion vignette, set the end state flags manually
+        // We avoid calling activateEndingUI here because that would swap action bars 
+        // in the game container, causing buttons to "pop in" during the cross-fade.
+        if (scene.vignetteType === 'conclusion') {
+             isGameEnded = 'win';
+             gameEndTime = Date.now();
+             
+             // Show the diary button on the vignette screen if enabled
+             if (vignetteDiaryButton && gameData.enableRetrospective !== false) {
+                 vignetteDiaryButton.classList.remove('hidden');
+             }
+        }
+        
+        // Vertical Alignment
+        vignetteScreen.classList.remove('align-v-center', 'align-v-bottom');
+        if (gameData.gameSplashContentVerticalAlignment === 'center') {
+            vignetteScreen.classList.add('align-v-center');
+        } else {
+            vignetteScreen.classList.add('align-v-bottom');
+        }
         
         // Set vignette content
-        if (vignetteTitle) vignetteTitle.textContent = scene.name || '';
-        if (vignetteDescription) vignetteDescription.textContent = scene.description || '';
+        if (vignetteTitle) {
+            vignetteTitle.textContent = scene.name || '';
+            vignetteTitle.classList.toggle('hidden', !!scene.omitSplashTitle);
+        }
+        if (vignetteDescription) {
+            vignetteDescription.textContent = scene.description || '';
+            vignetteDescription.classList.toggle('hidden', !!scene.omitSplashDescription);
+        }
         
         // Set button text
-        const buttonText = scene.vignetteButtonText || (scene.vignetteType === 'conclusion' ? 'Reiniciar' : 'Continuar');
+        const buttonText = scene.vignetteButtonText || (scene.vignetteType === 'conclusion' ? (gameData.gameRestartButtonText || 'Restart') : (gameData.gameContinueButtonText || 'Continue'));
         if (vignetteContinueButton) vignetteContinueButton.textContent = buttonText;
         
         // Set background image
@@ -940,34 +1966,104 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Handle button click
         const handleVignetteClick = () => {
-            vignetteContinueButton.removeEventListener('click', handleVignetteClick);
             if (typeof rainEffect !== 'undefined') rainEffect.stop();
             
             if (scene.vignetteType === 'conclusion') {
-                // Restart game: Reset music FIRST, hide vignette, show splash
+                // Restart game
                 playBgm(gameData.gameBackgroundMusic || "");
-                vignetteScreen.classList.add('hidden');
-                gameContainer.classList.remove('hidden');
                 startGame();
+                
+                // CRITICAL FIX: If the game starts with a vignette (opening), 
+                // we must NOT fade out the vignette screen, or it will be skipped.
+                const nextScene = gameData.cenas[currentSceneId];
+                const isNextVignette = nextScene && nextScene.vignetteType && nextScene.vignetteType !== 'none';
+                
+                if (!isNextVignette) {
+                    // Only reveal game container if we are transitioning to a narrative scene
+                    gameContainer.classList.remove('hidden');
+                    gameContainer.classList.remove('fade-out');
+
+                    vignetteScreen.classList.add('fade-out');
+                    setTimeout(() => {
+                        vignetteScreen.classList.add('hidden');
+                        vignetteScreen.classList.remove('fade-out');
+                    }, 1000);
+                }
+                return;
 
             } else if (scene.vignetteNextSceneId) {
-                // Go to next scene: Load it FIRST (behind the vignette), then fade out
-                gameContainer.classList.remove('hidden');
-                loadScene(scene.vignetteNextSceneId, false);
+                const nextSceneId = scene.vignetteNextSceneId;
+                const nextScene = gameData.cenas[nextSceneId];
                 
+                if (nextScene) {
+                    const isNextVignette = nextScene.vignetteType && nextScene.vignetteType !== 'none';
+                    
+                    if (isNextVignette) {
+                        // Vignette to Vignette: Just load the next one instantly
+                        // The showVignetteScreen call inside loadScene will update the content
+                        loadScene(nextSceneId, false);
+                    } else {
+                        // Vignette to Narrative: Load narrative behind, then fade out vignette
+                        loadScene(nextSceneId, false);
+                        gameContainer.classList.remove('hidden');
+                        gameContainer.classList.remove('fade-out');
+                        
+                        vignetteScreen.classList.add('fade-out');
+                        setTimeout(() => {
+                            vignetteScreen.classList.add('hidden');
+                            vignetteScreen.classList.remove('fade-out');
+                        }, 1000);
+                    }
+                } else {
+                    console.warn('Vignette target scene not found:', nextSceneId);
+                    vignetteScreen.classList.add('fade-out');
+                    setTimeout(() => {
+                        vignetteScreen.classList.add('hidden');
+                        vignetteScreen.classList.remove('fade-out');
+                        gameContainer.classList.remove('hidden');
+                        gameContainer.classList.remove('fade-out');
+                    }, 1000);
+                }
+            } else {
+                // No next scene defined: Fade out vignette to show current game container
+                gameContainer.classList.remove('hidden');
+                gameContainer.classList.remove('fade-out');
                 vignetteScreen.classList.add('fade-out');
                 setTimeout(() => {
                     vignetteScreen.classList.add('hidden');
                     vignetteScreen.classList.remove('fade-out');
                 }, 1000);
-            } else {
-                // No next scene defined, just hide vignette and show game
-                vignetteScreen.classList.add('hidden');
-                gameContainer.classList.remove('hidden');
             }
         };
         
-        vignetteContinueButton.addEventListener('click', handleVignetteClick);
+        vignetteContinueButton.onclick = handleVignetteClick;
+
+        // Credits rendering for conclusion vignettes
+        const existingCredits = vignetteScreen.querySelector('.vignette-credits');
+        if (existingCredits) existingCredits.remove();
+
+        if (scene.creditsText && scene.creditsText.trim()) {
+            const creditsDiv = document.createElement('div');
+            creditsDiv.className = 'vignette-credits';
+            if (scene.creditsScrollEnabled) {
+                creditsDiv.classList.add('credits-scroll');
+            }
+
+            // Determine which side the content is on to put credits on the opposite
+            // Content defaults to right (flex-end), but align-left class moves it to left
+            const isContentLeft = vignetteScreen.classList.contains('align-left');
+            if (isContentLeft) {
+                creditsDiv.classList.add('credits-right');
+            } else {
+                creditsDiv.classList.add('credits-left');
+            }
+
+            const creditsInner = document.createElement('div');
+            creditsInner.className = 'vignette-credits-text';
+            creditsInner.textContent = scene.creditsText;
+            creditsDiv.appendChild(creditsInner);
+            vignetteScreen.appendChild(creditsDiv);
+        }
         
         // Show the vignette screen FIRST, then start rain effect after it's visible
         vignetteScreen.classList.remove('hidden');
@@ -1123,6 +2219,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
                     vOverlay.appendChild(fogContainer);
                     vOverlay.classList.add('overlay-fog');
+                    
+                    updateFogSizes(fogContainer);
                 }
             });
         } else {
@@ -1138,28 +2236,75 @@ document.addEventListener('DOMContentLoaded', () => {
     const loadScene = (sceneId, transition = true, transitionType = 'none', transitionSpeed = null, successPrefix = null) => {
         const scene = gameData.cenas[sceneId]; if (!scene) return;
         if (scene.backgroundMusic) playBgm(scene.backgroundMusic);
+        const oldChances = chances;
         if (scene.removesChanceOnEntry && gameData.enableChances) chances--; 
         if (scene.restoresChanceOnEntry && gameData.enableChances) chances = Math.min(chances + 1, gameData.gameMaxChances);
+        
+        if (chances !== oldChances) {
+            lastChanceChange = {
+                type: chances < oldChances ? 'lost' : 'restored',
+                index: chances < oldChances ? chances : (chances - 1)
+            };
+        }
         currentSceneId = sceneId;
         if (!visitedScenes.includes(sceneId)) visitedScenes.push(sceneId);
         actionLog.push({ type: 'scene', name: scene.name, timestamp: new Date().toLocaleTimeString(), description: scene.description, image: scene.image });
         
         // Check if this is a vignette scene
         if (scene.vignetteType && scene.vignetteType !== 'none') {
-            showVignetteScreen(scene);
+            if (transition) {
+                // Prepare vignette screen with fade-out before making it visible
+                vignetteScreen.classList.add('fade-out');
+                showVignetteScreen(scene);
+                
+                // Cross-fade: fade out game and fade in vignette
+                gameContainer.classList.add('fade-out');
+                
+                // Trigger fade-in for vignette
+                requestAnimationFrame(() => {
+                    vignetteScreen.classList.remove('fade-out');
+                });
+
+                setTimeout(() => {
+                    gameContainer.classList.add('hidden');
+                    gameContainer.classList.remove('fade-out');
+                }, 1000);
+            } else {
+                showVignetteScreen(scene);
+                // If no transition, hide game container immediately
+                gameContainer.classList.add('hidden');
+            }
             autoSaveGame();
             return;
         }
         
         let effectiveTransition = !transitionType || transitionType === 'none' ? (gameData.gameImageTransitionType || 'fade') : transitionType;
         if (effectiveTransition === 'none') transition = false;
-        if (transitionSpeed !== null) {
-            const dynamicDuration = Math.max(0.3, 5.0 - (transitionSpeed * 0.9)) + 's';
-            document.documentElement.style.setProperty('--image-anim-speed', dynamicDuration);
+        let speed = 0.5;
+        const savedImageSpeedStr = localStorage.getItem('if_builder_settings_image_speed');
+        if (savedImageSpeedStr) {
+            const speedVal = parseInt(savedImageSpeedStr);
+            if (speedVal === 1) speed = 2.0;
+            else if (speedVal === 2) speed = 1.0;
+            else if (speedVal === 3) speed = 0.5;
+            else if (speedVal === 4) speed = 0.2;
+        } else if (transitionSpeed !== null) {
+            speed = transitionSpeed;
+            if (speed === 1) speed = 2.0;
+            else if (speed === 2) speed = 1.0;
+            else if (speed === 3) speed = 0.5;
+            else if (speed === 4) speed = 0.2;
+            else if (speed > 2.0) speed = 0.5;
         } else {
-            const defaultDuration = Math.max(0.3, 5.0 - ((gameData.gameImageSpeed || 3) * 0.9)) + 's';
-            document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
+            speed = gameData.gameImageSpeed || 0.5;
+            if (speed === 1) speed = 2.0;
+            else if (speed === 2) speed = 1.0;
+            else if (speed === 3) speed = 0.5;
+            else if (speed === 4) speed = 0.2;
+            else if (speed > 2.0) speed = 0.5;
         }
+        const defaultDuration = speed + 's';
+        document.documentElement.style.setProperty('--image-anim-speed', defaultDuration);
         if (transition && sceneImage && sceneImageBack && gameData.enableImages !== false) {
              sceneImageBack.src = scene.image || ''; sceneImageBack.classList.toggle('hidden', !scene.image);
              if (sceneImage.src) {
@@ -1179,15 +2324,150 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.stopPropagation();
                 if (isPrinting) return; 
                 const word = span.dataset.word;
-                const currentVal = verbInput.value.trim();
-                verbInput.value = currentVal ? (currentVal + ' ' + word) : word;
+                const currentVal = verbInput.textContent.trim();
+                verbInput.textContent = currentVal ? (currentVal + ' ' + word) : word;
                 verbInput.focus();
+                
+                // Move cursor to end for contenteditable
+                if (typeof window.getSelection !== "undefined" && typeof document.createRange !== "undefined") {
+                    const range = document.createRange();
+                    range.selectNodeContents(verbInput);
+                    range.collapse(false);
+                    const sel = window.getSelection();
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                }
             });
         });
     };
 
+    const adjustLayoutForImagesAndChances = (scene) => {
+        const imagePanel = imageContainer ? imageContainer.parentElement : null;
+        const textPanel = document.querySelector('.text-panel');
+        const chancesContainer = document.getElementById('chances-container');
+        
+        const isImagesEnabled = gameData.enableImages !== false;
+        
+        if (sceneNameOverlay) {
+            sceneNameOverlay.style.whiteSpace = 'nowrap';
+        }
+        
+        if (!isImagesEnabled) {
+            // Completely hide image panel and container
+            if (imagePanel) imagePanel.style.display = 'none';
+            if (imageContainer) imageContainer.style.display = 'none';
+            if (textPanel) textPanel.style.padding = '0';
+            
+            // Create text-scene-header if not present
+            let textSceneHeader = document.getElementById('text-scene-header');
+            if (!textSceneHeader && textPanel) {
+                textSceneHeader = document.createElement('div');
+                textSceneHeader.id = 'text-scene-header';
+                textSceneHeader.className = 'text-scene-header';
+                
+                // Style the header container using standard CSS tokens
+                textSceneHeader.style.display = 'flex';
+                textSceneHeader.style.justifyContent = 'space-between';
+                textSceneHeader.style.alignItems = 'center';
+                textSceneHeader.style.marginBottom = '20px';
+                textSceneHeader.style.paddingBottom = '10px';
+                textSceneHeader.style.borderBottom = '2px solid var(--border-color)';
+                
+                // Insert before scene-description
+                if (sceneDescription) {
+                    textPanel.insertBefore(textSceneHeader, sceneDescription);
+                } else {
+                    textPanel.appendChild(textSceneHeader);
+                }
+            }
+            
+            if (textSceneHeader) {
+                // Move scene-name-overlay and chances-container to the text-scene-header
+                if (sceneNameOverlay) {
+                    textSceneHeader.appendChild(sceneNameOverlay);
+                    
+                    // Reset styling for inline text display
+                    sceneNameOverlay.style.position = 'relative';
+                    sceneNameOverlay.style.top = '0';
+                    sceneNameOverlay.style.left = '0';
+                    sceneNameOverlay.style.border = '2px solid var(--border-color)';
+                    sceneNameOverlay.style.backgroundColor = 'var(--scene-name-overlay-bg)';
+                    sceneNameOverlay.style.color = 'var(--scene-name-overlay-text-color)';
+                    sceneNameOverlay.style.pointerEvents = 'none';
+                    sceneNameOverlay.style.padding = '6px 12px';
+                    sceneNameOverlay.style.margin = '0';
+                    sceneNameOverlay.style.boxSizing = 'border-box';
+                }
+                
+                if (chancesContainer) {
+                    textSceneHeader.appendChild(chancesContainer);
+                    
+                    // Reset chances styling for inline display
+                    chancesContainer.style.position = 'relative';
+                    chancesContainer.style.top = '0';
+                    chancesContainer.style.right = '0';
+                    chancesContainer.style.margin = '0';
+                    chancesContainer.style.padding = '0';
+                    chancesContainer.style.backgroundColor = 'transparent';
+                    chancesContainer.style.border = 'none';
+                    chancesContainer.style.backdropFilter = 'none';
+                }
+            }
+        } else {
+            // Restore default panels visibility
+            if (imagePanel) imagePanel.style.display = '';
+            if (imageContainer) imageContainer.style.display = '';
+            if (textPanel) textPanel.style.padding = '';
+            
+            // Remove text-scene-header if present
+            const textSceneHeader = document.getElementById('text-scene-header');
+            if (textSceneHeader) {
+                textSceneHeader.remove();
+            }
+            
+            // Move scene-name-overlay back inside imageContainer
+            if (sceneNameOverlay && imageContainer) {
+                imageContainer.appendChild(sceneNameOverlay);
+                
+                // Style scene-name-overlay for absolute overlay mode
+                sceneNameOverlay.style.position = 'absolute';
+                sceneNameOverlay.style.top = '20px';
+                sceneNameOverlay.style.left = '20px';
+                sceneNameOverlay.style.border = '2px solid var(--border-color)';
+                sceneNameOverlay.style.backgroundColor = 'var(--scene-name-overlay-bg)';
+                sceneNameOverlay.style.color = 'var(--scene-name-overlay-text-color)';
+                sceneNameOverlay.style.padding = '6px 12px';
+                sceneNameOverlay.style.margin = '0';
+                sceneNameOverlay.style.boxSizing = 'border-box';
+            }
+            
+            // Move chances-container inside imageContainer in the top-right corner
+            if (chancesContainer && imageContainer) {
+                imageContainer.appendChild(chancesContainer);
+                
+                // Absolute overlay positioning (floating directly over image)
+                chancesContainer.style.position = 'absolute';
+                chancesContainer.style.top = '20px'; // Matching top padding of sceneNameOverlay
+                chancesContainer.style.right = '20px';
+                chancesContainer.style.margin = '0';
+                chancesContainer.style.zIndex = '30';
+                chancesContainer.style.display = 'flex';
+                chancesContainer.style.alignItems = 'center';
+                chancesContainer.style.gap = '8px';
+                chancesContainer.style.justifyContent = 'flex-end';
+                chancesContainer.style.backgroundColor = 'transparent';
+                chancesContainer.style.padding = '0';
+                chancesContainer.style.border = 'none';
+                chancesContainer.style.borderRadius = '0';
+                chancesContainer.style.backdropFilter = 'none';
+                chancesContainer.style.boxSizing = 'border-box';
+            }
+        }
+    };
+
     const renderScene = (scene, successPrefix = null) => {
-        if (scene.image) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
+        const isImagesEnabled = gameData.enableImages !== false;
+        if (scene.image && isImagesEnabled) { sceneImage.src = scene.image; sceneImage.classList.remove('hidden'); imageContainer.classList.remove('no-image'); }
         else { sceneImage.src = ''; sceneImage.classList.add('hidden'); imageContainer.classList.add('no-image'); }
         if (sceneNameOverlay) { sceneNameOverlay.textContent = scene.name; sceneNameOverlay.style.opacity = '1'; }
         
@@ -1318,6 +2598,8 @@ document.addEventListener('DOMContentLoaded', () => {
              fogContainer.innerHTML = '<div class="fog-img fog-img-first"></div><div class="fog-img fog-img-second"></div>';
              sceneOverlay.appendChild(fogContainer);
              sceneOverlay.classList.add('overlay-fog');
+             
+             updateFogSizes(fogContainer);
         } else {
              sceneOverlay.classList.remove('overlay-fog');
              const existing = sceneOverlay.querySelector('.fog-container');
@@ -1326,10 +2608,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         sceneDescription.innerHTML = '';
         
-        let fullDescription = scene.description;
+        let fullDescription = scene.description || '';
         if (successPrefix) fullDescription = successPrefix + "\\n\\n" + fullDescription;
 
-        const paragraphs = fullDescription.split('\\n').filter(p => p.trim().length > 0);
+        const paragraphs = fullDescription.split(/\\n|\\\\n/).filter(p => p.trim().length > 0);
         let pIndex = 0; const textAnimType = (gameData.enableTextControl !== false) ? (gameData.gameTextAnimationType || 'fade') : 'none';
         const isImmersive = document.body.classList.contains('behavior-immersive') && window.innerWidth <= 768;
 
@@ -1340,7 +2622,16 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSessionId++;
         const mySessionId = renderSessionId;
 
+        let skipParagraph = false;
+        const globalEnterSkip = (e) => {
+            if (e.key === 'Enter' && isPrinting) {
+                skipParagraph = true;
+            }
+        };
+        window.addEventListener('keydown', globalEnterSkip);
+
         const renderNextParagraph = () => {
+            skipParagraph = false;
             if (pIndex >= paragraphs.length) { 
                 isPrinting = false;
                 sceneDescription.classList.remove('typewriting-active');
@@ -1350,20 +2641,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const p = document.createElement('p'); const formattedHTML = formatText(paragraphs[pIndex]);
             if (textAnimType === 'typewriter') {
-                p.className = 'scene-paragraph typewriter-cursor'; p.style.opacity = '1'; p.innerHTML = formattedHTML; sceneDescription.appendChild(p);
+                p.className = 'scene-paragraph typewriter-cursor'; p.style.opacity = '1'; 
+                p.innerHTML = window.safeHTML(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+                sceneDescription.appendChild(p);
                 const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
-                let node; const textNodes = []; while(node = walker.nextNode()) textNodes.push(node);
+                let node; const textNodes = []; while((node = walker.nextNode())) textNodes.push(node);
                 const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
                 let nodeIdx = 0; let charIdx = 0;
                 const type = () => {
-                    if (mySessionId !== renderSessionId) return; // Stop if new render started
-                    if (nodeIdx >= textNodes.length) { p.classList.remove('typewriter-cursor'); setupHighlights(p); finishParagraph(); return; }
+                    if (mySessionId !== renderSessionId) {
+                        window.removeEventListener('keydown', globalEnterSkip);
+                        return;
+                    }
+                    if (skipParagraph || nodeIdx >= textNodes.length) {
+                        // Complete all remaining text nodes immediately
+                        for (let i = nodeIdx; i < textNodes.length; i++) {
+                            textNodes[i].nodeValue = fullTexts[i];
+                        }
+                        p.classList.remove('typewriter-cursor');
+                        setupHighlights(p);
+                        finishParagraph();
+                        return;
+                    }
                     const currentNode = textNodes[nodeIdx]; const fullText = fullTexts[nodeIdx];
                     if (charIdx < fullText.length) { currentNode.nodeValue += fullText[charIdx]; charIdx++; if (sceneDescription) sceneDescription.scrollTop = sceneDescription.scrollHeight; setTimeout(type, typeSpeedBase); }
                     else { nodeIdx++; charIdx = 0; type(); }
                 };
                 type();
-            } else { p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); finishParagraph(); }
+            } else { 
+                p.innerHTML = window.safeHTML(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+                p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); finishParagraph(); 
+            }
         };
 
         const finishParagraph = () => {
@@ -1397,6 +2705,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sceneDescription.appendChild(continueBtn); sceneDescription.scrollTop = sceneDescription.scrollHeight;
             } else { 
                 isPrinting = false;
+                window.removeEventListener('keydown', globalEnterSkip);
                 sceneDescription.classList.remove('typewriting-active');
                 sceneDescription.scrollTop = sceneDescription.scrollHeight; 
                 if (chances <= 0) gameOver(); else { verbInput.focus(); if (scene.isEndingScene) activateEndingUI('win'); }
@@ -1412,10 +2721,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const iconSvg = ICONS[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
             const iconOutlineSvg = ICONS_OUTLINE[gameData.gameChanceIcon || 'heart'].replace('%COLOR%', gameData.gameChanceIconColor || '#ff4d4d');
             for (let i = 0; i < (gameData.gameMaxChances || 3); i++) {
-                const icon = document.createElement('div'); icon.className = 'chance-icon ' + (i < chances ? '' : 'lost');
-                icon.innerHTML = i < chances ? iconSvg : iconOutlineSvg; chancesContainer.appendChild(icon);
+                const icon = document.createElement('div');
+                const isLost = i >= chances;
+                icon.className = 'chance-icon ' + (isLost ? 'lost' : '');
+                
+                // Aplicar animação se este ícone foi o afetado agora
+                if (lastChanceChange && lastChanceChange.index === i) {
+                    icon.classList.add('animate-chance-' + lastChanceChange.type);
+                }
+                
+                icon.innerHTML = isLost ? iconOutlineSvg : iconSvg;
+                chancesContainer.appendChild(icon);
             }
+            lastChanceChange = null;
         }
+        
+        adjustLayoutForImagesAndChances(scene);
         
         // CHOICE MODE HANDLING
         if (gameData.gameInteractionType === 'choice') {
@@ -1490,25 +2811,38 @@ document.addEventListener('DOMContentLoaded', () => {
             if (oldChoices) oldChoices.remove();
         }
 
-        actionPopup.classList.add('hidden'); verbInput.value = ''; activePopupType = null;
+        actionPopup.classList.add('hidden'); verbInput.textContent = ''; activePopupType = null;
     };
 
     const activateEndingUI = (type) => {
         isGameEnded = type;
+        gameEndTime = Date.now();
         standardActionBar.classList.add('hidden');
         endingActionBar.classList.remove('hidden');
-        if (!window.isPreview) localStorage.removeItem('if_builder_autosave_' + document.title);
+
+        // Show View Diary button only for victory/defeat if enabled
+        const showRetrospective = gameData.enableRetrospective !== false;
+        if ((type === 'win' || type === 'lose') && showRetrospective) {
+            if (vignetteDiaryButton) vignetteDiaryButton.classList.remove('hidden');
+        } else {
+            if (vignetteDiaryButton) vignetteDiaryButton.classList.add('hidden');
+        }
+
+        removeGameSave('if_builder_autosave_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
     };
 
     const gameOver = () => { 
-        const defeatSceneId = Object.keys(gameData.cenas).find(id => gameData.cenas[id].isDefeatOutcome);
-        if (defeatSceneId) {
-            loadScene(defeatSceneId, true);
-        } else {
-            activateEndingUI('lose'); 
-        }
+        activateEndingUI('lose'); 
     };
-    const handleInput = () => { if (isPrinting) return; const input = verbInput.value.trim(); if (input) { processCommand(input); verbInput.value = ''; } };
+    const handleInput = () => { if (isPrinting) return; const input = verbInput.textContent.trim(); if (input) { processCommand(input); verbInput.textContent = ''; } };
+    
+    // Prevent Enter from creating new lines in contenteditable and trigger handleInput instead
+    verbInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            handleInput();
+        }
+    });
     const hasWord = (word, text) => {
         if (!word || !text) return false;
         const normalizedWord = word.toLowerCase().trim();
@@ -1562,7 +2896,7 @@ document.addEventListener('DOMContentLoaded', () => {
              if (obj) { printOutput(obj.examineDescription); return; }
              printOutput(scene.description); return;
         }
-        printOutput(gameData.mensagem_falha_padrao || "Não aconteceu nada.");
+        printOutput(scene.negativeFeedback || gameData.mensagem_falha_padrao || "Não aconteceu nada.");
     };
 
     const executeInteraction = (interaction) => {
@@ -1570,7 +2904,14 @@ document.addEventListener('DOMContentLoaded', () => {
         if (interaction.trackerEffects) updateTrackers(interaction.trackerEffects);
         if (interaction.addsToInventory && interaction.target) {
             const objInScene = getObjectsForScene(currentSceneId).find(o => o.id === interaction.target);
-            if (objInScene) { addToInventory(objInScene); flagObjectAsRemoved(currentSceneId, objInScene.id); }
+            if (objInScene) { 
+                addToInventory(objInScene); 
+                flagObjectAsRemoved(currentSceneId, objInScene.id); 
+                // NEW: Trigger centered object image popup
+                if (interaction.showObjectImage) {
+                    openAcquisitionModal(objInScene, interaction.successMessage);
+                }
+            }
         } else if (interaction.removesTargetFromScene && interaction.target) flagObjectAsRemoved(currentSceneId, interaction.target);
         if (interaction.soundEffect) playSound(interaction.soundEffect);
         if (interaction.goToScene) loadScene(interaction.goToScene, true, interaction.transitionType, interaction.transitionSpeed, interaction.successMessage);
@@ -1594,10 +2935,10 @@ document.addEventListener('DOMContentLoaded', () => {
             sceneDescription.classList.add('typewriting-active');
             p.className = 'scene-paragraph typewriter-cursor'; 
             p.style.opacity = '1'; 
-            p.innerHTML = formattedHTML; 
+            p.innerHTML = window.safeHTML(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }); 
             sceneDescription.appendChild(p);
             const walker = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, null, false);
-            let node; const textNodes = []; while(node = walker.nextNode()) textNodes.push(node);
+            let node; const textNodes = []; while((node = walker.nextNode())) textNodes.push(node);
             const fullTexts = textNodes.map(n => n.nodeValue); textNodes.forEach(n => n.nodeValue = '');
             let nodeIdx = 0; let charIdx = 0;
             const type = () => {
@@ -1618,13 +2959,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (textAnimType === 'typewriter') {
                  // Already handled by if block above
             } else {
-                p.innerHTML = formattedHTML; p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
+                p.innerHTML = window.safeHTML(formattedHTML, { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+                p.className = 'scene-paragraph'; sceneDescription.appendChild(p); setupHighlights(p); sceneDescription.scrollTop = sceneDescription.scrollHeight;
             }
         }
     };
 
     const findItemInInventoryById = (id) => inventory.find(o => o.id === id) || null;
-    const findItemName = (id) => (findItemInInventoryById(id) || gameData.globalObjects[id])?.name || 'item';
     const addToInventory = (obj) => { if (!inventory.some(o => o.id === obj.id)) inventory.push(obj); };
     const removeFromInventory = (id) => { inventory = inventory.filter(i => i.id !== id); };
     
@@ -1641,61 +2982,190 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const showSuggestions = () => {
         actionPopup.classList.remove('hidden'); actionPopup.innerHTML = '';
-        const sceneObjects = getObjectsForScene(currentSceneId); const container = document.createElement('div'); container.className = 'action-popup-container';
-        const row1 = document.createElement('div'); row1.className = 'action-popup-row';
-        sceneObjects.forEach(obj => { const btn = document.createElement('button'); btn.textContent = obj.name; btn.addEventListener('click', () => { 
-            verbInput.value = 'examinar ' + obj.name; 
-            actionPopup.classList.add('hidden'); 
-            activePopupType = null; 
-            handleInput(); 
-        }); row1.appendChild(btn); });
-        container.appendChild(row1);
-        const row2 = document.createElement('div'); row2.className = 'action-popup-row';
-        ['Examinar', 'Pegar', 'Usar', 'Falar', 'Abrir'].forEach(v => { const btn = document.createElement('button'); btn.textContent = v; btn.addEventListener('click', () => { 
-            verbInput.value = v.toLowerCase() + ' '; 
-            verbInput.focus(); 
-            actionPopup.classList.add('hidden'); 
-            activePopupType = null; 
-        }); row2.appendChild(btn); });
-        container.appendChild(row2); actionPopup.appendChild(container);
+        const currentSceneData = gameData.cenas[currentSceneId];
+        const sceneSuggestions = currentSceneData.suggestions || [];
+        
+        const container = document.createElement('div'); container.className = 'action-popup-container';
+        
+        if (sceneSuggestions.length === 0) {
+            const row1 = document.createElement('div'); row1.className = 'action-popup-row empty-inventory-msg mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            row1.textContent = gameData.gameSuggestionsEmptyFeedback || 'não há sugestões';
+            container.appendChild(row1);
+        } else {
+
+            const row1 = document.createElement('div'); row1.className = 'action-popup-row max-w-full flex-wrap justify-start';
+            sceneSuggestions.forEach(v => { 
+                const btn = document.createElement('button'); btn.textContent = v; 
+                btn.addEventListener('click', () => { 
+                    verbInput.textContent = v.toLowerCase() + ' '; 
+                    verbInput.focus(); 
+                    // Move cursor to end of contenteditable
+                    const range = document.createRange();
+                    const sel = window.getSelection();
+                    range.selectNodeContents(verbInput);
+                    range.collapse(false);
+                    sel.removeAllRanges();
+                    sel.addRange(range);
+                    actionPopup.classList.add('hidden'); 
+                    activePopupType = null; 
+                }); 
+                row1.appendChild(btn); 
+            });
+            container.appendChild(row1); 
+        }
+        actionPopup.appendChild(container);
     };
     const showInventory = () => {
-        actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; const list = document.createElement('div'); list.className = 'action-popup-list';
-        if (inventory.length === 0) { const msg = document.createElement('p'); msg.textContent = 'Seu inventário está vazio.'; list.appendChild(msg); }
-        else { inventory.forEach(item => { const btn = document.createElement('button'); btn.textContent = item.name; btn.addEventListener('click', () => { 
-            openItemModal(item); 
-            actionPopup.classList.add('hidden'); 
-            activePopupType = null; 
-        }); list.appendChild(btn); }); }
-        actionPopup.appendChild(list);
+        actionPopup.classList.remove('hidden'); actionPopup.innerHTML = ''; 
+        const container = document.createElement('div'); container.className = 'action-popup-container';
+        if (inventory.length === 0) { 
+            const msg = document.createElement('div'); 
+            msg.className = 'action-popup-row empty-inventory-msg mb-2 text-center text-sm font-medium text-zinc-400 p-4';
+            msg.textContent = gameData.gameInventoryEmptyFeedback || 'não há itens no inventário'; 
+            container.appendChild(msg); 
+        }
+        else { 
+            const list = document.createElement('div');
+            list.className = 'action-popup-list';
+            inventory.forEach(item => { 
+                const btn = document.createElement('button'); 
+                btn.textContent = item.name; 
+                btn.addEventListener('click', () => { 
+                    openItemModal(item); 
+                    actionPopup.classList.add('hidden'); 
+                    activePopupType = null; 
+                }); 
+                list.appendChild(btn); 
+            }); 
+            container.appendChild(list);
+        }
+        actionPopup.appendChild(container);
     };
+
+
+
+    const showTrackers = () => {
+        trackersContent.innerHTML = '';
+        const definitions = gameData.consequenceTrackers || [];
+        if (definitions.length === 0) {
+            const msg = document.createElement('p');
+            msg.className = 'text-center text-zinc-400 p-4';
+            msg.textContent = 'Não há rastreadores ativos';
+            trackersContent.appendChild(msg);
+        } else {
+            definitions.forEach(def => {
+                const currentVal = trackers[def.id] || 0;
+                const percentage = Math.min(100, Math.max(0, (currentVal / def.maxValue) * 100));
+                const barColor = def.barColor || '#ffffff';
+                const item = document.createElement('div');
+                item.className = 'tracker-item';
+                
+                item.innerHTML = window.safeHTML(
+                    '<div class="tracker-item-header">' +
+                        '<span class="tracker-item-name">' + def.name + '</span>' +
+                        (!def.hideValue ? '<span class="tracker-item-values">' + currentVal + ' / ' + def.maxValue + '</span>' : '') +
+                    '</div>' +
+                    '<div class="tracker-bar-container">' +
+                        '<div class="tracker-bar" style="width: ' + percentage + '%; background-color: ' + barColor + '; margin-left: ' + (def.invertBar ? 'auto' : '0') + '"></div>' +
+                    '</div>'
+                , { ADD_ATTR: ['style'] });
+                trackersContent.appendChild(item);
+            });
+        }
+        trackersModal.classList.remove('hidden');
+    };
+
     const openItemModal = (item) => {
-        itemModalName.textContent = item.name; itemModalDescription.innerHTML = formatText(item.examineDescription);
+        itemModalName.textContent = item.name; itemModalDescription.innerHTML = window.safeHTML(formatText(item.examineDescription), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
         setupHighlights(itemModalDescription);
         if (item.image) { itemModalImage.src = item.image; itemModalImageContainer.classList.remove('hidden'); }
         else itemModalImageContainer.classList.add('hidden');
         itemModal.classList.remove('hidden');
     };
-    const showDiary = () => {
+    const openAcquisitionModal = (item, customDescription) => {
+        if (!acquisitionModal) return;
+        acquisitionModalTitle.textContent = item.name;
+        acquisitionModalDescription.innerHTML = window.safeHTML(formatText(customDescription || item.examineDescription), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
+        setupHighlights(acquisitionModalDescription);
+        if (item.image) { acquisitionModalImage.src = item.image; acquisitionModalImageContainer.classList.remove('hidden'); }
+        else acquisitionModalImageContainer.classList.add('hidden');
+        acquisitionModal.classList.remove('hidden');
+    };
+    const showDiary = (isConclusion = false) => {
         diaryLog.innerHTML = ''; let currentInterContainer = null;
+        
+        const diaryTitle = document.getElementById('diary-modal-title');
+        if (diaryTitle) {
+            diaryTitle.style.display = isConclusion ? 'none' : 'block';
+        }
+
+        // Show Stats if triggered from conclusion
+        if (isConclusion) {
+            const statsContainer = document.createElement('div');
+            statsContainer.className = 'diary-stats-container';
+            
+            const totalScenesCount = Object.keys(gameData.cenas).length;
+            const visitedCount = visitedScenes.length;
+            
+            let timeStr = "0s";
+            if (gameStartTime && gameEndTime) {
+                const totalSeconds = Math.floor((gameEndTime - gameStartTime) / 1000);
+                const hrs = Math.floor(totalSeconds / 3600);
+                const mins = Math.floor((totalSeconds % 3600) / 60);
+                const secs = totalSeconds % 60;
+                
+                if (hrs > 0) timeStr = hrs + "h " + mins + "m " + secs + "s";
+                else if (mins > 0) timeStr = mins + "m " + secs + "s";
+                else timeStr = secs + "s";
+            }
+
+            let totalWords = 0;
+            actionLog.forEach(entry => {
+                if (entry.type === 'scene' && entry.description) {
+                    totalWords += entry.description.split(/\\s+/).filter(Boolean).length;
+                } else if (entry.type === 'output' && entry.text) {
+                    totalWords += entry.text.split(/\\s+/).filter(Boolean).length;
+                }
+            });
+
+            statsContainer.innerHTML = window.safeHTML(
+                '<div class="diary-stat-box">' +
+                    '<span class="diary-stat-label">' + gameData.gameTranslations.stats_visited + '</span>' +
+                    '<span class="diary-stat-value">' + visitedCount + ' / ' + totalScenesCount + ' ' + gameData.gameTranslations.of_scenes + '</span>' +
+                '</div>' +
+                '<div class="diary-stat-box">' +
+                    '<span class="diary-stat-label">' + gameData.gameTranslations.stats_time + '</span>' +
+                    '<span class="diary-stat-value">' + timeStr + '</span>' +
+                '</div>' +
+                '<div class="diary-stat-box">' +
+                    '<span class="diary-stat-label">' + gameData.gameTranslations.total_words_read + '</span>' +
+                    '<span class="diary-stat-value">' + totalWords + '</span>' +
+                '</div>'
+            );
+            diaryLog.appendChild(statsContainer);
+        }
+
         actionLog.forEach(entry => {
             if (entry.type === 'scene') {
                 const div = document.createElement('div'); div.className = 'diary-entry';
                 if (entry.image) { const img = document.createElement('img'); img.src = entry.image; div.appendChild(img); }
                 const txt = document.createElement('div'); txt.className = 'text-container'; 
-                txt.innerHTML = '<span class="scene-name">' + entry.name + '</span><p>' + formatText(entry.description) + '</p>';
+                txt.innerHTML = window.safeHTML('<span class="scene-name">' + entry.name + '</span><p>' + formatText(entry.description) + '</p>', { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] });
                 div.appendChild(txt); diaryLog.appendChild(div);
                 setupHighlights(txt);
                 currentInterContainer = document.createElement('div'); currentInterContainer.className = 'diary-interactions-container'; txt.appendChild(currentInterContainer);
             } else {
                 if (currentInterContainer) {
                     const p = document.createElement('p'); p.className = 'diary-' + entry.type; 
-                    if (entry.type === 'output') { p.innerHTML = formatText(entry.text); setupHighlights(p); } else p.textContent = entry.text;
+                    if (entry.type === 'output') { p.innerHTML = window.safeHTML(formatText(entry.text), { ADD_TAGS: ['span'], ADD_ATTR: ['data-word'] }); setupHighlights(p); } else p.textContent = entry.text;
                     currentInterContainer.appendChild(p);
                 }
             }
         });
-        diaryModal.classList.remove('hidden'); setTimeout(() => { diaryLog.scrollTop = diaryLog.scrollHeight; }, 10);
+        diaryModal.classList.remove('hidden'); 
+        setTimeout(() => { 
+            diaryLog.scrollTop = isConclusion ? 0 : diaryLog.scrollHeight; 
+        }, 10);
     };
     init();
 });

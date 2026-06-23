@@ -144,8 +144,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.safeHTML = function(content, config) {
         if (typeof DOMPurify !== 'undefined') {
             const finalConfig = config || {};
-            finalConfig.ADD_ATTR = [...(finalConfig.ADD_ATTR || []), 'class', 'style', 'data-word'];
-            finalConfig.ADD_TAGS = [...(finalConfig.ADD_TAGS || []), 'span'];
+            finalConfig.ADD_ATTR = [...(finalConfig.ADD_ATTR || []), 'class', 'style', 'data-word', 'data-slot', 'title', 'viewBox', 'fill', 'stroke', 'stroke-width', 'stroke-linecap', 'stroke-linejoin', 'd', 'x1', 'y1', 'x2', 'y2'];
+            finalConfig.ADD_TAGS = [...(finalConfig.ADD_TAGS || []), 'span', 'svg', 'path', 'line'];
             return DOMPurify.sanitize(content, finalConfig);
         }
         // Fail Secure: If DOMPurify is missing, return raw text without HTML execution
@@ -1802,11 +1802,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         const data = JSON.parse(savedData);
                         const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
                         contentHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
-                        
-                        let actionsHtml = '<div class="slot-actions" style="display: flex; gap: 6px; align-items: center;">';
-                        actionsHtml += '<button class="slot-delete-btn" style="background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 1.5em; padding: 0 5px; line-height: 1;">&times;</button>';
-                        actionsHtml += '</div>';
-                        contentHtml += actionsHtml;
+                        contentHtml += '<button class="slot-delete-btn" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>';
                     } catch (e) {
                         contentHtml = '<div class="slot-info"><span class="slot-title">Caminho salvo ' + i + '</span><span class="slot-empty">Erro ao ler dados</span></div>';
                     }
@@ -1822,21 +1818,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Add button listeners
                 const deleteBtn = slotDiv.querySelector('.slot-delete-btn');
                 
-                slotDiv.addEventListener('click', () => {
-                    if (savedData) {
+                slotDiv.addEventListener('click', (e) => {
+                    const deleteBtnClicked = e.target.closest('.slot-delete-btn');
+                    if (deleteBtnClicked) {
+                        return;
+                    }
+                    if (mode === 'save') {
+                        if (!savedData) {
+                            performSave(i);
+                        }
+                    } else if (savedData) {
                         loadGameFromData(savedData);
-                    } else if (mode === 'save') {
-                        performSave(i);
                     }
                 });
 
                 if (deleteBtn && savedData) {
                     deleteBtn.addEventListener('click', (e) => {
                         e.stopPropagation();
-                        if (confirm('Tem certeza que deseja deletar este caminho salvo?')) {
-                            removeGameSave(slotKey);
-                            renderSlots(mode);
-                        }
+                        removeGameSave(slotKey);
+                        renderSlots(mode);
                     });
                 }
                 slotsList.appendChild(slotDiv);
@@ -1851,23 +1851,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (savedData) {
                     const data = JSON.parse(savedData); const sceneName = gameData.cenas[data.currentSceneId]?.name || 'Desconhecido';
                     contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + ' - ' + sceneName + '</span><span class="slot-meta">' + data.timestamp + '</span></div>';
-                    if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Sobrescrever</span></div>';
-                    else contentHtml += '<div class="slot-actions"><button class="slot-delete-btn" data-slot="' + i + '">×</button></div>';
+                    contentHtml += '<button class="slot-delete-btn" data-slot="' + i + '" title="Excluir"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-2"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg></button>';
                 } else {
                     contentHtml = '<div class="slot-info"><span class="slot-title">Slot ' + i + '</span><span class="slot-empty">Vazio</span></div>';
-                    if (mode === 'save') contentHtml += '<div class="slot-actions"><span class="highlight-word">Salvar</span></div>';
                 }
                 slotDiv.innerHTML = window.safeHTML(contentHtml);
                 slotDiv.addEventListener('click', (e) => { 
-                    if (e.target.classList.contains('slot-delete-btn')) {
-                        const slot = e.target.getAttribute('data-slot');
-                        if (confirm('Tem certeza que deseja deletar este arquivo de progresso?')) {
-                            removeGameSave('if_builder_slot_' + slot + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
-                            renderSlots(mode);
-                        }
+                    const deleteBtn = e.target.closest('.slot-delete-btn');
+                    if (deleteBtn) {
+                        e.stopPropagation();
+                        const slot = deleteBtn.getAttribute('data-slot');
+                        removeGameSave('if_builder_slot_' + slot + '_' + (gameData.gameTitle || 'IF Builder / Ficções Interativas'));
+                        renderSlots(mode);
                         return;
                     } 
-                    if (mode === 'save') performSave(i); 
+                    if (mode === 'save') {
+                        if (!savedData) {
+                            performSave(i);
+                        }
+                    } 
                     else if (mode === 'load' && savedData) loadGameFromData(savedData); 
                 });
                 slotsList.appendChild(slotDiv);
@@ -1965,10 +1967,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (deleteBtn && savedData) {
                 deleteBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    if (window.isPreview || confirm('Tem certeza que deseja deletar este caminho salvo?')) {
-                        removeGameSave(slotKey);
-                        renderStartScreenSlots();
-                    }
+                    removeGameSave(slotKey);
+                    renderStartScreenSlots();
                 });
             }
             

@@ -523,7 +523,8 @@ body.with-spacing .main-wrapper { height: 100%; }
 .slot-meta { font-size: 0.75em; font-weight: normal; color: inherit; opacity: 0.7; margin-top: 2px; }
 .slot-empty { font-size: 1em; font-weight: normal; color: inherit; opacity: 0.5; }
 .slot-actions { display: flex; gap: 10px; align-items: center; }
-.slot-delete-btn { position: absolute; left: 0; top: 0; bottom: 0; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background-color: #f85149 !important; border: none; border-radius: 0 !important; color: #fff !important; cursor: pointer; z-index: 10; transition: background-color 0.2s, transform 0.2s; padding: 0; }
+.slot-delete-btn { position: absolute; right: 0; top: 0; bottom: 0; width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; background-color: #f85149 !important; border: none; border-radius: 0 !important; color: #fff !important; cursor: pointer; z-index: 10; transform: translateX(101%); transition: transform 0.2s ease-in-out, background-color 0.2s; padding: 0; pointer-events: auto; }
+.slot-item:hover .slot-delete-btn { transform: translateX(0); }
 .slot-delete-btn:hover { background-color: #da3633 !important; }
 
 /* Custom Square Slider track & thumb styling */

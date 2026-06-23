@@ -388,7 +388,7 @@ const Preview: React.FC<{ gameData: GameData, testSceneId?: string | null, baseP
                 src={blobUrl || 'about:blank'}
                 title="Pré-visualização do Jogo"
                 className="w-full h-full border-none"
-                sandbox="allow-scripts allow-same-origin"
+                sandbox="allow-scripts allow-same-origin allow-modals"
             />
         </div>
     );
