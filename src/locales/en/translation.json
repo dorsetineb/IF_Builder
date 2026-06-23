@@ -152,7 +152,16 @@
     "helpPlayTitle": "Offline",
     "helpPlayDesc": "Extract the contents of <strong>file.zip</strong> and open the <strong>index.html</strong> file to access the interactive fiction offline.",
     "helpEditTitle": "Online",
-    "helpEditDesc": "Click the <strong>LOAD</strong> button on the left side of the header to access and edit the project in IF Builder."
+    "helpEditDesc": "Click the <strong>LOAD</strong> button on the left side of the header to access and edit the project in IF Builder.",
+    "description": "This is a tool for authors to create <strong>interactive fictions</strong> without hassle. Create branching narratives, control possible actions, and compile entire stories into a file.",
+    "bullet1Title": "Narrative Map",
+    "bullet1Desc": "Track the structure of your project graphically through the branch map.",
+    "bullet2Title": "Trackers",
+    "bullet2Desc": "Add numerical trackers like health, energy, or sanity to shape the consequences of choices.",
+    "bullet3Title": "Text (PARSER) or Choice (IF) Interactions",
+    "bullet3Desc": "Offer your players traditional action buttons or the freedom of a text interpreter (parser).",
+    "bullet4Title": "Export to .zip or .html",
+    "bullet4Desc": "Generate .zip files independent of internet or servers. Just extract and play directly in the browser."
   },
   "guide": {
     "title": "Quick Guide",

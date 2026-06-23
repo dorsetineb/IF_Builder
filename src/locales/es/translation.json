@@ -16,7 +16,16 @@
     "helpPlayTitle": "Offline",
     "helpPlayDesc": "Extrae el contenido de <strong>archivo.zip</strong> y abre el archivo <strong>index.html</strong> para acceder a la ficción interactiva offline.",
     "helpEditTitle": "Online",
-    "helpEditDesc": "Haz clic en el botón <strong>CARGAR</strong> en el lado izquierdo del encabezado para acceder y editar el proyecto en IF Builder."
+    "helpEditDesc": "Haz clic en el botón <strong>CARGAR</strong> en el lado izquierdo del encabezado para acceder y editar el proyecto en IF Builder.",
+    "description": "Esta es una herramienta para autores para crear <strong>ficciones interactivas</strong> sin complicaciones. Crea narrativas ramificadas, controla las acciones posibles y compila historias enteras en un archivo.",
+    "bullet1Title": "Mapa Narrativo",
+    "bullet1Desc": "Realiza el seguimiento de la estructura de tu proyecto gráficamente a través del mapa de ramificaciones.",
+    "bullet2Title": "Rastreadores",
+    "bullet2Desc": "Añade rastreadores numéricos como vida, energía o cordura para moldar las consecuencias de las decisiones.",
+    "bullet3Title": "Interacciones por texto (PARSER) o Elección (IF)",
+    "bullet3Desc": "Ofrece a tus jugadores botones de acción tradicionales o la libertad de un intérprete de texto (parser).",
+    "bullet4Title": "Exporta a .zip o .html",
+    "bullet4Desc": "Genera archivos .zip independientes de internet o servidores. Solo extrae y juega directamente en el navegador."
   },
   "common": {
     "back": "Volver",

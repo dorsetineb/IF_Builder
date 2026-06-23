@@ -16,7 +16,16 @@
     "helpPlayTitle": "Offline",
     "helpPlayDesc": "Extraia o conteúdo do <strong>arquivo.zip</strong> e abra o arquivo <strong>index.html</strong> para acessar a ficção interativa de modo offline.",
     "helpEditTitle": "Online",
-    "helpEditDesc": "Clique no botão <strong>CARREGAR</strong> no canto esquerdo do cabeçalho para acessar e editar o projeto no IF Builder."
+    "helpEditDesc": "Clique no botão <strong>CARREGAR</strong> no canto esquerdo do cabeçalho para acessar e editar o projeto no IF Builder.",
+    "description": "Esta é uma ferramenta para autores criarem <strong>ficções interativas</strong> sem complicação. Crie narrativas ramificadas, controle as ações possíveis e compile histórias inteiras em um arquivo.",
+    "bullet1Title": "Mapa Narrativo",
+    "bullet1Desc": "Acompanhe o fluxo narrativo do seu projeto através de um mapa de ramificações.",
+    "bullet2Title": "Rastreadores",
+    "bullet2Desc": "Adicione rastreadores numéricos como vida, energia ou sanidade para moldar as consequências das decisões.",
+    "bullet3Title": "Interações por texto (PARSER) ou Escolha (IF)",
+    "bullet3Desc": "Avance nas histórias com descrições textuais (PARSER) ou botões de ação tradicionais (IF)",
+    "bullet4Title": "Exporte para .zip ou .html",
+    "bullet4Desc": "Gere arquivos independentes de internet. Carregue-os no IF Builder para editá-los, ou execute-os diretamente no navegador."
   },
   "common": {
     "back": "Voltar",
